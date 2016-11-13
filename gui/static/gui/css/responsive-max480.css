@@ -1,0 +1,76 @@
+@media (max-width: 480px) {
+  /* line 5, ../scss/responsive-max480.scss */
+  .base-nav .tabbable.black-box .nav-tabs {
+    padding: 10px 10px 0 10px;
+  }
+  /* line 8, ../scss/responsive-max480.scss */
+  .base-nav .tabbable.black-box .nav-tabs li {
+    float: none;
+  }
+  /* line 10, ../scss/responsive-max480.scss */
+  .base-nav .tabbable.black-box .nav-tabs li a {
+    padding: 4px 8px;
+  }
+
+  /* line 17, ../scss/responsive-max480.scss */
+  nav#primary > ul > li {
+    width: 33.3%;
+    margin-left: -3px;
+  }
+
+  /* line 23, ../scss/responsive-max480.scss */
+  .modal.black-box .modal-header .close {
+    margin-top: -5px;
+  }
+
+  /* line 27, ../scss/responsive-max480.scss */
+  .modal2 {
+    top: 50px;
+    left: 40px;
+    right: 40px;
+  }
+
+  /* line 33, ../scss/responsive-max480.scss */
+  .dynatext {
+    font-size: 8px;
+  }
+
+  /* line 37, ../scss/responsive-max480.scss */
+  .vm_hostname {
+    font-size: 8px;
+  }
+}
+@media (min-width: 321px) and (max-width: 480px) {
+  /* line 43, ../scss/responsive-max480.scss */
+  table.table-responsive th, table.table-responsive td {
+    max-width: 160px;
+  }
+}
+@media (max-width: 320px) {
+  /* line 47, ../scss/responsive-max480.scss */
+  table.table-responsive th, table.table-responsive td {
+    max-width: 100px;
+  }
+}
+@media (max-height: 459px) and (max-width: 767px) {
+  /* line 51, ../scss/responsive-max480.scss */
+  .modal, .modal.fade.in {
+    top: 2px;
+  }
+
+  /* line 52, ../scss/responsive-max480.scss */
+  .modal-body {
+    max-height: 180px;
+  }
+}
+@media (min-height: 460px) and (max-height: 599px) and (max-width: 767px) {
+  /* line 56, ../scss/responsive-max480.scss */
+  .modal, .modal.fade.in {
+    top: 10px;
+  }
+
+  /* line 57, ../scss/responsive-max480.scss */
+  .modal-body {
+    max-height: 300px;
+  }
+}

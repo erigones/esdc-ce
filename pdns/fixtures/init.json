@@ -1,0 +1,89 @@
+[
+{
+    "pk": 1,
+    "model": "pdns.domain",
+    "fields": {
+        "account": null,
+        "name": "local",
+        "last_check": null,
+        "master": null,
+        "user": 1,
+        "notified_serial": null,
+        "type": "NATIVE",
+        "access": 3,
+        "created": "2013-10-22T16:11:38.158Z",
+        "changed": "2013-10-22T16:11:38.158Z",
+        "desc": "Default domain for DanubeCloud infrastructure"
+    }
+},
+{
+    "pk": 2,
+    "model": "pdns.domain",
+    "fields": {
+        "account": null,
+        "name": "lan",
+        "last_check": null,
+        "master": null,
+        "user": 1,
+        "notified_serial": null,
+        "type": "NATIVE",
+        "access": 1,
+        "created": "2013-10-22T16:11:38.158Z",
+        "changed": "2013-10-22T16:11:38.158Z",
+        "desc": "Example domain"
+    }
+},
+
+{
+    "pk": 1,
+    "model": "pdns.record",
+    "fields": {
+        "domain": 1,
+        "name": "local",
+        "prio": 0,
+        "content": "ns1.local hostmaster.example.com 2013033100 28800 7200 604800 86400",
+        "ttl": 3600,
+        "change_date": 1406645299,
+        "type": "SOA"
+    }
+},
+{
+    "pk": 2,
+    "model": "pdns.record",
+    "fields": {
+        "domain": 1,
+        "name": "local",
+        "prio": 0,
+        "content": "ns1.local",
+        "ttl": 3600,
+        "change_date": 1406644697,
+        "type": "NS"
+    }
+},
+{
+    "pk": 3,
+    "model": "pdns.record",
+    "fields": {
+        "domain": 2,
+        "name": "lan",
+        "prio": 0,
+        "content": "ns1.local hostmaster.default.com 2013033100 28800 7200 604800 86400",
+        "ttl": 86400,
+        "change_date": 1406645122,
+        "type": "SOA"
+    }
+},
+{
+    "pk": 4,
+    "model": "pdns.record",
+    "fields": {
+        "domain": 2,
+        "name": "lan",
+        "prio": 0,
+        "content": "ns1.local",
+        "ttl": 86400,
+        "change_date": 1406645114,
+        "type": "NS"
+    }
+}
+]

@@ -1,0 +1,23 @@
+{% load i18n %}
+{% csrf_token %}
+{% for error in form.non_field_errors %}
+<div class="alert alert-error"><i class="icon-warning-sign"></i> {{ error }}</div>
+{% endfor %}
+
+<div class="input">
+  <div class="control-group thinner">
+    <label class="control-label" for="id_record-domain">{% trans "Domain" %}:</label>
+    <div class="controls">
+      <input class="uneditable-input narrow" id="id_record-domain" name="record-domain" type="text" disabled="disabled" value="{{ domain.name }}" />
+    </div>
+  </div>
+</div>
+{{ form.id }}
+{% include "gui/form_field.html" with field=form.type %}
+{% include "gui/form_field.html" with field=form.name %}
+{% include "gui/form_field.html" with field=form.prio %}
+{% include "gui/form_field.html" with field=form.content %}
+{% include "gui/form_field.html" with field=form.ttl addon=" sec" %}
+{% include "gui/form_field_checkbox.html" with field=form.disabled %}
+
+<div class="advanced hide"></div>

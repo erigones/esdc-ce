@@ -1,0 +1,10 @@
+{% load i18n %}{% autoescape off %}{% blocktrans %}Dear customer,
+
+your request with following summary was received.{% endblocktrans %}
+
+{{ summary }}{% if vm %} ({{ vm }}){% endif %}
+
+{% trans "You will be informed about the resolution of your request by email." %}
+
+{% endautoescape %}
+{% include "email_signature.txt" %}

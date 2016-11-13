@@ -1,0 +1,270 @@
+/* line 5, ../scss/notifications.scss */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* line 10, ../scss/notifications.scss */
+.notifications {
+  z-index: 1100;
+  position: absolute;
+  overflow: hidden;
+  min-height: 0;
+  margin-top: 40px;
+  background: #dbdbdb;
+  background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4gPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiBncmFkaWVudFVuaXRzPSJvYmplY3RCb3VuZGluZ0JveCIgeDE9IjAuNSIgeTE9IjAuMCIgeDI9IjAuNSIgeTI9IjEuMCI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2RiZGJkYiIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JhZCkiIC8+PC9zdmc+IA==');
+  background-size: 100%;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #dbdbdb));
+  background-image: -moz-linear-gradient(top, #ffffff, #dbdbdb);
+  background-image: -webkit-linear-gradient(top, #ffffff, #dbdbdb);
+  background-image: linear-gradient(to bottom, #ffffff, #dbdbdb);
+  -moz-box-shadow: white 0px -1px 0px inset, rgba(0, 0, 0, 0.5) 0px 4px 30px;
+  -webkit-box-shadow: white 0px -1px 0px inset, rgba(0, 0, 0, 0.5) 0px 4px 30px;
+  box-shadow: white 0px -1px 0px inset, rgba(0, 0, 0, 0.5) 0px 4px 30px;
+  -moz-border-radius: 6px;
+  -webkit-border-radius: 6px;
+  border-radius: 6px;
+  text-shadow: 0 1px rgba(255, 255, 255, 0.5);
+}
+/* line 25, ../scss/notifications.scss */
+.notifications .dismiss-all {
+  width: 150px;
+  position: absolute;
+  left: 50%;
+  margin-left: -75px;
+  text-align: center;
+  -moz-transition: top 0.3s;
+  -o-transition: top 0.3s;
+  -webkit-transition: top 0.3s;
+  transition: top 0.3s;
+  height: 20px;
+  line-height: 20px;
+  top: -16px;
+  -moz-border-radius: 0 0 4px 4px;
+  -webkit-border-radius: 0;
+  border-radius: 0 0 4px 4px;
+  z-index: 1;
+  border-top: none;
+  padding: 0;
+  cursor: pointer;
+}
+/* line 43, ../scss/notifications.scss */
+.notifications:hover .dismiss-all {
+  top: 0;
+}
+/* line 49, ../scss/notifications.scss */
+.notifications.active .dismiss-all {
+  top: 0;
+}
+/* line 53, ../scss/notifications.scss */
+.notifications.active .notification .hide {
+  display: block;
+}
+
+/* line 60, ../scss/notifications.scss */
+.notification {
+  position: relative;
+  -webkit-transform: translateZ(0);
+  border-bottom: 1px solid #c1c1c1;
+  -moz-box-shadow: white 0px 1px 0px;
+  -webkit-box-shadow: white 0px 1px 0px;
+  box-shadow: white 0px 1px 0px;
+}
+/* line 68, ../scss/notifications.scss */
+.notification.no-image .left {
+  display: none;
+}
+/* line 72, ../scss/notifications.scss */
+.notification.no-image .right {
+  margin-left: 0;
+}
+/* line 77, ../scss/notifications.scss */
+.notification:last-child {
+  border-bottom: none;
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  -moz-border-radius-bottomleft: 5px;
+  -webkit-border-bottom-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  -moz-border-radius-bottomright: 5px;
+  -webkit-border-bottom-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+/* line 84, ../scss/notifications.scss */
+.notification:first-child {
+  -moz-border-radius-topleft: 5px;
+  -webkit-border-top-left-radius: 5px;
+  border-top-left-radius: 5px;
+  -moz-border-radius-topright: 5px;
+  -webkit-border-top-right-radius: 5px;
+  border-top-right-radius: 5px;
+}
+/* line 89, ../scss/notifications.scss */
+.notification .click {
+  cursor: pointer;
+}
+/* line 92, ../scss/notifications.scss */
+.notification:hover .hide {
+  display: block;
+}
+/* line 97, ../scss/notifications.scss */
+.notification .hide {
+  position: absolute;
+  display: none;
+  right: 10px;
+  top: 7px;
+  cursor: pointer;
+  color: #aaa;
+  font-size: 22px;
+  line-height: 25px;
+}
+/* line 105, ../scss/notifications.scss */
+.notification .hide:hover {
+  color: #888;
+}
+/* line 112, ../scss/notifications.scss */
+.notification .right, .notification .left {
+  height: 100%;
+  float: left;
+  position: relative;
+}
+/* line 118, ../scss/notifications.scss */
+.notification .time {
+  font-size: 9px;
+  position: relative;
+}
+/* line 123, ../scss/notifications.scss */
+.notification .right {
+  margin-left: 50px;
+}
+/* line 127, ../scss/notifications.scss */
+.notification .right .time {
+  margin-left: 10px;
+  margin-top: -8px;
+  margin-bottom: 10px;
+  opacity: 0.4;
+}
+/* line 134, ../scss/notifications.scss */
+.notification .right .inner {
+  padding: 10px;
+  min-height: 42px;
+}
+/* line 140, ../scss/notifications.scss */
+.notification .left {
+  height: 100%;
+  width: 50px;
+  padding: 10px;
+  position: absolute;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  overflow: hidden;
+}
+/* line 149, ../scss/notifications.scss */
+.notification .left:after {
+  content: '';
+  background: #c1c1c1;
+  -moz-box-shadow: white 1px 0px 0px;
+  -webkit-box-shadow: white 1px 0px 0px;
+  box-shadow: white 1px 0px 0px;
+  width: 1px;
+  height: 100%;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+}
+/* line 160, ../scss/notifications.scss */
+.notification .left > .icon {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  height: 100%;
+  width: 100%;
+  text-align: center;
+  line-height: 50px;
+  font: normal 35px/39px Icons;
+  /* TODO: get icons */
+  text-shadow: white 0px 1px 0px;
+}
+/* line 173, ../scss/notifications.scss */
+.notification .img {
+  width: 30px;
+  background-size: auto 100%;
+  background-position: center;
+  height: 30px;
+  -moz-border-radius: 6px;
+  -webkit-border-radius: 6px;
+  border-radius: 6px;
+  -moz-box-shadow: rgba(255, 255, 255, 0.9) 0px -1px 0px inset, rgba(0, 0, 0, 0.2) 0px 1px 2px;
+  -webkit-box-shadow: rgba(255, 255, 255, 0.9) 0px -1px 0px inset, rgba(0, 0, 0, 0.2) 0px 1px 2px;
+  box-shadow: rgba(255, 255, 255, 0.9) 0px -1px 0px inset, rgba(0, 0, 0, 0.2) 0px 1px 2px;
+  border: 1px solid rgba(0, 0, 0, 0.55);
+  position: absolute;
+  top: 50%;
+  margin-top: 5px;
+}
+/* line 185, ../scss/notifications.scss */
+.notification .img.border {
+  box-shadow: none;
+  border: none;
+}
+/* line 190, ../scss/notifications.scss */
+.notification .img.fill {
+  top: 0px;
+  margin: 0px;
+  border: none;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  -moz-border-radius: 0px;
+  -webkit-border-radius: 0px;
+  border-radius: 0px;
+  -moz-box-shadow: rgba(0, 0, 0, 0.2) 0px 1px 0px inset, black -1px 0px 16px inset;
+  -webkit-box-shadow: rgba(0, 0, 0, 0.2) 0px 1px 0px inset, black -1px 0px 16px inset;
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 1px 0px inset, black -1px 0px 16px inset;
+  background-color: #333;
+}
+/* line 202, ../scss/notifications.scss */
+.notification .img i {
+  font-size: 38px;
+}
+/* line 205, ../scss/notifications.scss */
+.notification .img i.icon-ok-sign {
+  color: #00CC00;
+}
+/* line 208, ../scss/notifications.scss */
+.notification .img i.icon-info-sign {
+  color: #3366FF;
+}
+/* line 211, ../scss/notifications.scss */
+.notification .img i.icon-remove-sign {
+  color: #CC0033;
+}
+/* line 214, ../scss/notifications.scss */
+.notification .img i.icon-warning-sign {
+  color: #FF9933;
+}
+/* line 221, ../scss/notifications.scss */
+.notification:first-child .img.fill {
+  -moz-border-radius-topleft: 5px;
+  -webkit-border-top-left-radius: 5px;
+  border-top-left-radius: 5px;
+}
+/* line 227, ../scss/notifications.scss */
+.notification:last-child .img.fill {
+  -moz-border-radius-bottomleft: 5px;
+  -webkit-border-bottom-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+/* line 232, ../scss/notifications.scss */
+.notification:after {
+  content: ".";
+  visibility: hidden;
+  display: block;
+  clear: both;
+  height: 0;
+  font-size: 0;
+}
+/* line 241, ../scss/notifications.scss */
+.notification h2 {
+  font-size: 14px;
+}

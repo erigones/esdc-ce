@@ -1,0 +1,29 @@
+{% load i18n %}
+{% csrf_token %}
+{% for error in snapform.non_field_errors %}
+<div class="alert alert-error"><i class="icon-warning-sign"></i> {{ error }}</div>
+{% endfor %}
+
+{% include "gui/vm/form_field_hostname.html" with field=snapform.hostname %}
+{% include "gui/form_field.html" with field=snapform.name %}
+{% with field=snapform.disk_id field2=snapform.disk_all %}
+<div class="input{% if field.errors %} error wobble animated{% endif %}">
+  <div class="control-group thinner">
+    <label class="control-label" for="{{ field.id_for_label }}">{{ field.label }}:</label>
+    <div class="controls">
+      {{ field }}{% if field2 %}
+      &nbsp; {{ field2.label }}:
+      <span class="oneline">
+        {{ field2 }} <label for="{{ field2.id_for_label }}"></label>
+      </span>{% endif %}
+      {% for error in field.errors %}
+      <span class="help-inline error"><i class="icon-warning-sign"></i> {{ error }}</span>
+      {% empty %}
+      <span class="help-inline note">{% if field.help_text %}<i class="icon-info-sign"></i> {{ field.help_text }}{% else %} &nbsp; {% endif %}</span>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endwith %}
+{% if snapform.fsfreeze and vm.is_kvm %}{% include "gui/form_field_checkbox.html" with field=snapform.fsfreeze %}{% endif %}
+{% include "gui/form_field.html" with field=snapform.note class="thin" %}

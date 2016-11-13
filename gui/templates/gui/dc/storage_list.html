@@ -1,0 +1,135 @@
+{% extends load_base %}
+{% load i18n %}
+{% load gui_utils %}
+
+{% block javascript %}
+<script type="text/javascript">
+  $(document).ready(function() {
+    DC_STORAGES = new DcStorageList({{ node_zpool|json:None|safe }});
+  });
+</script>
+{% endblock %}
+
+{% block base_content %}
+{% if can_edit %}
+<div id="obj_form_modal" class="black-box modal hide fade vm_modal">
+  <div class="modal-head tab-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <span class="title_edit"><i class="icon-th"></i> {% trans "Update or detach Node Storage" %}</span>
+    <span class="title_add"><i class="icon-th"></i> {% trans "Attach Node Storage" %}</span>
+  </div>
+  <div class="modal-body separator">
+    <div class="text_edit"></div>
+    <div class="text_add"></div>
+    <form class="form-horizontal" action="#" data-source="{% url 'dc_storage_form' %}?{{ qs }}" method="POST">
+      {% include "gui/dc/storage_form.html" %}
+    </form>
+  </div>
+  <div class="modal-footer">
+    <div class="inner-well">
+      {# <span class="pull-left"><a class="vm_modal_more btn btn-small btn-inverse no-ajax">{% trans "Show advanced settings" %}</a></span> #}
+      <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
+      {# <a class="vm_modal_update button green no-ajax" data-enter="true">{% trans "Update" %}</a> #}
+      <a class="vm_modal_delete button gold no-ajax">{% trans "Detach Storage" %}</a>
+      <a class="vm_modal_create button gold no-ajax">{% trans "Attach Storage" %}</a>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<div class="container-fluid">
+  <div class="row-fluid">
+
+    <div class="span12">
+      <div class="tab-header">
+        <span class="options window-control pull-right">
+          <i class="icon-cloud"></i> {{ request.dc.alias }}
+        </span>
+        <i class="icon-th"></i> {% trans "Storages" %}
+      </div>
+      <table class="table box table-striped table-hover table-responsive" id="etable">
+
+        <thead>
+          {% if can_edit %}
+          <tr>
+            <th colspan="11">
+              <div class="pull-right">
+                {% include "gui/dc/dc_all_toggle.html" %}
+              </div>
+            </th>
+          </tr>
+          {% endif %}
+          {% if storages %}
+          <tr>
+            <th>{% trans "Alias (zpool)" %}</th>
+            <th>{% trans "Node" %}</th>
+            <th>{% trans "Access" %}</th>
+            <th>{% trans "Owner" %}</th>
+            <th class="hidden-phone">{% trans "Type" %}</th>
+            <th class="hidden-phone">{% trans "Size" %}</th>
+            <th class="hidden-phone">{% trans "Servers" %}</th>
+            <th class="hidden-phone">{% trans "Snapshots" %}</th>
+            <th class="hidden-phone">{% trans "Backups" %}</th>
+            <th>{% trans "Free" %} <span title="{% trans "Estimated value - may not include size of images, backups and snapshots" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-info-sign"></i></span></th>
+            {% if all %}
+            <th class="hidden-phone">{% trans "Datacenters" %}</th>
+            {% else %}
+            <th class="hidden-phone">{% trans "Description" %}</th>
+            {% endif %}
+          </tr>
+          {% endif %}
+        </thead>
+
+        <tbody>
+          {% for ns in storages %}{% with st=ns.storage node=ns.node %}
+          <tr>
+            <td>
+              {% if can_edit %}{% if all and ns.pk in dc_storages %}
+              {% if node.hostname in node_zpool %}
+              <a href="#" class="btn-link btn-icon-link no-ajax obj_add italic" title="{% trans "Attach Storage" %}" data-toggle="tooltip" data-placement="bottom" data-form='{{ ns.web_data|jsondata }}'>{{ st.alias }} </a>
+              {% else %}
+              <em>{{ st.alias }}</em>
+              {% endif %}
+              {% else %}
+              <a href="#" class="btn-link btn-icon-edit no-ajax obj_edit" title="{% trans "Update or detach Storage" %}" data-toggle="tooltip" data-placement="bottom" data-form='{{ ns.web_data|jsondata }}'>{{ st.alias }}</a></i>{% endif %}
+              {% else %}{{ st.alias }}{% endif %} <small>({{ ns.zpool }})</small>
+            </td>
+            <td class="nowrap"><span class="vm_hostname"><i class="icon-sitemap vm_node_color" style="color: {{ node.color }};"></i> {{ node.hostname }}</span></td>
+            <td>{{ st.get_access_display }}</td>
+            <td class="nowrap"><span class="vm_hostname" title="{{ st.owner }}"><i class="icon-user"></i> {{ st.owner|truncatechars:16 }}</span></td>
+            <td class="hidden-phone">{{ st.get_type_display }}</td>
+            <td class="hidden-phone nowrap">{{ ns.size_total|mb_to_gb }} <small>GB</small></td>
+            <td class="hidden-phone nowrap">{% if node.is_compute %}{{ ns.size_dc_vms|mb_to_gb }} <small>GB</small>{% endif %}</td>
+            <td class="hidden-phone nowrap">{% if node.is_compute %}{{ ns.size_dc_snapshots|mb_to_gb }} <small>GB</small>{% endif %}</td>
+            <td class="hidden-phone nowrap">{% if node.is_backup %}{{ ns.size_dc_backups|mb_to_gb }} <small>GB</small>{% endif %}</td>
+            <td class="nowrap">{{ ns.size_free|mb_to_gb }} <small>GB</small></td>
+            {% if all %}
+            <td class="hidden-phone"><small class="vm_hostname">{{ ns.dc.all|dcify }}</small></td>
+            {% else %}
+            <td class="hidden-phone"><small class="vm_snapshot_note">{{ st.desc|wordwrap:44 }}</small></td>
+            {% endif %}
+          </tr>
+          {% endwith %}{% endfor %}
+        </tbody>
+
+        <tfoot>
+          <tr>
+            <td colspan="11">
+              <span class="pull-right">
+                {% trans "Total" %}: {{ storages|length }}&nbsp;
+              </span>
+              {% if can_edit %}
+              <div class="vm_control">
+                <a href="#" class="button gray no-ajax obj_add{% if not node_zpool %} disabled{% endif %}" title="{% trans "Associate new Node Storage with this Datacenter" %}" data-toggle="tooltip" data-placement="top"><i class="icon-link"></i> {% trans "Attach Node Storage" %}</a>
+              </div>
+              {% endif %}
+            </td>
+          </tr>
+        </tfoot>
+
+      </table>
+    </div>
+
+  </div> <!-- end row-fluid -->
+</div> <!-- end container-fluid -->
+{% endblock %}

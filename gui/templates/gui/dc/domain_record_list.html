@@ -1,0 +1,147 @@
+{% extends load_base %}
+{% load i18n %}
+{% load gui_utils %}
+
+{% block javascript %}
+<script type="text/javascript">
+  $(document).ready(function() {
+    DC_DOMAIN_RECORDS = new DcDomainRecordList();
+    filter_links();
+  });
+</script>
+{% endblock %}
+
+{% block base_content %}
+<div id="obj_form_modal" class="black-box modal hide fade vm_modal">
+  <div class="modal-head tab-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <span class="title_edit"><i class="icon-edit"></i> {% trans "Update or Delete DNS record" %}</span>
+    <span class="title_add"><i class="icon-plus"></i> {% trans "Add new DNS record" %}</span>
+  </div>
+  <div class="modal-body separator">
+    <div class="text_edit"></div>
+    <div class="text_add"></div>
+    <form class="form-horizontal" action="#" data-source="{{ url_form_record }}" method="POST">
+      {% include "gui/dc/domain_record_form.html" with form=form_record %}
+    </form>
+  </div>
+  <div class="modal-footer">
+    <div class="inner-well">
+      <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
+      <a class="vm_modal_delete button red no-ajax">{% trans "Delete" %}</a>
+      <a class="vm_modal_update button green no-ajax" data-enter="true">{% trans "Update" %}</a>
+      <a class="vm_modal_create button green no-ajax" data-enter="true">{% trans "Add DNS record" %}</a>
+    </div>
+  </div>
+</div>
+
+<div id="records_del_modal" class="black-box modal hide fade vm_modal">
+  <div class="modal-head tab-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <span class="title_edit"><i class="icon-warning-sign"></i> {% trans "Delete DNS records" %}</span>
+    <span class="title_add"></span>
+  </div>
+
+  <div class="modal-body separator">
+    <form class="form-horizontal" action="#" data-source="{{ url_form_record }}" method="POST">
+      {% include "gui/dc/domain_records_form.html" with form=form_records %}
+    </form>
+
+    <div class="text_edit form-horizontal form-fake">
+      <div class="input">
+        <div class="control-group thinner">
+          <label class="control-label">{% trans "DNS records" %}:</label>
+          <div class="controls"><div class="input-fake">__records__</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="text_add"></div>
+  </div>
+
+  <div class="modal-footer">
+    <div class="inner-well">
+      <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
+      <a class="vm_modal_delete button red no-ajax">{% trans "Delete" %}</a>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span12">
+      <div class="tab-header">
+        <span class="options window-control pull-right">
+          <i class="icon-cloud"></i> {{ request.dc.alias }}
+        </span>
+        <i class="icon-globe"></i> {% trans "DNS records" %} &rsaquo; {{ domain.name }}
+      </div>
+      <table class="table box table-striped table-hover table-responsive" id="etable">
+
+        <thead>
+          {% if records %}
+          <tr class="sortable" data-order_by="{{ order_by.0 }}">
+            <th class="top chbox hidden-phone-small">
+              <div class="input">
+                <input type="checkbox" class="normal-check" id="id_all" />
+                <label for="id_all"></label>
+              </div>
+            </th>
+            <th data-field="name">{% trans "Name" %}</th>
+            <th data-field="type">{% trans "Type" %}</th>
+            <th>{% trans "Content" %}</th>
+            <th class="hidden-tablet" data-field="ttl">{% trans "TTL" %}</th>
+            <th class="hidden-phone" data-field="disabled">{% trans "Enabled" %}</th>
+            <th class="hidden-phone" data-field="changed">{% trans "Changed" %}</th>
+          </tr>
+          {% endif %}
+        </thead>
+
+        <tbody>
+          {% for record in records %}
+          <tr data-desc="{{ record.web_desc }}">
+            <td class="top chbox hidden-phone-small">
+              <div class="input">
+                <input type="checkbox" class="normal-check" id="id_{{ record.id }}" />
+                <label for="id_{{ record.id }}"></label>
+              </div>
+            </td>
+            <td>
+              <a href="#" class="btn-link btn-icon-edit no-ajax obj_edit" title="{% trans "Update or delete DNS record" %}" data-toggle="tooltip" data-placement="bottom" data-form='{{ record.web_data|jsondata }}'>{{ record.name }}</a>
+            </td>
+            <td class="nowrap">{{ record.type }}</td>
+            <td>{{ record.full_content|default_if_none:"" }}</td>
+            <td class="hidden-tablet">{{ record.ttl }}</td>
+            <td class="hidden-phone"><i class="icon-{{ record.disabled|yesno:"remove,ok" }}"></i></td>
+            <td class="hidden-phone">{{ record.changed|date:"SHORT_DATETIME_FORMAT" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+
+        <tfoot>
+          <tr>
+            <td colspan="7">
+              <div>
+                <span>
+                  {% blocktrans count len=pager.paginator.count %}Selected <span id="selected">0</span> of <span id="total">{{ len }}</span> DNS record{% plural %}Selected <span id="selected">0</span> of <span id="total">{{ len }}</span> DNS records{% endblocktrans %}
+                </span>
+              </div>
+              {% if records and pager.paginator.num_pages > 1 %}
+              <div class="paginator-sink dataTables_paginate center">
+                {% paginator %}
+              </div>
+              {% endif %}
+              <div class="vm_control">
+                <a href="#" class="button gray no-ajax obj_add" title="{% trans "Add new DNS record for this domain" %}" data-toggle="tooltip" data-placement="top" data-prefix='adm'><i class="icon-plus"></i> {% trans "Add DNS record" %}</a>
+                <a href="#" class="button gray no-ajax obj_del disabled" id="records_del" title="{% trans "Delete selected DNS records" %}" data-toggle="tooltip" data-placement="top" data-prefix='adm'><i class="icon-remove"></i> {% trans "Delete" %}</a>
+              </div>
+            </td>
+          </tr>
+        </tfoot>
+
+      </table>
+    </div>
+
+  </div> <!-- end row-fluid -->
+</div> <!-- end container-fluid -->
+{% endblock %}

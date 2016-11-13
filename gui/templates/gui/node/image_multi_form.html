@@ -1,0 +1,33 @@
+{% load i18n %}
+{% csrf_token %}
+
+<div class="input">
+  <div class="control-group thinner">
+    <label class="control-label" for="id_imf_node">{% trans "Node" %}:</label>
+    <div class="controls">
+      <input class="input-transparent narrow uneditable-input" disabled="disabled" id="id_imf_node" name="node" type="text" value="{{ node.hostname }}" /> 
+      <span class="help-inline note"> &nbsp; </span>
+    </div>
+  </div>
+</div>
+
+<div class="input">
+  <div class="control-group thinner">
+    <label class="control-label" for="id_imf_zpool">{% trans "Storage" %}:</label>
+    <div class="controls">
+      <select class="narrow input-select2" disabled="disabled" id="id_imf_zpool" name="zpool">
+        <option value="{{ ns.zpool }}" selected="selected">{{ ns.alias }}</option>
+      </select> 
+      <span class="help-inline note"> &nbsp; </span>
+    </div>
+  </div>
+</div>
+
+<div class="input">
+  <div class="control-group thinner">
+    <label class="control-label" for="id_imf_images">{% trans "Images" %}:</label>
+    <div class="controls">
+      <div class="input-fake" id="id_imf_images"></div>
+    </div>
+  </div>
+</div>

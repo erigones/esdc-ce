@@ -1,0 +1,77 @@
+{% load i18n %}{% load compress %}<!DOCTYPE html>
+<html>
+  <head>
+    <title>Danube Cloud Console | {{ vm.alias }}</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, maximum-scale=1, initial-scale=1, user-scalable=0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <link rel="icon" type="image/png" href="{{ STATIC_URL }}gui/ico/danubecloud-logo-64.png">
+    <link rel="apple-touch-icon" type="image/png" href="{{ STATIC_URL }}gui/ico/danubecloud-logo-144.png">
+    {% compress css %}
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}3rd-party/font-awesome/css/font-awesome.css">
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}guacamole/styles/guacamole-erigones.css">
+    {% endcompress %}
+    <script src="{% url 'javascript_catalog' %}" type="text/javascript"></script>
+    {% compress js %}
+    <script type="text/javascript" src="{{ STATIC_URL }}guacamole/guacamole-common-js/all.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}guacamole/scripts/guacamole-erigones.js"></script>
+    {% endcompress %}
+  </head>
+
+  <body>
+    {% if gc %}{% if gc.ready %}
+    <div id="message" class="hide"></div>
+
+    <ul id="menu" class="right">
+      <li><a href="#" id="btn-capture" title="{% trans "Send key strokes and mouse events into the server" %}">
+        <i class="icon-magnet"></i>
+      </a></li>
+      <li><a href="#zoom" id="btn-zoom" title="{% trans "Zoom in/out" %}">
+        <i class="icon-resize-{% if gc.vnc_zoom %}small{% else %}full{% endif %}"></i>
+      </a></li>
+      <li><a href="#onscreen-keyboard" id="btn-kbd" title="{% trans "Show or hide on-screen keyboard" %}">
+        <i class="icon-text-height"></i>
+      </a></li>
+      <li><a href="#" id="btn-menu" title="{% trans "Change menu position" %}">
+        <i class="icon-move"></i>
+      </a></li>
+    </ul>
+
+    <div class="table">
+      <div class="table-cell">
+        <div id="display"></div>
+      </div>
+    </div>
+
+    <div id="onscreen-keyboard" class="hide" data-source="{{ STATIC_URL }}guacamole/layouts/en-us-qwerty.json"></div>
+    <textarea id="touch-keyboard" class="hide" autofocus="off" autocorrect="off" autocapitalize="off" ></textarea>
+
+    <script type="text/javascript">
+      window.onload = function() {
+        var guac = new Guacamole.Client(new Guacamole.ChainedTunnel(
+              new Guacamole.WebSocketTunnel('{{ gc.wss }}'),
+              new Guacamole.HTTPTunnel('{{ gc.tunnel }}')
+        ));
+        var gues = new GuacamoleErigones(guac, {{ gc.vnc_zoom|lower }});
+        gues.connect("GUAC_ID={{ vm.hostname }}&GUAC_TYPE=c&GUAC_DATA_SOURCE=redis-auth&token={{ gc.token }}");
+      };
+    </script>
+
+    {% else %}
+    <div id="message">{% trans "Please wait..." %}</div>
+    <script type="text/javascript">
+      window.onload = function() {
+        window.setTimeout(function() {
+          location.reload(true);
+        }, 3000);
+      };
+    </script>
+    {% endif %}
+
+    {% else %}
+    <div id="message">{% trans "Remote console is not available." %}</div>
+    {% endif %}
+  </body>
+</html>

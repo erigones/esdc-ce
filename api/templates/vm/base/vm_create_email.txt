@@ -1,0 +1,8 @@
+{% load i18n %}{% autoescape off %}{% blocktrans with server=vm.alias %}Hello,
+
+Your server {{ server }} was successfully created and it is going to be deployed.
+The deployment process takes approximately 10 minutes.
+You will receive the login details after the server is deployed.
+
+{% endblocktrans %}{% endautoescape %}
+{% include "email_signature.txt" %}

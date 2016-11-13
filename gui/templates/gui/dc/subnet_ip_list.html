@@ -1,0 +1,124 @@
+{% extends load_base %}
+{% load i18n %}
+{% load gui_utils %}
+
+{% block javascript %}
+<script type="text/javascript">
+  $(document).ready(function() {
+    DC_SUBNET_IPS = new DcSubnetIPList();
+  });
+</script>
+{% endblock %}
+
+{% block base_content %}
+<div class="container-fluid">
+
+  <div class="row-fluid">
+    <div class="span6">
+      <div class="tab-header">
+        <i class="icon-retweet"></i> {% trans "Subnet" %}
+      </div>
+      <table class="table box table-striped">
+        <thead>
+        </thead>
+
+        <tbody>
+          <tr><th>{% trans "Network" %}:</th><td>{{ ip_network.network_address }}</td></tr>
+          <tr><th>{% trans "Netmask" %}:</th><td>{{ ip_network.netmask }}</td></tr>
+          <tr><th>{% trans "VLAN ID" %}:</th><td>{{ vlan_id }}</td></tr>
+          <tr><th>{% trans "First host address" %}:</th><td>{{ netinfo.min }}</td></tr>
+          <tr><th>{% trans "Last host address" %}:</th><td>{{ netinfo.max }}</td></tr>
+          <tr>
+            <th>{% trans "Usable / Registered / Free IPs" %}:</th>
+            <td>{{ netinfo.hosts }} / {{ total }} / {{ free }}</td>
+          </tr>
+           <tr><td colspan="2">
+          {% blocktrans count counter=num_networks %}
+          This subnet with this VLAN ID is used by {{ num_networks }} network.
+          {% plural %}
+          This subnet with this VLAN ID is used by {{ num_networks }} networks.
+          {% endblocktrans %}
+          </td></tr>
+        </tbody>
+
+        <tfoot>
+          <tr>
+            <td colspan="2">
+              <div>
+                <a href="{% url 'dc_network_list' %}" class="button gray"><i class="icon-circle-arrow-left"></i> {% trans "Return to network list" %}</a>
+              </div>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <div class="row-fluid">
+    <div class="span12">
+      <div class="tab-header">
+        <i class="icon-retweet"></i> {% trans "Subnet" %} &rsaquo; {% trans "IP addresses" %}
+      </div>
+      <table class="table box table-striped table-hover table-responsive" id="etable">
+
+        <thead>
+          <tr class="sortable" data-order_by="{{ order_by.0 }}" data-order_by_default="ip">
+            <th data-field="ip">{% trans "IP address" %}</th>
+            <th>{% trans "Usage" %}</th>
+            <th data-field="hostname">{% trans "Server" %}</th>
+            <th class="hidden-phone" data-field="hostname">{% trans "Hostname" %}</th>
+            <th class="hidden-phone">{% trans "Datacenter" %}</th>
+            <th>{% trans "MAC address" %}</th>
+            <th class="visible-bigscreen">{% trans "NIC ID" %}</th>
+            <th data-field="net">{% trans "Network" %}</th>
+            <th class="hidden-phone">{% trans "Note" %}</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for ip in ips %}
+          <tr>
+            <td class="nowrap">{{ ip.ip }}</td>
+            <td>{{ ip.get_usage_display }}</td>
+
+            {% if ip.vm %}
+            <td class="nowrap">
+              <a href="{% url 'dc_vm_details' ip.vm.dc ip.vm.hostname %}" class="btn-link"><i class="icon-hdd"></i>&nbsp;{{ ip.vm.alias }}</a>
+            </td>
+            <td class="hidden-phone nowrap"><span class="vm_hostname">{{ ip.vm.hostname }}</span></td>
+            <td class="hidden-phone nowrap"><span class="vm_hostname"><i class="icon-cloud"></i>&nbsp;{{ ip.vm.dc.alias }}</span></td>
+            {% else %}
+            <td></td>
+            <td class="hidden-phone nowrap">{% if is_node_address %}<span class="vm_hostname">{{ ip.hostname }}</span>{% endif %}</td>
+            <td class="hidden-phone"></td> {# other IPs have no DC relation #}
+            {% endif %}
+            <td class="hidden-phone nowrap"><span class="vm_hostname">{{ ip.mac }}</span></td>
+            <td class="visible-bigscreen">{% if ip.nic_id %}{{ ip.nic_id }}{% endif %}</td>
+            <td class="nowrap"><a href="{% url 'dc_network_ip_list' ip.subnet %}" class="btn-link"><i class="icon-retweet"></i>&nbsp;{{ ip.subnet }}</a></td>
+            <td class="hidden-phone"><small class="vm_snapshot_note">{{ ip.note|wordwrap:44 }}</small></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+
+        <tfoot>
+          <tr>
+            <td colspan="10">
+              <span class="pull-right">
+                {% trans "Total" %}: {{ pager.paginator.count }}&nbsp;
+              </span>
+              {% if ips and pager.paginator.num_pages > 1 %}
+              <div class="dataTables_paginate center">
+                {% paginator %}
+              </div>
+              {% endif %}
+            </td>
+          </tr>
+        </tfoot>
+
+      </table>
+    </div>
+
+  </div> <!-- end row-fluid -->
+
+</div> <!-- end container-fluid -->
+{% endblock %}

@@ -1,0 +1,133 @@
+@import "compass";
+@import "mixins";
+
+/**********************
+ * AJAX movement      *
+ *                    *
+ * Used while windows *
+ **********************/
+
+.modal-loading {
+  opacity: 0.8;
+  top: 20px;
+  margin-top: 0;
+  margin-bottom: 0;
+
+  .modal-body {
+    text-align: center;
+    background: #000;
+    color: #fff;
+    font-size: 13px;
+    opacity: 1;
+  }
+
+  .close {
+    color: #fff;
+    opacity: 1;
+    font-size: 25px;
+    line-height: 25px;
+    text-shadow: none;
+  }
+}
+
+/*****************
+ * Modal windows *
+ *****************/
+
+%modal_width {
+  width: 100%;
+}
+
+%modal_background_position {
+  background-position: 0 -38px;
+}
+
+.modal {
+  &.black-box {
+    background: inline-image("backgrounds/linen-light.png");
+    color: #fff;
+    @include text-shadow-bottom(#000);
+
+    .modal-head {
+      @extend %modal_width;
+      padding: 0 12px;
+
+      .close {
+        margin-top: 5px;
+        color: white;
+        opacity: 1;
+        text-shadow: 0 1px black;
+      }
+    }
+
+    .modal-body {
+      @extend %modal_width;
+
+      .morespace {
+        padding-left: 5px;
+        padding-right: 5px;
+      }
+    }
+
+    .modal-footer {
+      @extend %modal_width;
+      border-top: none;
+      background-color: transparent;
+      @include box-shadow(none);
+    }
+  }
+
+  .normal-check {
+    &:checked + label {
+      &:before {
+        @extend %modal_background_position;
+      }
+      &:hover:before {
+        @extend %modal_background_position;
+      }
+    }
+
+    & + label {
+      &:before {
+        background: inline-image('form_elements/checkbox2-black.png') no-repeat;
+        background-position: 0 0;
+      }
+
+      & + .help-inline {
+        text-indent: 8px;
+      }
+
+      &:hover:before {
+        background-position: 0 -19px;
+      }
+
+      &:active:before {
+        @extend %modal_background_position;
+      }
+    }
+
+    &[disabled] + label:before {
+      @include box-shadow(inset 0 0 0 1000px rgba(200, 200, 200, 0.4));
+      cursor: not-allowed;
+    }
+  }
+}
+
+.modal2 {
+  z-index: 1051;
+  width: 360px;
+  margin: -220px 0 0 -180px;
+
+  .modal-body {
+    padding-bottom: 5px;
+  }
+
+  .modal-footer {
+    padding: 10px;
+
+    .inner-well {
+      padding-top: 5px;
+      padding-bottom: 5px;
+    }
+  }
+}

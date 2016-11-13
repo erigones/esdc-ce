@@ -1,0 +1,77 @@
+{% load i18n %}
+{% load gui_utils %}
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span12">
+
+      <div class="tab-header" >
+        <i class="icon-file"></i> {% trans "Import servers from file" %}: {{ filename }}
+      </div>
+
+      <table class="box table table-striped">
+        <form id="import-define-servers" action="#" data-source="" method="POST">
+        {% csrf_token %}
+        {% with colspan=header|length %}
+        {% if import_error %}
+        <thead>
+          <tr>
+            <td colspan="{{ colspan }}">
+              <div class="alert alert-error"><i class="icon-warning-sign"></i> {% trans "Error processing import file" %} </div>
+            </td>
+          </tr>
+        </thead>
+        <tbody><tr><td>{{ import_error }}</td></tr></tbody>
+        {% else %}
+        <thead>
+          <tr>
+            {% for field in header %}
+            <th>{{ field|title }}</th>
+            {% endfor %}
+          </tr>
+          <tr>
+            <td colspan="{{ colspan }}">
+              <div class="alert alert-error"><i class="icon-warning-sign"></i> {% trans "Some servers cannot be imported." %} </div>
+            </td>
+          </tr>
+        </thead>
+        <tbody id="servers-list">
+          {% for hostname, params in vms.items %}
+          {% for row in params.html_rows %}
+          <tr{% if forloop.first %} data-vm="{{ params.json }}"{% endif %}>
+            {% for field in header %}{% with error=row.errors|keyvalue_lower:field info=row.info|keyvalue_lower:field %}
+            <td{% if error %} class="error"{% endif %}>
+              {% if error %}
+              <span data-placement="bottom" data-toggle="tooltip" data-original-title="{{ error }}" class="error"><i class="icon-warning-sign"></i></span>
+              {% elif info %}
+              <span data-placement="bottom" data-toggle="tooltip" data-original-title="{{ info }}" class="error"><i class="icon-info-sign"></i></span>
+              {% endif %}
+              {{ row|keyvalue_lower:field }}
+            </td>
+            {% endwith %}{% endfor %}
+          </tr>
+          {% endfor %}
+          {% empty %}
+          <tr>
+            <td colspan="{{ colspan }}"><p class="msg">{% trans "No servers available" %}</p></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+        {% endif %}
+
+        <tfoot>
+          <tr>
+            <td colspan="{{ colspan }}">
+              <a class="button gray no-ajax vm_import2"><i class="icon-file"></i> {% trans "Import from file" %}</a>
+            </td>
+          </tr>
+        </tfoot>
+        {% endwith %}
+
+        </form>
+      </table>
+
+    </div> <!-- end span12 -->
+  </div> <!-- end row-fluid -->
+</div> <!-- end container-fluid -->
+
+<script type="text/javascript">VM_ADD && VM_ADD.init_import2();</script>

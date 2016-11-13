@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block body_class %} class="no-auth"{% endblock %}
+
+{% block base_content %}
+<div class="container">
+  <div class="no-auth-logo">
+    {% if dc_settings.SITE_LOGO %}
+    <img src="{{ dc_settings.SITE_LOGO }}" alt="{{ dc_settings.SITE_NAME }}" />
+    {% else %}
+    <img src="{{ STATIC_URL }}gui/img/danubecloud-logo-white.png" alt="Danube Cloud" />
+    {% endif %}
+  </div>
+
+  {% block main_content %}{% endblock %}
+  <div class="no-auth-content">
+
+    {% block login_content %}{% endblock %}
+    <div class="inner-well no-auth-menu">
+      {% if dc_settings.REGISTRATION_ENABLED %}
+      {% block nav_accounts_login %}<a href="{% url 'login' %}" class="no-ajax button mini rounded gray"><i class="icon-signin"></i> {% trans "Sign in" %}</a>{% endblock %}
+      {% block nav_accounts_register %}<a href="{% url 'registration' %}" class="no-ajax button mini rounded gray"><i class="icon-plus"></i> {% trans "Sign up" %}</a>{% endblock %}
+      {% block nav_accounts_forgot %}<a href="{% url 'forgot' %}" class="no-ajax button mini rounded gray"><i class="icon-question-sign"></i> {% trans "Forgotten password" %}?</a>{% endblock %}
+      {% endif %}
+      {% block nav_accounts_setlang %}
+      <div class="dropdown inline">
+        <a href="#" class="no-ajax button mini rounded gray dropdown-toggle" data-toggle="dropdown">
+          <i class="flag {{ LANGUAGE_CODE }}"></i>
+        </a>
+        <ul class="lang-nav dropdown-menu dark" role="menu">{% url 'setlang' as setlang %}
+          {% for lang_code, lang_name in LANGUAGES %}
+          <li{% ifequal lang_code LANGUAGE_CODE %} class="active"{% endifequal %}>
+            <a href="{{ setlang }}?language={{ lang_code }}&amp;next={{ request.path|safe }}" title="{{ lang_name }}">
+              <i class="flag {{ lang_code }}"></i> {{ lang_name }}
+            </a>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endblock %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}

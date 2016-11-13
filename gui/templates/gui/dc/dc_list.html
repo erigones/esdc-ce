@@ -1,0 +1,148 @@
+{% extends load_base %}
+{% load i18n %}
+{% load gui_utils %}
+
+{% block javascript %}
+<script type="text/javascript">
+  $(document).ready(function() {
+    DCS = new DcList();
+  });
+</script>
+{% endblock %}
+
+{% block base_content %}
+{% if can_edit %}
+
+{% include "gui/mdata_template.html" with value_class="input-transparent narrower" %}
+{% include "gui/array_template.html" %}
+
+<div id="obj_form_modal" class="black-box modal hide fade vm_modal">
+  <div class="modal-head tab-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <span class="title_edit"><i class="icon-cloud"></i> {% trans "Update Datacenter" %}</span>
+    <span class="title_add"><i class="icon-cloud"></i> {% trans "Add new Datacenter" %}</span>
+  </div>
+  <div class="modal-body separator">
+    <div class="text_edit"></div>
+    <div class="text_add"></div>
+    <form class="form-horizontal" action="#" data-source="{% url 'dc_form' %}?{{ qs }}" method="POST">
+      {% include "gui/dc/dc_form.html" %}
+    </form>
+  </div>
+  <div class="modal-footer">
+    <div class="inner-well">
+      <span class="pull-left"><a class="vm_modal_more btn btn-small btn-inverse no-ajax">{% trans "Edit more settings" %}</a></span>
+      <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
+      <a class="vm_modal_update button green no-ajax" data-enter="true">{% trans "Update" %}</a>
+      <a class="vm_modal_delete button red no-ajax">{% trans "Delete Datacenter" %}</a>
+      <a class="vm_modal_create button green no-ajax" data-enter="true">{% trans "Add Datacenter" %}</a>
+    </div>
+  </div>
+</div>
+
+<div id="dc_settings_modal" class="black-box modal hide fade vm_modal">
+  <div class="modal-head tab-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <span class="title_edit"><i class="icon-cloud"></i> {% trans "Change Datacenter Settings" %}</span>
+    <span class="title_add"></span>
+  </div>
+  <div class="modal-body separator morespace">
+    <div class="text_edit"></div>
+    <div class="text_add"></div>
+    <form class="form-horizontal wider" action="#" data-source="{% url 'dc_settings_form' %}?{{ qs }}" method="POST">
+      {% include "gui/dc/dc_settings_form.html" with form=settings_form %}
+    </form>
+  </div>
+  <div class="modal-footer">
+    <div class="inner-well">
+      <span class="pull-left"><a class="vm_modal_more btn btn-small btn-inverse no-ajax">{% trans "Show advanced settings" %}</a></span>
+      <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
+      <a class="vm_modal_update button green no-ajax" data-enter="true">{% trans "Update settings" %}</a>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<div class="container-fluid">
+  <div class="row-fluid">
+
+    <div class="span12">
+      <div class="tab-header">
+        <i class="icon-cloud"></i> {% trans "Datacenters" %}
+      </div>
+      <table class="table box table-striped table-hover table-responsive" id="etable">
+
+        <thead>
+          {% if dcs %}
+          <tr>
+            <th>{% trans "Alias (name)" %}</th>
+            <th>{% trans "Site" %}</th>
+            <th>{% trans "Access" %}</th>
+            <th>{% trans "Owner" %}</th>
+            {% if can_edit %}<th class="hidden-phone">{% trans "Groups" %}</th>{% endif %}
+            <th class="hidden-phone">{% trans "Nodes" %}</th>
+            <th class="hidden-phone">{% trans "Servers" %}</th>
+            <th class="hidden-phone">{% if can_edit %}{% trans "Settings" %}{% endif %}</th>
+            <th class="hidden-phone">{% trans "Description" %}</th>
+          </tr>
+          {% endif %}
+        </thead>
+
+        <tbody>
+          {% for dc in dcs %}{% with dc_settings=dc.settings %}
+          <tr>
+            <td>
+              {% if can_edit %}<a href="#" class="btn-link btn-icon-edit no-ajax obj_edit{% if dc.vms or dc.dcnodes %} no-delete{% endif %}" title="{% trans "Update or delete Datacenter" %}" data-toggle="tooltip" data-placement="bottom" data-form='{{ dc.web_data|jsondata }}'>{{ dc.alias }}</a>{% else %}{{ dc.alias }}{% endif %} <small>({{ dc.name }})</small>
+            </td>
+            <td class="nowrap"><span class="vm_hostname">{{ dc.site }}</span></td>
+            <td>{{ dc.get_access_display }}</td>
+            <td class="nowrap"><span class="vm_hostname" title="{{ dc.owner }}"><i class="icon-user"></i> {{ dc.owner|truncatechars:16 }}</span></td>
+            {% if can_edit %}<td class="hidden-phone"><span class="vm_hostname">{{ dc.roles.all|groupify }}</span></td>{% endif %}
+            {% is_admin request.user dc=dc as user_is_this_dc_admin %}  {# TODO FIXME: this hits the database hard for not staff users and many DCs #}
+            {% if user_is_this_dc_admin %}
+            <td class="hidden-phone"><i class="icon-sitemap"></i> {{ dc.dcnodes }}</td>
+            <td class="hidden-phone"><i class="icon-hdd"></i> {{ dc.vms }} <small>({{ dc.real_vms }})</small></td>
+            {% else %}
+            <td class="hidden-phone"></td>
+            <td class="hidden-phone"></td>
+            {% endif %}
+            <td class="hidden-phone">
+              {% if can_edit %}
+              <a href="#" class="btn-link no-ajax obj_more" title="{% trans "Change Datacenter settings" %}" data-toggle="tooltip" data-placement="bottom" data-form='{% form_data settings_form dc %}'>
+                <i class="icon-copy {{ dc_settings.VMS_VM_SNAPSHOT_ENABLED|yesno }}" title="{% trans "Snapshots" %}"></i>
+                <i class="icon-paste {{ dc_settings.VMS_VM_BACKUP_ENABLED|yesno }}" title="{% trans "Backups" %}"></i>
+                <i class="icon-bar-chart {{ dc_settings.MON_ZABBIX_ENABLED|yesno }}" title="{% trans "Monitoring" %}"></i>
+                <i class="icon-wrench {{ dc_settings.SUPPORT_ENABLED|yesno }}" title="{% trans "Support" %}"></i>
+                <i class="icon-signin {{ dc_settings.REGISTRATION_ENABLED|yesno }}" title="{% trans "User Registration" %}"></i>
+                <i class="icon-question-sign {{ dc_settings.FAQ_ENABLED|yesno }}" title="{% trans "FAQ" %}"></i>
+              </a>
+              {% endif %}
+            </td>
+            <td class="hidden-phone"><small class="vm_snapshot_note">{{ dc.desc|wordwrap:44 }}</small></td>
+          </tr>
+          {% endwith %}{% endfor %}
+        </tbody>
+
+        <tfoot>
+          <tr>
+            <td colspan="{{ colspan }}">
+              <span class="pull-right">
+                {% trans "Total" %}: {{ dcs|length }}&nbsp;
+              </span>
+              {% if can_edit %}
+              <div class="vm_control">
+                {% if can_add %}
+                <a href="#" class="button gray no-ajax obj_add" title="{% trans "Create new Datacenter" %}" data-toggle="tooltip" data-placement="top"><i class="icon-plus"></i> {% trans "Add Datacenter" %}</a>
+                {% endif %}
+              </div>
+              {% endif %}
+            </td>
+          </tr>
+        </tfoot>
+
+      </table>
+    </div>
+
+  </div> <!-- end row-fluid -->
+</div> <!-- end container-fluid -->
+{% endblock %}

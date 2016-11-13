@@ -1,0 +1,51 @@
+{% load i18n tz %}
+{% load gui_utils %}
+{% get_current_timezone as TZ %}
+<table class="table box table-striped table-hover table-responsive">
+  <thead>
+    {% if bkpdefs %}
+    <tr>
+      <th>{% trans "Name" %}</th>
+      <th>{% trans "Disk&nbsp;ID" %}</th>
+      <th>{% trans "Type" %}</th>
+      <th class="hidden-phone">{% trans "Schedule" %}</th>
+      <th class="hidden-phone">{% trans "Retention" %}</th>
+      <th>{% trans "Active" %}</th>
+      <th class="hidden-phone">{% trans "Description" %}</th>
+    </tr>
+    {% endif %}
+  </thead>
+  <tbody>
+    {% for bd in bkpdefs %}{% with disk_id=bd.array_disk_id  %}
+    <tr>
+      <td>
+        {% if can_edit and not bkpdefs.definition %}
+        <a href="#" class="btn-link btn-icon-edit no-ajax" title="{% trans "Update or delete backup definition" %}" data-toggle="tooltip" data-placement="bottom" data-form='{{ bd.web_data|local_schedule:TZ|jsondata }}'>{{ bd.name }}</a>
+        {% else %}
+        {{ bd.name }}
+        {% endif %}
+      </td>
+      <td>{{ disk_id }}{% if not bkpdefs.definition %} <small>({{ bd.disk_size|multiply:1048576|filesizeformat }})</small>{% endif %}</td>
+      <td>{{ bd.get_type_display }}</td>
+      <td class="hidden-phone">{{ bd.schedule|local_schedule:TZ }}</td>
+      <td class="hidden-phone">{{ bd.retention }}</td>
+      <td><i class="icon-{{ bd.active|yesno:"ok,remove" }}"></i></td>
+      <td class="hidden-phone"><small class="vm_snapshot_note">{{ bd.desc|wordwrap:44 }}</small></td>
+    </tr>
+    {% endwith %}{% endfor %}
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="7">
+        <span class="pull-right">
+          {% trans "Total" %}: {{ bkpdefs|length }}&nbsp;
+        </span>
+        {% if can_edit %}
+        <div class="vm_control vm_control_{{ vm.hostname }}" data-vm_locked='{{ vm.locked|lower }}'>
+          <a href="#" id="vm_bkpdef_add_{{ vm.hostname }}" class="button gray no-ajax vm_add" data-modal_nohide="true" title="{% trans "Create new backup definition" %}" data-toggle="tooltip" data-placement="bottom" data-prefix="bkpdef_create"><i class="icon-plus"></i> {% trans "Add definition" %}</a>
+        </div>
+        {% endif %}
+      </td>
+    </tr>
+  </tfoot>
+</table>

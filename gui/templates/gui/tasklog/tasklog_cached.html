@@ -1,0 +1,19 @@
+{% load i18n %}{% load gui_utils %}{% if not disable_cached_tasklog and tasklog_cached %}
+<div id="cached-tasks-details">
+  <table class="nowrap table-responsive">
+    {% for log in tasklog_cached %}
+    <tr{% if forloop.counter > 5 %} class="hidden-phone"{% endif %}>
+      <td{% if log.status == 'PENDING' and log.task in pending_tasks %} class="loading-gif"{% endif %}><i class="icon-time"></i> {{ log.time|dtparse|date:"SHORT_DATETIME_FORMAT" }}</td>
+      <td><i class="icon-{{ log.status }}" title="{% trans log.status %}"></i><span class="hidden-phone"> {% trans log.status %}</span></td>
+      <td class="wrap"><i class="icon-{{ log.object_type }}"></i>&nbsp;{{ log.object_alias }}</td>
+      <td><i class="icon-task-flag{{ log.flag }}"></i> {% if log.msg %}{% trans log.msg %}{% endif %}</td>
+      <td class="hidden-phone"><i class="icon-user"></i> {{ log.username }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>{% endif %}
+<script type="text/javascript">
+  TASKS['PENDING'] = {{ pending_tasks|length }};
+  TASKS['RUNNING'] = {{ pending_tasks|safe }};
+  _update_tasks_icon($('#tasks'));
+</script>

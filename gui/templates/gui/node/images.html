@@ -1,0 +1,137 @@
+{% extends load_base %}
+{% load i18n %}
+{% load gui_utils %}
+
+{% block javascript %}
+<script type="text/javascript">
+  $(document).ready(function() {
+    NODE_IMAGE = new NodeImage('{{ node.hostname }}', '{{ ns.zpool }}');
+  });
+</script>
+{% endblock %}
+
+{% block base_nav %}{% include "gui/node/navigation.html" with li_images="active" %}{% endblock %}
+
+{% block base_content %}
+<div id="obj_form_modal" class="black-box modal hide fade vm_modal">
+  <div class="modal-head tab-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <span class="title_edit"><i class="icon-save"></i> {% trans "Delete Disk Image from node storage" %}</span>
+    <span class="title_add"><i class="icon-save"></i> {% trans "Import Disk Image into node storage" %}</span>
+  </div>
+  <div class="modal-body separator">
+    <div class="text_edit"></div>
+    <div class="text_add"></div>
+    <div class="hide alert alert-error" id="image_vms_error">{% trans "Image is used by some servers" %}</div>
+    <form class="form-horizontal" action="#" data-source="#" method="POST">
+      {% include "gui/node/image_form.html" %}
+    </form>
+  </div>
+  <div class="modal-footer">
+    <div class="inner-well">
+      <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
+      <a class="vm_modal_delete button red no-ajax">{% trans "Delete disk Image" %}</a>
+      <a class="vm_modal_create button green no-ajax">{% trans "Import disk Image" %}</a>
+    </div>
+  </div>
+</div>
+
+<div id="node_image_multi_modal" class="black-box modal hide fade vm_modal">
+  <div class="modal-head tab-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <span class="vm_modal_title"><i class="icon-remove"></i> {% trans "Delete Disk Images from node storage" %}</span>
+  </div>
+  <div class="modal-body separator">
+    <div class="vm_modal_text"></div>
+    <form class="form-horizontal thin" action="#" data-source="#" method="POST">
+      {% include "gui/node/image_multi_form.html" %}
+    </form>
+  </div>
+  <div class="modal-footer">
+    <div class="inner-well">
+      <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
+      <a class="vm_modal_yes button red no-ajax">{% trans "Delete disk Images" %}</a>
+      {# <a class="vm_modal_yes_force button red no-ajax hide">{% trans "Force" %}</a> #}
+    </div>
+  </div>
+</div>
+
+
+<div class="container-fluid" id="node_images_{{ node.hostname }}_{{ ns.zpool }}">
+  <div class="row-fluid">
+
+    <div class="span12">
+      <div class="tab-header">
+        <i class="icon-save"></i> {{ node.hostname }} &rsaquo; {{ ns.storage.alias }} &rsaquo; {% trans "images" %}
+      </div>
+
+      <table class="table box table-striped table-hover table-responsive" id="etable">
+        <thead>
+
+          <tr>
+            <th colspan="10" class="row_menu pad">
+              <div class="btn-group">
+                {% for i in storages %}
+                <a href="{% url 'node_images_zpool' node.hostname i.zpool %}" class="btn btn-small{% if i.zpool == ns.zpool %} active{% endif %}" data-toggle="tooltip" data-placement="bottom" title="{% blocktrans with zpool=i.zpool %}Show images stored on {{ zpool }} zpool{% endblocktrans %}">
+                  <i class="icon-th"></i> {{ i.storage.alias }} <span class="sep" id="total_{{ node.hostname }}_{{ i.zpool }}">{{ i.imgs }}</span>
+                </a>
+                {% endfor %}
+              </div>
+            </th>
+          </tr>
+
+          {% if images %}
+          <tr>
+            <th>{% trans "Alias (name)" %}</th>
+            <th class="hidden-tablet hidden-phone">{% trans "Access" %}</th>
+            <th class="hidden-tablet hidden-phone">{% trans "Owner" %}</th>
+            <th class="hidden-phone">{% trans "DC bound?" %}</th>
+            <th>{% trans "Size" %}</th>
+            <th>{% trans "OS&nbsp;Type" %}</th>
+            <th class="hidden-phone-small">{% trans "Status" %}</th>
+            <th>{% trans "Servers" %}</th>
+            <th class="hidden-phone">{% trans "Datacenters" %}</th>
+            <th class="hidden-phone">{% trans "Description" %}</th>
+          </tr>
+          {% endif %}
+        </thead>
+
+        <tbody>
+          {% for img in images %}{% with vms=image_vms|keyvalue:img.uuid ns_status=img|img_ns_status_display:ns %}
+          {% with vms_count=vms|length %}
+          <tr id="ns_image_{{ img.name }}">
+            <td>
+              <a href="#" class="btn-link btn-icon-edit no-ajax obj_edit{% if ns_status.status != img.READY %} disabled{% endif %}" title="{% trans "Delete disk image from compute node storage" %}" data-toggle="tooltip" data-placement="bottom" data-form='{"name":{{ img.name|jsondata }}, "alias_version": {{ img.alias_version|jsondata }}}' data-vms="{{ vms_count }}">{{ img.alias_version }}</a> <small>({{ img.name }})</small>
+            </td>
+            <td class="hidden-tablet hidden-phone">{{ img.get_access_display }}</td>
+            <td class="hidden-tablet hidden-phone nowrap"><span class="vm_hostname" title="{{ img.owner }}"><i class="icon-user"></i> {{ img.owner|truncatechars:16 }}</span></td>
+            <td class="hidden-phone"><i class="icon-{{ img.dc_bound_bool|yesno:"ok,remove" }}"></i></td>
+            <td class="nowrap">{{ img.size|mb_to_gb }} <small>GB</small></td>
+            <td>{{ img.get_ostype_display }}</td>
+            <td class="hidden-phone-small"><span class="ns_image_status">{{ ns_status.display }}</span></td>
+            <td><span{% if vms %} data-toggle="tooltip" data-placement="bottom" title="{% for vm in vms %}{{ vm.hostname }} ({% trans "DC" %}: {{ vm.dc }}){% if not forloop.last %}, {% endif %}{% endfor %}"{% endif %}><i class="icon-hdd"></i> {{ vms_count }}</span></td>
+            <td class="hidden-phone"><i class="icon-cloud"></i> {{ img.dcs }}</td>
+            <td class="hidden-phone"><small class="vm_snapshot_note">{{ img.desc|wordwrap:44 }}</small></td>
+          </tr>
+          {% endwith %}{% endwith %}{% endfor %}
+        </tbody>
+
+        <tfoot>
+          <tr>
+            <td colspan="10">
+              <span class="pull-right">
+                {% trans "Total" %}: <span id="total">{{ images|length }}</span>&nbsp;
+              </span>
+              <div class="vm_control">
+                <a href="#" class="button gray no-ajax" id="node_image_multi_delete" title="{% trans "Remove all unused disk images imported on compute node storage" %}" data-toggle="tooltip" data-placement="top" data-prefix="adm"><i class="icon-remove"></i> {% trans "Delete unused images" %}</a>
+              </div>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+
+    </div> <!-- end span9 -->
+
+  </div> <!-- end row-fluid -->
+</div> <!-- end container-fluid -->
+{% endblock %}

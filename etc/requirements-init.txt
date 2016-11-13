@@ -1,0 +1,3 @@
+### project
+pip
+Django==1.8.16

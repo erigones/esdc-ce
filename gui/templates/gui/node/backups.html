@@ -1,0 +1,70 @@
+{% extends load_base %}
+{% load i18n %}
+
+{% block javascript %}
+<script type="text/javascript">
+  $(document).ready(function() {
+    create_backup_list('{{ vm.hostname }}');
+    filter_links();
+  });
+</script>
+{% endblock %}
+
+{% block base_nav %}{% include "gui/node/navigation.html" with li_backups="active" %}{% endblock %}
+
+{% block base_content %}
+
+{% include "gui/vm/backup_update_modal.html" with mod_source=update_mod_source mod_form="gui/node/backup_form.html" %}
+
+{% include "gui/vm/backup_delete_modal.html" %}
+
+{% include "gui/vm/backup_restore_modal.html" %}
+
+<div class="container-fluid">
+
+  {% if not node.is_online %}
+  <div class="row-fluid">
+    <div class="span8 offset2">
+      <div class="box">
+        <div class="tab-header tab-header-light">
+          <i class="icon-bullhorn"></i> {% trans "Unavailable backups" %}
+        </div>
+        <div class="padded">
+          <p>{% trans "Backups are not visible or accessible, because the compute node is not in <strong>online state</strong>. Existing backups are kept untouched, but new backups cannot be created. Full backup control will be possible as soon as the compute node returns to online state." %}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="row-fluid">
+    <div class="span12">
+      {% if vm %}
+      <div class="tab-header">
+        <i class="icon-paste"></i> {{ node.hostname }} &rsaquo; {{ vm.alias }} &rsaquo; {% trans "backups" %}
+      </div>
+      <div id="vm_backups_{{ vm.hostname }}" data-source="{% url 'node_vm_backup_list' node.hostname vm.hostname %}" data-page="{{ pager.number }}" data-qs="{{ qs_nopage }}" data-order_by="{{ order_by|join:',' }}">
+        {% include "gui/node/backup_list.html" %}
+      </div>
+
+      {% elif no_vm %}
+      <div class="tab-header">
+        <i class="icon-paste"></i> {{ node.hostname }} &rsaquo; {% trans "(no server)" %} &rsaquo; {% trans "backups" %}
+      </div>
+      <div id="vm_backups_" data-source="{% url 'node_backup_list' node.hostname %}" data-page="{{ pager.number }}" data-qs="{{ qs_nopage }}">
+        {% include "gui/node/backup_list_novm.html" %}
+      </div>
+
+      {% else %}
+      <div class="tab-header">
+        <i class="icon-paste"></i> {{ node.hostname }} &rsaquo; {% trans "backups" %}
+      </div>
+      <div id="vm_backups_" data-source="" data-page="">
+        {% include "gui/node/backup_list_all.html" %}
+      </div>
+      {% endif %}
+    </div> <!-- end span12 -->
+
+  </div> <!-- end row-fluid -->
+</div> <!-- end container-fluid -->
+{% endblock %}

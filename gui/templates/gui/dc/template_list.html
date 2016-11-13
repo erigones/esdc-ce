@@ -1,0 +1,121 @@
+{% extends load_base %}
+{% load i18n %}
+{% load gui_utils %}
+
+{% block javascript %}
+<script type="text/javascript">
+  $(document).ready(function() {
+    DC_TEMPLATES = new DcTemplateList();
+  });
+</script>
+{% endblock %}
+
+{% block base_content %}
+{% if is_staff %}
+<div id="obj_form_modal" class="black-box modal hide fade vm_modal">
+  <div class="modal-head tab-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <span class="title_edit"><i class="icon-umbrella"></i> {% trans "Detach Server Template" %}</span>
+    <span class="title_add"><i class="icon-umbrella"></i> {% trans "Attach Server Template" %}</span>
+  </div>
+  <div class="modal-body separator">
+    <div class="text_edit"></div>
+    <div class="text_add"></div>
+    <form class="form-horizontal" action="#" data-source="{% url 'dc_template_form' %}?{{ qs }}" method="POST">
+      {% include "gui/dc/template_form.html" %}
+    </form>
+  </div>
+  <div class="modal-footer">
+    <div class="inner-well">
+      <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
+      <a class="vm_modal_delete button gold no-ajax">{% trans "Detach server Template" %}</a>
+      <a class="vm_modal_create button gold no-ajax">{% trans "Attach server Template" %}</a>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<div class="container-fluid">
+  <div class="row-fluid">
+
+    <div class="span12">
+      <div class="tab-header">
+        <span class="options window-control pull-right">
+          <i class="icon-cloud"></i> {{ request.dc.alias }}
+        </span>
+        <i class="icon-umbrella"></i> {% trans "Templates" %}
+      </div>
+      <table class="table box table-striped table-hover table-responsive" id="etable">
+
+        <thead>
+          {% if can_edit %}
+          <tr>
+            <th colspan="6">
+              <div class="pull-right">
+                {% include "gui/dc/dc_deleted_toggle.html" %}
+                {% if is_staff %}{% include "gui/dc/dc_all_toggle.html" %}{% endif %}
+              </div>
+            </th>
+          </tr>
+          {% endif %}
+          {% if templates %}
+          <tr>
+            <th>{% trans "Alias (name)" %}</th>
+            <th>{% trans "Access" %}</th>
+            <th>{% trans "Owner" %}</th>
+            <th class="hidden-phone">{% trans "DC bound?" %}</th>
+            <th class="hidden-phone">{% trans "OS&nbsp;Type" %}</th>
+            {% if all %}
+            <th class="hidden-phone">{% trans "Datacenters" %}</th>
+            {% else %}
+            <th class="hidden-phone">{% trans "Description" %}</th>
+            {% endif %}
+          </tr>
+          {% endif %}
+        </thead>
+
+        <tbody>
+          {% for vmt in templates %}
+          <tr>
+            <td>
+              {% if is_staff %}{% if all and vmt.pk in can_add %}
+              <a href="#" class="btn-link btn-icon-link no-ajax obj_add italic" title="{% trans "Attach server Template" %}" data-toggle="tooltip" data-placement="bottom" data-form='{"name":"{{ vmt.name }}"}'>{{ vmt.alias }}</a>
+              {% else %}
+              <a href="#" class="btn-link btn-icon-edit no-ajax obj_edit" title="{% trans "Detach server Template from Datacenter" %}" data-toggle="tooltip" data-placement="bottom" data-form='{"name":"{{ vmt.name }}"}'>{{ vmt.alias }}</a>
+              {% endif %}
+              {% else %}{{ vmt.alias }}{% endif %} <small>({{ vmt.name }})</small>
+            </td>
+            <td>{{ vmt.get_access_display }}</td>
+            <td class="nowrap"><span class="vm_hostname" title="{{ vmt.owner }}"><i class="icon-user"></i> {{ vmt.owner|truncatechars:16 }}</span></td>
+            <td class="hidden-phone"><i class="icon-{{ vmt.dc_bound_bool|yesno:"ok,remove" }}"></i></td>
+            <td class="hidden-phone">{{ vmt.get_ostype_display }}</td>
+            {% if all %}
+            <td class="hidden-phone"><small class="vm_hostname">{{ vmt.dc.all|dcify }}</small></td>
+            {% else %}
+            <td class="hidden-phone"><small class="vm_snapshot_note">{{ vmt.desc|wordwrap:44 }}</small></td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </tbody>
+
+        <tfoot>
+          <tr>
+            <td colspan="6">
+              <span class="pull-right">
+                {% trans "Total" %}: {{ templates|length }}&nbsp;
+              </span>
+              {% if is_staff %}
+              <div class="vm_control">
+                <a href="#" class="button gray no-ajax obj_add{% if not can_add %} disabled{% endif %}" title="{% trans "Associate server Template with this Datacenter" %}" data-toggle="tooltip" data-placement="top"><i class="icon-link"></i> {% trans "Attach server Template" %}</a>
+              </div>
+              {% endif %}
+            </td>
+          </tr>
+        </tfoot>
+
+      </table>
+    </div>
+
+  </div> <!-- end row-fluid -->
+</div> <!-- end container-fluid -->
+{% endblock %}

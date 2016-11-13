@@ -1,0 +1,19 @@
+{% extends load_base %}
+{% load i18n %}
+
+{% block base_content %}
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span8 offset2">
+      <div class="box">
+        <div class="tab-header tab-header-light">
+          <i class="icon-bullhorn"></i> {% trans "Permission denied" %}
+        </div>
+        <div class="padded">
+          <p>{% trans "Please contact your cloud administrator for new server requests." %}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> <!-- end container-fluid -->
+{% endblock %}

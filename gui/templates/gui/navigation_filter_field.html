@@ -1,0 +1,10 @@
+<div class="input {% if field.errors %}error wobble animated{% endif %}">
+  {% if "checkbox" in field.field.widget.attrs.class %}
+  <label for="{{ field.id_for_label }}" class="input-navigation">{{ field }} {{ field.label }}</label>
+  {% else %}
+  {{ field }}
+  {% endif %}
+  {% for error in field.errors %}
+  <span class="help-inline error pull-right"><i class="icon-warning-sign"></i> {{ error }}</span>
+  {% endfor %}
+</div>

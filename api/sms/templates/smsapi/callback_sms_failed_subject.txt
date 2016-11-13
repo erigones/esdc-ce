@@ -1,0 +1,1 @@
+{% load i18n %}{% autoescape off %}{% blocktrans with phone=to %}Error with SMS to {{ phone }}{% endblocktrans %}{% endautoescape %}

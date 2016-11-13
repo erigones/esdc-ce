@@ -1,0 +1,231 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Erigones GUI JS\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-10-25 14:03+0000\n"
+"PO-Revision-Date: 2013-10-18 14:02+0100\n"
+"Last-Translator: Richard Kellner <richard.kellner@erigones.com>\n"
+"Language-Team: Erigones s. r. o. <erigones@erigones.com>\n"
+"Language: SK\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"X-Generator: Poedit 1.5.4\n"
+
+#: static/3rd-party/jqueryUI/jquery-ui.min.js:10
+msgid "'"
+msgstr ""
+
+#: static/guacamole/scripts/guacamole-erigones.js:151
+msgid "Idle."
+msgstr "Nečinný."
+
+#: static/guacamole/scripts/guacamole-erigones.js:154
+msgid "Connecting..."
+msgstr "Pripájanie..."
+
+#: static/guacamole/scripts/guacamole-erigones.js:157
+msgid "Connected, waiting for first update..."
+msgstr "Pripojený, čáka sa na prvú odozvu..."
+
+#: static/guacamole/scripts/guacamole-erigones.js:163
+msgid "Disconnecting..."
+msgstr "Odpájanie..."
+
+#: static/guacamole/scripts/guacamole-erigones.js:166
+msgid "Disconnected."
+msgstr "Odpojený."
+
+#: static/guacamole/scripts/guacamole-erigones.js:169
+msgid "Unknown status"
+msgstr "Neznámy stav"
+
+#: static/gui/js/gsio.js:327
+msgid "Socket.io connection error."
+msgstr "Chyba v spojení so Socket.io."
+
+#: static/gui/js/gsio.js:336
+msgid "Socket.io connection problem. Please try again later."
+msgstr "Chyba v spojení so Socket.io. Prosím skúste to znovu."
+
+#: static/gui/js/gsio.js:345
+msgid ""
+"Your current datacenter was changed by another user session. Please refresh "
+"your browser."
+msgstr ""
+
+#: static/gui/js/gsio.js:654
+msgid "Server"
+msgstr "Server"
+
+#: static/gui/js/gsio.js:654
+msgid "changed status to"
+msgstr "zmenil stav na"
+
+#: static/gui/js/gsio.js:758
+msgid "Snapshot successfully created"
+msgstr "Snapshot bol úspešne vytvorený"
+
+#: static/gui/js/gsio.js:761
+msgid "Snapshot successfully deleted"
+msgstr "Snapshot bol úspešne vymazaný"
+
+#: static/gui/js/gsio.js:764
+msgid "Snapshot successfully restored"
+msgstr "Snapshot bol úspešne obnovený"
+
+#: static/gui/js/gsio.js:772
+msgid "Creating new snapshot failed"
+msgstr "Vytvorenie snapshotu zlyhalo"
+
+#: static/gui/js/gsio.js:775
+msgid "Deleting snapshot failed"
+msgstr "Vymazanie snapshotu zlyhalo"
+
+#: static/gui/js/gsio.js:778
+msgid "Restoring snapshot failed"
+msgstr "Obnova snapshotu zlyhala"
+
+#: static/gui/js/gsio.js:823
+msgid "Backup successfully created"
+msgstr ""
+
+#: static/gui/js/gsio.js:826
+msgid "Backup successfully deleted"
+msgstr ""
+
+#: static/gui/js/gsio.js:829
+msgid "Backup successfully restored"
+msgstr ""
+
+#: static/gui/js/gsio.js:837
+msgid "Creating new backup failed"
+msgstr ""
+
+#: static/gui/js/gsio.js:840
+msgid "Deleting backup failed"
+msgstr ""
+
+#: static/gui/js/gsio.js:843
+msgid "Restoring backup failed"
+msgstr ""
+
+#: static/gui/js/helpers.js:243
+msgid "Unknown error"
+msgstr ""
+
+#: static/gui/js/helpers.js:247
+msgid "Network error"
+msgstr ""
+
+#: static/gui/js/mon.js:99
+msgid "N/A"
+msgstr "N/A"
+
+#: static/user-guide/_static/doctools.js:167
+msgid "Permalink to this headline"
+msgstr ""
+
+#: static/user-guide/_static/doctools.js:173
+msgid "Permalink to this definition"
+msgstr ""
+
+#: static/user-guide/_static/doctools.js:206
+msgid "Hide Search Matches"
+msgstr ""
+
+#: static/user-guide/_static/searchtools.js:300
+msgid "Searching"
+msgstr ""
+
+#: static/user-guide/_static/searchtools.js:305
+msgid "Preparing search..."
+msgstr ""
+
+#: static/user-guide/_static/searchtools.js:461
+msgid "Search Results"
+msgstr ""
+
+#: static/user-guide/_static/searchtools.js:463
+msgid ""
+"Your search did not match any documents. Please make sure that all words are "
+"spelled correctly and that you've selected enough categories."
+msgstr ""
+
+#: static/user-guide/_static/searchtools.js:465
+#, javascript-format
+msgid "Search finished, found %s page(s) matching the search query."
+msgstr ""
+
+#: static/user-guide/_static/searchtools.js:517
+msgid ", in "
+msgstr ""
+
+#~ msgid "recurring"
+#~ msgstr "Pravidelné platby"
+
+#~ msgid "non-recurring"
+#~ msgstr "Jednorazová platba"
+
+#~ msgid "save "
+#~ msgstr "ušetríte "
+
+#~ msgid "Test period"
+#~ msgstr "Testovacia perióda"
+
+#~ msgid ""
+#~ "We are sorry, but this subscription cannot be changed automatically.\n"
+#~ "Please submit a support ticket or contact us via email for custom "
+#~ "subscription offer."
+#~ msgstr ""
+#~ "Je nám lúto, ale Vaše predplatené obdobie nie je možné automaticky "
+#~ "zmeniť. Prosím zadajte supportnú požiadavku alebo nás kontaktujte emailom "
+#~ "pre vypracovanie ponuky na zmenu predplateného obdobia."
+
+#~ msgid "This payment provider is not available for custom subscriptions."
+#~ msgstr ""
+#~ "Tohto poskytovateľa platobných služieb nie je možné použiť na úhradu "
+#~ "Vášho špeciálneho predplateného obdobia."
+
+#~ msgid "Contacting Payment Provider"
+#~ msgstr "Kontaktujem poskytovateľa platobných služieb"
+
+#~ msgid ""
+#~ "Test period cannot be renewed. Please change subscription parameters for "
+#~ "the next period."
+#~ msgstr ""
+#~ "Testovacie predplatené obdobie nie je možné obnoviť. Prosím zvoľte nové "
+#~ "predplatné na daľšie obdobie."
+
+#~ msgid "Server name is already used by another server"
+#~ msgstr "Názov servera sa už používa"
+
+#~ msgid "Server name has to be between 4 and 24 characters long"
+#~ msgstr "Názov servera musí mať dĺžku od 4 do 24 znakov"
+
+#~ msgid "Server name can contain only letters, numbers and hyphens"
+#~ msgstr "Názov servera môže obsahovať len písmena, čísla a pomlčky"
+
+#~ msgid "Invalid server configuration"
+#~ msgstr "Chybná konfigurácia servera"
+
+#~ msgid "Invalid server name"
+#~ msgstr "Chybný názov servera"
+
+#~ msgid "Invalid disk image"
+#~ msgstr "Chybný obraz disku"
+
+#~ msgid "Invalid subscription period"
+#~ msgstr "Chybné predplatené obdobie"
+
+#~ msgid "Error"
+#~ msgstr "Chyba"
+
+#~ msgid "Your request has timed out."
+#~ msgstr "Vaša požiadavka vypršala."

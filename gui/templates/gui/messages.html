@@ -1,0 +1,5 @@
+{% if messages %}<script type="text/javascript">
+{% for message in messages %}
+  notify({% if message.tags %}'{{ message.tags }}'{% else %}'error'{% endif %}, '{{ message }}', 7);
+{% endfor %}
+</script>{% endif %}

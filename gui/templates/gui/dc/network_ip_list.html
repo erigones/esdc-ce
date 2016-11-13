@@ -1,0 +1,279 @@
+{% extends load_base %}
+{% load i18n %}
+{% load gui_utils %}
+
+{% block javascript %}
+<script type="text/javascript">
+  $(document).ready(function() {
+    DC_NETWORK_IPS = new DcNetworkIPList({% if can_edit %}true{% else %}false{% endif %});
+  });
+</script>
+{% endblock %}
+
+{% block base_content %}
+{% if can_edit %}
+<div id="network_modal" class="black-box modal hide fade vm_modal">
+  <div class="modal-head tab-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <span class="title_edit"><i class="icon-retweet"></i> {% trans "Update or Delete Network" %}</span>
+    <span class="title_add"></span>
+  </div>
+  <div class="modal-body separator">
+    <div class="text_edit"></div>
+    <div class="text_add"></div>
+    <form class="form-horizontal" action="#" data-source="{{ url_form_admin }}" method="POST">
+      {% include "gui/dc/network_admin_form.html" with form=form_admin nodc="True" %}
+    </form>
+  </div>
+  <div class="modal-footer">
+    <div class="inner-well">
+      <span class="pull-left"><a class="vm_modal_more btn btn-small btn-inverse no-ajax">{% trans "Show advanced settings" %}</a></span>
+      <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
+      <a class="vm_modal_update button green no-ajax" data-enter="true">{% trans "Update" %}</a>
+      <a class="vm_modal_delete button red no-ajax">{% trans "Delete Network" %}</a>
+    </div>
+  </div>
+</div>
+
+<div id="obj_form_modal" class="black-box modal hide fade vm_modal">
+  <div class="modal-head tab-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <span class="title_edit"><i class="icon-edit"></i> {% trans "Update or Delete IP address" %}</span>
+    <span class="title_add"><i class="icon-plus"></i> {% trans "Add new IP address(es)" %}</span>
+  </div>
+  <div class="modal-body separator">
+    <div class="text_edit"></div>
+    <div class="text_add"></div>
+    <form class="form-horizontal" action="#" data-source="{{ url_form_ip }}" method="POST">
+      {% include "gui/dc/network_ip_form.html" with form=form_ip %}
+    </form>
+  </div>
+  <div class="modal-footer">
+    <div class="inner-well">
+      <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
+      <a class="vm_modal_delete button red no-ajax">{% trans "Delete" %}</a>
+      <a class="vm_modal_update button green no-ajax" data-enter="true">{% trans "Update" %}</a>
+      <a class="vm_modal_create button green no-ajax" data-enter="true">{% trans "Add IP address(es)" %}</a>
+    </div>
+  </div>
+</div>
+
+<div id="ips_del_modal" class="black-box modal hide fade vm_modal">
+  <div class="modal-head tab-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <span class="title_edit"><i class="icon-warning-sign"></i> {% trans "Delete IP addresses" %}</span>
+    <span class="title_add"></span>
+  </div>
+
+  <div class="modal-body separator">
+    <form class="form-horizontal" action="#" data-source="{{ url_form_ip }}" method="POST">
+      {% include "gui/dc/network_ips_form.html" with form=form_ips %}
+    </form>
+
+    <div class="text_edit form-horizontal form-fake">
+      <div class="input">
+        <div class="control-group thinner">
+          <label class="control-label">{% trans "IP Addresses" %}:</label>
+          <div class="controls"><div class="input-fake">__ips__</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="text_add"></div>
+  </div>
+
+  <div class="modal-footer">
+    <div class="inner-well">
+      <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
+      <a class="vm_modal_delete button red no-ajax">{% trans "Delete" %}</a>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<div class="container-fluid">
+
+  <div class="row-fluid">
+    <div class="span6">
+      <div class="tab-header">
+        <i class="icon-retweet"></i> {% trans "Networks" %} &rsaquo; {{ net.alias }}
+      </div>
+      <table class="table box table-striped">
+        <thead>
+        </thead>
+
+        <tbody>
+          <tr>
+            <th>{% trans "Alias" %}:</th>
+            <td>{% if can_edit %}<a href="#" id="network_edit" class="btn-link btn-icon-edit no-ajax" title="{% trans "Update or delete Network" %}" data-toggle="tooltip" data-placement="bottom" data-prefix="adm">{{ net.alias }}</a>{% else %}{{ net.alias }}{% endif %}</td>
+          </tr>
+          <tr><th>{% trans "Name" %}:</th><td>{{ net.name }}</td></tr>
+          <tr><th>{% trans "Network" %}:</th><td>{{ net.network }}</td></tr>
+          <tr><th>{% trans "Netmask" %}:</th><td>{{ net.netmask }}</td></tr>
+          <tr><th>{% trans "Gateway" %}:</th><td>{{ net.gateway }}</td></tr>
+          {% if can_edit %}
+          <tr><th>{% trans "VLAN ID" %}:</th><td>{{ net.vlan_id }}</td></tr>
+          <tr><th>{% trans "First host address" %}:</th><td>{{ netinfo.min }}</td></tr>
+          <tr><th>{% trans "Last host address" %}:</th><td>{{ netinfo.max }}</td></tr>
+          <tr>
+            <th>{% trans "Usable / Registered / Free IPs" %}:</th>
+            <td>{{ netinfo.hosts }} / {{ total }} / {{ free }}</td>
+          </tr>
+          {% else %}
+          <tr>
+            <th>{% trans "Total / Free IPs" %}:</th>
+            <td>{{ total }} / {{ free }}</td>
+          </tr>
+          {% endif %}
+          <tr><th>{% trans "Description" %}:</th><td><small>{{ net.desc }}</small></td></tr>
+          {% if is_staff %}{% with ip_network=net.ip_network %}{% url 'dc_subnet_ip_list' ip_network.network_address ip_network.prefixlen net.vlan_id as subnet_url %}
+          <tr class="row-alert"><td colspan="2">
+          {% blocktrans with ip_network=ip_network vlan_id=net.vlan_id count counter=networks %}
+          This subnet <small>({{ ip_network }})</small> with this VLAN ID <small>({{ vlan_id }})</small> is <a href="{{ subnet_url }}" class="btn-link">used by {{ networks }} network</a>.
+          {% plural %}
+          This subnet <small>({{ ip_network }})</small> with this VLAN ID <small>({{ vlan_id }})</small> is <a href="{{ subnet_url }}" class="btn-link">used by {{ networks }} networks</a>.
+          {% endblocktrans %}
+          </td></tr>
+          {% endwith %}{% endif %}
+          {% if net.dhcp_passthrough %}
+          <tr class="row-alert"><td colspan="2">
+              <i class="icon-warning-sign"></i> {% trans "IP addresses for this network are managed by an external service" %}.
+          </td></tr>
+          {% endif %}
+        </tbody>
+
+        <tfoot>
+          <tr>
+            <td colspan="2">
+              <div>
+                <a href="{% url 'dc_network_list' %}?{{ qs }}" class="button gray"><i class="icon-circle-arrow-left"></i> {% trans "Return to network list" %}</a>
+              </div>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <div class="row-fluid">
+    <div class="span12">
+      <div class="tab-header">
+        <span class="options window-control pull-right">
+          <i class="icon-cloud"></i> {{ request.dc.alias }}
+        </span>
+        <i class="icon-retweet"></i> {% trans "Networks" %} &rsaquo; {{ net.alias }} &rsaquo; {% trans "IP addresses" %}
+      </div>
+      <table class="table box table-striped table-hover table-responsive" id="etable">
+
+        <thead>
+          {% if can_edit %}
+          <tr>
+            <th colspan="{{ colspan }}">
+              <div class="pull-right">
+                {% if used %}
+                <a href="{{ request.path }}?{{ qs|qs_del:'used' }}" class="btn btn-mini active" title="{% trans "Switch between showing all or only used IP addresses" %}" data-toggle="tooltip" data-placement="left"><i class="icon-check"></i> {% trans "Used IPs" %}</a>
+                {% else %}
+                <a href="{{ request.path }}?{{ qs|qs_set:'used' }}" class="btn btn-mini" title="{% trans "Switch between showing all or only used IP addresses" %}" data-toggle="tooltip" data-placement="left"><i class="icon-check-empty"></i> {% trans "Used IPs" %}</a>
+                {% endif %}
+                {% include "gui/dc/dc_all_toggle.html" %}
+              </div>
+            </th>
+          </tr>
+          {% endif %}
+          {% if ips %}
+          <tr class="sortable" data-order_by="{{ order_by.0 }}">
+            {% if can_edit %}
+            <th class="top chbox hidden-phone-small">
+              <div class="input">
+                <input type="checkbox" class="normal-check" id="id_all" />
+                <label for="id_all"></label>
+              </div>
+            </th>
+            {% endif %}
+            <th data-field="ip">{% trans "IP address" %}</th>
+            <th>{% trans "Usage" %}</th>
+            <th data-field="hostname">{% trans "Server" %}</th>
+            <th class="hidden-phone" data-field="hostname">{% trans "Hostname" %}</th>
+            {% if all %}<th class="hidden-phone">{% trans "Datacenter" %}</th>{% endif %}
+            <th class="hidden-phone">{% trans "MAC address" %}</th>
+            <th class="hidden-phone">{% trans "Note" %}</th>
+          </tr>
+          {% endif %}
+        </thead>
+
+        <tbody>
+          {% for ip in ips %}{% with vm=ip.vm is_node_address=ip.is_node_address %}
+          <tr>
+            {% if can_edit %}
+            {% if is_node_address %}
+            <td class="top chbox hidden-phone-small">
+              <div class="input">
+                <input type="checkbox" class="normal-check" id="id_{{ ip.ip }}" disabled="disabled" readonly="true" />
+                <label for="id_{{ ip.ip }}"></label>
+              </div>
+            </td>
+            <td class="nowrap">{{ ip.ip }}</td>
+            {% else %}
+            <td class="top chbox hidden-phone-small">
+              <div class="input">
+                <input type="checkbox" class="normal-check" id="id_{{ ip.ip }}"{% if ip.vm %} disabled="disabled" readonly="true"{% endif %} />
+                <label for="id_{{ ip.ip }}"></label>
+              </div>
+            </td>
+            <td class="nowrap">
+              <a href="#" class="btn-link btn-icon-edit no-ajax obj_edit" title="{% trans "Update or delete IP address" %}" data-toggle="tooltip" data-placement="bottom" data-form='{{ ip.web_data|jsondata }}'>{{ ip.ip }}</a>
+            </td>
+            {% endif %}{% else %}
+            <td class="nowrap">{{ ip.ip }}</td>
+            {% endif %}
+            <td>{{ ip.get_usage_display }}</td>
+            {% if vm %}
+            <td class="nowrap">
+              {% if all %}<a href="{% url 'dc_vm_details' vm.dc vm.hostname %}" class="btn-link">{% else %}<a href="{% url 'vm_details' vm.hostname %}" class="btn-link">{% endif %}<i class="icon-hdd"></i>&nbsp;{{ vm.alias }}</a>
+            </td>
+            <td class="hidden-phone nowrap"><span class="vm_hostname">{{ vm.hostname }}</span></td>
+            {% if all %}<td class="hidden-phone nowrap"><span class="vm_hostname"><i class="icon-cloud"></i> {{ vm.dc.alias }}</span></td>{% endif %}
+            {% else %}
+            <td></td>
+            <td class="hidden-phone nowrap">{% if is_node_address %}<span class="vm_hostname">{{ ip.hostname }}</span>{% endif %}</td>
+            {% if all %}<td class="hidden-phone"></td>{% endif %} {# other IPs have no DC relation #}
+            {% endif %}
+            <td class="hidden-phone nowrap"><span class="vm_hostname">{{ ip.mac }}</span></td>
+            <td class="hidden-phone"><small class="vm_snapshot_note">{{ ip.api_note|wordwrap:44 }}</small></td>
+          </tr>
+          {% endwith %}{% endfor %}
+        </tbody>
+
+        <tfoot>
+          <tr>
+            <td colspan="{{ colspan }}">
+              {% if can_edit %}
+              <div>
+                <span>
+                  {% blocktrans count len=pager.paginator.count %}Selected <span id="selected">0</span> of <span id="total">{{ len }}</span> IP address{% plural %}Selected <span id="selected">0</span> of <span id="total">{{ len }}</span> IP addresses{% endblocktrans %}
+                </span>
+              </div>
+              {% if ips and pager.paginator.num_pages > 1 %}
+              <div class="paginator-sink dataTables_paginate center">
+                {% paginator %}
+              </div>
+              {% endif %}
+              <div class="vm_control">
+                <a href="#" class="button gray no-ajax obj_add{% if netinfo.hosts == total %} disabled{% endif %}" title="{% trans "Add IP address or range of IP addresses into this network" %}" data-toggle="tooltip" data-placement="top" data-prefix='adm'><i class="icon-plus"></i> {% trans "Add IP address(es)" %}</a>
+                <a href="#" class="button gray no-ajax obj_del disabled" id="ips_del" title="{% trans "Delete selected IP addresses" %}" data-toggle="tooltip" data-placement="top" data-prefix='adm'><i class="icon-remove"></i> {% trans "Delete" %}</a>
+              </div>
+              {% else %}
+              <span class="pull-right">
+                {% trans "Total" %}: {{ pager.paginator.count }}&nbsp;
+              </span>
+              {% endif %}
+            </td>
+          </tr>
+        </tfoot>
+
+      </table>
+    </div>
+
+  </div> <!-- end row-fluid -->
+</div> <!-- end container-fluid -->
+{% endblock %}

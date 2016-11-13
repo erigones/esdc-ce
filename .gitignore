@@ -1,0 +1,53 @@
+# Django stuff
+*.log
+*.pot
+*.pyc
+local_settings.py
+local_config.py
+local_gunicorn.py
+config.cfg
+
+# Packages
+*.egg
+*.egg-info
+dist
+build
+eggs
+parts
+sdist
+develop-eggs
+.installed.cfg
+MANIFEST
+envs
+.initialized
+
+# Databases
+*.sql
+*.db
+
+# Installer logs
+pip-log.txt
+
+# Unit test / coverage reports
+.coverage
+.tox
+
+# SASS generated files
+.sass-cache
+*.css.map
+
+# PyCharm
+.idea
+
+# Eclipse
+.project
+.pydevproject
+.settings
+
+# OS files
+.DS_Store
+*.swp
+*.test
+
+# Celery
+celerybeat-schedule*

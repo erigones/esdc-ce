@@ -1,0 +1,43 @@
+{% extends load_base %}
+{% load i18n %}
+
+{% block javascript %}
+<script type="text/javascript">
+  $(document).ready(function() {
+    show_loading_screen('{% trans "Loading console window" %}', false, true);
+    var vncs = [];
+    {% for vm in vms_vnc %}
+    var vnc_e = $(jq('vnc_{{ vm.hostname }}'));
+    vncs.push(new VNC(vnc_e, 330));
+    vnc_e.load(function() {
+      if (_.every(vncs, function(x) { return x.is_loaded(); })) {
+        hide_loading_screen();
+      }
+    });
+    {% endfor %}
+  });
+</script>
+{% endblock %}
+
+{% block base_content %}
+<div class="container-fluid">
+  <div class="row-fluid">
+
+    {% for vm in vms_vnc %}
+    {% if forloop.counter|divisibleby:cols %}</div><div class="row-fluid">{% endif %}
+    <div class="{{ span }} black-box">
+      <div class="tab-header">
+        <span>
+          <i class="icon-picture"></i> {{ vm.alias }} &rsaquo; {% trans "console" %}
+        </span>
+        <span class="options window-control pull-right">
+          <a href="{% url 'vnc' vm.hostname %}?nologin=1" target="_blank" class="no-ajax" title="{% trans "Open console in new window" %}" data-toggle="tooltip" data-placement="left"><i class="icon-external-link"></i></a>
+        </span>
+      </div>
+      <iframe id="vnc_{{ vm.hostname }}" class="vnc" src="{% url 'vnc' vm.hostname %}?nologin=1&zoom=1" seamless="seamless"></iframe>
+    </div> <!-- end span4 -->
+    {% endfor %}
+
+  </div> <!-- end row-fluid -->
+</div> <!-- end container-fluid -->
+{% endblock %}

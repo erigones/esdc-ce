@@ -1,0 +1,22 @@
+{% load i18n %}
+{% csrf_token %}
+{% for error in form.non_field_errors %}
+<div class="alert alert-error"><i class="icon-warning-sign"></i> {{ error }}</div>
+{% endfor %}
+
+{% include "gui/dc/dc_form_field.html" with prefix="_adm" %}
+{% include "gui/form_field_checkbox.html" with field=form.dc_bound %}
+{% include "gui/form_field.html" with field=form.manifest_url %}
+{% include "gui/form_field.html" with field=form.name %}
+{% include "gui/form_field.html" with field=form.alias %}
+{% include "gui/form_field.html" with field=form.version %}
+{% include "gui/form_field.html" with field=form.owner %}
+{% include "gui/form_field.html" with field=form.access %}
+{% include "gui/form_field.html" with field=form.tags %}
+{% include "gui/form_field.html" with field=form.desc %}
+
+<div class="advanced hide">
+{% include "gui/form_field_checkbox.html" with field=form.resize %}
+{% include "gui/form_field_checkbox.html" with field=form.deploy %}
+{% include "gui/form_field.html" with field=form.file_url %}
+</div>

@@ -1,0 +1,148 @@
+#cached-tasks {
+  bottom: 0;
+  position: fixed;
+  width: 100%;
+  display: none;
+  a {
+    color: #fff;
+    &:hover {
+      color: #aaa;
+    }
+  }
+}
+
+#cached-tasks-icon {
+  -webkit-box-shadow: 0px -5px 10px 3px rgba(0, 0, 0, 0.1);
+  -moz-box-shadow: 0px -5px 10px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px -5px 10px 3px rgba(0, 0, 0, 0.1);
+  -webkit-border-top-left-radius: 5px;
+  -webkit-border-top-right-radius: 5px;
+  -moz-border-radius-topleft: 5px;
+  -moz-border-radius-topright: 5px;
+  -ms-border-top-left-radius: 5px;
+  -ms-border-top-right-radius: 5px;
+  -o-border-top-left-radius: 5px;
+  -o-border-top-right-radius: 5px;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  border: 1px solid #1D1E21;
+  border-bottom: 0px;
+  /* background: #3B3B42; */
+  background: inline-image('backgrounds/linen-gray.png');
+  color: #fff;
+  text-shadow: 0 1px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  cursor: pointer;
+  padding: 5px;
+  width: 100px;
+  margin-left: 65%;
+}
+
+#cached-tasks-details {
+  -webkit-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.6), inset 1px 0px 0px rgba(255, 255, 255, 0.1), inset -1px 0px 0px rgba(255, 255, 255, 0.1), inset 0px -1px 0px rgba(255, 255, 255, 0.1);
+  -moz-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.6), inset 1px 0px 0px rgba(255, 255, 255, 0.1), inset -1px 0px 0px rgb a(255, 255, 255, 0.1), inset 0px -1px 0px rgba(255, 255, 255, 0.1);
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.6), inset 1px 0px 0px rgba(255, 255, 255, 0.1), inset -1px 0px 0px rgba(255, 255, 255, 0.1), inset 0px -1px 0px rgba(255, 255, 255, 0.1);
+  border-top: 1px solid #1D1E21;
+  /* background: #3B3B42; */
+  background: inline-image('backgrounds/linen-gray.png');
+  color: #fff;
+  text-shadow: 0 1px rgba(0, 0, 0, 0.5);
+  opacity: 0.9;
+  padding-top: 2px;
+  padding-bottom: 1px;
+
+  table {
+    width: 100%;
+    tr {
+      td {
+        padding: 2px 5px;
+        vertical-align: middle;
+      }
+      &:nth-child(even) td {
+        background-color: rgba(255, 255, 255, 0.05);
+      }
+    }
+  }
+}
+
+#tasklog {
+  pre {
+    line-height: 16px;
+    font-size: 10px;
+    color: #222;
+    margin: 0;
+    padding: 1px 2px;
+    display: inline-block;
+    background-color: transparent;
+  }
+
+  span.log-detail-less, span.log-detail-more {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    i {
+      position: absolute;
+      top: 0;
+      right: 5px;
+      margin: 0;
+      padding: 0;
+      cursor: pointer;
+    }
+  }
+
+  > tr > td > pre {
+    max-width: 400px;
+  }
+}
+
+.loading-gif {
+  background-image: inline-image('loading.gif');
+  background-repeat: no-repeat;
+  background-position: 100% 0;
+  background-size: 14px 14px;
+}
+
+.loading-gif-header {
+  background-image: inline-image('loading.gif');
+  background-repeat: no-repeat;
+  background-position: 98% 50%;
+  background-size: 14px 14px;
+}
+
+.loading-gif-navi {
+  background-image: inline-image('loading.gif');
+  background-repeat: no-repeat;
+  background-position: 90% 10%;
+  background-size: 14px 14px;
+}
+
+.icon-PENDING:before { content: "\f085"; }
+.icon-STARTED:before { content: "\f085"; }
+.icon-SUCCESS:before { content: "\f087"; }
+.icon-FAILURE:before { content: "\f088"; }
+.icon-REVOKED:before { content: "\f00d"; }
+
+.icon-vm:before { content: "\f0a0"; }
+.icon-node:before { content: "\f0e8"; }
+.icon-dc:before { content: "\f0c2"; }
+.icon-nodestorage:before { content: "\f00a"; }
+.icon-image:before { content: "\f0c7"; }
+.icon-subnet:before { content: "\f079"; }
+.icon-vmtemplate:before { content: "\f0e9"; }
+.icon-iso:before { content: "\f01d"; }
+.icon-domain:before { content: "\f0ac"; }
+.icon-role:before { content: "\f0c0"; }
+.icon-imagestore:before { content: "\f00b"; }
+
+.icon-task-flag0:before { content: "\f0ae"; }
+.icon-task-flag1:before { content: "\f067"; }
+.icon-task-flag2:before { content: "\f00d"; }
+.icon-task-flag3:before { content: "\f040"; }
+.icon-task-flag4:before { content: "\f064"; }
+
+tr.running > td > div.status {
+  background-image: inline-image('loading.gif');
+  background-repeat: no-repeat;
+  background-position: 99% 10%;
+  background-size: 14px 14px;
+}

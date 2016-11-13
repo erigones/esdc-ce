@@ -1,0 +1,11 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+
+{% block title %}{{ title }} | {% trans 'Danube Cloud Admin' %}{% endblock %}
+
+{% block branding %}
+{% if request.impersonated %}{% include "impersonation.html" %}{% endif %}
+<h1 id="site-name">{% trans 'Danube Cloud Admin' %}</h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}

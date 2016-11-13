@@ -1,0 +1,506 @@
+#!/usr/bin/env bash
+#
+# esimg - Erigones VM image creator
+#
+
+set -u
+set -o pipefail
+
+
+###############################################################
+# globals
+###############################################################
+
+ERIGONES_HOME=${ERIGONES_HOME:-"/opt/erigones"}
+SELF="${ERIGONES_HOME}/bin/esimg"
+PROG="$(basename "$0")"
+
+. "${ERIGONES_HOME}"/bin/eslib/functions.sh
+
+
+declare MODE								# string: "create" or "import"
+declare VERBOSE=""							# bool: print info messages if non-empty
+declare DATASETS							# string: path to datasets directory
+declare MANIFEST							# string: json manifest
+declare IMG_UUID							# string: image uuid
+declare IMG_DIR								# string: target image dir path
+declare IMG_FILE							# string: target image file path
+declare IMG_MANIFEST						# string: target image manifest file path
+declare IMG_DIR_CREATED=""					# bool: true if target image dir was created (used by rollback)
+declare DSNAP								# string: source dataset@snapshot
+declare IMG_URL								# string: image file URL
+declare HOST								# string: IP address
+declare SIZE								# long: total transfer size in bytes
+declare SIZE_REQUIRED						# long: approximate size of saved data (bytes)
+declare -i TIME_STARTED=$(get_timestamp)	# int: timestamp
+declare -ri SHIPMENT_UID=10000				# int: image server user ID
+declare -ri SHIPMENT_GID=10000				# int: image server group ID
+
+
+###############################################################
+# exit codes
+###############################################################
+
+declare -ri OK=0
+declare -ri ERR_INPUT=1
+declare -ri ERR_MANIFEST_CHECK=2
+declare -ri ERR_DATASETS_CHECK=3
+declare -ri ERR_HOST_CHECK=4
+declare -ri ERR_DSNAP_CHECK=5
+declare -ri ERR_URL_CHECK=6
+declare -ri ERR_IMG_DIR=7
+declare -ri ERR_IMG_FILE=8
+declare -ri ERR_IMG_MANIFEST=9
+declare -ri ERR_IMG_SIZE=10
+
+
+###############################################################
+# helpers
+###############################################################
+
+function techo() {
+	local msg=$*
+
+	[[ -z "${VERBOSE}" ]] && return 0
+
+	echo "[$(${DATE} '+%Y-%d-%m %H:%M:%S')] ${msg}"
+}
+
+function usage() {
+	cat << EOF
+Usage: ${PROG} {create|update|delete|import} [parameters] [< <image manifest>]
+
+  Create mode parameters:
+    <image manifest>        valid json read from stdin will be saved as the image manifest [required]
+    -d <datasets dir>       path to datasets directory on image server [required]
+    -s <dataset@snapshot>   name of the source dataset and snapshot used for creating the image [required]
+    -H <host>               IP address of the compute node where the source dataset is located
+    -v                      print information about each step of the creation process
+
+  Update mode parameters:
+    <image manifest>        valid json read from stdin will be saved as the image manifest [required]
+    -d <datasets dir>       path to datasets directory on image server [required]
+    -v                      print information about each step of the creation process
+
+  Delete mode parameters:
+    -d <datasets dir>       path to datasets directory on image server [required]
+    -u                      image uuid [required]
+    -v                      print information about each step of the creation process
+
+  Import mode parameters:
+    <image manifest>        valid json read from stdin will be saved as the image manifest [required]
+    -d <datasets dir>       path to datasets directory on image server [required]
+    -f <image file URL>     HTTP URL pointing to image file [required]
+    -v                      print information about each step of the import process
+
+EOF
+}
+
+
+###############################################################
+# stage 1
+###############################################################
+
+validate_datasets() {
+	[[ -z "${DATASETS}" ]] && die ${ERR_DATASETS_CHECK} "Missing datasets image directory parameter"
+	[[ ! -d "${DATASETS}" ]] && die ${ERR_DATASETS_CHECK} "Datasets image directory does not exist"
+}
+
+_set_image_paths() {
+	IMG_DIR="${DATASETS}/${IMG_UUID}"
+	IMG_MANIFEST="${IMG_DIR}/manifest"
+	IMG_FILE="${IMG_DIR}/file"
+}
+
+validate_image() {
+	validate_uuid "${IMG_UUID}"
+
+	_set_image_paths
+
+	[[ ! -d "${IMG_DIR}" ]] && die ${ERR_INPUT} "Image directory does not exist"
+}
+
+validate_manifest() {
+	[[ -z "${MANIFEST}" ]] && die ${ERR_MANIFEST_CHECK} "Missing image manifest"
+
+	IMG_UUID=$(echo "${MANIFEST}" | json "uuid")
+
+	validate_uuid "${IMG_UUID}"
+
+	[[ ${?} -ne 0 || -z "${IMG_UUID}" ]] && die ${ERR_MANIFEST_CHECK} "Invalid image manifest"
+}
+
+validate_image_paths() {
+	_set_image_paths
+
+	[[ ! -d "${IMG_DIR}" ]] && die ${ERR_MANIFEST_CHECK} "Target image directory does not exist"
+	[[ ! -f "${IMG_MANIFEST}" ]] && die ${ERR_MANIFEST_CHECK} "Target image manifest already exists"
+}
+
+check_image_paths() {
+	_set_image_paths
+
+	[[ -d "${IMG_DIR}" ]] && die ${ERR_MANIFEST_CHECK} "Target image directory already exists"
+	[[ -f "${IMG_MANIFEST}" ]] && die ${ERR_MANIFEST_CHECK} "Target image manifest already exists"
+	[[ -f "${IMG_FILE}" ]] && die ${ERR_MANIFEST_CHECK} "Target image file already exists"
+}
+
+validate_host_ssh() {
+	if [[ -n "${HOST}" ]]; then
+		validate_ascii "${HOST}" "Invalid target host name or IP address"
+		test_ssh "${HOST}" || die ${ERR_HOST_CHECK} "Source host is unreachable!"
+	fi
+}
+
+_host_cmd() {
+	local -a cmd=("$@")
+	local agent
+
+	if [[ -n "${VERBOSE}" ]]; then
+		agent="agent-verbose"
+	else
+		agent="agent"
+	fi
+
+	if [[ -n "${HOST}" ]]; then
+		run_ssh "root@${HOST}" "${SELF} ${agent} ${cmd[*]}"
+	else
+		"${cmd[@]}"
+	fi
+}
+
+validate_dataset_snapshot() {
+	[[ -z "${DSNAP}" ]] && die ${ERR_DSNAP_CHECK} "Missing source dataset parameter"
+
+	SIZE="$(_host_cmd _zfs_send_size "${DSNAP}")"
+
+	[[ ${?} -ne 0 || -z "${SIZE}" ]] && die ${ERR_DSNAP_CHECK} "Invalid source dataset"
+
+	SIZE_REQUIRED=$(round "$(calculate "${SIZE}*0.8")")  # Calculate only 80% of zfs stream size, because of compression
+}
+
+validate_url() {
+	[[ -z "${IMG_URL}" ]] && die ${ERR_URL_CHECK} "Missing image file URL parameter"
+
+	#
+	# HEAD method is not available in curl, so this check was moved to API.
+	#
+
+	SIZE=$(echo "${MANIFEST}" | json "files.0.size")
+
+	[[ ${?} -ne 0 || -z "${SIZE}" ]] && die ${ERR_MANIFEST_CHECK} "Invalid file in image manifest"
+
+	SIZE_REQUIRED=$(round "$(calculate "${SIZE}+512*1024")")  # Add some kB for the manifest
+}
+
+validate_image_size() {
+	local free_space="$(_zfs_dataset_property "${DATASETS}" "available" 2> /dev/null)"
+
+	[[ ${SIZE_REQUIRED} -gt ${free_space} ]] && die ${ERR_IMG_SIZE} "Not enough free space on image server"
+}
+
+verbose_stage1() {
+	[[ -z "${VERBOSE}" ]] && return
+
+	echo "Going to ${MODE} image ${IMG_UUID}:"
+	echo " * manifest: ${IMG_MANIFEST}"
+	echo " * file: ${IMG_FILE}"
+	echo " * file size: ${SIZE} bytes"
+	echo
+}
+
+
+###############################################################
+# stage 2
+###############################################################
+
+create_image_dir() {
+	if mkdir "${IMG_DIR}"; then
+		IMG_DIR_CREATED="true"
+		techo "Successfully created image directory: ${IMG_DIR}"
+	else
+		die ${ERR_IMG_DIR} "Could not create image directory"
+	fi
+}
+
+delete_image_dir() {
+	if rm -rf "${IMG_DIR}"; then
+		techo "Removed target image directory: ${IMG_DIR}"
+	else
+		die ${ERR_IMG_DIR} "Failed to remove target image directory: ${IMG_DIR}"
+	fi
+}
+
+remove_image_dir() {
+	[[ -z "${IMG_DIR_CREATED}" ]] && return
+
+	# Remove target image directory (emergency rollback)
+	if rm -rf "${IMG_DIR}" &> /dev/null; then
+		IMG_DIR_CREATED=""
+		techo "Removed target image directory: ${IMG_DIR}"
+	else
+		echo "Failed to remove target image directory: ${IMG_DIR}" 1>&2
+	fi
+}
+
+_send_recv_dataset() {
+	local dsnap="${1}"
+
+	_zfs_send "${dsnap}" | run_mbuffer | "${GZIP}" -9 -c
+}
+
+send_recv_file() {
+	techo "Sending dataset: ${DSNAP} -> ${IMG_FILE}"
+
+    if [[ -z "${HOST}" ]]; then
+		_zfs_send "${DSNAP}" | "${GZIP}" -9 -c > "${IMG_FILE}"
+	else
+		_host_cmd _send_recv_dataset "${DSNAP}" | run_mbuffer -f -o "${IMG_FILE}"
+	fi
+
+	if [[ ${?} -eq 0 && -f "${IMG_FILE}" ]]; then
+		chmod 644 "${IMG_FILE}"
+		techo "Successfully send/received image file: ${IMG_FILE}"
+	else
+		die ${ERR_IMG_FILE} "Could not send/receive image file"
+	fi
+}
+
+update_manifest() {
+	local size=$(get_file_size "${IMG_FILE}")
+	local sha1=$(checksum "${IMG_FILE}")
+	local json_file="{\"sha1\": \"${sha1}\", \"size\": ${size}, \"compression\": \"gzip\"}"
+	local json_files="{\"files\": [${json_file}]}"
+	local -i ec
+
+	MANIFEST=$(echo -e "${MANIFEST}\n${json_files}" | json --merge)
+	ec=${?}
+
+	echo "${MANIFEST}" | json --validate
+	((ec+=${?}))
+
+	if [[ ${ec} -eq 0 ]]; then
+		techo "Successfully updated image manifest: ${json_file}"
+	else
+		die ${ERR_IMG_MANIFEST} "Could not update image manifest"
+	fi
+}
+
+download_file() {
+	local out=""
+	local ec
+
+	techo "Downloading file: ${IMG_URL} -> ${IMG_FILE}"
+
+	if [[ -z "${VERBOSE}" ]]; then
+		out=$(curl --connect-timeout 5 -s -k -L -S -o "${IMG_FILE}" "${IMG_URL}" 2>&1)
+		ec=$?
+	else
+		curl --connect-timeout 5 -s -k -L -o "${IMG_FILE}" "${IMG_URL}"
+		ec=$?
+	fi
+
+	if [[ ${ec} -eq 0 ]]; then
+		techo "Successfully downloaded image file: ${IMG_FILE}"
+	else
+		die ${ERR_IMG_FILE} "Could not download image file (${out})"
+	fi
+}
+
+validate_file() {
+	local manifest_sha1=$(echo "${MANIFEST}" | json "files.0.sha1")
+
+	techo "Checking downloaded image file checksum against manifest checksum: ${manifest_sha1}"
+
+	local current_sha1=$(checksum "${IMG_FILE}")
+
+	if [[ "${manifest_sha1}" == "${current_sha1}" ]]; then
+		techo "Successfully verified image file checksum: ${IMG_FILE}"
+	else
+		die ${ERR_IMG_FILE} "Image file checksum mismatch (${manifest_sha1} != ${current_sha1})"
+	fi
+}
+
+save_manifest() {
+	if echo "${MANIFEST}" > "${IMG_MANIFEST}"; then
+		techo "Successfully saved image manifest: ${IMG_MANIFEST}"
+	else
+		die ${ERR_IMG_MANIFEST} "Could not save image manifest"
+	fi
+}
+
+chown_image_dir() {
+	if chown -R ${SHIPMENT_UID}:${SHIPMENT_GID} "${IMG_DIR}"; then
+		techo "Fixed image directory permissions"
+	else
+		die ${ERR_IMG_DIR} "Could not fix image directory permissions"
+	fi
+}
+
+
+###############################################################
+# stage 3
+###############################################################
+
+allright() {
+	IMG_DIR_CREATED=""  # Clear the need for emergency target directory removal
+}
+
+success() {
+	local msg="Successfully ${MODE%e}ed image ${IMG_UUID}"
+
+	if [[ "${MODE}" == "create" || "${MODE}" == "import" ]]; then
+		local time_ended=$(get_timestamp)
+		local time_elapsed=$((time_ended - TIME_STARTED))
+
+		msg+=" (transferred ${SIZE} bytes in ${time_elapsed} seconds)"
+	fi
+
+	[[ -n "${VERBOSE}" ]] && echo
+
+	echo "${msg}"
+}
+
+cleanup() {
+	# Emergency stuff (will run only if allright was not run)
+	remove_image_dir
+}
+
+
+###############################################################
+# main
+###############################################################
+
+set_opts() {
+	local opt
+
+	DSNAP=""
+	DATASETS=""
+	HOST=""
+	IMG_URL=""
+	IMG_UUID=""
+
+	[[ ! -t 0 ]] && MANIFEST="$(cat /dev/stdin)" || MANIFEST=""
+
+	while getopts "vs:d:H:f:u:" opt; do
+		case "${opt}" in
+			v)
+				VERBOSE="true"
+				;;
+			s)
+				DSNAP="${OPTARG}"
+				;;
+			d)
+				DATASETS="${OPTARG%/}"  # remove trailing slash
+				;;
+			H)
+				HOST="${OPTARG}"
+				;;
+			f)
+				IMG_URL="${OPTARG}"
+				;;
+			u)
+				IMG_UUID="${OPTARG}"
+				;;
+			*)
+				die ${ERR_INPUT}
+				;;
+		esac
+	done
+}
+
+delete() {
+	# stage 1
+	set_opts "${@-}"			# Prepare all params
+	validate_datasets			# Check local datasets folder
+	validate_image				# Validate IMG_UUID and check if image directory exists
+	# stage 2
+	delete_image_dir			# Delete image directory
+	# stage 3
+	success						# Print success message
+}
+
+update() {
+	# stage 1
+	set_opts "${@-}"			# Prepare all params
+	validate_datasets			# Check local datasets folder
+	validate_manifest			# Check if manifest is valid and set/validate IMG_UUID
+	validate_image_paths		# Image directory and manifest must exist
+	# stage 2
+	save_manifest				# Replace image manifest
+	# stage 3
+	success						# Print success message
+}
+
+create() {
+	trap cleanup EXIT			# Enable emergency cleanup
+
+	# stage 1
+	set_opts "${@-}"			# Prepare all params
+	validate_datasets			# Check local datasets folder
+	validate_manifest			# Check if manifest is valid and set/validate IMG_UUID
+	check_image_paths			# Image directory should not exist
+	validate_host_ssh			# Check if remote host is reachable
+	validate_dataset_snapshot	# Check input dataset@snapshot
+	validate_image_size			# Approximate image size vs datasets free space
+	verbose_stage1				# Print info message
+	# stage 2
+	create_image_dir			# Create image directory
+	send_recv_file				# Full zfs send/recv to file
+	update_manifest				# Add files section into image manifest
+	save_manifest				# Save image manifest
+	chown_image_dir				# Image directory should be writable by shipment
+	# stage 3
+	allright					# Turn off emergency cleanup stuff
+	success						# Print success message
+}
+
+import() {
+	trap cleanup EXIT			# Enable emergency cleanup
+
+	# stage 1
+	set_opts "${@-}"			# Prepare all params
+	validate_datasets			# Check local datasets folder
+	validate_manifest			# Check if manifest is valid and set/validate IMG_UUID
+	check_image_paths			# Image directory should not exist
+	validate_url				# Check if file URL is valid
+	validate_image_size			# Approximate image size vs datasets free space
+	verbose_stage1				# Print info message
+	# stage 2
+	create_image_dir			# Create image directory
+	download_file				# Download image file
+	validate_file				# Check file checksum against checksum provided in manifest - #773
+	save_manifest				# Save image manifest
+	chown_image_dir				# Image directory should be writable by shipment
+	# stage 3
+	allright					# Turn off emergency cleanup stuff
+	success						# Print success message
+}
+
+main() {
+	MODE=${1-}
+
+	case "${MODE}" in
+		create|update|delete|import)
+			shift
+			${MODE} "${@-}"
+			exit ${OK}
+			;;
+		agent|agent-verbose)
+			[[ "${MODE}" == *"verbose" ]] && VERBOSE="true"
+			shift
+			"${@-}"
+			exit $?
+			;;
+		-h|--help)
+			usage
+			exit ${OK}
+			;;
+		*)
+			usage
+			exit ${ERR_INPUT}
+			;;
+	esac
+}
+
+main "$@"

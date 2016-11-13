@@ -1,0 +1,18 @@
+{% load i18n %}
+{% csrf_token %}
+{% for error in form.non_field_errors %}
+<div class="alert alert-error"><i class="icon-warning-sign"></i> {{ error }}</div>
+{% endfor %}
+
+{% include "gui/form_field.html" with field=form.hostname %}
+{% include "gui/form_field.html" with field=form.owner %}
+{% include "gui/form_field.html" with field=form.status %}
+{% include "gui/form_field_checkbox.html" with field=form.is_compute %}
+{% include "gui/form_field_checkbox.html" with field=form.is_backup %}
+
+<div class="advanced hide">
+{% include "gui/form_field.html" with field=form.cpu_coef %}
+{% include "gui/form_field.html" with field=form.ram_coef %}
+{% include "gui/form_field.html" with field=form.monitoring_templates %}
+{% include "gui/form_field.html" with field=form.monitoring_hostgroups %}
+</div>

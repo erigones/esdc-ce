@@ -1,0 +1,14 @@
+{% load i18n %}
+{% csrf_token %}
+{% for error in form.non_field_errors %}
+<div class="alert alert-error"><i class="icon-warning-sign"></i> {{ error }}</div>
+{% endfor %}
+
+{% include "gui/vm/form_field_hostname.html" with field=form.hostname %}
+{% include "gui/form_field.html" with field=form.repname %}
+{% include "gui/form_field.html" with field=form.node %}
+{% include "gui/form_field.html" with field=form.sleep_time addon=" sec" %}
+{% include "gui/form_field_checkbox.html" with field=form.enabled %}
+
+<div class="advanced hide">
+</div>

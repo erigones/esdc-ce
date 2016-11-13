@@ -1,0 +1,16 @@
+/* TEAM */
+Your title: Erigones Team.
+Site: erigones@erigones.com, http://www.erigones.com/#aboutus
+LinkedIn: http://www.linkedin.com/company/3169712?trk=tyah
+Facebook: https://www.facebook.com/erigones
+Twitter: @erigones
+Location: Bratislava, Slovakia.
+
+/* THANKS */
+Name: To all opensource supporters
+
+/* SITE */
+Last update: 07/06/2013
+Standards: HTML5, CSS3
+Components: jQuery
+Software: Python, Django, PostgreSQL

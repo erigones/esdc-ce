@@ -1,0 +1,115 @@
+@import "compass";
+
+@media (max-width: 1024px) {
+
+//  LAYOUT
+
+  html {
+    overflow: visible;
+  }
+
+  .container-fluid {
+    padding-left: 20px;
+    padding-right: 20px;
+    overflow-x: visible;
+  }
+
+  nav#primary {
+    float: none;
+    height: auto;
+    width: 100%;
+    border-bottom: 1px solid #1D1E21;
+    overflow: visible;
+    display: block;
+    position: relative;
+    z-index: 1;
+
+    > ul {
+      width: 100%;
+    }
+
+    .dropdown {
+      position: relative;
+      z-index: 1;
+    }
+
+    > ul > li {
+      display: inline-block;
+      width: 80px;
+      border: none;
+
+      &.bottom a {
+        position: static;
+      }
+    }
+  }
+
+  nav#secondary {
+    float: none;
+    width: auto;
+    height: auto;
+    border: none;
+  }
+
+  section#main {
+    overflow: visible;
+    height: auto;
+  }
+
+  .profile-menu {
+    .profile-menu-nav-collapse {
+      line-height: 70px;
+      margin-right: 15px;
+      display: inline;
+    }
+  }
+
+  .secondary-nav-menu {
+    display: none;
+    &.open {
+      display: block;
+    }
+  }
+
+  //WIDGETS N STUFF
+
+  .big-button-bar {
+    @include clearfix;
+    @include border-radius(4px);
+
+    .large {
+      width: 33.3%;
+      min-width: auto;
+      margin: 0;
+      float: left;
+      @include border-radius(0);
+    }
+
+    &.two a {
+      width: 140px;
+      float: none;
+    }
+  }
+}
+
+@media (min-width: 1600px) {
+  table.table-responsive th, table.table-responsive td { max-width: 600px; }
+}
+
+@media (min-width: 1460px) {
+  .visible-bigscreen {
+    display: table-cell !important;
+  }
+}
+
+@media (min-width: 1200px) and (max-width: 1599px) {
+  table.table-responsive th, table.table-responsive td { max-width: 500px; }
+}
+
+@media (min-width: 980px) and (max-width: 1199px) {
+  table.table-responsive th, table.table-responsive td { max-width: 300px; }
+}
+
+@media (min-width: 748px) and (max-width: 979px) {
+  table.table-responsive th, table.table-responsive td { max-width: 320px; }
+}

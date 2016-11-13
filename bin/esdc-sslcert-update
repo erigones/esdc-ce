@@ -1,0 +1,76 @@
+#!/bin/bash
+# 
+# description:  Script performs update of Danube Cloud main proxy server (HAProxy)
+#               to a file specified as input parameter.
+# input params: $1 - full path to SSL certificate in PEM format
+#
+# author:       Erigones, s. r. o.
+# email:        info@erigones.com
+# copyright:    Copyright 2016, Erigones, s. r. o.
+
+set -o pipefail
+
+# #####################
+# Positional arguments
+# #####################
+CERT_PATH=${1:-}
+
+# #################
+# Global variables
+# #################
+MAINDIR="$(cd "$(dirname "$0")/.." ; pwd -P)"
+ERIGONES_HOME=${ERIGONES_HOME:-"${MAINDIR}"}
+CERT_CURRENT="/etc/pki/tls/certs/server.pem"
+CERT_BACKUP="/etc/pki/tls/certs/server.pem.bkp"
+
+# ##########
+# Functions
+# ##########
+function die() {
+	local exit_code="${1:-1}"
+	shift
+	local msg="$*"
+
+	[[ -n "${msg}" ]] && echo "ERROR: ${msg}" 1>&2
+
+	exit "${exit_code}"
+}
+
+function backup() {
+	/bin/cp -a -f "${CERT_CURRENT}" "${CERT_BACKUP}"
+}
+
+function rollback() {
+	/bin/cp -a -f "${CERT_BACKUP}" "${CERT_CURRENT}"
+}
+
+if [[ "$(id -u)" != "0" ]]; then
+	die 1 "This script must be run as root"
+fi
+
+if [[ -z "${CERT_PATH}" || ! -f "${CERT_PATH}" ]]; then
+	die 1 "Path to a SSL certificate file must be provided as first parameter of this script."
+fi
+
+SSL_TEST="$(openssl verify -untrusted "${CERT_PATH}" "${CERT_PATH}" 2>&1)"
+EC=$?
+
+if [[ "${EC}" -ne 0 ]]; then
+	echo "${SSL_TEST}" >&2
+	die "${EC}" "SSL certificate validation failed"
+fi
+
+set -e
+backup
+trap rollback ERR
+# Deploy new cert
+/bin/cp -f "${CERT_PATH}" "${CERT_CURRENT}"
+restorecon "${CERT_CURRENT}"
+chmod 0600 "${CERT_CURRENT}"
+
+if ! haproxy -c -f /etc/haproxy/haproxy.cfg > /dev/null; then
+	die 99 "Invalid SSL certificate"
+fi
+
+systemctl reload haproxy
+exit 0

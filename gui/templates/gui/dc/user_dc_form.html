@@ -1,0 +1,21 @@
+{% load i18n %}
+{% csrf_token %}
+{% for error in form.non_field_errors %}
+<div class="alert alert-error"><i class="icon-warning-sign"></i> {{ error }}</div>
+{% endfor %}
+
+{% include "gui/dc/dc_form_field.html" %}
+{% include "gui/form_field_checkbox.html" with field=form.dc_bound %}
+{% include "gui/form_field.html" with field=form.username %}
+{% include "gui/form_field.html" with field=form.first_name %}
+{% include "gui/form_field.html" with field=form.last_name %}
+{% include "gui/form_field.html" with field=form.email %}
+{% include "gui/serializer_form_field.html" with field=form.groups %}
+{% include "gui/form_field_checkbox.html" with field=form.is_super_admin %}
+{% include "gui/form_field_checkbox.html" with field=form.is_active %}
+{% include "gui/form_field_checkbox.html" with field=form.api_access %}
+
+<div class="advanced hide">
+{% include "gui/form_field.html" with field=form.password %}
+{% include "gui/form_field.html" with field=form.password2 %}
+</div>

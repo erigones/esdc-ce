@@ -1,0 +1,33 @@
+{% extends load_base %}
+{% load i18n %}
+{% load gui_utils %}
+
+{% block javascript %}
+{% include "gui/vm/monitoring_js.html" with graphs=graphs %}
+{% endblock %}
+
+{% block base_nav %}
+{% include "gui/vm/navigation.html" with li_monitoring="active" %}
+{% include "gui/vm/monitoring_navigation.html" with mon_disk="active" %}
+{% endblock %}
+
+{% block base_content %}
+<div id="graph_tooltip" class="tooltip right"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>
+
+<div class="container-fluid">
+  {% for disk_id in vm_disks %}
+  <div class="row-fluid">
+    <div class="span6 small" id="vm_history_{{ graph_prefix }}-throughput-{{ disk_id }}_{{ vm.hostname }}">
+      <div class="tab-header">
+        <i class="icon-bar-chart"></i> {{ vm.alias }} &rsaquo; {% blocktrans %}disk {{ disk_id }} &rsaquo; throughput{% endblocktrans %}
+        {% include "gui/vm/monitoring_graph.html" with desc=desc_throughput %}
+    </div>
+    <div class="span6 small" id="vm_history_{{ graph_prefix }}-io-{{ disk_id }}_{{ vm.hostname }}">
+      <div class="tab-header">
+        <i class="icon-bar-chart"></i> {{ vm.alias }} &rsaquo; {% blocktrans %}disk {{ disk_id }} &rsaquo; I/O{% endblocktrans %}
+        {% include "gui/vm/monitoring_graph.html" with desc=desc_io %}
+    </div>
+  </div>
+  {% endfor%}
+</div> <!-- end container-fluid -->
+{% endblock %}

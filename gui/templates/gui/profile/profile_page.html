@@ -1,0 +1,90 @@
+{% load i18n %}
+
+{% if not profile.email_verified or not profile.phone_verified %}
+<div id="profile_activation_modal" class="black-box modal hide fade vm_modal">
+  <div class="modal-head tab-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <span><i class="icon-check"></i> <span class="vm_modal_title">{% trans "Profile Activation" %}</span></span>
+  </div>
+  <div class="modal-body separator">
+    <form id="profile_activation_form" class="form-horizontal thin" action="#" data-source="{% url 'profile_activation' %}" method="POST">
+    {% include "gui/profile/profile_activation_form.html" %}
+    </form>
+  </div>
+  <div class="modal-footer">
+    <div class="inner-well">
+      <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
+      <a class="vm_modal_yes button red no-ajax">{% trans "Verify" %}</a>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% if not profile.is_ok %}
+<div class="row-fluid" id="profile_is_not_ok">
+  <div class="span8 offset2">
+    <div class="box">
+      <div class="tab-header tab-header-light">
+        <i class="icon-bullhorn"></i> {% trans "Incomplete User Profile" %}
+      </div>
+      <div class="padded">
+        <p>{% trans "Some required information is missing or incomplete. Please fill in all required profile fields before proceeding." %}</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<form id="profile_form" action="#" method="POST" class="fill-up">
+  <div class="row-fluid">
+    <div class="span6">
+      <div class="tab-header">
+        <i class="icon-user"></i> {% trans "User Profile" %}
+      </div>
+      <div id="profile_user_form">
+        {% include "gui/profile/profile_user_form.html" %}
+      </div>
+
+      <div class="tab-header">
+        <i class="icon-cogs"></i> {% trans "User Settings" %}
+      </div>
+      <div id="profile_settings_form">
+        {% include "gui/profile/profile_settings_form.html" %}
+      </div>
+    </div>
+
+    <div class="span6">
+      <div class="tab-header">
+        <i class="icon-envelope-alt"></i> {% trans "Address" %}
+      </div>
+      <div id="profile_address_form">
+        {% include "gui/profile/profile_address_form.html" %}
+      </div>
+
+      <div id="billing_address_details">
+          <div class="tab-header">
+            <i class="icon-envelope"></i> {% trans "Billing Address" %}
+          </div>
+          <div id="profile_billing_address_form">
+            {% include "gui/profile/profile_billing_address_form.html" %}
+          </div>
+      </div>
+
+      {% if user.api_access %}
+      <div class="tab-header">
+        <i class="icon-lock"></i> {% trans "API Keys" %}
+      </div>
+      <div id="profile_apikey_list" data-source="{% url 'profile_apikeys' %}?display=true">
+        {% include "gui/profile/profile_api_keys_list.html" %}
+      </div>
+      {% endif %}
+
+      <div class="tab-header">
+        <i class="icon-key"></i> {% trans "SSH Keys" %}
+      </div>
+      <div id="profile_sshkey_list">
+        {% include "gui/profile/profile_sshkey_list.html" %}
+      </div>
+    </div>
+  </div>
+</form>

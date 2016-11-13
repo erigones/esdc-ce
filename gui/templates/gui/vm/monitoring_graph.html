@@ -1,0 +1,41 @@
+{% load i18n %}
+        <span class="options window-control pull-right">
+          <a href="#" class="no-ajax winctrl" data-resize="horizontal" title="{% trans 'Toggle horizontal size' %}" data-toggle="tooltip" data-placement="left"><i class="icon-resize-horizontal"></i></a>
+          <a href="#" class="no-ajax winctrl" data-resize="vertical" title="{% trans 'Toggle vertical size' %}" data-toggle="tooltip" data-placement="left"><i class="icon-resize-vertical"></i></a>
+        </span>
+      </div>
+
+<table class="table box chartable">
+  <thead>
+    {% if desc %}
+    <tr>
+      <th><p class="table_desc"><i class="icon-info-sign"></i> {% trans desc %}</p></th>
+    </tr>
+    {% endif %}
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <div class="graph">{% if not vm_operational %}<span class="msg">{% trans "Monitoring data is not available." %}</span>{% endif %}</div>
+      </td>
+    </tr>
+  </tbody>
+  <tfoot>
+    <tr>
+      <td>
+        <div class="btn-group vm_history_control">
+          <a href="#" class="button gray smaller no-ajax disabled active" data-period="1h">{% trans "1h" %}</a>
+          <a href="#" class="button gray smaller no-ajax disabled{% if vm_lifetime < 3000 %} useless{% endif %}" data-period="4h">{% trans "4h" %}</a>
+          <a href="#" class="button gray smaller no-ajax disabled{% if vm_lifetime < 43200 %} useless{% endif %}" data-period="1d">{% trans "1d" %}</a>
+          <a href="#" class="button gray smaller no-ajax disabled{% if vm_lifetime < 86400 %} useless{% endif %}" data-period="1w">{% trans "1w" %}</a>
+          <a href="#" class="button gray smaller no-ajax disabled{% if vm_lifetime < 604800 %} useless{% endif %}" data-period="2w">{% trans "2w" %}</a>
+          <a href="#" class="button gray smaller no-ajax disabled{% if vm_lifetime < 1209600 %} useless{% endif %}" data-period="1m">{% trans "1m" %}</a>
+          <a href="#" class="button gray smaller no-ajax disabled{% if vm_lifetime < 2592000 %} useless{% endif %}" data-period="1y">{% trans "1y" %}</a>
+          <br>
+          <div class="period-wrap"><i class="icon-caret-left"></i> <span class="period"></span> <i class="icon-caret-right"></i></div>
+        </div>
+        <div class="legend pull-right"></div>
+      </td>
+    </tr>
+  </tfoot>
+</table>

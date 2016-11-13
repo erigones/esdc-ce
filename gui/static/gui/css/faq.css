@@ -1,0 +1,10 @@
+/* line 2, ../scss/faq.scss */
+.faq-questions li {
+  line-height: 20px;
+}
+
+/* line 7, ../scss/faq.scss */
+.faq-id {
+  min-width: 25px;
+  display: inline-block;
+}

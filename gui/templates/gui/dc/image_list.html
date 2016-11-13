@@ -1,0 +1,168 @@
+{% extends load_base %}
+{% load i18n %}
+{% load gui_utils %}
+
+{% block javascript %}
+<script type="text/javascript">
+  $(document).ready(function() {
+    DC_IMAGES = new DcImageList('{{ task_id }}');
+  });
+</script>
+{% endblock %}
+
+{% block base_content %}
+{% if can_edit %}
+<div id="obj_form_modal" class="black-box modal hide fade vm_modal">
+  <div class="modal-head tab-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    {% if is_staff %}
+    <span class="title_edit"><i class="icon-save"></i> {% trans "Update, Delete or Detach Disk Image" %}</span>
+    <span class="title_edit_or_add_dc hide"><i class="icon-save"></i> {% trans "Update, Delete or Attach Disk Image" %}</span>
+    {% else %}
+    <span class="title_edit"><i class="icon-save"></i> {% trans "Update or Delete Disk Image" %}</span>
+    <span class="title_edit_or_add_dc hide"><i class="icon-save"></i> {% trans "Update or Delete Disk Image" %}</span>
+    {% endif %}
+    <span class="title_add"><i class="icon-save"></i> {% trans "Import Disk Image" %}</span>
+  </div>
+  <div class="modal-body separator">
+    <div class="text_edit"></div>
+    <div class="text_add"></div>
+    <form class="form-horizontal" action="#" data-source="{{ url_form_admin }}" method="POST">
+      {% include "gui/dc/image_admin_form.html" with form=form_admin %}
+    </form>
+  </div>
+  <div class="modal-footer">
+    <div class="inner-well">
+      <span class="pull-left"><a class="vm_modal_more btn btn-small btn-inverse no-ajax">{% trans "Show advanced settings" %}</a></span>
+      <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
+      <a class="vm_modal_update button green no-ajax" data-enter="true">{% trans "Update" %}</a>
+      {% if is_staff %}
+      <a class="vm_modal_delete vm_modal_delete_dc button gold no-ajax hide" data-source="{{ url_form_dc }}">{% trans "Detach Image" %}</a>
+      <a class="vm_modal_create vm_modal_create_dc button gold no-ajax hide" data-source="{{ url_form_dc }}">{% trans "Attach Image" %}</a>
+      {% endif %}
+      <a class="vm_modal_delete button red no-ajax">{% trans "Delete Image" %}</a>
+      <a class="vm_modal_create button green no-ajax" data-enter="true">{% trans "Import Image" %}</a>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% if is_staff %}
+<div id="obj_add_dc_modal" class="black-box modal hide fade vm_modal">
+  <div class="modal-head tab-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <span class="title_edit"></span>
+    <span class="title_add"><i class="icon-save"></i> {% trans "Attach Disk Image" %}</span>
+  </div>
+  <div class="modal-body separator">
+    <div class="text_edit"></div>
+    <div class="text_add"></div>
+    <form class="form-horizontal" action="#" data-source="{{ url_form_dc }}" method="POST">
+      {% include "gui/dc/image_dc_form.html" with form=form_dc %}
+    </form>
+  </div>
+  <div class="modal-footer">
+    <div class="inner-well">
+      <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
+      <a class="vm_modal_create button gold no-ajax">{% trans "Attach Image" %}</a>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<div class="container-fluid" id="image_list">
+  <div class="row-fluid">
+
+    <div class="span12">
+      <div class="tab-header">
+        <span class="options window-control pull-right">
+          <i class="icon-cloud"></i> {{ request.dc.alias }}
+        </span>
+        <i class="icon-save"></i> {% trans "Images" %}
+      </div>
+      <table class="table box table-striped table-hover table-responsive" id="etable">
+
+        <thead>
+          {% if can_edit %}
+          <tr>
+            <th colspan="10">
+              <div class="pull-right">
+                {% include "gui/dc/dc_deleted_toggle.html" %}
+                {% if is_staff %}{% include "gui/dc/dc_all_toggle.html" %}{% endif %}
+              </div>
+            </th>
+          </tr>
+          {% endif %}
+          {% if images %}
+          <tr>
+            <th>{% trans "Alias (name)" %}</th>
+            <th>{% trans "Access" %}</th>
+            <th>{% trans "Owner" %}</th>
+            <th class="hidden-phone">{% trans "DC bound?" %}</th>
+            <th>{% trans "Size" %}</th>
+            <th class="hidden-phone">{% trans "OS&nbsp;Type" %}</th>
+            <th class="hidden-phone-small">{% trans "Status" %}</th>
+            <th class="hidden-phone">{% trans "Deploy?" %}</th>
+            <th class="hidden-phone">{% trans "Resize?" %}</th>
+            {% if all %}
+            <th class="hidden-phone">{% trans "Datacenters" %}</th>
+            {% else %}
+            <th class="hidden-phone">{% trans "Description" %}</th>
+            {% endif %}
+          </tr>
+          {% endif %}
+        </thead>
+
+        <tbody>
+          {% for img in images %}
+          <tr id="image_{{ img.name }}">
+            <td>
+              {% if is_staff or can_edit and img.dc_bound %}{% if all and img.pk in can_add %}
+              <a href="#" class="btn-link btn-icon-link no-ajax obj_edit_or_add_dc italic{% if not img.is_ok %} disabled{% endif %}" title="{% trans "Attach, update or delete disk Image" %}" data-toggle="tooltip" data-placement="bottom" data-form='{{ img.web_data_admin|jsondata }}' data-prefix="adm">{{ img.alias_version }}</a>
+              {% else %}
+              <a href="#" class="btn-link btn-icon-edit no-ajax obj_edit{% if not img.is_ok %} disabled{% endif %}" title="{% if is_staff %}{% trans "Detach, update or delete disk Image" %}{% else %}{% trans "Update or delete disk Image" %}{% endif %}" data-toggle="tooltip" data-placement="bottom" data-form='{{ img.web_data_admin|jsondata }}' data-prefix="adm">{{ img.alias_version }}</a>
+              {% endif %}
+              {% else %}{{ img.alias_version }}{% endif %} <small>({{ img.name }})</small>
+            </td>
+            <td>{{ img.get_access_display }}</td>
+            <td class="nowrap"><span class="vm_hostname" title="{{ img.owner }}"><i class="icon-user"></i> {{ img.owner|truncatechars:16 }}</span></td>
+            <td class="hidden-phone"><i class="icon-{{ img.dc_bound_bool|yesno:"ok,remove" }}"></i></td>
+            <td class="nowrap">{{ img.size|mb_to_gb }} <small>GB</small></td>
+            <td class="hidden-phone">{{ img.get_ostype_display }}</td>
+            <td class="hidden-phone-small"><span class="image_status">{{ img.get_status_display }}</span></td>
+            <td class="hidden-phone"><i class="icon-{{ img.deploy|yesno:"ok,remove" }}"></i></td>
+            <td class="hidden-phone"><i class="icon-{{ img.resize|yesno:"ok,remove" }}"></i></td>
+            {% if all %}
+            <td class="hidden-phone"><small class="vm_hostname">{{ img.dc.all|dcify }}</small></td>
+            {% else %}
+            <td class="hidden-phone"><small class="vm_snapshot_note">{{ img.desc|wordwrap:44 }}</small></td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </tbody>
+
+        <tfoot>
+          <tr>
+            <td colspan="10">
+              <span class="pull-right">
+                {% trans "Total" %}: <span id="total">{{ images|length }}</span>&nbsp;
+              </span>
+              {% if can_edit %}
+              <div class="vm_control">
+                {% if is_staff %}
+                <a href="#" class="button gray no-ajax obj_add obj_add_dc{% if not can_add %} disabled{% endif %}" title="{% trans "Associate disk Image with this Datacenter" %}" data-toggle="tooltip" data-placement="top" data-prefix="adm"><i class="icon-link"></i> {% trans "Attach disk Image" %}</a>
+                {% endif %}
+                <a href="#" class="button gray no-ajax obj_add obj_add_admin{% if not can_import %} disabled{% endif %}" title="{% trans "Import disk Image from external URL" %}" data-toggle="tooltip" data-placement="top"><i class="icon-plus"></i> {% trans "Import disk Image from URL" %}</a>
+                <a href="{% url 'imagestore_list' %}?{{ qs }}" class="button gray {% if not can_import %} disabled{% endif %}" title="{% trans "Import disk Image from remote image repository" %}" data-toggle="tooltip" data-placement="top"><i class="icon-plus"></i> {% trans "Import disk Image from repository" %}</a>
+              </div>
+              {% endif %}
+            </td>
+          </tr>
+        </tfoot>
+
+      </table>
+    </div>
+
+  </div> <!-- end row-fluid -->
+</div> <!-- end container-fluid -->
+{% endblock %}

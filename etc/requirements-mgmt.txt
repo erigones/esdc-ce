@@ -1,0 +1,45 @@
+--find-links https://download.erigones.org/pypi/
+### project
+pip
+setuptools==28.6.1
+Django==1.8.16
+Sphinx==1.4.8
+Jinja2==2.8
+sphinxcontrib-httpdomain==1.5.0
+Pygments==2.1.3
+docutils==0.12
+
+### dns
+dnspython==1.15.0
+
+### api, gui
+celery==3.1.25
+kombu==3.0.37
+pytz==2016.7
+ipaddress==1.0.17
+gevent==1.1.2
+gevent-socketio-es==0.3.7
+gevent-websocket==0.9.5
+greenlet==0.4.10
+gunicorn==19.6.0
+Pillow==3.3.3
+xmltodict==0.10.2
+python-dateutil==2.5.3
+django-taggit==0.21.3
+django-celery==3.1.17
+cryptography==1.5.3
+netifaces==0.10.5
+dictdiffer==0.6.0
+zabbix-api-erigones==1.2.3
+psycopg2==2.6.2
+psycogreen==1.0
+requests==2.11.1
+django-redis-cache==1.7.1
+hiredis==0.2.0
+wsgiref==0.1.2
+django-compressor==2.1
+phonenumbers==7.7.3
+django-timezone-field==1.3
+blinker==1.4
+lxml==3.6.4
+openpyxl==2.3.5

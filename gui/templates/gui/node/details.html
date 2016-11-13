@@ -1,0 +1,313 @@
+{% extends load_base %}
+{% load i18n %}
+{% load gui_utils %}
+
+{% block javascript %}
+<script type="text/javascript">
+  $(document).ready(function() {
+    NODE = new Node('{{ node.hostname }}');
+    {% if mon_sla_enabled %}
+    sla_init('mon_node_sla', '{{ node.hostname }}', '{% now "Ym" %}');
+    {% endif %}
+  });
+</script>
+{% endblock %}
+
+{% block base_nav %}{% include "gui/node/navigation.html" with li_details="active" %}{% endblock %}
+
+{% block base_content %}
+<div id="node_define_modal" class="black-box modal hide fade vm_modal">
+  <div class="modal-head tab-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <span class="title_edit"><i class="icon-sitemap"></i> {% trans "Update Compute Node Settings" %}</span>
+    <span class="title_add"></span>
+  </div>
+  <div class="modal-body separator">
+    <div class="text_edit"></div>
+    <div class="text_add"></div>
+    <form class="form-horizontal" action="#" data-source="{% url 'node_define_form' node.hostname %}" method="POST">
+      {% include "gui/node/define_form.html" %}
+    </form>
+  </div>
+  <div class="modal-footer">
+    <div class="inner-well">
+      <span class="pull-left"><a class="vm_modal_more btn btn-small btn-inverse no-ajax">{% trans "Show advanced settings" %}</a></span>
+      <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
+      <a class="vm_modal_update button green no-ajax" data-enter="true">{% trans "Update" %}</a>
+      <a class="vm_modal_delete{% if node_vms or node_backups %}_no disabled{% endif %} button red no-ajax">{% trans "Delete" %}</a>
+    </div>
+  </div>
+</div>
+
+{% if modals %}{% for template in modals %}{% include template %}{% endfor %}{% endif %}  {# used by esdc-ee-eslic #}
+
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span6">
+      <div class="tab-header" id="node_header_{{ node.hostname }}">
+        <i class="icon-sitemap"></i> {{ node.hostname }} &rsaquo; {% trans "details" %}
+      </div>
+
+      <form><table class="table box table-striped form">
+        <tbody>
+          <tr>
+            <td>{% trans "Hostname" %}:</td>
+            <td>
+              <strong>
+                <a href="#" class="btn-link btn-icon-edit no-ajax" id="node_define" title="{% trans "Change node settings" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-sitemap" style="color: {{ node.color }};"></i> {{ node.hostname }}</a>{% if node.is_head %}&nbsp;<span title="{% trans "Head node" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-flag"></i></span>{% endif %}
+              </strong>
+            </td>
+          </tr>
+          <tr>
+            <td>{% trans "IP address" %}:</td>
+            <td>{{ node.address }}</td>
+          </tr>
+          <tr>
+            <td>{% trans "Owner" %}:</td>
+            <td><i class="icon-user"></i> {{ node.owner }}</td>
+          </tr>
+          <tr>
+            <td>{% trans "Capabilities" %}:</td>
+            <td>
+              <span><i class="icon-hdd"></i> <small>{% trans "Compute" %}:</small> <i class="icon-{{ node.is_compute|yesno:"ok,remove" }}"></i></span>
+              <span class="sep"><i class="icon-paste"></i> <small>{% trans "Backup" %}:</small> <i class="icon-{{ node.is_backup|yesno:"ok,remove" }}"></i></span>
+            </td>
+          </tr>
+          <tr>
+            <td>{% trans "CPUs / Free" %}:</td>
+            <td>
+              <span>{{ node.cpu_total }} <small>x ({{ node.cpu }} * {{ node.cpu_coef }})</small></span>
+              <span class="sep">{{ node.cpu_free }} <small>x</small></span>
+            </td>
+          </tr>
+          <tr>
+            <td>{% trans "RAM / Free / " %}<span title="{% trans "Aggregated memory overhead caused by KVM servers." %}" data-toggle="tooltip" data-placement="bottom">{% trans "Overhead" %}<sup><i class="icon-star"></i></sup></span>:</td>
+            <td>
+              <span>{{ node.ram_total }} <small>MB ({{ node.ram }} * {{ node.ram_coef }})</small></span>
+              <span class="sep">{{ node.ram_free }} <small>MB</small></span>
+              <span class="sep"><small>{{ node.ram_kvm_overhead }} MB</small></span>
+            </td>
+          </tr>
+
+          {% with sysinfo=node.sysinfo %}
+          <tr>
+            <td>{% trans "Manufacturer" %}:</td>
+            <td>{{ sysinfo.Manufacturer }}</td>
+          </tr>
+          <tr>
+            <td>{% trans "Product" %}:</td>
+            <td>{{ sysinfo.Product }}</td>
+          </tr>
+          <tr>
+            <td>{% trans "Serial Number" %}:</td>
+            <td>{{ sysinfo|keyvalue:"Serial Number" }}</td>
+          </tr>
+          <tr>
+            <td>{% trans "CPU Type" %}:</td>
+            <td>{{ sysinfo|keyvalue:"CPU Physical Cores" }} * {{ node.sysinfo|keyvalue:"CPU Type" }}</td>
+          </tr>
+          <tr>
+            <td>{% trans "Uptime" %}:</td>
+            {% with up=node.boottime|uptime %}
+            <td>
+            <span title="{% trans "The displayed uptime is based on the last known boot time of the compute node" %}" data-toggle="tooltip" data-placement="bottom">
+            {% blocktrans with hms=up.seconds|timeformat count days=up.days %}
+            {{ days }} day, {{ hms }}
+            {% plural %}
+            {{ days }} days, {{ hms }}
+            {% endblocktrans %}
+            <i class="icon-info-sign"></i></span>
+            </td>
+            {% endwith %}
+          </tr>
+          {% endwith %}
+
+          <tr>
+            <td>{% trans "Datacenters" %}:</td>
+            <td>{{ node_dcs|dcify }}</td>
+          </tr>
+          <tr>
+            <td>{% trans "Servers" %}:</td>
+            <td><i class="icon-hdd"></i> {{ node_vms }} <span title="{% trans "Number of real servers (with slave/replication machines excluded)" %}" data-toggle="tooltip" data-placement="right">({{ node_real_vms }})</span></td>
+          </tr>
+
+          {% if mon_sla_enabled %}
+          <tr id="mon_sla_{{ node.hostname }}">
+            <td style="min-width: 110px;">{% trans "SLA" %}:
+              <span class="sla_chooser pull-right">
+                <a href="#" class="sla_prev btn-link no-ajax"><i class="icon-chevron-left"></i></a>
+                <span class="sla_date" data-min="{{ node.created|date:"m/Y" }}" data-max="{% now "m/Y" %}">{% now "m/Y" %}</span>
+                <a href="#" class="sla_next btn-link no-ajax"><i class="icon-chevron-right"></i></a>
+              </span>
+            </td>
+            <td>
+              <span class="sla_value" title="{% trans "Actual monthly SLA for this compute node" %}" class="loading-gif" data-toggle="tooltip" data-placement="right">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+            </td>
+          </tr>
+          {% endif %}
+
+          <tr>
+            <td>{% trans "Status" %}:</td>
+            <td><span class="label status_node{{ node.status }}" id="node_label_{{ node.hostname }}">{{ node.get_status_display }}</span></td>
+          </tr>
+
+          {% if details_rows %}{% for template in details_rows %}  {# used by esdc-ee-eslic #}
+          {% include template %}
+          {% endfor %}{% endif %}
+        </tbody>
+
+        <tfoot>
+          <tr>
+            <td colspan="2">
+              <div class="vm_control">
+                <a href="#" id="node_sysinfo" class="button gray no-ajax {% if not node.is_online %}disabled{% endif %}" title="{% trans "Refresh compute node information" %}" data-toggle="tooltip" data-placement="top"><i class="icon-refresh"></i> {% trans "Refresh" %}</a>
+                {% if node_controls %}{% for template in node_controls %}  {# used by esdc-ee-eslic #}
+                {% include template %}
+                {% endfor %}{% endif %}
+              </div>
+            </td>
+          </tr>
+        </tfoot>
+
+      </table></form>
+    </div> <!-- end span6 -->
+
+    {% with net_aggr=node.network_aggregations net_iface=node.network_interfaces net_vnic=node.virtual_network_interfaces %}
+    <div class="span6">
+      <div class="tab-header">
+        <i class="icon-retweet"></i> {{ node.hostname }} &rsaquo; {% trans "network interfaces" %}
+      </div>
+      <table class="table box table-stripep">
+        <thead>
+          <tr>
+            <th>{% trans "Name" %}</th>
+            <th class="hidden-phone">{% trans "MAC address" %}</th>
+            <th>{% trans "Aggregation" %}</th>
+            <th>{% trans "IP address" %}</th>
+            <th>{% trans "NIC tags" %}</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for aggr_name, aggr in net_aggr.items %}{% with aggr_iface=net_iface|pop:aggr_name rowspan=aggr.Interfaces|length %}
+          {% for iface_name in aggr.Interfaces %}{% with iface=net_iface|pop:iface_name %}
+          <tr>
+            <td>{{ iface_name }}</td>
+            <td class="hidden-phone"><span class="vm_hostname">{{ iface|keyvalue:"MAC Address" }}</span></td>
+            {% if forloop.first %}
+            <td rowspan="{{ rowspan }}" class="middle">{{ aggr_name }} <small>({{ aggr|keyvalue:"LACP mode" }})</small></td>
+            <td rowspan="{{ rowspan }}" class="middle">{{ aggr_iface.ip4addr }}</td>
+            <td rowspan="{{ rowspan }}" class="middle"><span class="vm_hostname">{{ aggr_iface|keyvalue:"NIC Names"|join:", " }}</span></td>
+            {% endif %}
+          </tr>
+          {% endwith %}{% endfor %}{% endwith %}{% endfor %}
+
+          {% for iface_name, iface in net_iface.items %}
+          <tr>
+            <td>{{ iface_name }}</td>
+            <td class="hidden-phone"><span class="vm_hostname">{{ iface|keyvalue:"MAC Address" }}</span></td>
+            <td>-</td>
+            <td>{{ iface.ip4addr }}</td>
+            <td><span class="vm_hostname">{{ iface|keyvalue:"NIC Names"|join:", " }}</span></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+
+        <tfoot>
+          <tr>
+            <td colspan="5" class="vm_admin vm_control">
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+
+      {% if net_vnic %}
+      <div class="tab-header">
+        <i class="icon-retweet"></i> {{ node.hostname }} &rsaquo; {% trans "virtual network interfaces" %}
+      </div>
+      <table class="table box table-stripep">
+        <thead>
+          <tr>
+            <th>{% trans "Name" %}</th>
+            <th class="hidden-phone">{% trans "MAC address" %}</th>
+            <th>{% trans "Interface" %}</th>
+            <th>{% trans "IP address" %}</th>
+            <th>{% trans "VLAN" %}</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for vnic_name, vnic in net_vnic.items %}
+          <tr>
+            <td>{{ vnic_name }}</td>
+            <td class="hidden-phone"><span class="vm_hostname">{{ vnic|keyvalue:"MAC Address" }}</span></td>
+            <td class="middle">{{ vnic|keyvalue:"Host Interface" }}</td>
+            <td class="middle">{{ vnic.ip4addr }}</td>
+            <td class="middle">{{ vnic.VLAN }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+
+        <tfoot>
+          <tr>
+            <td colspan="5" class="vm_admin vm_control">
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+      {% endif %}{% endwith %}
+
+      {% with zpools=node.zpools diskinfo=node.diskinfo %}
+      <div class="tab-header">
+        <i class="icon-th-large"></i> {{ node.hostname }} &rsaquo; {% trans "disk pools" %}
+      </div>
+      <table class="table box table-striped">
+        <thead>
+          <tr>
+            <th>{% trans "Name" %}</th>
+            <th>{% trans "Size" %}</th>
+            <th class="hidden-phone">{% trans "Disk Configuration" %}</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for zpool_name, zpool in zpools.items %}
+          <tr>
+            <td class="middle">{{ zpool_name }}</td>
+            <td class="middle">{{ zpool.size|multiply:1048576|filesizeformat }}</td>
+            <td class="hidden-phone">
+              <ul class="l0">
+                {% for zpool_cfg, zpool_groups in zpool.config.items %}
+                <li>{{ zpool_cfg }}
+                  <ul class="l1">
+                    {% for group_name, disks in zpool_groups.items %}
+                    <li>{{ group_name }}
+                      <ul class="l2">
+                        {% for disk_name in disks %}{% with disk=diskinfo|keyvalue:disk_name %}
+                        <li>{{ disk_name }}: {{ disk.size|multiply:1048576|filesizeformat }} <small>({{ disk.VID }} {{ disk.PID }})</small></li>
+                        {% endwith %}{% endfor %}
+                      </ul>
+                    </li>
+                    {% endfor %}
+                  </ul>
+                </li>
+                {% endfor %}
+              </ul>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+
+        <tfoot>
+          <tr>
+            <td colspan="3" class="vm_admin vm_control">
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+      {% endwith %}
+
+    </div> <!-- end span6 -->
+  </div> <!-- end row-fluid -->
+</div> <!-- end container-fluid -->
+{% endblock %}

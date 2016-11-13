@@ -1,0 +1,104 @@
+{% extends load_base %}
+{% load i18n %}
+
+{% block javascript %}
+<script type="text/javascript">
+$(document).ready(function() {
+  new FAQView();
+});
+</script>
+{% endblock %}
+
+{% block base_content %}{% trans "Pending" as pending %}{% trans "Pre-Order" as preorder %}
+<script type="text/html" id="template-toc-item"><li>
+  <span class="faq-id">{% templatetag openvariable %} id {% templatetag closevariable %}.</span> <a class="btn-link no-ajax" href="#faq-question-{% templatetag openvariable %} id {% templatetag closevariable %}">{% templatetag openvariable %} subject {% templatetag closevariable %}</a>
+</li>
+</script>
+
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span12">
+      <div class="box">
+
+        <div class="tab-header">
+          <i class="icon-question-sign"></i> {% trans "FAQ" %}
+        </div>
+
+        <div class="padded">
+          <div id="faq-header hide">
+            <input type="text" class="fill-up" id="faq-search" placeholder="{% trans "enter keyword here..." %}" />
+            <ol id="faq-toc" class="faq-questions"></ol>
+            <hr />
+          </div>
+
+          <ol id="faq-content" class="faq-list">
+
+            <li>
+              <h4>{% trans "Cannot connect to port after installing service XY, what's wrong?" %}</h4>
+              <p>
+                {% blocktrans %}Our images have firewall enabled by default. Check you firewall settings.{% endblocktrans %}
+              </p>
+            </li>
+
+            <li>
+              <h4>{% trans "Why I'm not able to access the API?" %}</h4>
+              <p>
+              {% blocktrans %}Please <a href="{{ support_section_url }}">contact our support</a> in order to check and allow API access for your user account. Also please make sure that you are using a valid username and password or API key.{% endblocktrans %}
+              </p>
+            </li>
+
+            <li>
+              <h4>{% trans "What is API key?" %}</h4>
+              <p>
+              {% blocktrans %}Generated key that can be used instead of user/password authentication.{% endblocktrans %}
+              </p>
+            </li>
+
+            <li>
+              <h4>{% trans "What is callback key?" %}</h4>
+              <p>
+              {% blocktrans %}Generated key which is used to verify, if callback response is from our servers.{% endblocktrans %}
+              </p>
+            </li>
+
+            <li>
+              <h4>{% trans "How shall I verify callbacks with callback key?" %}</h4>
+              <p>
+              {% blocktrans %}The callback response will contain a random token and a verification string. You should generate your own verification sting by attaching the callback key after the random token and create an MD5 hash from the string. If your MD5 hash matches the verification string you can be sure the callback came from our servers.{% endblocktrans %}
+              </p>
+            </li>
+
+            <li>
+              <h4>{% trans "How to add custom ISO images?" %}</h4>
+              <p>
+                {% blocktrans %}Unfortunately this feature is not built in the GUI yet, but we do support custom ISO images. Please create a support request via our <a href="{{ support_section_url }}">support section</a>.{% endblocktrans %}
+              </p>
+            </li>
+
+            <li>
+              <h4>{% trans "How to enable built-in monitoring and better graphing?" %}</h4>
+              <p>
+                {% blocktrans %}Monitoring and more accurate VM resource graphs can be turned on by enabling a monitoring agent, which is preconfigured in our VM disk images.{% endblocktrans %}
+                {% blocktrans %}This can be accomplished by running these commands as root:<br />
+                * RHEL, CentOS, Scientific Linux: <code>chkconfig zabbix-agent on && service zabbix-agent start</code><br />
+                * Debian, Ubuntu: <code>update-rc.d zabbix-agent defaults && service zabbix-agent start</code>{% endblocktrans %}
+              </p>
+            </li>
+
+            <li>
+              <h4>{% blocktrans %}Why do I see "eth0: IPv6 duplicate address fe80::XXXX:XXff:feXX:XXXX detected!" in my server's logs?{% endblocktrans %}</h4>
+              <p>
+                {% blocktrans %}Our anti-spoofing protection allows only assigned IPv4 addresses to originate from the network interface. We do not support IPv6 at this point, which we hope to support in the near future. However, IPv6 is enabled by default in our images as disabling it will break some applications.{% endblocktrans %}
+              </p>
+            </li>
+            {% if include_sections %}{% for html_template in include_sections %}
+              {% include html_template %}
+            {% endfor %}{% endif %}
+          </ol>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base_no_auth.html" %}
+{% load i18n %}
+
+{% block login_content %}
+<div class="no-auth-message black-box inner-well">
+  <h4>{{ header }}</h4>
+  <br>
+  {% for block in blocks %}
+    <p>{{ block }}</p>
+  {% endfor %}
+  {% for link in links %}
+    <p><a href="{{ link.url }}" class="btn-link">{{ link.label }}</a></p>
+  {% endfor %}
+</div>
+{% endblock %}
+
+{% block nav_accounts_register %}{% endblock %}

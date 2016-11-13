@@ -1,0 +1,1 @@
+{% load i18n %}{% autoescape off %}{% blocktrans with server=vm.alias %}Server {{ server }} was deployed{% endblocktrans %}{% endautoescape %}

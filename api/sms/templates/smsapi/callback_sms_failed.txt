@@ -1,0 +1,7 @@
+{% load i18n %}{% autoescape off %}{% blocktrans with phone=to status=status timestamp=donedate account=username id=MsgId %}Hello,
+
+we have received a problematic delivery report from SMSAPI (former HQSMS) at {{ timestamp }}.
+
+SMS sent from account {{ account }} with ID {{ id }} to {{ phone }} has {{ status }}.
+
+{% endblocktrans %}{% endautoescape %}{% include "email_signature.txt" %}

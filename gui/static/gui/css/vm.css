@@ -1,0 +1,998 @@
+/**********************
+ * VM statuses colors *
+ **********************/
+/* line 5, ../scss/vm.scss */
+.status_stopped, .status_stopped- {
+  background-color: #b94a48;
+}
+
+/* line 6, ../scss/vm.scss */
+.secondary-sub-menu > ul > li > a i.stopped, .secondary-sub-menu > ul > li > a i.stopped- {
+  color: #CC0000;
+}
+
+/* line 7, ../scss/vm.scss */
+.status_running, .status_running- {
+  background-color: #468847;
+}
+
+/* line 8, ../scss/vm.scss */
+.secondary-sub-menu > ul > li > a i.running, .secondary-sub-menu > ul > li > a i.running- {
+  color: #66CC00;
+}
+
+/* line 9, ../scss/vm.scss */
+.status_stopping {
+  background-color: #f89406;
+}
+
+/* line 10, ../scss/vm.scss */
+.secondary-sub-menu > ul > li > a i.stopping {
+  color: #f89406;
+}
+
+/* line 11, ../scss/vm.scss */
+.status_pending {
+  background-color: #3a87ad;
+}
+
+/* line 12, ../scss/vm.scss */
+.secondary-sub-menu > ul > li > a i.pending {
+  color: #3a87ad;
+}
+
+/* line 13, ../scss/vm.scss */
+.status_error {
+  background-color: #333333;
+}
+
+/* line 14, ../scss/vm.scss */
+.secondary-sub-menu > ul > li > a i.error {
+  color: #333333;
+}
+
+/* line 15, ../scss/vm.scss */
+.status_frozen, .status_frozen- {
+  color: #ddffff;
+}
+
+/* line 16, ../scss/vm.scss */
+.secondary-sub-menu > ul > li > a i.notready {
+  color: #999999;
+}
+
+/* line 17, ../scss/vm.scss */
+.secondary-sub-menu > ul > li > a i.notcreated, .secondary-sub-menu > ul > li > a i.notcreated- {
+  color: #999999;
+}
+
+/* line 18, ../scss/vm.scss */
+.secondary-sub-menu > ul > li > a i.deploying {
+  color: #999999;
+}
+
+/* line 19, ../scss/vm.scss */
+.status_unknown, .status_unknown- {
+  background-color: transparent;
+  color: #444;
+}
+
+/* line 20, ../scss/vm.scss */
+.secondary-sub-menu > ul > li > a i.unknown, .secondary-sub-menu > ul > li > a i.unknown- {
+  color: #F4FA58;
+}
+
+/**************
+ * VM Control *
+ **************/
+/* line 26, ../scss/vm.scss */
+tr.setting td:first-child:after {
+  font-family: FontAwesome;
+  font-weight: normal;
+  font-style: normal;
+  display: inline-block;
+  text-decoration: inherit;
+  float: right;
+  content: "\f013";
+}
+
+/* line 37, ../scss/vm.scss */
+table.form td.row-header, table.form th.row-header {
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: bold;
+  color: #555;
+  text-shadow: 0 1px 0 rgba(205, 205, 205, 0.5);
+  text-transform: uppercase;
+  height: 26px;
+  line-height: 26px;
+  background-color: #efefef !important;
+  border-top: 1px solid #aaa;
+}
+/* line 50, ../scss/vm.scss */
+table.form tr:hover td.row-header, table.form tr:hover th.row-header {
+  background-color: #efefef !important;
+}
+/* line 55, ../scss/vm.scss */
+table.form td input, table.form td td select {
+  font-size: 12px;
+  margin-top: -3px;
+  margin-bottom: 0px;
+  height: 26px;
+}
+/* line 61, ../scss/vm.scss */
+table.form td textarea {
+  font-size: 12px;
+  margin-top: -3px;
+  margin-bottom: 0px;
+}
+/* line 66, ../scss/vm.scss */
+table.form td label {
+  font-size: 12px;
+}
+/* line 70, ../scss/vm.scss */
+table.form td div.span6, table.form td div.span9 {
+  margin-bottom: -7px;
+  margin-left: 0;
+}
+/* line 75, ../scss/vm.scss */
+table.form td.compress {
+  padding-top: 3px;
+  padding-bottom: 0px;
+}
+
+/* line 83, ../scss/vm.scss */
+.vm_control .button {
+  margin-top: 5px;
+}
+/* line 87, ../scss/vm.scss */
+.vm_control button.button {
+  margin-bottom: 7px;
+  padding-top: 5px;
+  padding-bottom: 6px;
+}
+
+/* line 94, ../scss/vm.scss */
+td.vm_admin {
+  padding-top: 2px;
+}
+
+/* line 98, ../scss/vm.scss */
+.vm_control_list .button {
+  padding-top: 2px;
+  padding-bottom: 1px;
+  padding-left: 6px;
+  padding-right: 6px;
+}
+
+/* line 105, ../scss/vm.scss */
+.vm_hostname {
+  font-size: 11px;
+}
+
+/* line 109, ../scss/vm.scss */
+.visible-bigscreen {
+  display: none !important;
+}
+
+/* line 113, ../scss/vm.scss */
+.vm_modal_force_text {
+  margin-top: 12px;
+}
+
+/* line 117, ../scss/vm.scss */
+img.vm_task_img {
+  width: 20px;
+}
+
+/* line 121, ../scss/vm.scss */
+.vm_tasks {
+  width: 65% !important;
+}
+
+/* line 125, ../scss/vm.scss */
+table.box.table-striped tbody tr.info td {
+  background-color: #d9edf7;
+}
+
+/* line 130, ../scss/vm.scss */
+.vm_modal .modal-body {
+  font-size: 12px;
+  line-height: 16px;
+}
+/* line 134, ../scss/vm.scss */
+.vm_modal .modal-body .control-label, .vm_modal .modal-body .control, .vm_modal .modal-body input, .vm_modal .modal-body select {
+  font-size: 12px;
+}
+/* line 138, ../scss/vm.scss */
+.vm_modal .modal-body h5 {
+  margin-top: 0px;
+  margin-bottom: 0px;
+  font-size: 12.5px;
+}
+/* line 144, ../scss/vm.scss */
+.vm_modal .modal-body .modal-text-header {
+  margin-top: 0px;
+  margin-bottom: 0px;
+  font-size: 12.5px;
+  font-family: inherit;
+  font-weight: bold;
+  line-height: 20px;
+  color: inherit;
+  text-rendering: optimizelegibility;
+}
+/* line 155, ../scss/vm.scss */
+.vm_modal .modal-body form {
+  margin-top: 4px;
+  padding-top: 2px;
+  padding-bottom: 0px;
+  margin-bottom: 4px;
+}
+
+/* line 164, ../scss/vm.scss */
+.vm_modal_alert {
+  margin-top: 4px;
+  margin-bottom: 0px;
+}
+
+/* line 169, ../scss/vm.scss */
+#my_server_list tbody tr td {
+  vertical-align: middle;
+}
+
+/* line 174, ../scss/vm.scss */
+table tbody tr td.top, table tbody tr th.top, table thead tr td.top, table thead tr th.top {
+  vertical-align: top !important;
+  padding-right: 0;
+}
+/* line 179, ../scss/vm.scss */
+table tbody tr td.chbox, table tbody tr th.chbox, table thead tr td.chbox, table thead tr th.chbox {
+  vertical-align: top !important;
+  padding-right: 0;
+  padding-top: 4px;
+  max-width: 36px;
+}
+/* line 186, ../scss/vm.scss */
+table tbody tr td.right, table tbody tr th.right, table thead tr td.right, table thead tr th.right {
+  padding-right: 0;
+  text-align: right;
+}
+
+/* line 192, ../scss/vm.scss */
+.table-hover tbody tr:hover td,
+.table-hover tbody tr:hover th {
+  background-color: #d9edf7;
+}
+
+/* line 197, ../scss/vm.scss */
+table.box.table-hover tbody tr:hover td,
+table.box.table-hover tbody tr:hover th {
+  background-color: #d9edf7;
+}
+
+/* line 203, ../scss/vm.scss */
+.table-striped2 tbody tr td, .table-striped2 tbody tr th {
+  background-color: #fdfdfd;
+}
+/* line 207, ../scss/vm.scss */
+.table-striped2 tbody tr:nth-child(4n) td, .table-striped2 tbody tr:nth-child(4n) th, .table-striped2 tbody tr:nth-child(4n-1) td, .table-striped2 tbody tr:nth-child(4n-1) th {
+  background-color: #f9f9f9;
+}
+/* line 211, ../scss/vm.scss */
+.table-striped2 tbody tr.row1 td {
+  border-bottom: none;
+  padding-bottom: 0px;
+  line-height: 16px;
+}
+/* line 216, ../scss/vm.scss */
+.table-striped2 tbody tr.row2 td {
+  line-height: 16px;
+  padding-top: 0px;
+  border-top: none;
+}
+
+/* line 223, ../scss/vm.scss */
+table.table-striped tbody tr.highlight td,
+table.table-striped tbody tr.highlight th,
+table.box.table-striped tbody tr.highlight td,
+table.box.table-striped tbody tr.highlight th,
+table tbody tr.highlight td,
+table tbody tr.highlight th {
+  background: transparent;
+  /*background-color: #FFFACD;*/
+  background-color: #FFFFE0;
+}
+
+/* line 234, ../scss/vm.scss */
+input[type="checkbox"].big-check {
+  height: 20px;
+  width: 20px;
+  display: inline-block;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  vertical-align: middle;
+}
+
+/* line 245, ../scss/vm.scss */
+.vm_modal .modal-body form.thin {
+  margin-bottom: 0px;
+}
+
+/* line 249, ../scss/vm.scss */
+.vm_modal .modal-body form.invisible, form.nospace {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+/* line 255, ../scss/vm.scss */
+.control-group.thinner {
+  margin-bottom: 10px;
+}
+
+/* line 259, ../scss/vm.scss */
+.control-group.thin {
+  margin-bottom: 0px;
+}
+
+/* line 263, ../scss/vm.scss */
+.control-inline {
+  padding-left: 0px;
+  margin-left: 0px;
+}
+
+/* line 268, ../scss/vm.scss */
+i.icon-search.row_icon, i.icon-tags.row_icon {
+  font-size: 18px;
+  line-height: 100%;
+  vertical-align: middle;
+}
+
+/* line 274, ../scss/vm.scss */
+th.row_menu_icon {
+  padding-left: 0px;
+  padding-right: 0px;
+  vertical-align: middle !important;
+  text-align: center;
+}
+
+/* line 281, ../scss/vm.scss */
+th.row_menu {
+  vertical-align: middle;
+  padding-left: 0px;
+  padding-right: 0px;
+}
+/* line 286, ../scss/vm.scss */
+th.row_menu .btn-group {
+  white-space: normal;
+  margin-top: -2px;
+  margin-bottom: -2px;
+}
+/* line 290, ../scss/vm.scss */
+th.row_menu .btn-group a:first-child {
+  margin-left: -1px;
+}
+/* line 293, ../scss/vm.scss */
+th.row_menu .btn-group button:first-child {
+  margin-left: -1px;
+}
+/* line 298, ../scss/vm.scss */
+th.row_menu a {
+  font-weight: normal;
+}
+
+/* line 303, ../scss/vm.scss */
+input.quick-search {
+  padding-left: 5px;
+  margin-top: -2px;
+  margin-bottom: -2px;
+  height: 19px;
+  font-size: 12px;
+  line-height: 18px;
+  border: none;
+  background: #eeeeee;
+  background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4gPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjUwJSIgeTE9IjAlIiB4Mj0iNTAlIiB5Mj0iMTAwJSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzY2NjY3MCIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzQ2NDY0ZCIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JhZCkiIC8+PC9zdmc+IA==");
+  background-size: 100%;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #eeeeee));
+  background-image: -webkit-linear-gradient(top, #ffffff, #eeeeee);
+  background-image: -moz-linear-gradient(top, #ffffff, #eeeeee);
+  background-image: -o-linear-gradient(top, #ffffff, #eeeeee);
+  background-image: linear-gradient(top, #ffffff, #eeeeee);
+  -webkit-box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.7) inset;
+  -moz-box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.7) inset;
+  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.7) inset;
+  color: #404040;
+  -webkit-transition: width, 0.3s;
+  -moz-transition: width, 0.3s;
+  -o-transition: width, 0.3s;
+  transition: width, 0.3s;
+}
+
+/* line 329, ../scss/vm.scss */
+.btn-link.disabled {
+  color: gray;
+}
+/* line 331, ../scss/vm.scss */
+.btn-link.disabled:hover {
+  text-decoration: none;
+  cursor: default;
+}
+
+/* line 337, ../scss/vm.scss */
+.sla_chooser {
+  white-space: nowrap;
+}
+
+/**********************
+ * Remote VNC console *
+ **********************/
+/* line 345, ../scss/vm.scss */
+.vnc {
+  -webkit-border-bottom-left-radius: 5px;
+  -moz-border-bottom-left-radius: 5px;
+  -ms-border-bottom-left-radius: 5px;
+  -o-border-bottom-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  -webkit-border-bottom-right-radius: 5px;
+  -moz-border-bottom-right-radius: 5px;
+  -ms-border-bottom-right-radius: 5px;
+  -o-border-bottom-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+/* line 358, ../scss/vm.scss */
+iframe[seamless] {
+  background-color: transparent;
+  border: 0px none transparent;
+  padding: 0px;
+  overflow: hidden;
+}
+
+/* line 366, ../scss/vm.scss */
+.tab-header .window-control > a:hover, .tab-header .window-control.open > a {
+  -webkit-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.6), inset 1px 0px 0px rgba(255, 255, 255, 0.1), inset -1px 0px 0px rgba(255, 255, 255, 0.1), inset 0px -1px 0px rgba(255, 255, 255, 0.1);
+  -moz-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.6), inset 1px 0px 0px rgba(255, 255, 255, 0.1), inset -1px 0px 0px rgba(255, 255, 255, 0.1), inset 0px -1px 0px rgba(255, 255, 255, 0.1);
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.6), inset 1px 0px 0px rgba(255, 255, 255, 0.1), inset -1px 0px 0px rgba(255, 255, 255, 0.1), inset 0px -1px 0px rgba(255, 255, 255, 0.1);
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -o-border-radius: 5px;
+  border-radius: 5px;
+  border: 1px solid #1D1E21;
+  background: #3B3B42;
+  color: #fff;
+  text-shadow: 0 1px rgba(0, 0, 0, 0.5);
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
+/* line 383, ../scss/vm.scss */
+.tab-header .window-control > a:hover.tex, .tab-header .window-control.open > a.tex {
+  background: url("../../gui-theme/images/linen-light.png");
+}
+/* line 386, ../scss/vm.scss */
+.tab-header .window-control > a:hover .separator a, .tab-header .window-control.open > a .separator a {
+  color: #fff;
+  text-shadow: 0 1px rgba(0, 0, 0, 0.5);
+  font-weight: bold;
+}
+/* line 390, ../scss/vm.scss */
+.tab-header .window-control > a:hover .separator a:hover, .tab-header .window-control.open > a .separator a:hover {
+  color: #fff;
+}
+/* line 396, ../scss/vm.scss */
+.tab-header .window-control.open > a i {
+  color: #aaa;
+  text-shadow: none;
+}
+/* line 401, ../scss/vm.scss */
+.tab-header .window-control > a {
+  cursor: pointer;
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  font-size: 15px;
+  line-height: 24px;
+  border: 1px solid transparent;
+  text-align: center;
+}
+
+/* line 413, ../scss/vm.scss */
+a.white {
+  color: #fff;
+}
+
+/**************
+ * Add SERVER *
+ **************/
+/* line 421, ../scss/vm.scss */
+.fadeOut {
+  filter: alpha(opacity=50);
+  -moz-opacity: 0.5;
+  -khtml-opacity: 0.5;
+  opacity: 0.5;
+}
+
+/* line 428, ../scss/vm.scss */
+.center {
+  margin: auto;
+  text-align: center;
+}
+
+/* line 432, ../scss/vm.scss */
+.big-button-bar.two a {
+  width: 140px;
+}
+
+/* line 437, ../scss/vm.scss */
+.add-server .btn {
+  -webkit-box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.4);
+  -moz-box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.4);
+  box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.4);
+}
+/* line 442, ../scss/vm.scss */
+.add-server .btn.btn-big {
+  vertical-align: top;
+  padding: 10px;
+  margin: 0;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -o-border-radius: 5px;
+  border-radius: 5px;
+  background-color: rgba(0, 0, 0, 0.2);
+  margin-left: 10px;
+  margin-bottom: 14px;
+}
+/* line 456, ../scss/vm.scss */
+.add-server .btn.btn-big:hover, .add-server .btn.btn-big:active, .add-server .btn.btn-big.active {
+  -webkit-box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.4);
+  -moz-box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.4);
+  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.4);
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+  background-image: -moz-linear-gradient(top, #5bc0de, #2f96b4);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#5bc0de), to(#2f96b4));
+  background-image: -webkit-linear-gradient(top, #5bc0de, #2f96b4);
+  background-image: -o-linear-gradient(top, #5bc0de, #2f96b4);
+  background-image: linear-gradient(to bottom, #5bc0de, #2f96b4);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FF5BC0DE', endColorstr='#FF2F96B4', GradientType=0);
+  border-color: #2f96b4 #2f96b4 #1f6377;
+  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+  color: white;
+  background-color: #2f96b4;
+  *background-color: #2a85a0;
+}
+/* line 474, ../scss/vm.scss */
+.add-server .btn.btn-big.disabled, .add-server .btn.btn-big[disabled] {
+  -webkit-box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.4);
+  -moz-box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.4);
+  box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.4);
+}
+/* line 481, ../scss/vm.scss */
+.add-server .btn.btn-nobg {
+  background: none;
+}
+/* line 486, ../scss/vm.scss */
+.add-server .span4 {
+  margin: 0;
+  padding: 0;
+}
+/* line 491, ../scss/vm.scss */
+.add-server h3 {
+  font-size: 16px;
+  line-height: 20px;
+  color: white;
+  margin-bottom: 10px;
+  margin-right: 5px;
+  margin-left: 10px;
+}
+/* line 501, ../scss/vm.scss */
+.add-server .btn.template {
+  width: 220px;
+  text-shadow: 0 2px rgba(0, 0, 0, 0.5);
+  font-size: 13px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+/* line 508, ../scss/vm.scss */
+.add-server .btn.template img {
+  width: 80px;
+  height: 55px;
+}
+/* line 514, ../scss/vm.scss */
+.add-server ul.template-price {
+  margin-left: 10px;
+}
+/* line 517, ../scss/vm.scss */
+.add-server ul.template-price li.price-tag {
+  font-size: 20px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+/* line 524, ../scss/vm.scss */
+.add-server ul.template-specs {
+  margin-right: 10px;
+  list-style-type: disc;
+}
+/* line 528, ../scss/vm.scss */
+.add-server ul.template-specs li {
+  text-align: left;
+}
+/* line 533, ../scss/vm.scss */
+.add-server .template-name {
+  font-size: 20px;
+  min-height: 55px;
+}
+/* line 539, ../scss/vm.scss */
+.add-server #select-name #server-name-input {
+  margin-bottom: 6px;
+  margin-left: 10px;
+}
+/* line 544, ../scss/vm.scss */
+.add-server #select-name .help-inline {
+  margin: 0;
+  padding: 0;
+  margin-left: 13px;
+  height: 40px;
+}
+/* line 552, ../scss/vm.scss */
+.add-server hr {
+  color: #1D1E21;
+  background-color: #1D1E21;
+  height: 2px;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+/* line 561, ../scss/vm.scss */
+.add-server .btn.image {
+  width: 110px;
+  height: 110px;
+  padding: 5px;
+}
+/* line 566, ../scss/vm.scss */
+.add-server .btn.image img {
+  width: 50px;
+}
+/* line 570, ../scss/vm.scss */
+.add-server .btn.image p {
+  font-size: 12px;
+  line-height: 14px;
+}
+/* line 574, ../scss/vm.scss */
+.add-server .btn.image p small {
+  font-size: 9px;
+}
+/* line 580, ../scss/vm.scss */
+.add-server .periods .btn {
+  width: 90px;
+  height: 90px;
+  padding-top: 0;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+/* line 587, ../scss/vm.scss */
+.add-server .periods .btn .length {
+  font-size: 20px;
+}
+/* line 591, ../scss/vm.scss */
+.add-server .periods .btn .unit {
+  font-size: 12px;
+}
+/* line 595, ../scss/vm.scss */
+.add-server .periods .btn .info {
+  font-size: 11px;
+  line-height: 12px;
+  padding-top: 3px;
+  padding-bottom: 2px;
+  margin-left: -10px;
+  margin-right: -10px;
+  border: 1px solid lime;
+  background-color: #3c3c3c;
+  background-image: -moz-linear-gradient(top, #444444, #3c3c3c);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#444444), to(#3c3c3c));
+  background-image: -webkit-linear-gradient(top, #444444, #3c3c3c);
+  background-image: -o-linear-gradient(top, #444444, #3c3c3c);
+  background-image: linear-gradient(to bottom, #444444, #3c3c3c);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FF444444', endColorstr='#FF3c3c3c', GradientType=0);
+}
+/* line 613, ../scss/vm.scss */
+.add-server .periods .btn .info.discount {
+  color: lime;
+}
+/* line 619, ../scss/vm.scss */
+.add-server #recurring {
+  margin-top: 10px;
+  margin-bottom: 20px;
+  margin-left: 10px;
+  margin-right: 10px;
+  line-height: 11px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+/* line 628, ../scss/vm.scss */
+.add-server #recurring label {
+  font-size: 12px;
+}
+/* line 631, ../scss/vm.scss */
+.add-server #recurring label:hover {
+  cursor: pointer;
+}
+/* line 635, ../scss/vm.scss */
+.add-server #recurring small {
+  font-size: 10px;
+}
+/* line 640, ../scss/vm.scss */
+.add-server #price {
+  padding-top: 26px;
+  padding-bottom: 26px;
+}
+/* line 644, ../scss/vm.scss */
+.add-server #price:hover {
+  cursor: default;
+}
+/* line 648, ../scss/vm.scss */
+.add-server #price .h3 {
+  margin-left: 10px;
+  font-size: 16px;
+  line-height: 20px;
+  color: white;
+}
+/* line 655, ../scss/vm.scss */
+.add-server #price .total-price-placeholder {
+  background-color: transparent;
+  font-weight: bold;
+  padding-left: 0;
+  padding-right: 0;
+}
+/* line 663, ../scss/vm.scss */
+.add-server #order-buttons {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+/* line 668, ../scss/vm.scss */
+.add-server .button_wide {
+  width: 220px !important;
+}
+
+/* line 674, ../scss/vm.scss */
+#select-configuration .completed h3, #select-name .completed h3, #select-disk .completed h3, #select-period .completed h3 {
+  opacity: 0.8;
+}
+/* line 676, ../scss/vm.scss */
+#select-configuration .completed h3:after, #select-name .completed h3:after, #select-disk .completed h3:after, #select-period .completed h3:after {
+  font-weight: normal;
+  font-family: FontAwesome;
+  content: " \F046";
+  color: lime;
+  opacity: 1;
+}
+/* line 685, ../scss/vm.scss */
+#select-configuration h3:after, #select-name h3:after, #select-disk h3:after, #select-period h3:after {
+  font-weight: normal;
+  font-family: FontAwesome;
+  content: " \F096";
+  opacity: 0.8;
+}
+
+/* line 693, ../scss/vm.scss */
+.erigonag {
+  color: #EAEAEA;
+}
+
+/* line 694, ../scss/vm.scss */
+.erigonau {
+  color: #EFECC6;
+}
+
+/* line 695, ../scss/vm.scss */
+.erigonpt {
+  color: #D4E1ED;
+}
+
+/* line 697, ../scss/vm.scss */
+#total-price, #total-price-orig, #change-subscription-total-price, #change-subscription-total-price-orig {
+  font-weight: bold;
+  color: white;
+}
+
+/* line 702, ../scss/vm.scss */
+.total-price-placeholder, #total-price, #change-subscription-total-price {
+  font-size: 16px;
+  padding: 7px;
+  line-height: 17px;
+}
+
+/* line 708, ../scss/vm.scss */
+.strikethrough {
+  text-decoration: line-through;
+}
+
+/* line 712, ../scss/vm.scss */
+.note.aligned {
+  padding-left: 18px;
+}
+
+/* line 717, ../scss/vm.scss */
+.chartable > tbody > tr > td {
+  background: #FDFDFD;
+}
+/* line 721, ../scss/vm.scss */
+.chartable > thead > tr > td, .chartable > tfoot > tr > td {
+  padding: 0;
+}
+/* line 726, ../scss/vm.scss */
+.chartable .legend tr td {
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+/* line 731, ../scss/vm.scss */
+.chartable .legend tr:first-child td {
+  padding-top: 4px;
+  border-top: none;
+}
+/* line 737, ../scss/vm.scss */
+.chartable .vm_history_control {
+  padding: 0;
+  margin-top: 2px;
+  margin-bottom: 4px;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+/* line 744, ../scss/vm.scss */
+.chartable .vm_history_control a.active {
+  background: #46464d;
+  background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4gPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjUwJSIgeTE9IjAlIiB4Mj0iNTAlIiB5Mj0iMTAwJSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzY2NjY3MCIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzQ2NDY0ZCIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JhZCkiIC8+PC9zdmc+IA==");
+  background-size: 100%;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #666670), color-stop(100%, #46464d));
+  background-image: -webkit-linear-gradient(top, #666670, #46464d);
+  background-image: -moz-linear-gradient(top, #666670, #46464d);
+  background-image: -o-linear-gradient(top, #666670, #46464d);
+  background-image: linear-gradient(top, #666670, #46464d);
+  -webkit-box-shadow: inset 0px 0px 5px rgba(0, 0, 0, 0.5), 0px 1px 0px transparent;
+  -moz-box-shadow: inset 0px 0px 5px rgba(0, 0, 0, 0.5), 0px 1px 0px transparent;
+  box-shadow: inset 0px 0px 5px rgba(0, 0, 0, 0.5), 0px 1px 0px transparent;
+  text-shadow: none;
+  cursor: default;
+  opacity: 0.90;
+  filter: alpha(opacity=90);
+}
+/* line 763, ../scss/vm.scss */
+.chartable.disabled > tbody > tr > td {
+  background: #C0C0C0;
+}
+/* line 767, ../scss/vm.scss */
+.chartable.problem > tbody > tr > td {
+  background: #FF6666;
+}
+/* line 771, ../scss/vm.scss */
+.chartable .period-wrap {
+  font-size: 10px;
+  color: #545454;
+  height: 16px;
+  text-align: center;
+}
+
+/* line 779, ../scss/vm.scss */
+.graph {
+  width: 100%;
+  height: 260px;
+}
+/* line 783, ../scss/vm.scss */
+.graph .tall {
+  height: 500px;
+}
+
+/* line 788, ../scss/vm.scss */
+.narrow {
+  width: 160px;
+}
+
+/* line 792, ../scss/vm.scss */
+.narrower {
+  width: 120px;
+}
+
+/* line 796, ../scss/vm.scss */
+.wide {
+  width: 260px;
+}
+
+/* line 800, ../scss/vm.scss */
+.vms_tags.select2-container .select2-choices {
+  -webkit-box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 0.5), 0px 1px 0px rgba(255, 255, 255, 0.3);
+  -moz-box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 0.5), 0px 1px 0px rgba(255, 255, 255, 0.3);
+  box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 0.5), 0px 1px 0px rgba(255, 255, 255, 0.3);
+  text-shadow: none;
+  background: rgba(0, 0, 0, 0.15);
+  border-color: transparent;
+  color: #fff;
+  padding: 0;
+  padding-top: 3px;
+  font-size: 11px;
+  font-weight: normal;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+/* line 815, ../scss/vm.scss */
+.vms_tags.select2-container .select2-choices .select2-search-field input {
+  color: #eee;
+}
+
+/* line 820, ../scss/vm.scss */
+.define_changed i {
+  color: lime !important;
+}
+
+/* line 824, ../scss/vm.scss */
+.oneline label {
+  display: inline-block;
+  margin-bottom: 13px;
+}
+
+/* line 829, ../scss/vm.scss */
+select.select-transparent {
+  height: 32px;
+  -webkit-box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.5) inset, 0px 1px 0px rgba(255, 255, 255, 0.3);
+  -moz-box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.5) inset, 0px 1px 0px rgba(255, 255, 255, 0.3);
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.5) inset, 0px 1px 0px rgba(255, 255, 255, 0.3);
+  background: none repeat scroll 0% 0% rgba(0, 0, 0, 0.25);
+  padding-top: 8px;
+  padding-bottom: 8px;
+  border: medium none;
+  color: #FFF;
+}
+/* line 840, ../scss/vm.scss */
+select.select-transparent option {
+  color: #000;
+}
+/* line 844, ../scss/vm.scss */
+select.select-transparent.uneditable-input {
+  background: #ccc;
+  color: #444;
+  text-shadow: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
+
+/* line 854, ../scss/vm.scss */
+textarea.uneditable-input, input[type="text"].uneditable-input, input[type="password"].uneditable-input, input[type="datetime"].uneditable-input, input[type="datetime-local"].uneditable-input, input[type="date"].uneditable-input, input[type="month"].uneditable-input, input[type="time"].uneditable-input, input[type="week"].uneditable-input, input[type="number"].uneditable-input, input[type="email"].uneditable-input, input[type="url"].uneditable-input, input[type="search"].uneditable-input, input[type="tel"].uneditable-input, input[type="color"].uneditable-input {
+  background: #ccc;
+  color: #444;
+  text-shadow: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
+
+/* line 863, ../scss/vm.scss */
+.tiny {
+  font-size: 9px;
+}
+
+/* line 867, ../scss/vm.scss */
+.vm_snapshot_note {
+  white-space: pre;
+  white-space: pre-line;
+}
+
+/* line 872, ../scss/vm.scss */
+.icon-enabled i {
+  color: #468847;
+}
+
+/* line 875, ../scss/vm.scss */
+.icon-disabled i {
+  color: #b94a48;
+}
+
+/* line 879, ../scss/vm.scss */
+.vm_flags {
+  white-space: nowrap;
+  margin-left: 3px;
+}

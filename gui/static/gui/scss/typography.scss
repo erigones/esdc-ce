@@ -1,0 +1,55 @@
+p {
+  line-height: 20px;
+}
+
+.italic {
+  font-style: italic;
+}
+
+.icontext {
+  white-space: nowrap;
+}
+
+a.btn-icon {
+
+  &:after {
+    font-family: FontAwesome;
+    font-weight: normal;
+    font-style: normal;
+    display: inline-block;
+    padding-left: 2px;
+    color: #000 !important;
+  }
+
+  &.icon-active {
+    &:after {
+      color: #0088cc !important;
+
+      &:hover {
+        color: #005580 !important;
+      }
+    }
+
+    &.disabled:after, &.disabled:after:hover {
+      color: #333 !important;
+    }
+  }
+}
+
+a.btn-icon-edit:after {
+  @extend a.btn-icon;
+  content: "\f044";
+}
+
+a.btn-icon-link:after {
+  @extend a.btn-icon;
+  content: "\f0c1";
+}
+
+a.btn-text {
+  color: #333333;
+}
+
+[class^="icon-"]:before, [class*=" icon-"]:before {
+  cursor: default;
+}

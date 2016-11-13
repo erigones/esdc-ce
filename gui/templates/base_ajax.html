@@ -1,0 +1,20 @@
+{% if request.user.is_authenticated %}
+{% if request.impersonated %}{% include "impersonation.html" %}{% endif %}
+{% block javascript %}{% endblock %}
+{% include "gui/navigation.html" %}
+{% block javascript2 %}{% endblock %}
+{% endif %}
+<section id="main">
+  {% include "gui/messages.html" %}
+  <div class="base-nav">
+    {% block base_nav %}{% endblock %}
+  </div> <!-- end base-nav -->
+  {% block base_content %}{% endblock %}
+  {% if request.user.is_authenticated %}
+  <div id="cached-tasks">
+    {% include "gui/tasklog/tasklog_cached.html" %}
+  </div> <!-- end cached-tasks -->
+  {% endif %}
+</section>
+{% if DEBUG.sql %}{% include "debug.html" %}{% endif %}
+{% if ANALYTICS %}{% include "ga.html" %}{% endif %}

@@ -1,0 +1,66 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-10-25 10:12+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+
+#: static/api/doc/_static/doctools.js:167
+msgid "Permalink to this headline"
+msgstr ""
+
+#: static/api/doc/_static/doctools.js:173
+msgid "Permalink to this definition"
+msgstr ""
+
+#: static/api/doc/_static/doctools.js:206
+msgid "Hide Search Matches"
+msgstr ""
+
+#: static/api/doc/_static/searchtools.js:300
+msgid "Searching"
+msgstr ""
+
+#: static/api/doc/_static/searchtools.js:305
+msgid "Preparing search..."
+msgstr ""
+
+#: static/api/doc/_static/searchtools.js:461
+msgid "Search Results"
+msgstr ""
+
+#: static/api/doc/_static/searchtools.js:463
+msgid ""
+"Your search did not match any documents. Please make sure that all words are "
+"spelled correctly and that you've selected enough categories."
+msgstr ""
+
+#: static/api/doc/_static/searchtools.js:465
+#, javascript-format
+msgid "Search finished, found %s page(s) matching the search query."
+msgstr ""
+
+#: static/api/doc/_static/searchtools.js:517
+msgid ", in "
+msgstr ""
+
+#~ msgid "Your servers can not be started until the payment is received."
+#~ msgstr "Vaše servery budú spustené až po prijatí platby."
+
+#~ msgid ""
+#~ "You will be forwarded to FastSpring site where you can finish your order."
+#~ msgstr ""
+#~ "Budete presmerovaný na stránku FastSpring, kde môžete dokončit svoju "
+#~ "objednávku."

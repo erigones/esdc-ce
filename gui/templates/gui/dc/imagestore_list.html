@@ -1,0 +1,141 @@
+{% extends load_base %}
+{% load i18n %}
+{% load gui_utils %}
+
+{% block javascript %}
+<script type="text/javascript">
+  $(document).ready(function() {
+    IMAGESTORE = new ImageStoreList();
+  });
+</script>
+{% endblock %}
+
+{% block base_content %}
+<div id="obj_form_modal" class="black-box modal hide fade vm_modal">
+  <div class="modal-head tab-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <span class="title_edit"></span>
+    <span class="title_add"><i class="icon-save"></i> {% trans "Import Disk Image" %}</span>
+  </div>
+  <div class="modal-body separator">
+    <div class="text_edit"></div>
+    <div class="text_add"></div>
+    <form class="form-horizontal" action="#" data-source="{{ url_form_admin }}" method="POST">
+      {% include "gui/dc/image_admin_form.html" with form=form_admin %}
+    </form>
+  </div>
+  <div class="modal-footer">
+    <div class="inner-well">
+      <span class="pull-left"><a class="vm_modal_more btn btn-small btn-inverse no-ajax">{% trans "Show advanced settings" %}</a></span>
+      <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
+      <a class="vm_modal_update button green no-ajax" data-enter="true"></a>
+      <a class="vm_modal_delete button red no-ajax"></a>
+      <a class="vm_modal_create button green no-ajax" data-enter="true">{% trans "Import Image" %}</a>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid">
+  <div class="row-fluid">
+
+    <div class="span12">
+      <div class="tab-header">
+        <span class="options window-control pull-right">
+          <i class="icon-cloud"></i> {{ request.dc.alias }}
+        </span>
+        <i class="icon-save"></i> {% trans "Images" %} &rsaquo; {% trans "repository" %}:{{ imagestore.name }}
+      </div>
+      <table class="table box table-striped table-hover table-responsive" id="etable">
+
+        <thead>
+          <tr>
+            <th colspan="6" class="row_menu pad">
+              <div class="btn-group">
+                {% for i in imagestores %}
+                <a href="{% url 'imagestore_list_repo' i.name %}?{{ qs }}" class="btn btn-small{% if imagestore.name == i.name %} active{% endif %}" data-toggle="tooltip" data-placement="bottom" title="{% blocktrans with repo_name=i.name repo_url=i.url %}Show images available on the {{ repo_name }} ({{ repo_url }}) image repository{% endblocktrans %}">
+                  <i class="icon-th-list"></i> {{ i.name }} <span class="sep">{{ i.image_count }}</span>
+                </a>
+                {% endfor %}
+              </div>
+            </th>
+          </tr>
+
+          <tr>
+            <th colspan="6" class="pad">
+              <div class="btn-group">
+                <i class="icon-search row_icon" style="padding-right:2px;"></i>
+                <input type="search" results="5" id="image_search" class="quick-search" name="image_search" placeholder="{% trans "search by image name" %}">
+              </div>
+              <div class="btn-group">
+                {% with qs=qs|qs_del:'created_since' %}
+                <a href="{{ request.path }}?{{ qs }}&created_since=30" class="btn btn-mini{% if created_since == 30 %} active{% endif %}" title="{% trans "Show images published during last month" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-list-ol"></i> {% trans "Last month" %}</a>
+                <a href="{{ request.path }}?{{ qs }}&created_since=365" class="btn btn-mini{% if created_since == 365 %} active{% endif %}" title="{% trans "Show images published during last year" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-list-ol"></i> {% trans "Last year" %}</a>
+                <a href="{{ request.path }}?{{ qs }}&created_since=0" class="btn btn-mini{% if created_since == 0 %} active{% endif %}" title="{% trans "Show all published images" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-list-ol"></i> {% trans "All" %}</a>
+                {% endwith %}
+              </div>
+              <div class="pull-right">
+                <form method="POST" action="#" data-source="{% url 'imagestore_update' imagestore.name %}?{{ qs }}" id="imagestore-refresh-form" class="nospace">
+                  {% csrf_token %}
+                  <a href="#" class="button gray" id="imagestore-refresh" title="{% if imagestore.last_update %}{% blocktrans with repo_name=imagestore.name last_update=imagestore.last_update|date:"SHORT_DATETIME_FORMAT" %}Image repository {{ repo_name }} was last updated on {{ last_update }}{% endblocktrans %}{% else %}{% blocktrans with repo_name=imagestore.name %}Image repostiory {{ repo_name }} was not updated yet{% endblocktrans %}{% endif %}" data-toggle="tooltip" data-placement="left"><i class="icon-refresh"></i> {% trans "Refresh" %}</a>
+                </form>
+              </div>
+            </th>
+          </tr>
+
+          <tr class="row-alert{% if not imagestore.error %} hide{% endif %}" id="imagestore-refresh-error">
+            <td colspan="6">
+              <div class="alert alert-error"><i class="icon-warning-sign"></i> <span>{{ imagestore.error|default:"" }}</span></div>
+            </td>
+          </tr>
+
+          {% if images %}
+          <tr class="datatable_head" data-order_by_default="[[4,&quot;desc&quot;]]">
+            <th>{% trans "Name (version)" %}</th>
+            <th>{% trans "OS&nbsp;Type" %}</th>
+            <th class="hidden-phone">{% trans "Size (download)" %}</th>
+            <th class="hidden-phone-small">{% trans "Status" %}</th>
+            <th>{% trans "Published at" %}</th>
+            <th class="hidden-phone">{% trans "Description" %}</th>
+          </tr>
+          {% endif %}
+        </thead>
+
+        <tbody>
+          {% for img in images %}
+          <tr>
+            <td><a href="#" class="btn-link btn-icon-link obj_add imagestore-image" data-prefix="adm" data-form="{{ img.web_data|jsondata }}">{{ img.name }} ({{ img.version }})</a><br><small>{{ img.uuid }}</small></td>
+            <td>{{ img.get_ostype_display }}</td>
+            <td class="hidden-phone">{{ img.size|mb_to_gb }} <small>GB</small><br><small>({{ img.download_size|b_to_mb }}&nbsp;MB)</small></td>
+            <td class="hidden-phone-small">{{ img.state }}</td>
+            <td>{{ img.created|date:"SHORT_DATETIME_FORMAT" }}</td>
+            <td class="hidden-phone">
+              {% if img.homepage %}
+              <a href="{{ img.homepage }}" target="_blank" class="btn-icon-link btn-text btn-link no-ajax"><small class="vm_snapshot_note">{{ img.desc }}</small></a>
+              {% else %}
+              <small class="vm_snapshot_note">{{ img.desc }}</small>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+
+        <tfoot>
+          <tr>
+            <td colspan="6">
+              <span class="pull-right">
+                {% trans "Last updated" %}: <span>{{ imagestore.last_update|date:"SHORT_DATETIME_FORMAT" }}</span>&nbsp;&nbsp;&nbsp;
+                {% trans "Total" %}: <span id="total">{{ images|length }}</span>&nbsp;
+              </span>
+              <div class="vm_control">
+                <a href="{% url 'dc_image_list' %}?{{ qs }}" class="button gray"><i class="icon-circle-arrow-left"></i> {% trans "Return to image list" %}</a>
+              </div>
+            </td>
+          </tr>
+        </tfoot>
+
+      </table>
+    </div>
+
+  </div> <!-- end row-fluid -->
+</div> <!-- end container-fluid -->
+{% endblock %}

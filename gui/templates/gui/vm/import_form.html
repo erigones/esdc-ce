@@ -1,0 +1,7 @@
+{% load i18n %}
+{% csrf_token %}
+{% for error in importform.non_field_errors %}
+<div class="alert alert-error"><i class="icon-warning-sign"></i> {{ error }}</div>
+{% endfor %}
+
+{% include "gui/form_field.html" with field=importform.import_file %}

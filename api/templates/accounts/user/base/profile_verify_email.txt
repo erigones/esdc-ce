@@ -1,0 +1,8 @@
+{% load i18n %}{% autoescape off %}{% blocktrans %}Hello!
+
+In order to confirm your new email address please go to the profile section at {{ site_link }} and use this activation code.
+
+Email activation code: {{ email_token }}
+{% endblocktrans %}{% endautoescape %}
+
+{% include "email_signature.txt" %}

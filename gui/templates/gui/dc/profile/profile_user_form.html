@@ -1,0 +1,42 @@
+{% load i18n %}
+{% csrf_token %}
+<input type="hidden" name="action" value="update" />
+
+<table class="table box table-striped form">
+  <thead>
+  </thead>
+  <tbody>
+    {% include "gui/profile/profile_user_field.html" with field=uform.username %}
+    {% include "gui/profile/profile_user_field.html" with field=upform.title %}
+    {% include "gui/profile/profile_user_field.html" with field=upform.first_name %}
+    {% include "gui/profile/profile_user_field.html" with field=upform.middle_name %}
+    {% include "gui/profile/profile_user_field.html" with field=upform.last_name %}
+    {% include "gui/profile/profile_user_field_verify.html" with field=upform.email %}
+    {% include "gui/profile/profile_user_field_checkbox.html" with field=upform.email_verified %}
+    {% spaceless %}{% include "gui/profile/profile_user_field_verify.html" with field=upform.phone %}{% endspaceless %}
+    {% include "gui/profile/profile_user_field_checkbox.html" with field=upform.phone_verified %}
+    {% include "gui/profile/profile_user_field_checkbox.html" with field=upform.tos_acceptation %}
+    {% include "gui/profile/profile_user_field.html" with field=upform.jabber %}
+    {% include "gui/profile/profile_user_field.html" with field=upform.website %}
+    {% include "gui/profile/profile_user_field_radio.html" with field=upform.usertype %}
+    {% include "gui/profile/profile_user_field.html" with field=upform.company %}
+    {% include "gui/profile/profile_user_field.html" with field=upform.companyid %}
+    {% include "gui/profile/profile_user_field.html" with field=upform.taxid %}
+    {% include "gui/profile/profile_user_field.html" with field=upform.vatid %}
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="2">
+        <div class="vm_control">
+          {% for error in uform.non_field_errors %}<div class="alert alert-error"><i class="icon-warning-sign"></i> {{ error }}</div>{% endfor %}
+          {% for error in upform.non_field_errors %}<div class="alert alert-error"><i class="icon-warning-sign"></i> {{ error }}</div>{% endfor %}
+          <a href="#" id="profile_update" class="button gray no-ajax profile_control"><i class="icon-check"></i> {% trans "Update profile" %}</a>
+          <a href="#" id="profile_password" class="button gray no-ajax profile_control" data-modal_nohide="true"><i class="icon-lock"></i> {% trans "Change password" %}</a>
+          {% if request.user != user and request.user.is_staff %}
+          <a href="{% url 'start_impersonation' user.username %}" id="profile_impersonate" class="button gray no-ajax pull-right" title="{% blocktrans with user=user.username %}Switch into {{ user }} account {% endblocktrans %}" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-eye-open"></i> {% trans "Impersonate" %}</a>
+          {% endif %}
+        </div>
+      </td>
+    </tr>
+  </tfoot>
+</table>

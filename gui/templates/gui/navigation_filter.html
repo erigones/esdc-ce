@@ -1,0 +1,14 @@
+{% load i18n %}
+<div class="nav-filter">
+  <h5><i class="icon-filter"></i> {% trans "Filters" %}</h5>
+
+  <form name="filter" id="filter_form" action="#" method="get">
+    {% for filter_field in filters %}
+      {% include "gui/navigation_filter_field.html" with field=filter_field %}
+    {% endfor %}
+    <div class="input">
+      <a href="#" id="report_filter" class="button blue no-ajax filter_action small"><i class="icon-search"></i> {% trans "Filter" %}</a> &nbsp;
+      <a href="#" id="report_clear" class="button red no-ajax filter_action small pull-right"><i class="icon-remove-circle"></i> {% trans "Reset" %}</a>
+    </div>
+  </form>
+</div>

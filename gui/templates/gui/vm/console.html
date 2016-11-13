@@ -1,0 +1,33 @@
+{% extends load_base %}
+{% load i18n %}
+
+{% block javascript %}
+<script type="text/javascript">
+  $(document).ready(function() {
+    var vnc_e = $(jq('vnc_{{ vm.hostname }}'));
+    new VNC(vnc_e);
+    show_loading_screen('{% trans "Loading console window" %}', false, true);
+    vnc_e.on('load', hide_loading_screen);
+  });
+</script>
+{% endblock %}
+
+{% block base_nav %}{% include "gui/vm/navigation.html" with li_console="active" %}{% endblock %}
+
+{% block base_content %}
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span12 black-box" id="console">
+      <div class="tab-header">
+        <span>
+          <i class="icon-picture"></i> {{ vm.alias }} &rsaquo; {% trans "console" %}
+        </span>
+        <span class="options window-control pull-right">
+          <a href="{% url 'vnc' vm.hostname %}?nologin=1" target="_blank" class="no-ajax" title="{% trans "Open console in new window" %}" data-toggle="tooltip" data-placement="left"><i class="icon-external-link"></i></a>
+        </span>
+      </div>
+      <iframe id="vnc_{{ vm.hostname }}" class="vnc" src="{% url 'vnc' vm.hostname %}" seamless="seamless"></iframe>
+    </div> <!-- end span12 -->
+  </div> <!-- end row-fluid -->
+</div> <!-- end container-fluid -->
+{% endblock %}

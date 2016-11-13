@@ -1,0 +1,24 @@
+<div id="debug" style="position: fixed; bottom: 0; left: 0; background-color: #fff; opacity: 0.9; width: 100%; padding: 0 5px;">
+  <p>
+    {{ DEBUG.sql_queries|length }} Quer{{ DEBUG.sql_queries|pluralize:"y,ies" }}
+    {% ifnotequal DEBUG.sql_queries|length 0 %}
+    (<span style="cursor: pointer;" onclick="var s=document.getElementById('debugQueryTable').style;s.display=s.display=='none'?'':'none';this.innerHTML=this.innerHTML=='Show'?'Hide':'Show';">Show</span>)
+    {% endifnotequal %}
+  </p>
+  <table id="debugQueryTable" style="display: none;" class="table table-bordered table-condensed">
+    <thead>
+    <tr>
+      <th>#</th>
+      <th>SQL</th>
+      <th>Time</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for query in DEBUG.sql_queries %}<tr class="{% cycle odd,even %}">
+      <td>{{ forloop.counter }}</td>
+      <td style="background-color: #f7f7f9;"><code style="font-size: 9px; border: 0; margin: 0; padding: 0; line-height: 8px;">{{ query.sql|escape }}</code></td>
+      <td>{{ query.time }}</td>
+    </tr>{% endfor %}
+    </tbody>
+  </table>
+</div>

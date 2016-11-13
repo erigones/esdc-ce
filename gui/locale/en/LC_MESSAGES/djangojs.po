@@ -1,0 +1,167 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-10-25 14:03+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: static/3rd-party/jqueryUI/jquery-ui.min.js:10
+msgid "'"
+msgstr ""
+
+#: static/guacamole/scripts/guacamole-erigones.js:151
+msgid "Idle."
+msgstr ""
+
+#: static/guacamole/scripts/guacamole-erigones.js:154
+msgid "Connecting..."
+msgstr ""
+
+#: static/guacamole/scripts/guacamole-erigones.js:157
+msgid "Connected, waiting for first update..."
+msgstr ""
+
+#: static/guacamole/scripts/guacamole-erigones.js:163
+msgid "Disconnecting..."
+msgstr ""
+
+#: static/guacamole/scripts/guacamole-erigones.js:166
+msgid "Disconnected."
+msgstr ""
+
+#: static/guacamole/scripts/guacamole-erigones.js:169
+msgid "Unknown status"
+msgstr ""
+
+#: static/gui/js/gsio.js:327
+msgid "Socket.io connection error."
+msgstr ""
+
+#: static/gui/js/gsio.js:336
+msgid "Socket.io connection problem. Please try again later."
+msgstr ""
+
+#: static/gui/js/gsio.js:345
+msgid ""
+"Your current datacenter was changed by another user session. Please refresh "
+"your browser."
+msgstr ""
+
+#: static/gui/js/gsio.js:654
+msgid "Server"
+msgstr ""
+
+#: static/gui/js/gsio.js:654
+msgid "changed status to"
+msgstr ""
+
+#: static/gui/js/gsio.js:758
+msgid "Snapshot successfully created"
+msgstr ""
+
+#: static/gui/js/gsio.js:761
+msgid "Snapshot successfully deleted"
+msgstr ""
+
+#: static/gui/js/gsio.js:764
+msgid "Snapshot successfully restored"
+msgstr ""
+
+#: static/gui/js/gsio.js:772
+msgid "Creating new snapshot failed"
+msgstr ""
+
+#: static/gui/js/gsio.js:775
+msgid "Deleting snapshot failed"
+msgstr ""
+
+#: static/gui/js/gsio.js:778
+msgid "Restoring snapshot failed"
+msgstr ""
+
+#: static/gui/js/gsio.js:823
+msgid "Backup successfully created"
+msgstr ""
+
+#: static/gui/js/gsio.js:826
+msgid "Backup successfully deleted"
+msgstr ""
+
+#: static/gui/js/gsio.js:829
+msgid "Backup successfully restored"
+msgstr ""
+
+#: static/gui/js/gsio.js:837
+msgid "Creating new backup failed"
+msgstr ""
+
+#: static/gui/js/gsio.js:840
+msgid "Deleting backup failed"
+msgstr ""
+
+#: static/gui/js/gsio.js:843
+msgid "Restoring backup failed"
+msgstr ""
+
+#: static/gui/js/helpers.js:243
+msgid "Unknown error"
+msgstr ""
+
+#: static/gui/js/helpers.js:247
+msgid "Network error"
+msgstr ""
+
+#: static/gui/js/mon.js:99
+msgid "N/A"
+msgstr ""
+
+#: static/user-guide/_static/doctools.js:167
+msgid "Permalink to this headline"
+msgstr ""
+
+#: static/user-guide/_static/doctools.js:173
+msgid "Permalink to this definition"
+msgstr ""
+
+#: static/user-guide/_static/doctools.js:206
+msgid "Hide Search Matches"
+msgstr ""
+
+#: static/user-guide/_static/searchtools.js:300
+msgid "Searching"
+msgstr ""
+
+#: static/user-guide/_static/searchtools.js:305
+msgid "Preparing search..."
+msgstr ""
+
+#: static/user-guide/_static/searchtools.js:461
+msgid "Search Results"
+msgstr ""
+
+#: static/user-guide/_static/searchtools.js:463
+msgid ""
+"Your search did not match any documents. Please make sure that all words are "
+"spelled correctly and that you've selected enough categories."
+msgstr ""
+
+#: static/user-guide/_static/searchtools.js:465
+#, javascript-format
+msgid "Search finished, found %s page(s) matching the search query."
+msgstr ""
+
+#: static/user-guide/_static/searchtools.js:517
+msgid ", in "
+msgstr ""

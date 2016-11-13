@@ -1,0 +1,106 @@
+{% extends load_base %}
+{% load i18n %}
+{% load gui_utils %}
+
+{% block javascript %}
+<script type="text/javascript">
+  $(document).ready(function() {
+    NODE_STORAGE = new NodeStorage({{ zpools|json:None|safe }});
+  });
+</script>
+{% endblock %}
+
+{% block base_nav %}{% include "gui/node/navigation.html" with li_storages="active" %}{% endblock %}
+
+{% block base_content %}
+<div id="obj_form_modal" class="black-box modal hide fade vm_modal">
+  <div class="modal-head tab-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <span class="title_edit"><i class="icon-th"></i> {% trans "Change node Storage Settings" %}</span>
+    <span class="title_add"><i class="icon-th"></i> {% trans "Add new node Storage" %}</span>
+  </div>
+  <div class="modal-body separator">
+    <div class="text_edit"></div>
+    <div class="text_add"></div>
+    <form class="form-horizontal" action="#" data-source="{% url 'node_storage_form' node.hostname %}" method="POST">
+      {% include "gui/node/storage_form.html" %}
+    </form>
+  </div>
+  <div class="modal-footer">
+    <div class="inner-well">
+      <span class="pull-left"><a class="vm_modal_more btn btn-small btn-inverse no-ajax">{% trans "Show advanced settings" %}</a></span>
+      <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
+      <a class="vm_modal_update button green no-ajax" data-enter="true">{% trans "Update" %}</a>
+      <a class="vm_modal_delete button red no-ajax">{% trans "Delete Storage" %}</a>
+      <a class="vm_modal_create button green no-ajax" data-enter="true">{% trans "Add Storage" %}</a>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid">
+  <div class="row-fluid">
+
+    <div class="span12">
+      <div class="tab-header">
+        <i class="icon-th"></i> {{ node.hostname }} &rsaquo; {% trans "storages" %}
+      </div>
+      <table class="table box table-striped table-hover table-responsive" id="etable">
+
+        <thead>
+          {% if storages %}
+          <tr>
+            <th>{% trans "Alias (zpool)" %}</th>
+            <th>{% trans "Access" %}</th>
+            <th>{% trans "Owner" %}</th>
+            <th class="hidden-phone">{% trans "Type" %}</th>
+            <th class="hidden-phone">{% trans "Size" %}</th>
+            <th class="hidden-phone">{% trans "Servers" %}</th>
+            <th class="hidden-phone">{% trans "Snapshots" %}</th>
+            <th class="hidden-tablet">{% trans "Replicated<br>snapshots" %}</th>
+            <th class="hidden-phone">{% trans "Backups" %}</th>
+            <th>{% trans "Free" %}</th>
+            <th class="hidden-phone">{% trans "Datacenters" %}</th>
+            <th class="hidden-phone">{% trans "Description" %}</th>
+          </tr>
+          {% endif %}
+        </thead>
+
+        <tbody>
+          {% for ns in storages %}{% with st=ns.storage %}
+          <tr>
+            <td class="nowrap">
+              <a href="#" class="btn-link btn-icon-edit no-ajax obj_edit" title="{% trans "Update or delete node Storage" %}" data-toggle="tooltip" data-placement="bottom" data-form='{{ ns.web_data|jsondata }}'>{{ st.alias }}</a> <small{% if ns.zpool in zpools_missing %} class="strikethrough"{% endif %}>({{ ns.zpool }})</small>
+            </td>
+            <td>{{ st.get_access_display }}</td>
+            <td class="nowrap"><span class="vm_hostname" title="{{ st.owner }}"><i class="icon-user"></i> {{ st.owner|truncatechars:16 }}</span></td>
+            <td class="hidden-phone">{{ st.get_type_display }}</td>
+            <td class="hidden-phone nowrap">{{ st.size_total|mb_to_gb }} <small>GB</small></td>
+            <td class="hidden-phone nowrap">{% if node.is_compute %}{{ ns.size_vms|mb_to_gb }} <small>GB</small>{% endif %}</td>
+            <td class="hidden-phone nowrap">{% if node.is_compute %}{{ ns.size_snapshots|mb_to_gb }} <small>GB</small>{% endif %}</td>
+            <td class="hidden-tablet nowrap">{% if node.is_compute %}{{ ns.size_rep_snapshots|mb_to_gb }} <small>GB</small>{% endif %}</td>
+            <td class="hidden-phone nowrap">{% if node.is_backup %}{{ ns.size_backups|mb_to_gb }} <small>GB</small>{% endif %}</td>
+            <td class="nowrap">{{ st.size_free|mb_to_gb }} <small>GB</small></td>
+            <td class="hidden-phone"><i class="icon-cloud"></i> {{ ns.dc__count }}</td>
+            <td class="hidden-phone"><small class="vm_snapshot_note">{{ st.desc|wordwrap:44 }}</small></td>
+          </tr>
+          {% endwith %}{% endfor %}
+        </tbody>
+
+        <tfoot>
+          <tr>
+            <td colspan="12">
+              <span class="pull-right">
+                {% trans "Total" %}: {{ storages|length }}&nbsp;
+              </span>
+              <div class="vm_control">
+                <a href="#" class="button gray no-ajax obj_add{% if not zpools %} disabled{% endif %}" title="{% trans "Add new node Storage" %}" data-toggle="tooltip" data-placement="top"><i class="icon-plus"></i> {% trans "Add node Storage" %}</a>
+              </div>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+  </div>
+</div> <!-- end container-fluid -->
+{% endblock %}

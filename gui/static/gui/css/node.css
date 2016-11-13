@@ -1,0 +1,132 @@
+/* line 1, ../scss/node.scss */
+.status_node1 {
+  background-color: #b94a48;
+}
+
+/* line 2, ../scss/node.scss */
+.status_node2 {
+  background-color: #468847;
+}
+
+/* line 3, ../scss/node.scss */
+.status_node3 {
+  background-color: #f89406;
+}
+
+/* line 4, ../scss/node.scss */
+.status_node9 {
+  background-color: #999999;
+}
+
+/* line 6, ../scss/node.scss */
+span.sep {
+  border-left: 2px solid #AAA;
+  margin-left: 4px;
+  padding-left: 8px;
+}
+
+/* line 12, ../scss/node.scss */
+th.middle, td.middle {
+  vertical-align: middle;
+}
+
+/* line 17, ../scss/node.scss */
+ul.l0 > li {
+  line-height: 14px;
+  /*list-style-type:disc;*/
+}
+/* line 22, ../scss/node.scss */
+ul.l1 > li {
+  margin-left: 16px;
+  line-height: 14px;
+  font-size: 12px;
+  list-style-type: square;
+}
+/* line 29, ../scss/node.scss */
+ul.l2 > li {
+  margin-left: 16px;
+  line-height: 12px;
+  font-size: 11.5px;
+  list-style-type: circle;
+}
+
+/* line 38, ../scss/node.scss */
+i.yes, i.no {
+  font-size: 15px;
+  padding-left: 1px;
+  padding-right: 1px;
+}
+/* line 44, ../scss/node.scss */
+i.no {
+  color: #aaa;
+}
+
+/* line 50, ../scss/node.scss */
+.form-horizontal.wider .control-label {
+  width: 200px;
+}
+/* line 53, ../scss/node.scss */
+.form-horizontal.wider .controls {
+  margin-left: 220px;
+}
+
+/* line 59, ../scss/node.scss */
+#dc_settings_modal .form-horizontal.wider .control-label {
+  width: 260px;
+}
+/* line 62, ../scss/node.scss */
+#dc_settings_modal .form-horizontal.wider .controls {
+  margin-left: 280px;
+}
+
+/* line 68, ../scss/node.scss */
+.form-horizontal.left .control-label {
+  width: auto;
+  margin-right: 10px;
+}
+/* line 73, ../scss/node.scss */
+.form-horizontal.left .controls {
+  margin-left: 0px;
+}
+
+/* line 78, ../scss/node.scss */
+.license-ok i {
+  color: #468847;
+}
+
+/* line 81, ../scss/node.scss */
+.license-expired i {
+  color: #b94a48;
+}
+
+/* line 85, ../scss/node.scss */
+.same-width a.btn {
+  min-width: 200px;
+  text-align: left;
+}
+
+/* line 90, ../scss/node.scss */
+.btn-badge {
+  position: absolute;
+  right: 0;
+  left: auto;
+  margin-top: -2px;
+  margin-bottom: 0px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  padding-left: 4px;
+  padding-right: 4px;
+  border-left: 1px dotted #989898;
+  line-height: 24px;
+}
+
+/* line 104, ../scss/node.scss */
+th.row_menu.pad div.btn-group {
+  margin-left: 10px;
+}
+
+/* line 108, ../scss/node.scss */
+.node_flags {
+  white-space: nowrap;
+  margin-left: 3px;
+}

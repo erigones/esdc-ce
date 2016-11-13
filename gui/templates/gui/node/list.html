@@ -1,0 +1,137 @@
+{% extends load_base %}
+{% load i18n %}
+
+{% block javascript %}
+<script type="text/javascript">
+  $(document).ready(function() {
+    NODE_LIST = new NodeList();
+  });
+</script>
+{% endblock %}
+
+{% block base_content %}
+{% if modals %}{% for template in modals %}{% include template %}{% endfor %}{% endif %} {# used by esdc-ee-eslic #}
+
+<div class="container-fluid">
+  <div class="row-fluid">
+
+    <div class="span12">
+      <div class="tab-header">
+        <i class="icon-sitemap"></i> {% trans "Compute Nodes" %}
+      </div>
+      <table class="table box table-striped table-hover table-responsive" id="etable">
+
+        <thead>
+          {% if node_list %}
+          <tr>
+            <th class="hidden-phone-small row_menu_icon">
+              <i class="icon-search row_icon"></i>
+            </th>
+            <th colspan="10" class="row_menu">
+              <input type="search" results="5" id="node_search" class="quick-search" name="node_search" placeholder="{% trans "enter node hostname" %}">
+            </th>
+          </tr>
+
+          <tr>
+            <th class="top chbox hidden-phone-small">
+              <div class="input">
+                <input type="checkbox" class="normal-check" id="id_all"/>
+                <label for="id_all"></label>
+              </div>
+            </th>
+            <th>{% trans "Hostname" %}</th>
+            <th class="hidden-phone">{% trans "Vendor" %}</th>
+            <th class="hidden-phone">{% trans "Model" %}</th>
+            <th>{% trans "Status" %}</th>
+            <th class="hidden-phone">{% trans "CPUs" %}</th>
+            <th class="hidden-phone">{% trans "RAM" %}</th>
+            <th>{% trans "Free CPUs" %}</th>
+            <th>{% trans "Free RAM" %}</th>
+            <th class="hidden-phone">{% trans "Servers" %}</th>
+            <th class="visible-bigscreen">{% trans "Capabilities" %}</th>
+          </tr>
+          {% endif %}
+        </thead>
+
+        <tbody id="node_list">
+          {% for node in node_list %}
+          <tr>
+            <td class="top chbox hidden-phone-small">
+              <div class="input">
+                <input type="checkbox" class="normal-check" id="id_{{ node.hostname}}"/>
+                <label for="id_{{ node.hostname }}"></label>
+              </div>
+            </td>
+
+            <td class="nowrap">
+              <a href="{% url 'node_details' node.hostname %}" class="btn-link"><i class="icon-sitemap" style="color: {{ node.color }};"></i> <span class="node_hostname">{{ node.hostname }}</span></a>{% if node.is_head %}<span title="{% trans "Head node" %}" data-toggle="tooltip" data-placement="bottom" class="node_flags"><i class="icon-flag"></i></span>{% endif %}
+            </td>
+
+            <td class="hidden-phone nowrap">
+              <span class="vm_hostname">{{ node.vendor }}</span>
+            </td>
+
+            <td class="hidden-phone nowrap">
+              <span class="vm_hostname">{{ node.model }}</span>
+            </td>
+
+            <td>
+              <span class="label status_node{{ node.status }}" id="node_label_{{ node.hostname }}">{{ node.get_status_display }}</span>
+            </td>
+
+            <td class="hidden-phone nowrap">
+              {{ node.cpu_total }} <small>x</small>
+            </td>
+            <td class="hidden-phone nowrap">
+              {{ node.ram_total }} <small>MB</small>
+            </td>
+
+            <td class="nowrap">
+              {{ node.cpu_free }} <small>x</small>
+            </td>
+            <td class="nowrap">
+              {{ node.ram_free }} <small>MB</small>
+            </td>
+
+            <td class="hidden-phone">
+              <i class="icon-hdd"></i> {{ node.vms }} <small>({{ node.real_vms }})</small>
+            </td>
+
+            <td class="visible-bigscreen">
+              <i class="icon-hdd {{ node.is_compute|yesno }}" title="{% trans "Compute node" %}"></i>
+              <i class="icon-paste {{ node.is_backup|yesno }}" title="{% trans "Backup node" %}"></i>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="11">
+              <p class="msg"></p>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+
+        <tfoot>
+          {% if node_list %}
+          <tr>
+            <td colspan="11">
+              <span>
+                {% blocktrans count node_len=node_list|length %}Selected <span id="selected">0</span> of {{ node_len }} node
+                {% plural %}Selected <span id="selected">0</span> of {{ node_len }} nodes{% endblocktrans %}
+              </span>
+              <div class="vm_control">
+                {% if node_controls %}{% for template in node_controls %}  {# used by esdc-ee-eslic #}
+                {% include template %}
+                {% endfor %}{% endif %}
+              </div>
+            </td>
+          </tr>
+          {% endif %}
+        </tfoot>
+
+      </table>
+    </div>
+
+  </div> <!-- end row-fluid -->
+</div> <!-- end container-fluid -->
+{% endblock %}

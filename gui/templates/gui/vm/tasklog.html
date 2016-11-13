@@ -1,0 +1,28 @@
+{% extends load_base %}
+{% load i18n %}
+
+{% block javascript %}
+<script type="text/javascript">
+  $(document).ready(function() {
+    filter_links();
+    tasklog_init();
+  });
+</script>
+{% endblock %}
+
+{% block base_nav %}{% include "gui/vm/navigation.html" with li_tasklog="active" %}{% endblock %}
+
+{% block base_content %}
+{% include "gui/tasklog/tasklog_detail_template.html" %}
+
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span12">
+      <div class="tab-header">
+        <i class="icon-tasks"></i> {{ vm.alias }} &rsaquo; {% trans "task log" %}
+      </div>
+      {% include "gui/tasklog/tasklog_table.html" %}
+    </div>
+  </div> <!-- end row-fluid -->
+</div> <!-- end container-fluid -->
+{% endblock %}

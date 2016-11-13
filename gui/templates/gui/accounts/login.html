@@ -1,0 +1,31 @@
+{% extends "base_no_auth.html" %}
+{% load i18n %}
+
+{% block login_content %}
+<form class="form-horizontal animated{% if form.errors %} wobble{% endif %}" action="{% url 'login' %}" method="POST" novalidate="novalidate">
+
+  <div class="input-group">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next }}" />
+    <div class="input{% if field.errors %} error{% endif %}">
+      {{ form.username }}
+      {% for error in form.username.errors %}
+      <span class="help-inline error"><i class="icon-warning-sign"></i> {{ error }}</span>
+      {% endfor %}
+    </div>
+    <div class="input{% if field.errors %} error{% endif %}">
+      {{ form.password }}
+      {% for error in form.password.errors %}
+      <span class="help-inline error"><i class="icon-warning-sign"></i> {{ error }}</span>
+      {% endfor %}
+    </div>
+  </div>
+
+  {% for error in form.non_field_errors %}<div class="help-inline error"><i class="icon-warning-sign"></i> {{ error }}</div>{% endfor %}
+
+  <button type="submit" class="no-auth-button">{% trans "Sign in" %}</button>
+
+</form>
+{% endblock %}
+
+{% block nav_accounts_login %}{% endblock %}

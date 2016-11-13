@@ -1,0 +1,10 @@
+{% load i18n %}
+{% csrf_token %}
+{% for error in bkpform.non_field_errors %}
+<div class="alert alert-error"><i class="icon-warning-sign"></i> {{ error }}</div>
+{% endfor %}
+
+{% include "gui/vm/form_field_hostname.html" with field=bkpform.hostname %}
+{% include "gui/form_field.html" with field=bkpform.name %}
+{% include "gui/form_field.html" with field=bkpform.disk_id %}
+{% include "gui/form_field.html" with field=bkpform.note class="thin" %}

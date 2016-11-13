@@ -1,0 +1,2 @@
+class HttpRedirectException(Exception):
+    pass

@@ -1,0 +1,5 @@
+{% load i18n gui_utils %}{% if all %}
+<a href="{{ request.path }}?{{ qs|qs_del:'all' }}" class="btn btn-mini active" title="{% trans "Switch between showing all available items or only items attached to current datacenter" %}" data-toggle="tooltip" data-placement="left"><i class="icon-check"></i> {% trans "Show all" %}</a>
+{% else %}
+<a href="{{ request.path }}?{{ qs|qs_set:'all' }}" class="btn btn-mini" title="{% trans "Switch between showing all available items or only items attached to current datacenter" %}" data-toggle="tooltip" data-placement="left"><i class="icon-check-empty"></i> {% trans "Show all" %}</a>
+{% endif %}

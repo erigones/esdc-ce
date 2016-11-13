@@ -1,0 +1,28 @@
+{% extends load_base %}
+{% load i18n %}
+
+{% block javascript %}
+<script type="text/javascript">
+  $(document).ready(function() {
+    IframeView('#docs_api', '#docs_api-header', '{% trans "Loading API documentation" %}');
+  });
+</script>
+{% endblock %}
+
+{% block base_content %}
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span12">
+
+      <div class="tab-header" id="docs_api-header">
+        <span>
+          <i class="icon-book"></i> {% trans "API Documentation" %}
+        </span>
+      </div>
+
+      <iframe id="docs_api" src="{{ STATIC_URL }}api/doc/index.html" seamless="seamless" class="black-box"></iframe>
+
+    </div> <!-- end span12 -->
+  </div> <!-- end row-fluid -->
+</div> <!-- end container-fluid -->
+{% endblock %}

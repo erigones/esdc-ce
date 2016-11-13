@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<!DOCTYPE service_bundle SYSTEM "/usr/share/lib/xml/dtd/service_bundle.dtd.1">
+
+<service_bundle type='manifest' name='erigonesd'>
+  <service name='application/erigonesd' type='service' version='0'>
+
+	<dependency name='smartdc-vmadmd' grouping='require_all'
+		restart_on='none' type='service'>
+		<service_fmri value='svc:/system/smartdc/vmadmd' />
+	</dependency>
+
+	<exec_method type='method' name='start'
+		exec='%{config/erigones_home}/bin/erigonesd %{config/queue} multi start %{config/queue} --loglevel=%{config/loglevel} --logfile="%{config/erigones_home}%{config/logfile}" --pidfile="%{config/erigones_home}%{config/pidfile}" -c %{config/concurrency} %{config/celeryd}' timeout_seconds='0'>
+	</exec_method>
+
+	<exec_method type='method' name='stop'
+		exec='%{config/erigones_home}/bin/erigonesd %{config/queue} multi stop %{config/queue} --pidfile="%{config/erigones_home}%{config/pidfile}"' timeout_seconds='300'>
+	</exec_method>
+
+	<exec_method type='method' name='refresh'
+		exec=':kill -HUP' timeout_seconds='60'>
+	</exec_method>
+
+	<property_group name='startd' type='framework'>
+		<propval name='ignore_error' type='astring' value='core,signal' />
+	</property_group>
+
+	<instance name='fast' enabled='true'>
+		<property_group name='config' type='application'>
+			<propval name='erigones_home' type='astring' value='/opt/erigones' />
+			<propval name='queue' type='astring' value='fast' />
+			<propval name='celeryd' type='astring' value='-O fair -E' />
+			<propval name='concurrency' type='astring' value='0' />
+			<propval name='loglevel' type='astring' value='WARNING' />
+			<propval name='logfile' type='astring' value='/var/log/%n.log' />
+			<propval name='pidfile' type='astring' value='/var/run/%n.pid' />
+		</property_group>
+	</instance>
+
+	<instance name='slow' enabled='true'>
+		<property_group name='config' type='application'>
+			<propval name='erigones_home' type='astring' value='/opt/erigones' />
+			<propval name='queue' type='astring' value='slow' />
+			<propval name='celeryd' type='astring' value='-O fair -E' />
+			<propval name='concurrency' type='astring' value='1' />
+			<propval name='loglevel' type='astring' value='WARNING' />
+			<propval name='logfile' type='astring' value='/var/log/%n.log' />
+			<propval name='pidfile' type='astring' value='/var/run/%n.pid' />
+		</property_group>
+	</instance>
+
+	<instance name='backup' enabled='true'>
+		<property_group name='config' type='application'>
+			<propval name='erigones_home' type='astring' value='/opt/erigones' />
+			<propval name='queue' type='astring' value='backup' />
+			<propval name='celeryd' type='astring' value='-O fair -E' />
+			<propval name='concurrency' type='astring' value='4' />
+			<propval name='loglevel' type='astring' value='WARNING' />
+			<propval name='logfile' type='astring' value='/var/log/%n.log' />
+			<propval name='pidfile' type='astring' value='/var/run/%n.pid' />
+		</property_group>
+	</instance>
+
+	<instance name='image' enabled='true'>
+		<property_group name='config' type='application'>
+			<propval name='erigones_home' type='astring' value='/opt/erigones' />
+			<propval name='queue' type='astring' value='image' />
+			<propval name='celeryd' type='astring' value='-O fair -E' />
+			<propval name='concurrency' type='astring' value='2' />
+			<propval name='loglevel' type='astring' value='WARNING' />
+			<propval name='logfile' type='astring' value='/var/log/%n.log' />
+			<propval name='pidfile' type='astring' value='/var/run/%n.pid' />
+		</property_group>
+	</instance>
+
+	<stability value='Evolving' />
+
+  </service>
+</service_bundle>

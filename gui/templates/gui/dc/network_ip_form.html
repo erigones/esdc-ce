@@ -1,0 +1,20 @@
+{% load i18n %}
+{% csrf_token %}
+{% for error in form.non_field_errors %}
+<div class="alert alert-error"><i class="icon-warning-sign"></i> {{ error }}</div>
+{% endfor %}
+
+<div class="input">
+  <div class="control-group thinner">
+    <label class="control-label" for="id_ip-network">{% trans "Network" %}:</label>
+    <div class="controls">
+      <input class="uneditable-input narrow" id="id_ip-network" name="ip-network" type="text" disabled="disabled" value="{{ net.name }}" />
+    </div>
+  </div>
+</div>
+{% include "gui/form_field.html" with field=form.ip %}
+{% include "gui/form_field.html" with field=form.count %}
+{% include "gui/form_field.html" with field=form.usage %}
+{% include "gui/form_field.html" with field=form.note %}
+
+<div class="advanced hide"></div>

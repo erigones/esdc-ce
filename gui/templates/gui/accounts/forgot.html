@@ -1,0 +1,25 @@
+{% extends "base_no_auth.html" %}
+{% load i18n %}
+
+{% block login_content %}
+<form class="form-horizontal animated{% if form.errors %} wobble{% endif %}" action="{% url 'forgot' %}" method="POST">
+
+  <div class="input-group">
+    {% csrf_token %}
+    <div class="input{% if form.email.errors %} error{% endif %}">
+      {{ form.email }}
+      {% for error in form.email.errors %}
+      <span class="help-inline error"><i class="icon-warning-sign"></i> {{ error }}</span>
+      {% empty %}{% if form.email.help_text %}
+      <span class="help-inline note"><i class="icon-info-sign"></i> {{ form.email.help_text }}</span>
+      {% endif %}{% endfor %}
+    </div>
+  </div>
+
+  {% for error in form.non_field_errors %}<div class="help-inline error"><i class="icon-warning-sign"></i> {{ error }}</div>{% endfor %}
+  <button type="submit" class="no-auth-button">{% trans "Password reset" %}</button>
+
+</form>
+{% endblock %}
+
+{% block nav_accounts_forgot %}{% endblock %}

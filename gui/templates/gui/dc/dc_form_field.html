@@ -1,0 +1,9 @@
+{% load i18n %}
+<div class="input">
+  <div class="control-group thinner">
+    <label class="control-label" for="id{{ prefix }}_datacenter">{% trans "Datacenter" %}:</label>
+    <div class="controls">
+      <input class="uneditable-input narrow" id="id{{ prefix }}_datacenter" name="datacenter" type="text" disabled="disabled" value="{{ request.dc.alias }}" />
+    </div>
+  </div>
+</div>

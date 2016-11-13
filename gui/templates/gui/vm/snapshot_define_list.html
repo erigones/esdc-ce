@@ -1,0 +1,49 @@
+{% load i18n tz %}
+{% load gui_utils %}
+{% get_current_timezone as TZ %}
+<table class="table box table-striped table-hover table-responsive">
+  <thead>
+    {% if snapdefs %}
+    <tr>
+      <th>{% trans "Name" %}</th>
+      <th>{% trans "Disk&nbsp;ID" %}</th>
+      <th class="hidden-phone">{% trans "Schedule" %}</th>
+      <th class="hidden-phone">{% trans "Retention" %}</th>
+      <th>{% trans "Active" %}</th>
+      <th class="hidden-phone">{% trans "Description" %}</th>
+    </tr>
+    {% endif %}
+  </thead>
+  <tbody>
+    {% for sd in snapdefs %}{% with disk_id=sd.array_disk_id  %}
+    <tr>
+      <td>
+        {% if can_edit and not snapdefs.definition %}
+        <a href="#" class="btn-link btn-icon-edit no-ajax" title="{% trans "Update or delete snapshot definition" %}" data-toggle="tooltip" data-placement="bottom" data-form='{{ sd.web_data|local_schedule:TZ|jsondata }}'>{{ sd.name }}</a>
+        {% else %}
+        {{ sd.name }}
+        {% endif %}
+      </td>
+      <td>{{ disk_id }}{% if not snapdefs.definition %} <small>({{ sd.disk_size|multiply:1048576|filesizeformat }})</small>{% endif %}</td>
+      <td class="hidden-phone">{{ sd.schedule|local_schedule:TZ }}</td>
+      <td class="hidden-phone">{{ sd.retention }}</td>
+      <td><i class="icon-{{ sd.active|yesno:"ok,remove" }}"></i></td>
+      <td class="hidden-phone"><small class="vm_snapshot_note">{{ sd.desc|wordwrap:44 }}</small></td>
+    </tr>
+    {% endwith %}{% endfor %}
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="6">
+        <span class="pull-right">
+          {% trans "Total" %}: {{ snapdefs|length }}&nbsp;
+        </span>
+        {% if can_edit %}
+        <div class="vm_control vm_control_{{ vm.hostname }}" data-vm_locked='{{ vm.locked|lower }}'>
+          <a href="#" id="vm_snapdef_add_{{ vm.hostname }}" class="button gray no-ajax vm_add" data-modal_nohide="true" title="{% trans "Create new snapshot definition" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-plus"></i> {% trans "Add definition" %}</a>
+        </div>
+        {% endif %}
+      </td>
+    </tr>
+  </tfoot>
+</table>

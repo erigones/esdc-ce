@@ -1,0 +1,23 @@
+{% load i18n %}
+<table class="table box table-striped">
+  <tbody>
+    <tr>
+      <td>{% trans "API key" %}:</td>
+      <td>{% if display_keys %}{{ user.api_key }}{% else %}***{% endif %}</td>
+    </tr>
+    <tr>
+      <td>{% trans "Callback key" %}:</td>
+      <td>{% if display_keys %}{{ user.callback_key }}{% else %}***{% endif %}</td>
+    </tr>
+  <tfoot>
+    <tr>
+      <td colspan="2">
+        <div class="vm_control">
+          {% if not display_keys %}
+          <a href="#" id="profile_display-apikeys" class="button gray no-ajax profile_control{% if disabled_api_key %} disabled{% endif %}"><i class="icon-eye-open"></i> {% trans "Show keys" %}</a>
+          {% endif %}
+        </div>
+      </td>
+    </tr>
+  </tfoot>
+</table>

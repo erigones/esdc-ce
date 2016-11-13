@@ -1,0 +1,10 @@
+{% load i18n %}
+{% csrf_token %}
+{% for error in form.non_field_errors %}
+<div class="alert alert-error"><i class="icon-warning-sign"></i> {{ error }}</div>
+{% endfor %}
+
+{% include "gui/dc/dc_form_field.html" %}
+{% include "gui/form_field.html" with field=form.name %}
+
+<div class="advanced hide"></div>

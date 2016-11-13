@@ -1,0 +1,7555 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-11-11 20:52+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: accounts/forms.py:29
+msgid "username or email"
+msgstr ""
+
+#: accounts/forms.py:31
+msgid "Username or Email"
+msgstr ""
+
+#: accounts/forms.py:35 profile/forms.py:365 profile/forms.py:370
+msgid "Password"
+msgstr ""
+
+#: accounts/forms.py:56
+#, python-format
+msgid ""
+"You made %(attempts)s wrong login attempts, all further attempts will be "
+"ignored for %(timeout)s seconds."
+msgstr ""
+
+#: accounts/forms.py:78
+msgid "Your email address"
+msgstr ""
+
+#: accounts/forms.py:81
+msgid ""
+"You will receive a validation email with instruction on how to reset your "
+"password."
+msgstr ""
+
+#: accounts/forms.py:105
+#, python-format
+msgid ""
+"You have requested password reset %(attempts)s times. All further attempts "
+"will be ignored for %(timeout)s seconds."
+msgstr ""
+
+#: accounts/forms.py:113
+msgid ""
+"That email address doesn't have an associated user account. Are you sure "
+"you've registered?"
+msgstr ""
+
+#: accounts/forms.py:156
+#, python-format
+msgid "Your password at %(site_name)s has been reset to: %(password)s"
+msgstr ""
+
+#: accounts/forms.py:169
+msgid "You will receive a validation email to activate your account."
+msgstr ""
+
+#: accounts/forms.py:176 dc/user/forms.py:75 profile/forms.py:42
+msgid "Email address"
+msgstr ""
+
+#: accounts/forms.py:180 dc/user/forms.py:71 profile/forms.py:30
+#: templates/gui/dc/user_list.html:73
+msgid "First name"
+msgstr ""
+
+#: accounts/forms.py:184 dc/user/forms.py:73 profile/forms.py:36
+#: templates/gui/dc/user_list.html:74
+msgid "Last name"
+msgstr ""
+
+#: accounts/forms.py:202
+msgid ""
+"This email address is already in use. Please supply a different email "
+"address."
+msgstr ""
+
+#: accounts/forms.py:214
+msgid ""
+"You will receive a text message with an auto-generated password which you "
+"can change after login."
+msgstr ""
+
+#: accounts/forms.py:223 models/userprofile.py:47 profile/forms.py:86
+msgid "Phone"
+msgstr ""
+
+#: accounts/forms.py:229
+msgid "TOS Confirmation"
+msgstr ""
+
+#: accounts/forms.py:236 models/userprofile.py:82 profile/forms.py:190
+msgid "Company"
+msgstr ""
+
+#: accounts/forms.py:242 models/userprofile.py:83 profile/forms.py:197
+msgid "Company ID"
+msgstr ""
+
+#: accounts/forms.py:274
+msgid "In order to use this service, you have to accept the Terms of Service."
+msgstr ""
+
+#: accounts/views.py:56
+msgid "Registration almost complete!"
+msgstr ""
+
+#: accounts/views.py:58
+#, python-format
+msgid "Thank you for registering at %s."
+msgstr ""
+
+#: accounts/views.py:59
+msgid ""
+"A verification email has been send to your email address. Please click on "
+"the link in the email to activate your account."
+msgstr ""
+
+#: accounts/views.py:101
+#, python-format
+msgid "Welcome to %(site_name)s, your new password is: %(password)s"
+msgstr ""
+
+#: accounts/views.py:146
+msgid "Password reset instructions!"
+msgstr ""
+
+#: accounts/views.py:148
+msgid ""
+"We've emailed you instructions for setting your password. You should be "
+"receiving them shortly."
+msgstr ""
+
+#: accounts/views.py:149
+msgid ""
+"If you don't receive an email, please make sure you've entered the address "
+"you registered with, and check your spam folder."
+msgstr ""
+
+#: accounts/views.py:197
+msgid "Password reset!"
+msgstr ""
+
+#: accounts/views.py:199
+msgid ""
+"Your password has been reset and send to your phone number via text message."
+msgstr ""
+
+#: admin.py:20 templates/gui/dc/profile/profile_page.html:63
+#: templates/gui/profile/profile_page.html:83
+msgid "SSH Keys"
+msgstr ""
+
+#: admin.py:52 templates/gui/navigation.html:103
+msgid "Profile"
+msgstr ""
+
+#: admin.py:58 templates/gui/dc/profile/profile_page.html:29
+#: templates/gui/profile/profile_page.html:49
+msgid "User Settings"
+msgstr ""
+
+#: admin.py:61
+msgid "Verification"
+msgstr ""
+
+#: admin.py:64
+msgid "Verification tokens"
+msgstr ""
+
+#: admin.py:68
+msgid "Contact details"
+msgstr ""
+
+#: admin.py:72
+msgid "Company details"
+msgstr ""
+
+#: admin.py:76
+msgid "Primary address details"
+msgstr ""
+
+#: admin.py:80
+msgid "Billing address details"
+msgstr ""
+
+#: admin.py:94
+msgid "group"
+msgstr ""
+
+#: admin.py:100 admin.py:147
+msgid "Info"
+msgstr ""
+
+#: admin.py:117
+msgid "permission"
+msgstr ""
+
+#: admin.py:137
+msgid "Basic info"
+msgstr ""
+
+#: admin.py:140 navigation.py:87 templates/gui/dc/dc_list.html:85
+msgid "Settings"
+msgstr ""
+
+#: admin.py:143
+msgid "Groups & Keys"
+msgstr ""
+
+#: countries.py:5
+msgid "Afghanistan"
+msgstr ""
+
+#: countries.py:6
+msgid "Åland Islands"
+msgstr ""
+
+#: countries.py:7
+msgid "Albania"
+msgstr ""
+
+#: countries.py:8
+msgid "Algeria"
+msgstr ""
+
+#: countries.py:9
+msgid "American Samoa"
+msgstr ""
+
+#: countries.py:10
+msgid "Andorra"
+msgstr ""
+
+#: countries.py:11
+msgid "Angola"
+msgstr ""
+
+#: countries.py:12
+msgid "Anguilla"
+msgstr ""
+
+#: countries.py:13
+msgid "Antarctica"
+msgstr ""
+
+#: countries.py:14
+msgid "Antigua and Barbuda"
+msgstr ""
+
+#: countries.py:15
+msgid "Argentina"
+msgstr ""
+
+#: countries.py:16
+msgid "Armenia"
+msgstr ""
+
+#: countries.py:17
+msgid "Aruba"
+msgstr ""
+
+#: countries.py:18
+msgid "Australia"
+msgstr ""
+
+#: countries.py:19
+msgid "Austria"
+msgstr ""
+
+#: countries.py:20
+msgid "Azerbaijan"
+msgstr ""
+
+#: countries.py:21
+msgid "Bahamas"
+msgstr ""
+
+#: countries.py:22
+msgid "Bahrain"
+msgstr ""
+
+#: countries.py:23
+msgid "Bangladesh"
+msgstr ""
+
+#: countries.py:24
+msgid "Barbados"
+msgstr ""
+
+#: countries.py:25
+msgid "Belarus"
+msgstr ""
+
+#: countries.py:26
+msgid "Belgium"
+msgstr ""
+
+#: countries.py:27
+msgid "Belize"
+msgstr ""
+
+#: countries.py:28
+msgid "Benin"
+msgstr ""
+
+#: countries.py:29
+msgid "Bermuda"
+msgstr ""
+
+#: countries.py:30
+msgid "Bhutan"
+msgstr ""
+
+#: countries.py:31
+msgid "Bolivia, Plurinational State of"
+msgstr ""
+
+#: countries.py:32
+msgid "Bonaire, Saint Eustatius and Saba"
+msgstr ""
+
+#: countries.py:33
+msgid "Bosnia and Herzegovina"
+msgstr ""
+
+#: countries.py:34
+msgid "Botswana"
+msgstr ""
+
+#: countries.py:35
+msgid "Bouvet Island"
+msgstr ""
+
+#: countries.py:36
+msgid "Brazil"
+msgstr ""
+
+#: countries.py:37
+msgid "British Indian Ocean Territory"
+msgstr ""
+
+#: countries.py:38
+msgid "Brunei Darussalam"
+msgstr ""
+
+#: countries.py:39
+msgid "Bulgaria"
+msgstr ""
+
+#: countries.py:40
+msgid "Burkina Faso"
+msgstr ""
+
+#: countries.py:41
+msgid "Burundi"
+msgstr ""
+
+#: countries.py:42
+msgid "Cambodia"
+msgstr ""
+
+#: countries.py:43
+msgid "Cameroon"
+msgstr ""
+
+#: countries.py:44
+msgid "Canada"
+msgstr ""
+
+#: countries.py:45
+msgid "Cape Verde"
+msgstr ""
+
+#: countries.py:46
+msgid "Cayman Islands"
+msgstr ""
+
+#: countries.py:47
+msgid "Central African Republic"
+msgstr ""
+
+#: countries.py:48
+msgid "Chad"
+msgstr ""
+
+#: countries.py:49
+msgid "Chile"
+msgstr ""
+
+#: countries.py:50
+msgid "China"
+msgstr ""
+
+#: countries.py:51
+msgid "Christmas Island"
+msgstr ""
+
+#: countries.py:52
+msgid "Cocos (Keeling) Islands"
+msgstr ""
+
+#: countries.py:53
+msgid "Colombia"
+msgstr ""
+
+#: countries.py:54
+msgid "Comoros"
+msgstr ""
+
+#: countries.py:55
+msgid "Congo"
+msgstr ""
+
+#: countries.py:56
+msgid "Congo, The Democratic Republic of the"
+msgstr ""
+
+#: countries.py:57
+msgid "Cook Islands"
+msgstr ""
+
+#: countries.py:58
+msgid "Costa Rica"
+msgstr ""
+
+#: countries.py:59
+msgid "Côte d'Ivoire"
+msgstr ""
+
+#: countries.py:60
+msgid "Croatia"
+msgstr ""
+
+#: countries.py:61
+msgid "Cuba"
+msgstr ""
+
+#: countries.py:62
+msgid "Curaçao"
+msgstr ""
+
+#: countries.py:63
+msgid "Cyprus"
+msgstr ""
+
+#: countries.py:64
+msgid "Czech Republic"
+msgstr ""
+
+#: countries.py:65
+msgid "Denmark"
+msgstr ""
+
+#: countries.py:66
+msgid "Djibouti"
+msgstr ""
+
+#: countries.py:67
+msgid "Dominica"
+msgstr ""
+
+#: countries.py:68
+msgid "Dominican Republic"
+msgstr ""
+
+#: countries.py:69
+msgid "Ecuador"
+msgstr ""
+
+#: countries.py:70
+msgid "Egypt"
+msgstr ""
+
+#: countries.py:71
+msgid "El Salvador"
+msgstr ""
+
+#: countries.py:72
+msgid "Equatorial Guinea"
+msgstr ""
+
+#: countries.py:73
+msgid "Eritrea"
+msgstr ""
+
+#: countries.py:74
+msgid "Estonia"
+msgstr ""
+
+#: countries.py:75
+msgid "Ethiopia"
+msgstr ""
+
+#: countries.py:76
+msgid "Falkland Islands (Malvinas)"
+msgstr ""
+
+#: countries.py:77
+msgid "Faroe Islands"
+msgstr ""
+
+#: countries.py:78
+msgid "Fiji"
+msgstr ""
+
+#: countries.py:79
+msgid "Finland"
+msgstr ""
+
+#: countries.py:80
+msgid "France"
+msgstr ""
+
+#: countries.py:81
+msgid "French Guiana"
+msgstr ""
+
+#: countries.py:82
+msgid "French Polynesia"
+msgstr ""
+
+#: countries.py:83
+msgid "French Southern Territories"
+msgstr ""
+
+#: countries.py:84
+msgid "Gabon"
+msgstr ""
+
+#: countries.py:85
+msgid "Gambia"
+msgstr ""
+
+#: countries.py:86
+msgid "Georgia"
+msgstr ""
+
+#: countries.py:87
+msgid "Germany"
+msgstr ""
+
+#: countries.py:88
+msgid "Ghana"
+msgstr ""
+
+#: countries.py:89
+msgid "Gibraltar"
+msgstr ""
+
+#: countries.py:90
+msgid "Greece"
+msgstr ""
+
+#: countries.py:91
+msgid "Greenland"
+msgstr ""
+
+#: countries.py:92
+msgid "Grenada"
+msgstr ""
+
+#: countries.py:93
+msgid "Guadeloupe"
+msgstr ""
+
+#: countries.py:94
+msgid "Guam"
+msgstr ""
+
+#: countries.py:95
+msgid "Guatemala"
+msgstr ""
+
+#: countries.py:96
+msgid "Guernsey"
+msgstr ""
+
+#: countries.py:97
+msgid "Guinea"
+msgstr ""
+
+#: countries.py:98
+msgid "Guinea-Bissau"
+msgstr ""
+
+#: countries.py:99
+msgid "Guyana"
+msgstr ""
+
+#: countries.py:100
+msgid "Haiti"
+msgstr ""
+
+#: countries.py:101
+msgid "Heard Island and McDonald Islands"
+msgstr ""
+
+#: countries.py:102
+msgid "Holy See (Vatican City State)"
+msgstr ""
+
+#: countries.py:103
+msgid "Honduras"
+msgstr ""
+
+#: countries.py:104
+msgid "Hong Kong"
+msgstr ""
+
+#: countries.py:105
+msgid "Hungary"
+msgstr ""
+
+#: countries.py:106
+msgid "Iceland"
+msgstr ""
+
+#: countries.py:107
+msgid "India"
+msgstr ""
+
+#: countries.py:108
+msgid "Indonesia"
+msgstr ""
+
+#: countries.py:109
+msgid "Iran, Islamic Republic of"
+msgstr ""
+
+#: countries.py:110
+msgid "Iraq"
+msgstr ""
+
+#: countries.py:111
+msgid "Ireland"
+msgstr ""
+
+#: countries.py:112
+msgid "Isle of Man"
+msgstr ""
+
+#: countries.py:113
+msgid "Israel"
+msgstr ""
+
+#: countries.py:114
+msgid "Italy"
+msgstr ""
+
+#: countries.py:115
+msgid "Jamaica"
+msgstr ""
+
+#: countries.py:116
+msgid "Japan"
+msgstr ""
+
+#: countries.py:117
+msgid "Jersey"
+msgstr ""
+
+#: countries.py:118
+msgid "Jordan"
+msgstr ""
+
+#: countries.py:119
+msgid "Kazakhstan"
+msgstr ""
+
+#: countries.py:120
+msgid "Kenya"
+msgstr ""
+
+#: countries.py:121
+msgid "Kiribati"
+msgstr ""
+
+#: countries.py:122
+msgid "Korea, Democratic People's Republic of"
+msgstr ""
+
+#: countries.py:123
+msgid "Korea, Republic of"
+msgstr ""
+
+#: countries.py:124
+msgid "Kuwait"
+msgstr ""
+
+#: countries.py:125
+msgid "Kyrgyzstan"
+msgstr ""
+
+#: countries.py:126
+msgid "Lao People's Democratic Republic"
+msgstr ""
+
+#: countries.py:127
+msgid "Latvia"
+msgstr ""
+
+#: countries.py:128
+msgid "Lebanon"
+msgstr ""
+
+#: countries.py:129
+msgid "Lesotho"
+msgstr ""
+
+#: countries.py:130
+msgid "Liberia"
+msgstr ""
+
+#: countries.py:131
+msgid "Libya"
+msgstr ""
+
+#: countries.py:132
+msgid "Liechtenstein"
+msgstr ""
+
+#: countries.py:133
+msgid "Lithuania"
+msgstr ""
+
+#: countries.py:134
+msgid "Luxembourg"
+msgstr ""
+
+#: countries.py:135
+msgid "Macao"
+msgstr ""
+
+#: countries.py:136
+msgid "Macedonia, Republic of"
+msgstr ""
+
+#: countries.py:137
+msgid "Madagascar"
+msgstr ""
+
+#: countries.py:138
+msgid "Malawi"
+msgstr ""
+
+#: countries.py:139
+msgid "Malaysia"
+msgstr ""
+
+#: countries.py:140
+msgid "Maldives"
+msgstr ""
+
+#: countries.py:141
+msgid "Mali"
+msgstr ""
+
+#: countries.py:142
+msgid "Malta"
+msgstr ""
+
+#: countries.py:143
+msgid "Marshall Islands"
+msgstr ""
+
+#: countries.py:144
+msgid "Martinique"
+msgstr ""
+
+#: countries.py:145
+msgid "Mauritania"
+msgstr ""
+
+#: countries.py:146
+msgid "Mauritius"
+msgstr ""
+
+#: countries.py:147
+msgid "Mayotte"
+msgstr ""
+
+#: countries.py:148
+msgid "Mexico"
+msgstr ""
+
+#: countries.py:149
+msgid "Micronesia, Federated States of"
+msgstr ""
+
+#: countries.py:150
+msgid "Moldova, Republic of"
+msgstr ""
+
+#: countries.py:151
+msgid "Monaco"
+msgstr ""
+
+#: countries.py:152
+msgid "Mongolia"
+msgstr ""
+
+#: countries.py:153
+msgid "Montenegro"
+msgstr ""
+
+#: countries.py:154
+msgid "Montserrat"
+msgstr ""
+
+#: countries.py:155
+msgid "Morocco"
+msgstr ""
+
+#: countries.py:156
+msgid "Mozambique"
+msgstr ""
+
+#: countries.py:157
+msgid "Myanmar"
+msgstr ""
+
+#: countries.py:158
+msgid "Namibia"
+msgstr ""
+
+#: countries.py:159
+msgid "Nauru"
+msgstr ""
+
+#: countries.py:160
+msgid "Nepal"
+msgstr ""
+
+#: countries.py:161
+msgid "Netherlands"
+msgstr ""
+
+#: countries.py:162
+msgid "New Caledonia"
+msgstr ""
+
+#: countries.py:163
+msgid "New Zealand"
+msgstr ""
+
+#: countries.py:164
+msgid "Nicaragua"
+msgstr ""
+
+#: countries.py:165
+msgid "Niger"
+msgstr ""
+
+#: countries.py:166
+msgid "Nigeria"
+msgstr ""
+
+#: countries.py:167
+msgid "Niue"
+msgstr ""
+
+#: countries.py:168
+msgid "Norfolk Island"
+msgstr ""
+
+#: countries.py:169
+msgid "Northern Mariana Islands"
+msgstr ""
+
+#: countries.py:170
+msgid "Norway"
+msgstr ""
+
+#: countries.py:171
+msgid "Oman"
+msgstr ""
+
+#: countries.py:172
+msgid "Pakistan"
+msgstr ""
+
+#: countries.py:173
+msgid "Palau"
+msgstr ""
+
+#: countries.py:174
+msgid "Palestine, State of"
+msgstr ""
+
+#: countries.py:175
+msgid "Panama"
+msgstr ""
+
+#: countries.py:176
+msgid "Papua New Guinea"
+msgstr ""
+
+#: countries.py:177
+msgid "Paraguay"
+msgstr ""
+
+#: countries.py:178
+msgid "Peru"
+msgstr ""
+
+#: countries.py:179
+msgid "Philippines"
+msgstr ""
+
+#: countries.py:180
+msgid "Pitcairn"
+msgstr ""
+
+#: countries.py:181
+msgid "Poland"
+msgstr ""
+
+#: countries.py:182
+msgid "Portugal"
+msgstr ""
+
+#: countries.py:183
+msgid "Puerto Rico"
+msgstr ""
+
+#: countries.py:184
+msgid "Qatar"
+msgstr ""
+
+#: countries.py:185
+msgid "Réunion"
+msgstr ""
+
+#: countries.py:186
+msgid "Romania"
+msgstr ""
+
+#: countries.py:187
+msgid "Russian Federation"
+msgstr ""
+
+#: countries.py:188
+msgid "Rwanda"
+msgstr ""
+
+#: countries.py:189
+msgid "Saint Barthélemy"
+msgstr ""
+
+#: countries.py:190
+msgid "Saint Helena, Ascension and Tristan da Cunha"
+msgstr ""
+
+#: countries.py:191
+msgid "Saint Kitts and Nevis"
+msgstr ""
+
+#: countries.py:192
+msgid "Saint Lucia"
+msgstr ""
+
+#: countries.py:193
+msgid "Saint Martin (French part)"
+msgstr ""
+
+#: countries.py:194
+msgid "Saint Pierre and Miquelon"
+msgstr ""
+
+#: countries.py:195
+msgid "Saint Vincent and the Grenadines"
+msgstr ""
+
+#: countries.py:196
+msgid "Samoa"
+msgstr ""
+
+#: countries.py:197
+msgid "San Marino"
+msgstr ""
+
+#: countries.py:198
+msgid "Sao Tome and Principe"
+msgstr ""
+
+#: countries.py:199
+msgid "Saudi Arabia"
+msgstr ""
+
+#: countries.py:200
+msgid "Senegal"
+msgstr ""
+
+#: countries.py:201
+msgid "Serbia"
+msgstr ""
+
+#: countries.py:202
+msgid "Seychelles"
+msgstr ""
+
+#: countries.py:203
+msgid "Sierra Leone"
+msgstr ""
+
+#: countries.py:204
+msgid "Singapore"
+msgstr ""
+
+#: countries.py:205
+msgid "Sint Maarten (Dutch part)"
+msgstr ""
+
+#: countries.py:206
+msgid "Slovakia"
+msgstr ""
+
+#: countries.py:207
+msgid "Slovenia"
+msgstr ""
+
+#: countries.py:208
+msgid "Solomon Islands"
+msgstr ""
+
+#: countries.py:209
+msgid "Somalia"
+msgstr ""
+
+#: countries.py:210
+msgid "South Africa"
+msgstr ""
+
+#: countries.py:211
+msgid "South Georgia and the South Sandwich Islands"
+msgstr ""
+
+#: countries.py:212
+msgid "Spain"
+msgstr ""
+
+#: countries.py:213
+msgid "Sri Lanka"
+msgstr ""
+
+#: countries.py:214
+msgid "Sudan"
+msgstr ""
+
+#: countries.py:215
+msgid "Suriname"
+msgstr ""
+
+#: countries.py:216
+msgid "South Sudan"
+msgstr ""
+
+#: countries.py:217
+msgid "Svalbard and Jan Mayen"
+msgstr ""
+
+#: countries.py:218
+msgid "Swaziland"
+msgstr ""
+
+#: countries.py:219
+msgid "Sweden"
+msgstr ""
+
+#: countries.py:220
+msgid "Switzerland"
+msgstr ""
+
+#: countries.py:221
+msgid "Syrian Arab Republic"
+msgstr ""
+
+#: countries.py:222
+msgid "Taiwan, Province of China"
+msgstr ""
+
+#: countries.py:223
+msgid "Tajikistan"
+msgstr ""
+
+#: countries.py:224
+msgid "Tanzania, United Republic of"
+msgstr ""
+
+#: countries.py:225
+msgid "Thailand"
+msgstr ""
+
+#: countries.py:226
+msgid "Timor-Leste"
+msgstr ""
+
+#: countries.py:227
+msgid "Togo"
+msgstr ""
+
+#: countries.py:228
+msgid "Tokelau"
+msgstr ""
+
+#: countries.py:229
+msgid "Tonga"
+msgstr ""
+
+#: countries.py:230
+msgid "Trinidad and Tobago"
+msgstr ""
+
+#: countries.py:231
+msgid "Tunisia"
+msgstr ""
+
+#: countries.py:232
+msgid "Turkey"
+msgstr ""
+
+#: countries.py:233
+msgid "Turkmenistan"
+msgstr ""
+
+#: countries.py:234
+msgid "Turks and Caicos Islands"
+msgstr ""
+
+#: countries.py:235
+msgid "Tuvalu"
+msgstr ""
+
+#: countries.py:236
+msgid "Uganda"
+msgstr ""
+
+#: countries.py:237
+msgid "Ukraine"
+msgstr ""
+
+#: countries.py:238
+msgid "United Arab Emirates"
+msgstr ""
+
+#: countries.py:239
+msgid "United Kingdom"
+msgstr ""
+
+#: countries.py:240
+msgid "United States"
+msgstr ""
+
+#: countries.py:241
+msgid "United States Minor Outlying Islands"
+msgstr ""
+
+#: countries.py:242
+msgid "Uruguay"
+msgstr ""
+
+#: countries.py:243
+msgid "Uzbekistan"
+msgstr ""
+
+#: countries.py:244
+msgid "Vanuatu"
+msgstr ""
+
+#: countries.py:245
+msgid "Venezuela, Bolivarian Republic of"
+msgstr ""
+
+#: countries.py:246
+msgid "Viet Nam"
+msgstr ""
+
+#: countries.py:247
+msgid "Virgin Islands, British"
+msgstr ""
+
+#: countries.py:248
+msgid "Virgin Islands, U.S."
+msgstr ""
+
+#: countries.py:249
+msgid "Wallis and Futuna"
+msgstr ""
+
+#: countries.py:250
+msgid "Western Sahara"
+msgstr ""
+
+#: countries.py:251
+msgid "Yemen"
+msgstr ""
+
+#: countries.py:252
+msgid "Zambia"
+msgstr ""
+
+#: countries.py:253
+msgid "Zimbabwe"
+msgstr ""
+
+#: dc/base/forms.py:23 dc/dns/forms.py:51 dc/dns/forms.py:90
+#: dc/dns/forms.py:157 dc/group/forms.py:36 dc/image/forms.py:34
+#: dc/iso/forms.py:36 dc/network/forms.py:45
+#: templates/gui/dc/domain_list.html:89
+#: templates/gui/dc/domain_record_list.html:90
+#: templates/gui/dc/network_ip_list.html:110
+#: templates/gui/node/backup_list.html:13
+#: templates/gui/node/backup_list_all.html:8
+#: templates/gui/node/backup_list_novm.html:13
+#: templates/gui/node/details.html:183 templates/gui/node/details.html:231
+#: templates/gui/node/details.html:267 templates/gui/node/vms.html:88
+#: templates/gui/profile/profile_sshkey_list.html:6
+#: templates/gui/vm/backup_define_list.html:8
+#: templates/gui/vm/backup_list.html:13 templates/gui/vm/details.html:272
+#: templates/gui/vm/list.html:98 templates/gui/vm/snapshot_define_list.html:8
+#: templates/gui/vm/snapshot_list.html:13 vm/forms.py:530
+msgid "Name"
+msgstr ""
+
+#: dc/base/forms.py:26 dc/group/forms.py:39 dc/image/forms.py:37
+#: dc/iso/forms.py:40 dc/network/forms.py:48 node/forms.py:86
+#: templates/gui/dc/network_ip_list.html:107
+msgid "Alias"
+msgstr ""
+
+#: dc/base/forms.py:28
+msgid "Site Hostname"
+msgstr ""
+
+#: dc/base/forms.py:31 dc/dns/forms.py:54 dc/image/forms.py:42
+#: dc/iso/forms.py:42 dc/network/forms.py:50 node/forms.py:35 node/forms.py:90
+#: templates/gui/dc/dc_list.html:81 templates/gui/dc/domain_list.html:91
+#: templates/gui/dc/image_list.html:100 templates/gui/dc/iso_list.html:98
+#: templates/gui/dc/network_list.html:100 templates/gui/dc/storage_list.html:67
+#: templates/gui/dc/template_list.html:65 templates/gui/node/details.html:66
+#: templates/gui/node/images.html:87 templates/gui/node/storages.html:54
+#: templates/gui/node/vms.html:91 templates/gui/vm/details.html:286
+#: templates/gui/vm/list.html:101 vm/forms.py:244
+msgid "Owner"
+msgstr ""
+
+#: dc/base/forms.py:33 dc/dns/forms.py:56 dc/image/forms.py:44
+#: dc/iso/forms.py:44 dc/network/forms.py:52 node/forms.py:92
+#: templates/gui/dc/dc_list.html:80 templates/gui/dc/domain_list.html:90
+#: templates/gui/dc/image_list.html:99 templates/gui/dc/iso_list.html:97
+#: templates/gui/dc/network_list.html:99 templates/gui/dc/storage_list.html:66
+#: templates/gui/dc/template_list.html:64 templates/gui/node/images.html:86
+#: templates/gui/node/storages.html:53
+msgid "Access"
+msgstr ""
+
+#: dc/base/forms.py:35 mixins.py:9 navigation.py:74
+#: templates/gui/dc/dc_list.html:82 templates/gui/dc/group_list.html:81
+#: templates/gui/dc/user_list.html:76
+msgid "Groups"
+msgstr ""
+
+#: dc/base/forms.py:38 dc/dns/forms.py:58 dc/image/forms.py:46
+#: dc/iso/forms.py:49 dc/network/forms.py:54 node/forms.py:94
+#: templates/gui/dc/dc_list.html:86 templates/gui/dc/domain_list.html:97
+#: templates/gui/dc/image_list.html:110
+#: templates/gui/dc/imagestore_list.html:98 templates/gui/dc/iso_list.html:104
+#: templates/gui/dc/network_ip_list.html:128
+#: templates/gui/dc/network_list.html:109 templates/gui/dc/storage_list.html:77
+#: templates/gui/dc/template_list.html:71 templates/gui/node/images.html:94
+#: templates/gui/node/storages.html:63
+#: templates/gui/vm/backup_define_list.html:14
+#: templates/gui/vm/snapshot_define_list.html:13 vm/forms.py:548
+msgid "Description"
+msgstr ""
+
+#: dc/base/forms.py:110 dc/iso/forms.py:47 dc/node/forms.py:9
+#: templates/gui/vm/details.html:485 vm/forms.py:290 vm/forms.py:364
+msgid "(none)"
+msgstr ""
+
+#: dc/base/views.py:18 dc/base/views.py:75
+msgid "Datacenter settings were successfully updated"
+msgstr ""
+
+#: dc/base/views.py:23
+msgid "Datacenter settings were not updated. Please correct errors below"
+msgstr ""
+
+#: dc/dns/forms.py:32 dc/dns/forms.py:85
+#: templates/gui/dc/domain_record_form.html:9
+#: templates/gui/dc/domain_records_form.html:10
+msgid "Domain"
+msgstr ""
+
+#: dc/dns/forms.py:49 dc/group/forms.py:34 dc/image/forms.py:79
+#: dc/iso/forms.py:34 dc/network/forms.py:43 dc/user/forms.py:26
+msgid "DC-bound?"
+msgstr ""
+
+#: dc/dns/forms.py:88 dc/dns/forms.py:163 node/forms.py:88
+#: templates/gui/dc/domain_record_list.html:91
+#: templates/gui/dc/storage_list.html:68 templates/gui/node/backup_list.html:15
+#: templates/gui/node/backup_list_all.html:11
+#: templates/gui/node/backup_list_novm.html:16
+#: templates/gui/node/storages.html:55
+#: templates/gui/vm/backup_define_list.html:10
+#: templates/gui/vm/backup_list.html:15 templates/gui/vm/snapshot_list.html:15
+msgid "Type"
+msgstr ""
+
+#: dc/dns/forms.py:88 node/forms.py:160
+msgid "Type (all)"
+msgstr ""
+
+#: dc/dns/forms.py:92
+msgid "Search by name"
+msgstr ""
+
+#: dc/dns/forms.py:93 dc/dns/forms.py:160
+#: templates/gui/dc/domain_record_list.html:92
+msgid "Content"
+msgstr ""
+
+#: dc/dns/forms.py:95
+msgid "Search by content"
+msgstr ""
+
+#: dc/dns/forms.py:96 dc/dns/forms.py:98
+msgid "Changed since"
+msgstr ""
+
+#: dc/dns/forms.py:156 templates/gui/vm/details.html:402
+#: templates/gui/vm/details.html.py:453
+msgid "ID"
+msgstr ""
+
+#: dc/dns/forms.py:158
+msgid "The full URI the DNS server should pick up on."
+msgstr ""
+
+#: dc/dns/forms.py:165 templates/gui/dc/domain_record_list.html:93
+msgid "TTL"
+msgstr ""
+
+#: dc/dns/forms.py:166
+msgid "How long the DNS client is allowed to remember this record."
+msgstr ""
+
+#: dc/dns/forms.py:168 dc/node/forms.py:22 templates/gui/dc/node_list.html:66
+msgid "Priority"
+msgstr ""
+
+#: dc/dns/forms.py:171
+msgid "Disabled?"
+msgstr ""
+
+#: dc/dns/forms.py:172
+msgid "If set to true, this record is hidden from DNS clients."
+msgstr ""
+
+#: dc/forms.py:15 navigation.py:15 node/forms.py:156
+#: templates/gui/dc/dc_form_field.html:4
+#: templates/gui/dc/network_ip_list.html:197
+#: templates/gui/dc/subnet_ip_list.html:70 templates/gui/node/vms.html:90
+#: templates/gui/support/add_ticket_email.txt:4
+msgid "Datacenter"
+msgstr ""
+
+#: dc/forms.py:32
+#, python-format
+msgid "Datacenter successfully changed to %s"
+msgstr ""
+
+#: dc/group/forms.py:17
+msgid "User group"
+msgstr ""
+
+#: dc/group/forms.py:41 models/user.py:56 navigation.py:68
+#: templates/gui/dc/group_list.html:99 templates/gui/dc/user_list.html:51
+msgid "Users"
+msgstr ""
+
+#: dc/group/forms.py:43 models/permission.py:28
+#: templates/gui/dc/group_list.html:100
+msgid "Permissions"
+msgstr ""
+
+#: dc/image/forms.py:19 node/forms.py:142 templates/gui/vm/details.html:460
+#: vm/forms.py:334
+msgid "Image"
+msgstr ""
+
+#: dc/image/forms.py:39
+msgid "Version"
+msgstr ""
+
+#: dc/image/forms.py:48
+msgid "Resizable?"
+msgstr ""
+
+#: dc/image/forms.py:49
+msgid ""
+"Image is able to resize the disk during an initial start or deploy process."
+msgstr ""
+
+#: dc/image/forms.py:52
+msgid "Shutdown after deploy?"
+msgstr ""
+
+#: dc/image/forms.py:53
+msgid ""
+"Image is able to shut down the server after an initial start and successful "
+"deploy."
+msgstr ""
+
+#: dc/image/forms.py:56 templates/gui/vm/details.html:290 vm/forms.py:206
+msgid "Tags"
+msgstr ""
+
+#: dc/image/forms.py:57
+msgid "Tags will be inherited by servers which will use this image."
+msgstr ""
+
+#: dc/image/forms.py:75
+msgid "Manifest URL"
+msgstr ""
+
+#: dc/image/forms.py:77
+msgid "Image file URL"
+msgstr ""
+
+#: dc/image/views.py:206
+#, python-format
+msgid ""
+"Downloaded metadata for %(image_count)d images from image repository %(name)s"
+msgstr ""
+
+#: dc/iso/forms.py:17
+msgid "ISO Image"
+msgstr ""
+
+#: dc/iso/forms.py:37
+msgid "ISO image file name (including file extension)."
+msgstr ""
+
+#: dc/iso/forms.py:46 templates/gui/vm/details.html:308 vm/forms.py:214
+msgid "OS Type"
+msgstr ""
+
+#: dc/network/forms.py:27 templates/gui/dc/network_ip_form.html:9
+#: templates/gui/dc/network_ip_list.html:111
+#: templates/gui/dc/network_ips_form.html:10
+#: templates/gui/dc/subnet_ip_list.html:26
+#: templates/gui/dc/subnet_ip_list.html:73 templates/gui/vm/details.html:408
+#: vm/forms.py:439
+msgid "Network"
+msgstr ""
+
+#: dc/network/forms.py:56
+msgid "Network/Netmask"
+msgstr ""
+
+#: dc/network/forms.py:57
+msgid "IPv4 network address with netmask in CIDR format."
+msgstr ""
+
+#: dc/network/forms.py:59 templates/gui/dc/network_ip_list.html:113
+#: templates/gui/dc/network_list.html:103 templates/gui/vm/details.html:407
+msgid "Gateway"
+msgstr ""
+
+#: dc/network/forms.py:60
+msgid "IPv4 gateway in quad-dotted format."
+msgstr ""
+
+#: dc/network/forms.py:62 templates/gui/dc/network_ip_list.html:115
+#: templates/gui/dc/subnet_ip_list.html:28
+msgid "VLAN ID"
+msgstr ""
+
+#: dc/network/forms.py:63
+msgid "802.1Q virtual LAN ID (0 - 4096, 0 = none)."
+msgstr ""
+
+#: dc/network/forms.py:64
+msgid "NIC Tag"
+msgstr ""
+
+#: dc/network/forms.py:65
+msgid "NIC tag or device name on compute node."
+msgstr ""
+
+#: dc/network/forms.py:69
+msgid "Resolvers"
+msgstr ""
+
+#: dc/network/forms.py:70
+msgid "Comma-separated list of IPv4 addresses that can be used as resolvers."
+msgstr ""
+
+#: dc/network/forms.py:75
+msgid "PTR Domain"
+msgstr ""
+
+#: dc/network/forms.py:76
+msgid ""
+"Existing in-addr.arpa domain used for creating PTR associations with virtual "
+"servers."
+msgstr ""
+
+#: dc/network/forms.py:79
+msgid "DHCP Passthrough"
+msgstr ""
+
+#: dc/network/forms.py:80
+msgid ""
+"When enabled, IP addresses for this network are managed by an external DHCP "
+"service."
+msgstr ""
+
+#: dc/network/forms.py:97
+msgid "Enter valid IPv4 network and netmask."
+msgstr ""
+
+#: dc/network/forms.py:148
+msgid "IPv4 address"
+msgstr ""
+
+#: dc/network/forms.py:151
+msgid "Count"
+msgstr ""
+
+#: dc/network/forms.py:152
+msgid "Number of IP addresses to create."
+msgstr ""
+
+#: dc/network/forms.py:154 templates/gui/dc/network_ip_list.html:194
+#: templates/gui/dc/subnet_ip_list.html:67
+msgid "Usage"
+msgstr ""
+
+#: dc/network/forms.py:156 templates/gui/dc/network_ip_list.html:199
+#: templates/gui/dc/subnet_ip_list.html:74
+#: templates/gui/node/backup_list.html:20
+#: templates/gui/node/backup_list_all.html:16
+#: templates/gui/node/backup_list_novm.html:21
+#: templates/gui/vm/backup_list.html:20 templates/gui/vm/snapshot_list.html:19
+#: vm/forms.py:638 vm/forms.py:756
+msgid "Note"
+msgstr ""
+
+#: dc/network/forms.py:197
+msgid "Invalid IP address range."
+msgstr ""
+
+#: dc/network/forms.py:217
+msgid "IP address was successfully updated"
+msgstr ""
+
+#: dc/network/forms.py:219 dc/network/forms.py:251
+#, python-format
+msgid "IP address was successfully deleted"
+msgid_plural "%(count)d IP addresses were successfully deleted"
+msgstr[0] ""
+msgstr[1] ""
+
+#: dc/network/forms.py:222
+#, python-format
+msgid "IP address was successfully created"
+msgid_plural "%(count)d IP addresses were successfully created"
+msgstr[0] ""
+msgstr[1] ""
+
+#: dc/node/forms.py:9 templates/gui/node/vms.html:69
+msgid "(all)"
+msgstr ""
+
+#: dc/node/forms.py:18 node/forms.py:32
+#: templates/gui/dc/network_ip_list.html:196 templates/gui/dc/node_list.html:64
+#: templates/gui/dc/subnet_ip_list.html:69
+#: templates/gui/node/backup_list_all.html:9
+#: templates/gui/node/backup_list_novm.html:14
+#: templates/gui/node/details.html:54 templates/gui/node/list.html:42
+#: templates/gui/node/vms.html:89 templates/gui/vm/backup_delete_modal.html:10
+#: templates/gui/vm/backup_restore_modal.html:10
+#: templates/gui/vm/details.html:280 templates/gui/vm/list.html:99
+#: templates/gui/vm/snapshot.html:79 templates/gui/vm/snapshot.html.py:110
+#: vm/forms.py:82
+msgid "Hostname"
+msgstr ""
+
+#: dc/node/forms.py:20
+msgid "Resource strategy"
+msgstr ""
+
+#: dc/node/forms.py:23
+msgid ""
+"Higher priority means that the automatic node chooser will more likely "
+"choose this node."
+msgstr ""
+
+#: dc/node/forms.py:27 templates/gui/dc/node_list.html:67
+#: templates/gui/node/list.html:46
+msgid "CPUs"
+msgstr ""
+
+#: dc/node/forms.py:28
+msgid "Total number of CPUs (cores)."
+msgstr ""
+
+#: dc/node/forms.py:31 templates/gui/dc/node_list.html:68
+#: templates/gui/node/list.html:47 templates/gui/node/vms.html:94
+#: templates/gui/reports/cloud_customers.html:39
+#: templates/gui/vm/details.html:317 templates/gui/vm/list.html:104
+#: vm/forms.py:220
+msgid "RAM"
+msgstr ""
+
+#: dc/node/forms.py:32
+msgid "Total RAM size in MB."
+msgstr ""
+
+#: dc/node/forms.py:37
+msgid "Disk pool size"
+msgstr ""
+
+#: dc/node/forms.py:38
+msgid "Size of the local disk pool."
+msgstr ""
+
+#: dc/node/forms.py:42
+msgid "Attach node Storages"
+msgstr ""
+
+#: dc/storage/forms.py:15 node/forms.py:81 node/forms.py:137
+#: templates/gui/dc/storage_list.html:65
+#: templates/gui/node/image_multi_form.html:6 templates/gui/vm/details.html:294
+#: templates/gui/vm/list.html:100 vm/forms.py:208
+msgid "Node"
+msgstr ""
+
+#: dc/storage/forms.py:17 node/forms.py:84
+msgid "Zpool"
+msgstr ""
+
+#: dc/template/forms.py:14 templates/gui/vm/details.html:304 vm/forms.py:210
+msgid "Template"
+msgstr ""
+
+#: dc/user/forms.py:28 templates/gui/dc/user_list.html:72
+#: templates/gui/profile/profile_user_form.html:11
+msgid "Username"
+msgstr ""
+
+#: dc/user/forms.py:31
+msgid "User groups"
+msgstr ""
+
+#: dc/user/forms.py:34 models/user.py:37
+msgid "SuperAdmin status"
+msgstr ""
+
+#: dc/user/forms.py:36 templates/gui/vm/backup_define_list.html:13
+#: templates/gui/vm/snapshot_define_list.html:12
+msgid "Active"
+msgstr ""
+
+#: dc/user/forms.py:38
+msgid "Access to API"
+msgstr ""
+
+#: dc/user/forms.py:78 dc/user/forms.py:180 profile/forms.py:428
+msgid "New password"
+msgstr ""
+
+#: dc/user/forms.py:80 profile/forms.py:375 profile/forms.py:379
+msgid "Confirm password"
+msgstr ""
+
+#: dc/user/forms.py:99 profile/forms.py:394
+msgid "You must confirm your password."
+msgstr ""
+
+#: dc/user/forms.py:104 dc/user/forms.py:105 profile/forms.py:397
+#: profile/forms.py:398
+msgid "Your passwords do not match."
+msgstr ""
+
+#: dc/user/forms.py:182 profile/forms.py:430
+msgid "Confirm new password"
+msgstr ""
+
+#: dc/user/views.py:96
+msgid "User was successfully created"
+msgstr ""
+
+#: dc/user/views.py:99 dc/user/views.py:151
+msgid "User profile was successfully updated"
+msgstr ""
+
+#: dc/user/views.py:189
+msgid "User password was successfully changed"
+msgstr ""
+
+#: dc/user/views.py:232 profile/views.py:172
+msgid "SSH key was successfully saved"
+msgstr ""
+
+#: dc/user/views.py:244 profile/views.py:184
+msgid "SSH key was successfully removed"
+msgstr ""
+
+#: fields.py:89
+msgid "Please provide a comma-separated list of items."
+msgstr ""
+
+#: fields.py:107
+msgid "Please provide a valid JSON array."
+msgstr ""
+
+#: fields.py:127
+msgid "Please provide a valid JSON object."
+msgstr ""
+
+#: fields.py:137
+msgid "Please provide a comma-separated list of integers."
+msgstr ""
+
+#: mixins.py:7
+msgid ""
+"The groups this object belongs to. A object will get all permissions granted "
+"to each of its groups."
+msgstr ""
+
+#: models/permission.py:22 models/role.py:18
+msgid "name"
+msgstr ""
+
+#: models/permission.py:23 models/role.py:19
+msgid "alias"
+msgstr ""
+
+#: models/permission.py:27
+msgid "Permission"
+msgstr ""
+
+#: models/role.py:20
+msgid "permissions"
+msgstr ""
+
+#: models/role.py:21 templates/gui/node/backup_list.html:16
+#: templates/gui/node/backup_list_all.html:12
+#: templates/gui/node/backup_list_novm.html:17
+#: templates/gui/vm/backup_list.html:16 templates/gui/vm/snapshot_list.html:16
+msgid "Created"
+msgstr ""
+
+#: models/role.py:22
+msgid "Last changed"
+msgstr ""
+
+#: models/role.py:26
+msgid "User Group"
+msgstr ""
+
+#: models/role.py:27
+msgid "User Groups"
+msgstr ""
+
+#: models/user.py:33
+msgid "username"
+msgstr ""
+
+#: models/user.py:34
+msgid "email address"
+msgstr ""
+
+#: models/user.py:35
+msgid "first name"
+msgstr ""
+
+#: models/user.py:36
+msgid "last name"
+msgstr ""
+
+#: models/user.py:38
+msgid "Designates whether the user can log into this admin site."
+msgstr ""
+
+#: models/user.py:39
+msgid "active"
+msgstr ""
+
+#: models/user.py:40
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+
+#: models/user.py:42
+msgid "access to API"
+msgstr ""
+
+#: models/user.py:42
+msgid "Designates whether the user has access to /api."
+msgstr ""
+
+#: models/user.py:44
+msgid "API Key"
+msgstr ""
+
+#: models/user.py:45
+msgid "Callback Key"
+msgstr ""
+
+#: models/user.py:46
+msgid "date joined"
+msgstr ""
+
+#: models/user.py:55 templates/gui/reports/cloud_customers.html:36
+#: templates/gui/tasklog/tasklog_table.html:10
+msgid "User"
+msgstr ""
+
+#: models/userprofile.py:29
+msgid "Unknown account"
+msgstr ""
+
+#: models/userprofile.py:30
+msgid "Company account"
+msgstr ""
+
+#: models/userprofile.py:31
+msgid "Personal account"
+msgstr ""
+
+#: models/userprofile.py:40
+msgid "Terms of Service"
+msgstr ""
+
+#: models/userprofile.py:42
+msgid "Email verification token"
+msgstr ""
+
+#: models/userprofile.py:43
+msgid "Email verified"
+msgstr ""
+
+#: models/userprofile.py:44 profile/forms.py:151
+msgid "Billing Email"
+msgstr ""
+
+#: models/userprofile.py:45
+msgid "Billing Email verification token"
+msgstr ""
+
+#: models/userprofile.py:46
+msgid "Billing Email verified"
+msgstr ""
+
+#: models/userprofile.py:48
+msgid "Phone verification token"
+msgstr ""
+
+#: models/userprofile.py:49
+msgid "Phone verified"
+msgstr ""
+
+#: models/userprofile.py:50 profile/forms.py:146
+msgid "Billing Phone"
+msgstr ""
+
+#: models/userprofile.py:51
+msgid "Billing Phone verification token"
+msgstr ""
+
+#: models/userprofile.py:52
+msgid "Billing Phone verified"
+msgstr ""
+
+#: models/userprofile.py:53 profile/forms.py:233
+msgid "Technical newsletter"
+msgstr ""
+
+#: models/userprofile.py:54 profile/forms.py:238
+msgid "Business newsletter"
+msgstr ""
+
+#: models/userprofile.py:55 profile/forms.py:215
+msgid "Account type"
+msgstr ""
+
+#: models/userprofile.py:56 profile/forms.py:223
+msgid "Language"
+msgstr ""
+
+#: models/userprofile.py:58 profile/forms.py:228
+msgid "Time zone"
+msgstr ""
+
+#: models/userprofile.py:59 profile/forms.py:243
+msgid "Currency"
+msgstr ""
+
+#: models/userprofile.py:62 models/usersshkey.py:15 profile/forms.py:78
+msgid "Title"
+msgstr ""
+
+#: models/userprofile.py:64 profile/forms.py:82
+msgid "Middle name"
+msgstr ""
+
+#: models/userprofile.py:66 profile/forms.py:96
+msgid "Website"
+msgstr ""
+
+#: models/userprofile.py:67 profile/forms.py:92
+msgid "Jabber"
+msgstr ""
+
+#: models/userprofile.py:68 models/userprofile.py:69 models/userprofile.py:75
+#: models/userprofile.py:76 profile/forms.py:107 profile/forms.py:156
+msgid "Street address"
+msgstr ""
+
+#: models/userprofile.py:70 models/userprofile.py:77 profile/forms.py:125
+#: profile/forms.py:174
+msgid "City"
+msgstr ""
+
+#: models/userprofile.py:71 models/userprofile.py:78 profile/forms.py:119
+#: profile/forms.py:168
+msgid "ZIP/Postal Code"
+msgstr ""
+
+#: models/userprofile.py:72 models/userprofile.py:79 profile/forms.py:131
+#: profile/forms.py:180
+msgid "State/Province/Region"
+msgstr ""
+
+#: models/userprofile.py:73 models/userprofile.py:80 profile/forms.py:136
+#: profile/forms.py:185
+msgid "Country"
+msgstr ""
+
+#: models/userprofile.py:74 profile/forms.py:141
+msgid "Use different billing address"
+msgstr ""
+
+#: models/userprofile.py:84 profile/forms.py:203
+msgid "TAX ID"
+msgstr ""
+
+#: models/userprofile.py:85 profile/forms.py:209
+msgid "VAT ID"
+msgstr ""
+
+#: models/userprofile.py:86
+msgid "Bank Account Number"
+msgstr ""
+
+#: models/userprofile.py:90
+msgid "User profile"
+msgstr ""
+
+#: models/userprofile.py:91
+msgid "User profiles"
+msgstr ""
+
+#: models/usersshkey.py:16 templates/gui/profile/profile_sshkey_list.html:7
+msgid "Fingerprint"
+msgstr ""
+
+#: models/usersshkey.py:17 profile/forms.py:469
+msgid "Key"
+msgstr ""
+
+#: models/usersshkey.py:21 templates/gui/dc/profile/user_profile.html:72
+#: templates/gui/profile/profile.html:77
+msgid "SSH key"
+msgstr ""
+
+#: models/usersshkey.py:22
+msgid "SSH keys"
+msgstr ""
+
+#: navigation.py:8
+msgid "Dashboard"
+msgstr ""
+
+#: navigation.py:26 templates/gui/dc/dc_list.html:71
+#: templates/gui/dc/domain_list.html:95 templates/gui/dc/group_list.html:102
+#: templates/gui/dc/image_list.html:108 templates/gui/dc/iso_list.html:102
+#: templates/gui/dc/network_list.html:107 templates/gui/dc/node_list.html:75
+#: templates/gui/dc/storage_list.html:75 templates/gui/dc/template_list.html:69
+#: templates/gui/dc/user_list.html:80 templates/gui/node/details.html:126
+#: templates/gui/node/images.html:93 templates/gui/node/storages.html:62
+msgid "Datacenters"
+msgstr ""
+
+#: navigation.py:32 templates/gui/dc/dc_settings_table.html:52
+msgid "Compute nodes"
+msgstr ""
+
+#: navigation.py:38 templates/gui/dc/storage_list.html:48
+#: templates/gui/node/navigation.html:6
+msgid "Storages"
+msgstr ""
+
+#: navigation.py:44 templates/gui/dc/dc_settings_table.html:86
+#: templates/gui/dc/network_ip_list.html:99
+#: templates/gui/dc/network_ip_list.html:164
+#: templates/gui/dc/network_list.html:81
+#: templates/gui/vm/monitoring_navigation.html:7
+msgid "Networks"
+msgstr ""
+
+#: navigation.py:50 templates/gui/dc/dc_settings_table.html:91
+#: templates/gui/dc/image_list.html:81 templates/gui/dc/imagestore_list.html:46
+#: templates/gui/node/image_multi_form.html:28
+#: templates/gui/node/navigation.html:7
+msgid "Images"
+msgstr ""
+
+#: navigation.py:56 templates/gui/dc/template_list.html:46
+msgid "Templates"
+msgstr ""
+
+#: navigation.py:62 templates/gui/dc/iso_list.html:80
+msgid "ISO Images"
+msgstr ""
+
+#: navigation.py:81 templates/gui/dc/dc_settings_table.html:100
+msgid "DNS"
+msgstr ""
+
+#: navigation.py:93 templates/gui/dc/dc_list.html:83
+msgid "Nodes"
+msgstr ""
+
+#: navigation.py:100 templates/gui/dc/dc_list.html:84
+#: templates/gui/dc/dc_settings_table.html:57
+#: templates/gui/dc/node_list.html:77 templates/gui/dc/storage_list.html:70
+#: templates/gui/node/details.html:130 templates/gui/node/images.html:92
+#: templates/gui/node/list.html:50 templates/gui/node/navigation.html:8
+#: templates/gui/node/storages.html:57 templates/gui/vm/list.html:61
+msgid "Servers"
+msgstr ""
+
+#: navigation.py:106 templates/gui/vm/add.html:35
+#: templates/gui/vm/add.html.py:48 templates/gui/vm/add.html:55
+#: templates/gui/vm/details.html:131 templates/gui/vm/list_control.html:7
+#: templates/gui/vm/list_control.html:25
+msgid "Add Server"
+msgstr ""
+
+#: navigation.py:114 templates/gui/dc/dc_list.html:114
+#: templates/gui/dc/dc_settings_table.html:118 templates/gui/vm/list.html:157
+#: templates/gui/vm/navigation.html:16
+msgid "Monitoring"
+msgstr ""
+
+#: navigation.py:123
+msgid "Task log"
+msgstr ""
+
+#: navigation.py:131 templates/gui/dc/dc_list.html:115
+msgid "Support"
+msgstr ""
+
+#: navigation.py:139 templates/gui/dc/dc_list.html:117
+#: templates/gui/docs/faq.html:24
+msgid "FAQ"
+msgstr ""
+
+#: navigation.py:145 templates/gui/docs/api.html:19
+msgid "API Documentation"
+msgstr ""
+
+#: navigation.py:151 templates/gui/docs/user_guide.html:19
+msgid "User Guide"
+msgstr ""
+
+#: navigation.py:157 templates/gui/support/add_ticket.html:19
+msgid "Add Ticket"
+msgstr ""
+
+#: navigation.py:163
+msgid "More"
+msgstr ""
+
+#: node/forms.py:37 node/forms.py:162 tasklog/forms.py:13
+#: templates/gui/dc/image_list.html:104
+#: templates/gui/dc/imagestore_list.html:96
+#: templates/gui/node/backup_list.html:17
+#: templates/gui/node/backup_list_all.html:13
+#: templates/gui/node/backup_list_novm.html:18
+#: templates/gui/node/details.html:150 templates/gui/node/images.html:91
+#: templates/gui/node/list.html:45 templates/gui/node/vms.html:92
+#: templates/gui/reports/cloud_customers.html:45
+#: templates/gui/tasklog/tasklog_table.html:7
+#: templates/gui/vm/backup_list.html:17 templates/gui/vm/details.html:344
+#: templates/gui/vm/list.html:102 templates/gui/vm/snapshot_list.html:17
+msgid "Status"
+msgstr ""
+
+#: node/forms.py:39
+msgid "Compute?"
+msgstr ""
+
+#: node/forms.py:41
+msgid "Backup?"
+msgstr ""
+
+#: node/forms.py:43
+msgid "CPUs coefficient"
+msgstr ""
+
+#: node/forms.py:44
+msgid "Coefficient for calculating the the total number of virtual CPUs."
+msgstr ""
+
+#: node/forms.py:47
+msgid "RAM coefficient"
+msgstr ""
+
+#: node/forms.py:48
+msgid ""
+"Coefficient for calculating the maximum amount of memory for virtual "
+"machines."
+msgstr ""
+
+#: node/forms.py:53 vm/forms.py:247
+msgid "Monitoring templates"
+msgstr ""
+
+#: node/forms.py:54 vm/forms.py:248
+msgid "Comma-separated list of custom monitoring templates."
+msgstr ""
+
+#: node/forms.py:56 vm/forms.py:250
+msgid "Monitoring hostgroups"
+msgstr ""
+
+#: node/forms.py:57 vm/forms.py:251
+msgid "Comma-separated list of custom monitoring hostgroups."
+msgstr ""
+
+#: node/forms.py:96
+msgid "Size coefficient"
+msgstr ""
+
+#: node/forms.py:97
+msgid ""
+"Coefficient for calculating the maximum amount of disk space for virtual "
+"machines."
+msgstr ""
+
+#: node/forms.py:140 templates/gui/node/image_multi_form.html:16
+#: templates/gui/vm/details.html:462 vm/forms.py:242 vm/forms.py:350
+#: vm/forms.py:725
+msgid "Storage"
+msgstr ""
+
+#: node/forms.py:158 templates/gui/dc/network_ip_list.html:195
+#: templates/gui/dc/subnet_ip_list.html:68
+#: templates/gui/reports/cloud_customers.html:37
+#: templates/gui/support/add_ticket_email.txt:5
+msgid "Server"
+msgstr ""
+
+#: node/forms.py:160 vm/forms.py:720
+msgid "Backup type"
+msgstr ""
+
+#: node/forms.py:162
+msgid "Status (all)"
+msgstr ""
+
+#: node/forms.py:164
+msgid "Larger than"
+msgstr ""
+
+#: node/forms.py:166
+msgid "Larger than (MB)"
+msgstr ""
+
+#: node/forms.py:167
+msgid "Smaller than"
+msgstr ""
+
+#: node/forms.py:169
+msgid "Smaller than (MB)"
+msgstr ""
+
+#: node/forms.py:170 node/forms.py:172
+msgid "Created since"
+msgstr ""
+
+#: node/forms.py:175 node/forms.py:177
+msgid "Created until"
+msgstr ""
+
+#: node/forms.py:187
+msgid "Server (all)"
+msgstr ""
+
+#: node/forms.py:191
+#, python-format
+msgid "(no server) (%s)"
+msgstr ""
+
+#: node/forms.py:197
+msgid "Datacenter (all)"
+msgstr ""
+
+#: profile/forms.py:57
+msgid ""
+"WARNING: After changing the email address you will receive a email to "
+"validate the new email address."
+msgstr ""
+
+#: profile/forms.py:100
+msgid "TOS Acceptation"
+msgstr ""
+
+#: profile/forms.py:102
+msgid "I accept the General Terms and Conditions."
+msgstr ""
+
+#: profile/forms.py:113 profile/forms.py:162
+msgid "Street address 2"
+msgstr ""
+
+#: profile/forms.py:115 profile/forms.py:164
+msgid "Optional, use in case your address contains multiple names."
+msgstr ""
+
+#: profile/forms.py:278
+msgid ""
+"WARNING: After changing the phone number you will receive a text message to "
+"validate the new phone number."
+msgstr ""
+
+#: profile/forms.py:313 profile/forms.py:319
+msgid "Email activation code"
+msgstr ""
+
+#: profile/forms.py:329
+msgid "Email activation code is invalid."
+msgstr ""
+
+#: profile/forms.py:339 profile/forms.py:345
+msgid "Phone activation code"
+msgstr ""
+
+#: profile/forms.py:355
+msgid "Phone activation code is invalid."
+msgstr ""
+
+#: profile/forms.py:418
+msgid "Old password"
+msgstr ""
+
+#: profile/forms.py:436
+msgid "Your old password was entered incorrectly."
+msgstr ""
+
+#: profile/forms.py:462
+msgid "Key title"
+msgstr ""
+
+#: profile/forms.py:470
+msgid "Public SSH key in OpenSSH format."
+msgstr ""
+
+#: profile/views.py:56
+msgid "Your profile was successfully updated"
+msgstr ""
+
+#: profile/views.py:93
+msgid "Your email address was successfully verified"
+msgstr ""
+
+#: profile/views.py:102
+msgid "Your phone number was successfully verified"
+msgstr ""
+
+#: profile/views.py:135
+msgid "Your password was successfully changed"
+msgstr ""
+
+#: support/forms.py:14 templates/gui/support/add_ticket_email.txt:6
+msgid "Severity"
+msgstr ""
+
+#: support/forms.py:15 templates/gui/support/add_ticket_form.html:11
+msgid "Critical"
+msgstr ""
+
+#: support/forms.py:16 templates/gui/support/add_ticket_form.html:12
+msgid "Major"
+msgstr ""
+
+#: support/forms.py:17 templates/gui/support/add_ticket_form.html:13
+msgid "Minor"
+msgstr ""
+
+#: support/forms.py:18 templates/gui/support/add_ticket_form.html:14
+msgid "Cosmetic"
+msgstr ""
+
+#: support/forms.py:21 support/forms.py:39
+msgid "Ticket type"
+msgstr ""
+
+#: support/forms.py:22
+msgid "Usability issue"
+msgstr ""
+
+#: support/forms.py:23
+msgid "Bug Report"
+msgstr ""
+
+#: support/forms.py:24
+msgid "Feature request"
+msgstr ""
+
+#: support/forms.py:25
+msgid "Operational problem"
+msgstr ""
+
+#: support/forms.py:26
+msgid "Sales and payments"
+msgstr ""
+
+#: support/forms.py:30 support/forms.py:66
+msgid "Select Server"
+msgstr ""
+
+#: support/forms.py:34
+msgid "Problem severity"
+msgstr ""
+
+#: support/forms.py:44 support/forms.py:48
+#: templates/gui/support/add_ticket_email.txt:3
+msgid "Summary"
+msgstr ""
+
+#: support/forms.py:51 support/forms.py:55
+msgid "Problem description"
+msgstr ""
+
+#: support/forms.py:58 support/forms.py:61
+msgid "Steps to Reproduce"
+msgstr ""
+
+#: support/views.py:70
+msgid "Your ticket has been submitted."
+msgstr ""
+
+#: tasklog/forms.py:15
+msgid "Show only running tasks"
+msgstr ""
+
+#: tasklog/forms.py:17
+msgid "Hide automatic tasks"
+msgstr ""
+
+#: tasklog/forms.py:19 tasklog/forms.py:21
+msgid "Since"
+msgstr ""
+
+#: tasklog/forms.py:24 tasklog/forms.py:26
+msgid "Until"
+msgstr ""
+
+#: tasklog/forms.py:51
+msgid "Object type"
+msgstr ""
+
+#: tasklog/forms.py:53 tasklog/forms.py:55
+msgid "Object name"
+msgstr ""
+
+#: templates/404.html:4
+msgid "The page you were looking for does not exist"
+msgstr ""
+
+#: templates/404.html:61
+msgid "You seem to be lost in space"
+msgstr ""
+
+#: templates/404.html:62
+msgid "Click here"
+msgstr ""
+
+#: templates/404.html:62
+msgid "to go home"
+msgstr ""
+
+#: templates/50x.html:4
+msgid "The page is temporarily unavailable"
+msgstr ""
+
+#: templates/50x.html:13
+msgid "The page you are looking for is temporarily unavailable"
+msgstr ""
+
+#: templates/50x.html:14
+msgid "Please try again later"
+msgstr ""
+
+#: templates/admin/gui/user/change_form.html:5
+msgid "Login as"
+msgstr ""
+
+#: templates/base.html:138
+msgid ""
+"We’re sorry, but you are using an <b>unsupported browser</b>. <small>You may "
+"experience unexpected errors and limited functionality.</small>"
+msgstr ""
+
+#: templates/base.html:158
+msgid "Dismiss all"
+msgstr ""
+
+#: templates/base.html:171
+msgid "Please Wait"
+msgstr ""
+
+#: templates/base.html:179 templates/base.html.py:194
+msgid "Warning"
+msgstr ""
+
+#: templates/base.html:186 templates/base.html.py:202
+#: templates/gui/node/vms.html:29 templates/gui/vm/details.html:44
+#: templates/gui/vm/list.html:27
+msgid "OK"
+msgstr ""
+
+#: templates/base.html:201 templates/gui/dc/dc_list.html:35
+#: templates/gui/dc/dc_list.html.py:59 templates/gui/dc/domain_list.html:31
+#: templates/gui/dc/domain_list.html:58
+#: templates/gui/dc/domain_record_list.html:30
+#: templates/gui/dc/domain_record_list.html:64
+#: templates/gui/dc/group_list.html:36 templates/gui/dc/group_list.html:65
+#: templates/gui/dc/image_list.html:37 templates/gui/dc/image_list.html:66
+#: templates/gui/dc/imagestore_list.html:30 templates/gui/dc/iso_list.html:36
+#: templates/gui/dc/iso_list.html.py:65
+#: templates/gui/dc/network_ip_list.html:31
+#: templates/gui/dc/network_ip_list.html:53
+#: templates/gui/dc/network_ip_list.html:87
+#: templates/gui/dc/network_list.html:37 templates/gui/dc/network_list.html:66
+#: templates/gui/dc/node_list.html:31
+#: templates/gui/dc/profile/user_profile.html:41
+#: templates/gui/dc/profile/user_profile.html:60
+#: templates/gui/dc/profile/user_profile.html:82
+#: templates/gui/dc/storage_list.html:31 templates/gui/dc/template_list.html:30
+#: templates/gui/dc/user_list.html:34 templates/gui/navigation.html:76
+#: templates/gui/node/details.html:35 templates/gui/node/images.html:32
+#: templates/gui/node/images.html.py:52 templates/gui/node/storages.html:32
+#: templates/gui/node/vms.html:28 templates/gui/profile/profile.html:46
+#: templates/gui/profile/profile.html:65 templates/gui/profile/profile.html:87
+#: templates/gui/profile/profile_page.html:16 templates/gui/vm/add.html:32
+#: templates/gui/vm/backup.html:46 templates/gui/vm/backup.html.py:66
+#: templates/gui/vm/backup.html:86 templates/gui/vm/backup_delete_modal.html:19
+#: templates/gui/vm/backup_restore_modal.html:26
+#: templates/gui/vm/backup_update_modal.html:16
+#: templates/gui/vm/details.html:43 templates/gui/vm/details.html.py:85
+#: templates/gui/vm/details.html:106 templates/gui/vm/details.html.py:127
+#: templates/gui/vm/details.html:152 templates/gui/vm/details.html.py:177
+#: templates/gui/vm/details.html:210 templates/gui/vm/import_modal.html:18
+#: templates/gui/vm/list.html:26 templates/gui/vm/snapshot.html:41
+#: templates/gui/vm/snapshot.html.py:65 templates/gui/vm/snapshot.html:95
+#: templates/gui/vm/snapshot.html.py:119 templates/gui/vm/snapshot.html:140
+#: templates/gui/vm/snapshot.html.py:160 templates/gui/vm/snapshot.html:185
+msgid "Cancel"
+msgstr ""
+
+#: templates/base_no_auth.html:22 templates/gui/accounts/login.html:26
+msgid "Sign in"
+msgstr ""
+
+#: templates/base_no_auth.html:23 templates/gui/accounts/register.html:77
+msgid "Sign up"
+msgstr ""
+
+#: templates/base_no_auth.html:24
+msgid "Forgotten password"
+msgstr ""
+
+#: templates/email_signature.txt:1
+msgid ""
+"Best regards,\n"
+"\n"
+msgstr ""
+
+#: templates/gui/accounts/forgot.html:20
+#: templates/gui/accounts/forgot_check.html:8
+msgid "Password reset"
+msgstr ""
+
+#: templates/gui/accounts/forgot_check.html:9
+msgid "Your new password will be send as text message to your phone number."
+msgstr ""
+
+#: templates/gui/accounts/forgot_check.html:11
+msgid "Reset my password"
+msgstr ""
+
+#: templates/gui/accounts/forgot_check.html:15
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used."
+msgstr ""
+
+#: templates/gui/accounts/forgot_check.html:15
+msgid "Please request a new password reset."
+msgstr ""
+
+#: templates/gui/accounts/forgot_email.txt:1
+#, python-format
+msgid ""
+"You're receiving this email because you requested a password reset for your "
+"user account at %(site_name)s."
+msgstr ""
+
+#: templates/gui/accounts/forgot_email.txt:3
+msgid "Please go to the following page and request a new password:"
+msgstr ""
+
+#: templates/gui/accounts/forgot_email.txt:7
+msgid "Your new password will be send as text message to your phone number:"
+msgstr ""
+
+#: templates/gui/accounts/forgot_email.txt:8
+msgid "Your username (email address), in case you've forgotten:"
+msgstr ""
+
+#: templates/gui/accounts/forgot_subject.txt:2
+#, python-format
+msgid "Password reset on %(site_name)s"
+msgstr ""
+
+#: templates/gui/accounts/register.html:62
+#, python-format
+msgid ""
+"I accept %(startlink1)s%(tos_link)s%(startlink2)sthe General Terms and "
+"Conditions%(endlink)s."
+msgstr ""
+
+#: templates/gui/accounts/register_check.html:8
+msgid "Registration complete!"
+msgstr ""
+
+#: templates/gui/accounts/register_check.html:10
+#: templates/gui/accounts/register_check.html:15
+#: templates/gui/accounts/register_subject.txt:1
+#, python-format
+msgid "Welcome to %(site_name)s!"
+msgstr ""
+
+#: templates/gui/accounts/register_check.html:11
+#, python-format
+msgid ""
+"Your password has been sent to your phone number %(phone)s as text message."
+msgstr ""
+
+#: templates/gui/accounts/register_check.html:11
+msgid "You may go ahead and log in now."
+msgstr ""
+
+#: templates/gui/accounts/register_check.html:13
+#: templates/gui/accounts/register_check.html:19
+msgid "Registration problem :("
+msgstr ""
+
+#: templates/gui/accounts/register_check.html:16
+#, python-format
+msgid ""
+"There was an error while sending a text message with your new password to "
+"your phone number %(phone)s. Please contact us at <b>%(support_email)s</b>."
+msgstr ""
+
+#: templates/gui/accounts/register_check.html:21
+msgid "The activation link is invalid. Your account may already be activated."
+msgstr ""
+
+#: templates/gui/accounts/register_email.txt:1
+#, python-format
+msgid ""
+"Dear customer,\n"
+"\n"
+"Welcome to %(site_name)s!\n"
+"\n"
+"In order to finish registration and activate your account please follow this "
+"link:"
+msgstr ""
+
+#: templates/gui/accounts/register_email.txt:9
+msgid "Your login details are:"
+msgstr ""
+
+#: templates/gui/accounts/register_email.txt:10
+msgid "Username (email address):"
+msgstr ""
+
+#: templates/gui/accounts/register_email.txt:11
+msgid "Password will be send to phone number:"
+msgstr ""
+
+#: templates/gui/accounts/register_email.txt:13
+#, python-format
+msgid "Thank you for choosing %(site_name)s."
+msgstr ""
+
+#: templates/gui/dc/dc_all_toggle.html:2 templates/gui/dc/dc_all_toggle.html:4
+msgid ""
+"Switch between showing all available items or only items attached to current "
+"datacenter"
+msgstr ""
+
+#: templates/gui/dc/dc_all_toggle.html:2 templates/gui/dc/dc_all_toggle.html:4
+msgid "Show all"
+msgstr ""
+
+#: templates/gui/dc/dc_deleted_toggle.html:2
+#: templates/gui/dc/dc_deleted_toggle.html:4
+msgid "Show/Hide items with access=deleted"
+msgstr ""
+
+#: templates/gui/dc/dc_deleted_toggle.html:2
+#: templates/gui/dc/dc_deleted_toggle.html:4
+msgid "Show deleted"
+msgstr ""
+
+#: templates/gui/dc/dc_list.html:22
+msgid "Update Datacenter"
+msgstr ""
+
+#: templates/gui/dc/dc_list.html:23
+msgid "Add new Datacenter"
+msgstr ""
+
+#: templates/gui/dc/dc_list.html:34
+msgid "Edit more settings"
+msgstr ""
+
+#: templates/gui/dc/dc_list.html:36 templates/gui/dc/domain_list.html:32
+#: templates/gui/dc/domain_record_list.html:32
+#: templates/gui/dc/group_list.html:37 templates/gui/dc/image_list.html:38
+#: templates/gui/dc/iso_list.html:37 templates/gui/dc/network_ip_list.html:32
+#: templates/gui/dc/network_ip_list.html:55
+#: templates/gui/dc/network_list.html:38 templates/gui/dc/node_list.html:32
+#: templates/gui/dc/user_list.html:36 templates/gui/node/details.html:36
+#: templates/gui/node/storages.html:33 templates/gui/vm/add.html:33
+#: templates/gui/vm/details.html:107 templates/gui/vm/details.html.py:128
+#: templates/gui/vm/details.html:153 templates/gui/vm/details.html.py:178
+#: templates/gui/vm/details.html:369 templates/gui/vm/list_control.html:16
+msgid "Update"
+msgstr ""
+
+#: templates/gui/dc/dc_list.html:37
+msgid "Delete Datacenter"
+msgstr ""
+
+#: templates/gui/dc/dc_list.html:38 templates/gui/dc/dc_list.html.py:135
+msgid "Add Datacenter"
+msgstr ""
+
+#: templates/gui/dc/dc_list.html:46
+msgid "Change Datacenter Settings"
+msgstr ""
+
+#: templates/gui/dc/dc_list.html:58 templates/gui/dc/image_list.html:36
+#: templates/gui/dc/imagestore_list.html:29
+#: templates/gui/dc/network_ip_list.html:30
+#: templates/gui/dc/network_list.html:36 templates/gui/node/details.html:34
+#: templates/gui/node/storages.html:31 templates/gui/vm/add.html:30
+#: templates/gui/vm/backup.html:65 templates/gui/vm/backup.html.py:85
+#: templates/gui/vm/details.html:126 templates/gui/vm/details.html.py:151
+#: templates/gui/vm/details.html:176 templates/gui/vm/snapshot.html:139
+#: templates/gui/vm/snapshot.html.py:159 templates/gui/vm/snapshot.html:184
+msgid "Show advanced settings"
+msgstr ""
+
+#: templates/gui/dc/dc_list.html:60 templates/gui/dc/dc_settings.html:74
+msgid "Update settings"
+msgstr ""
+
+#: templates/gui/dc/dc_list.html:78 templates/gui/dc/group_list.html:97
+#: templates/gui/dc/image_list.html:98 templates/gui/dc/iso_list.html:96
+#: templates/gui/dc/network_list.html:98 templates/gui/dc/template_list.html:63
+#: templates/gui/node/images.html:85
+msgid "Alias (name)"
+msgstr ""
+
+#: templates/gui/dc/dc_list.html:79
+msgid "Site"
+msgstr ""
+
+#: templates/gui/dc/dc_list.html:95
+msgid "Update or delete Datacenter"
+msgstr ""
+
+#: templates/gui/dc/dc_list.html:111
+msgid "Change Datacenter settings"
+msgstr ""
+
+#: templates/gui/dc/dc_list.html:112 templates/gui/dc/storage_list.html:71
+#: templates/gui/node/storages.html:58 templates/gui/vm/navigation.html:10
+msgid "Snapshots"
+msgstr ""
+
+#: templates/gui/dc/dc_list.html:113 templates/gui/dc/storage_list.html:72
+#: templates/gui/node/navigation.html:10 templates/gui/node/storages.html:60
+#: templates/gui/vm/navigation.html:13
+msgid "Backups"
+msgstr ""
+
+#: templates/gui/dc/dc_list.html:116
+msgid "User Registration"
+msgstr ""
+
+#: templates/gui/dc/dc_list.html:130 templates/gui/dc/domain_list.html:131
+#: templates/gui/dc/group_list.html:130 templates/gui/dc/image_list.html:148
+#: templates/gui/dc/imagestore_list.html:127 templates/gui/dc/iso_list.html:138
+#: templates/gui/dc/network_ip_list.html:267
+#: templates/gui/dc/network_list.html:146 templates/gui/dc/node_list.html:131
+#: templates/gui/dc/storage_list.html:119
+#: templates/gui/dc/subnet_ip_list.html:107
+#: templates/gui/dc/template_list.html:105 templates/gui/dc/user_list.html:117
+#: templates/gui/node/backup_list_all.html:42
+#: templates/gui/node/images.html:123 templates/gui/node/storages.html:93
+#: templates/gui/vm/backup_define_list.html:41
+#: templates/gui/vm/snapshot_define_list.html:39
+msgid "Total"
+msgstr ""
+
+#: templates/gui/dc/dc_list.html:135
+msgid "Create new Datacenter"
+msgstr ""
+
+#: templates/gui/dc/dc_settings.html:24
+msgid "This might be dangerous!"
+msgstr ""
+
+#: templates/gui/dc/dc_settings.html:27
+msgid ""
+"Changing these advanced settings may cause application errors and lead to "
+"software malfunction. You should only continue if you are sure of what you "
+"are doing."
+msgstr ""
+
+#: templates/gui/dc/dc_settings.html:40
+msgid "Datacenter settings"
+msgstr ""
+
+#: templates/gui/dc/dc_settings.html:74
+msgid "Save datacenter settings"
+msgstr ""
+
+#: templates/gui/dc/dc_settings_table.html:9
+msgid "Modules"
+msgstr ""
+
+#: templates/gui/dc/dc_settings_table.html:29
+msgid "Email"
+msgstr ""
+
+#: templates/gui/dc/dc_settings_table.html:97
+msgid "ISO images"
+msgstr ""
+
+#: templates/gui/dc/dc_settings_table.html:111
+msgid "User accounts"
+msgstr ""
+
+#: templates/gui/dc/dc_settings_table.html:147
+msgid "API"
+msgstr ""
+
+#: templates/gui/dc/dc_settings_table.html:151
+msgid "SMS"
+msgstr ""
+
+#: templates/gui/dc/domain_list.html:18
+msgid "Update, Delete or Detach DNS Domain"
+msgstr ""
+
+#: templates/gui/dc/domain_list.html:19
+msgid "Update, Delete or Attach DNS Domain"
+msgstr ""
+
+#: templates/gui/dc/domain_list.html:20
+msgid "Add new DNS Domain"
+msgstr ""
+
+#: templates/gui/dc/domain_list.html:33
+msgid "Detach Domain"
+msgstr ""
+
+#: templates/gui/dc/domain_list.html:34 templates/gui/dc/domain_list.html:59
+msgid "Attach Domain"
+msgstr ""
+
+#: templates/gui/dc/domain_list.html:35
+msgid "Delete Domain"
+msgstr ""
+
+#: templates/gui/dc/domain_list.html:36
+msgid "Add Domain"
+msgstr ""
+
+#: templates/gui/dc/domain_list.html:47 templates/gui/dc/domain_list.html:136
+msgid "Attach DNS Domain"
+msgstr ""
+
+#: templates/gui/dc/domain_list.html:73
+msgid "DNS Domains"
+msgstr ""
+
+#: templates/gui/dc/domain_list.html:92 templates/gui/dc/group_list.html:98
+#: templates/gui/dc/image_list.html:101 templates/gui/dc/iso_list.html:99
+#: templates/gui/dc/network_list.html:101
+#: templates/gui/dc/template_list.html:66 templates/gui/dc/user_list.html:75
+#: templates/gui/node/images.html:88
+msgid "DC bound?"
+msgstr ""
+
+#: templates/gui/dc/domain_list.html:93
+msgid "Records"
+msgstr ""
+
+#: templates/gui/dc/domain_list.html:108
+msgid "Attach, update or delete DNS Domain"
+msgstr ""
+
+#: templates/gui/dc/domain_list.html:110
+msgid "Detach, update or delete DNS Domain"
+msgstr ""
+
+#: templates/gui/dc/domain_list.html:117
+msgid "Show/edit domain DNS records"
+msgstr ""
+
+#: templates/gui/dc/domain_list.html:117
+#, python-format
+msgid "%(counter)s record"
+msgid_plural "%(counter)s records"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/gui/dc/domain_list.html:117
+msgid "N/A"
+msgstr ""
+
+#: templates/gui/dc/domain_list.html:136
+msgid "Associate DNS Domain with this Datacenter"
+msgstr ""
+
+#: templates/gui/dc/domain_list.html:138
+msgid "Create new DNS Domain"
+msgstr ""
+
+#: templates/gui/dc/domain_list.html:138
+msgid "Add DNS Domain"
+msgstr ""
+
+#: templates/gui/dc/domain_record_list.html:18
+msgid "Update or Delete DNS record"
+msgstr ""
+
+#: templates/gui/dc/domain_record_list.html:19
+msgid "Add new DNS record"
+msgstr ""
+
+#: templates/gui/dc/domain_record_list.html:31
+#: templates/gui/dc/domain_record_list.html:65
+#: templates/gui/dc/domain_record_list.html:136
+#: templates/gui/dc/network_ip_list.html:54
+#: templates/gui/dc/network_ip_list.html:88
+#: templates/gui/dc/network_ip_list.html:263
+#: templates/gui/node/backup_list.html:67
+#: templates/gui/node/backup_list_novm.html:69
+#: templates/gui/node/details.html:37 templates/gui/vm/backup_list.html:69
+#: templates/gui/vm/details.html:372 templates/gui/vm/list_control.html:18
+#: templates/gui/vm/snapshot_list.html:68
+msgid "Delete"
+msgstr ""
+
+#: templates/gui/dc/domain_record_list.html:33
+#: templates/gui/dc/domain_record_list.html:135
+msgid "Add DNS record"
+msgstr ""
+
+#: templates/gui/dc/domain_record_list.html:41
+msgid "Delete DNS records"
+msgstr ""
+
+#: templates/gui/dc/domain_record_list.html:53
+#: templates/gui/dc/domain_record_list.html:77
+msgid "DNS records"
+msgstr ""
+
+#: templates/gui/dc/domain_record_list.html:94
+msgid "Enabled"
+msgstr ""
+
+#: templates/gui/dc/domain_record_list.html:95
+msgid "Changed"
+msgstr ""
+
+#: templates/gui/dc/domain_record_list.html:110
+msgid "Update or delete DNS record"
+msgstr ""
+
+#: templates/gui/dc/domain_record_list.html:126
+#, python-format
+msgid ""
+"Selected <span id=\"selected\">0</span> of <span id=\"total\">%(len)s</span> "
+"DNS record"
+msgid_plural ""
+"Selected <span id=\"selected\">0</span> of <span id=\"total\">%(len)s</span> "
+"DNS records"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/gui/dc/domain_record_list.html:135
+msgid "Add new DNS record for this domain"
+msgstr ""
+
+#: templates/gui/dc/domain_record_list.html:136
+msgid "Delete selected DNS records"
+msgstr ""
+
+#: templates/gui/dc/group_list.html:19
+msgid "Update, Delete or Detach User Group"
+msgstr ""
+
+#: templates/gui/dc/group_list.html:20
+msgid "Update, Delete or Attach User Group"
+msgstr ""
+
+#: templates/gui/dc/group_list.html:22 templates/gui/dc/group_list.html:23
+msgid "Update or Delete User Group"
+msgstr ""
+
+#: templates/gui/dc/group_list.html:25
+msgid "Add new User Group"
+msgstr ""
+
+#: templates/gui/dc/group_list.html:39
+msgid "Detach User Group"
+msgstr ""
+
+#: templates/gui/dc/group_list.html:40 templates/gui/dc/group_list.html:54
+#: templates/gui/dc/group_list.html:66 templates/gui/dc/group_list.html:135
+msgid "Attach User Group"
+msgstr ""
+
+#: templates/gui/dc/group_list.html:42
+msgid "Delete User Group"
+msgstr ""
+
+#: templates/gui/dc/group_list.html:43 templates/gui/dc/group_list.html:137
+msgid "Add User Group"
+msgstr ""
+
+#: templates/gui/dc/group_list.html:112
+msgid "Attach, update or delete User Group"
+msgstr ""
+
+#: templates/gui/dc/group_list.html:114
+msgid "Detach, update or delete User Group"
+msgstr ""
+
+#: templates/gui/dc/group_list.html:114
+msgid "Update or delete User Group"
+msgstr ""
+
+#: templates/gui/dc/group_list.html:135
+msgid "Associate User group with this Datacenter"
+msgstr ""
+
+#: templates/gui/dc/group_list.html:137
+msgid "Create new user group"
+msgstr ""
+
+#: templates/gui/dc/image_list.html:19
+msgid "Update, Delete or Detach Disk Image"
+msgstr ""
+
+#: templates/gui/dc/image_list.html:20
+msgid "Update, Delete or Attach Disk Image"
+msgstr ""
+
+#: templates/gui/dc/image_list.html:22 templates/gui/dc/image_list.html:23
+msgid "Update or Delete Disk Image"
+msgstr ""
+
+#: templates/gui/dc/image_list.html:25 templates/gui/dc/imagestore_list.html:18
+msgid "Import Disk Image"
+msgstr ""
+
+#: templates/gui/dc/image_list.html:40
+msgid "Detach Image"
+msgstr ""
+
+#: templates/gui/dc/image_list.html:41 templates/gui/dc/image_list.html:67
+msgid "Attach Image"
+msgstr ""
+
+#: templates/gui/dc/image_list.html:43
+msgid "Delete Image"
+msgstr ""
+
+#: templates/gui/dc/image_list.html:44 templates/gui/dc/imagestore_list.html:33
+msgid "Import Image"
+msgstr ""
+
+#: templates/gui/dc/image_list.html:55
+msgid "Attach Disk Image"
+msgstr ""
+
+#: templates/gui/dc/image_list.html:102 templates/gui/dc/storage_list.html:69
+#: templates/gui/node/backup_list.html:19
+#: templates/gui/node/backup_list.html:58
+#: templates/gui/node/backup_list_all.html:15
+#: templates/gui/node/backup_list_all.html:43
+#: templates/gui/node/backup_list_novm.html:20
+#: templates/gui/node/backup_list_novm.html:60
+#: templates/gui/node/details.html:268 templates/gui/node/images.html:89
+#: templates/gui/node/storages.html:56 templates/gui/vm/backup_list.html:19
+#: templates/gui/vm/backup_list.html:58 templates/gui/vm/details.html:459
+#: templates/gui/vm/snapshot_list.html:18
+#: templates/gui/vm/snapshot_list.html:58 vm/forms.py:338
+msgid "Size"
+msgstr ""
+
+#: templates/gui/dc/image_list.html:103
+#: templates/gui/dc/imagestore_list.html:94 templates/gui/dc/iso_list.html:100
+#: templates/gui/dc/template_list.html:67 templates/gui/node/images.html:90
+msgid "OS&nbsp;Type"
+msgstr ""
+
+#: templates/gui/dc/image_list.html:105
+msgid "Deploy?"
+msgstr ""
+
+#: templates/gui/dc/image_list.html:106
+msgid "Resize?"
+msgstr ""
+
+#: templates/gui/dc/image_list.html:121
+msgid "Attach, update or delete disk Image"
+msgstr ""
+
+#: templates/gui/dc/image_list.html:123
+msgid "Detach, update or delete disk Image"
+msgstr ""
+
+#: templates/gui/dc/image_list.html:123
+msgid "Update or delete disk Image"
+msgstr ""
+
+#: templates/gui/dc/image_list.html:153
+msgid "Associate disk Image with this Datacenter"
+msgstr ""
+
+#: templates/gui/dc/image_list.html:153
+msgid "Attach disk Image"
+msgstr ""
+
+#: templates/gui/dc/image_list.html:155
+msgid "Import disk Image from external URL"
+msgstr ""
+
+#: templates/gui/dc/image_list.html:155
+msgid "Import disk Image from URL"
+msgstr ""
+
+#: templates/gui/dc/image_list.html:156
+msgid "Import disk Image from remote image repository"
+msgstr ""
+
+#: templates/gui/dc/image_list.html:156
+msgid "Import disk Image from repository"
+msgstr ""
+
+#: templates/gui/dc/imagestore_list.html:46
+msgid "repository"
+msgstr ""
+
+#: templates/gui/dc/imagestore_list.html:55
+#, python-format
+msgid ""
+"Show images available on the %(repo_name)s (%(repo_url)s) image repository"
+msgstr ""
+
+#: templates/gui/dc/imagestore_list.html:67
+msgid "search by image name"
+msgstr ""
+
+#: templates/gui/dc/imagestore_list.html:71
+msgid "Show images published during last month"
+msgstr ""
+
+#: templates/gui/dc/imagestore_list.html:71
+msgid "Last month"
+msgstr ""
+
+#: templates/gui/dc/imagestore_list.html:72
+msgid "Show images published during last year"
+msgstr ""
+
+#: templates/gui/dc/imagestore_list.html:72
+msgid "Last year"
+msgstr ""
+
+#: templates/gui/dc/imagestore_list.html:73
+msgid "Show all published images"
+msgstr ""
+
+#: templates/gui/dc/imagestore_list.html:73
+msgid "All"
+msgstr ""
+
+#: templates/gui/dc/imagestore_list.html:79
+#, python-format
+msgid "Image repository %(repo_name)s was last updated on %(last_update)s"
+msgstr ""
+
+#: templates/gui/dc/imagestore_list.html:79
+#, python-format
+msgid "Image repostiory %(repo_name)s was not updated yet"
+msgstr ""
+
+#: templates/gui/dc/imagestore_list.html:79 templates/gui/node/details.html:163
+msgid "Refresh"
+msgstr ""
+
+#: templates/gui/dc/imagestore_list.html:93
+msgid "Name (version)"
+msgstr ""
+
+#: templates/gui/dc/imagestore_list.html:95
+msgid "Size (download)"
+msgstr ""
+
+#: templates/gui/dc/imagestore_list.html:97
+msgid "Published at"
+msgstr ""
+
+#: templates/gui/dc/imagestore_list.html:126
+msgid "Last updated"
+msgstr ""
+
+#: templates/gui/dc/imagestore_list.html:130
+msgid "Return to image list"
+msgstr ""
+
+#: templates/gui/dc/iso_list.html:19
+msgid "Update, Delete or Detach ISO Image"
+msgstr ""
+
+#: templates/gui/dc/iso_list.html:20
+msgid "Update, Delete or Attach ISO Image"
+msgstr ""
+
+#: templates/gui/dc/iso_list.html:22 templates/gui/dc/iso_list.html.py:23
+msgid "Update or Delete ISO Image"
+msgstr ""
+
+#: templates/gui/dc/iso_list.html:25
+msgid "Add new ISO Image"
+msgstr ""
+
+#: templates/gui/dc/iso_list.html:29
+msgid ""
+"<strong>Note:</strong> All operations are currently performed only at "
+"database level. ISO images need to be manually distributed across all "
+"compute nodes."
+msgstr ""
+
+#: templates/gui/dc/iso_list.html:39
+msgid "Detach ISO Image"
+msgstr ""
+
+#: templates/gui/dc/iso_list.html:40 templates/gui/dc/iso_list.html.py:54
+#: templates/gui/dc/iso_list.html:66
+msgid "Attach ISO Image"
+msgstr ""
+
+#: templates/gui/dc/iso_list.html:42
+msgid "Delete ISO Image"
+msgstr ""
+
+#: templates/gui/dc/iso_list.html:43
+msgid "Add ISO Image"
+msgstr ""
+
+#: templates/gui/dc/iso_list.html:115
+msgid "Attach, update or delete ISO Image"
+msgstr ""
+
+#: templates/gui/dc/iso_list.html:117
+msgid "Detach, update or delete ISO Image"
+msgstr ""
+
+#: templates/gui/dc/iso_list.html:117
+msgid "Update or delete ISO Image"
+msgstr ""
+
+#: templates/gui/dc/iso_list.html:143
+msgid "Associate ISO Image with this Datacenter"
+msgstr ""
+
+#: templates/gui/dc/iso_list.html:143
+msgid "Attach ISO image"
+msgstr ""
+
+#: templates/gui/dc/iso_list.html:145
+msgid "Create new ISO image"
+msgstr ""
+
+#: templates/gui/dc/iso_list.html:145
+msgid "Add ISO image"
+msgstr ""
+
+#: templates/gui/dc/network_ip_list.html:18
+#: templates/gui/dc/network_list.html:22 templates/gui/dc/network_list.html:23
+msgid "Update or Delete Network"
+msgstr ""
+
+#: templates/gui/dc/network_ip_list.html:33
+#: templates/gui/dc/network_list.html:43
+msgid "Delete Network"
+msgstr ""
+
+#: templates/gui/dc/network_ip_list.html:41
+msgid "Update or Delete IP address"
+msgstr ""
+
+#: templates/gui/dc/network_ip_list.html:42
+msgid "Add new IP address(es)"
+msgstr ""
+
+#: templates/gui/dc/network_ip_list.html:56
+#: templates/gui/dc/network_ip_list.html:262
+msgid "Add IP address(es)"
+msgstr ""
+
+#: templates/gui/dc/network_ip_list.html:64
+msgid "Delete IP addresses"
+msgstr ""
+
+#: templates/gui/dc/network_ip_list.html:76
+msgid "IP Addresses"
+msgstr ""
+
+#: templates/gui/dc/network_ip_list.html:108
+#: templates/gui/dc/network_list.html:122
+msgid "Update or delete Network"
+msgstr ""
+
+#: templates/gui/dc/network_ip_list.html:112
+#: templates/gui/dc/subnet_ip_list.html:27 templates/gui/vm/details.html:406
+msgid "Netmask"
+msgstr ""
+
+#: templates/gui/dc/network_ip_list.html:116
+#: templates/gui/dc/subnet_ip_list.html:29
+msgid "First host address"
+msgstr ""
+
+#: templates/gui/dc/network_ip_list.html:117
+#: templates/gui/dc/subnet_ip_list.html:30
+msgid "Last host address"
+msgstr ""
+
+#: templates/gui/dc/network_ip_list.html:119
+#: templates/gui/dc/subnet_ip_list.html:32
+msgid "Usable / Registered / Free IPs"
+msgstr ""
+
+#: templates/gui/dc/network_ip_list.html:124
+msgid "Total / Free IPs"
+msgstr ""
+
+#: templates/gui/dc/network_ip_list.html:131
+#, python-format
+msgid ""
+"\n"
+"          This subnet <small>(%(ip_network)s)</small> with this VLAN ID "
+"<small>(%(vlan_id)s)</small> is <a href=\"%(subnet_url)s\" class=\"btn-link"
+"\">used by %(networks)s network</a>.\n"
+"          "
+msgid_plural ""
+"\n"
+"          This subnet <small>(%(ip_network)s)</small> with this VLAN ID "
+"<small>(%(vlan_id)s)</small> is <a href=\"%(subnet_url)s\" class=\"btn-link"
+"\">used by %(networks)s networks</a>.\n"
+"          "
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/gui/dc/network_ip_list.html:140
+#: templates/gui/dc/network_list.html:129 templates/gui/vm/details.html:421
+msgid "IP addresses for this network are managed by an external service"
+msgstr ""
+
+#: templates/gui/dc/network_ip_list.html:149
+#: templates/gui/dc/subnet_ip_list.html:48
+msgid "Return to network list"
+msgstr ""
+
+#: templates/gui/dc/network_ip_list.html:164
+#: templates/gui/dc/subnet_ip_list.html:60
+msgid "IP addresses"
+msgstr ""
+
+#: templates/gui/dc/network_ip_list.html:174
+#: templates/gui/dc/network_ip_list.html:176
+msgid "Switch between showing all or only used IP addresses"
+msgstr ""
+
+#: templates/gui/dc/network_ip_list.html:174
+#: templates/gui/dc/network_ip_list.html:176
+msgid "Used IPs"
+msgstr ""
+
+#: templates/gui/dc/network_ip_list.html:193
+#: templates/gui/dc/subnet_ip_list.html:66 templates/gui/node/details.html:62
+#: templates/gui/node/details.html.py:186 templates/gui/node/details.html:234
+msgid "IP address"
+msgstr ""
+
+#: templates/gui/dc/network_ip_list.html:198
+#: templates/gui/dc/subnet_ip_list.html:71 templates/gui/node/details.html:184
+#: templates/gui/node/details.html:232
+msgid "MAC address"
+msgstr ""
+
+#: templates/gui/dc/network_ip_list.html:224
+msgid "Update or delete IP address"
+msgstr ""
+
+#: templates/gui/dc/network_ip_list.html:253
+#, python-format
+msgid ""
+"Selected <span id=\"selected\">0</span> of <span id=\"total\">%(len)s</span> "
+"IP address"
+msgid_plural ""
+"Selected <span id=\"selected\">0</span> of <span id=\"total\">%(len)s</span> "
+"IP addresses"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/gui/dc/network_ip_list.html:262
+msgid "Add IP address or range of IP addresses into this network"
+msgstr ""
+
+#: templates/gui/dc/network_ip_list.html:263
+msgid "Delete selected IP addresses"
+msgstr ""
+
+#: templates/gui/dc/network_list.html:19
+msgid "Update, Delete or Detach Network"
+msgstr ""
+
+#: templates/gui/dc/network_list.html:20
+msgid "Update, Delete or Attach Network"
+msgstr ""
+
+#: templates/gui/dc/network_list.html:25
+msgid "Add new Network"
+msgstr ""
+
+#: templates/gui/dc/network_list.html:40
+msgid "Detach Network"
+msgstr ""
+
+#: templates/gui/dc/network_list.html:41 templates/gui/dc/network_list.html:55
+#: templates/gui/dc/network_list.html:67 templates/gui/dc/network_list.html:151
+msgid "Attach Network"
+msgstr ""
+
+#: templates/gui/dc/network_list.html:44 templates/gui/dc/network_list.html:153
+msgid "Add Network"
+msgstr ""
+
+#: templates/gui/dc/network_list.html:102
+#: templates/gui/dc/subnet_ip_list.html:19
+#: templates/gui/dc/subnet_ip_list.html:60
+msgid "Subnet"
+msgstr ""
+
+#: templates/gui/dc/network_list.html:104 templates/gui/node/details.html:235
+msgid "VLAN"
+msgstr ""
+
+#: templates/gui/dc/network_list.html:105
+msgid "Free IPs"
+msgstr ""
+
+#: templates/gui/dc/network_list.html:120
+msgid "Attach, update or delete Network"
+msgstr ""
+
+#: templates/gui/dc/network_list.html:122
+msgid "Detach, update or delete Network"
+msgstr ""
+
+#: templates/gui/dc/network_list.html:129
+msgid "Show/edit network IP addresses"
+msgstr ""
+
+#: templates/gui/dc/network_list.html:151
+msgid "Associate Network with this Datacenter"
+msgstr ""
+
+#: templates/gui/dc/network_list.html:153
+msgid "Create new Network"
+msgstr ""
+
+#: templates/gui/dc/node_list.html:18
+msgid "Update or detach Compute Node"
+msgstr ""
+
+#: templates/gui/dc/node_list.html:19 templates/gui/dc/node_list.html.py:34
+#: templates/gui/dc/node_list.html:111 templates/gui/dc/node_list.html:135
+msgid "Attach Compute Node"
+msgstr ""
+
+#: templates/gui/dc/node_list.html:33
+msgid "Detach Compute Node"
+msgstr ""
+
+#: templates/gui/dc/node_list.html:48 templates/gui/node/list.html:20
+msgid "Compute Nodes"
+msgstr ""
+
+#: templates/gui/dc/node_list.html:65
+msgid "Strategy"
+msgstr ""
+
+#: templates/gui/dc/node_list.html:69
+msgid "RAM Overhead"
+msgstr ""
+
+#: templates/gui/dc/node_list.html:70 vm/forms.py:42 vm/forms.py:806
+msgid "Disk"
+msgstr ""
+
+#: templates/gui/dc/node_list.html:71 templates/gui/node/list.html:48
+msgid "Free CPUs"
+msgstr ""
+
+#: templates/gui/dc/node_list.html:72 templates/gui/node/list.html:49
+msgid "Free RAM"
+msgstr ""
+
+#: templates/gui/dc/node_list.html:73
+msgid "Free Disk"
+msgstr ""
+
+#: templates/gui/dc/node_list.html:73 templates/gui/dc/storage_list.html:73
+msgid "Estimated value - may not include size of images, backups and snapshots"
+msgstr ""
+
+#: templates/gui/dc/node_list.html:88
+msgid "Update or remove Compute Node association"
+msgstr ""
+
+#: templates/gui/dc/node_list.html:135
+msgid "Associate new Compute Node with this Datacenter"
+msgstr ""
+
+#: templates/gui/dc/profile/profile_page.html:8
+#: templates/gui/profile/profile_page.html:28
+msgid "Incomplete User Profile"
+msgstr ""
+
+#: templates/gui/dc/profile/profile_page.html:11
+msgid ""
+"Some required information is missing or incomplete. User will have to fill "
+"in all required profile fields before proceeding."
+msgstr ""
+
+#: templates/gui/dc/profile/profile_page.html:22
+#: templates/gui/profile/profile_page.html:42
+msgid "User Profile"
+msgstr ""
+
+#: templates/gui/dc/profile/profile_page.html:38
+#: templates/gui/profile/profile_page.html:58
+msgid "Address"
+msgstr ""
+
+#: templates/gui/dc/profile/profile_page.html:46
+#: templates/gui/profile/profile_page.html:66
+msgid "Billing Address"
+msgstr ""
+
+#: templates/gui/dc/profile/profile_page.html:55
+#: templates/gui/profile/profile_page.html:75
+msgid "API Keys"
+msgstr ""
+
+#: templates/gui/dc/profile/profile_settings_form.html:23
+#: templates/gui/dc/profile/profile_user_form.html:33
+#: templates/gui/profile/profile_address_form.html:31
+#: templates/gui/profile/profile_billing_address_form.html:22
+#: templates/gui/profile/profile_settings_form.html:18
+#: templates/gui/profile/profile_user_form.html:42
+msgid "Update profile"
+msgstr ""
+
+#: templates/gui/dc/profile/profile_user_form.html:34
+#: templates/gui/dc/profile/user_profile.html:42
+#: templates/gui/profile/profile.html:47
+#: templates/gui/profile/profile_user_form.html:43
+msgid "Change password"
+msgstr ""
+
+#: templates/gui/dc/profile/profile_user_form.html:36
+#, python-format
+msgid "Switch into %(user)s account "
+msgstr ""
+
+#: templates/gui/dc/profile/profile_user_form.html:36
+msgid "Impersonate"
+msgstr ""
+
+#: templates/gui/dc/profile/user_profile.html:31
+#: templates/gui/profile/profile.html:36
+msgid "Change Password"
+msgstr ""
+
+#: templates/gui/dc/profile/user_profile.html:34
+msgid "Please enter new password."
+msgstr ""
+
+#: templates/gui/dc/profile/user_profile.html:50
+#: templates/gui/profile/profile.html:55
+msgid "Add SSH Public Key"
+msgstr ""
+
+#: templates/gui/dc/profile/user_profile.html:53
+#: templates/gui/profile/profile.html:58
+msgid "Please enter the name and contents of your SSH public key."
+msgstr ""
+
+#: templates/gui/dc/profile/user_profile.html:61
+#: templates/gui/profile/profile.html:66
+#: templates/gui/profile/profile_sshkey_list.html:23
+msgid "Add SSH key"
+msgstr ""
+
+#: templates/gui/dc/profile/user_profile.html:69
+#: templates/gui/profile/profile.html:74
+msgid "Delete SSH Public Key"
+msgstr ""
+
+#: templates/gui/dc/profile/user_profile.html:74
+#: templates/gui/profile/profile.html:79
+msgid "Are you sure that you want to delete this SSH key?"
+msgstr ""
+
+#: templates/gui/dc/profile/user_profile.html:83
+#: templates/gui/profile/profile.html:88
+msgid "Delete SSH key"
+msgstr ""
+
+#: templates/gui/dc/storage_list.html:18
+msgid "Update or detach Node Storage"
+msgstr ""
+
+#: templates/gui/dc/storage_list.html:19 templates/gui/dc/storage_list.html:123
+msgid "Attach Node Storage"
+msgstr ""
+
+#: templates/gui/dc/storage_list.html:33
+msgid "Detach Storage"
+msgstr ""
+
+#: templates/gui/dc/storage_list.html:34 templates/gui/dc/storage_list.html:89
+msgid "Attach Storage"
+msgstr ""
+
+#: templates/gui/dc/storage_list.html:64 templates/gui/node/storages.html:52
+msgid "Alias (zpool)"
+msgstr ""
+
+#: templates/gui/dc/storage_list.html:73 templates/gui/node/storages.html:61
+msgid "Free"
+msgstr ""
+
+#: templates/gui/dc/storage_list.html:94
+msgid "Update or detach Storage"
+msgstr ""
+
+#: templates/gui/dc/storage_list.html:123
+msgid "Associate new Node Storage with this Datacenter"
+msgstr ""
+
+#: templates/gui/dc/subnet_ip_list.html:36
+#, python-format
+msgid ""
+"\n"
+"          This subnet with this VLAN ID is used by %(num_networks)s "
+"network.\n"
+"          "
+msgid_plural ""
+"\n"
+"          This subnet with this VLAN ID is used by %(num_networks)s "
+"networks.\n"
+"          "
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/gui/dc/subnet_ip_list.html:72
+msgid "NIC ID"
+msgstr ""
+
+#: templates/gui/dc/template_list.html:18
+msgid "Detach Server Template"
+msgstr ""
+
+#: templates/gui/dc/template_list.html:19
+msgid "Attach Server Template"
+msgstr ""
+
+#: templates/gui/dc/template_list.html:31
+msgid "Detach server Template"
+msgstr ""
+
+#: templates/gui/dc/template_list.html:32
+#: templates/gui/dc/template_list.html:82
+#: templates/gui/dc/template_list.html:109
+msgid "Attach server Template"
+msgstr ""
+
+#: templates/gui/dc/template_list.html:84
+msgid "Detach server Template from Datacenter"
+msgstr ""
+
+#: templates/gui/dc/template_list.html:109
+msgid "Associate server Template with this Datacenter"
+msgstr ""
+
+#: templates/gui/dc/user_list.html:18
+msgid "Update or Delete User"
+msgstr ""
+
+#: templates/gui/dc/user_list.html:19
+msgid "Create new User"
+msgstr ""
+
+#: templates/gui/dc/user_list.html:31
+msgid "Show password fields"
+msgstr ""
+
+#: templates/gui/dc/user_list.html:32
+msgid "Edit profile"
+msgstr ""
+
+#: templates/gui/dc/user_list.html:35 templates/gui/dc/user_list.html.py:121
+msgid "Add User"
+msgstr ""
+
+#: templates/gui/dc/user_list.html:37
+msgid "Delete User"
+msgstr ""
+
+#: templates/gui/dc/user_list.html:61 templates/gui/dc/user_list.html.py:63
+msgid "Show/Hide deactivated users"
+msgstr ""
+
+#: templates/gui/dc/user_list.html:61 templates/gui/dc/user_list.html.py:63
+msgid "Show active"
+msgstr ""
+
+#: templates/gui/dc/user_list.html:77
+msgid "API access?"
+msgstr ""
+
+#: templates/gui/dc/user_list.html:78
+msgid "SuperAdmin?"
+msgstr ""
+
+#: templates/gui/dc/user_list.html:82
+msgid "Joined"
+msgstr ""
+
+#: templates/gui/dc/user_list.html:93
+msgid "Update or delete user"
+msgstr ""
+
+#: templates/gui/dc/user_list.html:95
+msgid "User is owner of this datacenter"
+msgstr ""
+
+#: templates/gui/dc/user_list.html:121
+msgid "Create new user"
+msgstr ""
+
+#: templates/gui/docs/api.html:7
+msgid "Loading API documentation"
+msgstr ""
+
+#: templates/gui/docs/faq.html:12
+msgid "Pending"
+msgstr ""
+
+#: templates/gui/docs/faq.html:12
+msgid "Pre-Order"
+msgstr ""
+
+#: templates/gui/docs/faq.html:29
+msgid "enter keyword here..."
+msgstr ""
+
+#: templates/gui/docs/faq.html:37
+msgid "Cannot connect to port after installing service XY, what's wrong?"
+msgstr ""
+
+#: templates/gui/docs/faq.html:39
+msgid ""
+"Our images have firewall enabled by default. Check you firewall settings."
+msgstr ""
+
+#: templates/gui/docs/faq.html:44
+msgid "Why I'm not able to access the API?"
+msgstr ""
+
+#: templates/gui/docs/faq.html:46
+#, python-format
+msgid ""
+"Please <a href=\"%(support_section_url)s\">contact our support</a> in order "
+"to check and allow API access for your user account. Also please make sure "
+"that you are using a valid username and password or API key."
+msgstr ""
+
+#: templates/gui/docs/faq.html:51
+msgid "What is API key?"
+msgstr ""
+
+#: templates/gui/docs/faq.html:53
+msgid "Generated key that can be used instead of user/password authentication."
+msgstr ""
+
+#: templates/gui/docs/faq.html:58
+msgid "What is callback key?"
+msgstr ""
+
+#: templates/gui/docs/faq.html:60
+msgid ""
+"Generated key which is used to verify, if callback response is from our "
+"servers."
+msgstr ""
+
+#: templates/gui/docs/faq.html:65
+msgid "How shall I verify callbacks with callback key?"
+msgstr ""
+
+#: templates/gui/docs/faq.html:67
+msgid ""
+"The callback response will contain a random token and a verification string. "
+"You should generate your own verification sting by attaching the callback "
+"key after the random token and create an MD5 hash from the string. If your "
+"MD5 hash matches the verification string you can be sure the callback came "
+"from our servers."
+msgstr ""
+
+#: templates/gui/docs/faq.html:72
+msgid "How to add custom ISO images?"
+msgstr ""
+
+#: templates/gui/docs/faq.html:74
+#, python-format
+msgid ""
+"Unfortunately this feature is not built in the GUI yet, but we do support "
+"custom ISO images. Please create a support request via our <a href="
+"\"%(support_section_url)s\">support section</a>."
+msgstr ""
+
+#: templates/gui/docs/faq.html:79
+msgid "How to enable built-in monitoring and better graphing?"
+msgstr ""
+
+#: templates/gui/docs/faq.html:81
+msgid ""
+"Monitoring and more accurate VM resource graphs can be turned on by enabling "
+"a monitoring agent, which is preconfigured in our VM disk images."
+msgstr ""
+
+#: templates/gui/docs/faq.html:82
+msgid ""
+"This can be accomplished by running these commands as root:<br />\n"
+"                * RHEL, CentOS, Scientific Linux: <code>chkconfig zabbix-"
+"agent on && service zabbix-agent start</code><br />\n"
+"                * Debian, Ubuntu: <code>update-rc.d zabbix-agent defaults && "
+"service zabbix-agent start</code>"
+msgstr ""
+
+#: templates/gui/docs/faq.html:89
+msgid ""
+"Why do I see \"eth0: IPv6 duplicate address fe80::XXXX:XXff:feXX:XXXX "
+"detected!\" in my server's logs?"
+msgstr ""
+
+#: templates/gui/docs/faq.html:91
+msgid ""
+"Our anti-spoofing protection allows only assigned IPv4 addresses to "
+"originate from the network interface. We do not support IPv6 at this point, "
+"which we hope to support in the near future. However, IPv6 is enabled by "
+"default in our images as disabling it will break some applications."
+msgstr ""
+
+#: templates/gui/docs/user_guide.html:7
+msgid "Loading User Guide"
+msgstr ""
+
+#: templates/gui/navigation.html:66
+msgid "Select Datacenter"
+msgstr ""
+
+#: templates/gui/navigation.html:69
+msgid "Please select datacenter to work with."
+msgstr ""
+
+#: templates/gui/navigation.html:77
+msgid "Switch Datacenter"
+msgstr ""
+
+#: templates/gui/navigation.html:88
+msgid "Socket.io connection status"
+msgstr ""
+
+#: templates/gui/navigation.html:103
+msgid "My profile and settings"
+msgstr ""
+
+#: templates/gui/navigation.html:106
+msgid "Logout"
+msgstr ""
+
+#: templates/gui/navigation.html:112
+#, python-format
+msgid "Working in %(dc_alias)s datacenter. Click to change active datacenter"
+msgstr ""
+
+#: templates/gui/navigation.html:137
+msgid "Filter servers by tags"
+msgstr ""
+
+#: templates/gui/navigation_filter.html:3
+msgid "Filters"
+msgstr ""
+
+#: templates/gui/navigation_filter.html:10
+msgid "Filter"
+msgstr ""
+
+#: templates/gui/navigation_filter.html:11 templates/gui/vm/details.html:364
+msgid "Reset"
+msgstr ""
+
+#: templates/gui/navigation_pager.html:3
+msgid "Page"
+msgstr ""
+
+#: templates/gui/node/backup_list.html:14
+#: templates/gui/node/backup_list_all.html:10
+#: templates/gui/node/backup_list_novm.html:15
+#: templates/gui/vm/backup_define_list.html:9
+#: templates/gui/vm/backup_list.html:14
+#: templates/gui/vm/snapshot_define_list.html:9
+#: templates/gui/vm/snapshot_list.html:14
+msgid "Disk&nbsp;ID"
+msgstr ""
+
+#: templates/gui/node/backup_list.html:18
+#: templates/gui/node/backup_list_all.html:14
+#: templates/gui/node/backup_list_novm.html:19
+#: templates/gui/vm/backup_list.html:18
+msgid "Duration"
+msgstr ""
+
+#: templates/gui/node/backup_list.html:35
+#: templates/gui/node/backup_list_novm.html:36
+#: templates/gui/vm/backup_list.html:35
+msgid "Delete or restore this backup"
+msgstr ""
+
+#: templates/gui/node/backup_list.html:46
+#: templates/gui/node/backup_list_all.html:33
+#: templates/gui/node/backup_list_novm.html:48
+#: templates/gui/vm/backup_list.html:46
+msgid "Update backup information"
+msgstr ""
+
+#: templates/gui/node/backup_list.html:55
+#: templates/gui/node/backup_list_novm.html:57
+#: templates/gui/vm/backup_list.html:55
+#, python-format
+msgid ""
+"Selected <span id=\"selected\">0</span> of <span id=\"total\">%(len)s</span> "
+"backup"
+msgid_plural ""
+"Selected <span id=\"selected\">0</span> of <span id=\"total\">%(len)s</span> "
+"backups"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/gui/node/backup_list.html:67
+#: templates/gui/node/backup_list_novm.html:69
+#: templates/gui/vm/backup_list.html:69
+msgid "Delete selected backups"
+msgstr ""
+
+#: templates/gui/node/backup_list_all.html:24
+msgid "Edit backups for this server"
+msgstr ""
+
+#: templates/gui/node/backups.html:30
+msgid "Unavailable backups"
+msgstr ""
+
+#: templates/gui/node/backups.html:33
+msgid ""
+"Backups are not visible or accessible, because the compute node is not in "
+"<strong>online state</strong>. Existing backups are kept untouched, but new "
+"backups cannot be created. Full backup control will be possible as soon as "
+"the compute node returns to online state."
+msgstr ""
+
+#: templates/gui/node/backups.html:44 templates/gui/node/backups.html.py:52
+#: templates/gui/node/backups.html:60 templates/gui/vm/backup.html:116
+msgid "backups"
+msgstr ""
+
+#: templates/gui/node/backups.html:52
+msgid "(no server)"
+msgstr ""
+
+#: templates/gui/node/details.html:22
+msgid "Update Compute Node Settings"
+msgstr ""
+
+#: templates/gui/node/details.html:48 templates/gui/vm/details.html:266
+msgid "details"
+msgstr ""
+
+#: templates/gui/node/details.html:57
+msgid "Change node settings"
+msgstr ""
+
+#: templates/gui/node/details.html:57 templates/gui/node/list.html:67
+msgid "Head node"
+msgstr ""
+
+#: templates/gui/node/details.html:70 templates/gui/node/list.html:51
+msgid "Capabilities"
+msgstr ""
+
+#: templates/gui/node/details.html:72
+msgid "Compute"
+msgstr ""
+
+#: templates/gui/node/details.html:73
+msgid "Backup"
+msgstr ""
+
+#: templates/gui/node/details.html:77
+msgid "CPUs / Free"
+msgstr ""
+
+#: templates/gui/node/details.html:84
+msgid "RAM / Free / "
+msgstr ""
+
+#: templates/gui/node/details.html:84
+msgid "Aggregated memory overhead caused by KVM servers."
+msgstr ""
+
+#: templates/gui/node/details.html:84
+msgid "Overhead"
+msgstr ""
+
+#: templates/gui/node/details.html:94
+msgid "Manufacturer"
+msgstr ""
+
+#: templates/gui/node/details.html:98
+msgid "Product"
+msgstr ""
+
+#: templates/gui/node/details.html:102
+msgid "Serial Number"
+msgstr ""
+
+#: templates/gui/node/details.html:106
+msgid "CPU Type"
+msgstr ""
+
+#: templates/gui/node/details.html:110
+msgid "Uptime"
+msgstr ""
+
+#: templates/gui/node/details.html:113
+msgid ""
+"The displayed uptime is based on the last known boot time of the compute node"
+msgstr ""
+
+#: templates/gui/node/details.html:114
+#, python-format
+msgid ""
+"\n"
+"            %(days)s day, %(hms)s\n"
+"            "
+msgid_plural ""
+"\n"
+"            %(days)s days, %(hms)s\n"
+"            "
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/gui/node/details.html:131
+msgid "Number of real servers (with slave/replication machines excluded)"
+msgstr ""
+
+#: templates/gui/node/details.html:136 templates/gui/vm/details.html:324
+msgid "SLA"
+msgstr ""
+
+#: templates/gui/node/details.html:144
+msgid "Actual monthly SLA for this compute node"
+msgstr ""
+
+#: templates/gui/node/details.html:163
+msgid "Refresh compute node information"
+msgstr ""
+
+#: templates/gui/node/details.html:178
+msgid "network interfaces"
+msgstr ""
+
+#: templates/gui/node/details.html:185
+msgid "Aggregation"
+msgstr ""
+
+#: templates/gui/node/details.html:187
+msgid "NIC tags"
+msgstr ""
+
+#: templates/gui/node/details.html:226
+msgid "virtual network interfaces"
+msgstr ""
+
+#: templates/gui/node/details.html:233
+msgid "Interface"
+msgstr ""
+
+#: templates/gui/node/details.html:262
+msgid "disk pools"
+msgstr ""
+
+#: templates/gui/node/details.html:269
+msgid "Disk Configuration"
+msgstr ""
+
+#: templates/gui/node/images.html:19
+msgid "Delete Disk Image from node storage"
+msgstr ""
+
+#: templates/gui/node/images.html:20
+msgid "Import Disk Image into node storage"
+msgstr ""
+
+#: templates/gui/node/images.html:25
+msgid "Image is used by some servers"
+msgstr ""
+
+#: templates/gui/node/images.html:33
+msgid "Delete disk Image"
+msgstr ""
+
+#: templates/gui/node/images.html:34
+msgid "Import disk Image"
+msgstr ""
+
+#: templates/gui/node/images.html:42
+msgid "Delete Disk Images from node storage"
+msgstr ""
+
+#: templates/gui/node/images.html:53
+msgid "Delete disk Images"
+msgstr ""
+
+#: templates/gui/node/images.html:65
+msgid "images"
+msgstr ""
+
+#: templates/gui/node/images.html:75
+#, python-format
+msgid "Show images stored on %(zpool)s zpool"
+msgstr ""
+
+#: templates/gui/node/images.html:104
+msgid "Delete disk image from compute node storage"
+msgstr ""
+
+#: templates/gui/node/images.html:112
+msgid "DC"
+msgstr ""
+
+#: templates/gui/node/images.html:126
+msgid "Remove all unused disk images imported on compute node storage"
+msgstr ""
+
+#: templates/gui/node/images.html:126
+msgid "Delete unused images"
+msgstr ""
+
+#: templates/gui/node/images_disabled.html:12
+msgid "Missing node storage"
+msgstr ""
+
+#: templates/gui/node/images_disabled.html:15
+msgid "Compute node has no storage configured."
+msgstr ""
+
+#: templates/gui/node/list.html:31
+msgid "enter node hostname"
+msgstr ""
+
+#: templates/gui/node/list.html:43
+msgid "Vendor"
+msgstr ""
+
+#: templates/gui/node/list.html:44 templates/gui/vm/details.html:404
+#: templates/gui/vm/details.html.py:455 vm/forms.py:315 vm/forms.py:420
+msgid "Model"
+msgstr ""
+
+#: templates/gui/node/list.html:101
+msgid "Compute node"
+msgstr ""
+
+#: templates/gui/node/list.html:102
+msgid "Backup node"
+msgstr ""
+
+#: templates/gui/node/list.html:119
+#, python-format
+msgid ""
+"Selected <span id=\"selected\">0</span> of %(node_len)s node\n"
+"                "
+msgid_plural "Selected <span id=\"selected\">0</span> of %(node_len)s nodes"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/gui/node/navigation.html:5
+msgid "Show compute node details"
+msgstr ""
+
+#: templates/gui/node/navigation.html:5 templates/gui/vm/navigation.html:5
+msgid "Details"
+msgstr ""
+
+#: templates/gui/node/navigation.html:6
+msgid "Show storages available on this compute node"
+msgstr ""
+
+#: templates/gui/node/navigation.html:7
+msgid "Show images stored on this compute node storages"
+msgstr ""
+
+#: templates/gui/node/navigation.html:8
+msgid "Show servers defined on this compute node"
+msgstr ""
+
+#: templates/gui/node/navigation.html:10
+msgid "Show backups stored on this compute node"
+msgstr ""
+
+#: templates/gui/node/navigation.html:16
+msgid "Show compute node related task log"
+msgstr ""
+
+#: templates/gui/node/navigation.html:16 templates/gui/tasklog/tasklog.html:23
+#: templates/gui/vm/list.html:159 templates/gui/vm/navigation.html:18
+msgid "Task Log"
+msgstr ""
+
+#: templates/gui/node/storages.html:19
+msgid "Change node Storage Settings"
+msgstr ""
+
+#: templates/gui/node/storages.html:20 templates/gui/node/storages.html:96
+msgid "Add new node Storage"
+msgstr ""
+
+#: templates/gui/node/storages.html:34
+msgid "Delete Storage"
+msgstr ""
+
+#: templates/gui/node/storages.html:35
+msgid "Add Storage"
+msgstr ""
+
+#: templates/gui/node/storages.html:45
+msgid "storages"
+msgstr ""
+
+#: templates/gui/node/storages.html:59
+msgid "Replicated<br>snapshots"
+msgstr ""
+
+#: templates/gui/node/storages.html:72
+msgid "Update or delete node Storage"
+msgstr ""
+
+#: templates/gui/node/storages.html:96
+msgid "Add node Storage"
+msgstr ""
+
+#: templates/gui/node/tasklog.html:22 templates/gui/vm/tasklog.html:22
+msgid "task log"
+msgstr ""
+
+#: templates/gui/node/vms.html:20 templates/gui/vm/details.html:35
+#: templates/gui/vm/list.html:18
+msgid "This could be dangerous"
+msgstr ""
+
+#: templates/gui/node/vms.html:30 templates/gui/vm/details.html:45
+#: templates/gui/vm/list.html:28
+msgid "Force"
+msgstr ""
+
+#: templates/gui/node/vms.html:46
+msgid "Unavailable servers"
+msgstr ""
+
+#: templates/gui/node/vms.html:49
+msgid ""
+"Servers are not visible or accessible, because the compute node is not in "
+"<strong>online state</strong>. Servers are kept untouched. Full server "
+"control will be possible as soon as the compute node returns to online state."
+msgstr ""
+
+#: templates/gui/node/vms.html:59
+msgid "servers"
+msgstr ""
+
+#: templates/gui/node/vms.html:68
+msgid "Show servers stored on all zpools"
+msgstr ""
+
+#: templates/gui/node/vms.html:72
+#, python-format
+msgid "Show servers stored on %(zpool_name)s zpool"
+msgstr ""
+
+#: templates/gui/node/vms.html:93 templates/gui/reports/cloud_customers.html:38
+#: templates/gui/vm/details.html:313 templates/gui/vm/list.html:103
+#: vm/forms.py:217
+msgid "VCPUs"
+msgstr ""
+
+#: templates/gui/node/vms.html:95 templates/gui/reports/cloud_customers.html:40
+#: templates/gui/vm/list.html:105
+msgid "HDD"
+msgstr ""
+
+#: templates/gui/profile/profile.html:39
+msgid "Please enter old and new password."
+msgstr ""
+
+#: templates/gui/profile/profile_activation_form.html:5
+#, python-format
+msgid ""
+"Please enter the activation code sent to you via email to activate your new "
+"email address %(email)s"
+msgstr ""
+
+#: templates/gui/profile/profile_activation_form.html:15
+#, python-format
+msgid ""
+"Please enter the activation code sent to you via text message to activate "
+"your new phone number %(phone)s"
+msgstr ""
+
+#: templates/gui/profile/profile_api_keys_list.html:5
+msgid "API key"
+msgstr ""
+
+#: templates/gui/profile/profile_api_keys_list.html:9
+msgid "Callback key"
+msgstr ""
+
+#: templates/gui/profile/profile_api_keys_list.html:17
+msgid "Show keys"
+msgstr ""
+
+#: templates/gui/profile/profile_page.html:7
+msgid "Profile Activation"
+msgstr ""
+
+#: templates/gui/profile/profile_page.html:17
+#: templates/gui/profile/profile_user_field_verify.html:10
+msgid "Verify"
+msgstr ""
+
+#: templates/gui/profile/profile_page.html:31
+msgid ""
+"Some required information is missing or incomplete. Please fill in all "
+"required profile fields before proceeding."
+msgstr ""
+
+#: templates/gui/profile/profile_sshkey_list.html:14
+msgid "Delete this SSH key"
+msgstr ""
+
+#: templates/gui/profile/profile_user_field_verify.html:10
+msgid "is not verified."
+msgstr ""
+
+#: templates/gui/reports/cloud_customers.html:20
+msgid "Cloud Customers Transactions Items Report"
+msgstr ""
+
+#: templates/gui/reports/cloud_customers.html:41
+msgid "Fee"
+msgstr ""
+
+#: templates/gui/reports/cloud_customers.html:41
+msgid "Price invoiced for server"
+msgstr ""
+
+#: templates/gui/reports/cloud_customers.html:42
+msgid "Subscription"
+msgstr ""
+
+#: templates/gui/reports/cloud_customers.html:42
+msgid "Subscription length in months"
+msgstr ""
+
+#: templates/gui/reports/cloud_customers.html:43
+msgid "PpM"
+msgstr ""
+
+#: templates/gui/reports/cloud_customers.html:43
+msgid "Calculated Price per Month"
+msgstr ""
+
+#: templates/gui/reports/cloud_customers.html:44
+msgid "PpY"
+msgstr ""
+
+#: templates/gui/reports/cloud_customers.html:44
+msgid "Calculated Price per Year"
+msgstr ""
+
+#: templates/gui/reports/cloud_customers.html:46
+#: templates/gui/vm/details.html:356 templates/gui/vm/list_control.html:8
+msgid "Start"
+msgstr ""
+
+#: templates/gui/reports/cloud_customers.html:47
+msgid "End"
+msgstr ""
+
+#: templates/gui/reports/cloud_customers.html:83
+msgid "No items available"
+msgstr ""
+
+#: templates/gui/support/add_ticket.html:24
+msgid "Submit Ticket"
+msgstr ""
+
+#: templates/gui/support/add_ticket_email.txt:1
+#, python-format
+msgid "Support ticket submitted by %(first_name)s %(last_name)s"
+msgstr ""
+
+#: templates/gui/support/add_ticket_email.txt:7
+msgid "Ticket Type"
+msgstr ""
+
+#: templates/gui/support/add_ticket_email.txt:9
+msgid "Problem Description"
+msgstr ""
+
+#: templates/gui/support/add_ticket_email.txt:12
+msgid "How to reproduce"
+msgstr ""
+
+#: templates/gui/support/add_ticket_email.txt:15
+msgid "Contact"
+msgstr ""
+
+#: templates/gui/support/add_ticket_form.html:11
+msgid ""
+"Critical production issue affecting all users, including system "
+"unavailability and data integrity issues with no workaround available."
+msgstr ""
+
+#: templates/gui/support/add_ticket_form.html:12
+msgid ""
+"Major functionality is impacted or significant performance degradation is "
+"experienced. Issue is persistent and affects many users and/or major "
+"functionality. No reasonable workaround available."
+msgstr ""
+
+#: templates/gui/support/add_ticket_form.html:13
+msgid ""
+"System performance issue or bug affecting some but not all users. Short-term "
+"workaround is available, but not scalable."
+msgstr ""
+
+#: templates/gui/support/add_ticket_form.html:14
+msgid ""
+"Inquiry regarding a routine technical issue; information requested on "
+"application capabilities, navigation, installation or configuration; bug "
+"affecting a small number of users. Acceptable workaround available."
+msgstr ""
+
+#: templates/gui/support/add_ticket_subject.txt:1
+#: templates/gui/support/add_ticket_user_subject.txt:1
+#, python-format
+msgid "[Danube Cloud Support] %(summary)s"
+msgstr ""
+
+#: templates/gui/support/add_ticket_user_email.txt:1
+msgid ""
+"Dear customer,\n"
+"\n"
+"your request with following summary was received."
+msgstr ""
+
+#: templates/gui/support/add_ticket_user_email.txt:7
+msgid "You will be informed about the resolution of your request by email."
+msgstr ""
+
+#: templates/gui/tasklog/tasklog_detail_template.html:3
+msgid "show more"
+msgstr ""
+
+#: templates/gui/tasklog/tasklog_detail_template.html:4
+msgid "show less"
+msgstr ""
+
+#: templates/gui/tasklog/tasklog_table.html:6
+msgid "Time"
+msgstr ""
+
+#: templates/gui/tasklog/tasklog_table.html:8
+msgid "Object"
+msgstr ""
+
+#: templates/gui/tasklog/tasklog_table.html:9
+msgid "Message"
+msgstr ""
+
+#: templates/gui/tasklog/tasklog_table.html:11
+msgid "Detail"
+msgstr ""
+
+#: templates/gui/tasklog/tasklog_table.html:33
+msgid "No log entries found."
+msgstr ""
+
+#: templates/gui/vm/add.html:19 templates/gui/vm/details.html:115
+msgid "Change Server Settings"
+msgstr ""
+
+#: templates/gui/vm/add.html:20 templates/gui/vm/details.html:116
+msgid "Add new Server"
+msgstr ""
+
+#: templates/gui/vm/add.html:31 templates/gui/vm/add_import.html:64
+msgid "Import from file"
+msgstr ""
+
+#: templates/gui/vm/add.html:34 templates/gui/vm/details.html:130
+msgid "Delete Server"
+msgstr ""
+
+#: templates/gui/vm/add.html:59 templates/gui/vm/import_modal.html:6
+msgid "Import Servers"
+msgstr ""
+
+#: templates/gui/vm/add_disabled.html:10
+msgid "Permission denied"
+msgstr ""
+
+#: templates/gui/vm/add_disabled.html:13
+msgid "Please contact your cloud administrator for new server requests."
+msgstr ""
+
+#: templates/gui/vm/add_import.html:8
+msgid "Import servers from file"
+msgstr ""
+
+#: templates/gui/vm/add_import.html:19
+msgid "Error processing import file"
+msgstr ""
+
+#: templates/gui/vm/add_import.html:33
+msgid "Some servers cannot be imported."
+msgstr ""
+
+#: templates/gui/vm/add_import.html:55
+msgid "No servers available"
+msgstr ""
+
+#: templates/gui/vm/backup.html:36
+msgid "Create Backup"
+msgstr ""
+
+#: templates/gui/vm/backup.html:39
+msgid "Please select the backup definition to run."
+msgstr ""
+
+#: templates/gui/vm/backup.html:47
+msgid "Create backup"
+msgstr ""
+
+#: templates/gui/vm/backup.html:55
+msgid "Create Backup Definition"
+msgstr ""
+
+#: templates/gui/vm/backup.html:67 templates/gui/vm/snapshot.html:141
+msgid "Create definition"
+msgstr ""
+
+#: templates/gui/vm/backup.html:75
+msgid "Update or delete Backup Definition"
+msgstr ""
+
+#: templates/gui/vm/backup.html:87 templates/gui/vm/snapshot.html:161
+msgid "Update definition"
+msgstr ""
+
+#: templates/gui/vm/backup.html:88 templates/gui/vm/snapshot.html:162
+msgid "Delete definition"
+msgstr ""
+
+#: templates/gui/vm/backup.html:102
+msgid "backup definitions"
+msgstr ""
+
+#: templates/gui/vm/backup_define_list.html:11
+#: templates/gui/vm/snapshot_define_list.html:10 vm/forms.py:537
+msgid "Schedule"
+msgstr ""
+
+#: templates/gui/vm/backup_define_list.html:12
+#: templates/gui/vm/snapshot_define_list.html:11 vm/forms.py:542
+msgid "Retention"
+msgstr ""
+
+#: templates/gui/vm/backup_define_list.html:23
+msgid "Update or delete backup definition"
+msgstr ""
+
+#: templates/gui/vm/backup_define_list.html:45
+msgid "Create new backup definition"
+msgstr ""
+
+#: templates/gui/vm/backup_define_list.html:45
+#: templates/gui/vm/snapshot_define_list.html:43
+msgid "Add definition"
+msgstr ""
+
+#: templates/gui/vm/backup_delete_modal.html:5
+msgid "Delete Backups"
+msgstr ""
+
+#: templates/gui/vm/backup_delete_modal.html:11
+msgid ""
+"Backups: <strong>__name__</strong><br>Disk ID: <strong>__disk_id__</strong>"
+msgstr ""
+
+#: templates/gui/vm/backup_delete_modal.html:14
+#: templates/gui/vm/backup_restore_modal.html:14
+msgid "Deleting a backup will only remove the data of the backup."
+msgstr ""
+
+#: templates/gui/vm/backup_delete_modal.html:20
+msgid "Delete backups"
+msgstr ""
+
+#: templates/gui/vm/backup_list.html:68
+msgid ""
+"Create backup of your disk. You will have to choose a backup definition to "
+"run"
+msgstr ""
+
+#: templates/gui/vm/backup_list.html:68
+msgid "Backup now"
+msgstr ""
+
+#: templates/gui/vm/backup_restore_modal.html:5
+msgid "Delete or Restore Backup"
+msgstr ""
+
+#: templates/gui/vm/backup_restore_modal.html:11
+msgid ""
+"Backup: <strong>__name__</strong><br>Disk ID: <strong>__disk_id__</strong> "
+"(__disk_size__ MB)"
+msgstr ""
+
+#: templates/gui/vm/backup_restore_modal.html:15
+msgid ""
+"A backup restore will restore your data from the backup. <strong>All your "
+"data created after the backup (including all existing snapshots) on target "
+"server will be lost!</strong>"
+msgstr ""
+
+#: templates/gui/vm/backup_restore_modal.html:16
+msgid ""
+"Do you wan't to <strong>delete existing data and snapshots on target server</"
+"strong> and restore data from this backup?"
+msgstr ""
+
+#: templates/gui/vm/backup_restore_modal.html:27
+msgid "Delete backup"
+msgstr ""
+
+#: templates/gui/vm/backup_restore_modal.html:28
+msgid "Restore backup"
+msgstr ""
+
+#: templates/gui/vm/backup_update_modal.html:5
+msgid "Update Backup"
+msgstr ""
+
+#: templates/gui/vm/backup_update_modal.html:8
+msgid "Update backup information (note only)."
+msgstr ""
+
+#: templates/gui/vm/backup_update_modal.html:17
+msgid "Update backup"
+msgstr ""
+
+#: templates/gui/vm/console.html:9 templates/gui/vm/console_multi.html:7
+msgid "Loading console window"
+msgstr ""
+
+#: templates/gui/vm/console.html:23 templates/gui/vm/console_multi.html:31
+msgid "console"
+msgstr ""
+
+#: templates/gui/vm/console.html:26 templates/gui/vm/console_multi.html:34
+msgid "Open console in new window"
+msgstr ""
+
+#: templates/gui/vm/details.html:54
+msgid "Start Server with ISO Image"
+msgstr ""
+
+#: templates/gui/vm/details.html:58
+msgid "ISO image to boot from:"
+msgstr ""
+
+#: templates/gui/vm/details.html:64
+msgid "Use once?"
+msgstr ""
+
+#: templates/gui/vm/details.html:71
+msgid "Attach 2nd ISO image (optional):"
+msgstr ""
+
+#: templates/gui/vm/details.html:73
+msgid "(Disabled)"
+msgstr ""
+
+#: templates/gui/vm/details.html:86 templates/gui/vm/details.html.py:362
+msgid "Start server"
+msgstr ""
+
+#: templates/gui/vm/details.html:96
+msgid "Change Reverse DNS Name"
+msgstr ""
+
+#: templates/gui/vm/details.html:99
+msgid ""
+"Please enter a valid value for the reverse DNS record of IP "
+"<strong>__ipaddr__</strong>."
+msgstr ""
+
+#: templates/gui/vm/details.html:130 templates/gui/vm/list_control.html:18
+msgid ""
+"Are you sure that you want to delete the server definition from database?"
+msgstr ""
+
+#: templates/gui/vm/details.html:140
+msgid "Change NIC Settings"
+msgstr ""
+
+#: templates/gui/vm/details.html:141
+msgid "Add new NIC to Server"
+msgstr ""
+
+#: templates/gui/vm/details.html:155
+msgid "Delete NIC"
+msgstr ""
+
+#: templates/gui/vm/details.html:156 templates/gui/vm/details.html.py:439
+msgid "Add NIC"
+msgstr ""
+
+#: templates/gui/vm/details.html:165
+msgid "Change Disk Settings"
+msgstr ""
+
+#: templates/gui/vm/details.html:166
+msgid "Add new Disk to Server"
+msgstr ""
+
+#: templates/gui/vm/details.html:178
+msgid ""
+"Changing disk size is dangerous! Are you sure you want to change the disk "
+"size?"
+msgstr ""
+
+#: templates/gui/vm/details.html:180
+msgid ""
+"Deleting the disk will result in data loss of this disk and its snapshots! "
+"Are you sure you want to delete this disk?"
+msgstr ""
+
+#: templates/gui/vm/details.html:180
+msgid "Delete Disk"
+msgstr ""
+
+#: templates/gui/vm/details.html:181 templates/gui/vm/details.html.py:504
+msgid "Add Disk"
+msgstr ""
+
+#: templates/gui/vm/details.html:191
+msgid "Migrate Server to another Node"
+msgstr ""
+
+#: templates/gui/vm/details.html:198
+msgid "Please choose target compute node:"
+msgstr ""
+
+#: templates/gui/vm/details.html:211
+msgid "Migrate server"
+msgstr ""
+
+#: templates/gui/vm/details.html:234
+msgid "Server is Not Installed"
+msgstr ""
+
+#: templates/gui/vm/details.html:237
+msgid ""
+"The server is marked as <strong>not installed</strong>. You have to start "
+"the server with an ISO image and install your favourite operating system. "
+"Please mark the server as installed <strong>after you have successfully "
+"installed the operating system</strong>."
+msgstr ""
+
+#: templates/gui/vm/details.html:239
+msgid "Is the server installed?"
+msgstr ""
+
+#: templates/gui/vm/details.html:239
+msgid ""
+"After marking the server as installed you <strong>won't be able to boot the "
+"server with an ISO image</strong>, only a rescue CD will be available. But "
+"you will be able to use the snapshot functionality afterwards."
+msgstr ""
+
+#: templates/gui/vm/details.html:239
+msgid "Not yet"
+msgstr ""
+
+#: templates/gui/vm/details.html:239
+msgid "Yes, server is installed"
+msgstr ""
+
+#: templates/gui/vm/details.html:239
+msgid "Server is installed"
+msgstr ""
+
+#: templates/gui/vm/details.html:254
+msgid "Server is Frozen"
+msgstr ""
+
+#: templates/gui/vm/details.html:257
+msgid ""
+"The server is marked as frozen, which means that it is stopped and cannot be "
+"started unless a valid subscription is recognized."
+msgstr ""
+
+#: templates/gui/vm/details.html:275
+msgid "Change server settings"
+msgstr ""
+
+#: templates/gui/vm/details.html:275 templates/gui/vm/details.html.py:415
+#: templates/gui/vm/details.html:473
+msgid ""
+"Server is locked or has slave servers, which means that server settings "
+"cannot be changed"
+msgstr ""
+
+#: templates/gui/vm/details.html:299
+msgid "Every compute node is identified by its unique color"
+msgstr ""
+
+#: templates/gui/vm/details.html:332
+msgid "Actual monthly SLA for this server"
+msgstr ""
+
+#: templates/gui/vm/details.html:356 templates/gui/vm/list_control.html:8
+msgid "Immediately start a stopped server"
+msgstr ""
+
+#: templates/gui/vm/details.html:357
+msgid ""
+"<i>Reboot</i> will send a reboot ACPI signal into the server, which "
+"initiates a reboot process. In case the reboot process takes longer than 3 "
+"minutes (e.g. there is no ACPI daemon) a Force Reboot will take place."
+msgstr ""
+
+#: templates/gui/vm/details.html:357
+msgid ""
+"<i>Force Reboot</i> will <strong>immediately reboot</strong> the server."
+msgstr ""
+
+#: templates/gui/vm/details.html:357 templates/gui/vm/list_control.html:9
+msgid "Reboot"
+msgstr ""
+
+#: templates/gui/vm/details.html:357 templates/gui/vm/list_control.html:9
+msgid "Force Reboot"
+msgstr ""
+
+#: templates/gui/vm/details.html:357
+msgid ""
+"You can choose to forcefully reboot the server or to send a reboot ACPI "
+"signal into the system"
+msgstr ""
+
+#: templates/gui/vm/details.html:358
+msgid ""
+"<i>Shutdown</i> will send a shutdown ACPI signal into the server, which "
+"initiates a shutdown process. In case the shutdown process takes longer than "
+"3 minutes (e.g. there is no ACPI daemon) a Force Shutdown will take place."
+msgstr ""
+
+#: templates/gui/vm/details.html:358
+msgid ""
+"<i>Force shutdown</i> will <strong>immediately power off</strong> the server."
+msgstr ""
+
+#: templates/gui/vm/details.html:358 templates/gui/vm/list_control.html:10
+msgid "Shutdown"
+msgstr ""
+
+#: templates/gui/vm/details.html:358 templates/gui/vm/list_control.html:10
+msgid "Force Shutdown"
+msgstr ""
+
+#: templates/gui/vm/details.html:358
+msgid ""
+"You can choose to forcefully shutdown the server or to send a shutdown ACPI "
+"signal into the system"
+msgstr ""
+
+#: templates/gui/vm/details.html:358 templates/gui/vm/list_control.html:10
+msgid "Stop"
+msgstr ""
+
+#: templates/gui/vm/details.html:360
+msgid "Boot server from ISO image"
+msgstr ""
+
+#: templates/gui/vm/details.html:360
+msgid "Boot CD"
+msgstr ""
+
+#: templates/gui/vm/details.html:362
+msgid ""
+"Boot the server from System Rescue CD. You will have to use the console and "
+"perform any rescue operation manually."
+msgstr ""
+
+#: templates/gui/vm/details.html:362
+msgid "Boot server from System Rescue CD"
+msgstr ""
+
+#: templates/gui/vm/details.html:362
+msgid "Rescue CD"
+msgstr ""
+
+#: templates/gui/vm/details.html:364
+msgid ""
+"Factory reset will <strong>completely delete the server and its snapshots</"
+"strong> and create it like it was on the first time. <strong>All your data "
+"will be lost!</strong>"
+msgstr ""
+
+#: templates/gui/vm/details.html:364
+#, python-format
+msgid "Recreate %(alias)s"
+msgstr ""
+
+#: templates/gui/vm/details.html:364 templates/gui/vm/details.html.py:373
+msgid "Are you sure that you want completely delete your server data?"
+msgstr ""
+
+#: templates/gui/vm/details.html:364
+msgid ""
+"Recreate the server. The server needs to be stopped in order to use this "
+"function. Use with caution!"
+msgstr ""
+
+#: templates/gui/vm/details.html:364
+msgid "Factory reset"
+msgstr ""
+
+#: templates/gui/vm/details.html:369 templates/gui/vm/list_control.html:16
+msgid ""
+"Update server configuration on compute node according to current server "
+"definition"
+msgstr ""
+
+#: templates/gui/vm/details.html:369
+msgid ""
+"The server definition has been modified and needs to be updated on compute "
+"node.<br><br><i>Update & Start</i> will first update the server "
+"configuration on compute node and then start the server."
+msgstr ""
+
+#: templates/gui/vm/details.html:369
+msgid "Update & Start"
+msgstr ""
+
+#: templates/gui/vm/details.html:369
+msgid ""
+"<i>Start (no update)</i> will just start the server without modifying the "
+"server configuration on compute node."
+msgstr ""
+
+#: templates/gui/vm/details.html:369
+msgid "Start (skip update)"
+msgstr ""
+
+#: templates/gui/vm/details.html:369
+msgid "Start and update Server"
+msgstr ""
+
+#: templates/gui/vm/details.html:370
+msgid ""
+"Revert server configuration to currently active server configuration on "
+"compute node"
+msgstr ""
+
+#: templates/gui/vm/details.html:370
+msgid "Undo"
+msgstr ""
+
+#: templates/gui/vm/details.html:371 templates/gui/vm/list_control.html:17
+msgid "Create server on compute node and start deploy process"
+msgstr ""
+
+#: templates/gui/vm/details.html:371 templates/gui/vm/list_control.html:17
+msgid "Deploy"
+msgstr ""
+
+#: templates/gui/vm/details.html:372
+msgid ""
+"Are you sure that you want to delete the server definition from the "
+"inventory?"
+msgstr ""
+
+#: templates/gui/vm/details.html:372
+msgid "Remove server definition from inventory"
+msgstr ""
+
+#: templates/gui/vm/details.html:373
+msgid ""
+"<i>Destroy</i> will <strong>completely delete the server and its snapshots</"
+"strong> from the compute node. <strong>All your data will be lost!</strong>"
+msgstr ""
+
+#: templates/gui/vm/details.html:373 templates/gui/vm/list_control.html:19
+msgid "Destroy"
+msgstr ""
+
+#: templates/gui/vm/details.html:373
+#, python-format
+msgid "Really destroy %(alias)s"
+msgstr ""
+
+#: templates/gui/vm/details.html:373 templates/gui/vm/list_control.html:19
+msgid "Delete server and its data from compute node. Use with caution!"
+msgstr ""
+
+#: templates/gui/vm/details.html:374 templates/gui/vm/list_control.html:20
+msgid ""
+"<i>Freeze</i> will send a shutdown signal into the server, which can "
+"initiate a shutdown process. In case the shutdown process takes longer than "
+"3 minutes a Force Shutdown will take place."
+msgstr ""
+
+#: templates/gui/vm/details.html:374 templates/gui/vm/list_control.html:20
+msgid ""
+"<i>Force Freeze</i> will <strong>immediately power off</strong> the server."
+"<br><br>After the shutdown process is completed the server status will be "
+"set to <strong>frozen</strong>."
+msgstr ""
+
+#: templates/gui/vm/details.html:374 templates/gui/vm/list_control.html:20
+msgid "Freeze"
+msgstr ""
+
+#: templates/gui/vm/details.html:374 templates/gui/vm/list_control.html:20
+msgid "Force Freeze"
+msgstr ""
+
+#: templates/gui/vm/details.html:374 templates/gui/vm/list_control.html:20
+msgid "Shutdown the server and set its status to frozen"
+msgstr ""
+
+#: templates/gui/vm/details.html:375 templates/gui/vm/list_control.html:21
+msgid "Remove frozen server status"
+msgstr ""
+
+#: templates/gui/vm/details.html:375 templates/gui/vm/list_control.html:21
+msgid "Unfreeze"
+msgstr ""
+
+#: templates/gui/vm/details.html:376
+msgid "Migrate server stopped to another compute node"
+msgstr ""
+
+#: templates/gui/vm/details.html:376
+msgid "Migrate"
+msgstr ""
+
+#: templates/gui/vm/details.html:397
+msgid "networks"
+msgstr ""
+
+#: templates/gui/vm/details.html:406
+msgid "IP"
+msgstr ""
+
+#: templates/gui/vm/details.html:415
+msgid "Change or Delete this NIC definition"
+msgstr ""
+
+#: templates/gui/vm/details.html:428
+msgid "Change reverse DNS record for this IP address"
+msgstr ""
+
+#: templates/gui/vm/details.html:439
+msgid "Add new NIC into Server definition"
+msgstr ""
+
+#: templates/gui/vm/details.html:448
+msgid "disks"
+msgstr ""
+
+#: templates/gui/vm/details.html:457
+msgid "FS"
+msgstr ""
+
+#: templates/gui/vm/details.html:463 vm/forms.py:348 vm/forms.py:727
+msgid "Compression"
+msgstr ""
+
+#: templates/gui/vm/details.html:465 vm/forms.py:343
+msgid "Bootable"
+msgstr ""
+
+#: templates/gui/vm/details.html:473
+msgid "Change or Delete this disk definition"
+msgstr ""
+
+#: templates/gui/vm/details.html:504
+msgid "Add new disk into Server definition"
+msgstr ""
+
+#: templates/gui/vm/import_modal.html:16
+msgid "Download sample file"
+msgstr ""
+
+#: templates/gui/vm/import_modal.html:17
+msgid "Add one server"
+msgstr ""
+
+#: templates/gui/vm/import_modal.html:19
+msgid "Import"
+msgstr ""
+
+#: templates/gui/vm/list.html:44
+msgid "Hidden servers"
+msgstr ""
+
+#: templates/gui/vm/list.html:47
+msgid ""
+"Some servers are not visible or accessible, because some compute nodes are "
+"not in <strong>online state</strong>. Servers are kept untouched. Full "
+"server control will be possible as soon as the compute nodes return to "
+"online state."
+msgstr ""
+
+#: templates/gui/vm/list.html:72
+msgid "enter server name or status"
+msgstr ""
+
+#: templates/gui/vm/list.html:155 templates/gui/vm/navigation.html:7
+msgid "Show server native console"
+msgstr ""
+
+#: templates/gui/vm/list.html:155 templates/gui/vm/navigation.html:7
+msgid "Console"
+msgstr ""
+
+#: templates/gui/vm/list.html:157 templates/gui/vm/navigation.html:16
+msgid "Show server monitoring details"
+msgstr ""
+
+#: templates/gui/vm/list.html:159 templates/gui/vm/navigation.html:18
+msgid "Show server related task log"
+msgstr ""
+
+#: templates/gui/vm/list.html:166
+msgid "You don't have any server yet"
+msgstr ""
+
+#: templates/gui/vm/list.html:166
+msgid "Please"
+msgstr ""
+
+#: templates/gui/vm/list.html:166
+msgid "create one"
+msgstr ""
+
+#: templates/gui/vm/list_control.html:4
+#, python-format
+msgid ""
+"Selected <span id=\"vms_selected\">0</span> of %(vms_len)s server\n"
+"  "
+msgid_plural ""
+"Selected <span id=\"vms_selected\">0</span> of %(vms_len)s servers"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/gui/vm/list_control.html:7 templates/gui/vm/list_control.html:25
+msgid "Create new server"
+msgstr ""
+
+#: templates/gui/vm/list_control.html:9
+msgid ""
+"Reboot will send a reboot signal into the server, which can initiate a "
+"reboot process."
+msgstr ""
+
+#: templates/gui/vm/list_control.html:9
+msgid "Force Reboot will <strong>immediately reboot</strong> the server."
+msgstr ""
+
+#: templates/gui/vm/list_control.html:9
+msgid ""
+"You can choose to forcefully reboot the server or to send a reboot signal "
+"into the system"
+msgstr ""
+
+#: templates/gui/vm/list_control.html:10
+msgid ""
+"Shutdown will send a shutdown signal into the server, which can initiate a "
+"shutdown process."
+msgstr ""
+
+#: templates/gui/vm/list_control.html:10
+msgid "Force shutdown will <strong>immediately power off</strong> the server."
+msgstr ""
+
+#: templates/gui/vm/list_control.html:10
+msgid ""
+"You can choose to forcefully shutdown the server or to send a shutdown "
+"signal into the system"
+msgstr ""
+
+#: templates/gui/vm/list_control.html:11
+msgid "Export selected servers into XLS file"
+msgstr ""
+
+#: templates/gui/vm/list_control.html:11
+msgid "Export"
+msgstr ""
+
+#: templates/gui/vm/list_control.html:18
+msgid "Remove server definition from database"
+msgstr ""
+
+#: templates/gui/vm/list_control.html:19
+msgid ""
+"<i>Destroy</i> will <strong>completly delete the server and its snapshots</"
+"strong> from the compute node. <strong>All your data will be lost!</strong>"
+msgstr ""
+
+#: templates/gui/vm/list_control.html:19
+msgid "Really destroy my server"
+msgstr ""
+
+#: templates/gui/vm/list_control.html:19
+msgid "Are you sure that you want completly delete your server data?"
+msgstr ""
+
+#: templates/gui/vm/monitoring_cpu.html:21
+msgid "CPU usage"
+msgstr ""
+
+#: templates/gui/vm/monitoring_cpu.html:28
+msgid "CPU wait time"
+msgstr ""
+
+#: templates/gui/vm/monitoring_cpu.html:35
+msgid "CPU load"
+msgstr ""
+
+#: templates/gui/vm/monitoring_disabled.html:12
+msgid "Server monitoring disabled"
+msgstr ""
+
+#: templates/gui/vm/monitoring_disabled.html:15
+msgid ""
+"Monitoring information for this server is not available, because the "
+"monitoring status is set to <i>Disabled</i>."
+msgstr ""
+
+#: templates/gui/vm/monitoring_disk.html:22
+#, python-format
+msgid "disk %(disk_id)s &rsaquo; throughput"
+msgstr ""
+
+#: templates/gui/vm/monitoring_disk.html:27
+#, python-format
+msgid "disk %(disk_id)s &rsaquo; I/O"
+msgstr ""
+
+#: templates/gui/vm/monitoring_graph.html:3
+msgid "Toggle horizontal size"
+msgstr ""
+
+#: templates/gui/vm/monitoring_graph.html:4
+msgid "Toggle vertical size"
+msgstr ""
+
+#: templates/gui/vm/monitoring_graph.html:19
+msgid "Monitoring data is not available."
+msgstr ""
+
+#: templates/gui/vm/monitoring_graph.html:27
+msgid "1h"
+msgstr ""
+
+#: templates/gui/vm/monitoring_graph.html:28
+msgid "4h"
+msgstr ""
+
+#: templates/gui/vm/monitoring_graph.html:29
+msgid "1d"
+msgstr ""
+
+#: templates/gui/vm/monitoring_graph.html:30
+msgid "1w"
+msgstr ""
+
+#: templates/gui/vm/monitoring_graph.html:31
+msgid "2w"
+msgstr ""
+
+#: templates/gui/vm/monitoring_graph.html:32
+msgid "1m"
+msgstr ""
+
+#: templates/gui/vm/monitoring_graph.html:33
+msgid "1y"
+msgstr ""
+
+#: templates/gui/vm/monitoring_js.html:16
+msgid "Average"
+msgstr ""
+
+#: templates/gui/vm/monitoring_js.html:17
+msgid "Maximum"
+msgstr ""
+
+#: templates/gui/vm/monitoring_js.html:18
+msgid "Minimum"
+msgstr ""
+
+#: templates/gui/vm/monitoring_js.html:21
+msgid "Value"
+msgstr ""
+
+#: templates/gui/vm/monitoring_memory.html:21
+msgid "Memory usage"
+msgstr ""
+
+#: templates/gui/vm/monitoring_memory.html:28
+msgid "Swap usage"
+msgstr ""
+
+#: templates/gui/vm/monitoring_navigation.html:5
+msgid "CPU"
+msgstr ""
+
+#: templates/gui/vm/monitoring_navigation.html:6
+msgid "Memory"
+msgstr ""
+
+#: templates/gui/vm/monitoring_navigation.html:8
+msgid "Disks"
+msgstr ""
+
+#: templates/gui/vm/monitoring_navigation.html:9
+msgid "VM Disk Summary"
+msgstr ""
+
+#: templates/gui/vm/monitoring_network.html:23
+#, python-format
+msgid "nic %(nic_id)s &rsaquo; bandwidth"
+msgstr ""
+
+#: templates/gui/vm/monitoring_network.html:28
+#, python-format
+msgid "nic %(nic_id)s &rsaquo; packets"
+msgstr ""
+
+#: templates/gui/vm/monitoring_vm-disk.html:21
+msgid "VM disk logical throughput"
+msgstr ""
+
+#: templates/gui/vm/monitoring_vm-disk.html:28
+msgid "VM disk logical I/O"
+msgstr ""
+
+#: templates/gui/vm/monitoring_vm-disk.html:35
+msgid "VM disk physical throughput"
+msgstr ""
+
+#: templates/gui/vm/monitoring_vm-disk.html:42
+msgid "VM disk physical I/O"
+msgstr ""
+
+#: templates/gui/vm/monitoring_vm-disk.html:49
+msgid "VM disk I/O operations by latency"
+msgstr ""
+
+#: templates/gui/vm/navigation.html:5
+msgid "Show server details"
+msgstr ""
+
+#: templates/gui/vm/navigation.html:10
+msgid "Show server snapshots"
+msgstr ""
+
+#: templates/gui/vm/navigation.html:13
+msgid "Show server backups"
+msgstr ""
+
+#: templates/gui/vm/settings_form.html:16
+#, python-format
+msgid "DNS A record pointing to %(ipaddr)s will also be updated."
+msgstr ""
+
+#: templates/gui/vm/snapshot.html:27
+msgid "Create Snapshot"
+msgstr ""
+
+#: templates/gui/vm/snapshot.html:31 templates/gui/vm/snapshot.html.py:54
+msgid "Snapshot functionality is available for installed server only."
+msgstr ""
+
+#: templates/gui/vm/snapshot.html:33
+msgid "Please enter the name and select the disk ID of the new snapshot."
+msgstr ""
+
+#: templates/gui/vm/snapshot.html:42 templates/gui/vm/snapshot_list.html:67
+msgid "Create snapshot"
+msgstr ""
+
+#: templates/gui/vm/snapshot.html:50
+msgid "Update Snapshot"
+msgstr ""
+
+#: templates/gui/vm/snapshot.html:56
+msgid "Update snapshot information (note only)."
+msgstr ""
+
+#: templates/gui/vm/snapshot.html:66
+msgid "Update snapshot"
+msgstr ""
+
+#: templates/gui/vm/snapshot.html:74
+msgid "Delete or Rollback Snapshot"
+msgstr ""
+
+#: templates/gui/vm/snapshot.html:80
+msgid ""
+"Snapshot: <strong>__name__</strong><br>Disk ID: <strong>__disk_id__</strong>"
+msgstr ""
+
+#: templates/gui/vm/snapshot.html:83 templates/gui/vm/snapshot.html.py:114
+msgid "Deleting a snapshot will only remove the data of the snapshot."
+msgstr ""
+
+#: templates/gui/vm/snapshot.html:84
+msgid ""
+"A snapshot rollback will restore your data from the snapshot. <strong>All "
+"your data created after the snapshot will be lost!</strong>"
+msgstr ""
+
+#: templates/gui/vm/snapshot.html:85
+msgid ""
+"Do you wan't to <strong>delete every newer snapshot</strong> and restore "
+"data from this snapshot?"
+msgstr ""
+
+#: templates/gui/vm/snapshot.html:88
+msgid "Server has to be stopped and not locked in order to perform a rollback."
+msgstr ""
+
+#: templates/gui/vm/snapshot.html:93
+msgid "Create Image"
+msgstr ""
+
+#: templates/gui/vm/snapshot.html:96
+msgid "Delete snapshot"
+msgstr ""
+
+#: templates/gui/vm/snapshot.html:97
+msgid "Rollback snapshot"
+msgstr ""
+
+#: templates/gui/vm/snapshot.html:105
+msgid "Delete Snapshots"
+msgstr ""
+
+#: templates/gui/vm/snapshot.html:111
+msgid ""
+"Snapshots: <strong>__name__</strong><br>Disk ID: <strong>__disk_id__</strong>"
+msgstr ""
+
+#: templates/gui/vm/snapshot.html:120
+msgid "Delete snapshots"
+msgstr ""
+
+#: templates/gui/vm/snapshot.html:129
+msgid "Create Snapshot Definition"
+msgstr ""
+
+#: templates/gui/vm/snapshot.html:149
+msgid "Update or delete Snapshot Definition"
+msgstr ""
+
+#: templates/gui/vm/snapshot.html:173
+msgid "Create Disk Image from Server Snapshot"
+msgstr ""
+
+#: templates/gui/vm/snapshot.html:186
+msgid "Create disk Image"
+msgstr ""
+
+#: templates/gui/vm/snapshot.html:199
+msgid "snapshot definitions"
+msgstr ""
+
+#: templates/gui/vm/snapshot.html:213
+msgid "snapshots"
+msgstr ""
+
+#: templates/gui/vm/snapshot_define_list.html:22
+msgid "Update or delete snapshot definition"
+msgstr ""
+
+#: templates/gui/vm/snapshot_define_list.html:43
+msgid "Create new snapshot definition"
+msgstr ""
+
+#: templates/gui/vm/snapshot_list.html:36
+msgid "Delete or rollback this snapshot"
+msgstr ""
+
+#: templates/gui/vm/snapshot_list.html:44
+msgid "Update snapshot information"
+msgstr ""
+
+#: templates/gui/vm/snapshot_list.html:53
+#, python-format
+msgid ""
+"Selected <span id=\"selected\">0</span> of <span id=\"total\">%(len)s</span> "
+"snapshot"
+msgid_plural ""
+"Selected <span id=\"selected\">0</span> of <span id=\"total\">%(len)s</span> "
+"snapshots"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/gui/vm/snapshot_list.html:56
+msgid "Manual"
+msgstr ""
+
+#: templates/gui/vm/snapshot_list.html:57
+msgid "Automatic"
+msgstr ""
+
+#: templates/gui/vm/snapshot_list.html:67
+msgid ""
+"Create snapshot of your disk. You will have to choose a name for the snapshot"
+msgstr ""
+
+#: templates/gui/vm/snapshot_list.html:68
+msgid "Delete selected snapshots"
+msgstr ""
+
+#: templates/gui/vm/vnc.html:28
+msgid "Send key strokes and mouse events into the server"
+msgstr ""
+
+#: templates/gui/vm/vnc.html:31
+msgid "Zoom in/out"
+msgstr ""
+
+#: templates/gui/vm/vnc.html:34
+msgid "Show or hide on-screen keyboard"
+msgstr ""
+
+#: templates/gui/vm/vnc.html:37
+msgid "Change menu position"
+msgstr ""
+
+#: templates/gui/vm/vnc.html:63
+msgid "Please wait..."
+msgstr ""
+
+#: templates/gui/vm/vnc.html:74
+msgid "Remote console is not available."
+msgstr ""
+
+#: templates/impersonation.html:5
+msgid "Changed identity from user"
+msgstr ""
+
+#: templates/impersonation.html:7
+msgid "Logged in GUI as"
+msgstr ""
+
+#: templates/impersonation.html:9
+msgid "Cancel impersonation"
+msgstr ""
+
+#: timezones.py:3
+msgid "Africa/Abidjan"
+msgstr ""
+
+#: timezones.py:4
+msgid "Africa/Accra"
+msgstr ""
+
+#: timezones.py:5
+msgid "Africa/Addis_Ababa"
+msgstr ""
+
+#: timezones.py:6
+msgid "Africa/Algiers"
+msgstr ""
+
+#: timezones.py:7
+msgid "Africa/Asmara"
+msgstr ""
+
+#: timezones.py:8
+msgid "Africa/Bamako"
+msgstr ""
+
+#: timezones.py:9
+msgid "Africa/Bangui"
+msgstr ""
+
+#: timezones.py:10
+msgid "Africa/Banjul"
+msgstr ""
+
+#: timezones.py:11
+msgid "Africa/Bissau"
+msgstr ""
+
+#: timezones.py:12
+msgid "Africa/Blantyre"
+msgstr ""
+
+#: timezones.py:13
+msgid "Africa/Brazzaville"
+msgstr ""
+
+#: timezones.py:14
+msgid "Africa/Bujumbura"
+msgstr ""
+
+#: timezones.py:15
+msgid "Africa/Cairo"
+msgstr ""
+
+#: timezones.py:16
+msgid "Africa/Casablanca"
+msgstr ""
+
+#: timezones.py:17
+msgid "Africa/Ceuta"
+msgstr ""
+
+#: timezones.py:18
+msgid "Africa/Conakry"
+msgstr ""
+
+#: timezones.py:19
+msgid "Africa/Dakar"
+msgstr ""
+
+#: timezones.py:20
+msgid "Africa/Dar_es_Salaam"
+msgstr ""
+
+#: timezones.py:21
+msgid "Africa/Djibouti"
+msgstr ""
+
+#: timezones.py:22
+msgid "Africa/Douala"
+msgstr ""
+
+#: timezones.py:23
+msgid "Africa/El_Aaiun"
+msgstr ""
+
+#: timezones.py:24
+msgid "Africa/Freetown"
+msgstr ""
+
+#: timezones.py:25
+msgid "Africa/Gaborone"
+msgstr ""
+
+#: timezones.py:26
+msgid "Africa/Harare"
+msgstr ""
+
+#: timezones.py:27
+msgid "Africa/Johannesburg"
+msgstr ""
+
+#: timezones.py:28
+msgid "Africa/Juba"
+msgstr ""
+
+#: timezones.py:29
+msgid "Africa/Kampala"
+msgstr ""
+
+#: timezones.py:30
+msgid "Africa/Khartoum"
+msgstr ""
+
+#: timezones.py:31
+msgid "Africa/Kigali"
+msgstr ""
+
+#: timezones.py:32
+msgid "Africa/Kinshasa"
+msgstr ""
+
+#: timezones.py:33
+msgid "Africa/Lagos"
+msgstr ""
+
+#: timezones.py:34
+msgid "Africa/Libreville"
+msgstr ""
+
+#: timezones.py:35
+msgid "Africa/Lome"
+msgstr ""
+
+#: timezones.py:36
+msgid "Africa/Luanda"
+msgstr ""
+
+#: timezones.py:37
+msgid "Africa/Lubumbashi"
+msgstr ""
+
+#: timezones.py:38
+msgid "Africa/Lusaka"
+msgstr ""
+
+#: timezones.py:39
+msgid "Africa/Malabo"
+msgstr ""
+
+#: timezones.py:40
+msgid "Africa/Maputo"
+msgstr ""
+
+#: timezones.py:41
+msgid "Africa/Maseru"
+msgstr ""
+
+#: timezones.py:42
+msgid "Africa/Mbabane"
+msgstr ""
+
+#: timezones.py:43
+msgid "Africa/Mogadishu"
+msgstr ""
+
+#: timezones.py:44
+msgid "Africa/Monrovia"
+msgstr ""
+
+#: timezones.py:45
+msgid "Africa/Nairobi"
+msgstr ""
+
+#: timezones.py:46
+msgid "Africa/Ndjamena"
+msgstr ""
+
+#: timezones.py:47
+msgid "Africa/Niamey"
+msgstr ""
+
+#: timezones.py:48
+msgid "Africa/Nouakchott"
+msgstr ""
+
+#: timezones.py:49
+msgid "Africa/Ouagadougou"
+msgstr ""
+
+#: timezones.py:50
+msgid "Africa/Porto-Novo"
+msgstr ""
+
+#: timezones.py:51
+msgid "Africa/Sao_Tome"
+msgstr ""
+
+#: timezones.py:52
+msgid "Africa/Tripoli"
+msgstr ""
+
+#: timezones.py:53
+msgid "Africa/Tunis"
+msgstr ""
+
+#: timezones.py:54
+msgid "Africa/Windhoek"
+msgstr ""
+
+#: timezones.py:55
+msgid "America/Adak"
+msgstr ""
+
+#: timezones.py:56
+msgid "America/Anchorage"
+msgstr ""
+
+#: timezones.py:57
+msgid "America/Anguilla"
+msgstr ""
+
+#: timezones.py:58
+msgid "America/Antigua"
+msgstr ""
+
+#: timezones.py:59
+msgid "America/Araguaina"
+msgstr ""
+
+#: timezones.py:60
+msgid "America/Argentina/Buenos_Aires"
+msgstr ""
+
+#: timezones.py:61
+msgid "America/Argentina/Catamarca"
+msgstr ""
+
+#: timezones.py:62
+msgid "America/Argentina/Cordoba"
+msgstr ""
+
+#: timezones.py:63
+msgid "America/Argentina/Jujuy"
+msgstr ""
+
+#: timezones.py:64
+msgid "America/Argentina/La_Rioja"
+msgstr ""
+
+#: timezones.py:65
+msgid "America/Argentina/Mendoza"
+msgstr ""
+
+#: timezones.py:66
+msgid "America/Argentina/Rio_Gallegos"
+msgstr ""
+
+#: timezones.py:67
+msgid "America/Argentina/Salta"
+msgstr ""
+
+#: timezones.py:68
+msgid "America/Argentina/San_Juan"
+msgstr ""
+
+#: timezones.py:69
+msgid "America/Argentina/San_Luis"
+msgstr ""
+
+#: timezones.py:70
+msgid "America/Argentina/Tucuman"
+msgstr ""
+
+#: timezones.py:71
+msgid "America/Argentina/Ushuaia"
+msgstr ""
+
+#: timezones.py:72
+msgid "America/Aruba"
+msgstr ""
+
+#: timezones.py:73
+msgid "America/Asuncion"
+msgstr ""
+
+#: timezones.py:74
+msgid "America/Atikokan"
+msgstr ""
+
+#: timezones.py:75
+msgid "America/Bahia"
+msgstr ""
+
+#: timezones.py:76
+msgid "America/Bahia_Banderas"
+msgstr ""
+
+#: timezones.py:77
+msgid "America/Barbados"
+msgstr ""
+
+#: timezones.py:78
+msgid "America/Belem"
+msgstr ""
+
+#: timezones.py:79
+msgid "America/Belize"
+msgstr ""
+
+#: timezones.py:80
+msgid "America/Blanc-Sablon"
+msgstr ""
+
+#: timezones.py:81
+msgid "America/Boa_Vista"
+msgstr ""
+
+#: timezones.py:82
+msgid "America/Bogota"
+msgstr ""
+
+#: timezones.py:83
+msgid "America/Boise"
+msgstr ""
+
+#: timezones.py:84
+msgid "America/Cambridge_Bay"
+msgstr ""
+
+#: timezones.py:85
+msgid "America/Campo_Grande"
+msgstr ""
+
+#: timezones.py:86
+msgid "America/Cancun"
+msgstr ""
+
+#: timezones.py:87
+msgid "America/Caracas"
+msgstr ""
+
+#: timezones.py:88
+msgid "America/Cayenne"
+msgstr ""
+
+#: timezones.py:89
+msgid "America/Cayman"
+msgstr ""
+
+#: timezones.py:90
+msgid "America/Chicago"
+msgstr ""
+
+#: timezones.py:91
+msgid "America/Chihuahua"
+msgstr ""
+
+#: timezones.py:92
+msgid "America/Costa_Rica"
+msgstr ""
+
+#: timezones.py:93
+msgid "America/Creston"
+msgstr ""
+
+#: timezones.py:94
+msgid "America/Cuiaba"
+msgstr ""
+
+#: timezones.py:95
+msgid "America/Curacao"
+msgstr ""
+
+#: timezones.py:96
+msgid "America/Danmarkshavn"
+msgstr ""
+
+#: timezones.py:97
+msgid "America/Dawson"
+msgstr ""
+
+#: timezones.py:98
+msgid "America/Dawson_Creek"
+msgstr ""
+
+#: timezones.py:99
+msgid "America/Denver"
+msgstr ""
+
+#: timezones.py:100
+msgid "America/Detroit"
+msgstr ""
+
+#: timezones.py:101
+msgid "America/Dominica"
+msgstr ""
+
+#: timezones.py:102
+msgid "America/Edmonton"
+msgstr ""
+
+#: timezones.py:103
+msgid "America/Eirunepe"
+msgstr ""
+
+#: timezones.py:104
+msgid "America/El_Salvador"
+msgstr ""
+
+#: timezones.py:105
+msgid "America/Fortaleza"
+msgstr ""
+
+#: timezones.py:106
+msgid "America/Glace_Bay"
+msgstr ""
+
+#: timezones.py:107
+msgid "America/Godthab"
+msgstr ""
+
+#: timezones.py:108
+msgid "America/Goose_Bay"
+msgstr ""
+
+#: timezones.py:109
+msgid "America/Grand_Turk"
+msgstr ""
+
+#: timezones.py:110
+msgid "America/Grenada"
+msgstr ""
+
+#: timezones.py:111
+msgid "America/Guadeloupe"
+msgstr ""
+
+#: timezones.py:112
+msgid "America/Guatemala"
+msgstr ""
+
+#: timezones.py:113
+msgid "America/Guayaquil"
+msgstr ""
+
+#: timezones.py:114
+msgid "America/Guyana"
+msgstr ""
+
+#: timezones.py:115
+msgid "America/Halifax"
+msgstr ""
+
+#: timezones.py:116
+msgid "America/Havana"
+msgstr ""
+
+#: timezones.py:117
+msgid "America/Hermosillo"
+msgstr ""
+
+#: timezones.py:118
+msgid "America/Indiana/Indianapolis"
+msgstr ""
+
+#: timezones.py:119
+msgid "America/Indiana/Knox"
+msgstr ""
+
+#: timezones.py:120
+msgid "America/Indiana/Marengo"
+msgstr ""
+
+#: timezones.py:121
+msgid "America/Indiana/Petersburg"
+msgstr ""
+
+#: timezones.py:122
+msgid "America/Indiana/Tell_City"
+msgstr ""
+
+#: timezones.py:123
+msgid "America/Indiana/Vevay"
+msgstr ""
+
+#: timezones.py:124
+msgid "America/Indiana/Vincennes"
+msgstr ""
+
+#: timezones.py:125
+msgid "America/Indiana/Winamac"
+msgstr ""
+
+#: timezones.py:126
+msgid "America/Inuvik"
+msgstr ""
+
+#: timezones.py:127
+msgid "America/Iqaluit"
+msgstr ""
+
+#: timezones.py:128
+msgid "America/Jamaica"
+msgstr ""
+
+#: timezones.py:129
+msgid "America/Juneau"
+msgstr ""
+
+#: timezones.py:130
+msgid "America/Kentucky/Louisville"
+msgstr ""
+
+#: timezones.py:131
+msgid "America/Kentucky/Monticello"
+msgstr ""
+
+#: timezones.py:132
+msgid "America/Kralendijk"
+msgstr ""
+
+#: timezones.py:133
+msgid "America/La_Paz"
+msgstr ""
+
+#: timezones.py:134
+msgid "America/Lima"
+msgstr ""
+
+#: timezones.py:135
+msgid "America/Los_Angeles"
+msgstr ""
+
+#: timezones.py:136
+msgid "America/Lower_Princes"
+msgstr ""
+
+#: timezones.py:137
+msgid "America/Maceio"
+msgstr ""
+
+#: timezones.py:138
+msgid "America/Managua"
+msgstr ""
+
+#: timezones.py:139
+msgid "America/Manaus"
+msgstr ""
+
+#: timezones.py:140
+msgid "America/Marigot"
+msgstr ""
+
+#: timezones.py:141
+msgid "America/Martinique"
+msgstr ""
+
+#: timezones.py:142
+msgid "America/Matamoros"
+msgstr ""
+
+#: timezones.py:143
+msgid "America/Mazatlan"
+msgstr ""
+
+#: timezones.py:144
+msgid "America/Menominee"
+msgstr ""
+
+#: timezones.py:145
+msgid "America/Merida"
+msgstr ""
+
+#: timezones.py:146
+msgid "America/Metlakatla"
+msgstr ""
+
+#: timezones.py:147
+msgid "America/Mexico_City"
+msgstr ""
+
+#: timezones.py:148
+msgid "America/Miquelon"
+msgstr ""
+
+#: timezones.py:149
+msgid "America/Moncton"
+msgstr ""
+
+#: timezones.py:150
+msgid "America/Monterrey"
+msgstr ""
+
+#: timezones.py:151
+msgid "America/Montevideo"
+msgstr ""
+
+#: timezones.py:152
+msgid "America/Montreal"
+msgstr ""
+
+#: timezones.py:153
+msgid "America/Montserrat"
+msgstr ""
+
+#: timezones.py:154
+msgid "America/Nassau"
+msgstr ""
+
+#: timezones.py:155
+msgid "America/New_York"
+msgstr ""
+
+#: timezones.py:156
+msgid "America/Nipigon"
+msgstr ""
+
+#: timezones.py:157
+msgid "America/Nome"
+msgstr ""
+
+#: timezones.py:158
+msgid "America/Noronha"
+msgstr ""
+
+#: timezones.py:159
+msgid "America/North_Dakota/Beulah"
+msgstr ""
+
+#: timezones.py:160
+msgid "America/North_Dakota/Center"
+msgstr ""
+
+#: timezones.py:161
+msgid "America/North_Dakota/New_Salem"
+msgstr ""
+
+#: timezones.py:162
+msgid "America/Ojinaga"
+msgstr ""
+
+#: timezones.py:163
+msgid "America/Panama"
+msgstr ""
+
+#: timezones.py:164
+msgid "America/Pangnirtung"
+msgstr ""
+
+#: timezones.py:165
+msgid "America/Paramaribo"
+msgstr ""
+
+#: timezones.py:166
+msgid "America/Phoenix"
+msgstr ""
+
+#: timezones.py:167
+msgid "America/Port-au-Prince"
+msgstr ""
+
+#: timezones.py:168
+msgid "America/Port_of_Spain"
+msgstr ""
+
+#: timezones.py:169
+msgid "America/Porto_Velho"
+msgstr ""
+
+#: timezones.py:170
+msgid "America/Puerto_Rico"
+msgstr ""
+
+#: timezones.py:171
+msgid "America/Rainy_River"
+msgstr ""
+
+#: timezones.py:172
+msgid "America/Rankin_Inlet"
+msgstr ""
+
+#: timezones.py:173
+msgid "America/Recife"
+msgstr ""
+
+#: timezones.py:174
+msgid "America/Regina"
+msgstr ""
+
+#: timezones.py:175
+msgid "America/Resolute"
+msgstr ""
+
+#: timezones.py:176
+msgid "America/Rio_Branco"
+msgstr ""
+
+#: timezones.py:177
+msgid "America/Santa_Isabel"
+msgstr ""
+
+#: timezones.py:178
+msgid "America/Santarem"
+msgstr ""
+
+#: timezones.py:179
+msgid "America/Santiago"
+msgstr ""
+
+#: timezones.py:180
+msgid "America/Santo_Domingo"
+msgstr ""
+
+#: timezones.py:181
+msgid "America/Sao_Paulo"
+msgstr ""
+
+#: timezones.py:182
+msgid "America/Scoresbysund"
+msgstr ""
+
+#: timezones.py:183
+msgid "America/Shiprock"
+msgstr ""
+
+#: timezones.py:184
+msgid "America/Sitka"
+msgstr ""
+
+#: timezones.py:185
+msgid "America/St_Barthelemy"
+msgstr ""
+
+#: timezones.py:186
+msgid "America/St_Johns"
+msgstr ""
+
+#: timezones.py:187
+msgid "America/St_Kitts"
+msgstr ""
+
+#: timezones.py:188
+msgid "America/St_Lucia"
+msgstr ""
+
+#: timezones.py:189
+msgid "America/St_Thomas"
+msgstr ""
+
+#: timezones.py:190
+msgid "America/St_Vincent"
+msgstr ""
+
+#: timezones.py:191
+msgid "America/Swift_Current"
+msgstr ""
+
+#: timezones.py:192
+msgid "America/Tegucigalpa"
+msgstr ""
+
+#: timezones.py:193
+msgid "America/Thule"
+msgstr ""
+
+#: timezones.py:194
+msgid "America/Thunder_Bay"
+msgstr ""
+
+#: timezones.py:195
+msgid "America/Tijuana"
+msgstr ""
+
+#: timezones.py:196
+msgid "America/Toronto"
+msgstr ""
+
+#: timezones.py:197
+msgid "America/Tortola"
+msgstr ""
+
+#: timezones.py:198
+msgid "America/Vancouver"
+msgstr ""
+
+#: timezones.py:199
+msgid "America/Whitehorse"
+msgstr ""
+
+#: timezones.py:200
+msgid "America/Winnipeg"
+msgstr ""
+
+#: timezones.py:201
+msgid "America/Yakutat"
+msgstr ""
+
+#: timezones.py:202
+msgid "America/Yellowknife"
+msgstr ""
+
+#: timezones.py:203
+msgid "Antarctica/Casey"
+msgstr ""
+
+#: timezones.py:204
+msgid "Antarctica/Davis"
+msgstr ""
+
+#: timezones.py:205
+msgid "Antarctica/DumontDUrville"
+msgstr ""
+
+#: timezones.py:206
+msgid "Antarctica/Macquarie"
+msgstr ""
+
+#: timezones.py:207
+msgid "Antarctica/Mawson"
+msgstr ""
+
+#: timezones.py:208
+msgid "Antarctica/McMurdo"
+msgstr ""
+
+#: timezones.py:209
+msgid "Antarctica/Palmer"
+msgstr ""
+
+#: timezones.py:210
+msgid "Antarctica/Rothera"
+msgstr ""
+
+#: timezones.py:211
+msgid "Antarctica/South_Pole"
+msgstr ""
+
+#: timezones.py:212
+msgid "Antarctica/Syowa"
+msgstr ""
+
+#: timezones.py:213
+msgid "Antarctica/Vostok"
+msgstr ""
+
+#: timezones.py:214
+msgid "Arctic/Longyearbyen"
+msgstr ""
+
+#: timezones.py:215
+msgid "Asia/Aden"
+msgstr ""
+
+#: timezones.py:216
+msgid "Asia/Almaty"
+msgstr ""
+
+#: timezones.py:217
+msgid "Asia/Amman"
+msgstr ""
+
+#: timezones.py:218
+msgid "Asia/Anadyr"
+msgstr ""
+
+#: timezones.py:219
+msgid "Asia/Aqtau"
+msgstr ""
+
+#: timezones.py:220
+msgid "Asia/Aqtobe"
+msgstr ""
+
+#: timezones.py:221
+msgid "Asia/Ashgabat"
+msgstr ""
+
+#: timezones.py:222
+msgid "Asia/Baghdad"
+msgstr ""
+
+#: timezones.py:223
+msgid "Asia/Bahrain"
+msgstr ""
+
+#: timezones.py:224
+msgid "Asia/Baku"
+msgstr ""
+
+#: timezones.py:225
+msgid "Asia/Bangkok"
+msgstr ""
+
+#: timezones.py:226
+msgid "Asia/Beirut"
+msgstr ""
+
+#: timezones.py:227
+msgid "Asia/Bishkek"
+msgstr ""
+
+#: timezones.py:228
+msgid "Asia/Brunei"
+msgstr ""
+
+#: timezones.py:229
+msgid "Asia/Choibalsan"
+msgstr ""
+
+#: timezones.py:230
+msgid "Asia/Chongqing"
+msgstr ""
+
+#: timezones.py:231
+msgid "Asia/Colombo"
+msgstr ""
+
+#: timezones.py:232
+msgid "Asia/Damascus"
+msgstr ""
+
+#: timezones.py:233
+msgid "Asia/Dhaka"
+msgstr ""
+
+#: timezones.py:234
+msgid "Asia/Dili"
+msgstr ""
+
+#: timezones.py:235
+msgid "Asia/Dubai"
+msgstr ""
+
+#: timezones.py:236
+msgid "Asia/Dushanbe"
+msgstr ""
+
+#: timezones.py:237
+msgid "Asia/Gaza"
+msgstr ""
+
+#: timezones.py:238
+msgid "Asia/Harbin"
+msgstr ""
+
+#: timezones.py:239
+msgid "Asia/Hebron"
+msgstr ""
+
+#: timezones.py:240
+msgid "Asia/Ho_Chi_Minh"
+msgstr ""
+
+#: timezones.py:241
+msgid "Asia/Hong_Kong"
+msgstr ""
+
+#: timezones.py:242
+msgid "Asia/Hovd"
+msgstr ""
+
+#: timezones.py:243
+msgid "Asia/Irkutsk"
+msgstr ""
+
+#: timezones.py:244
+msgid "Asia/Jakarta"
+msgstr ""
+
+#: timezones.py:245
+msgid "Asia/Jayapura"
+msgstr ""
+
+#: timezones.py:246
+msgid "Asia/Jerusalem"
+msgstr ""
+
+#: timezones.py:247
+msgid "Asia/Kabul"
+msgstr ""
+
+#: timezones.py:248
+msgid "Asia/Kamchatka"
+msgstr ""
+
+#: timezones.py:249
+msgid "Asia/Karachi"
+msgstr ""
+
+#: timezones.py:250
+msgid "Asia/Kashgar"
+msgstr ""
+
+#: timezones.py:251
+msgid "Asia/Kathmandu"
+msgstr ""
+
+#: timezones.py:252
+msgid "Asia/Khandyga"
+msgstr ""
+
+#: timezones.py:253
+msgid "Asia/Kolkata"
+msgstr ""
+
+#: timezones.py:254
+msgid "Asia/Krasnoyarsk"
+msgstr ""
+
+#: timezones.py:255
+msgid "Asia/Kuala_Lumpur"
+msgstr ""
+
+#: timezones.py:256
+msgid "Asia/Kuching"
+msgstr ""
+
+#: timezones.py:257
+msgid "Asia/Kuwait"
+msgstr ""
+
+#: timezones.py:258
+msgid "Asia/Macau"
+msgstr ""
+
+#: timezones.py:259
+msgid "Asia/Magadan"
+msgstr ""
+
+#: timezones.py:260
+msgid "Asia/Makassar"
+msgstr ""
+
+#: timezones.py:261
+msgid "Asia/Manila"
+msgstr ""
+
+#: timezones.py:262
+msgid "Asia/Muscat"
+msgstr ""
+
+#: timezones.py:263
+msgid "Asia/Nicosia"
+msgstr ""
+
+#: timezones.py:264
+msgid "Asia/Novokuznetsk"
+msgstr ""
+
+#: timezones.py:265
+msgid "Asia/Novosibirsk"
+msgstr ""
+
+#: timezones.py:266
+msgid "Asia/Omsk"
+msgstr ""
+
+#: timezones.py:267
+msgid "Asia/Oral"
+msgstr ""
+
+#: timezones.py:268
+msgid "Asia/Phnom_Penh"
+msgstr ""
+
+#: timezones.py:269
+msgid "Asia/Pontianak"
+msgstr ""
+
+#: timezones.py:270
+msgid "Asia/Pyongyang"
+msgstr ""
+
+#: timezones.py:271
+msgid "Asia/Qatar"
+msgstr ""
+
+#: timezones.py:272
+msgid "Asia/Qyzylorda"
+msgstr ""
+
+#: timezones.py:273
+msgid "Asia/Rangoon"
+msgstr ""
+
+#: timezones.py:274
+msgid "Asia/Riyadh"
+msgstr ""
+
+#: timezones.py:275
+msgid "Asia/Sakhalin"
+msgstr ""
+
+#: timezones.py:276
+msgid "Asia/Samarkand"
+msgstr ""
+
+#: timezones.py:277
+msgid "Asia/Seoul"
+msgstr ""
+
+#: timezones.py:278
+msgid "Asia/Shanghai"
+msgstr ""
+
+#: timezones.py:279
+msgid "Asia/Singapore"
+msgstr ""
+
+#: timezones.py:280
+msgid "Asia/Taipei"
+msgstr ""
+
+#: timezones.py:281
+msgid "Asia/Tashkent"
+msgstr ""
+
+#: timezones.py:282
+msgid "Asia/Tbilisi"
+msgstr ""
+
+#: timezones.py:283
+msgid "Asia/Tehran"
+msgstr ""
+
+#: timezones.py:284
+msgid "Asia/Thimphu"
+msgstr ""
+
+#: timezones.py:285
+msgid "Asia/Tokyo"
+msgstr ""
+
+#: timezones.py:286
+msgid "Asia/Ulaanbaatar"
+msgstr ""
+
+#: timezones.py:287
+msgid "Asia/Urumqi"
+msgstr ""
+
+#: timezones.py:288
+msgid "Asia/Ust-Nera"
+msgstr ""
+
+#: timezones.py:289
+msgid "Asia/Vientiane"
+msgstr ""
+
+#: timezones.py:290
+msgid "Asia/Vladivostok"
+msgstr ""
+
+#: timezones.py:291
+msgid "Asia/Yakutsk"
+msgstr ""
+
+#: timezones.py:292
+msgid "Asia/Yekaterinburg"
+msgstr ""
+
+#: timezones.py:293
+msgid "Asia/Yerevan"
+msgstr ""
+
+#: timezones.py:294
+msgid "Atlantic/Azores"
+msgstr ""
+
+#: timezones.py:295
+msgid "Atlantic/Bermuda"
+msgstr ""
+
+#: timezones.py:296
+msgid "Atlantic/Canary"
+msgstr ""
+
+#: timezones.py:297
+msgid "Atlantic/Cape_Verde"
+msgstr ""
+
+#: timezones.py:298
+msgid "Atlantic/Faroe"
+msgstr ""
+
+#: timezones.py:299
+msgid "Atlantic/Madeira"
+msgstr ""
+
+#: timezones.py:300
+msgid "Atlantic/Reykjavik"
+msgstr ""
+
+#: timezones.py:301
+msgid "Atlantic/South_Georgia"
+msgstr ""
+
+#: timezones.py:302
+msgid "Atlantic/St_Helena"
+msgstr ""
+
+#: timezones.py:303
+msgid "Atlantic/Stanley"
+msgstr ""
+
+#: timezones.py:304
+msgid "Australia/Adelaide"
+msgstr ""
+
+#: timezones.py:305
+msgid "Australia/Brisbane"
+msgstr ""
+
+#: timezones.py:306
+msgid "Australia/Broken_Hill"
+msgstr ""
+
+#: timezones.py:307
+msgid "Australia/Currie"
+msgstr ""
+
+#: timezones.py:308
+msgid "Australia/Darwin"
+msgstr ""
+
+#: timezones.py:309
+msgid "Australia/Eucla"
+msgstr ""
+
+#: timezones.py:310
+msgid "Australia/Hobart"
+msgstr ""
+
+#: timezones.py:311
+msgid "Australia/Lindeman"
+msgstr ""
+
+#: timezones.py:312
+msgid "Australia/Lord_Howe"
+msgstr ""
+
+#: timezones.py:313
+msgid "Australia/Melbourne"
+msgstr ""
+
+#: timezones.py:314
+msgid "Australia/Perth"
+msgstr ""
+
+#: timezones.py:315
+msgid "Australia/Sydney"
+msgstr ""
+
+#: timezones.py:316
+msgid "Canada/Atlantic"
+msgstr ""
+
+#: timezones.py:317
+msgid "Canada/Central"
+msgstr ""
+
+#: timezones.py:318
+msgid "Canada/Eastern"
+msgstr ""
+
+#: timezones.py:319
+msgid "Canada/Mountain"
+msgstr ""
+
+#: timezones.py:320
+msgid "Canada/Newfoundland"
+msgstr ""
+
+#: timezones.py:321
+msgid "Canada/Pacific"
+msgstr ""
+
+#: timezones.py:322
+msgid "Europe/Amsterdam"
+msgstr ""
+
+#: timezones.py:323
+msgid "Europe/Andorra"
+msgstr ""
+
+#: timezones.py:324
+msgid "Europe/Athens"
+msgstr ""
+
+#: timezones.py:325
+msgid "Europe/Belgrade"
+msgstr ""
+
+#: timezones.py:326
+msgid "Europe/Berlin"
+msgstr ""
+
+#: timezones.py:327
+msgid "Europe/Bratislava"
+msgstr ""
+
+#: timezones.py:328
+msgid "Europe/Brussels"
+msgstr ""
+
+#: timezones.py:329
+msgid "Europe/Bucharest"
+msgstr ""
+
+#: timezones.py:330
+msgid "Europe/Budapest"
+msgstr ""
+
+#: timezones.py:331
+msgid "Europe/Busingen"
+msgstr ""
+
+#: timezones.py:332
+msgid "Europe/Chisinau"
+msgstr ""
+
+#: timezones.py:333
+msgid "Europe/Copenhagen"
+msgstr ""
+
+#: timezones.py:334
+msgid "Europe/Dublin"
+msgstr ""
+
+#: timezones.py:335
+msgid "Europe/Gibraltar"
+msgstr ""
+
+#: timezones.py:336
+msgid "Europe/Guernsey"
+msgstr ""
+
+#: timezones.py:337
+msgid "Europe/Helsinki"
+msgstr ""
+
+#: timezones.py:338
+msgid "Europe/Isle_of_Man"
+msgstr ""
+
+#: timezones.py:339
+msgid "Europe/Istanbul"
+msgstr ""
+
+#: timezones.py:340
+msgid "Europe/Jersey"
+msgstr ""
+
+#: timezones.py:341
+msgid "Europe/Kaliningrad"
+msgstr ""
+
+#: timezones.py:342
+msgid "Europe/Kiev"
+msgstr ""
+
+#: timezones.py:343
+msgid "Europe/Lisbon"
+msgstr ""
+
+#: timezones.py:344
+msgid "Europe/Ljubljana"
+msgstr ""
+
+#: timezones.py:345
+msgid "Europe/London"
+msgstr ""
+
+#: timezones.py:346
+msgid "Europe/Luxembourg"
+msgstr ""
+
+#: timezones.py:347
+msgid "Europe/Madrid"
+msgstr ""
+
+#: timezones.py:348
+msgid "Europe/Malta"
+msgstr ""
+
+#: timezones.py:349
+msgid "Europe/Mariehamn"
+msgstr ""
+
+#: timezones.py:350
+msgid "Europe/Minsk"
+msgstr ""
+
+#: timezones.py:351
+msgid "Europe/Monaco"
+msgstr ""
+
+#: timezones.py:352
+msgid "Europe/Moscow"
+msgstr ""
+
+#: timezones.py:353
+msgid "Europe/Oslo"
+msgstr ""
+
+#: timezones.py:354
+msgid "Europe/Paris"
+msgstr ""
+
+#: timezones.py:355
+msgid "Europe/Podgorica"
+msgstr ""
+
+#: timezones.py:356
+msgid "Europe/Prague"
+msgstr ""
+
+#: timezones.py:357
+msgid "Europe/Riga"
+msgstr ""
+
+#: timezones.py:358
+msgid "Europe/Rome"
+msgstr ""
+
+#: timezones.py:359
+msgid "Europe/Samara"
+msgstr ""
+
+#: timezones.py:360
+msgid "Europe/San_Marino"
+msgstr ""
+
+#: timezones.py:361
+msgid "Europe/Sarajevo"
+msgstr ""
+
+#: timezones.py:362
+msgid "Europe/Simferopol"
+msgstr ""
+
+#: timezones.py:363
+msgid "Europe/Skopje"
+msgstr ""
+
+#: timezones.py:364
+msgid "Europe/Sofia"
+msgstr ""
+
+#: timezones.py:365
+msgid "Europe/Stockholm"
+msgstr ""
+
+#: timezones.py:366
+msgid "Europe/Tallinn"
+msgstr ""
+
+#: timezones.py:367
+msgid "Europe/Tirane"
+msgstr ""
+
+#: timezones.py:368
+msgid "Europe/Uzhgorod"
+msgstr ""
+
+#: timezones.py:369
+msgid "Europe/Vaduz"
+msgstr ""
+
+#: timezones.py:370
+msgid "Europe/Vatican"
+msgstr ""
+
+#: timezones.py:371
+msgid "Europe/Vienna"
+msgstr ""
+
+#: timezones.py:372
+msgid "Europe/Vilnius"
+msgstr ""
+
+#: timezones.py:373
+msgid "Europe/Volgograd"
+msgstr ""
+
+#: timezones.py:374
+msgid "Europe/Warsaw"
+msgstr ""
+
+#: timezones.py:375
+msgid "Europe/Zagreb"
+msgstr ""
+
+#: timezones.py:376
+msgid "Europe/Zaporozhye"
+msgstr ""
+
+#: timezones.py:377
+msgid "Europe/Zurich"
+msgstr ""
+
+#: timezones.py:378
+msgid "GMT"
+msgstr ""
+
+#: timezones.py:379
+msgid "Indian/Antananarivo"
+msgstr ""
+
+#: timezones.py:380
+msgid "Indian/Chagos"
+msgstr ""
+
+#: timezones.py:381
+msgid "Indian/Christmas"
+msgstr ""
+
+#: timezones.py:382
+msgid "Indian/Cocos"
+msgstr ""
+
+#: timezones.py:383
+msgid "Indian/Comoro"
+msgstr ""
+
+#: timezones.py:384
+msgid "Indian/Kerguelen"
+msgstr ""
+
+#: timezones.py:385
+msgid "Indian/Mahe"
+msgstr ""
+
+#: timezones.py:386
+msgid "Indian/Maldives"
+msgstr ""
+
+#: timezones.py:387
+msgid "Indian/Mauritius"
+msgstr ""
+
+#: timezones.py:388
+msgid "Indian/Mayotte"
+msgstr ""
+
+#: timezones.py:389
+msgid "Indian/Reunion"
+msgstr ""
+
+#: timezones.py:390
+msgid "Pacific/Apia"
+msgstr ""
+
+#: timezones.py:391
+msgid "Pacific/Auckland"
+msgstr ""
+
+#: timezones.py:392
+msgid "Pacific/Chatham"
+msgstr ""
+
+#: timezones.py:393
+msgid "Pacific/Chuuk"
+msgstr ""
+
+#: timezones.py:394
+msgid "Pacific/Easter"
+msgstr ""
+
+#: timezones.py:395
+msgid "Pacific/Efate"
+msgstr ""
+
+#: timezones.py:396
+msgid "Pacific/Enderbury"
+msgstr ""
+
+#: timezones.py:397
+msgid "Pacific/Fakaofo"
+msgstr ""
+
+#: timezones.py:398
+msgid "Pacific/Fiji"
+msgstr ""
+
+#: timezones.py:399
+msgid "Pacific/Funafuti"
+msgstr ""
+
+#: timezones.py:400
+msgid "Pacific/Galapagos"
+msgstr ""
+
+#: timezones.py:401
+msgid "Pacific/Gambier"
+msgstr ""
+
+#: timezones.py:402
+msgid "Pacific/Guadalcanal"
+msgstr ""
+
+#: timezones.py:403
+msgid "Pacific/Guam"
+msgstr ""
+
+#: timezones.py:404
+msgid "Pacific/Honolulu"
+msgstr ""
+
+#: timezones.py:405
+msgid "Pacific/Johnston"
+msgstr ""
+
+#: timezones.py:406
+msgid "Pacific/Kiritimati"
+msgstr ""
+
+#: timezones.py:407
+msgid "Pacific/Kosrae"
+msgstr ""
+
+#: timezones.py:408
+msgid "Pacific/Kwajalein"
+msgstr ""
+
+#: timezones.py:409
+msgid "Pacific/Majuro"
+msgstr ""
+
+#: timezones.py:410
+msgid "Pacific/Marquesas"
+msgstr ""
+
+#: timezones.py:411
+msgid "Pacific/Midway"
+msgstr ""
+
+#: timezones.py:412
+msgid "Pacific/Nauru"
+msgstr ""
+
+#: timezones.py:413
+msgid "Pacific/Niue"
+msgstr ""
+
+#: timezones.py:414
+msgid "Pacific/Norfolk"
+msgstr ""
+
+#: timezones.py:415
+msgid "Pacific/Noumea"
+msgstr ""
+
+#: timezones.py:416
+msgid "Pacific/Pago_Pago"
+msgstr ""
+
+#: timezones.py:417
+msgid "Pacific/Palau"
+msgstr ""
+
+#: timezones.py:418
+msgid "Pacific/Pitcairn"
+msgstr ""
+
+#: timezones.py:419
+msgid "Pacific/Pohnpei"
+msgstr ""
+
+#: timezones.py:420
+msgid "Pacific/Port_Moresby"
+msgstr ""
+
+#: timezones.py:421
+msgid "Pacific/Rarotonga"
+msgstr ""
+
+#: timezones.py:422
+msgid "Pacific/Saipan"
+msgstr ""
+
+#: timezones.py:423
+msgid "Pacific/Tahiti"
+msgstr ""
+
+#: timezones.py:424
+msgid "Pacific/Tarawa"
+msgstr ""
+
+#: timezones.py:425
+msgid "Pacific/Tongatapu"
+msgstr ""
+
+#: timezones.py:426
+msgid "Pacific/Wake"
+msgstr ""
+
+#: timezones.py:427
+msgid "Pacific/Wallis"
+msgstr ""
+
+#: timezones.py:428
+msgid "US/Alaska"
+msgstr ""
+
+#: timezones.py:429
+msgid "US/Arizona"
+msgstr ""
+
+#: timezones.py:430
+msgid "US/Central"
+msgstr ""
+
+#: timezones.py:431
+msgid "US/Eastern"
+msgstr ""
+
+#: timezones.py:432
+msgid "US/Hawaii"
+msgstr ""
+
+#: timezones.py:433
+msgid "US/Mountain"
+msgstr ""
+
+#: timezones.py:434
+msgid "US/Pacific"
+msgstr ""
+
+#: timezones.py:435
+msgid "UTC"
+msgstr ""
+
+#: vm/forms.py:54
+msgid "Reverse DNS name"
+msgstr ""
+
+#: vm/forms.py:112
+msgid "Short server name"
+msgstr ""
+
+#: vm/forms.py:118
+msgid "Server hostname"
+msgstr ""
+
+#: vm/forms.py:124
+msgid "DNS domain name"
+msgstr ""
+
+#: vm/forms.py:211
+msgid ""
+"Setting template can modify lots of server attributes, e.g. disks, nics."
+msgstr ""
+
+#: vm/forms.py:223
+msgid "Monitored?"
+msgstr ""
+
+#: vm/forms.py:225
+msgid "Installed?"
+msgstr ""
+
+#: vm/forms.py:226
+msgid "This field is used for informational purposes only."
+msgstr ""
+
+#: vm/forms.py:228
+msgid "Snapshot count limit"
+msgstr ""
+
+#: vm/forms.py:230
+msgid "Maximum number of manual server snapshots."
+msgstr ""
+
+#: vm/forms.py:231
+msgid "Snapshot size limit"
+msgstr ""
+
+#: vm/forms.py:233
+msgid "Maximum size of all server snapshots."
+msgstr ""
+
+#: vm/forms.py:234
+msgid "CPU Shares"
+msgstr ""
+
+#: vm/forms.py:239
+msgid "IO Priority"
+msgstr ""
+
+#: vm/forms.py:253
+msgid "Metadata"
+msgstr ""
+
+#: vm/forms.py:255
+msgid "key=value string pairs."
+msgstr ""
+
+#: vm/forms.py:263
+msgid "(auto)"
+msgstr ""
+
+#: vm/forms.py:312 vm/forms.py:534 vm/forms.py:635 vm/forms.py:794
+#: vm/forms.py:868
+msgid "Disk ID"
+msgstr ""
+
+#: vm/forms.py:339
+msgid ""
+"Changing disk size of created server is a dangerous operation and can cause "
+"data loss!"
+msgstr ""
+
+#: vm/forms.py:366
+#, python-format
+msgid ""
+"Setting first disk storage to different value than server settings storage "
+"(%s) is not recommended."
+msgstr ""
+
+#: vm/forms.py:417
+msgid "Nic ID"
+msgstr ""
+
+#: vm/forms.py:441
+msgid "IP Address"
+msgstr ""
+
+#: vm/forms.py:443
+msgid "Automatic allocation"
+msgstr ""
+
+#: vm/forms.py:444
+msgid "Create DNS?"
+msgstr ""
+
+#: vm/forms.py:446
+msgid "Use for monitoring?"
+msgstr ""
+
+#: vm/forms.py:448
+msgid "MAC Address"
+msgstr ""
+
+#: vm/forms.py:450
+msgid "Primary NIC?"
+msgstr ""
+
+#: vm/forms.py:452
+msgid "Allow DHCP Spoofing?"
+msgstr ""
+
+#: vm/forms.py:454
+msgid "Allow IP Spoofing?"
+msgstr ""
+
+#: vm/forms.py:456
+msgid "Allow MAC Spoofing?"
+msgstr ""
+
+#: vm/forms.py:458
+msgid "Allow Restricted Traffic?"
+msgstr ""
+
+#: vm/forms.py:503
+msgid "File with servers"
+msgstr ""
+
+#: vm/forms.py:519
+msgid "File type is not supported"
+msgstr ""
+
+#: vm/forms.py:538
+msgid ""
+"Schedule in CRON format. Please use your local time for the hour field (will "
+"be internally converted into UTC)."
+msgstr ""
+
+#: vm/forms.py:543
+msgid "Maximum number of snapshots to keep."
+msgstr ""
+
+#: vm/forms.py:546
+msgid "Active?"
+msgstr ""
+
+#: vm/forms.py:550 vm/forms.py:654
+msgid "Freeze filesystem?"
+msgstr ""
+
+#: vm/forms.py:551 vm/forms.py:655
+msgid "Create application-consistent snapshot; Requires QEMU Guest Agent."
+msgstr ""
+
+#: vm/forms.py:630 vm/forms.py:865
+msgid "Snapshot Name"
+msgstr ""
+
+#: vm/forms.py:632
+msgid "backup1"
+msgstr ""
+
+#: vm/forms.py:638
+msgid "Optional snapshot comment."
+msgstr ""
+
+#: vm/forms.py:652
+msgid "All disks?"
+msgstr ""
+
+#: vm/forms.py:676
+msgid "Snapshot name is already used"
+msgstr ""
+
+#: vm/forms.py:686
+msgid "Snapshot limit reached"
+msgstr ""
+
+#: vm/forms.py:723
+msgid "Backup Node"
+msgstr ""
+
+#: vm/forms.py:730
+msgid "Bandwidth limit"
+msgstr ""
+
+#: vm/forms.py:731
+msgid "Optional transfer rate limit in bytes."
+msgstr ""
+
+#: vm/forms.py:736
+msgid "Maximum number of backups to keep."
+msgstr ""
+
+#: vm/forms.py:756
+msgid "Optional backup comment."
+msgstr ""
+
+#: vm/forms.py:769
+msgid "Definition"
+msgstr ""
+
+#: vm/forms.py:797
+msgid "Backup Name"
+msgstr ""
+
+#: vm/forms.py:831
+msgid "Restore to Server"
+msgstr ""
+
+#: vm/forms.py:833
+msgid "Restore to Disk"
+msgstr ""
+
+#: vm/imports.py:60
+#, python-format
+msgid "Uploaded file mimetype: \"%s\" has not been recognized!"
+msgstr ""
+
+#: vm/utils.py:318
+msgid "Header does not match expected fields!"
+msgstr ""
+
+#: vm/views.py:303
+msgid "Server was marked as installed."
+msgstr ""
+
+#: vm/views.py:369
+msgid "Import Failed"
+msgstr ""
+
+#: widgets.py:173
+msgid "The phone number entered is not valid."
+msgstr ""

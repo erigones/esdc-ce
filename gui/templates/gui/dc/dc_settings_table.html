@@ -1,0 +1,183 @@
+{% load gui_utils %}
+{% load i18n %}
+<tr class="hidden">
+  <td colspan="2">
+    {% csrf_token %}
+    {% if error %}{% include "gui/messages.html" with messages=error %}{% endif %}
+  </td>
+</tr>
+<tr><td colspan="2" class="row-header"><i class="icon-ok"></i> {% trans "Modules" %}</td></tr>
+{% if all %}
+{% include "gui/table_form_field_checkbox.html" with field=form.ACL_ENABLED trclass="setting" %}
+{% include "gui/table_form_field_checkbox.html" with field=form.API_ENABLED trclass="setting" %}
+{% include "gui/table_form_field_checkbox.html" with field=form.VMS_DC_ENABLED trclass="setting" %}
+{% include "gui/table_form_field_checkbox.html" with field=form.SMS_ENABLED trclass="setting" %}
+{% for module in form.default_dc_third_party_modules %}
+{% include "gui/table_form_field_checkbox.html" with field=form|get_item:module trclass="setting" %}
+{% endfor %}
+{% endif %}
+{% include "gui/table_form_field_checkbox.html" with field=form.VMS_VM_SNAPSHOT_ENABLED %}
+{% include "gui/table_form_field_checkbox.html" with field=form.VMS_VM_BACKUP_ENABLED %}
+{% include "gui/table_form_field_checkbox.html" with field=form.MON_ZABBIX_ENABLED %}
+{% include "gui/table_form_field_checkbox.html" with field=form.SUPPORT_ENABLED %}
+{% include "gui/table_form_field_checkbox.html" with field=form.REGISTRATION_ENABLED %}
+{% include "gui/table_form_field_checkbox.html" with field=form.FAQ_ENABLED %}
+{% for module in form.third_party_modules %}
+{% include "gui/table_form_field_checkbox.html" with field=form|get_item:module %}
+{% endfor %}
+
+<tr><td colspan="2" class="row-header"><i class="icon-envelope-alt"></i> {% trans "Email" %}</td></tr>
+{% include "gui/table_form_field.html" with field=form.COMPANY_NAME %}
+{% include "gui/table_form_field.html" with field=form.SITE_NAME %}
+{% include "gui/table_form_field.html" with field=form.SITE_LINK %}
+{% include "gui/table_form_field.html" with field=form.SITE_SIGNATURE %}
+{% include "gui/table_form_field.html" with field=form.SITE_LOGO %}
+{% include "gui/table_form_field.html" with field=form.SITE_ICON %}
+{% include "gui/table_form_field.html" with field=form.SUPPORT_EMAIL %}
+{% include "gui/table_form_field.html" with field=form.SUPPORT_PHONE %}
+{% include "gui/table_form_field_checkbox.html" with field=form.SUPPORT_USER_CONFIRMATION %}
+{% include "gui/table_form_field.html" with field=form.DEFAULT_FROM_EMAIL %}
+{% include "gui/table_form_field_checkbox.html" with field=form.EMAIL_ENABLED %}
+{% if all %}
+{% include "gui/table_form_field.html" with field=form.SHADOW_EMAIL trclass="setting" %}
+{% include "gui/table_form_field.html" with field=form.EMAIL_HOST trclass="setting" %}
+{% include "gui/table_form_field.html" with field=form.EMAIL_PORT trclass="setting" %}
+{% include "gui/table_form_field_checkbox.html" with field=form.EMAIL_USE_TLS trclass="setting" %}
+{% include "gui/table_form_field_checkbox.html" with field=form.EMAIL_USE_SSL trclass="setting" %}
+{% include "gui/table_form_field.html" with field=form.EMAIL_HOST_USER trclass="setting" %}
+{% include "gui/table_form_field.html" with field=form.EMAIL_HOST_PASSWORD trclass="setting" %}
+{% endif %}
+
+{% if all %}
+<tr><td colspan="2" class="row-header"><i class="icon-sitemap"></i> {% trans "Compute nodes" %}</td></tr>
+{% include "gui/table_form_field.html" with field=form.VMS_NET_NIC_TAGS trclass="setting" %}
+{% include "gui/table_form_field.html" with field=form.VMS_NODE_SSH_KEYS_DEFAULT trclass="setting" %}
+{% endif %}
+
+<tr><td colspan="2" class="row-header"><i class="icon-hdd"></i> {% trans "Servers" %}</td></tr>
+{% include "gui/table_form_field_checkbox.html" with field=form.VMS_ZONE_ENABLED %}
+{% include "gui/table_form_field.html" with field=form.VMS_VM_OSTYPE_DEFAULT %}
+{% include "gui/table_form_field_checkbox.html" with field=form.VMS_VM_MONITORED_DEFAULT %}
+{% include "gui/table_form_field.html" with field=form.VMS_VM_CPU_SHARES_DEFAULT %}
+{% include "gui/table_form_field.html" with field=form.VMS_VM_ZFS_IO_PRIORITY_DEFAULT %}
+{% include "gui/table_form_field.html" with field=form.VMS_DISK_MODEL_DEFAULT %}
+{% include "gui/table_form_field.html" with field=form.VMS_DISK_COMPRESSION_DEFAULT %}
+{% include "gui/table_form_field.html" with field=form.VMS_DISK_IMAGE_DEFAULT %}
+{% include "gui/table_form_field.html" with field=form.VMS_DISK_IMAGE_ZONE_DEFAULT %}
+{% include "gui/table_form_field.html" with field=form.VMS_NIC_MODEL_DEFAULT %}
+{% include "gui/table_form_field.html" with field=form.VMS_NIC_MONITORING_DEFAULT %}
+{% include "gui/table_form_field.html" with field=form.VMS_NET_DEFAULT %}
+{% include "gui/table_form_field.html" with field=form.VMS_STORAGE_DEFAULT %}
+{% include "gui/table_form_field.html" with field=form.VMS_VGA_MODEL_DEFAULT %}
+{% include "gui/table_form_field.html" with field=form.VMS_VM_SSH_KEYS_DEFAULT %}
+{% include "gui/table_form_field.html" with field=form.VMS_VM_MDATA_DEFAULT %}
+{% include "gui/table_form_field.html" with field=form.VMS_VM_SNAPSHOT_DEFINE_LIMIT %}
+{% include "gui/table_form_field.html" with field=form.VMS_VM_SNAPSHOT_LIMIT_AUTO %}
+{% include "gui/table_form_field.html" with field=form.VMS_VM_SNAPSHOT_LIMIT_MANUAL %}
+{% include "gui/table_form_field.html" with field=form.VMS_VM_SNAPSHOT_LIMIT_MANUAL_DEFAULT %}
+{% include "gui/table_form_field.html" with field=form.VMS_VM_SNAPSHOT_SIZE_LIMIT addon=" MB" %}
+{% include "gui/table_form_field.html" with field=form.VMS_VM_SNAPSHOT_SIZE_LIMIT_DEFAULT addon=" MB" %}
+{% include "gui/table_form_field.html" with field=form.VMS_VM_SNAPSHOT_DC_SIZE_LIMIT addon=" MB" %}
+{% include "gui/table_form_field.html" with field=form.VMS_VM_BACKUP_DEFINE_LIMIT %}
+{% include "gui/table_form_field.html" with field=form.VMS_VM_BACKUP_LIMIT %}
+{% include "gui/table_form_field.html" with field=form.VMS_VM_BACKUP_DC_SIZE_LIMIT addon=" MB" %}
+{% include "gui/table_form_field.html" with field=form.VMS_VM_BACKUP_COMPRESSION_DEFAULT %}
+
+<tr><td colspan="2" class="row-header"><i class="icon-retweet"></i> {% trans "Networks" %}</td></tr>
+{% include "gui/table_form_field.html" with field=form.VMS_NET_LIMIT %}
+{% include "gui/table_form_field_checkbox.html" with field=form.VMS_NET_VLAN_RESTRICT %}
+{% include "gui/table_form_field.html" with field=form.VMS_NET_VLAN_ALLOWED %}
+
+<tr><td colspan="2" class="row-header"><i class="icon-save"></i> {% trans "Images" %}</td></tr>
+{% include "gui/table_form_field.html" with field=form.VMS_IMAGE_LIMIT %}
+{% if all %}
+{% include "gui/table_form_field.html" with field=form.VMS_IMAGE_REPOSITORIES trclass="setting" %}
+{% endif %}
+
+<tr><td colspan="2" class="row-header"><i class="icon-play-circle"></i> {% trans "ISO images" %}</td></tr>
+{% include "gui/table_form_field.html" with field=form.VMS_ISO_LIMIT %}
+
+<tr><td colspan="2" class="row-header"><i class="icon-globe"></i> {% trans "DNS" %}</td></tr>
+{% include "gui/table_form_field.html" with field=form.VMS_VM_DOMAIN_DEFAULT %}
+{% include "gui/table_form_field.html" with field=form.VMS_VM_RESOLVERS_DEFAULT %}
+{% include "gui/table_form_field.html" with field=form.DNS_PTR_DEFAULT %}
+{% if all %}
+{% include "gui/table_form_field.html" with field=form.DNS_NAMESERVERS trclass="setting" %}
+{% include "gui/table_form_field.html" with field=form.DNS_HOSTMASTER trclass="setting" %}
+{% include "gui/table_form_field.html" with field=form.DNS_SOA_DEFAULT trclass="setting" %}
+{% endif %}
+
+{% if all %}
+<tr><td colspan="2" class="row-header"><i class="icon-user"></i> {% trans "User accounts" %}</td></tr>
+{% include "gui/table_form_field.html" with field=form.PROFILE_SSH_KEY_LIMIT trclass="setting" %}
+{% include "gui/table_form_field.html" with field=form.PROFILE_COUNTRY_CODE_DEFAULT trclass="setting" %}
+{% include "gui/table_form_field.html" with field=form.PROFILE_PHONE_PREFIX_DEFAULT trclass="setting" %}
+{% include "gui/table_form_field.html" with field=form.PROFILE_TIME_ZONE_DEFAULT trclass="setting" %}
+{% endif %}
+
+<tr><td colspan="2" class="row-header"><i class="icon-bar-chart"></i> {% trans "Monitoring" %}</td></tr>
+{% include "gui/table_form_field.html" with field=form.MON_ZABBIX_SERVER %}
+{% include "gui/table_form_field_checkbox.html" with field=form.MON_ZABBIX_SERVER_SSL_VERIFY %}
+{% include "gui/table_form_field.html" with field=form.MON_ZABBIX_TIMEOUT %}
+{% include "gui/table_form_field.html" with field=form.MON_ZABBIX_USERNAME %}
+{% include "gui/table_form_field.html" with field=form.MON_ZABBIX_PASSWORD %}
+{% include "gui/table_form_field.html" with field=form.MON_ZABBIX_HTTP_USERNAME %}
+{% include "gui/table_form_field.html" with field=form.MON_ZABBIX_HTTP_PASSWORD %}
+{% if all %}
+{% include "gui/table_form_field_checkbox.html" with field=form.MON_ZABBIX_NODE_SYNC trclass="setting" %}
+{% include "gui/table_form_field_checkbox.html" with field=form.MON_ZABBIX_NODE_SLA trclass="setting" %}
+{% include "gui/table_form_field.html" with field=form.MON_ZABBIX_HOSTGROUP_NODE trclass="setting" %}
+{% include "gui/table_form_field.html" with field=form.MON_ZABBIX_HOSTGROUPS_NODE trclass="setting" %}
+{% include "gui/table_form_field.html" with field=form.MON_ZABBIX_TEMPLATES_NODE trclass="setting" %}
+{% endif %}
+{% include "gui/table_form_field_checkbox.html" with field=form.MON_ZABBIX_VM_SLA %}
+{% include "gui/table_form_field_checkbox.html" with field=form.MON_ZABBIX_VM_SYNC %}
+{% include "gui/table_form_field.html" with field=form.MON_ZABBIX_HOSTGROUP_VM %}
+{% include "gui/table_form_field.html" with field=form.MON_ZABBIX_HOSTGROUPS_VM %}
+{% include "gui/table_form_field_checkbox.html" with field=form.MON_ZABBIX_HOSTGROUPS_VM_RESTRICT %}
+{% include "gui/table_form_field.html" with field=form.MON_ZABBIX_HOSTGROUPS_VM_ALLOWED %}
+{% include "gui/table_form_field.html" with field=form.MON_ZABBIX_TEMPLATES_VM %}
+{% include "gui/table_form_field_checkbox.html" with field=form.MON_ZABBIX_TEMPLATES_VM_MAP_TO_TAGS %}
+{% include "gui/table_form_field_checkbox.html" with field=form.MON_ZABBIX_TEMPLATES_VM_RESTRICT %}
+{% include "gui/table_form_field.html" with field=form.MON_ZABBIX_TEMPLATES_VM_ALLOWED %}
+{% include "gui/table_form_field.html" with field=form.MON_ZABBIX_TEMPLATES_VM_NIC %}
+{% include "gui/table_form_field.html" with field=form.MON_ZABBIX_TEMPLATES_VM_DISK %}
+{% include "gui/table_form_field.html" with field=form.MON_ZABBIX_HOST_VM_PROXY %}
+
+<tr><td colspan="2" class="row-header"><i class="icon-beaker"></i> {% trans "API" %}</td></tr>
+{% include "gui/table_form_field_checkbox.html" with field=form.API_LOG_USER_CALLBACK %}
+
+{% if all %}
+<tr><td colspan="2" class="row-header"><i class="icon-twitter"></i> {% trans "SMS" %}</td></tr>
+{% include "gui/table_form_field.html" with field=form.SMS_PREFERRED_SERVICE trclass="setting" %}
+{% include "gui/table_form_field.html" with field=form.SMS_PRIVATE_KEY trclass="setting" %}
+{% include "gui/table_form_field.html" with field=form.SMS_SMSAPI_USERNAME trclass="setting" %}
+{% include "gui/table_form_field.html" with field=form.SMS_SMSAPI_PASSWORD trclass="setting" %}
+{% include "gui/table_form_field.html" with field=form.SMS_SMSAPI_FROM trclass="setting" %}
+{% endif %}
+
+{% for app, details, icon in form.third_party_settings %}
+<tr><td colspan="2" class="row-header"><i class="{{ icon }}"></i> {{ app }}</td></tr>
+  {% for module, template in details %}
+{% include template with field=form|get_item:module %}
+  {% endfor %}
+{% endfor %}
+
+{% if all %}
+{% for app, details, icon in form.default_dc_third_party_settings %}
+  {% if not form.third_party_settings %}
+<tr><td colspan="2" class="row-header"><i class="{{ icon }}"></i> {{ app }}</td></tr>
+  {% endif %}
+  {% for module, template in details %}
+{% include template with field=form|get_item:module trclass="setting" %}
+  {% endfor %}
+{% endfor %}
+{% endif %}
+
+{% if form.non_field_errors %}
+<tr class="row-alert">
+  <td colspan="2">
+    {% for error in form.non_field_errors %}<div class="alert alert-error"><i class="icon-warning-sign"></i> {{ error }}</div>{% endfor %}
+  </td>
+</tr>
+{% endif %}

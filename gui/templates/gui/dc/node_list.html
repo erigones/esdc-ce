@@ -1,0 +1,147 @@
+{% extends load_base %}
+{% load i18n %}
+{% load gui_utils %}
+
+{% block javascript %}
+<script type="text/javascript">
+  $(document).ready(function() {
+    DC_NODES = new DcNodeList();
+  });
+</script>
+{% endblock %}
+
+{% block base_content %}
+{% if can_edit %}
+<div id="obj_form_modal" class="black-box modal hide fade vm_modal">
+  <div class="modal-head tab-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <span class="title_edit"><i class="icon-sitemap"></i> {% trans "Update or detach Compute Node" %}</span>
+    <span class="title_add"><i class="icon-sitemap"></i> {% trans "Attach Compute Node" %}</span>
+  </div>
+  <div class="modal-body separator">
+    <div class="text_edit"></div>
+    <div class="text_add"></div>
+    <form class="form-horizontal" action="#" data-source="{% url 'dc_node_form' %}?{{ qs }}" method="POST">
+      {% include "gui/dc/node_form.html" %}
+    </form>
+  </div>
+  <div class="modal-footer">
+    <div class="inner-well">
+      {# <span class="pull-left"><a class="vm_modal_more btn btn-small btn-inverse no-ajax">{% trans "Show advanced settings" %}</a></span> #}
+      <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
+      <a class="vm_modal_update button green no-ajax" data-enter="true">{% trans "Update" %}</a>
+      <a class="vm_modal_delete button gold no-ajax">{% trans "Detach Compute Node" %}</a>
+      <a class="vm_modal_create button gold no-ajax">{% trans "Attach Compute Node" %}</a>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<div class="container-fluid">
+  <div class="row-fluid">
+
+    <div class="span12">
+      <div class="tab-header">
+        <span class="options window-control pull-right">
+          <i class="icon-cloud"></i> {{ request.dc.alias }}
+        </span>
+        <i class="icon-sitemap"></i> {% trans "Compute Nodes" %}
+      </div>
+      <table class="table box table-striped table-hover table-responsive" id="etable">
+
+        <thead>
+          {% if can_edit %}
+          <tr>
+            <th colspan="11">
+              <div class="pull-right">
+                {% include "gui/dc/dc_all_toggle.html" %}
+              </div>
+            </th>
+          </tr>
+          {% endif %}
+          {% if dc_nodes or all and can_add %}
+          <tr>
+            <th>{% trans "Hostname" %}</th>
+            <th>{% trans "Strategy" %}</th>
+            <th>{% trans "Priority" %}</th>
+            <th class="hidden-phone">{% trans "CPUs" %}</th>
+            <th class="hidden-phone">{% trans "RAM" %}</th>
+            <th class="visible-bigscreen">{% trans "RAM Overhead" %}</th>
+            <th class="hidden-phone">{% trans "Disk" %}</th>
+            <th>{% trans "Free CPUs" %}</th>
+            <th>{% trans "Free RAM" %}</th>
+            <th>{% trans "Free Disk" %} <span title="{% trans "Estimated value - may not include size of images, backups and snapshots" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-info-sign"></i></span></th>
+            {% if all %}
+            <th class="hidden-phone">{% trans "Datacenters" %}</th>
+            {% else %}
+            <th class="hidden-phone">{% trans "Servers" %}</th>
+            {% endif %}
+          </tr>
+          {% endif %}
+        </thead>
+
+        <tbody>
+          {% for dc_node in dc_nodes %}
+          <tr data-hostname="{{ dc_node.node.hostname }}">
+            <td class="nowrap">
+              <i class="icon-sitemap vm_node_color" style="color: {{ dc_node.node.color }};"></i>
+              {% if can_edit %}<a href="#" class="btn-link btn-icon-edit no-ajax obj_edit{% if dc_node.vms %} no-delete{% endif %}" title="{% trans "Update or remove Compute Node association" %}" data-toggle="tooltip" data-placement="bottom" data-form='{{ dc_node.web_data|jsondata }}'>{{ dc_node.node.hostname }}</a>{% else %}{{ dc_node.node.hostname }}{% endif %}
+            </td>
+            <td>{{ dc_node.get_strategy_display }}</td>
+            <td>{{ dc_node.priority }}</td>
+            <td class="hidden-phone nowrap">{{ dc_node.cpu }} <small>x</small></td>
+            <td class="hidden-phone nowrap">{{ dc_node.ram }} <small>MB</small></td>
+            <td class="visible-bigscreen nowrap">{{ dc_node.ram_kvm_overhead }} <small>MB</small></td>
+            <td class="hidden-phone nowrap">{{ dc_node.disk|mb_to_gb }} <small>GB</small></td>
+            <td class="nowrap">{{ dc_node.cpu_free }} <small>x</small></td>
+            <td class="nowrap">{{ dc_node.ram_free }} <small>MB</small></td>
+            <td class="nowrap">{{ dc_node.disk_free|mb_to_gb }} <small>GB</small></td>
+            {% if all %}
+            <td class="hidden-phone"><small class="vm_hostname">{{ dc_node.node.dc.all|dcify }}</small></td>
+            {% else %}
+            <td class="hidden-phone"><i class="icon-hdd"></i> {{ dc_node.vms }} <small>({{ dc_node.real_vms }})</small></td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+
+          {% if all %}{% for node in can_add %}
+          <tr>
+            <td class="nowrap">
+              <i class="icon-sitemap vm_node_color" style="color: {{ node.color }};"></i>
+              <a href="#" class="btn-link btn-icon-link no-ajax obj_add italic" title="{% trans "Attach Compute Node" %}" data-toggle="tooltip" data-placement="bottom" data-form='{"hostname":"{{ node.hostname }}"}'>{{ node.hostname }}</a>
+            </td>
+            <td></td>
+            <td></td>
+            <td class="hidden-phone"></td>
+            <td class="hidden-phone"></td>
+            <td class="visible-bigscreen"></td>
+            <td class="hidden-phone"></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="hidden-phone"></td>
+          </tr>
+          {% endfor %}{% endif %}
+        </tbody>
+
+        <tfoot>
+          <tr>
+            <td colspan="11">
+              <span class="pull-right">
+                {% trans "Total" %}: {{ dc_nodes|length }}&nbsp;
+              </span>
+              {% if can_edit %}
+              <div class="vm_control">
+                <a href="#" class="button gray no-ajax obj_add{% if not can_add %} disabled{% endif %}" title="{% trans "Associate new Compute Node with this Datacenter" %}" data-toggle="tooltip" data-placement="top"><i class="icon-link"></i> {% trans "Attach Compute Node" %}</a>
+              </div>
+              {% endif %}
+            </td>
+          </tr>
+        </tfoot>
+
+      </table>
+    </div>
+
+  </div> <!-- end row-fluid -->
+</div> <!-- end container-fluid -->
+{% endblock %}

@@ -1,0 +1,123 @@
+#!/usr/bin/env python
+
+import os
+import sys
+from subprocess import Popen, PIPE
+
+from eslib import ERIGONES_HOME
+from eslib.qga import QGAClient, QGAError
+from eslib.filelock import FileLock
+
+ESNAPSHOT = os.path.join(ERIGONES_HOME, 'bin/esnapshot')
+
+
+def _zfs_snap(snapshot, metadata=None):
+    cmd = [ESNAPSHOT, 'create', snapshot]
+
+    if metadata:
+        cmd.append(metadata)
+
+    p = Popen(cmd, close_fds=True, stdout=PIPE, stderr=PIPE)
+    stdout, stderr = p.communicate()
+
+    return p.returncode, stdout, stderr
+
+
+def zfs_snapshot(socket_path, snapshot, metadata=None):
+    if os.path.exists(socket_path):
+        lock = None
+        locked = False
+        qga = None
+        thaw = False
+        frozen = None
+        err = []
+        rc = 1
+        stdout = ''
+        stderr = ''
+
+        try:
+            try:
+                lock = FileLock(socket_path + '.lock')
+                lock.acquire()
+            except Exception as e:
+                err.append('Filesystem freeze failed (%s)' % e)
+            else:
+                locked = True
+
+                try:
+                    qga = QGAClient(socket_path)
+                    thaw = True
+                    frozen = int(qga.fsfreeze('freeze'))
+
+                    if frozen < 1:
+                        raise QGAError('No filesystem was frozen')
+                except Exception as e:
+                    err.append('Filesystem freeze failed (%s)' % e)
+
+            rc, stdout, stderr = _zfs_snap(snapshot, metadata=metadata)
+
+        finally:
+            try:
+                if thaw:
+                    thawed = int(qga.fsfreeze('thaw'))
+
+                    if frozen and thawed < frozen:
+                        raise QGAError('Not all filesystems were thawed')
+            except Exception as e:
+                err.append('Filesystem thaw failed (%s)' % e)
+
+            try:
+                if qga:
+                    qga.close()
+            except Exception as e:
+                err.append('Filesystem thaw failed (%s)' % e)
+
+            try:
+                if lock and locked:
+                    lock.release()
+            except Exception as e:
+                err.append('Filesystem thaw failed (%s)' % e)
+
+            if err:
+                err = '\n'.join(err)
+
+                if stderr:
+                    stderr += '\n' + err
+                else:
+                    stderr = err
+
+    else:
+        rc, stdout, stderr = _zfs_snap(snapshot, metadata=metadata)
+
+    return rc, stdout, stderr
+
+
+def usage():
+    return '''Usage: qga-snapshot <socket> <snapshot> [metadata]\n'''
+
+
+def main():
+    argv = sys.argv[1:]
+
+    if len(argv) < 2 or argv[0] in ('-h', '--help'):
+        sys.stderr.write(usage())
+        sys.exit(1)
+
+    try:
+        metadata = argv[2]
+    except IndexError:
+        metadata = None
+
+    rc, stdout, stderr = zfs_snapshot(argv[0], argv[1], metadata=metadata)
+
+    if stderr:
+        sys.stderr.write(str(stderr) + '\n')
+
+    if stdout:
+        sys.stdout.write(str(stdout) + '\n')
+
+    sys.exit(rc)
+
+
+if __name__ == '__main__':
+    main()

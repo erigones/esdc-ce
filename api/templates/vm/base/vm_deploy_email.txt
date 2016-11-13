@@ -1,0 +1,18 @@
+{% load i18n %}{% autoescape off %}{% with kvm=vm.is_kvm %}{% blocktrans with server=vm.alias %}Hello,
+
+Your server {{ server }} was successfully deployed and is ready to use.{% endblocktrans %}
+{% if vm.is_blank %}{% blocktrans %}
+Please start the server with an ISO image and install your preferred operating system.
+{% endblocktrans %}
+{% else %}
+{% if kvm %}{% trans "You can connect to the server via web console or by using SSH/remote desktop." %}{% else %}{% trans "You can connect to the server by using SSH." %}{% endif %}
+
+{% trans "Datacenter" %}: {{ vm.dc.alias }} ({{ vm.dc.name }})
+{% trans "Hostname" %}: {{ vm.hostname }}
+{% trans "IP address" %}: {{ vm.ips|join:", " }}
+{% trans "Password" %}: {{ internal_metadata.root_pw }}
+
+{% trans "NOTE" %}: {% trans "Automatic setup of administrator's password and/or SSH authorized keys depends on the disk image and/or user provided server metadata." %}
+
+{% endif %}{% endwith %}{% endautoescape %}
+{% include "email_signature.txt" %}

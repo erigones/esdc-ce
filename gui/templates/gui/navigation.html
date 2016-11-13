@@ -1,0 +1,160 @@
+{% load i18n %}
+{% load gui_utils %}
+
+{% block javascript-nav %}
+<script type="text/javascript">
+  $(document).ready(function() {
+    update_sio_status();
+    update_tasks_link();
+    dc_switch_link();
+    dc_check('{{ request.dc.name }}');
+    activate_nav_collapse();
+  });
+
+  SUBMENU_AUTO = '{{ submenu_auto }}';
+
+  {% if nodes %}
+  SUBMENU_GAP = 89;
+  VMS_TAGS = [];
+  $(window).resize(update_submenu);
+  $(document).ready(update_submenu);
+
+  {% elif vms %}
+  SUBMENU_GAP = 135;
+  VMS_TAGS = {{ vms_tags|json:None|safe }};
+  $(window).resize(update_submenu);
+  $(document).ready(function() {
+    update_submenu();
+    ServerListTags.init();
+  });
+
+  {% else %}
+  VMS_TAGS = [];
+  {% endif %}
+</script>
+{% endblock %}
+
+{% block main-nav %}
+<nav id="primary" class="main-nav">
+  <ul>
+    {% for item in navi.main_nav %}
+    <li class="{{ item.li_class }}" id="{{ item.icon }}">
+      {% if item.dropdown %}
+      <a href="{% if item.url %}{% url item.url %}{% else %}#{% endif %}" class="{{ item.a_class }}" data-toggle="dropdown">
+        <i class="icon-{{ item.icon }}"></i> {{ item.title }} <span class="caret"></span>
+      </a>
+      <ul class="dropdown-menu dark">
+        {% for i in item.dropdown %}
+        <li class="{{ i.li_class }}"><a href="{% url i.url %}"><i class="icon-{{ i.icon }}"></i> {{ i.title }}</a></li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <a href="{% if item.url %}{% url item.url %}{% else %}#{% endif %}" class="{{ item.a_class }}" target="{{ item.a_target }}">
+        <i class="icon-{{ item.icon }}"></i> {{ item.title }}
+      </a>
+      {% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+</nav>
+{% endblock %}
+
+{% block dc-switch %}
+<div id="dc_switch_modal" class="black-box modal hide fade vm_modal">
+  <div class="modal-head tab-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <span><i class="icon-cloud"></i> <span class="vm_modal_title">{% trans "Select Datacenter" %}</span></span>
+  </div>
+  <div class="modal-body separator">
+    <div class="vm_modal_text">{% trans "Please select datacenter to work with." %}</div>
+    <form id="dc_switch_form" class="form-horizontal thin" action="#" data-source="{% url 'dc_switch_form' %}" method="POST">
+      {% include "gui/dc/dc_switch_form.html" %}
+    </form>
+  </div>
+  <div class="modal-footer">
+    <div class="inner-well">
+      <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
+      <a class="vm_modal_yes button red no-ajax" data-enter="true">{% trans "Switch Datacenter" %}</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block secondary-nav %}
+<nav id="secondary" class="main-nav">
+  <div class="profile-menu">
+    <div class="pull-left">
+      <div class="avatar">
+        <span class="logo" id="sio-status" title="{% trans "Socket.io connection status" %}" data-toggle="tooltip" data-placement="right">
+          <img src="{% if dc_settings.SITE_ICON %}{{ dc_settings.SITE_ICON }}{% else %}{{ STATIC_URL }}gui/img/danubecloud-logo-48.png{% endif %}" class="logo" alt="" />
+        </span>
+      </div>
+    </div>
+
+    <div class="pull-right profile-menu-nav-collapse">
+      <button class="button black no-ajax"><i class="icon-reorder"></i></button>
+    </div>
+
+    <div class="profile-buttons">
+      <div class="title" title="{{ request.user.get_display_name }}">
+        {{ request.user.get_display_name|truncatechars:16 }}
+      </div>
+      <div class="btn-group">
+        <a href="{% url 'profile' %}" class="button mini inset black{% if navi.view_name == 'profile' %} disabled{% endif %}" title="{% trans "My profile and settings" %}">{% trans "Profile" %}</a>
+      </div>
+      <div class="btn-group">
+        <a href="{% url 'logout' %}" class="no-ajax button mini inset black" title="{% trans "Logout" %}">{% trans "Logout" %}</a>
+      </div>
+    </div>
+
+    {% with dc_alias=request.dc.alias %}
+    <div class="datacenter-nav">
+      <a href="#" class="btn-link no-ajax modal_nohide" id="dc-switch" title="{% blocktrans %}Working in {{ dc_alias }} datacenter. Click to change active datacenter{% endblocktrans %}" data-toggle="tooltip" data-placement="right"><i class="icon-cloud"></i> {{ dc_alias }}</a>
+    </div>
+    {% endwith %}
+  </div>
+
+  <ul class="secondary-nav-menu">
+    <li class="filler"></li>
+    {% for item in navi.second_nav %}
+    <li{% if navi.view_name == item.url %} class="active"{% endif %}>
+      <a href="{% url item.url %}{% if all %}?all=1{% endif %}"><i class="icon-{{ item.icon }}"></i> {{ item.title }}</a>
+    </li>
+    {% endfor %}
+
+    {% if nodes %}
+    <li class="secondary-sub-menu">
+      <ul id="sub-menu-list">
+        {% for n in nodes %}
+        <li class="{% if node and node.pk == n.pk %} active{% endif %}">
+          <a href="{% url 'node_details' n.hostname %}" title="{{ n.hostname }}"><i class="icon-sitemap" style="color: {{ n.color }};"></i> {{ n.hostname|truncatechars:24 }}</a>
+        </li>
+        {% endfor %}
+      </ul>
+    </li>
+    {% elif vms %}{% if not vms_tag_filter_disabled %}
+    <li class="append-transparent" id="vms_tags_wrapper">
+      <input type="text" id="vms_tags" class="vms_tags" name="vms_tags" data-placeholder="{% trans "Filter servers by tags" %}" />
+    </li>{% endif %}
+    <li class="secondary-sub-menu">
+      <ul id="sub-menu-list">
+        {% for vmx in vms %}{% with status_display=vmx.status_display %}
+        <li class="{{ vmx.tags|tagclass }}{% if vm and vmx.pk == vm.pk %} active{% endif %}">
+          <a href="{% url 'vm_details' vmx.hostname %}"><i id="vm_badge_{{ vmx.hostname }}" data-status_display="{{ status_display }}" class="icon-hdd {{ status_display }}"></i> {{ vmx.alias }}</a>
+        </li>
+        {% endwith %}{% endfor %}
+      </ul>
+    </li>
+    {% endif %}
+
+    {% block filter-nav %}
+    {% if filters %}
+    <li id="filters_section">
+      {% include "gui/navigation_filter.html" %}
+    </li>
+    {% endif %}
+    {% endblock %}
+
+  </ul>
+</nav>
+{% endblock %}

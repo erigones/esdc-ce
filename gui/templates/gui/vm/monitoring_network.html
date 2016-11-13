@@ -1,0 +1,35 @@
+{% extends load_base %}
+{% load i18n %}
+{% load gui_utils %}
+
+{% block javascript %}
+{% include "gui/vm/monitoring_js.html" with graphs=graphs %}
+{% endblock %}
+
+{% block base_nav %}
+{% include "gui/vm/navigation.html" with li_monitoring="active" %}
+{% include "gui/vm/monitoring_navigation.html" with mon_net="active" %}
+{% endblock %}
+
+{% block base_content %}
+<div id="graph_tooltip" class="tooltip right"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>
+
+{% with desc_bandwidth=graph_items|keyvalue:'net-bandwidth'|keyvalue:'desc' desc_packets=graph_items|keyvalue:'net-packets'|keyvalue:'desc' %}
+<div class="container-fluid">
+  {% for nic_id in vm_nics %}
+  <div class="row-fluid">
+    <div class="span6 small" id="vm_history_net-bandwidth-{{ nic_id }}_{{ vm.hostname }}">
+      <div class="tab-header">
+        <i class="icon-bar-chart"></i> {{ vm.alias }} &rsaquo; {% blocktrans %}nic {{ nic_id }} &rsaquo; bandwidth{% endblocktrans %}
+        {% include "gui/vm/monitoring_graph.html" with desc=desc_bandwidth %}
+    </div>
+    <div class="span6 small" id="vm_history_net-packets-{{ nic_id }}_{{ vm.hostname }}">
+      <div class="tab-header">
+        <i class="icon-bar-chart"></i> {{ vm.alias }} &rsaquo; {% blocktrans %}nic {{ nic_id }} &rsaquo; packets{% endblocktrans %}
+        {% include "gui/vm/monitoring_graph.html" with desc=desc_packets %}
+    </div>
+  </div>
+  {% endfor%}
+</div> <!-- end container-fluid -->
+{% endwith %}
+{% endblock %}

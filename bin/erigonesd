@@ -1,0 +1,66 @@
+#!/bin/bash
+
+if [ -f /opt/rh/python27/enable ]; then
+	. /opt/rh/python27/enable
+fi
+
+MAINDIR="$(cd "$(dirname "$0")/.." ; pwd -P)"
+ERIGONES_HOME=${ERIGONES_HOME:-"${MAINDIR}"}
+export ERIGONES_HOME
+ENVS="${ERIGONES_HOME}/envs"
+PATH="${ERIGONES_HOME}/bin:/opt/local/bin:/opt/local/sbin:${ENVS}/bin:${PATH}"
+export PATH
+
+APP="que.erigonesd:cq"
+NODENAME=$(hostname)
+
+if [ -d "${ENVS}" ]; then
+	. "${ENVS}/bin/activate"
+else
+	. "${ERIGONES_HOME}/envs/bin/activate"
+fi
+
+PYTHONPATH="${ERIGONES_HOME}:${ERIGONES_HOME}/bin:${ERIGONES_HOME}/envs/lib/python2.7/site-packages:${PYTHONPATH}"
+export PYTHONPATH
+DJANGO_SETTINGS_MODULE="core.settings"
+export DJANGO_SETTINGS_MODULE
+C_FORCE_ROOT="True"
+export C_FORCE_ROOT
+#TZ="Europe/Bratislava"
+#export TZ
+
+if [ -z "${1}" ]; then
+	echo "Usage: ${0} {fast|slow|backup|mgmt} {worker|multi|beat|status} [celeryd options]"
+	exit 1
+fi
+
+QTYPE="${1}"
+shift
+if [ "${QTYPE}" == "mgmt" ]; then
+	QUEUE="mgmt"
+else
+	QUEUE="${QTYPE}.${NODENAME}"
+	unset DJANGO_SETTINGS_MODULE
+fi
+
+CMD="${1}"
+case "${CMD}" in
+	"beat")
+		QTYPE="beat"
+		OPTS="${@} -A ${APP}"
+	;;
+	"worker"|"multi")
+		OPTS="${@} -A ${APP} -Q ${QUEUE}"
+	;;
+	*)
+		OPTS="${@}"
+esac
+
+if [ -f "${ERIGONES_HOME}/bin/erigonesd.exe" ]; then
+	EXEC="${ERIGONES_HOME}/bin/erigonesd.exe"
+else
+	EXEC="${ERIGONES_HOME}/que/erigonesd.py"
+fi
+
+cd "${ERIGONES_HOME}"
+exec "${EXEC}" ${OPTS}

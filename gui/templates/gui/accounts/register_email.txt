@@ -1,0 +1,16 @@
+{% load i18n %}{% autoescape off %}{% blocktrans with first_name=user.first_name last_name=user.last_name %}Dear customer,
+
+Welcome to {{ site_name }}!
+
+In order to finish registration and activate your account please follow this link:{% endblocktrans %}
+
+{{ site_link }}{% url 'registration_check' uidb64=uid token=token %}
+
+{% trans "Your login details are:" %}
+{% trans "Username (email address):" %} {{ user.username }}
+{% trans "Password will be send to phone number:" %} {{ profile.phone }}
+
+{% blocktrans %}Thank you for choosing {{ site_name }}.{% endblocktrans %}
+{% endautoescape %}
+
+{% include "email_signature.txt" %}

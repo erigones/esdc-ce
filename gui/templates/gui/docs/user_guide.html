@@ -1,0 +1,28 @@
+{% extends load_base %}
+{% load i18n %}
+
+{% block javascript %}
+<script type="text/javascript">
+  $(document).ready(function() {
+    IframeView('#user_guide', '#user_guide-header', '{% trans "Loading User Guide" %}');
+  });
+</script>
+{% endblock %}
+
+{% block base_content %}
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span12">
+
+      <div class="tab-header" id="user_guide-header">
+        <span>
+          <i class="icon-book"></i> {% trans "User Guide" %}
+        </span>
+      </div>
+
+      <iframe id="user_guide" src="{{ STATIC_URL }}user-guide/index.html" seamless="seamless" class="black-box"></iframe>
+
+    </div> <!-- end span12 -->
+  </div> <!-- end row-fluid -->
+</div> <!-- end container-fluid -->
+{% endblock %}

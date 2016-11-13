@@ -1,0 +1,21 @@
+{% extends load_base %}
+{% load i18n %}
+
+{% block base_nav %}{% include "gui/vm/navigation.html" with li_monitoring="active" %}{% endblock %}
+
+{% block base_content %}
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span8 offset2">
+      <div class="box">
+        <div class="tab-header tab-header-light">
+          <i class="icon-bullhorn"></i> {% trans "Server monitoring disabled" %}
+        </div>
+        <div class="padded">
+          <p>{% trans "Monitoring information for this server is not available, because the monitoring status is set to <i>Disabled</i>." %}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> <!-- end container-fluid -->
+{% endblock %}

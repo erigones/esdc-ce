@@ -1,0 +1,9 @@
+      <div class="input{% if field.errors %} error wobble animated{% endif %}">
+        <div class="controls">
+          {{ field }}{% for error in field.errors %}
+          <span class="help-inline error"><i class="icon-warning-sign"></i> {{ error }}</span>
+          {% empty %}{% if field.help_text %}
+          <span class="help-inline note"><i class="icon-info-sign"></i> {{ field.help_text }}</span>
+          {% endif %}{% endfor %}
+        </div>
+      </div>

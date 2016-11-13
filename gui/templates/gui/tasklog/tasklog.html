@@ -1,0 +1,29 @@
+{% extends load_base %}
+{% load i18n %}
+
+{% block javascript %}
+<script type="text/javascript">
+  $(document).ready(function() {
+    filter_links();
+    tasklog_init(true);
+  });
+</script>
+{% endblock %}
+
+{% block base_content %}
+{% include "gui/tasklog/tasklog_detail_template.html" %}
+
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span12">
+      <div class="tab-header">
+        <span class="options window-control pull-right">
+          <i class="icon-cloud"></i> {{ request.dc.alias }}
+        </span>
+        <i class="icon-tasks"></i> {% trans "Task Log" %}
+      </div>
+      {% include "gui/tasklog/tasklog_table.html" %}
+    </div>
+  </div> <!-- end row-fluid -->
+</div> <!-- end container-fluid -->
+{% endblock %}

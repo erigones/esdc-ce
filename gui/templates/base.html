@@ -1,0 +1,231 @@
+{% load i18n tz %}{% load compress %}<!DOCTYPE html>
+<html><head>
+  <title>{% block title %}Danube Cloud{% endblock %}</title>
+  <meta charset="utf-8">
+  <meta content="IE=edge" http-equiv="X-UA-Compatible">
+  <meta name="viewport" content="width=device-width, maximum-scale=1, initial-scale=1, user-scalable=0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="Cloud service powered by Danube Cloud. Provides a virtualized IaaS environment for your servers and software." />
+
+  <link rel="icon" type="image/png" href="{{ STATIC_URL }}gui/ico/danubecloud-logo-64.png">
+  <link rel="apple-touch-icon" type="image/png" href="{{ STATIC_URL }}gui/ico/danubecloud-logo-144.png">
+  {% compress css %}
+  <link href="{{ STATIC_URL }}3rd-party/bootstrap/css/bootstrap_include.css" media="screen" rel="stylesheet" type="text/css">
+  <link href="{{ STATIC_URL }}3rd-party/dataTables/css/jquery.dataTables.bootstrap.css" media="screen" rel="stylesheet" type="text/css">
+  <link href="{{ STATIC_URL }}3rd-party/font-awesome/css/font-awesome.css" media="screen" rel="stylesheet" type="text/css">
+  <link href="{{ STATIC_URL }}3rd-party/select2/select2.css" media="screen" rel="stylesheet" type="text/css">
+  <link href="{{ STATIC_URL }}3rd-party/select2/select2-bootstrap.css" media="screen" rel="stylesheet" type="text/css">
+  <link href="{{ STATIC_URL }}gui/css/layout.css" media="screen" rel="stylesheet" type="text/css">
+  <link href="{{ STATIC_URL }}gui/css/form-elements.css" media="screen" rel="stylesheet" type="text/css">
+  <link href="{{ STATIC_URL }}gui/css/no-auth.css" media="screen" rel="stylesheet" type="text/css">
+  <link href="{{ STATIC_URL }}gui/css/typography.css" media="screen" rel="stylesheet" type="text/css">
+  <link href="{{ STATIC_URL }}gui/css/modals.css" media="screen" rel="stylesheet" type="text/css">
+  <link href="{{ STATIC_URL }}gui/css/navigation.css" media="screen" rel="stylesheet" type="text/css">
+  <link href="{{ STATIC_URL }}gui/css/tables.css" media="screen" rel="stylesheet" type="text/css">
+  <link href="{{ STATIC_URL }}gui/css/animations.css" media="screen" rel="stylesheet" type="text/css">
+  <link href="{{ STATIC_URL }}gui/css/notifications.css" media="screen" rel="stylesheet" type="text/css">
+  <link href="{{ STATIC_URL }}gui/css/faq.css" media="screen" rel="stylesheet" type="text/css">
+  <link href="{{ STATIC_URL }}gui/css/tasklog.css" media="screen" rel="stylesheet" type="text/css">
+  <link href="{{ STATIC_URL }}gui/css/vm.css" media="screen" rel="stylesheet" type="text/css">
+  <link href="{{ STATIC_URL }}gui/css/node.css" media="screen" rel="stylesheet" type="text/css">
+  <link href="{{ STATIC_URL }}gui/css/responsive-max1024.css" media="screen" rel="stylesheet" type="text/css">
+  <link href="{{ STATIC_URL }}gui/css/responsive-max768.css" media="screen" rel="stylesheet" type="text/css">
+  <link href="{{ STATIC_URL }}gui/css/responsive-max480.css" media="screen" rel="stylesheet" type="text/css">
+  {% for stylesheet in THIRD_PARTY_CSS %}
+  <link href="{{ STATIC_URL }}{{ stylesheet }}" media="screen" rel="stylesheet" type="text/css">{% endfor %}
+  {% endcompress %}
+
+  {% compress js %}
+  <script src="{{ STATIC_URL }}3rd-party/jquery/jquery.min.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}3rd-party/jqueryUI/jquery-ui.min.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}3rd-party/jqueryUI/jqueryui.datepicker-en.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}3rd-party/jqueryUI/jqueryui.datepicker-sk.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}3rd-party/underscore/underscore.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}3rd-party/underscore/template.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}3rd-party/bootstrap/js/bootstrap-transition.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}3rd-party/bootstrap/js/bootstrap-button.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}3rd-party/bootstrap/js/bootstrap-dropdown.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}3rd-party/bootstrap/js/bootstrap-modal.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}3rd-party/bootstrap/js/bootstrap-tooltip.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}3rd-party/dataTables/js/jquery.dataTables.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}3rd-party/dataTables/js/jquery.dataTables.sorting.formatted-numbers.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}3rd-party/dataTables/js/jquery.dataTables.sorting.ip-address.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}3rd-party/dataTables/js/jquery.dataTables.sorting.icon-tag.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}3rd-party/history/jquery.history.js" type="text/javascript"></script>
+
+  <script src="{{ STATIC_URL }}gui/js/notify.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}gui/js/helpers.js" type="text/javascript"></script>
+  {% endcompress %}
+  <script src="{% url 'javascript_catalog' %}" type="text/javascript"></script>
+
+  {% if request.user.is_authenticated %}
+  <script type="text/javascript">
+    {% get_current_timezone as TIMEZONE %}
+    {% if DEBUG.javascript %}var DEBUG=true;{% else %}var DEBUG=false; var console = {}; console.log = function(){};{% endif %}
+    var TASKLOG_URL= '{% url "tasklog_cached" %}';
+    var STATIC_URL = '{{ STATIC_URL }}';
+    var SOCKETIO_URL = '{{ SOCKETIO_URL }}';
+    var LANGUAGE_CODE = '{{ LANGUAGE_CODE }}';
+    var USER_VMS_TAGS = '{{ request.user.vms_tags|escapejs }}';
+    var CURRENT_DC = '{{ request.dc.name }}';
+    var CURRENT_TZ = '{{ TIMEZONE }}';
+  </script>
+  {% compress js %}
+  <script src="{{ STATIC_URL }}3rd-party/mini-signals/mini-signals.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}3rd-party/select2/select2.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}3rd-party/select2/select2_locale_sk_django.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}3rd-party/moment/moment.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}3rd-party/moment/moment-timezone-with-data.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}3rd-party/moment/moment-strftime.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}3rd-party/jqueryFlot/jquery.flot.min.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}3rd-party/jqueryFlot/jquery.flot.resize.min.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}3rd-party/jqueryFlot/jquery.flot.time.min.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}3rd-party/jqueryFlot/jquery.flot.selection.min.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}3rd-party/jqueryFlot/jquery.flot.stack.min.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}3rd-party/jqueryFlot/jquery.flot.crosshair.min.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}3rd-party/jqueryFlot/jquery.flot.byte.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}3rd-party/jqueryFlot/jquery.flot.bit.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}3rd-party/jqueryFlot/jquery.flot.second.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}3rd-party/jqueryFileUpload/jquery.iframe-transport.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}3rd-party/jqueryFileUpload/jquery.fileupload.js" type="text/javascript"></script>
+
+  <script src="{{ STATIC_URL }}sio/js/socket.io.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}gui/js/signals.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}gui/js/ajax-loader.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}gui/js/tasklog/tasklog.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}gui/js/support/add_ticket.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}gui/js/profile/profile.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}gui/js/reports/reports.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}gui/js/vm/vm-details.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}gui/js/vm/vm-list.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}gui/js/vm/vm-console.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}gui/js/vm/vm-backup.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}gui/js/vm/vm-monitoring.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}gui/js/vm/vm-add.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}gui/js/obj.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}gui/js/mon.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}gui/js/dc/dc.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}gui/js/dc/dc-node.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}gui/js/dc/dc-storage.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}gui/js/dc/dc-network.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}gui/js/dc/dc-network-ip.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}gui/js/dc/dc-image.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}gui/js/dc/dc-imagestore.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}gui/js/dc/dc-template.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}gui/js/dc/dc-iso.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}gui/js/dc/dc-user.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}gui/js/dc/dc-group.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}gui/js/dc/dc-domain.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}gui/js/dc/dc-domain-record.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}gui/js/dc/dc-settings.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}gui/js/docs/docs.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}gui/js/docs/faq.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}gui/js/node/node-list.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}gui/js/node/node-details.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}gui/js/node/node-storage.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}gui/js/node/node-image.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}gui/js/gsio.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}sio/js/esio.js" type="text/javascript"></script>
+  {% for jslib in THIRD_PARTY_JS %}
+  <script src="{{ STATIC_URL }}{{ jslib }}" type="text/javascript"></script>{% endfor %}
+  {% endcompress %}
+  {% endif %}
+  {% block head %}{% endblock %}
+</head>
+<body{% block body_class %}{% endblock %}>
+  <div id="not_supported_browser" class="hide">
+    {% trans "We’re sorry, but you are using an <b>unsupported browser</b>. <small>You may experience unexpected errors and limited functionality.</small>" %}
+  </div>
+
+  {% spaceless %}
+  <script type="text/html" id="template-notification-element">
+    <div class="notification animated fadeInLeftMiddle fast {% templatetag openvariable %} main_class {% templatetag closevariable %}">
+      <div class="left">
+        <div class="icon {% templatetag openvariable %} image_class {% templatetag closevariable %}"><i class="{% templatetag openvariable %} icon_class {% templatetag closevariable %}"></i></div>
+      </div>
+      <div class="right">
+        <div class="inner"><b>{% templatetag openvariable %} text {% templatetag closevariable %}</b></div>
+        <div class="time">{% templatetag openvariable %} time {% templatetag closevariable %}</div>
+      </div>
+      <i class="icon-remove-sign hide"></i>
+    </div>
+  </script>
+  <script type="text/html" id="template-notification-bar">
+    <div class="container">
+      <div class="row">
+        <div id="notification-bar" class="span6 offset3 notifications animated">
+          <div id="dismiss-all" class="dismiss-all button blue">{% trans "Dismiss all" %}</div>
+          <div id="content">
+            <div id="notification-elements"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </script>
+  {% endspaceless %}
+
+  <div id="loading" class="modal modal-loading hide">
+    <div class="modal-body">
+      <button type="button" id="loading-close" class="close" data-dismiss="modal">&times;</button>
+      <span id="loading_msg">{% trans "Please Wait" %}</span><br/>
+      <img src="{{ STATIC_URL }}gui/img/ajax-loader.gif" alt="" />
+    </div>
+  </div>
+
+  <div id="alert2" class="modal black-box modal2 hide">
+    <div class="modal-head tab-header">
+      <button type="button" class="close" data-dismiss="modal">&times;</button>
+      <span><i class="icon-warning-sign"></i>&nbsp;<span class="modal2-header">{% trans "Warning" %}</span></span>
+    </div>
+    <div class="modal-body separator">
+      <p class="modal2-text"></p>
+    </div>
+    <div class="modal-footer">
+      <div class="inner-well">
+        <a class="button red no-ajax" data-dismiss="modal">{% trans "OK" %}</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="confirm2" class="modal black-box modal2 hide">
+    <div class="modal-head tab-header">
+      <button type="button" class="close" data-dismiss="modal">&times;</button>
+      <span><i class="icon-warning-sign"></i>&nbsp;<span class="modal2-header">{% trans "Warning" %}</span></span>
+    </div>
+    <div class="modal-body separator">
+      <p class="modal2-text"></p>
+    </div>
+    <div class="modal-footer">
+      <div class="inner-well">
+        <a class="button blue no-ajax confirm2-cancel" data-dismiss="modal">{% trans "Cancel" %}</a>
+        <a class="button red no-ajax confirm2-ok" data-dismiss="modal">{% trans "OK" %}</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="main-body">
+    {% if request.user.is_authenticated %}
+    {% if request.impersonated %}{% include "impersonation.html" %}{% endif %}
+    {% block javascript %}{% endblock %}
+    {% include "gui/navigation.html" %}
+    {% block javascript2 %}{% endblock %}
+    {% endif %}
+
+    <section id="main">
+      {% include "gui/messages.html" %}
+      <div class="base-nav">
+        {% block base_nav %}{% endblock %}
+      </div> <!-- end base-nav -->
+      {% block base_content %}{% endblock %}
+      {% if request.user.is_authenticated %}
+      <div id="cached-tasks">
+        {% include "gui/tasklog/tasklog_cached.html" %}
+      </div> <!-- end cached-tasks -->
+      {% endif %}
+    </section>
+    {% if DEBUG.sql %}{% include "debug.html" %}{% endif %}
+  </div>
+
+{% if ANALYTICS %}{% include "ga.html" %}{% endif %}
+</body></html>

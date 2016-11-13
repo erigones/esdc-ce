@@ -1,0 +1,5 @@
+{% load i18n %}
+<script type="text/html" id="template-log-detail">
+<span class="log-detail-less"><pre>{% templatetag openvariable %} less {% templatetag closevariable %}...&nbsp;</pre><i class="icon-plus" title="{% trans "show more" %}"></i></span>
+<span class="log-detail-more hide"><pre>{% templatetag openvariable %} orig {% templatetag closevariable %}&nbsp;&nbsp;</pre><i class="icon-minus" title="{% trans "show less" %}"></i></span>
+</script>

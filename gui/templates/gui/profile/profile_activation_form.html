@@ -1,0 +1,22 @@
+{% load i18n %}
+{% csrf_token %}
+
+{% if not profile.email_verified %}
+<div class="vm_modal_text">{% blocktrans with email=user.email %}Please enter the activation code sent to you via email to activate your new email address {{ email }}{% endblocktrans %}:</div>
+
+{% for error in email_aform.non_field_errors %}
+<div class="alert alert-error"><i class="icon-warning-sign"></i> {{ error }}</div>
+{% endfor %}
+
+{% include "gui/form_field.html" with field=email_aform.email_token %}
+{% endif %}
+
+{% if not profile.phone_verified %}                        
+<div class="vm_modal_text">{% blocktrans with phone=profile.phone %}Please enter the activation code sent to you via text message to activate your new phone number {{ phone }}{% endblocktrans %}:</div>
+
+{% for error in phone_aform.non_field_errors %}
+<div class="alert alert-error"><i class="icon-warning-sign"></i> {{ error }}</div>
+{% endfor %}
+
+{% include "gui/form_field.html" with field=phone_aform.phone_token %}
+{% endif %}

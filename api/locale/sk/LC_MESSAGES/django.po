@@ -1,0 +1,2982 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Erigones API\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-11-11 20:51+0000\n"
+"PO-Revision-Date: 2014-02-27 07:58+0100\n"
+"Last-Translator: Erigones, s. r. o. <erigones@erigones.com>\n"
+"Language-Team: Erigones, s. r. o. <erigones@erigones.com>\n"
+"Language: SK\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"X-Generator: Poedit 1.5.4\n"
+"X-Translated-Using: django-rosetta 0.7.3\n"
+
+#: accounts/group/serializers.py:65
+msgid "Group"
+msgstr ""
+
+#: accounts/group/serializers.py:102
+msgid "username"
+msgstr ""
+
+#: accounts/messages.py:4
+msgid "Create user"
+msgstr ""
+
+#: accounts/messages.py:5
+msgid "Update user"
+msgstr ""
+
+#: accounts/messages.py:6
+msgid "Delete user"
+msgstr ""
+
+#: accounts/messages.py:8
+msgid "Update user profile"
+msgstr ""
+
+#: accounts/messages.py:10
+msgid "Create user group"
+msgstr ""
+
+#: accounts/messages.py:11
+msgid "Update user group"
+msgstr ""
+
+#: accounts/messages.py:12
+msgid "Delete user group"
+msgstr ""
+
+#: accounts/messages.py:14
+msgid "Add user SSH key"
+msgstr ""
+
+#: accounts/messages.py:15
+msgid "Delete user SSH key"
+msgstr ""
+
+#: accounts/user/base/api_views.py:130
+msgid "Cannot delete user, because he has relations to some objects."
+msgstr ""
+
+#: accounts/user/base/serializers.py:144
+msgid "This email is already in use. Please supply a different email."
+msgstr ""
+
+#: accounts/user/base/serializers.py:169
+msgid "You don't have permission to use DC-unbound groups."
+msgstr ""
+
+#: accounts/user/base/serializers.py:237
+msgid "A SuperAdmin user cannot be DC-bound."
+msgstr ""
+
+#: accounts/user/base/serializers.py:251
+msgid "User's group(s) are attached into another datacenter(s)."
+msgstr ""
+
+#: accounts/user/profile/serializers.py:32 authtoken/serializers.py:35
+msgid "Username"
+msgstr "Používateľske meno"
+
+#: accounts/user/profile/serializers.py:33
+msgid "Terms of Service"
+msgstr ""
+
+#: accounts/user/profile/serializers.py:33
+msgid "TOS acceptation check."
+msgstr ""
+
+#: accounts/user/profile/serializers.py:34
+msgid "Email address"
+msgstr ""
+
+#: accounts/user/profile/serializers.py:35
+msgid "Email verified"
+msgstr ""
+
+#: accounts/user/profile/serializers.py:35
+msgid "Email verification check."
+msgstr ""
+
+#: accounts/user/profile/serializers.py:36
+msgid "Billing Email"
+msgstr ""
+
+#: accounts/user/profile/serializers.py:37
+msgid "Phone"
+msgstr "Mobilné tel. číslo"
+
+#: accounts/user/profile/serializers.py:38
+msgid "Phone verified"
+msgstr ""
+
+#: accounts/user/profile/serializers.py:38
+msgid "Phone verification check."
+msgstr ""
+
+#: accounts/user/profile/serializers.py:39
+msgid "Billing Phone"
+msgstr ""
+
+#: accounts/user/profile/serializers.py:40
+msgid "Technical newsletter"
+msgstr ""
+
+#: accounts/user/profile/serializers.py:41
+msgid "Business newsletter"
+msgstr ""
+
+#: accounts/user/profile/serializers.py:42
+msgid "Account type"
+msgstr ""
+
+#: accounts/user/profile/serializers.py:44
+msgid "Language"
+msgstr "Jazyk"
+
+#: accounts/user/profile/serializers.py:45
+msgid "Time zone"
+msgstr "Časové pásmo"
+
+#: accounts/user/profile/serializers.py:47
+msgid "Currency"
+msgstr "Mena"
+
+#: accounts/user/profile/serializers.py:49
+msgid "Title"
+msgstr "Titul"
+
+#: accounts/user/profile/serializers.py:51
+msgid "Middle name"
+msgstr "Druhé meno"
+
+#: accounts/user/profile/serializers.py:53
+msgid "Website"
+msgstr "Webstránka"
+
+#: accounts/user/profile/serializers.py:54
+msgid "Jabber"
+msgstr "Jabber"
+
+#: accounts/user/profile/serializers.py:55
+#: accounts/user/profile/serializers.py:63
+msgid "Street address"
+msgstr ""
+
+#: accounts/user/profile/serializers.py:56
+#: accounts/user/profile/serializers.py:64
+msgid "Street address 2"
+msgstr ""
+
+#: accounts/user/profile/serializers.py:57
+#: accounts/user/profile/serializers.py:65
+msgid "Optional, use in case your address contains multiple names."
+msgstr ""
+
+#: accounts/user/profile/serializers.py:58
+#: accounts/user/profile/serializers.py:66
+msgid "City"
+msgstr "Mesto"
+
+#: accounts/user/profile/serializers.py:59
+#: accounts/user/profile/serializers.py:67
+msgid "ZIP/Postal Code"
+msgstr "PSČ"
+
+#: accounts/user/profile/serializers.py:60
+#: accounts/user/profile/serializers.py:68
+msgid "State/Province/Region"
+msgstr ""
+
+#: accounts/user/profile/serializers.py:61
+#: accounts/user/profile/serializers.py:69
+msgid "Country"
+msgstr "Krajina"
+
+#: accounts/user/profile/serializers.py:62
+msgid "Use different billing address"
+msgstr ""
+
+#: accounts/user/profile/serializers.py:72
+msgid "Company"
+msgstr "Spoločnosť"
+
+#: accounts/user/profile/serializers.py:73
+msgid "Company ID"
+msgstr "IČO"
+
+#: accounts/user/profile/serializers.py:74
+msgid "TAX ID"
+msgstr ""
+
+#: accounts/user/profile/serializers.py:75
+msgid "VAT ID"
+msgstr "IČ DPH"
+
+#: accounts/user/profile/serializers.py:76
+msgid "Bank Account Number"
+msgstr "Číslo bankového účtu"
+
+#: accounts/user/profile/serializers.py:89
+#, python-format
+msgid ""
+"Please confirm your new phone number at %(site_link)s with this activation "
+"code: %(token)s"
+msgstr ""
+
+#: accounts/user/sshkey/serializers.py:30
+msgid "SSH key already defined"
+msgstr ""
+
+#: accounts/user/sshkey/serializers.py:38
+msgid "SSH keys limit reached"
+msgstr ""
+
+#: authentication.py:100
+msgid "Invalid basic header. No credentials provided."
+msgstr ""
+
+#: authentication.py:103
+msgid "Invalid basic header. Credentials string should not contain spaces."
+msgstr ""
+
+#: authentication.py:109
+msgid "Invalid basic header. Credentials not correctly base64 encoded."
+msgstr ""
+
+#: authentication.py:127
+msgid "Invalid username/password."
+msgstr ""
+
+#: authentication.py:130 authentication.py:228
+msgid "User inactive or deleted."
+msgstr ""
+
+#: authentication.py:206
+msgid "Invalid token header. No credentials provided."
+msgstr ""
+
+#: authentication.py:209
+msgid "Invalid token header. Token string should not contain spaces."
+msgstr ""
+
+#: authentication.py:215
+msgid ""
+"Invalid token header. Token string should not contain invalid characters."
+msgstr ""
+
+#: authentication.py:225
+msgid "Invalid token."
+msgstr ""
+
+#: authtoken/apps.py:34
+msgid "Auth Token"
+msgstr ""
+
+#: authtoken/models.py:42
+msgid "Key"
+msgstr ""
+
+#: authtoken/models.py:45
+msgid "User"
+msgstr "Používateľ"
+
+#: authtoken/models.py:47
+msgid "Created"
+msgstr "Vytvorená"
+
+#: authtoken/models.py:56
+msgid "Token"
+msgstr ""
+
+#: authtoken/models.py:57
+msgid "Tokens"
+msgstr ""
+
+#: authtoken/serializers.py:36 templates/vm/base/vm_deploy_email.txt:13
+msgid "Password"
+msgstr "Heslo"
+
+#: authtoken/serializers.py:47
+msgid "User account is disabled."
+msgstr ""
+
+#: authtoken/serializers.py:50
+msgid "Unable to log in with provided credentials."
+msgstr ""
+
+#: authtoken/serializers.py:53
+msgid "Must include \"username\" and \"password\"."
+msgstr ""
+
+#: dc/base/dc_view.py:172
+msgid "Default datacenter cannot be deleted"
+msgstr "Defaultné datacentrum nie je možné vymazať"
+
+#: dc/base/dc_view.py:174
+msgid "Datacenter has nodes"
+msgstr ""
+
+#: dc/base/dc_view.py:176
+msgid "Datacenter has VMs"
+msgstr ""
+
+#: dc/base/dc_view.py:178
+msgid "Datacenter has backups"
+msgstr ""
+
+#: dc/base/serializers.py:29
+msgid "Invalid placeholders."
+msgstr ""
+
+#: dc/base/serializers.py:91
+msgid ""
+"This site hostname is already in use. Please supply a different site "
+"hostname."
+msgstr "Takýto názov stránky sa už používa. Prosím zadajte iný názov stránky."
+
+#: dc/base/serializers.py:103
+msgid "Default datacenter must be public."
+msgstr "Defaultné datacentrum musí byť verejné"
+
+#: dc/base/serializers.py:121
+msgid "Default datacenter must be owned by user with SuperAdmin rights."
+msgstr ""
+
+#: dc/base/serializers.py:125 dc/base/serializers.py:226
+#: templates/vm/base/vm_deploy_email.txt:10
+msgid "Datacenter"
+msgstr "Datacentrum"
+
+#: dc/base/serializers.py:229
+msgid "Snapshots"
+msgstr ""
+
+#: dc/base/serializers.py:230
+msgid "Backups"
+msgstr ""
+
+#: dc/base/serializers.py:231
+msgid "Monitoring"
+msgstr ""
+
+#: dc/base/serializers.py:232
+msgid "Support"
+msgstr ""
+
+#: dc/base/serializers.py:233
+msgid "Registration"
+msgstr ""
+
+#: dc/base/serializers.py:234
+msgid "FAQ"
+msgstr ""
+
+#: dc/base/serializers.py:239
+msgid "Default domain part of the hostname of a newly created virtual server."
+msgstr ""
+
+#: dc/base/serializers.py:243
+msgid "Name of the company using this virtual datacenter."
+msgstr ""
+
+#: dc/base/serializers.py:245
+msgid "Name of this site used mostly in email and text message templates."
+msgstr ""
+
+#: dc/base/serializers.py:247
+msgid "Link to this site used mostly in email and text message templates."
+msgstr ""
+
+#: dc/base/serializers.py:249
+msgid ""
+"Signature attached to outgoing emails related to this virtual datacenter."
+msgstr ""
+
+#: dc/base/serializers.py:252
+msgid ""
+"URL pointing to an image, which will be displayed as a logo on the main "
+"page. If empty the default Danube Cloud logo will be used."
+msgstr ""
+
+#: dc/base/serializers.py:255
+msgid ""
+"URL pointing to an image, which will be displayed as an icon in the "
+"navigation bar. If empty the default Danube Cloud icon will be used."
+msgstr ""
+
+#: dc/base/serializers.py:258
+msgid ""
+"Destination email address used for all support tickets related to this "
+"virtual datacenter."
+msgstr ""
+
+#: dc/base/serializers.py:261
+msgid "Phone number displayed in the support contact details."
+msgstr ""
+
+#: dc/base/serializers.py:263
+msgid ""
+"Whether to send a confirmation email to the user after a support ticket has "
+"been sent to SUPPORT_EMAIL."
+msgstr ""
+
+#: dc/base/serializers.py:266
+msgid ""
+"Email address used as the \"From\" address for all outgoing emails related "
+"to this virtual datacenter."
+msgstr ""
+
+#: dc/base/serializers.py:269
+msgid ""
+"Whether to completely disable sending of emails related to this virtual "
+"datacenter."
+msgstr ""
+
+#: dc/base/serializers.py:272
+msgid "Whether to log API user callback requests into the tasklog."
+msgstr ""
+
+#: dc/base/serializers.py:275
+msgid "Whether to enable support for SunOS zones in this virtual datacenter."
+msgstr ""
+
+#: dc/base/serializers.py:278
+msgid ""
+"Default operating system type. One of: 1 - Linux, 2 - SunOS, 3 - BSD, 4 - "
+"Windows, 5 - SunOS Zone,6 - Linux Zone."
+msgstr ""
+
+#: dc/base/serializers.py:282
+msgid ""
+"Controls whether server synchronization with the monitoring system is "
+"enabled by default."
+msgstr ""
+
+#: dc/base/serializers.py:285
+msgid "Default value of the server's CPU shares, relative to other servers."
+msgstr ""
+
+#: dc/base/serializers.py:288
+msgid ""
+"Default value of the server's IO throttling priority, relative to other "
+"servers."
+msgstr ""
+
+#: dc/base/serializers.py:291
+msgid "Default DNS resolvers used for newly created servers."
+msgstr ""
+
+#: dc/base/serializers.py:294
+msgid ""
+"List of public SSH keys added to every virtual machine in this virtual "
+"datacenter."
+msgstr ""
+
+#: dc/base/serializers.py:298
+msgid "Default VM metadata (key=value string pairs)."
+msgstr ""
+
+#: dc/base/serializers.py:300
+msgid ""
+"Default disk model of newly created server disks. One of: virtio, ide, scsi."
+msgstr ""
+
+#: dc/base/serializers.py:303
+msgid ""
+"Default disk compression algorithm. One of: off, lzjb, gzip, gzip-N, zle, "
+"lz4."
+msgstr ""
+
+#: dc/base/serializers.py:306
+msgid "Name of the default disk image used for newly created server disks."
+msgstr ""
+
+#: dc/base/serializers.py:309
+msgid ""
+"Name of the default disk image used for newly created SunOS zone servers."
+msgstr ""
+
+#: dc/base/serializers.py:312
+msgid ""
+"Default virtual NIC model of newly created server NICs. One of: virtio, "
+"e1000, rtl8139."
+msgstr ""
+
+#: dc/base/serializers.py:315
+msgid "Default NIC ID, which will be used for external monitoring."
+msgstr ""
+
+#: dc/base/serializers.py:318
+msgid "Name of the default network used for newly created server NICs."
+msgstr ""
+
+#: dc/base/serializers.py:320
+msgid ""
+"Maximum number of DC-bound networks that can be created in this virtual "
+"datacenter."
+msgstr ""
+
+#: dc/base/serializers.py:323
+msgid "Whether to restrict VLAN IDs to the VMS_NET_VLAN_ALLOWED list."
+msgstr ""
+
+#: dc/base/serializers.py:326
+msgid ""
+"List of VLAN IDs available for newly created DC-bound networks in this "
+"virtual datacenter."
+msgstr ""
+
+#: dc/base/serializers.py:329
+msgid ""
+"Maximum number of DC-bound server images that can be created in this virtual "
+"datacenter."
+msgstr ""
+
+#: dc/base/serializers.py:332
+msgid ""
+"Maximum number of DC-bound ISO images that can be created in this virtual "
+"datacenter."
+msgstr ""
+
+#: dc/base/serializers.py:335
+msgid ""
+"Name of the default storage used for newly created servers and server disks."
+msgstr ""
+
+#: dc/base/serializers.py:338
+msgid ""
+"Default VGA emulation driver of newly created servers. One of: std, cirrus, "
+"vmware."
+msgstr ""
+
+#: dc/base/serializers.py:342
+msgid "Maximum number of snapshot definitions per server."
+msgstr ""
+
+#: dc/base/serializers.py:344
+msgid "Maximum number of automatic snapshots per server."
+msgstr ""
+
+#: dc/base/serializers.py:346
+msgid "Maximum number of manual snapshots per server."
+msgstr ""
+
+#: dc/base/serializers.py:348
+msgid "Predefined manual snapshot limit for new servers."
+msgstr ""
+
+#: dc/base/serializers.py:351
+msgid "Maximum size of all snapshots per server."
+msgstr ""
+
+#: dc/base/serializers.py:353
+msgid "Predefined snapshot size limit for new servers."
+msgstr ""
+
+#: dc/base/serializers.py:355
+msgid "Maximum size of all snapshots in this virtual datacenter."
+msgstr ""
+
+#: dc/base/serializers.py:358
+msgid "Maximum number of backup definitions per server."
+msgstr ""
+
+#: dc/base/serializers.py:360
+msgid "Upper retention limit used for new backup definitions."
+msgstr ""
+
+#: dc/base/serializers.py:362
+msgid "Maximum size of all backups in this virtual datacenter."
+msgstr ""
+
+#: dc/base/serializers.py:365
+msgid "Predefined compression algorithm for new file backups."
+msgstr ""
+
+#: dc/base/serializers.py:369
+#, python-brace-format
+msgid ""
+"Default value used for reverse DNS records of virtual server NIC's IP "
+"addresses. Available placeholders are: {ipaddr}, {hostname}, {alias}."
+msgstr ""
+
+#: dc/base/serializers.py:374
+msgid ""
+"URL address of Zabbix server used for external monitoring of servers in this "
+"virtual datacenter. WARNING: Changing this and other MON_ZABBIX_* values in "
+"default virtual datacenter will affect the built-in internal monitoring of "
+"servers and compute nodes."
+msgstr ""
+
+#: dc/base/serializers.py:380
+msgid ""
+"Whether to perform HTTPS certificate verification when connecting to the "
+"Zabbix API."
+msgstr ""
+
+#: dc/base/serializers.py:383
+msgid "Timeout in seconds used for connections to the Zabbix API."
+msgstr ""
+
+#: dc/base/serializers.py:385
+msgid "Username used for connecting to the Zabbix API."
+msgstr ""
+
+#: dc/base/serializers.py:387
+msgid "Password used for connecting to the Zabbix API."
+msgstr ""
+
+#: dc/base/serializers.py:389
+msgid ""
+"Username used for the HTTP basic authentication required for connections to "
+"the Zabbix API."
+msgstr ""
+
+#: dc/base/serializers.py:392
+msgid ""
+"Password used for the HTTP basic authentication required for connections to "
+"the Zabbix API."
+msgstr ""
+
+#: dc/base/serializers.py:396
+msgid "Whether to fetch and display the SLA value of virtual servers."
+msgstr ""
+
+#: dc/base/serializers.py:398
+msgid ""
+"Whether newly created virtual servers can be automatically synchronized with "
+"the monitoring server."
+msgstr ""
+
+#: dc/base/serializers.py:401
+msgid ""
+"Existing Zabbix host group, which will be used for all monitored servers in "
+"this virtual datacenter."
+msgstr ""
+
+#: dc/base/serializers.py:404
+#, python-brace-format
+msgid ""
+"List of other existing Zabbix host groups, which will be used for all "
+"monitored servers in this virtual datacenter. Available placeholders are: "
+"{ostype}, {ostype_text}, {disk_image}, {disk_image_abbr}, {dc_name}."
+msgstr ""
+
+#: dc/base/serializers.py:409
+msgid ""
+"Whether to restrict Zabbix host group names to the "
+"MON_ZABBIX_HOSTGROUPS_VM_ALLOWED list."
+msgstr ""
+
+#: dc/base/serializers.py:413
+#, python-brace-format
+msgid ""
+"List of Zabbix host groups that can be used by servers in this virtual "
+"datacenter. Available placeholders are: {ostype}, {ostype_text}, "
+"{disk_image}, {disk_image_abbr}, {dc_name}."
+msgstr ""
+
+#: dc/base/serializers.py:418
+#, python-brace-format
+msgid ""
+"List of existing Zabbix templates, which will be used for all monitored "
+"servers in this virtual datacenter. Available placeholders are: {ostype}, "
+"{ostype_text}, {disk_image}, {disk_image_abbr}, {dc_name}."
+msgstr ""
+
+#: dc/base/serializers.py:423
+msgid ""
+"Whether to find and use existing Zabbix templates according to tags of a "
+"monitored virtual server."
+msgstr ""
+
+#: dc/base/serializers.py:427
+msgid ""
+"Whether to restrict Zabbix template names to the "
+"MON_ZABBIX_TEMPLATES_VM_ALLOWED list."
+msgstr ""
+
+#: dc/base/serializers.py:431
+#, python-brace-format
+msgid ""
+"List of Zabbix templates that can be used by servers in this virtual "
+"datacenter. Available placeholders are: {ostype}, {ostype_text}, "
+"{disk_image}, {disk_image_abbr}, {dc_name}."
+msgstr ""
+
+#: dc/base/serializers.py:436
+#, python-brace-format
+msgid ""
+"List of Zabbix templates that will be used for all monitored servers, for "
+"every virtual NIC of a server. Available placeholders are: {net}, {nic_id} + "
+"MON_ZABBIX_TEMPLATES_VM placeholders."
+msgstr ""
+
+#: dc/base/serializers.py:441
+#, python-brace-format
+msgid ""
+"List of Zabbix templates that will be used for all monitored servers, for "
+"every virtual disk of a server. Available placeholders: {disk}, {disk_id} + "
+"MON_ZABBIX_TEMPLATES_VM placeholders."
+msgstr ""
+
+#: dc/base/serializers.py:447
+msgid ""
+"Name or ID of the monitoring proxy, which will be used to monitor all "
+"monitored virtual servers."
+msgstr ""
+
+#: dc/base/serializers.py:514
+#, python-format
+msgid "Object with name=%s does not exist."
+msgstr "Objekt s menom=%s neexistuje."
+
+#: dc/base/serializers.py:517
+msgid "Domain is not available in this datacenter."
+msgstr ""
+
+#: dc/base/serializers.py:573
+msgid "Cannot override global setting."
+msgstr ""
+
+#: dc/base/serializers.py:588
+msgid "Advanced User Management"
+msgstr ""
+
+#: dc/base/serializers.py:589
+msgid "API access"
+msgstr ""
+
+#: dc/base/serializers.py:590
+msgid "Virtual Datacenters"
+msgstr ""
+
+#: dc/base/serializers.py:591
+msgid "SMS"
+msgstr ""
+
+#: dc/base/serializers.py:594
+msgid "WARNING: Do not disable this unless you know what you are doing!"
+msgstr ""
+
+#: dc/base/serializers.py:597
+msgid "List of SSH keys to be added to compute nodes by default"
+msgstr ""
+
+#: dc/base/serializers.py:600
+msgid "List of aliases of network devices configured on compute nodes."
+msgstr ""
+
+#: dc/base/serializers.py:603
+msgid ""
+"Object (key=name, value=URL) with remote disk image repositories available "
+"in every virtual datacenter."
+msgstr ""
+
+#: dc/base/serializers.py:607
+msgid ""
+"Default hostmaster email address used for SOA records of newly created "
+"domains."
+msgstr ""
+
+#: dc/base/serializers.py:610
+msgid ""
+"List of DNS servers used for NS records of newly created domains. Set to an "
+"empty list to disable automatic creation of NS records."
+msgstr ""
+
+#: dc/base/serializers.py:613
+#, python-brace-format
+msgid ""
+"Default value for the SOA record of newly created domains. Available "
+"placeholders are: {nameserver} (replaced by first nameserver in "
+"DNS_NAMESERVERS) and {hostmaster} (replaced by DNS_HOSTMASTER). Set to an "
+"empty value to disable automatic creation of SOA records."
+msgstr ""
+
+#: dc/base/serializers.py:620
+msgid "Hostname or IP address of the SMTP server used for all outgoing emails."
+msgstr ""
+
+#: dc/base/serializers.py:622
+msgid "Port of the SMTP server."
+msgstr ""
+
+#: dc/base/serializers.py:624
+msgid "Whether to use an explicit TLS (secure) SMTP connection (STARTTLS)."
+msgstr ""
+
+#: dc/base/serializers.py:626
+msgid "Whether to use an implicit TLS (secure) SMTP connection."
+msgstr ""
+
+#: dc/base/serializers.py:628
+msgid "Username for SMTP authentication."
+msgstr ""
+
+#: dc/base/serializers.py:630
+msgid "Password for SMTP authentication."
+msgstr ""
+
+#: dc/base/serializers.py:632
+msgid "Email address to which hidden copies of all outgoing emails are sent."
+msgstr ""
+
+#: dc/base/serializers.py:635
+msgid ""
+"Maximum number of public SSH keys that can be stored in one user profile."
+msgstr ""
+
+#: dc/base/serializers.py:638
+msgid "Default country in user's profile."
+msgstr ""
+
+#: dc/base/serializers.py:641
+msgid "Default country phone prefix in user's profile."
+msgstr ""
+
+#: dc/base/serializers.py:643
+msgid "Default time zone in user's profile."
+msgstr ""
+
+#: dc/base/serializers.py:646
+msgid ""
+"Whether compute nodes should be automatically synchronized with the "
+"monitoring server."
+msgstr ""
+
+#: dc/base/serializers.py:649
+msgid "Whether to fetch and display the SLA value of compute nodes."
+msgstr ""
+
+#: dc/base/serializers.py:651
+msgid ""
+"Existing Zabbix host group, which will be used for all monitored compute "
+"nodes."
+msgstr ""
+
+#: dc/base/serializers.py:654
+msgid ""
+"List of other existing Zabbix host groups, which will be used for all "
+"monitored compute nodes."
+msgstr ""
+
+#: dc/base/serializers.py:657
+msgid ""
+"List of existing Zabbix templates, which will be used for all monitored "
+"compute nodes."
+msgstr ""
+
+#: dc/base/serializers.py:661
+msgid "Currently used SMS provider."
+msgstr ""
+
+#: dc/base/serializers.py:663
+msgid "Secure key required for sending text messages via the API."
+msgstr ""
+
+#: dc/base/serializers.py:665
+msgid "Username required for the SMSAPI service (former HQSMS)."
+msgstr ""
+
+#: dc/base/serializers.py:667
+msgid "Password required for the SMSAPI service (former HQSMS)."
+msgstr ""
+
+#: dc/base/serializers.py:669
+msgid ""
+"Phone number used for outgoing text messages sent via the SMSAPI service "
+"(former HQSMS)."
+msgstr ""
+
+#: dc/base/serializers.py:695
+msgid "Cannot remove used NIC tags."
+msgstr ""
+
+#: dc/base/serializers.py:719
+msgid "Cannot enable EMAIL_USE_TLS and EMAIL_USE_SSL together."
+msgstr ""
+
+#: dc/domain/api_views.py:78
+msgid "Default VM domain cannot be removed from datacenter"
+msgstr ""
+
+#: dc/image/api_views.py:72 image/base/api_views.py:308
+#: node/image/api_views.py:210
+msgid "Image is used by some VMs"
+msgstr "Image používajú niektoré serveri"
+
+#: dc/messages.py:4
+msgid "Create datacenter"
+msgstr "Vytvorenie datacentra"
+
+#: dc/messages.py:5
+msgid "Update datacenter"
+msgstr "Update datacentra"
+
+#: dc/messages.py:8
+msgid "Update datacenter settings"
+msgstr "Update nastavení datacentra"
+
+#: dc/messages.py:10
+msgid "Add compute node to datacenter"
+msgstr "Pridanie výpočtového uzla do datacentra"
+
+#: dc/messages.py:11
+msgid "Update compute node in datacenter"
+msgstr "Update výpočtového uzla v datacentre"
+
+#: dc/messages.py:12
+msgid "Remove compute node from datacenter"
+msgstr ""
+
+#: dc/messages.py:14
+msgid "Add node storage to datacenter"
+msgstr ""
+
+#: dc/messages.py:15
+msgid "Remove node storage from datacenter"
+msgstr ""
+
+#: dc/messages.py:17
+msgid "Add network to datacenter"
+msgstr ""
+
+#: dc/messages.py:18
+msgid "Remove network from datacenter"
+msgstr ""
+
+#: dc/messages.py:20
+msgid "Add server image to datacenter"
+msgstr ""
+
+#: dc/messages.py:21
+msgid "Remove server image from datacenter"
+msgstr ""
+
+#: dc/messages.py:23
+msgid "Add server template to datacenter"
+msgstr ""
+
+#: dc/messages.py:24
+msgid "Remove server template from datacenter"
+msgstr ""
+
+#: dc/messages.py:26
+msgid "Add ISO image to datacenter"
+msgstr ""
+
+#: dc/messages.py:27
+msgid "Remove ISO image from datacenter"
+msgstr ""
+
+#: dc/messages.py:29
+msgid "Add DNS domain to datacenter"
+msgstr ""
+
+#: dc/messages.py:30
+msgid "Remove DNS domain from datacenter"
+msgstr ""
+
+#: dc/messages.py:32
+msgid "Add user group to datacenter"
+msgstr ""
+
+#: dc/messages.py:33
+msgid "Remove user group from datacenter"
+msgstr ""
+
+#: dc/network/api_views.py:72 network/base/api_views.py:107
+msgid "Network is used by some VMs"
+msgstr "Sieť používajú niektoré serveri"
+
+#: dc/node/api_views.py:127
+msgid "Node has VMs in datacenter"
+msgstr ""
+
+#: dc/node/api_views.py:130
+msgid "Node has VM backups in datacenter"
+msgstr ""
+
+#: dc/node/serializers.py:60
+msgid "Not enough free CPUs on node."
+msgstr "Nedostatočný počet voľných CPU na výpočtovom uzle."
+
+#: dc/node/serializers.py:63 vm/define/serializers.py:484
+msgid "Not enough free RAM on node."
+msgstr "Nedostatočná veľkosť voľnej RAM na výpočtovom uzle."
+
+#: dc/node/serializers.py:66 vm/define/serializers.py:487
+#: vm/define/serializers.py:785
+msgid "Not enough free disk space on node."
+msgstr "Nedostatok voľného diskového priestoru na výpočtovom uzle."
+
+#: dc/storage/api_views.py:44
+msgid "Compute node is not available"
+msgstr "Výpočtový uzol nie je dostupný"
+
+#: dc/storage/api_views.py:97 node/storage/api_views.py:118
+msgid "Storage is used by some VMs"
+msgstr ""
+
+#: dc/storage/api_views.py:100 node/storage/api_views.py:122
+msgid "Storage is used by some VM backups"
+msgstr ""
+
+#: dc/template/api_views.py:74 template/base/api_views.py:89
+msgid "Template is used by some VMs"
+msgstr ""
+
+#: dns/domain/api_views.py:140
+msgid "Default VM domain cannot be deleted"
+msgstr ""
+
+#: dns/domain/serializers.py:45
+msgid "Domain"
+msgstr ""
+
+#: dns/messages.py:4
+msgid "Create DNS domain"
+msgstr ""
+
+#: dns/messages.py:5
+msgid "Update DNS domain"
+msgstr ""
+
+#: dns/messages.py:6
+msgid "Delete DNS domain"
+msgstr ""
+
+#: dns/messages.py:8
+msgid "Create DNS record"
+msgstr ""
+
+#: dns/messages.py:9
+msgid "Update DNS record"
+msgstr ""
+
+#: dns/messages.py:10
+msgid "Delete DNS record"
+msgstr ""
+
+#: dns/messages.py:11
+msgid "Delete DNS records"
+msgstr ""
+
+#: dns/record/api_views.py:53
+#, python-format
+msgid "Changing DNS records is not allowed for %s domain"
+msgstr ""
+
+#: exceptions.py:50
+msgid "A server error occurred."
+msgstr ""
+
+#: exceptions.py:69
+msgid "Object"
+msgstr ""
+
+#: exceptions.py:88
+msgid "Bad request"
+msgstr ""
+
+#: exceptions.py:93
+msgid "Malformed request"
+msgstr ""
+
+#: exceptions.py:98
+msgid "Incorrect authentication credentials."
+msgstr ""
+
+#: exceptions.py:103
+msgid "Authentication credentials were not provided."
+msgstr ""
+
+#: exceptions.py:108
+msgid "You do not have permission to perform this action."
+msgstr ""
+
+#: exceptions.py:113 views.py:119
+msgid "Not found"
+msgstr ""
+
+#: exceptions.py:118
+#, python-brace-format
+msgid "Method \"{method}\" not allowed."
+msgstr ""
+
+#: exceptions.py:129
+msgid "Could not satisfy the request Accept header."
+msgstr ""
+
+#: exceptions.py:141
+#, python-brace-format
+msgid "{object} not found"
+msgstr ""
+
+#: exceptions.py:146
+#, python-brace-format
+msgid "{object} already exists"
+msgstr ""
+
+#: exceptions.py:151
+#, python-brace-format
+msgid "{object} out of range"
+msgstr ""
+
+#: exceptions.py:155 exceptions.py:159 exceptions.py:163
+msgid "Item"
+msgstr "Položka"
+
+#: exceptions.py:168
+msgid "Invalid input"
+msgstr ""
+
+#: exceptions.py:173
+#, python-brace-format
+msgid "Unsupported media type \"{media_type}\" in request."
+msgstr ""
+
+#: exceptions.py:184
+msgid "Node is not operational"
+msgstr ""
+
+#: exceptions.py:189
+msgid "VM is not operational"
+msgstr ""
+
+#: exceptions.py:194
+msgid "VM is locked or has slave VMs"
+msgstr ""
+
+#: exceptions.py:199
+msgid "Task is already running"
+msgstr ""
+
+#: exceptions.py:204
+msgid "Node has pending tasks"
+msgstr ""
+
+#: exceptions.py:209
+msgid "VM has pending tasks"
+msgstr ""
+
+#: exceptions.py:214
+msgid "Expectation Failed"
+msgstr ""
+
+#: exceptions.py:219
+msgid "Precondition Required"
+msgstr ""
+
+#: exceptions.py:224
+msgid "Failed Dependency"
+msgstr ""
+
+#: exceptions.py:229
+msgid "Request was throttled."
+msgstr ""
+
+#: exceptions.py:252
+msgid "Internal Server Error"
+msgstr ""
+
+#: exceptions.py:257
+msgid "Operation not supported"
+msgstr ""
+
+#: exceptions.py:262
+msgid "Gateway Timeout"
+msgstr ""
+
+#: fields.py:326
+msgid "This field is required."
+msgstr ""
+
+#: fields.py:327 relations.py:321
+msgid "Invalid value."
+msgstr ""
+
+#: fields.py:501
+#, python-format
+msgid "'%s' value must be either True or False."
+msgstr ""
+
+#: fields.py:562
+msgid ""
+"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+msgstr ""
+
+#: fields.py:576
+#, python-format
+msgid "Select a valid choice. %(value)s is not one of the available choices."
+msgstr ""
+
+#: fields.py:641
+msgid "Enter a valid email address."
+msgstr ""
+
+#: fields.py:682
+#, python-format
+msgid "Date has wrong format. Use one of these formats instead: %s"
+msgstr ""
+
+#: fields.py:747
+#, python-format
+msgid "Datetime has wrong format. Use one of these formats instead: %s"
+msgstr ""
+
+#: fields.py:818
+#, python-format
+msgid "Time has wrong format. Use one of these formats instead: %s"
+msgstr ""
+
+#: fields.py:876
+msgid "Enter a whole number."
+msgstr ""
+
+#: fields.py:877 fields.py:928 fields.py:1167
+#, python-format
+msgid "Ensure this value is less than or equal to %(limit_value)s."
+msgstr ""
+
+#: fields.py:878 fields.py:929 fields.py:1168
+#, python-format
+msgid "Ensure this value is greater than or equal to %(limit_value)s."
+msgstr ""
+
+#: fields.py:907
+#, python-format
+msgid "'%s' value must be a float."
+msgstr ""
+
+#: fields.py:927
+msgid "Enter a number."
+msgstr ""
+
+#: fields.py:930
+#, python-format
+msgid "Ensure that there are no more than %s digits in total."
+msgstr ""
+
+#: fields.py:931
+#, python-format
+msgid "Ensure that there are no more than %s decimal places."
+msgstr ""
+
+#: fields.py:932
+#, python-format
+msgid "Ensure that there are no more than %s digits before the decimal point."
+msgstr ""
+
+#: fields.py:1001
+msgid "No file was submitted. Check the encoding type on the form."
+msgstr ""
+
+#: fields.py:1002
+msgid "No file was submitted."
+msgstr ""
+
+#: fields.py:1003
+msgid "The submitted file is empty."
+msgstr ""
+
+#: fields.py:1004
+#, python-format
+msgid ""
+"Ensure this filename has at most %(max)d characters (it has %(length)d)."
+msgstr ""
+
+#: fields.py:1005
+msgid "Please either submit a file or check the clear checkbox, not both."
+msgstr ""
+
+#: fields.py:1044
+msgid ""
+"Upload a valid image. The file you uploaded was either not an image or a "
+"corrupted image."
+msgstr ""
+
+#: fields.py:1140 validators.py:156
+msgid "Enter a valid IPv4 address."
+msgstr "Zadajte platnú IPv4 adresu."
+
+#: fields.py:1153 validators.py:125 validators.py:127
+msgid "Enter a valid MAC address."
+msgstr "Zadajte platnú MAC adresu."
+
+#: fields.py:1166
+msgid "Enter a valid timestamp."
+msgstr "Zadajte platný čas."
+
+#: fields.py:1273
+#, python-format
+msgid "Ensure this value has exactly %(exact)d items (it has %(count)d)."
+msgstr ""
+
+#: fields.py:1278
+#, python-format
+msgid "Ensure this value has at least %(min)d items (it has %(count)d)."
+msgstr ""
+
+#: fields.py:1283 fields.py:1427
+#, python-format
+msgid "Ensure this value has at most %(max)d items (it has %(count)d)."
+msgstr ""
+
+#: fields.py:1348
+msgid "Minute Hour Day Month Weekday."
+msgstr ""
+
+#: image/base/api_views.py:68
+msgid "Image server is not available"
+msgstr ""
+
+#: image/base/serializers.py:54 image/base/serializers.py:65
+msgid "Image"
+msgstr ""
+
+#: image/base/serializers.py:91
+msgid ""
+"This alias is already in use. Please supply a different alias or version."
+msgstr "Takýto alias sa už používa. Prosím zadajte iný alias alebo verziu."
+
+#: image/base/serializers.py:99
+msgid "Maximum number of server disk images reached"
+msgstr ""
+
+#: image/base/serializers.py:131
+#, python-format
+msgid "Image manifest URL is unreachable (%s)."
+msgstr ""
+
+#: image/base/serializers.py:136
+msgid "Could not parse image manifest."
+msgstr ""
+
+#: image/base/serializers.py:146
+msgid "Invalid image manifest."
+msgstr ""
+
+#: image/base/serializers.py:157
+#, python-format
+msgid "Image UUID is already registered by image \"%(name)s\"."
+msgstr ""
+
+#: image/base/serializers.py:176
+#, python-format
+msgid "Image file URL is unreachable (%s)."
+msgstr ""
+
+#: image/messages.py:4
+msgid "Create image"
+msgstr ""
+
+#: image/messages.py:5
+msgid "Import image"
+msgstr ""
+
+#: image/messages.py:6
+msgid "Update image"
+msgstr ""
+
+#: image/messages.py:7
+msgid "Delete image"
+msgstr ""
+
+#: imagestore/messages.py:4
+msgid "Refresh image repository"
+msgstr ""
+
+#: iso/base/serializers.py:47
+msgid "ISO image"
+msgstr ""
+
+#: iso/base/serializers.py:67
+msgid "Maximum number of ISO images reached"
+msgstr ""
+
+#: iso/messages.py:4
+msgid "Create ISO image"
+msgstr ""
+
+#: iso/messages.py:5
+msgid "Update ISO image"
+msgstr ""
+
+#: iso/messages.py:6
+msgid "Delete ISO image"
+msgstr ""
+
+#: mon/messages.py:4
+msgid "Update server monitoring definition"
+msgstr ""
+
+#: mon/messages.py:6
+msgid "Sync compute node monitoring host"
+msgstr ""
+
+#: mon/messages.py:7
+msgid "Delete compute node monitoring host"
+msgstr ""
+
+#: mon/messages.py:9
+msgid "Sync server monitoring host"
+msgstr ""
+
+#: mon/messages.py:10
+msgid "Delete server monitoring host"
+msgstr ""
+
+#: mon/vm/graphs.py:69
+msgid "Total compute node CPU consumed by the VM."
+msgstr ""
+
+#: mon/vm/graphs.py:81
+msgid "Total amount of time spent in CPU run queue by the VM."
+msgstr ""
+
+#: mon/vm/graphs.py:91
+msgid "1-minute load average."
+msgstr ""
+
+#: mon/vm/graphs.py:101
+msgid "Total compute node physical memory consumed by the VM."
+msgstr ""
+
+#: mon/vm/graphs.py:112
+msgid "Total compute node swap space used by the VM."
+msgstr ""
+
+#: mon/vm/graphs.py:122
+msgid ""
+"The amount of received and sent network traffic through the virtual network "
+"interface."
+msgstr ""
+
+#: mon/vm/graphs.py:133
+msgid ""
+"The amount of received and sent packets through the virtual network "
+"interface."
+msgstr ""
+
+#: mon/vm/graphs.py:144 mon/vm/graphs.py:168
+msgid "The amount of written and read data on the virtual hard drive."
+msgstr ""
+
+#: mon/vm/graphs.py:156 mon/vm/graphs.py:184
+msgid ""
+"The amount of write and read I/O operations performed on the virtual hard "
+"drive."
+msgstr ""
+
+#: mon/vm/graphs.py:199
+msgid ""
+"Aggregated disk throughput on the logical layer (with acceleration "
+"mechanisms included)."
+msgstr ""
+
+#: mon/vm/graphs.py:210
+msgid ""
+"Aggregated amount or read and write I/O operations on the logical layer "
+"(with acceleration mechanisms included)."
+msgstr ""
+
+#: mon/vm/graphs.py:222
+msgid "Aggregated disk throughput on the physical (disk) layer."
+msgstr ""
+
+#: mon/vm/graphs.py:233
+msgid ""
+"Aggregated amount of read and write I/O operations on the physical (disk) "
+"layer."
+msgstr ""
+
+#: mon/vm/graphs.py:244
+msgid ""
+"Aggregated amount of disk I/O operations by latency on the logical layer "
+"(with acceleration mechanisms included)."
+msgstr ""
+
+#: network/base/api_views.py:89
+msgid "This field cannot be updated because network has existing IP addresses."
+msgstr ""
+
+#: network/base/api_views.py:94
+msgid "This field cannot be updated because network is used by some VMs."
+msgstr ""
+
+#: network/base/serializers.py:62
+msgid "Network"
+msgstr ""
+
+#: network/base/serializers.py:90
+msgid ""
+"Network has IP addresses that already exist in another network with the same "
+"VLAN ID."
+msgstr ""
+
+#: network/base/serializers.py:104
+msgid "Invalid PTR domain name."
+msgstr ""
+
+#: network/base/serializers.py:128
+msgid "Enter a valid IPv4 network and netmask."
+msgstr "Zadajte platnú IPv4 adresu siete a jej masku."
+
+#: network/base/serializers.py:135
+msgid "Maximum number of networks reached"
+msgstr ""
+
+#: network/base/serializers.py:146
+msgid "VLAN ID is not available in datacenter."
+msgstr ""
+
+#: network/ip/api_views.py:167
+#, python-format
+msgid "IP address \"%s\" is used by VM"
+msgstr "IP adresa \"%s\" je použitá serverom"
+
+#: network/ip/api_views.py:169
+#, python-format
+msgid "IP address \"%s\" is used by Compute node"
+msgstr ""
+
+#: network/ip/api_views.py:176
+msgid "IP address is used by VM"
+msgstr "IP adresa je použitá serverom"
+
+#: network/ip/api_views.py:178
+msgid "IP address is used by Compute node"
+msgstr ""
+
+#: network/ip/serializers.py:56
+#, python-format
+msgid "IP address \"%(ip)s\" does not belong to network %(net)s."
+msgstr ""
+
+#: network/ip/serializers.py:61
+#, python-format
+msgid ""
+"IP address \"%(ip)s\" already exists in another network with the same VLAN "
+"ID."
+msgstr ""
+
+#: network/ip/serializers.py:73
+msgid "IP address is already used by some VM."
+msgstr "IP adresa je použitá niektorým serverom."
+
+#: network/ip/serializers.py:79
+msgid "IP address is used by Compute node."
+msgstr ""
+
+#: network/messages.py:4
+msgid "Create network"
+msgstr "Vytvorenie siete"
+
+#: network/messages.py:5
+msgid "Update network"
+msgstr "Update siete"
+
+#: network/messages.py:6
+msgid "Delete network"
+msgstr "Vymazanie siete"
+
+#: network/messages.py:8
+msgid "Create IP address"
+msgstr "Vytvorenie IP adresy"
+
+#: network/messages.py:9
+msgid "Update IP address"
+msgstr "Update IP adresy"
+
+#: network/messages.py:10
+msgid "Delete IP address"
+msgstr "Vymazanie IP adresy"
+
+#: network/messages.py:12
+msgid "Create IP addresses"
+msgstr "Vytvorenie IP adries"
+
+#: network/messages.py:13
+msgid "Delete IP addresses"
+msgstr "Vymazanie IP adries"
+
+#: node/define/serializers.py:15 node/storage/serializers.py:14
+msgid "Value is too low because of existing virtual machines."
+msgstr ""
+
+#: node/define/serializers.py:56
+msgid "Compute node"
+msgstr ""
+
+#: node/define/serializers.py:72
+msgid "Cannot change status. Please add a valid license first."
+msgstr ""
+
+#: node/define/serializers.py:76
+msgid "Cannot change status. Compute node is down."
+msgstr ""
+
+#: node/define/serializers.py:87
+msgid "Found existing VMs on node."
+msgstr ""
+
+#: node/define/serializers.py:96
+msgid "Found existing VM backup definitions."
+msgstr ""
+
+#: node/define/serializers.py:102
+msgid "Found existing VM backups."
+msgstr ""
+
+#: node/messages.py:4
+msgid "Update node status"
+msgstr ""
+
+#: node/messages.py:6
+msgid "Create compute node"
+msgstr "Vytvorenie výpočtového uzla"
+
+#: node/messages.py:7
+msgid "Update compute node"
+msgstr "Update výpočtového uzla"
+
+#: node/messages.py:9
+msgid "Update node definition"
+msgstr "Update definície výpočtového uzla"
+
+#: node/messages.py:10
+msgid "Delete node definition"
+msgstr "Vymazanie definície výpočtového uzla"
+
+#: node/messages.py:12
+msgid "Import image on node storage"
+msgstr ""
+
+#: node/messages.py:13
+msgid "Remove image from node storage"
+msgstr ""
+
+#: node/messages.py:15
+msgid "Create node storage"
+msgstr ""
+
+#: node/messages.py:16
+msgid "Update node storage"
+msgstr ""
+
+#: node/messages.py:17
+msgid "Delete node storage"
+msgstr ""
+
+#: node/messages.py:19
+msgid "Harvest servers"
+msgstr "Zber serverov"
+
+#: node/messages.py:21
+msgid "Synchronize server snapshots on node storage"
+msgstr ""
+
+#: node/storage/serializers.py:47
+msgid "Storage"
+msgstr ""
+
+#: relations.py:233
+#, python-format
+msgid "Invalid pk '%s' - object does not exist."
+msgstr ""
+
+#: relations.py:234
+#, python-format
+msgid "Incorrect type.  Expected pk value, received %s."
+msgstr ""
+
+#: relations.py:320
+#, python-format
+msgid "Object with %s=%s does not exist."
+msgstr ""
+
+#: relations.py:355
+msgid "Invalid hyperlink - No URL match"
+msgstr ""
+
+#: relations.py:356
+msgid "Invalid hyperlink - Incorrect URL match"
+msgstr ""
+
+#: relations.py:357
+msgid "Invalid hyperlink due to configuration error"
+msgstr ""
+
+#: relations.py:358
+msgid "Invalid hyperlink - object does not exist."
+msgstr ""
+
+#: relations.py:359
+#, python-format
+msgid "Incorrect type.  Expected url string, received %s."
+msgstr ""
+
+#: serializers.py:141
+#, python-format
+msgid "Object with %(field)s=%(value)s does not exist."
+msgstr ""
+
+#: serializers.py:150
+msgid "You don't have permission to modify this attribute."
+msgstr ""
+
+#: sms/templates/smsapi/callback_sms_failed.txt:1
+#, python-format
+msgid ""
+"Hello,\n"
+"\n"
+"we have received a problematic delivery report from SMSAPI (former HQSMS) at "
+"%(timestamp)s.\n"
+"\n"
+"SMS sent from account %(account)s with ID %(id)s to %(phone)s has "
+"%(status)s.\n"
+"\n"
+msgstr ""
+
+#: sms/templates/smsapi/callback_sms_failed_subject.txt:1
+#, python-format
+msgid "Error with SMS to %(phone)s"
+msgstr "Error with SMS to %(phone)s"
+
+#: system/messages.py:4
+msgid "System Update"
+msgstr ""
+
+#: system/messages.py:5
+msgid "Update system settings"
+msgstr ""
+
+#: system/service/events.py:16
+msgid "The system was reloaded. Please refresh your browser."
+msgstr ""
+
+#: task/messages.py:4
+msgid "Unknown error"
+msgstr ""
+
+#: task/messages.py:5
+msgid "Remote callback response"
+msgstr ""
+
+#: task/serializers.py:22
+msgid "Status (all)"
+msgstr ""
+
+#: task/serializers.py:30
+msgid "Object type (all)"
+msgstr ""
+
+#: task/serializers.py:56
+msgid "Status"
+msgstr "Stav"
+
+#: task/serializers.py:57
+msgid "Object type"
+msgstr ""
+
+#: task/serializers.py:59
+msgid "Object name"
+msgstr ""
+
+#: task/serializers.py:60
+msgid "Show only running tasks"
+msgstr ""
+
+#: task/serializers.py:61
+msgid "Hide automatic tasks"
+msgstr ""
+
+#: task/serializers.py:62
+msgid "Since"
+msgstr ""
+
+#: task/serializers.py:63
+msgid "Until"
+msgstr ""
+
+#: task/serializers.py:72
+msgid "object_type attribute is required when filtering by object_name."
+msgstr ""
+
+#: task/states.py:3
+msgid "PENDING"
+msgstr "Prebieha"
+
+#: task/states.py:4
+msgid "SUCCESS"
+msgstr "Úspešná"
+
+#: task/states.py:5
+msgid "FAILURE"
+msgstr "Neuspešná"
+
+#: task/states.py:6
+msgid "REVOKED"
+msgstr "Odvolaná"
+
+#: template/base/serializers.py:53
+msgid "Invalid field."
+msgstr ""
+
+#: template/base/serializers.py:140
+msgid "Template"
+msgstr "Šablóna"
+
+#: template/base/serializers.py:160
+msgid "Maximum number of server templates reached"
+msgstr ""
+
+#: template/messages.py:4
+msgid "Create server template"
+msgstr ""
+
+#: template/messages.py:5
+msgid "Update server template"
+msgstr ""
+
+#: template/messages.py:6
+msgid "Delete server template"
+msgstr ""
+
+#: templates/accounts/user/base/profile_verify_email.txt:1
+#, python-format
+msgid ""
+"Hello!\n"
+"\n"
+"In order to confirm your new email address please go to the profile section "
+"at %(site_link)s and use this activation code.\n"
+"\n"
+"Email activation code: %(email_token)s\n"
+msgstr ""
+
+#: templates/accounts/user/base/profile_verify_subject.txt:1
+msgid "Please confirm your email address"
+msgstr ""
+
+#: templates/email_signature.txt:1
+msgid ""
+"Best regards,\n"
+"\n"
+msgstr ""
+"S pozdravom,\n"
+"\n"
+
+#: templates/vm/base/vm_create_email.txt:1
+#, python-format
+msgid ""
+"Hello,\n"
+"\n"
+"Your server %(server)s was successfully created and it is going to be "
+"deployed.\n"
+"The deployment process takes approximately 10 minutes.\n"
+"You will receive the login details after the server is deployed.\n"
+"\n"
+msgstr ""
+"Vážený zákazník,\n"
+"\n"
+"Váš server %(server)s bol úspešne vytvorený a práve začala jeho automatická "
+"konfigurácia a nasadenie.\n"
+"Celý proces nasadenia trvá približne 10 minút.\n"
+"Prihlasovacie údaje Vám budú zaslané ihneď po nasadení servera.\n"
+"\n"
+
+#: templates/vm/base/vm_create_subject.txt:1
+#, python-format
+msgid "Server %(server)s was created"
+msgstr "Server %(server)s je vytvoreny"
+
+#: templates/vm/base/vm_deploy_email.txt:1
+#, python-format
+msgid ""
+"Hello,\n"
+"\n"
+"Your server %(server)s was successfully deployed and is ready to use."
+msgstr ""
+"Vážený zákazník,\n"
+"\n"
+"Váš server %(server)s bol úspešne nakonfigurovaný a pripravený pre Vaše "
+"použitie."
+
+#: templates/vm/base/vm_deploy_email.txt:4
+msgid ""
+"\n"
+"Please start the server with an ISO image and install your preferred "
+"operating system.\n"
+msgstr ""
+"\n"
+"Prosím spustite server z ISO súboru a nainštalujte Váš oblúbený operačný "
+"systém.\n"
+
+#: templates/vm/base/vm_deploy_email.txt:8
+msgid ""
+"You can connect to the server via web console or by using SSH/remote desktop."
+msgstr ""
+"K serveru sa môžete pripojiť cez webovú konzolu alebo použitím SSH/remote "
+"desktop."
+
+#: templates/vm/base/vm_deploy_email.txt:8
+msgid "You can connect to the server by using SSH."
+msgstr "K serveru sa môžete pripojiť použitím SSH."
+
+#: templates/vm/base/vm_deploy_email.txt:11
+msgid "Hostname"
+msgstr "Hostname"
+
+#: templates/vm/base/vm_deploy_email.txt:12
+msgid "IP address"
+msgstr "IP adresa"
+
+#: templates/vm/base/vm_deploy_email.txt:15
+msgid "NOTE"
+msgstr "POZNÁMKA"
+
+#: templates/vm/base/vm_deploy_email.txt:15
+msgid ""
+"Automatic setup of administrator's password and/or SSH authorized keys "
+"depends on the disk image and/or user provided server metadata."
+msgstr ""
+"Automatické nastavenie hesla administrátora a/alebo autorizačných SSH kľúčov "
+"závisí od použitého diskového obrazu a/alebo nastavenia serverových metadát."
+
+#: templates/vm/base/vm_deploy_subject.txt:1
+#, python-format
+msgid "Server %(server)s was deployed"
+msgstr "Server %(server)s je nakonfigurovany"
+
+#: validators.py:33
+#, python-format
+msgid "%(model)s has pending tasks."
+msgstr ""
+
+#: validators.py:46
+msgid "This alias is already in use. Please supply a different alias."
+msgstr "Takýto alias sa už používa. Prosím zadajte iný alias."
+
+#: validators.py:73
+#, python-format
+msgid "%(model)s is attached into more than one datacenter."
+msgstr ""
+
+#: validators.py:75
+#, python-format
+msgid "%(model)s is not attached into any datacenters."
+msgstr ""
+
+#: validators.py:87
+#, python-format
+msgid "Invalid key name(s) (%(invalid_keys)s)."
+msgstr ""
+
+#: validators.py:96
+msgid "Unknown SSH public key type."
+msgstr ""
+
+#: validators.py:99
+msgid "Invalid SSH public key format (newlines detected)."
+msgstr ""
+
+#: validators.py:111
+msgid "Invalid SSH public key format."
+msgstr ""
+
+#: validators.py:118
+msgid "Must be power of 2."
+msgstr ""
+
+#: validators.py:133
+msgid "Leading nor trailing spaces are allowed."
+msgstr ""
+
+#: validators.py:137
+msgid "Use only a single space as a column separator."
+msgstr ""
+
+#: validators.py:140
+msgid "Entry has to consist of exactly 5 columns."
+msgstr ""
+
+#: validators.py:146
+#, python-format
+msgid "Incorrect value in %d. column."
+msgstr ""
+
+#: validators.py:177
+msgid "Enter a valid IPv4 address or IPv4 network."
+msgstr "Zadajte platnú IPv4 adresu alebo sieť."
+
+#: validators.py:188
+msgid "Enter a valid IPv4 address or NIC."
+msgstr "Zadajte platnú IPv4 adresu alebo NIC."
+
+#: validators.py:194
+msgid "Certificate is missing standard PEM header/footer."
+msgstr ""
+
+#: validators.py:200
+msgid "Private key is missing standard PEM header/footer."
+msgstr ""
+
+#: versioning.py:72
+msgid "Invalid version in \"Accept\" header."
+msgstr ""
+
+#: versioning.py:100
+msgid "Invalid version in URL path."
+msgstr ""
+
+#: versioning.py:139
+msgid "Invalid version in URL path. Does not match any version namespace."
+msgstr ""
+
+#: versioning.py:173
+msgid "Invalid version in hostname."
+msgstr ""
+
+#: versioning.py:195
+msgid "Invalid version in query parameter."
+msgstr ""
+
+#: views.py:126 vm/define/serializers.py:18
+msgid "Permission denied"
+msgstr ""
+
+#: vm/backup/serializers.py:86
+msgid "Zpool does not exist on node."
+msgstr ""
+
+#: vm/backup/serializers.py:95
+msgid "Maximum number of backup definitions reached."
+msgstr ""
+
+#: vm/backup/vm_backup.py:229
+msgid "VM is not stopped"
+msgstr "Server nie je v stave stopped"
+
+#: vm/define/events.py:20
+#, python-format
+msgid ""
+"Hostname of server %(alias)s changed from %(old_hostname)s to "
+"%(new_hostname)s. Please refresh your browser."
+msgstr ""
+"Hostname servera %(alias)s sa zmenil z %(old_hostname)s na %(new_hostname)s. "
+"Prosím obnovte si váš prehliadač."
+
+#: vm/define/serializers.py:48
+#, python-format
+msgid "Storage with zpool=%s does not exist."
+msgstr ""
+
+#: vm/define/serializers.py:65
+msgid "Network is not available on compute node."
+msgstr ""
+
+#: vm/define/serializers.py:246
+msgid "VM"
+msgstr ""
+
+#: vm/define/serializers.py:263
+msgid "Cannot change node."
+msgstr "Nie je možné zmeniť výpočtový uzol."
+
+#: vm/define/serializers.py:269
+msgid "Node is currently not available."
+msgstr "Výpočtový uzol nie je dostupný."
+
+#: vm/define/serializers.py:341 vm/define/serializers.py:744
+msgid "Cannot change zpool."
+msgstr "Nie je možné zmeniť zpool."
+
+#: vm/define/serializers.py:343
+msgid ""
+"Cannot change zpool for this OS type. Please change it on the first disk."
+msgstr ""
+
+#: vm/define/serializers.py:359
+msgid "Cannot change ostype."
+msgstr "Nie je možné zmeniť typ operačného systému."
+
+#: vm/define/serializers.py:364
+msgid "This OS type is not supported."
+msgstr ""
+
+#: vm/define/serializers.py:371
+msgid "Default disk image for this OS type is not available."
+msgstr ""
+
+#: vm/define/serializers.py:398
+msgid "Selected monitoring hostgroups are not available."
+msgstr ""
+
+#: vm/define/serializers.py:413
+msgid "Selected monitoring templates are not available."
+msgstr ""
+
+#: vm/define/serializers.py:449
+#, python-format
+msgid "Not enough free disk space on storage with zpool=%s."
+msgstr ""
+
+#: vm/define/serializers.py:481
+msgid "Not enough free vCPUs on node."
+msgstr "Nedostatočný počet voľných vCPU na výpočtovom uzle."
+
+#: vm/define/serializers.py:506
+#, python-format
+msgid ""
+"Server template is only available for servers with \"%(ostype)s\" OS type."
+msgstr ""
+
+#: vm/define/serializers.py:547
+msgid ""
+"This server name is already in use. Please supply a different server name."
+msgstr "Takýto názov servera sa už používa. Prosím zadajte iný názov."
+
+#: vm/define/serializers.py:679
+msgid "Cannot set boot flag on disks other than first disk."
+msgstr "Boot parameter je možné zapnúť len na prvom disku."
+
+#: vm/define/serializers.py:690
+msgid "Cannot set boot flag on multiple disks."
+msgstr "Nie je možné zapnúť boot parameter na viacerých diskoch naraz."
+
+#: vm/define/serializers.py:707
+msgid "Cannot set image on disks other than first disk."
+msgstr ""
+
+#: vm/define/serializers.py:721
+msgid "Cannot change disk image."
+msgstr "Nie je možné zmeniť veľkosť disku."
+
+#: vm/define/serializers.py:723
+msgid "Cannot set disk image on already created server."
+msgstr ""
+
+#: vm/define/serializers.py:729
+msgid "Image is currently not available."
+msgstr ""
+
+#: vm/define/serializers.py:777
+msgid "Not enough free disk space on storage."
+msgstr ""
+
+#: vm/define/serializers.py:802
+#, python-format
+msgid ""
+"Cannot define disk size other than image size (%s), because image does not "
+"support resizing."
+msgstr ""
+"Nie je možné definovať disk s veľkosťou inou ako je veľkosť obrazu (%s), "
+"pretože obraz nepodporuje zmenu veľkosti."
+
+#: vm/define/serializers.py:805
+#, python-format
+msgid "Cannot define smaller disk size than image size (%s)."
+msgstr ""
+"Nie je možné definovať veľkosť disku menšiu ako je veľkosť obrazu (%s)."
+
+#: vm/define/serializers.py:818
+#, python-format
+msgid "Disk image requires specific disk model (%s)."
+msgstr ""
+
+#: vm/define/serializers.py:834
+msgid "Cannot define refreservation larger than disk size."
+msgstr "Nie je možné definovať väčšiu rezerváciu ako je veľkosť disku."
+
+#: vm/define/serializers.py:885
+msgid "Cannot change block_size."
+msgstr "Nie je možné zmeniť veľkosť blokov."
+
+#: vm/define/serializers.py:1097
+msgid "Cannot change MAC address."
+msgstr "Nie je možné zmenit MAC adresu."
+
+#: vm/define/serializers.py:1108
+msgid "Cannot change gateway."
+msgstr ""
+
+#: vm/define/serializers.py:1155
+msgid "Cannot enable primary flag on multiple NICs."
+msgstr ""
+
+#: vm/define/serializers.py:1204
+#, python-format
+msgid "Object with name=%s is already used."
+msgstr "Objekt s menom=%s sa už používa."
+
+#: vm/define/serializers.py:1208
+#, python-format
+msgid "Object with name=%s is not available."
+msgstr "Objekt s menom=%s nie je dostupný."
+
+#: vm/define/serializers.py:1212
+#, python-format
+msgid "Object with name=%s is already taken."
+msgstr "Objekt s menom=%s je už obsadený."
+
+#: vm/define/serializers.py:1241
+msgid "Cannot enable DNS for externally managed network."
+msgstr ""
+
+#: vm/define/serializers.py:1244
+msgid "Cannot enable monitoring for externally managed network."
+msgstr ""
+
+#: vm/define/serializers.py:1262
+#, python-format
+msgid "Cannot find free IP address for net %s."
+msgstr "Neexistuje voľná IP adresa pre sieť %s."
+
+#: vm/define/slave_vm_define.py:65
+#, python-format
+msgid "Storage with zpool=%(zpool)s does not exist on target node."
+msgstr ""
+
+#: vm/define/slave_vm_define.py:136
+msgid "Not enough free resources on target node."
+msgstr "Nedostatok voľných prostriedkov na cieľovom výpočtovom uzle."
+
+#: vm/define/slave_vm_define.py:144
+#, python-format
+msgid "Not enough free disk space on target storage with zpool=%s."
+msgstr ""
+
+#: vm/define/vm_define.py:186
+msgid "VM is not notcreated"
+msgstr "Server nie je v stave notcreated."
+
+#: vm/messages.py:4
+msgid "Create server definition"
+msgstr "Vytvorenie definície servera"
+
+#: vm/messages.py:5
+msgid "Update server definition"
+msgstr "Update definície servera"
+
+#: vm/messages.py:6
+msgid "Delete server definition"
+msgstr "Vymazanie definície servera"
+
+#: vm/messages.py:7
+msgid "Revert server definition"
+msgstr ""
+
+#: vm/messages.py:9
+msgid "Create server disk definition"
+msgstr "Vytvorenie definície pevného disku servera"
+
+#: vm/messages.py:10
+msgid "Update server disk definition"
+msgstr "Update definície pevného disku servera"
+
+#: vm/messages.py:11
+msgid "Delete server disk definition"
+msgstr "Vymazanie definície pevného disku servera"
+
+#: vm/messages.py:13
+msgid "Create server NIC definition"
+msgstr "Vytvorenie definície sieťovej karty servera"
+
+#: vm/messages.py:14
+msgid "Update server NIC definition"
+msgstr "Update definície sieťovej karty servera"
+
+#: vm/messages.py:15
+msgid "Delete server NIC definition"
+msgstr "Vymazanie definície sieťovej karty servera"
+
+#: vm/messages.py:18
+msgid "Create server"
+msgstr "Vytvorenie servera"
+
+#: vm/messages.py:19
+msgid "Recreate server"
+msgstr "Zrušenie a znovuvytvorenie servera"
+
+#: vm/messages.py:20
+msgid "Update server"
+msgstr "Update servera"
+
+#: vm/messages.py:21
+msgid "Delete server"
+msgstr "Zrušenie servera"
+
+#: vm/messages.py:24
+msgid "Create server backup definition"
+msgstr "Vytvorenie definície pre zálohu servera"
+
+#: vm/messages.py:25
+msgid "Update server backup definition"
+msgstr "Update definície pre zálohu servera"
+
+#: vm/messages.py:26
+msgid "Delete server backup definition"
+msgstr "Vymazanie definície pre zálohu servera"
+
+#: vm/messages.py:28
+msgid "Create server snapshot definition"
+msgstr "Vytvorenie definície pre snapshot servera"
+
+#: vm/messages.py:29
+msgid "Update server snapshot definition"
+msgstr "Update definície pre snapshot servera"
+
+#: vm/messages.py:30
+msgid "Delete server snapshot definition"
+msgstr "Vymazanie definície pre snapshot servera"
+
+#: vm/messages.py:32
+msgid "Create snapshot of server's disk"
+msgstr "Vytvorenie snapshotu disku servera"
+
+#: vm/messages.py:33
+msgid "Rollback snapshot of server's disk"
+msgstr "Obnovenie disku servera zo snapshotu"
+
+#: vm/messages.py:34
+msgid "Delete snapshot of server's disk"
+msgstr "Vymazanie snapshotu disku servera"
+
+#: vm/messages.py:35
+msgid "Delete snapshots of server's disk"
+msgstr "Vymazanie snapshotov disku servera"
+
+#: vm/messages.py:36
+msgid "Synchronize snapshots of server's disk"
+msgstr "Synchronizácia snapshotov disku servera"
+
+#: vm/messages.py:38
+msgid "Create backup of server's disk"
+msgstr "Vytvorenie zálohy disku servera"
+
+#: vm/messages.py:39
+msgid "Restore backup of server's disk"
+msgstr "Obnova zálohy disku servera"
+
+#: vm/messages.py:40
+msgid "Delete backup of server's disk"
+msgstr "Vymazanie zálohy disku servera"
+
+#: vm/messages.py:41
+msgid "Delete backups of server's disk"
+msgstr "Vymazanie záloh disku servera"
+
+#: vm/messages.py:44
+msgid "Status of server changed"
+msgstr "Stav servera sa zmenil"
+
+#: vm/messages.py:45
+msgid "Current status of server"
+msgstr "Aktuálny stav servera"
+
+#: vm/messages.py:47
+msgid "Start server"
+msgstr "Štart servera"
+
+#: vm/messages.py:48
+msgid "Update and start server"
+msgstr "Update a štart servera"
+
+#: vm/messages.py:49
+msgid "Start server from CD image"
+msgstr "Štart servera z CD ISO súboru"
+
+#: vm/messages.py:50
+msgid "Update and start server from CD image"
+msgstr "Update a štart servera z CD ISO súboru"
+
+#: vm/messages.py:51
+msgid "Reboot server"
+msgstr "Reštart servera"
+
+#: vm/messages.py:52
+msgid "Force server reboot"
+msgstr "Vynútený reštart servera"
+
+#: vm/messages.py:53
+msgid "Stop server"
+msgstr "Zastavenie servera"
+
+#: vm/messages.py:54
+msgid "Force server stop"
+msgstr "Vynútené zastavenie servera"
+
+#: vm/messages.py:57
+msgid "Migrate server"
+msgstr ""
+
+#: vm/messages.py:58
+msgid "Migrate server to datacenter"
+msgstr ""
+
+#: vm/messages.py:61
+msgid "Run QGA command"
+msgstr ""
+
+#: vm/migrate/serializers.py:45
+msgid "Invalid disk_id."
+msgstr ""
+
+#: vm/migrate/serializers.py:60
+msgid "Target node is the same as current node."
+msgstr "Cieľový výpočtový uzol je rovnaký ako súčasný."
+
+#: vm/migrate/serializers.py:63
+msgid "Target node is not in online state."
+msgstr "Cieľový výpočtový uzol nie je online."
+
+#: vm/migrate/serializers.py:69
+msgid "Some networks are not available on target node."
+msgstr ""
+
+#: vm/migrate/serializers.py:107
+msgid "Nothing to do."
+msgstr ""
+
+#: vm/migrate/serializers.py:209
+msgid "VM has no compute node assigned."
+msgstr ""
+
+#: vm/migrate/serializers.py:212
+msgid "Target datacenter is the same as current datacenter."
+msgstr ""
+
+#: vm/migrate/serializers.py:219
+msgid "VM compute node is not available in target datacenter."
+msgstr ""
+
+#: vm/migrate/serializers.py:226
+msgid "VM disk storages are not available in target datacenter."
+msgstr ""
+
+#: vm/migrate/serializers.py:233
+msgid "VM domain is not available in target datacenter."
+msgstr ""
+
+#: vm/migrate/serializers.py:237
+msgid "VM template is not available in target datacenter."
+msgstr ""
+
+#: vm/migrate/serializers.py:244
+msgid "VM disk image is not available in target datacenter."
+msgstr ""
+
+#: vm/migrate/serializers.py:251
+msgid "VM NIC networks are not available in target datacenter."
+msgstr ""
+
+#: vm/migrate/serializers.py:262
+msgid "VM backup node is not available in target datacenter."
+msgstr ""
+
+#: vm/migrate/serializers.py:267
+msgid "VM backup storage is not available in target datacenter."
+msgstr ""
+
+#: vm/migrate/serializers.py:274
+msgid "Not enough free compute node resources in target datacenter."
+msgstr ""
+
+#: vm/snapshot/serializers.py:106
+msgid "Maximum number of snapshot definitions reached."
+msgstr ""
+
+#~ msgid "To"
+#~ msgstr "Komu"
+
+#~ msgid "Email subject"
+#~ msgstr "Subjekt emailu"
+
+#~ msgid "Email body"
+#~ msgstr "Telo emailu"
+
+#~ msgid "Ordered Items"
+#~ msgstr "Objednané položky"
+
+#~ msgid "Timestamps"
+#~ msgstr "Časové údaje"
+
+#~ msgid "JSON"
+#~ msgstr "JSON"
+
+#~ msgid "Invoice email was successfully sent to %(to)s."
+#~ msgstr "Email s faktúrou bol úspešne odoslaný na %(to)s."
+
+#~ msgid "Send Invoice for Transaction %s"
+#~ msgstr "Zaslať faktúru pre Transakciu %s"
+
+#~ msgid "Pre-Order"
+#~ msgstr "Objednávka"
+
+#~ msgid "Pending"
+#~ msgstr "Čakajúca"
+
+#~ msgid "Active"
+#~ msgstr "Aktívna"
+
+#~ msgid "Failed"
+#~ msgstr "Neúspešná"
+
+#~ msgid "Refunded"
+#~ msgstr "Vrátená"
+
+#~ msgid "Active, final period"
+#~ msgstr "Aktívna, posledné obdobie"
+
+#~ msgid "Incomplete"
+#~ msgstr "Neurčitá"
+
+#~ msgid "Inactive"
+#~ msgstr "Neaktívna"
+
+#~ msgid "All"
+#~ msgstr "Všetky"
+
+#~ msgid "Transaction"
+#~ msgstr "Transakcia"
+
+#~ msgid "Server"
+#~ msgstr "Server"
+
+#~ msgid "Begin"
+#~ msgstr "Začiatok"
+
+#~ msgid "End"
+#~ msgstr "Koniec"
+
+#~ msgid "UID"
+#~ msgstr "UID"
+
+#~ msgid "Hash"
+#~ msgstr "Hash"
+
+#~ msgid "Amount"
+#~ msgstr "Suma"
+
+#~ msgid "Server name"
+#~ msgstr "Názov servera"
+
+#~ msgid "Recurring"
+#~ msgstr "Pravidelné platby"
+
+#~ msgid "Subscription Period"
+#~ msgstr "Predplatené obdobie"
+
+#~ msgid "Details"
+#~ msgstr "Detaily"
+
+#~ msgid "Items"
+#~ msgstr "Položky"
+
+#~ msgid "recurring"
+#~ msgstr "pravidelné platby"
+
+#~ msgid "non-recurring"
+#~ msgstr "jednorazová platba"
+
+#~ msgid "First-time test period"
+#~ msgstr "Prvá testovacia perióda"
+
+#~ msgid "Length (months)"
+#~ msgstr "Trvanie (mesiace)"
+
+#~ msgid "Price"
+#~ msgstr "Cena"
+
+#~ msgid "Discount"
+#~ msgstr "Zľava"
+
+#~ msgid "Type"
+#~ msgstr "Typ"
+
+#~ msgid "Subscription Periods"
+#~ msgstr "Predplatené obdobia"
+
+#~ msgid "Month"
+#~ msgid_plural "Months"
+#~ msgstr[0] "Mesiac"
+#~ msgstr[1] "Mesiace"
+#~ msgstr[2] "Mesiacov"
+
+#~ msgid "%(length)d Month"
+#~ msgid_plural "%(length)d Months"
+#~ msgstr[0] "%(length)d Mesiac"
+#~ msgstr[1] "%(length)d Mesiace"
+#~ msgstr[2] "%(length)d Mesiacov"
+
+#~ msgid "Payment Provider Name"
+#~ msgstr "Poskytovateľ platobných služieb"
+
+#~ msgid "Mode"
+#~ msgstr "Mód"
+
+#~ msgid "URL"
+#~ msgstr "URL"
+
+#~ msgid "Store"
+#~ msgstr "Obchod"
+
+#~ msgid "Payment Provider"
+#~ msgstr "Poskytovateľ platobných služieb"
+
+#~ msgid "Payment Providers"
+#~ msgstr "Poskytovatelia platobných služieb"
+
+#~ msgid "Last changed"
+#~ msgstr "Naposledy zmenená"
+
+#~ msgid "Previous Transaction"
+#~ msgstr "Predchádzajúca transakcia"
+
+#~ msgid "Invoice"
+#~ msgstr "Faktúra"
+
+#~ msgid "Transactions"
+#~ msgstr "Transakcie"
+
+#~ msgid ""
+#~ "Hello,\n"
+#~ "\n"
+#~ "Your %(t_name)s %(p_length)s subscription period for server *%(alias)s* "
+#~ "ended on %(i_end_date)s at %(i_end_time)s.\n"
+#~ "Your server %(alias)s is going to be stopped and frozen, which means that "
+#~ "it cannot be started unless a valid subscription is recognized."
+#~ msgstr ""
+#~ "Vážený zákazník,\n"
+#~ "\n"
+#~ "platnosť Vášho predplateného obdobia - %(t_name)s %(p_length)s pre server "
+#~ "*%(alias)s* skončila dňa %(i_end_date)s o %(i_end_time)s.\n"
+#~ "Váš server %(alias)s bude zastavený a zamknutý, čo znamená, že ho nebute "
+#~ "môcť spustiť pokiaľ k serveru nebude existovať platné predplatené obdobie."
+
+#~ msgid "Please follow this link for subscription renew/update information"
+#~ msgstr ""
+#~ "Pre predĺženie alebo zmenu predplateného odbobia prejdite na tento odkaz"
+
+#~ msgid ""
+#~ "In case your subscription is NOT renewed within 120 hours your server and "
+#~ "its data will be removed permanently!"
+#~ msgstr ""
+#~ "V prípade, že predplatené obdobie NEBUDE obnovené do 120 hodín, bude Váš "
+#~ "server a jeho dáta definitívne odstránené!"
+
+#~ msgid ""
+#~ "A missing payment for recurring item *%(i)s* was detected. The problem "
+#~ "should be resolved manually. The item/server is kept untouched."
+#~ msgstr ""
+#~ "Chýba platba pre opakované predplatené obdobie *%(i)s*. Problém je nutné "
+#~ "vyriešiť manuálne. Server a problémové predplatné ostávajú bez zmeny."
+
+#~ msgid "Payment provider"
+#~ msgstr "Poskytovateľ platobných služieb"
+
+#~ msgid "Subscription details"
+#~ msgstr "Detaily predplateného obdobia"
+
+#~ msgid "Subscription end"
+#~ msgstr "Koniec predplateného obdobia"
+
+#~ msgid "Subscription server"
+#~ msgstr "Server"
+
+#~ msgid "WARNING - Missing payment for recurring subscription"
+#~ msgstr "POZOR - Chyba platba pre opakovane predplatene obdobie"
+
+#~ msgid "Server Stop and Data Removal - %(alias)s"
+#~ msgstr "Zastavenie servera %(alias)s a odstranenie dat"
+
+#~ msgid ""
+#~ "Hello,\n"
+#~ "\n"
+#~ "Your %(t_name)s %(p_length)s subscription period for server *%(alias)s* "
+#~ "will end on %(i_end_date)s at %(i_end_time)s."
+#~ msgstr ""
+#~ "Vážený zákazník,\n"
+#~ "\n"
+#~ "platnosť Vášho predplateného obdobia - %(t_name)s %(p_length)s pre server "
+#~ "*%(alias)s* skončí dňa %(i_end_date)s o %(i_end_time)s."
+
+#~ msgid ""
+#~ "To ensure uninterrupted service, please follow this link for subscription "
+#~ "renew/update information"
+#~ msgstr ""
+#~ "Ak chcete zabezpečit neprerušený chod servera a služieb prejdite na "
+#~ "nasledovný odkaz pre predĺženie alebo zmenu predplateného odbobia"
+
+#~ msgid "Server %(alias)s - Subscription End"
+#~ msgstr "Server %(alias)s - Koniec predplateneho obdobia"
+
+#~ msgid ""
+#~ "Hello,\n"
+#~ "\n"
+#~ "Your %(t_name)s %(p_length)s subscription period for server *%(alias)s* "
+#~ "will end in less than 48 hours on %(i_end_date)s at %(i_end_time)s."
+#~ msgstr ""
+#~ "Vážený zákazník,\n"
+#~ "\n"
+#~ "platnosť Vášho predplateného obdobia - %(t_name)s %(p_length)s pre server "
+#~ "*%(alias)s* skončí za menej ako 48 hodín dňa %(i_end_date)s o "
+#~ "%(i_end_time)s."
+
+#~ msgid ""
+#~ "In case you decide NOT to renew or update your subscription, your server "
+#~ "and associated services will be stopped after the end of the subscription "
+#~ "period. Please be aware that removal of all server data will follow "
+#~ "shortly afterwards."
+#~ msgstr ""
+#~ "V prípade, že sa rozhodnete NEobnoviť alebo NEzmeniť predplatené obdobie "
+#~ "bude Váš server a služby s ním spojené zastavené ku koncu predplateného "
+#~ "obdobia. Neskôr bude server odstránený a jeho dáta vymazané."
+
+#~ msgid "Server %(alias)s - Subscription End Warning"
+#~ msgstr "Server %(alias)s - Koniec predplateneho obdobia"
+
+#~ msgid ""
+#~ "Hello,\n"
+#~ "\n"
+#~ "Your %(t_name)s %(p_length)s subscription period for server *%(alias)s* "
+#~ "is set for automatic renew on %(i_end_date)s at %(i_end_time)s.\n"
+#~ "Depending on your payment method your interaction with the payment "
+#~ "provider may be necessary in order to perform the payment."
+#~ msgstr ""
+#~ "Vážený zákazník,\n"
+#~ "\n"
+#~ "Vaše predplatené obdobie - %(t_name)s %(p_length)s pre server *%(alias)s* "
+#~ "má nastavené automatické predĺženie a platbu dňa %(i_end_date)s o "
+#~ "%(i_end_time)s.\n"
+#~ "V závislosti od Vami zvolenej platobnej metódy môže byť platba vykonaná "
+#~ "automaticky alebo ju budete musiet vykonať manuálne."
+
+#~ msgid "Please follow this link for more subscription information"
+#~ msgstr ""
+#~ "Pre viacej informácií o predplatenom období prejdite na nasledovný odkaz"
+
+#~ msgid "Server %(alias)s - Subscription Renew"
+#~ msgstr "Server %(alias)s - Obnova predplateneho obdobia"
+
+#~ msgid ""
+#~ "Hello,\n"
+#~ "\n"
+#~ "Your %(t_name)s %(p_length)s subscription period for server *%(alias)s* "
+#~ "has been in %(status)s state for more than 14 days.\n"
+#~ "Your server %(alias)s is going to be removed and the subscription item "
+#~ "will be set to %(failed)s status."
+#~ msgstr ""
+#~ "Vážený zákazník,\n"
+#~ "\n"
+#~ "Vaše objednané predplatené obdobie - %(t_name)s %(p_length)s pre server *"
+#~ "%(alias)s* bolo v stave %(status)s dlhšie ako 14 dní.\n"
+#~ "Váš server %(alias)s bude zrušený a stav objednanej položky bude zmenený "
+#~ "na %(failed)s."
+
+#~ msgid "Server %(alias)s - Subscription too long in %(status)s state"
+#~ msgstr ""
+#~ "Server %(alias)s - Objednana polozka je prilis dlho v stave %(status)s"
+
+#~ msgid "Send Invoice"
+#~ msgstr "Poslať faktúru"
+
+#~ msgid ""
+#~ "Dear customer,\n"
+#~ "\n"
+#~ "please find the attached invoice %(invoice_file)s. This invoice is valid "
+#~ "for the transaction ID %(thash)s."
+#~ msgstr ""
+#~ "Vážený zákazník,\n"
+#~ "\n"
+#~ "v prílohe tohto e-mailu Vám zasielame faktúru %(invoice_file)s platnú pre "
+#~ "transakciu s označením %(thash)s."
+
+#~ msgid "For more information about this transaction, please follow this link"
+#~ msgstr ""
+#~ "Pre získanie podrobnejších informácii o danej transakcii prejdite na "
+#~ "nasledovný odkaz"
+
+#~ msgid "Django site admin"
+#~ msgstr "Erigones admin"
+
+#~ msgid "Home"
+#~ msgstr "Domov"
+
+#~ msgid "Please correct the error below."
+#~ msgid_plural "Please correct the errors below."
+#~ msgstr[0] "Prosím opravte chybu nižšie."
+#~ msgstr[1] "Prosím opravte chyby nižšie."
+#~ msgstr[2] "Prosím opravte chyby nižšie."
+
+#~ msgid "User Language"
+#~ msgstr "Používateľský jazyk"
+
+#~ msgid "This transaction has no invoice file!"
+#~ msgstr "Táto transkacia nemá žiaden súbor s faktúrou!"
+
+#~ msgid "Attached invoice"
+#~ msgstr "Pripojená faktúra"
+
+#~ msgid "Send"
+#~ msgstr "Poslať"
+
+#~ msgid "Invoice %(invoice_filename)s"
+#~ msgstr "Faktura %(invoice_filename)s"
+
+#~ msgid ""
+#~ "Hello,\n"
+#~ "\n"
+#~ "New bank transfer transaction %(tid)s has been created."
+#~ msgstr ""
+#~ "Ahoj,\n"
+#~ "\n"
+#~ "bola vytvorená nová transakcia %(tid)s s platbou cez bankový prevod"
+
+#~ msgid "ID"
+#~ msgstr "ID"
+
+#~ msgid "hash"
+#~ msgstr "hash"
+
+#~ msgid "Variable symbol"
+#~ msgstr "Variabilný symbol"
+
+#~ msgid "Virtual server"
+#~ msgstr "Virtuálny server"
+
+#~ msgid "Configuration"
+#~ msgstr "Konfigurácia"
+
+#~ msgid "Subscription period"
+#~ msgstr "Predplatené obdobie"
+
+#~ msgid "Timezone"
+#~ msgstr "Časové pásmo"
+
+#~ msgid "Usertype"
+#~ msgstr "Typ účtu"
+
+#~ msgid "First name"
+#~ msgstr "Meno"
+
+#~ msgid "Last name"
+#~ msgstr "Priezvisko"
+
+#~ msgid "Street"
+#~ msgstr "Ulica"
+
+#~ msgid "Street 2"
+#~ msgstr "Ulica 2"
+
+#~ msgid "Postcode"
+#~ msgstr "PSČ"
+
+#~ msgid "State"
+#~ msgstr "Kraj/Provincia/Región"
+
+#~ msgid "Tax ID"
+#~ msgstr "DIČ"
+
+#~ msgid "Bank ID"
+#~ msgstr "Číslo bankového účtu"
+
+#~ msgid "Email"
+#~ msgstr "Email"
+
+#~ msgid "Bank Order Transaction %(tid)s"
+#~ msgstr "Transakcia %(tid)s s bankovym prevodom"
+
+#~ msgid ""
+#~ "Hello,\n"
+#~ "\n"
+#~ "You are almost done! In order to activate your server subscription(s) "
+#~ "please proceed with payment.\n"
+#~ "\n"
+#~ "Use the payment information provided in this email to finalize your bank "
+#~ "transaction.\n"
+#~ "Please ensure that the variable symbol is entered correctly, so we can "
+#~ "identify your payment.\n"
+#~ "\n"
+#~ "Once the payment is received, we will send you a final invoice and your "
+#~ "server subscription will be activated."
+#~ msgstr ""
+#~ "Vážený zákazník,\n"
+#~ "\n"
+#~ "Vaša objednávka bola zaevidovaná!\n"
+#~ "Pred spustením Vašich serverov alebo predĺžením predplateného obdobia je "
+#~ "nutné vykonať platbu prostredníctvom Vami vybranej platobnej metódy.\n"
+#~ "V prípade bankového prevodu Vás prosíme o správne zadanie variabilného "
+#~ "symbolu pre korektnú identifikáciu Vašej platby.\n"
+#~ "\n"
+#~ "Po zaevidovaní Vašej platby bude Vaše predplatené obdobie aktivované a my "
+#~ "Vám pošleme konečnú faktúru."
+
+#~ msgid "Order Summary"
+#~ msgstr "Objednávka"
+
+#~ msgid "Order ID"
+#~ msgstr "Číslo objednávky"
+
+#~ msgid "Order Details"
+#~ msgstr "Detaily objednávky"
+
+#~ msgid "Date Ordered"
+#~ msgstr "Dátum objednávky"
+
+#~ msgid "Total"
+#~ msgstr "Spolu"
+
+#~ msgid "incl. %(vat)s%% VAT"
+#~ msgstr "vrátane %(vat)s%% DPH"
+
+#~ msgid "Payment Information"
+#~ msgstr "Informácie o platbe"
+
+#~ msgid "Payment Method"
+#~ msgstr "Platobná metóda"
+
+#~ msgid "Bank Transfer"
+#~ msgstr "Bankový prevod"
+
+#~ msgid "Bank Account"
+#~ msgstr "Číslo bankového účtu"
+
+#~ msgid "IBAN"
+#~ msgstr "IBAN"
+
+#~ msgid "SWIFT"
+#~ msgstr "SWIFT"
+
+#~ msgid "Variable Symbol"
+#~ msgstr "Variabilný symbol"
+
+#~ msgid "Billing Address"
+#~ msgstr "Fakturačné údaje"
+
+#~ msgid "Thank you for your order."
+#~ msgstr "Ďakujeme za Vašu objednávku."
+
+#~ msgid "Order Process"
+#~ msgstr "Objednavka"
+
+#~ msgid "Create server replica"
+#~ msgstr "Vytvorenie repliky servera"
+
+#~ msgid "Update server replica"
+#~ msgstr "Update repliky servera"
+
+#~ msgid "Delete server replica"
+#~ msgstr "Zrušenie repliky servera"

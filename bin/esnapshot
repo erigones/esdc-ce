@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+#
+# esnapshot - Erigones snapshot tool
+#
+
+set -u
+set -o pipefail
+
+ERIGONES_HOME=${ERIGONES_HOME:-"/opt/erigones"}
+#SELF="${ERIGONES_HOME}/bin/esnapshot"
+PROG="$(basename "$0")"
+
+. "${ERIGONES_HOME}"/bin/eslib/functions.sh
+
+declare -ri OK=0
+declare -ri ERR_INPUT=1
+
+
+###############################################################
+# helper functions
+###############################################################
+
+function usage() {
+	cat <<EOF
+	${PROG} create <snapshot> [metadata] [fs_freeze_qa_agent_socket]
+	${PROG} destroy <snapshot>
+	${PROG} rollback <snapshot>
+EOF
+}
+
+
+###############################################################
+# ZFS snapshot
+###############################################################
+
+main() {
+	local action="${1:-}"
+	shift
+
+	case "${action}" in
+		list)
+			if [[ "${1}" == *"/"* ]]; then
+				_zfs_list_snapshots "${1}" "name,creation,written,es:snapname"
+			else
+				_zfs_list_snapshots_zpool "${1}" "name,creation,written,es:snapname"
+			fi
+			exit $?
+			;;
+		create)
+			_zfs_snap "${1}" "${2:-}" "${3:-}"
+			exit $?
+			;;
+		destroy)
+			_zfs_destroy "${1}"
+			exit $?
+			;;
+		rollback)
+			_zfs_rollback "${1}"
+			exit $?
+			;;
+        -h|--help)
+			usage
+			exit ${OK}
+			;;
+		*)
+			usage
+			exit ${ERR_INPUT}
+			;;
+	esac
+}
+
+main "$@"

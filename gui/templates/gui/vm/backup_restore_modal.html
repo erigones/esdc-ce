@@ -1,0 +1,31 @@
+{% load i18n %}
+<div id="vm_snapshot_restore_modal" class="black-box modal hide fade vm_modal">
+  <div class="modal-head tab-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <span><i class="icon-warning-sign"></i> {% trans "Delete or Restore Backup" %}</span>
+  </div>
+  <div class="modal-body separator">
+    <div class="alert alert-error modal_error hide"><i class="icon-warning-sign"></i> <span></span></div>
+    <div class="vm_modal_text modal-text-header">
+        {% trans "Hostname" %}: {% if vm %}{{ vm.hostname }}{% else %}__hostname__{% endif %}<br>
+        {% trans "Backup: <strong>__name__</strong><br>Disk ID: <strong>__disk_id__</strong> (__disk_size__ MB)" %}
+    </div>
+    <form id="vm_backup_restore_form" class="form-horizontal">
+      <div class="vm_modal_force_text">{% trans "Deleting a backup will only remove the data of the backup." %}</div>
+      <div class="vm_modal_force_text">{% trans "A backup restore will restore your data from the backup. <strong>All your data created after the backup (including all existing snapshots) on target server will be lost!</strong>" %}
+        <span class="vm_modal_force_force">{% trans "Do you wan't to <strong>delete existing data and snapshots on target server</strong> and restore data from this backup?" %} <input type="checkbox" id="vm_snapshot_rollback_force" class="big-check" /></span>
+      </div>
+      <div class="vm_modal_force_text">
+        {% include "gui/form_field.html" with field=bkpform_restore.target_hostname %}
+        {% include "gui/form_field.html" with field=bkpform_restore.target_disk_id %}
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <div class="inner-well">
+      <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
+      <a class="vm_modal_yes button red no-ajax">{% trans "Delete backup" %}</a>
+      <a class="vm_modal_yes_force button red no-ajax">{% trans "Restore backup" %}</a>
+    </div>
+  </div>
+</div>

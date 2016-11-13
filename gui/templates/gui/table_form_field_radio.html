@@ -1,0 +1,18 @@
+      <tr class="{{ trclass }}">
+        <td class="{% if field.field.required %}input-required{% endif %}">{{ field.label }}:</td>
+        <td class="span8 {{ tdclass }}">
+          <div class="input{% if field.errors %} error wobble animated{% endif %}" id="{{ field.name }}">
+            {% for radio in field %}
+            <div class="span9">
+              <input name="{{ radio.name }}" type="radio" id="id_{{ radio.name }}_{{ radio.index }}" value="{{ radio.choice_value }}" class="{{ radio.attrs.class }}" required="{{ radio.attrs.required }}"{% if radio.is_checked %} checked="checked"{% endif %} />
+              <label for="id_{{ radio.name }}_{{ radio.index }}">{{ radio.choice_label }}</label>
+            </div>
+            {% endfor %}
+            {% for error in field.errors %}
+            <span class="help-inline error pull-left"><i class="icon-warning-sign"></i> {{ error }}</span>
+            {% empty %}{% if field.help_text %}
+            <span class="help-inline note pull-left"><i class="icon-info-sign"></i> {{ field.help_text }}</span>
+            {% endif %}{% endfor %}
+          </div>
+        </td>
+      </tr>

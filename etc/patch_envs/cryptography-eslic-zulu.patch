@@ -1,0 +1,12 @@
+diff -Naur cryptography.orig/hazmat/backends/openssl/decode_asn1.py cryptography/hazmat/backends/openssl/decode_asn1.py
+--- cryptography.orig/hazmat/backends/openssl/decode_asn1.py	2016-04-17 08:07:14.000000000 +0200
++++ cryptography/hazmat/backends/openssl/decode_asn1.py	2016-04-17 08:10:02.000000000 +0200
+@@ -737,6 +737,8 @@
+     time = _asn1_string_to_ascii(
+         backend, backend._ffi.cast("ASN1_STRING *", generalized_time)
+     )
++    if time.endswith(('+0000', '-0000')):
++        time = time[:-5] + 'Z'
+     return datetime.datetime.strptime(time, "%Y%m%d%H%M%SZ")
+ 
+ 

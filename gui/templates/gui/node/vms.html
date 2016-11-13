@@ -1,0 +1,162 @@
+{% extends load_base %}
+{% load i18n %}
+{% load gui_utils %}
+
+{% block javascript %}
+<script type="text/javascript">
+  $(document).ready(function() {
+    {% for vm in vms %}vm_control_update('{{ vm.hostname }}', '{{ vm.status_display }}');{% endfor %}
+    VMS = new ServerList(true);
+  });
+</script>
+{% endblock %}
+
+{% block base_nav %}{% include "gui/node/navigation.html" with li_vms="active" %}{% endblock %}
+
+{% block base_content %}
+<div id="vms_control_modal" class="black-box modal hide fade vm_modal">
+  <div class="modal-head tab-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <span><i class="icon-warning-sign"></i> <span class="vm_modal_title">{% trans "This could be dangerous" %}</span></span>
+  </div>
+  <div class="modal-body separator">
+    <div class="vm_modal_text"></div>
+    <div class="vm_modal_force_text"></div>
+  </div>
+  <div class="modal-footer">
+    <div class="inner-well">
+      <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
+      <a class="vm_modal_yes button red no-ajax">{% trans "OK" %}</a>
+      <a class="vm_modal_yes_force button red no-ajax hide">{% trans "Force" %}</a>
+    </div>
+  </div>
+</div>
+
+<form class="hide" id="vms_form" action="#" data-source="{% url 'vm_multi_settings_form' %}?node={{ node.hostname }}" method="POST">
+  {% csrf_token %}
+</form>
+
+<div class="container-fluid">
+
+  {% if node_not_online %}
+  <div class="row-fluid">
+    <div class="span8 offset2">
+      <div class="box">
+        <div class="tab-header tab-header-light">
+          <i class="icon-bullhorn"></i> {% trans "Unavailable servers" %}
+        </div>
+        <div class="padded">
+          <p>{% trans "Servers are not visible or accessible, because the compute node is not in <strong>online state</strong>. Servers are kept untouched. Full server control will be possible as soon as the compute node returns to online state." %}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="row-fluid">
+    <div class="span12">
+      <div class="tab-header">
+        <i class="icon-hdd"></i> {{ node.hostname }} &rsaquo; {% trans "servers" %}
+      </div>
+
+      <table class="table box table-striped table-hover table-responsive" id="my_server_list">
+
+        <thead>
+          <tr>
+            <th colspan="9" class="row_menu pad">
+              <div class="btn-group">
+                <a href="{% url 'node_vms' node.hostname %}" class="btn btn-small{% if not zpool %} active{% endif %}" data-toggle="tooltip" data-placement="bottom" title="{% blocktrans %}Show servers stored on all zpools{% endblocktrans %}">
+                  <i class="icon-th"></i> {% trans "(all)" %} <span class="sep" id="total_{{ node.hostname }}_all">{{ vms_all_count }}</span>
+                </a>
+                {% for ns in storages %}
+                <a href="{% url 'node_vms_zpool' node.hostname ns.zpool %}" class="btn btn-small{% if zpool == ns.zpool %} active{% endif %}" data-toggle="tooltip" data-placement="bottom" title="{% blocktrans with zpool_name=ns.zpool %}Show servers stored on {{ zpool_name }} zpool{% endblocktrans %}">
+                  <i class="icon-th"></i> {{ ns.storage.alias }} <span class="sep" id="total_{{ node.hostname }}_{{ ns.zpool }}">{{ ns.vms_count }}</span>
+                </a>
+                {% endfor %}
+              </div>
+            </th>
+          </tr>
+
+          {% if vms %}
+          <tr>
+            <th class="top chbox hidden-phone-small">
+              <div class="input">
+                <input type="checkbox" class="normal-check" id="id_all"/>
+                <label for="id_all"></label>
+              </div>
+            </th>
+            <th>{% trans "Name" %}</th>
+            <th class="hidden-phone">{% trans "Hostname" %}</th>
+            <th class="hidden-phone">{% trans "Datacenter" %}</th>
+            <th class="hidden-phone">{% trans "Owner" %}</th>
+            <th>{% trans "Status" %}</th>
+            <th class="hidden-phone">{% trans "VCPUs" %}&nbsp;</th>
+            <th class="hidden-phone nowrap">{% trans "RAM" %}</th>
+            <th class="hidden-phone nowrap">{% trans "HDD" %}</th>
+            <th class="hide"> {# nosort #}
+          </tr>
+          {% endif %}
+        </thead>
+
+        <tbody id="my_server_list_tbody">
+          {% for vm in vms %}{% with vm_is_slave_vm=vm.is_slave_vm %}
+          <tr>
+            <td class="top chbox hidden-phone-small">
+              <div class="input">
+                <input type="checkbox" id="id_{{ vm.hostname }}" class="normal-check"{% if vm_is_slave_vm or request.dc != vm.dc %} disabled="disabled"{% endif %} />
+                <label for="id_{{ vm.hostname }}"></label>
+              </div>
+            </td>
+
+            <td class="nowrap">
+              <a href="{% if vm_is_slave_vm %}{% url 'dc_vm_details' vm.dc vm.slavevm.master_vm.hostname %}{% else %}{% url 'dc_vm_details' vm.dc vm.hostname %}{% endif %}" class="btn-link"><i class="icon-hdd"></i> <span class="vm_alias">{{ vm.alias }}</span></a><span id="vm_flags_{{ vm.hostname }}" class="vm_flags {% if vm.locked %} icon-lock{% endif %}"></span> <span class="vm_hostname visible-phone">{{ vm.hostname }}</span>
+            </td>
+
+            <td class="hidden-phone nowrap">
+              <span class="vm_hostname">{{ vm.hostname }}</span>
+            </td>
+
+            <td class="hidden-phone nowrap">
+              <span class="vm_hostname"><i class="icon-cloud"></i> {{ vm.dc.alias }}</span>
+            </td>
+
+            <td class="hidden-phone nowrap">
+              <span class="vm_hostname" title="{{ vm.owner }}"><i class="icon-user"></i> {{ vm.owner|truncatechars:16 }}</span>
+            </td>
+
+            <td>
+              {% with status_display=vm.status_display %}
+              <span class="label status_{{ status_display }}" id="vm_label_{{ vm.hostname }}" data-status_display="{{ status_display }}" data-define_changed="{{ vm.json_changed }}" data-locked='{{ vm.locked|lower }}'>{% trans vm.state %}{% if request.dc != vm.dc %}?{% endif %}</span>
+              {% endwith %}
+            </td>
+
+            {% with resources=vm.resources %} {# calculated in the view #}
+            <td class="hidden-phone nowrap">{{ resources.0 }} <small>x</small></td>
+            <td class="hidden-phone nowrap">{{ resources.1 }} <small>MB</small></td>
+            <td class="hidden-phone nowrap">{{ resources.2|mb_to_gb }} <small>GB</small></td>
+            {% endwith %}
+
+            <td class="hide"></td>
+          </tr>
+          {% endwith %}{% empty %}
+          <tr>
+            <td colspan="9">
+              <p class="msg"></p>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+
+        <tfoot>
+          <tr>
+            <td colspan="9">
+              {% include "gui/vm/list_control.html" %}
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+      
+    </div>
+  </div> <!-- end row-fluid -->
+</div> <!-- end container-fluid -->
+{% endblock %}

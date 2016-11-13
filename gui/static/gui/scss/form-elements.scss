@@ -1,0 +1,684 @@
+@import "compass";
+@import "mixins";
+
+.fill-up {
+  width: 100%;
+}
+form {
+  @include clearfix;
+}
+
+%box-sizing {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+form.fill-up {
+  width: 100%;
+  margin-bottom: 0;
+  input, textarea, select {
+    width: 100%;
+  }
+  .mdata-row {
+    input {
+      @extend %box-sizing;
+    }
+    .mdata-key {
+      width: 30% !important;
+    }
+    .mdata-val {
+      width: 62% !important;
+    }
+  }
+  .array-row input {
+    @extend %box-sizing;
+    width: 93% !important;
+  }
+  .add-on {
+    position: absolute;
+    top: 0px;
+    right: 10px;
+  }
+}
+
+.note {
+  font-style: italic;
+  color: #fff;
+  @include text-shadow-bottom(#000);
+  font-size: 12px;
+  padding: 0px 0px 10px 0px;
+
+  &.large {
+    font-size: 12px;
+    i {
+      font-size: 16px;
+    }
+  }
+}
+
+.box {
+  .note {
+    font-size: 10px;
+    color: #888;
+    @include text-shadow-bottom(#fff);
+  }
+}
+
+.black-box {
+  .note {
+    font-size: 10px;
+    color: #fff;
+    @include text-shadow-bottom(#000);
+  }
+}
+
+textarea, input[type="text"], input[type="password"], input[type="datetime"], input[type="datetime-local"], input[type="date"], input[type="month"], input[type="time"], input[type="week"], input[type="number"], input[type="email"], input[type="url"], input[type="search"], input[type="tel"], input[type="color"], .uneditable-input {
+  &.input-transparent {
+    @include box-shadow(inset 0px 0px 4px rgba(0, 0, 0, 0.5), 0px 1px 0px rgba(255, 255, 255, 0.3));
+    background: rgba(0, 0, 0, 0.25);
+    border: none;
+    color: #fff;
+    @include text-shadow(0px 1px 1px rgba(#111,0.5));
+    font-size: 100%;
+    padding: 5px 10px;
+    @include placeholder { color: #777; }
+  }
+
+  height: 32px;
+
+  &.error {
+    border: 1px solid #AD6262;
+    color: #AD6262;
+    i {color: #AD6262;}
+    &:focus {
+      @include box-shadow(none);
+    }
+  }
+}
+
+.form-fake {
+  padding-top: 0;
+}
+
+.input-fake {
+  padding-top: 7px;
+}
+
+.input {
+  position: relative;
+  .input-error {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    font-size: 16px;
+    color: #AD6262;
+  }
+
+  input.small, select.small, textarea.small {
+    font-size: 11px;
+  }
+
+  &.error input, &.error select, &.error textarea {
+    border: 1px solid #b94a48;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+
+    &:focus {
+      border: 0.5px solid #b94a48;
+      -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #d59392;
+      -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #d59392;
+      box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #d59392;
+    }
+  }
+}
+
+textarea {
+  height: auto;
+}
+
+.prepend-transparent, .append-transparent {
+  position: relative;
+
+  input[type="text"] {
+    @include border-radius(3px);
+    font-size: 12px;
+  }
+
+  .add-on {
+    @include simple-button;
+    @include border-radius(3px) ;
+    padding:0 7px;
+    position: absolute;
+    top: 5px;
+    border: none;
+    height: 20px;
+    line-height: 20px;
+  }
+}
+
+.prepend-transparent {
+
+  input[type="text"] {
+    padding-left: 35px;
+  }
+
+  .add-on {
+    left:5px;
+  }
+}
+
+.append-transparent {
+  input[type="text"] {
+    padding-right: 35px;
+  }
+
+  .add-on {
+    height: 20px;
+    line-height: 20px;
+    display: inline-block;
+    top: -5px;
+    position: relative;
+    right: 35px;
+  }
+}
+
+.form-actions {
+  margin-bottom: 0;
+  padding-bottom: 20px;
+  @include border-radius(0 0 6px 6px, 0 0 6px 6px);
+}
+
+.form-horizontal {
+  margin-bottom: 0;
+  padding-top: 20px;
+}
+
+.form-vertical {
+  padding-top: 20px;
+
+  .control-group {
+    padding-left: 20px;
+    padding-right: 20px;
+
+    input {
+      width: 100%;
+    }
+  }
+}
+
+// TODO: picture
+.normal-check {
+  @include form-box("form_elements/checkbox2.png");
+}
+
+.normal-check[disabled] + label:before {
+  @include box-shadow(inset 0 0 0 1000px rgba(0, 0, 0, 0.1));
+  cursor: not-allowed;
+}
+
+.normal-radio {
+  @include form-box("form_elements/radio.png");
+}
+
+.input-group {
+  input[type="text"], input[type="password"], input[type="datetime"], input[type="datetime-local"], input[type="date"], input[type="month"], input[type="time"], input[type="week"], input[type="number"], input[type="email"], input[type="url"], input[type="search"], input[type="tel"], input[type="color"], .uneditable-input {
+    &:first-child {
+      @include border-radius(4px 4px 0 0);
+      @include box-shadow(rgba(0, 0, 0, 0.4) 0px 6px 6px -6px inset);
+    }
+
+    &:last-child {
+      @include border-radius(0 0 4px 4px);
+      margin-bottom: 0;
+    }
+
+    margin: 0;
+    margin-bottom: -1px;
+    @include border-radius(0);
+
+    display: block;
+
+    border: 1px solid #555;
+    background: rgba(0, 0, 0, 0.3);
+    @include box-shadow(none);
+    padding-left: 20px;
+
+  }
+}
+
+.controls .normal-check {
+  display: none;
+}
+
+// Buttons
+
+button.button {
+  .caret {
+    margin-top: 4px;
+  }
+
+  &.mini {
+    padding: 0 4px;
+  }
+}
+
+.btn-group {
+  display: inline-block;
+
+  margin:0;
+  margin-top: 4px;
+  &:last-child {
+    margin-right: 0;
+  }
+
+  & + .btn-group {
+    margin-left: 0;
+  }
+
+  .button {
+    white-space: nowrap;
+    @include border-radius(0px);
+    margin-left: -1px;
+
+    &:first-child {
+      margin-left: 0;
+      @include border-radius(3px 0 0 3px, 3px 0 0 3px);
+    }
+
+    &:last-child {
+      @include border-radius(0 3px 3px 0, 0 3px 3px 0);
+    }
+
+    &.dropdown-toggle {
+      @include border-radius(4px);
+    }
+
+    &+ .button.dropdown-toggle {
+      border-radius: 0 4px 4px 0;
+    }
+
+  }
+
+  .dropdown-menu.dropdown-left {
+    right: 0;
+    position: absolute;
+    left: auto;
+  }
+
+  .dropdown-menu li a {
+    @include text-shadow(none);
+  }
+}
+
+.dropdown-menu .divider {
+  height: 2px;
+}
+
+.button {
+
+  @include simple-button;
+  @include button-color($white);
+
+  i {
+    line-height: 16px;
+    font-size: 14px;
+  }
+
+  &.rounded {
+    @include border-radius(10px);
+  }
+
+  &.mini {
+    padding: 0px 10px;
+    line-height: 20px;
+  }
+
+  &.small {
+    padding: 0px 10px;
+    line-height: 22.5px;
+  }
+
+  &.large {
+    border: none;
+    padding: 0 18px;
+    @include box-shadow(0 1px 3px rgba(0,0,0,.3));
+    @include border-radius(3px);
+    color: #666;
+    margin-right: 8px;
+    margin-bottom: 8px;
+    min-width: 103px;
+
+    &:active {
+      @include box-shadow(none);
+      color: #000;
+      top: 1px;
+      position: relative;
+    }
+
+    &:hover {
+      color: #333;
+    }
+
+    span {
+      margin-top: 5px;
+      font-size: 12px;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    i {
+      font-weight: normal;
+      font-size: 32px;
+      line-height: 32px;
+      margin-top: 20px;
+    }
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+
+  &:active {
+    @include box-shadow(rgba(0, 0, 0, 0.1) 0px 0px 4px 0px inset, rgba(255, 255, 255, 0.5) 0px 1px 0px 0px);
+  }
+
+  &.blue {
+    @include invert-button-color($blue);
+  }
+
+  &.red {
+    @include invert-button-color($red);
+  }
+
+  &.green {
+    @include invert-button-color($green);
+  }
+
+  &.black {
+    @include invert-button-color($black);
+  }
+
+  &.light-gray {
+    @include invert-button-color($light-gray);
+  }
+
+  &.gray {
+    @include invert-button-color($gray);
+
+    &.disabled {
+      opacity: 0.70;
+      filter: alpha(opacity=70);
+    }
+  }
+
+  &.gold {
+    @include invert-button-color($gold);
+  }
+
+}
+
+// dataepicker
+@import "compass/css3";
+
+.ui-datepicker {
+
+  width: 210px;
+  display: none;
+  @include box-shadow(#666 0 0 8px);
+  @include background-image(linear-gradient(top,#545454,#424242));
+  @include border-radius(4px,4px);
+
+  .ui-datepicker-header {
+    position: relative;
+    a.ui-datepicker-next {
+      cursor: pointer;
+      height: 22px;
+      width: 32px;
+      float: right;
+      background: inline-image("icons/calendar_right.png") center center no-repeat;
+      margin-right: 5px;
+      margin-top:5px;
+      span {
+        display: none;
+      }
+    }
+    a.ui-datepicker-prev {
+      margin-top:5px;
+      cursor: pointer;
+      float: left;
+      height: 22px;
+      width: 32px;
+      background: inline-image("icons/calendar_left.png") center center no-repeat;
+      margin-left: 5px;
+      span {
+        display: none;
+      }
+    }
+  }
+  .ui-datepicker-title {
+    padding-top: 8px;
+    text-align: center;
+    color: #FFF;
+    @include text-shadow(rgba(0, 0, 0, 0.6) 0 -1px 0);
+    font-weight: bold;
+    font-size: .8em;
+    input[type=select] {
+
+    }
+  }
+
+  .ui-datepicker-calendar {
+    margin-bottom: 5px;
+    margin-left: 6px;
+
+    thead {
+      th {
+        span {
+          line-height: 1.6em;
+          color: #9D9B9B;
+          font-size: .7em;
+          font-weight: bold;
+          @include text-shadow(rgba(0, 0, 0, 0.3) 0 -1px 0);
+        }
+      }
+    }
+
+    tbody {
+      tr:first-child td { border-top: 1px solid #303030; }
+      tr:last-child td { border-bottom: 1px solid #303030; }
+
+      td {
+        &:last-child { border-right: 1px solid #303030; }
+        &:first-child { border-left: 1px solid #303030; }
+
+        border: 1px solid #232323;
+        min-width: 28px;
+        line-height: 22px;
+
+        background: #444444;
+        @include box-shadow(#4a4a4a 0 1px 0 inset);
+
+        a,span {
+          text-align: center;
+          display: block;
+          line-height: 22px;
+          color: #FFF;
+          @include text-shadow(rgba(0, 0, 0, 0.6) 0 -1px 0);
+          font-weight: bold;
+          font-size: .8em;
+
+          &.ui-state-active {
+            @include text-shadow(darken(#8F9EB4,25) 0 -1px 0);
+            background: #8F9EB4;
+            @include box-shadow(darken(#8F9EB4,20) 0 1px 0 inset, darken(#8F9EB4,30) 0 2px 3px inset);
+          }
+        }
+        .ui-state-hover {
+          background: lighten(#444444,5);
+        }
+
+        &.ui-datepicker-other-month {
+          background: #333;
+          a,span {
+            color: #646162;
+          }
+          @include box-shadow(#414141 0 1px 0 inset);
+        }
+        &.ui-datepicker-unselectable {
+          a,span {color: darken(#FFF,40); }
+        }
+
+        &.ui-datepicker-today {
+          a.ui-state-active {
+            color: #FFF;
+          }
+          a,span {
+            color: Salmon;
+          }
+        }
+      }
+    }
+  }
+}
+
+/**************************
+ * Overloaded select2 CSS *
+ **************************/
+
+%font_definition {
+  font-size: 12px;
+  font-weight: normal;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+%select2-choices {
+  @include box-shadow(inset 0px 0px 4px rgba(0, 0, 0, 0.5), 0px 1px 0px rgba(255, 255, 255, 0.3));
+  @include text-shadow(none);
+  background: rgba(0, 0, 0, 0.25);
+  border: none;
+  color: #fff;
+  padding: 4px 10px;
+  height: 32px;
+}
+
+%select2-container-disabled {
+  background: #ccc;
+  color: #444;
+  @include text-shadow(none);
+  @include box-shadow(none);
+}
+
+%select2-arrow {
+  background: rgba(32, 32, 32, 0.95);
+  border-left: 1px solid transparent;
+}
+
+.modal {
+  .input-select2 {
+    &.select2-container {
+      .select2-choice {
+        @extend %font_definition;
+        @extend %select2-choices;
+        .select2-arrow {
+          @extend %select2-arrow;
+        }
+      }
+      &.select2-container-disabled .select2-choice, &.select2-container-disabled .select2-choice .select2-arrow, &.select2-container-disabled .select2-choice:hover {
+        @extend %select2-container-disabled;
+      }
+    }
+    .select2-drop, .select2-results, .select2-search input {
+      @extend %font_definition;
+    }
+  }
+
+  .tags-select2 {
+    &.select2-container {
+      .select2-choice .select2-arrow {
+        @extend %select2-arrow;
+      }
+      .select2-choices {
+        @extend %font_definition;
+        @extend %select2-choices;
+        @include border-radius(4px);
+        padding: 3px 0;
+      }
+      &.select2-container-disabled .select2-choice, &.select2-container-disabled .select2-choice .select2-arrow, &.select2-container-disabled .select2-choice:hover {
+        @extend %select2-container-disabled;
+      }
+    }
+    .select2-drop, .select2-results, .select2-search input {
+      @extend %font_definition;
+    }
+    input[type="text"] {
+      height: 28px;
+    }
+  }
+}
+
+html[dir="rtl"] .modal .input-select2.select2-container .select2-choice .select2-arrow,
+html[dir="rtl"] .modal .tags-select2.select2-container .select2-choice .select2-arrow {
+  border-right: 1px solid transparent;
+}
+
+/*
+ * The select2 classes above always work
+ *****
+ * The select2 classes below work only when dropdownCssClass is set to input-select2 or tags-select2
+ */
+
+.input-select2, .tags-select2 {
+
+  &.select2-drop {
+    background: rgba(32, 32, 32, 0.95);
+    border: 1px solid #111;
+    color: #ddd;
+  }
+
+  .select2-results {
+    li {
+      border: 1px solid transparent;
+    }
+    .select2-highlighted {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid #3875d7;
+      color: #fff;
+    }
+    .select2-disabled {
+      background: none;
+      color: #888;
+    }
+    .select2-no-results, .select2-searching, .select2-ajax-error, .select2-selection-limit {
+      background: rgba(32, 32, 32, 0.95);
+      color: #ddd;
+    }
+  }
+
+  .select2-choices .select2-search-field input {
+    color: #fff;
+  }
+
+  .select2-search input {
+    background: rgba(32, 32, 32, 0.95) inline-image('form_elements/select2.png') no-repeat 100% -22px;
+    color: #eee;
+
+    &.select2-active {
+      background: rgba(32, 32, 32, 0.95) inline-image('form_elements/select2-spinner.gif') no-repeat 100%;
+      color: #eee;
+    }
+  }
+}
+
+html[dir="rtl"] .input-select2 .select2-search input,
+html[dir="rtl"] .tags-select2 .select2-search input {
+  background: rgba(32, 32, 32, 0.95) inline-image('form_elements/select2.png') no-repeat -37px -22px;
+  color: #eee;
+}
+
+/* Profile form customization */
+
+#profile_user_form #id_phone_1, #profile_billing_address_form #id_phone2_1, #profile_billing_address_form #id_fax_1 {
+  margin-top: 0;
+}

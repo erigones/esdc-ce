@@ -1,0 +1,1 @@
+{% load i18n %}{% autoescape off %}{% blocktrans %}[Danube Cloud Support] {{ summary }}{% endblocktrans %}{% if vm %} ({{ vm }}){% endif %}{% endautoescape %}

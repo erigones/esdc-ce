@@ -1,0 +1,21 @@
+{% load i18n %}{% autoescape off %}{% blocktrans %}Support ticket submitted by {{ first_name }} {{ last_name }}{% endblocktrans %}
+
+{% trans "Summary" %}: {{ summary }}
+{% trans "Datacenter" %}: {{ dc.name }}
+{% trans "Server" %}: {{ vm }}
+{% trans "Severity" %}: {{ severity }}
+{% trans "Ticket Type" %}: {{ ticket_type }}
+
+{% trans "Problem Description" %}:
+{{ desc }}
+
+{% trans "How to reproduce" %}:
+{{ repro }}
+
+{% trans "Contact" %}:
+{{ first_name }} {{ last_name }}
+{{ company }}
+{{ email }}
+{{ phone }}
+
+{% endautoescape %}

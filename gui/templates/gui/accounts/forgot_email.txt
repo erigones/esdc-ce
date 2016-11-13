@@ -1,0 +1,11 @@
+{% load i18n %}{% autoescape off %}{% blocktrans %}You're receiving this email because you requested a password reset for your user account at {{ site_name }}.{% endblocktrans %}
+
+{% trans "Please go to the following page and request a new password:" %}
+
+{{ site_link }}{% url 'forgot_check' uidb64=uid token=token %}
+
+{% trans "Your new password will be send as text message to your phone number:" %} {{ user.userprofile.phone }}
+{% trans "Your username (email address), in case you've forgotten:" %} {{ user.username }}
+{% endautoescape %}
+
+{% include "email_signature.txt" %}

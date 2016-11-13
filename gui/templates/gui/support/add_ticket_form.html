@@ -1,0 +1,27 @@
+{% load i18n %}
+
+<div class="row-fluid" id="add_ticket_form" data-source="{% url 'add_ticket_submit' %}">
+  <div class="span6">
+    <div class="padded">
+
+      {% csrf_token %}
+      {% include "gui/support/add_ticket_field.html" with field=ticketform.vm %}
+      {% include "gui/support/add_ticket_field.html" with field=ticketform.ticket_type %}
+      {% include "gui/support/add_ticket_field.html" with field=ticketform.severity %}
+      <p><strong>{% trans "Critical" %}</strong>: {% trans "Critical production issue affecting all users, including system unavailability and data integrity issues with no workaround available." %}</p>
+      <p><strong>{% trans "Major" %}</strong>: {% trans "Major functionality is impacted or significant performance degradation is experienced. Issue is persistent and affects many users and/or major functionality. No reasonable workaround available." %}</p>
+      <p><strong>{% trans "Minor" %}</strong>: {% trans "System performance issue or bug affecting some but not all users. Short-term workaround is available, but not scalable." %}</p>
+      <p><strong>{% trans "Cosmetic" %}</strong>: {% trans "Inquiry regarding a routine technical issue; information requested on application capabilities, navigation, installation or configuration; bug affecting a small number of users. Acceptable workaround available." %}</p>
+
+    </div>
+  </div>
+  <div class="span6">
+    <div class="padded">
+    
+      {% include "gui/support/add_ticket_field.html" with field=ticketform.summary %}
+      {% include "gui/support/add_ticket_field.html" with field=ticketform.desc %}
+      {% include "gui/support/add_ticket_field.html" with field=ticketform.repro %}
+
+    </div>
+  </div>
+</div>

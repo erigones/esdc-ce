@@ -1,0 +1,96 @@
+{% extends load_base %}
+{% load i18n %}
+
+{% block javascript %}
+<script type="text/javascript">
+  $(document).ready(function() {
+    profile_control_links();
+    {% if dc_settings.REGISTRATION_ENABLED %}
+    {% if not profile.email_verified %}
+    profile_control($('#profile_verifyemail'));
+    {% elif not profile.phone_verified %}
+    profile_control($('#profile_verifyphone'));
+    {% endif %}{% endif %}
+
+    {% if not profile.different_billing %}
+    if($('#id_phone2_1').val() == "") {
+        $('#id_phone2_0').val($('#id_phone_0').val());
+    }
+    if($('#id_country2').val() == "") {
+        $('#id_country2').val($('#id_country').val());
+    }
+    {% endif %}
+
+    $(document).on("click","#{{ upform.different_billing.auto_id }}", function() {
+        profile_billing_address();
+    });
+
+  });
+</script>
+{% endblock %}
+
+{% block base_content %}
+<div id="profile_password_modal" class="black-box modal hide fade vm_modal">
+  <div class="modal-head tab-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <span><i class="icon-lock"></i> <span class="vm_modal_title">{% trans "Change Password" %}</span></span>
+  </div>
+  <div class="modal-body separator">
+    <div class="vm_modal_text">{% trans "Please enter old and new password." %}</div>
+    <form id="profile_password_form" class="form-horizontal thin" action="#" data-source="{% url 'profile_password' %}" method="POST">
+      {% include "gui/profile/profile_password_form.html" %}
+    </form>
+  </div>
+  <div class="modal-footer">
+    <div class="inner-well">
+      <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
+      <a class="vm_modal_yes button red no-ajax" data-enter="true">{% trans "Change password" %}</a>
+    </div>
+  </div>
+</div>
+
+<div id="profile_addsshkey_modal" class="black-box modal hide fade vm_modal">
+  <div class="modal-head tab-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <span><i class="icon-key"></i> <span class="vm_modal_title">{% trans "Add SSH Public Key" %}</span></span>
+  </div>
+  <div class="modal-body separator">
+    <div class="vm_modal_text">{% trans "Please enter the name and contents of your SSH public key." %}</div>
+    <form id="profile_addsshkey_form" class="form-horizontal thin" action="#" data-source="{% url 'profile_sshkey' action='add' %}" method="POST">
+      {% include "gui/profile/profile_sshkey_form.html" %}
+    </form>
+  </div>
+  <div class="modal-footer">
+    <div class="inner-well">
+      <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
+      <a class="vm_modal_yes button green no-ajax" data-enter="true">{% trans "Add SSH key" %}</a>
+    </div>
+  </div>
+</div>
+
+<div id="profile_deletesshkey_modal" class="black-box modal hide fade vm_modal">
+  <div class="modal-head tab-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <span><i class="icon-key"></i> <span class="vm_modal_title">{% trans "Delete SSH Public Key" %}</span></span>
+  </div>
+  <div class="modal-body separator">
+    <strong>{% trans "SSH key" %}: </strong><span class="vm_modal_text"></span>
+    <br>
+    <div class="vm_modal_force_text">{% trans "Are you sure that you want to delete this SSH key?" %}</div>
+    <form id="profile_deletesshkey_form" class="form-horizontal invisible" action="#" data-source="{% url 'profile_sshkey' action='delete' %}" method="POST">
+      {% csrf_token %}
+      <input type='hidden' name='title' value='_none_' />
+    </form>
+  </div>
+  <div class="modal-footer">
+    <div class="inner-well">
+      <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
+      <a class="vm_modal_yes button red no-ajax">{% trans "Delete SSH key" %}</a>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid" id="profile_page" data-source="{% url 'profile_update' %}">
+  {% include "gui/profile/profile_page.html" %}
+</div>
+{% endblock %}

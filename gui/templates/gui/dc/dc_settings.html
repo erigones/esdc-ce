@@ -1,0 +1,86 @@
+{% extends load_base %}
+{% load i18n %}
+{% load gui_utils %}
+
+{% block javascript %}
+<script type="text/javascript">
+  $(document).ready(function() {
+    DC_SETTINGS = new DcSettings();
+  });
+</script>
+{% endblock %}
+
+{% block base_content %}
+
+{% include "gui/mdata_template.html" with key_class="narrower-fill" value_class="narrow-fill" %}
+{% include "gui/array_template.html" with value_class="narrow-fill" %}
+
+<div class="container-fluid">
+
+  <div class="row-fluid">
+    <div class="span8 offset2">
+      <div class="box">
+        <div class="tab-header tab-header-light">
+          <i class="icon-bullhorn"></i> {% trans "This might be dangerous!" %}
+        </div>
+        <div class="padded">
+          <p>{% trans "Changing these advanced settings may cause application errors and lead to software malfunction. You should only continue if you are sure of what you are doing." %}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row-fluid">
+
+    <div class="span12">
+      <div class="tab-header">
+        <span class="options window-control pull-right">
+          <i class="icon-cloud"></i> {{ request.dc.alias }}
+        </span>
+        <i class="icon-cogs"></i> {% trans "Datacenter settings" %}
+      </div>
+
+      <form action="#" method="POST" id="dc_settings_form" class="fill-up" data-source="{% url 'dc_settings_table' %}?{{ qs }}">
+        <table class="table box table-striped table-hover form">
+
+          <thead>
+            <tr>
+              <th colspan="2">
+                <div class="pull-right">
+                  {% include "gui/dc/dc_all_toggle.html" %}
+                </div>
+              </th>
+            </tr>
+          </thead>
+
+          <tbody id="dc_settings_table">
+            {% include "gui/dc/dc_settings_table.html" %}
+          </tbody>
+
+          <tfoot>
+            <tr>
+              <td colspan="2">
+                <small>
+                  <ul>
+                    <li>Zabbix is a registered trademark of Zabbix LLC.</li>
+                  </ul>
+                </small>
+              </td>
+            </tr>
+
+            <tr>
+              <td colspan="2">
+                <div class="vm_control">
+                  <a href="#" class="button gray no-ajax" id="dc_settings_update" title="{% trans "Save datacenter settings" %}" data-toggle="tooltip" data-placement="top"><i class="icon-check"></i> {% trans "Update settings" %}</a>
+                </div>
+              </td>
+            </tr>
+          </tfoot>
+
+        </table>
+      </form>
+    </div>
+
+  </div> <!-- end row-fluid -->
+</div> <!-- end container-fluid -->
+{% endblock %}

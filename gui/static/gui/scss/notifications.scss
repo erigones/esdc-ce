@@ -1,0 +1,244 @@
+@import "mixins";
+
+$notificationIconSize: 30px;
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+
+.notifications {
+  z-index: 1100;
+  position: absolute;
+  overflow: hidden;
+
+  //bs 221 fix
+  min-height: 0;
+
+  margin-top: 40px;
+
+  @include std-bg(#fff, #dbdbdb);
+  @include box-shadow(white 0px -1px 0px inset, rgba(0,0,0,0.5) 0px 4px 30px);
+  @include border-radius(6px);
+  @include text-shadow-bottom(#fff);
+
+  .dismiss-all {
+    width: 150px;
+    position: absolute;
+    left: 50%;
+    margin-left: -75px;
+    text-align: center;
+    @include transition(top .3s);
+    height: 20px;
+    line-height: 20px;
+    top: -16px;
+    @include border-radius(0 0 4px 4px);
+    z-index: 1;
+    border-top: none;
+    padding: 0;
+	cursor: pointer;
+  }
+
+  &:hover {
+    .dismiss-all {
+      top: 0;
+    }
+  }
+
+  &.active {
+    .dismiss-all {
+      top: 0;
+    }
+
+    .notification .hide {
+      display: block;
+    }
+  }
+}
+
+
+.notification {
+  position: relative;
+  -webkit-transform: translateZ(0);
+
+  border-bottom: 1px solid #c1c1c1;
+  @include box-shadow(white 0px 1px 0px);
+
+  &.no-image {
+    .left {
+      display: none;
+    }
+
+    .right {
+      margin-left: 0;
+    }
+  }
+
+  &:last-child {
+    border-bottom: none;
+    @include box-shadow(none);
+    @include border-bottom-left-radius(5px);
+    @include border-bottom-right-radius(5px);
+  }
+
+  &:first-child {
+    @include border-top-left-radius(5px);
+    @include border-top-right-radius(5px);
+  }
+
+  .click {cursor: pointer;}
+
+  &:hover {
+    .hide {
+      display: block;
+    }
+  }
+
+  .hide {
+    position: absolute;
+    display: none;
+    right: 10px;
+    top: 7px;
+    cursor: pointer;
+    color: #aaa;
+    font-size: 22px;
+    &:hover {
+      color: #888;
+    }
+
+    line-height: 25px;
+  }
+
+  .right, .left {
+    height: 100%;
+    float: left;
+    position: relative;
+  }
+
+  .time {
+    font-size: 9px;
+    position: relative;
+  }
+
+  .right {
+
+    margin-left: 50px;
+
+    .time {
+      margin-left: 10px;
+      margin-top: -8px;
+      margin-bottom: 10px;
+      opacity: 0.4;
+    }
+
+    .inner {
+      padding: 10px;
+      min-height: 42px;
+    }
+  }
+
+  .left {
+    height: 100%;
+    width: 50px;
+    padding: 10px;
+    position: absolute;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    overflow: hidden;
+
+    &:after {
+      content: '';
+      background: #c1c1c1;
+      @include box-shadow(white 1px 0px 0px);
+      width: 1px;
+      height: 100%;
+      position: absolute;
+      top: 0px;
+      right: 0px;
+    }
+
+    > .icon {
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      height: 100%;
+      width: 100%;
+      text-align: center;
+      line-height: 50px;
+      font: normal 35px/39px Icons; /* TODO: get icons */
+      text-shadow: white 0px 1px 0px;
+    }
+  }
+
+  .img {
+    width: $notificationIconSize;
+    background-size: auto 100%;
+    background-position: center;
+    height: $notificationIconSize;
+    @include border-radius(6px);
+    @include box-shadow(rgba(255,255,255,0.9) 0px -1px 0px inset, rgba(0,0,0,0.2) 0px 1px 2px);
+    border: 1px solid rgba(0,0,0,0.55);
+    position: absolute;
+    top: 50%;
+    margin-top: 5px;
+
+    &.border {
+      box-shadow: none;
+      border: none;
+    }
+
+    &.fill {
+      top: 0px;
+      margin: 0px;
+      border: none;
+      left: 0px;
+      width: 100%;
+      height: 100%;
+      @include border-radius(0px);
+      @include box-shadow(rgba(0,0,0,0.2) 0px 1px 0px inset, black -1px 0px 16px inset);
+      background-color: #333;
+    }
+
+    i {
+      font-size: 38px;
+
+      &.icon-ok-sign {
+        color: #00CC00;
+      }
+      &.icon-info-sign {
+        color: #3366FF;
+      }
+      &.icon-remove-sign {
+        color: #CC0033;
+      }
+      &.icon-warning-sign {
+        color: #FF9933;
+      }
+    }
+  }
+
+  &:first-child {
+    .img.fill {
+      @include border-top-left-radius(5px);
+    }
+  }
+
+  &:last-child {
+    .img.fill {
+      @include border-bottom-left-radius(5px);
+    }
+  }
+
+  &:after {
+    content: ".";
+    visibility: hidden;
+    display: block;
+    clear: both;
+    height: 0;
+    font-size: 0;
+  }
+
+  h2 {
+    font-size: 14px;
+  }
+}

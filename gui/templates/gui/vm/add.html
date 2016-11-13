@@ -1,0 +1,71 @@
+{% extends load_base %}
+{% load i18n %}
+{% load gui_utils %}
+
+{% block javascript %}
+<script type="text/javascript">
+  $(document).ready(function() {
+    VM_ADD = new ServerAdd();
+  });
+</script>
+{% endblock %}
+
+{% block base_content %}
+{% include "gui/mdata_template.html" %}
+
+<div id="vm_settings_modal" class="black-box modal hide fade vm_modal">
+  <div class="modal-head tab-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <span class="title_edit"><i class="icon-hdd"></i> {% trans "Change Server Settings" %}</span>
+    <span class="title_add"><i class="icon-hdd"></i> {% trans "Add new Server" %}</span>
+  </div>
+  <div class="modal-body separator">
+    <div class="vm_modal_text"></div>
+    <form id="vm_settings_form" class="form-horizontal" action="#" data-source="{% url 'vm_add_settings_form' %}" method="POST">
+      {% include "gui/vm/settings_form.html" %}
+    </form>
+  </div>
+  <div class="modal-footer">
+    <div class="inner-well">
+      <span class="pull-left"><a class="vm_modal_more btn btn-small btn-inverse no-ajax">{% trans "Show advanced settings" %}</a></span>
+      <span class="pull-left">&nbsp; <a class="vm_import btn btn-small btn-inverse no-ajax">{% trans "Import from file" %}</a></span>
+      <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
+      <a class="vm_modal_update button green no-ajax" data-enter="true">{% trans "Update" %}</a>
+      <a class="vm_modal_delete button red no-ajax disabled">{% trans "Delete Server" %}</a>
+      <a class="vm_modal_create button green no-ajax" data-enter="true">{% trans "Add Server" %}</a>
+    </div>
+  </div>
+</div>
+
+{% include "gui/vm/import_modal.html" %}
+
+<div class="container-fluid" id="main-container">
+  <div class="row-fluid">
+    <div class="span6 offset3">
+      <div class="box">
+
+        <div class="tab-header">
+          <i class="icon-plus"></i> {% trans "Add Server" %}
+        </div>
+        <form>
+          <div class="padded center">
+            <div class="big-button-bar two">
+              <a class="vm_add button large" href="#">
+                <i class="icon-plus"></i>
+                <span>{% trans "Add Server" %}</span>
+              </a>
+              <a class="vm_import button large" href="#">
+                <i class="icon-upload-alt"></i>
+                <span>{% trans "Import Servers" %}</span>
+              </a>
+            </div>
+          </div>
+        </form>
+
+      </div>
+    </div> <!-- end span12 -->
+  </div> <!-- end row-fluid -->
+</div> <!-- end container-fluid -->
+
+<iframe id="iframe_with_sample_file" class="hide"></iframe>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% load i18n tz gui_utils %}
+<table class="box table table-striped table-condensed table-responsive" id="tasklog-table">
+  <thead>
+    {% if tasklog %}
+    <tr class="sortable" data-order_by="{{ order_by.0 }}">
+      <th data-field="time">{% trans "Time" %}</th>
+      <th>{% trans "Status" %}</th>
+      <th>{% trans "Object" %}</th>
+      <th>{% trans "Message" %}</th>
+      <th>{% trans "User" %}</th>
+      <th>{% trans "Detail" %}</th>
+    </tr>
+    {% endif %}
+  </thead>
+
+  <tbody id="tasklog" class="nowrap">
+    {% for log in tasklog %}
+    <tr class="{{ log.task }} {{ log.status }}{% if log.status == 'PENDING' and log.task in pending_tasks %} running{% endif %}" data-task_id="{{ log.task }}">
+      <td><i class="icon-time"></i> <span>{{ log.time|date:"H:i:s" }}<br>{{ log.time|date:"SHORT_DATE_FORMAT" }}</span></td>
+      <td>
+        <div class="status">
+          <i class="icon-{{ log.status }}" title="{% trans log.status %}"></i> <span class="hidden-phone">{% trans log.status %}</span><br>
+          <small class="hidden-phone tiny"><i class="icon-link"></i> {{ log.task }}</small>
+        </div>
+      </td>
+      <td class="wrap"><i class="icon-{{ log.object_type }}"></i> <span>{{ log.get_object_alias }}</span><br><small>{{ log.get_object_name }}</small></td>
+      <td class="log-msg wrap"><i class="icon-task-flag{{ log.flag }}"></i> <span class="logmsg">{% if log.msg %}{% trans log.msg %}{% endif %}</span></td>
+      <td class="log-user"><i class="icon-user"></i> <span>{{ log.get_username }}</span></td>
+      <td class="log-detail wrap">{% if log.detail %}<pre>{{ log.detail }}</pre>{% endif %}</td>
+    </tr>
+    {% empty %}
+    <tr>
+      <td colspan="6"><p class="msg">{% trans "No log entries found." %}</p></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+
+  <tfoot>
+    {% if tasklog %}
+    <tr>
+      <td colspan="6">
+        <div class="paginator dataTables_paginate center">
+          {% paginator %}
+        </div>
+      </td>
+    </tr>
+    {% endif %}
+  </tfoot>
+</table>

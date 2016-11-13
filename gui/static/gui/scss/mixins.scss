@@ -1,0 +1,252 @@
+@import "compass";
+$experimental-support-for-svg: true;
+
+@mixin text-shadow-bottom($color) {
+  @include text-shadow(0 1px rgba($color, 0.5));
+}
+
+@mixin std-bg($color1, $color2) {
+  background: $color2;
+  @include background-image(linear-gradient(top, $color1, $color2));
+  //filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=$color1, endColorstr=$color2, GradientType=0 );
+}
+
+@mixin placeholder {
+  &:placeholder-shown {
+  @content;
+  }
+  &::-webkit-input-placeholder {
+  @content;
+  }
+  &:-moz-placeholder {
+  @content;
+  }
+  &::-moz-placeholder {
+  @content;
+  }
+  &:-ms-input-placeholder {
+  @content;
+  }
+}
+
+// *************************
+// *   Navigation mixins   *
+// *************************
+
+@mixin tab-header {
+  @include std-bg(#494852, #2A2A30);
+  @include box-shadow(inset 0px 1px 0px rgba(255, 255, 255, 0.1));
+}
+
+// ***************************
+// *   Modal window mixins   *
+// ***************************
+
+@mixin black-box {
+  @include box-shadow(
+    0px 0px 10px rgba(0, 0, 0, 0.6),
+    inset 1px 0px 0px rgba(255, 255, 255, 0.1),
+    inset -1px 0px 0px rgba(255, 255, 255, 0.1),
+    inset 0px -1px 0px rgba(255, 255, 255, 0.1)
+  );
+  @include border-radius(5px);
+  border: 1px solid #1D1E21;
+  background: #3B3B42;
+  &.tex {
+    background: inline-image("backgrounds/linen-light.png");
+  }
+
+  color: #fff;
+  @include text-shadow-bottom(#000);
+
+  .separator a {
+    color: #fff;
+    @include text-shadow-bottom(#000);
+    font-weight: bold;
+    &:hover {
+      color: #fff;
+    }
+  }
+}
+
+// ********************
+// *   Form  mixins   *
+// ********************
+
+@mixin form-box($image-url) {
+  display: none;
+
+  &:checked + label:before {
+    background-position: 0 -38px;
+  }
+
+  &:checked + label:hover:before {
+    background-position: 0 -38px;
+  }
+
+  & + label {
+    padding-left: 25px;
+
+    &:before {
+      content: "";
+      background: inline-image($image-url) no-repeat;
+      background-position: 0 0;
+      height: 19px;
+      width: 18px;
+      position: absolute;
+      margin-left: -25px;
+    }
+
+    &:hover:before {
+      background-position: 0 -19px;
+    }
+
+    &:active:before {
+      background-position: 0 -38px;
+    }
+  }
+}
+
+// *********************
+// *   Button mixins   *
+// *********************
+
+$white: #ededed;
+$gray: #3A3A40;
+$blue: #147CB9;
+$red: desaturate(red, 40%);
+$green: desaturate(lighten(green, 5%), 40%);
+$black: lighten(black, 15);
+$light-gray: lighten($gray,5);
+$gold: #d4881c;
+
+@mixin simple-button() {
+  @include box-shadow(rgba(255, 255, 255, 0.1) 0px 1px 0px 0px inset);
+  @include border-radius(5px);
+  white-space: nowrap;
+  display: inline-block;
+  text-overflow: ellipsis;
+
+  @include box-sizing(border-box);
+  font-size: 11px;
+  font-weight: bold;
+  padding: 6px 10px;
+  text-align: center;
+  color: #434343;
+  line-height: 1;
+}
+
+@mixin button-disabled($base) {
+  background: desaturate(lighten($base, 8), 20%);
+  @include text-shadow(none);
+  border: 1px solid $base;
+  cursor: default;
+
+  &:hover, &:active {
+    background: desaturate(lighten($base, 8), 20%);
+    @include box-shadow(none);
+  }
+}
+
+@mixin button-color($base) {
+  @include std-bg(lighten($base, 8), $base);
+  @include text-shadow(rgba(#fff, 0.5) 0 1px 1px);
+  border: 1px solid darken($base, 10);
+
+
+  &.inset {
+    @include text-shadow(rgba(#fff, 0.5) 0 -1px 1px);
+  }
+  &.disabled {
+    @include button-disabled($base);
+  }
+
+  &:hover {
+    @include std-bg(lighten($base, 4), darken($base,4));
+  }
+
+  &:active {
+    @include std-bg(darken($base,9), darken($base,2));
+  }
+}
+
+@mixin invert-button-color($base) {
+  @include std-bg(lighten($base,14), $base);
+  border: 1px solid darken($base, 5);
+  @include text-shadow(rgba(#000, 0.5) 0px 1px 1px);
+  color: white;
+
+  &.inset {
+    @include text-shadow(rgba(#000, 0.5) 0px -1px 1px);
+  }
+
+  &.disabled {
+    @include button-disabled($base);
+  }
+
+  &:hover {
+    @include std-bg(lighten($base,18), lighten($base,5));
+  }
+
+  &:active {
+    @include std-bg(lighten($base,18), lighten($base,5));
+    @include box-shadow(inset 0px 0px 5px rgba(0,0,0,0.5), 0px 1px 0px rgba(0,0,0,0.0));
+  }
+}
+
+// *************************
+// *   Animations mixins   *
+// *************************
+
+@mixin prefixed($name, $val) {
+  -webkit-#{$name}: $val;
+  -moz-#{$name}: $val;
+  -ms-#{$name}: $val;
+  -o-#{$name}: $val;
+  #{$name}: $val;
+}
+
+@mixin keyframes($name) {
+  @-webkit-keyframes #{$name} {
+    @content;
+  }
+
+  @-moz-keyframes #{$name} {
+    @content;
+  }
+
+  @-ms-keyframes #{$name} {
+    @content;
+  }
+
+  @keyframes #{$name} {
+    @content;
+  }
+}
+
+
+// ****************************
+// *   NO-AUTH pages mixins   *
+// ****************************
+
+@mixin no-auth-media($min, $max, $width, $margin) {
+  @media (min-width: $min) and (max-width: $max) {
+    body.no-auth div.container {
+      width: $width;
+    }
+    .no-auth-content {
+      margin-left: $margin;
+    }
+  }
+}
+
+
+// ****************************
+// *     Typography mixins    *
+// ****************************
+
+@mixin emphasis-text {
+  color: #fff;
+  @include text-shadow(0px 1px 1px rgba(#000,0.5));
+  font-weight: bold;
+}

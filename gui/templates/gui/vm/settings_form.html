@@ -1,0 +1,50 @@
+{% load i18n %}
+
+{% csrf_token %}
+{% for error in settingsform.non_field_errors %}
+<div class="alert alert-error"><i class="icon-warning-sign"></i> {{ error }}</div>
+{% endfor %}
+
+{% include "gui/form_field.html" with field=settingsform.alias %}
+
+<div class="input{% if settingsform.hostname.errors or settingsform.domain.errors %} error wobble animated{% endif %}">
+  <div class="control-group thinner {% if not settingsform.admin %} thin{% endif %}">
+    <label class="control-label" for="{{ settingsform.hostname.id_for_label }}">{{ settingsform.hostname.label }}:</label>
+    <div class="controls">
+      {{ settingsform.hostname }}.{{ settingsform.domain }}
+      {% if settingsform.dns %}
+      <span class="help-inline note"><i class="icon-info-sign"></i> {% blocktrans with ipaddr=settingsform.dns_content %}DNS A record pointing to {{ ipaddr }} will also be updated.{% endblocktrans %}</span>
+      {% endif %}
+      {% for error in settingsform.hostname.errors %}
+      <span class="help-inline error"><i class="icon-warning-sign"></i> {{ error }}</span>{% endfor %}
+      {% for error in settingsform.domain.errors %}
+      <span class="help-inline error"><i class="icon-warning-sign"></i> {{ error }}</span>{% endfor %}
+    </div>
+  </div>
+</div>
+
+{% if settingsform.admin %}
+{% include "gui/form_field.html" with field=settingsform.tags %}
+{% include "gui/form_field.html" with field=settingsform.node %}
+{% include "gui/form_field.html" with field=settingsform.template %}
+{% include "gui/form_field.html" with field=settingsform.ostype %}
+{% include "gui/form_field.html" with field=settingsform.vcpus %}
+{% include "gui/form_field.html" with field=settingsform.ram addon=" MB" %}
+
+<div class="advanced hide">
+{% include "gui/form_field_checkbox.html" with field=settingsform.monitored %}
+{% include "gui/form_field_checkbox.html" with field=settingsform.installed %}
+{% include "gui/form_field.html" with field=settingsform.snapshot_limit_manual %}
+{% include "gui/form_field.html" with field=settingsform.snapshot_size_limit addon=" MB" %}
+{% include "gui/form_field.html" with field=settingsform.cpu_shares %}
+{% include "gui/form_field.html" with field=settingsform.zfs_io_priority %}
+{% include "gui/form_field.html" with field=settingsform.zpool %}
+{% include "gui/form_field.html" with field=settingsform.owner %}
+{% include "gui/form_field.html" with field=settingsform.monitoring_templates %}
+{% include "gui/form_field.html" with field=settingsform.monitoring_hostgroups class="thin" %}
+{% include "gui/form_field.html" with field=settingsform.mdata %}
+</div>
+
+{% else %}
+<div class="advanced hide"></div>
+{% endif %}

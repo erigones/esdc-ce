@@ -1,0 +1,25 @@
+#!/bin/bash
+
+(sysinfo -f)
+echo "||||"
+(imgadm sources -j)
+echo "||||"
+(diskinfo -Hp)
+echo "||||"
+(zpool list -Hp -o name,size)
+echo "||||"
+(zfs list -Hp -o name,used,available -d 0)
+echo "||||"
+(zpool status)
+echo "||||"
+(cat /usbkey/config)
+echo "||||"
+(cat /root/.ssh/id_rsa.pub)
+echo "||||"
+if /bin/bootparams | grep "^headnode=true" > /dev/null 2>&1; then
+	find /usbkey/datasets -type f -name '*.imgmanifest' -exec json -f {} \; | json -g
+else
+	echo '[]'
+fi
+
+exit 0

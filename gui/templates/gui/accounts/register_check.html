@@ -1,0 +1,26 @@
+{% extends "base_no_auth.html" %}
+{% load i18n %}
+
+{% block login_content %}
+<div class="no-auth-message black-box inner-well">
+  {% if profile and token_verified %}
+  {% if sms_sent %}
+  <h4>{% trans "Registration complete!" %}</h4>
+  <br>
+  <p>{% blocktrans %}Welcome to {{ site_name }}!{% endblocktrans %}</p>
+  <p>{% blocktrans with phone=profile.phone %}Your password has been sent to your phone number {{ phone }} as text message.{% endblocktrans %} <a href="{% url 'login' %}" class="btn-link">{% trans "You may go ahead and log in now." %}</a></p>
+  {% else %}
+  <h4>{% trans "Registration problem :(" %}</h4>
+  <br>
+  <p>{% blocktrans %}Welcome to {{ site_name }}!{% endblocktrans %}</p>
+  <p>{% blocktrans with phone=profile.phone %}There was an error while sending a text message with your new password to your phone number {{ phone }}. Please contact us at <b>{{ support_email }}</b>.{% endblocktrans %}
+  {% endif %}
+  {% else  %}
+  <h4>{% trans "Registration problem :(" %}</h4>
+  <br>
+  <p>{% trans "The activation link is invalid. Your account may already be activated."%}</p>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block nav_accounts_register %}{% endblock %}

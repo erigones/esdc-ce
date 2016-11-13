@@ -1,0 +1,163 @@
+@import "compass";
+@import "mixins";
+
+table tr {
+  td .alert {
+    margin-bottom: 1px;
+  }
+
+  &.row-alert td {
+    background-color: #e5e5e5 !important;
+  }
+}
+
+td, th {
+  .nowrap {
+    white-space: nowrap;
+  }
+  .wrap {
+    white-space: normal;
+  }
+}
+
+td {
+
+  .button {
+
+    &.mini {
+      padding: 0px 8px;
+      margin: 0;
+      font-weight: normal;
+
+      i {
+        padding-top: 0.5px;
+        vertical-align: middle;
+      }
+    }
+    &.small {
+      padding: 2px 10px;
+      margin: -2px 0;
+
+      i {
+        padding-top: 0.5px;
+        vertical-align: middle;
+      }
+    }
+  }
+
+  &.button-group .button.small {
+    margin: 0;
+    margin-top: 1px;
+  }
+
+  .input-error {
+    color: #c94a48;
+    font-style: bold;
+  }
+
+  .help-inline {
+    &.error {
+      padding-top: 0;
+      margin-bottom: -8px;
+    }
+    &.note {
+      padding-top: 0;
+      margin-bottom: -8px;
+      line-height: 14px;
+      color: #888888;
+    }
+  }
+
+  .msg {
+    padding-top: 10px;
+    text-align: center;
+    font-weight: bold;
+  }
+}
+
+.nowrap tr td {
+  white-space: nowrap;
+  &.wrap {
+    white-space: normal;
+  }
+}
+
+table.box {
+
+  background-color: #FAFAFA;
+
+  thead, tfoot {
+    @include std-bg(#ebebeb, #e5e5e5);
+    color: #898989;
+    @include text-shadow-bottom(#fff);
+    @include border-radius(3px 3px 0 0, 3px 3px 0 0);
+  }
+
+  &.table-striped tbody tr:nth-child(odd) td, &.table-striped tbody tr:nth-child(odd) th {
+    background: #FDFDFD;
+  }
+
+  .button {
+    i {
+      font-size: 14px;
+    }
+    line-height: normal;
+  }
+
+}
+
+/*
+ *  Responsive tables
+ */
+
+table.table-responsive th, table.table-responsive td {
+  word-wrap: break-word;
+  max-width: 200px;
+}
+
+.tab-header {
+  height: auto;
+  word-wrap: break-word;
+  overflow: hidden;
+}
+
+p.table_desc {
+  margin: 0;
+  color: #454545;
+}
+
+div.dataTables_paginate {
+
+  float: none;
+  margin-bottom: 20px;
+  padding-right: 10px;
+
+  a {
+    @include button-color($white);
+    padding: 4px 8px;
+    line-height: 25px;
+    height: 25px;
+    margin-left: -1px;
+  }
+
+  .first {
+    @include border-radius(4px 0 0 4px);
+  }
+
+  .last {
+    @include border-radius(0 4px 4px 0);
+  }
+
+  .ui-state-disabled, .ui-state-disabled:hover {
+    background: #ddd;
+    cursor: default;
+    @include text-shadow(none);
+  }
+}
+
+.inner-well {
+  .table th, .table td {
+    border: none;
+  }
+}
+

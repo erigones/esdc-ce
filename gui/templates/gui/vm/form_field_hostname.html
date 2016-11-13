@@ -1,0 +1,11 @@
+<div class="input{% if field.errors %} error wobble animated{% endif %}">
+  <div class="control-group thinner {{ class }}">
+    <label class="control-label" for="{{ field.id_for_label }}">{{ field.label }}:</label>
+    <div class="controls">
+      <input class="uneditable-input narrow" id="{{ field.auto_id }}" name="{{ field.html_name }}" type="text" required="required" disabled="disabled" value="{% if vm %}{{ vm.hostname }}{% else %}{{ field.value }}{% endif %}" />
+      {% for error in field.errors %}
+      <span class="help-inline error"><i class="icon-warning-sign"></i> {{ error }}</span>
+      {% endfor %}
+    </div>
+  </div>
+</div>

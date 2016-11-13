@@ -1,0 +1,36 @@
+{% load i18n %}
+{% csrf_token %}
+<table class="table box table-striped form">
+  <thead>
+  </thead>
+  <tbody>
+    {% include "gui/profile/profile_user_field.html" with field=upform.street_1 %}
+    {% include "gui/profile/profile_user_field.html" with field=upform.street2_1 %}
+    {% include "gui/profile/profile_user_field.html" with field=upform.postcode %}
+    {% include "gui/profile/profile_user_field.html" with field=upform.city %}
+    {% include "gui/profile/profile_user_field.html" with field=upform.state %}
+    {% spaceless %}{% include "gui/profile/profile_user_field.html" with field=upform.country %}{% endspaceless %}
+
+    <tr>
+        <td>&nbsp;</td>
+        <td>
+            <div class="input">
+                {{ upform.different_billing }}
+                <label for="{{ upform.different_billing.auto_id }}">{{ upform.different_billing.label }}</label>
+            </div>
+        </td>
+    </tr>
+
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="2">
+        <div class="vm_control">
+          {% for error in uform.non_field_errors %}<div class="alert alert-error"><i class="icon-warning-sign"></i> {{ error }}</div>{% endfor %}
+          {% for error in upform.non_field_errors %}<div class="alert alert-error"><i class="icon-warning-sign"></i> {{ error }}</div>{% endfor %}
+          <a href="#" id="profile_update3" class="button gray no-ajax profile_control"><i class="icon-check"></i> {% trans "Update profile" %}</a>
+        </div>
+      </td>
+    </tr>
+  </tfoot>
+</table>

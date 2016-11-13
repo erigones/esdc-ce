@@ -1,0 +1,485 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#
+#  es - Swiss Army Knife command-line interface (CLI) for the Danube Cloud API
+#
+################################################################################
+# configuration
+################################################################################
+API_URL = 'http://127.0.0.1:8000/api'
+API_KEY = None
+TOKEN_STORE = '/tmp/esdc.session'
+SSL_VERIFY = False
+TIMEOUT = None
+DEBUG = False
+SUPPRESS_SECURITY_WARNING = False
+SUPPRESS_INSECURE_PLATFORM_WARNING = False
+CSV_DELIMITER = ';'
+CSV_QUOTING = 0  # csv.QUOTE_MINIMAL
+################################################################################
+# DO NOT EDIT ANYTHING BELOW THIS LINE
+################################################################################
+
+__author__ = 'Erigones, s. r. o.'
+__copyright__ = 'Copyright 2013-2016, Erigones, s. r. o.'
+__version__ = '1.3.1'
+__email__ = 'info@erigones.com'
+
+################################################################################
+
+import os
+import sys
+from functools import partial
+
+PY3 = sys.version_info[0] > 2
+ENCODING = 'UTF-8'
+
+try:
+    import simplejson as json
+except ImportError:
+    import json
+
+try:
+    # noinspection PyUnresolvedReferences
+    import requests
+except ImportError:
+    sys.stderr.write('ERROR: No module named requests\n'
+                     'Please install the python requests package (http://python-requests.org)\n')
+    sys.exit(99)
+
+try:
+    # noinspection PyUnresolvedReferences
+    from requests.packages.urllib3 import disable_warnings
+    # noinspection PyUnresolvedReferences
+    from requests.packages.urllib3.exceptions import InsecurePlatformWarning, SecurityWarning
+except ImportError:
+    pass
+else:
+    if SUPPRESS_SECURITY_WARNING:
+        disable_warnings(SecurityWarning)
+    elif SUPPRESS_INSECURE_PLATFORM_WARNING:
+        disable_warnings(InsecurePlatformWarning)
+
+try:
+    import csv
+except ImportError:
+    csv = False
+else:
+    if PY3:
+        csv_writer = csv.writer
+    else:
+        # noinspection PyPep8Naming
+        class csv_writer(object):
+            """csv.writer with unicode support (python 2)"""
+            def __init__(self, *args, **kwargs):
+                self.writer = csv.writer(*args, **kwargs)
+
+            @staticmethod
+            def _to_string(x):
+                if x is None or isinstance(x, (int, long, float, bool)):
+                    return x
+                elif isinstance(x, unicode):
+                    return x.encode(ENCODING)
+                elif not isinstance(x, str):
+                    return str(x)
+                return x
+
+            def writerow(self, row):
+                try:
+                    return self.writer.writerow([self._to_string(col) for col in row])
+                except TypeError as exc:
+                    raise csv.Error(str(exc))
+
+            def writerows(self, rows):
+                for row in rows:
+                    self.writerow(row)
+
+try:
+    from tabulate import tabulate, tabulate_formats
+except ImportError:
+    tabulate = tabulate_formats = False
+
+
+################################################################################
+# output formatters
+################################################################################
+
+def output_json(response, status, txt):
+    if response.request.method == 'OPTIONS':
+        # noinspection PyBroadException
+        try:
+            txt = txt['description']
+        except:
+            pass
+        else:
+            print(txt)
+            return
+
+    out = {
+        'method': response.request.method,
+        'url': response.url,
+        'status': status,
+        'text': txt,
+    }
+
+    if DEBUG:
+        out['command'] = ' '.join(ARGS)
+        out['headers'] = dict(response.headers)
+        out['request.headers'] = dict(response.request.headers)
+
+    print(json.dumps(out, indent=4))
+
+
+def _to_string(x):
+    return '%s' % x
+
+
+def _normalize(item):
+    if isinstance(item, dict):
+        return ','.join('%s: %s' % kv for kv in item.items())
+    elif isinstance(item, (list, tuple)):
+        return ','.join(map(_to_string, item))
+    return item
+
+
+def _output_csv(table, headers=()):
+    csv_printer = csv_writer(sys.stdout, delimiter=CSV_DELIMITER, quoting=CSV_QUOTING)
+
+    if headers:
+        csv_printer.writerow(headers)
+
+    csv_printer.writerows(table)
+
+
+# noinspection PyUnusedLocal
+def output_tabulate(response, status, txt, tablefmt='simple'):
+    if 199 < status < 300:
+        # noinspection PyBroadException
+        try:
+            txt = txt['result']
+        except KeyError:
+            try:
+                txt = txt['results']
+            except KeyError:
+                pass
+        except:
+            pass
+
+    headers = ()
+
+    if isinstance(txt, dict):  # dict (convert to list of lists)
+        table = ((k, _normalize(v)) for k, v in txt.items())
+    elif isinstance(txt, list):
+        if txt:
+            first_item = txt[0]
+            if isinstance(first_item, dict):  # list of dicts (convert to list of lists)
+                headers = list(first_item.keys())  # python 3 conversion view -> list
+                table = ([_normalize(z) for z in x.values()] for x in txt)
+            elif isinstance(first_item, list):  # list of lists
+                table = txt
+            else:  # list of strings (convert to list of lists)
+                table = ((x,) for x in txt)
+        else:
+            table = txt  # empty list (nothing to do)
+    else:
+        print(txt)  # string
+        return
+
+    if tablefmt == 'csv':  # tabulate does not support csv
+        _output_csv(table, headers=headers)
+    else:
+        # noinspection PyCallingNonCallable
+        print(tabulate(table, headers=headers, tablefmt=tablefmt))
+
+
+def output_csv(response, status, txt):
+    return output_tabulate(response, status, txt, tablefmt='csv')
+
+
+################################################################################
+# globals
+################################################################################
+
+USER_AGENT = 'es/' + __version__
+METHOD = {
+    'login': requests.post,
+    'logout': requests.get,
+    'get': requests.get,
+    'create': requests.post,
+    'set': requests.put,
+    'delete': requests.delete,
+    'help': requests.options,
+}
+ACTION = METHOD.keys()
+
+USAGE = '''es - Swiss Army Knife for the Danube Cloud API
+
+Usage: es action [/resource] [parameters] [output format]
+
+ action:\t{%s}
+ resource:\t/some/resource/in/api
+ parameters:\t-foo baz -bar qux ...
+ output format:\t--json (default)
+''' % ('|'.join(ACTION))
+
+HEADERS = {
+    'User-Agent': USER_AGENT,
+    'Accept': 'application/json; indent=4',
+    'Content-Type': 'application/json; indent=4',
+    'ES-STREAM': 'es',
+}
+
+OUTPUT_FORMAT = 'json'
+OUTPUT_FORMATTERS = {
+    'json': output_json,
+}
+
+if csv:
+    OUTPUT_FORMATTERS['csv'] = output_csv
+    OUTPUT_FORMATTERS['tabulate-csv'] = output_csv
+    USAGE += '\t\t--csv\n'
+
+if tabulate:
+    OUTPUT_FORMATTERS['tabulate'] = output_tabulate
+
+    for fmt in tabulate_formats:
+        OUTPUT_FORMATTERS['tabulate-%s' % fmt] = partial(output_tabulate, tablefmt=fmt)
+
+    USAGE += '\t\t--tabulate\n\t\t--tabulate-<tablefmt>\n'
+
+USAGE += '\n'
+ARGS = sys.argv[1:]
+
+try:
+    with open(TOKEN_STORE, 'r') as f:
+        token = f.readline()
+except IOError:
+    pass
+else:
+    if token:
+        HEADERS['Authorization'] = 'Token ' + token
+
+ec = -1
+em = None
+
+
+################################################################################
+# input
+################################################################################
+
+if len(ARGS) > 0 and ARGS[0] in ('-h', '--help', '-?'):
+    sys.stdout.write(USAGE)
+    sys.exit(0)
+
+if len(ARGS) > 1 and ARGS[0] in ('-d', '--debug'):
+    del ARGS[0]
+    DEBUG = True
+
+for i, arg in enumerate(ARGS):
+    if arg.startswith('--') and len(arg) > 2:
+        OUTPUT_FORMAT = arg[2:]
+        del ARGS[i]
+
+if len(ARGS) < 1 or ARGS[0] not in ACTION:
+    sys.stderr.write(USAGE)
+    sys.exit(11)
+
+action = ARGS[0]
+
+if len(ARGS) > 1 and ARGS[1][0] == '/':
+    res = ARGS[1]
+    options = ARGS[2:]
+else:
+    res = None
+    options = ARGS[1:]
+
+
+################################################################################
+# more input
+################################################################################
+
+if action == 'login' or action == 'logout':
+    if res:
+        url = API_URL + res
+    else:
+        url = API_URL + '/accounts/' + action + '/'
+
+    if action == 'login':  # Ignore token
+        HEADERS.pop('Authorization', None)
+
+elif res:
+    url = API_URL + res
+else:
+    sys.stderr.write('ERROR: Missing resource\n')
+    sys.exit(12)
+
+try:
+    output_fun = OUTPUT_FORMATTERS[OUTPUT_FORMAT]
+except KeyError:
+    sys.stderr.write('ERROR: Invalid output format\n')
+    sys.exit(13)
+
+params = {}
+data = None
+parsed_options = {}
+
+if options:
+    key = None
+    val_next = False
+
+    for i in options:
+        if i and i.startswith('-'):
+            _key = i[1:]
+
+            if _key and _key[0].isalnum():
+                key = _key
+                parsed_options[key] = True
+                val_next = True
+                continue
+
+        if val_next and key:
+            _i = str(i).lower()
+
+            if _i == 'false':
+                parsed_options[key] = False
+            elif _i == 'true':
+                parsed_options[key] = True
+            elif _i == 'null':
+                parsed_options[key] = None
+            elif i.startswith('json::'):
+                i = i[6:]
+                try:
+                    i = json.loads(i)
+                except ValueError as e:
+                    sys.stderr.write('Ignoring parameter %s (%s)\n' % (key, e))
+                else:
+                    parsed_options[key] = i
+            elif i.startswith('file::'):
+                i = i[6:]
+                try:
+                    with open(i, 'r') as f:
+                        content = f.read()
+                except IOError as e:
+                    sys.stderr.write('Ignoring parameter %s (%s)\n' % (key, e))
+                    parsed_options[key] = None
+                else:
+                    # put file contents into parsed options
+                    parsed_options[key] = content
+            else:
+                parsed_options[key] = i
+
+            key = None
+            val_next = False
+
+api_key = parsed_options.pop('api-key', os.environ.get('ES_API_KEY', API_KEY))
+
+if api_key:
+    HEADERS['ES-API-KEY'] = api_key
+
+if action == 'get' or action == 'logout':
+    params = parsed_options
+else:
+    data = json.dumps(parsed_options)
+
+if url[-1] != '/':
+    url += '/'
+
+
+################################################################################
+# main
+################################################################################
+
+r = None
+text = ''
+status_code = '???'
+
+try:
+    http_request = METHOD[action]
+    r = http_request(url=url, headers=HEADERS, timeout=TIMEOUT, params=params,
+                     data=data, allow_redirects=False, stream=True, verify=SSL_VERIFY)
+
+    status_code = r.status_code
+
+    if r.headers.get('es_stream', None):  # Task status stream
+        sys.stderr.write('Waiting for pending task %s ' % r.headers['es_task_id'])
+        sys.stderr.flush()
+
+        for i in r.iter_content(chunk_size=1):
+            if i.isspace():
+                sys.stderr.write('.')
+                sys.stderr.flush()
+            else:
+                sys.stderr.write('\b\n')
+                _text = i + r.content
+                _text = _text.strip().split(b'\n', 1)
+                text = _text.pop().decode(ENCODING)
+
+                try:
+                    status_code = int(_text[0])
+                except (IndexError, ValueError, TypeError):
+                    status_code = '%s?' % status_code
+
+                break
+
+    else:
+        text = r.content.decode(ENCODING)
+
+except KeyboardInterrupt as e:
+    ec = 5
+    em = 'ERROR: Request interrupted by user. Please check your current task list.'
+except Exception as e:
+    ec = 3
+    em = 'ERROR: %s' % e
+
+else:
+    # noinspection PyBroadException
+    try:
+        text = json.loads(text)
+    except:
+        pass
+
+    if status_code < 400:
+        ec = 0
+    elif status_code < 500:
+        ec = 1
+    elif status_code:
+        ec = 2
+
+
+if action == 'login':
+    if isinstance(text, dict) and 'token' in text:
+        # noinspection PyTypeChecker
+        with os.fdopen(os.open(TOKEN_STORE, os.O_WRONLY | os.O_CREAT, 0o600), 'w') as f:
+            f.write(text['token'])
+    else:
+        ec = 4
+        em = '\nERROR: Login problem'
+
+if action == 'logout' and r and r.status_code == 200:
+    # noinspection PyBroadException
+    try:
+        os.remove(TOKEN_STORE)
+    except:
+        pass
+
+
+################################################################################
+# output
+################################################################################
+
+if r is not None:
+    try:
+        output_fun(r, status_code, text)
+    except UnicodeEncodeError as ex:
+        ec = 8
+        em = 'Hint: Try changing the PYTHONIOENCODING environment variable to "%s"\n' \
+             'ERROR (output): %s' % (ENCODING, ex)
+    except Exception as ex:
+        ec = 9
+        em = 'ERROR (output): %s' % ex
+
+if em:
+    sys.stderr.write(em + '\n')
+    sys.stderr.flush()
+
+sys.exit(ec)

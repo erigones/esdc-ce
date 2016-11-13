@@ -1,0 +1,58 @@
+@import "compass";
+
+@media (max-width: 480px) {
+
+  .base-nav .tabbable.black-box .nav-tabs {
+    padding: 10px 10px 0 10px;
+
+    li {
+      float: none;
+      a {
+        padding: 4px 8px;
+      }
+    }
+  }
+
+  nav#primary {
+    > ul > li {
+      width: 33.3%;
+      margin-left: -3px;
+    }
+  }
+
+  .modal.black-box .modal-header .close {
+    margin-top: -5px;
+  }
+
+  .modal2 {
+    top: 50px;
+    left: 40px;
+    right: 40px;
+  }
+
+  .dynatext {
+    font-size: 8px;
+  }
+
+  .vm_hostname {
+    font-size: 8px;
+  }
+}
+
+@media (min-width: 321px) and (max-width: 480px) {
+  table.table-responsive th, table.table-responsive td { max-width: 160px; }
+}
+
+@media (max-width: 320px) {
+  table.table-responsive th, table.table-responsive td { max-width: 100px; }
+}
+
+@media (max-height: 459px) and (max-width: 767px) {
+  .modal, .modal.fade.in { top: 2px; }
+  .modal-body { max-height: 180px; }
+}
+
+@media (min-height: 460px) and (max-height: 599px) and (max-width: 767px) {
+  .modal, .modal.fade.in { top: 10px; }
+  .modal-body { max-height: 300px; }
+}

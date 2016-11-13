@@ -1,0 +1,82 @@
+{% extends "base_no_auth.html" %}
+{% load i18n %}
+
+{% block login_content %}
+<form class="form-horizontal animated{% if failed_registration %} wobble{% endif %}" action="{{ request.path }}" method="POST">
+
+  <div class="input-group">
+    {% csrf_token %}
+    {{ upform.country }}
+    {{ upform.timezone }}
+    {{ upform.language }}
+
+    {% for field in uform %}
+    <div class="input{% if field.errors %} error wobble{% endif %}">
+      {{ field }}
+      {% for error in field.errors %}
+      <span class="help-inline error"><i class="icon-warning-sign"></i> {{ error }}</span>
+      {% empty %}{% if field.help_text %}
+      <span class="help-inline note"><i class="icon-info-sign"></i> {{ field.help_text }}</span>
+      {% endif %}{% endfor %}
+    </div>
+    {% endfor %}
+
+    {% with field=upform.phone %}
+    <div class="input{% if field.errors %} error wobble{% endif %}">
+      <div class="multiwidget">{% spaceless %}
+        {{ field }}
+      {% endspaceless %}</div>
+      {% for error in field.errors %}
+      <span class="help-inline error"><i class="icon-warning-sign"></i> {{ error }}</span>
+      {% empty %}{% if field.help_text %}
+      <span class="help-inline note"><i class="icon-info-sign"></i> {{ field.help_text }}</span>
+      {% endif %}{% endfor %}
+    </div>{% endwith %}
+
+    {% if upform.company and upform.companyid %}
+    {% with field=upform.company %}
+    <div class="input{% if field.errors %} error wobble{% endif %}">
+      {{ field }}
+      {% for error in field.errors %}
+      <span class="help-inline error"><i class="icon-warning-sign"></i> {{ error }}</span>
+      {% empty %}{% if field.help_text %}
+      <span class="help-inline note"><i class="icon-info-sign"></i> {{ field.help_text }}</span>
+      {% endif %}{% endfor %}
+    </div>{% endwith %}
+
+    {% with field=upform.companyid %}
+    <div class="input{% if field.errors %} error wobble{% endif %}">
+      {{ field }}
+      {% for error in field.errors %}
+      <span class="help-inline error"><i class="icon-warning-sign"></i> {{ error }}</span>
+      {% empty %}{% if field.help_text %}
+      <span class="help-inline note"><i class="icon-info-sign"></i> {{ field.help_text }}</span>
+      {% endif %}{% endfor %}
+    </div>{% endwith %}
+    {% endif %}
+
+    {% if upform.tos_acceptation %}
+    {% with field=upform.tos_acceptation %}
+    <div class="input{% if field.errors %} error{% endif %}">
+      <div class="no-auth-checkbox">
+        {{ field }} <label for="id_tos_acceptation">{% blocktrans with endlink='</a>' startlink1='<a href="' startlink2='" target="_blank" class="btn-link">' %}I accept {{ startlink1 }}{{ tos_link }}{{ startlink2 }}the General Terms and Conditions{{ endlink }}.{% endblocktrans %}</label>
+      </div>
+      {% for error in field.errors %}
+      <span class="help-inline error"><i class="icon-warning-sign"></i> {{ error }}</span>
+      {% empty %}{% if field.help_text %}
+      <span class="help-inline note"><i class="icon-info-sign"></i> {{ field.help_text }}</span>
+      {% endif %}{% endfor %}
+    </div>{% endwith %}
+    {% endif %}
+
+  </div>
+
+  {% for error in uform.non_field_errors %}<div class="help-inline error"><i class="icon-warning-sign"></i> {{ error }}</div>{% endfor %}
+  {% for error in upform.non_field_errors %}<div class="help-inline error"><i class="icon-warning-sign"></i> {{ error }}</div>{% endfor %}
+
+  <button type="submit" class="no-auth-button">{% trans "Sign up" %}</button>
+
+</form>
+{% endblock %}
+
+{% block nav_accounts_register %}{% endblock %}

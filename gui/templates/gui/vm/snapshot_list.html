@@ -1,0 +1,73 @@
+{% load i18n %}
+{% load gui_utils %}
+<table id="etable" class="table box table-striped table-hover table-responsive" data-nosort='0,-1,-2'>
+  <thead>
+    {% if snapshots %}
+    <tr class="sortable" data-order_by="{{ order_by.0 }}">
+      <th class="top chbox hidden-phone-small">
+        <div class="input">
+          <input type="checkbox" class="normal-check" id="id_all"/>
+          <label for="id_all"></label>
+        </div>
+      </th>
+      <th data-field="name">{% trans "Name" %}</th>
+      <th data-field="disk_id">{% trans "Disk&nbsp;ID" %}</th>
+      <th class="hidden-phone">{% trans "Type" %}</th>
+      <th data-field="created">{% trans "Created" %}</th>
+      <th class="hidden-phone-small">{% trans "Status" %}</th>
+      <th class="hidden-phone" data-field="size">{% trans "Size" %}</th>
+      <th class="hidden-phone">{% trans "Note" %}</th>
+    </tr>
+    {% endif %}
+  </thead>
+  <tbody id="vm_snaplist_{{ vm.hostname }}">
+    {% for snap in snapshots %}{% with disk_id=snap.array_disk_id snap_id=snap.snapid %}
+    <tr{% if snap_id == last_snapid %} class="info"{% endif %} data-disk_id="{{ disk_id }}" data-snapname="{{ snap.name }}" data-status="{{ snap.status }}" data-hostname="" data-type="">
+      <td class="top chbox hidden-phone-small">
+        <div class="input">
+          <input type="checkbox" class="normal-check" id="id_{{ snap_id }}"{% if snap.locked %} disabled="disabled" readonly="true"{% endif %} />
+          <label for="id_{{ snap_id }}"></label>
+        </div>
+      </td>
+      <td>
+        {% if snap.locked %}
+        {{ snap.name }}
+        {% else %}
+        <a href="#" class="btn-link no-ajax vm_snapshot_name"{% if disk_id not in lastsnap %}{{ lastsnap|append:disk_id }} data-rollback="true"{% endif %} data-backup="" title="{% trans "Delete or rollback this snapshot" %}" data-toggle="tooltip" data-placement="bottom">{{ snap.name }}</a>
+        {% endif %}
+      </td>
+      <td>{{ disk_id }} <small>({{ snap.disk_size|multiply:1048576|filesizeformat }})</small></td>
+      <td class="hidden-phone">{{ snap.get_type_display }}{% if snap.define %} <small>({{ snap.define.name }})</small>{% endif %}</td>
+      <td>{{ snap.created|date:"SHORT_DATETIME_FORMAT" }}</td>
+      <td class="hidden-phone-small">{{ snap.get_status_display }}{% if snap.fsfreeze %}&nbsp;<i class="icon-flag"></i>{% endif %}</td>
+      <td class="hidden-phone">{{ snap.size|filesizeformat }}</td>
+      <td class="hidden-phone"><small class="vm_snapshot_note">{{ snap.note|wordwrap:50 }}</small> <a href="#" class="btn-link btn-icon-edit icon-active no-ajax vm_snapshot_note" title="{% trans "Update snapshot information" %}" data-toggle="tooltip" data-placement="bottom"></a></td>
+    </tr>
+    {% endwith %}{% endfor %}
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="8">
+        <div>
+          <span>
+            {% blocktrans count len=snapshots_count %}Selected <span id="selected">0</span> of <span id="total">{{ len }}</span> snapshot{% plural %}Selected <span id="selected">0</span> of <span id="total">{{ len }}</span> snapshots{% endblocktrans %}
+          </span>
+          <span class="pull-right">
+            {% trans "Manual" %}: {{ snapshots_count_manual }} / {{ vm.snapshot_limit_manual|default_if_none:"&infin;" }}&nbsp;&nbsp;&nbsp;
+            {% trans "Automatic" %}: {{ snapshots_count_auto }} / {{ vm.snapshot_limit_auto|default_if_none:"&infin;" }}&nbsp;&nbsp;&nbsp;
+            {% trans "Size" %}: {{ vm.size_snapshots|multiply:1048576|filesizeformat }}&nbsp;
+          </span>
+        </div>
+        {% if snapshots and pager.paginator.num_pages > 1 %}
+        <div class="paginator-sink dataTables_paginate center">
+          {% paginator %}
+        </div>
+        {% endif %}
+        <div class="vm_control vm_control_{{ vm.hostname }}" data-vm_locked='{{ vm.locked|lower }}'>
+          <a href="#" id="vm_snapshot_add_{{ vm.hostname }}" class="button gray no-ajax" data-modal_nohide="true" title="{% trans "Create snapshot of your disk. You will have to choose a name for the snapshot" %}" data-toggle="tooltip" data-placement="top"><i class="icon-plus"></i> {% trans "Create snapshot" %}</a>
+          <a href="#" id="vm_snapshots_del_{{ vm.hostname }}" class="button gray no-ajax disabled" data-modal_nohide="true" title="{% trans "Delete selected snapshots" %}" data-toggle="tooltip" data-placement="top"><i class="icon-remove"></i> {% trans "Delete" %}</a>
+        </div>
+      </td>
+    </tr>
+  </tfoot>
+</table>

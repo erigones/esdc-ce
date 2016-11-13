@@ -1,0 +1,75 @@
+{% load i18n %}
+{% load gui_utils %}
+<table id="etable" class="table box table-striped table-hover table-responsive" data-nosort='0,-1,-2' data-sortnum='-3'>
+  <thead>
+    {% if backups %}
+    <tr class="sortable" data-order_by="{{ order_by.0 }}">
+      <th class="top chbox hidden-phone-small">
+        <div class="input">
+          <input type="checkbox" class="normal-check" id="id_all"/>
+          <label for="id_all"></label>
+        </div>
+      </th>
+      <th data-field="name">{% trans "Name" %}</th>
+      <th data-field="disk_id">{% trans "Disk&nbsp;ID" %}</th>
+      <th class="hidden-phone">{% trans "Type" %}</th>
+      <th data-field="created">{% trans "Created" %}</th>
+      <th class="hidden-phone-small">{% trans "Status" %}</th>
+      <th class="hidden-phone" data-field="time">{% trans "Duration" %}</th>
+      <th class="hidden-phone" data-field="size">{% trans "Size" %}</th>
+      <th class="hidden-phone">{% trans "Note" %}</th>
+    </tr>
+    {% endif %}
+  </thead>
+  <tbody id="vm_snaplist_{{ vm.hostname }}">
+    {% for bkp in backups %}{% with disk_id=bkp.array_disk_id bkp_id=bkp.bkpid disk_size=bkp.disk_size %}
+    <tr{% if bkp_id == last_bkpid %} class="info"{% endif %} data-disk_id="{{ disk_id }}" data-disk_size="{{ disk_size }}" data-snapname="{{ bkp.name }}" data-status="{{ bkp.status }}" data-hostname="" data-type="{{ bkp.type }}">
+      <td class="top chbox hidden-phone-small">
+        <div class="input">
+          <input type="checkbox" class="normal-check" id="id_{{ bkp_id }}"{% if bkp.locked %} disabled="disabled" readonly="true"{% endif %} />
+          <label for="id_{{ bkp_id }}"></label>
+        </div>
+      </td>
+      <td>
+        {% if can_edit and not bkp.locked %}
+        <a href="#" class="btn-link no-ajax vm_snapshot_name" data-backup="true" title="{% trans "Delete or restore this backup" %}" data-toggle="tooltip" data-placement="bottom">{{ bkp.name }}</a>
+        {% else %}
+        {{ bkp.name }}
+        {% endif %}
+      </td>
+      <td>{{ disk_id }} <small>({{ disk_size|multiply:1048576|filesizeformat }})</small></td>
+      <td class="hidden-phone">{{ bkp.get_type_display }}</td>
+      <td>{{ bkp.created|date:"SHORT_DATETIME_FORMAT" }}</td>
+      <td class="hidden-phone-small">{{ bkp.get_status_display }}{% if bkp.fsfreeze %}&nbsp;<i class="icon-flag"></i>{% endif %}</td>
+      <td class="hidden-phone">{{ bkp.time|timeformat }}</td>
+      <td class="hidden-phone">{{ bkp.size|filesizeformat }}</td>
+      <td class="hidden-phone"><small class="vm_snapshot_note">{{ bkp.note|wordwrap:44 }}</small>{% if can_edit %} <a href="#" class="btn-link btn-icon-edit icon-active no-ajax vm_snapshot_note" title="{% trans "Update backup information" %}" data-toggle="tooltip" data-placement="bottom"></a>{% endif %}</td>
+    </tr>
+    {% endwith %}{% endfor %}
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="10">
+        <div>
+          <span>
+            {% blocktrans count len=backups_count %}Selected <span id="selected">0</span> of <span id="total">{{ len }}</span> backup{% plural %}Selected <span id="selected">0</span> of <span id="total">{{ len }}</span> backups{% endblocktrans %}
+          </span>
+          <span class="pull-right">
+            {% trans "Size" %}: {{ vm.size_backups|multiply:1048576|filesizeformat }}&nbsp;
+          </span>
+        </div>
+        {% if backups and pager.paginator.num_pages > 1 %}
+        <div class="paginator-sink dataTables_paginate center">
+          {% paginator %}
+        </div>
+        {% endif %}
+        {% if can_edit %}
+        <div class="vm_control vm_control_{{ vm.hostname }}" data-vm_locked='{{ vm.locked|lower }}'>
+          <a href="#" id="vm_backup_add_{{ vm.hostname }}" class="button gray no-ajax" data-modal_nohide="true" title="{% trans "Create backup of your disk. You will have to choose a backup definition to run" %}" data-toggle="tooltip" data-placement="top"><i class="icon-plus"></i> {% trans "Backup now" %}</a>
+          <a href="#" id="vm_backups_del_{{ vm.hostname }}" class="button gray no-ajax disabled" data-modal_nohide="true" title="{% trans "Delete selected backups" %}" data-toggle="tooltip" data-placement="top"><i class="icon-remove"></i> {% trans "Delete" %}</a>
+        </div>
+        {% endif %}
+      </td>
+    </tr>
+  </tfoot>
+</table>

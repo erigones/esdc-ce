@@ -1,0 +1,28 @@
+{% load i18n %}
+<table class="table box table-striped">
+  <thead>
+    {% if ssh_keys %}
+    <tr>
+      <th>{% trans "Name" %}</th>
+      <th>{% trans "Fingerprint" %}</th>
+    </tr>
+    {% endif %}
+  </thead>
+  <tbody>
+    {% for key in ssh_keys %}
+    <tr>
+      <td><a href="#" id="profile_deletesshkey_{{ key.fingerprint_id }}" class="btn-link no-ajax profile_control" data-name="{{ key.title }}" data-modal_text="{{ key.title }} ({{ key.fingerprint }})" title="{% trans "Delete this SSH key" %}" data-toggle="tooltip" data-placement="bottom">{{ key.title }}</a></td>
+      <td>{{ key.display_fingerprint|safe }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="2">
+        <div class="vm_control">
+          <a href="#" id="profile_addsshkey" class="button gray no-ajax profile_control" data-modal_nohide="true"><i class="icon-plus"></i> {% trans "Add SSH key" %}</a>
+        </div>
+      </td>
+    </tr>
+  </tfoot>
+</table>

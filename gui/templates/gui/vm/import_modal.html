@@ -1,0 +1,22 @@
+{% load i18n %}
+
+<div id="vm_import_file_modal" class="black-box modal hide fade vm_modal">
+  <div class="modal-head tab-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <span class="title_edit"><i class="icon-upload-alt"></i> {% trans "Import Servers" %}</span>
+  </div>
+  <div class="modal-body separator">
+    <div class="text_text"></div>
+    <form class="form-horizontal" action="#" data-source="{% url 'vm_add_import_form' %}" method="POST" enctype="multipart/form-data">
+      {% include "gui/vm/import_form.html" %}
+    </form>
+  </div>
+  <div class="modal-footer">
+    <div class="inner-well">
+      <span class="pull-left"><a class="btn btn-small btn-inverse no-ajax download_sample" data-source="{% url "vm_import_sample" %}">{% trans "Download sample file" %}</a></span>
+      <span class="pull-left">&nbsp; <a class="btn btn-small btn-inverse no-ajax vm_add">{% trans "Add one server" %}</a></span>
+      <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
+      <a class="vm_modal_update button green no-ajax">{% trans "Import" %}</a>
+    </div>
+  </div>
+</div>

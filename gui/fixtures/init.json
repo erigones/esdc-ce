@@ -1,0 +1,212 @@
+[
+{
+    "pk": 1,
+    "model": "gui.permission",
+    "fields": {
+        "alias": "Admin",
+        "name": "admin"
+    }
+},
+{
+    "pk": 2,
+    "model": "gui.permission",
+    "fields": {
+        "alias": "NetworkAdmin",
+        "name": "network_admin"
+    }
+},
+{
+    "pk": 3,
+    "model": "gui.permission",
+    "fields": {
+        "alias": "ImageAdmin",
+        "name": "image_admin"
+    }
+},
+{
+    "pk": 4,
+    "model": "gui.permission",
+    "fields": {
+        "alias": "TemplateAdmin",
+        "name": "template_admin"
+    }
+},
+{
+    "pk": 5,
+    "model": "gui.permission",
+    "fields": {
+        "alias": "IsoAdmin",
+        "name": "iso_admin"
+    }
+},
+{
+    "pk": 6,
+    "model": "gui.permission",
+    "fields": {
+        "alias": "UserAdmin",
+        "name": "user_admin"
+    }
+},
+{
+    "pk": 7,
+    "model": "gui.permission",
+    "fields": {
+        "alias": "DnsAdmin",
+        "name": "dns_admin"
+    }
+},
+{
+    "pk": 8,
+    "model": "gui.permission",
+    "fields": {
+        "alias": "ImageImportAdmin",
+        "name": "image_import_admin"
+    }
+},
+
+{
+    "pk": 1,
+    "model": "gui.role",
+    "fields": {
+        "alias": "Admins",
+        "name": "admins",
+        "changed": "2014-08-13T10:26:18.367Z",
+        "created": "2014-08-13T10:26:18.367Z",
+        "permissions": [
+            1
+        ]
+    }
+},
+{
+    "pk": 1,
+    "model": "gui.user",
+    "fields": {
+        "username": "admin",
+        "first_name": "Danube",
+        "last_name": "Cloud",
+        "default_dc": null,
+        "api_access": true,
+        "is_active": true,
+        "is_superuser": true,
+        "is_staff": true,
+        "last_login": "2014-07-18T09:05:07Z",
+        "groups": [],
+        "user_permissions": [],
+        "password": "pbkdf2_sha256$12000$rgn8XlX25vuv$lw0rheZrCf0r9WkgHL4LKIXRRsGK9Q0vKaRbq6Gx5pM=",
+        "email": "admin@example.com",
+        "date_joined": "2012-07-11T17:20:41Z"
+    }
+},
+{
+    "pk": 7,
+    "model": "gui.user",
+    "fields": {
+        "username": "_system",
+        "first_name": "System",
+        "last_name": "Internal",
+        "default_dc": null,
+        "api_access": true,
+        "is_active": true,
+        "is_superuser": false,
+        "is_staff": true,
+        "last_login": "2012-12-17T20:02:00.622Z",
+        "groups": [],
+        "user_permissions": [],
+        "password": "pbkdf2_sha256$10000$P62bBmcsjoZJ$8MCE67YBsczSvRH88kzL5aOXteJyY1L6PTFrzvHbJWQ=",
+        "email": "_system@example.com",
+        "date_joined": "2012-07-11T17:40:01Z"
+    }
+},
+{
+    "pk": 1,
+    "model": "gui.userprofile",
+    "fields": {
+        "companyid": "",
+        "taxid": "",
+        "currency": "EUR",
+        "postcode": "",
+        "bankid": "",
+        "city2": "",
+        "timezone": "Europe/Bratislava",
+        "jabber": "",
+        "phone2_verified": true,
+        "phone_token": "",
+        "middle_name": "",
+        "different_billing": false,
+        "title": "",
+        "email2": "",
+        "postcode2": "",
+        "state": "",
+        "country2": "",
+        "email2_verified": false,
+        "vatid": "",
+        "website": "",
+        "city": "",
+        "phone2": "",
+        "company": "Danube Cloud",
+        "newsletter_buss": false,
+        "street2_1": "",
+        "phone": "",
+        "newsletter_tech": false,
+        "phone_verified": true,
+        "street_1": "",
+        "street_2": "",
+        "email2_token": "",
+        "language": "en",
+        "state2": "",
+        "email_verified": true,
+        "email_token": "",
+        "phone2_token": "",
+        "usertype": 2,
+        "street2_2": "",
+        "country": "SK",
+        "tos_acceptation": true
+    }
+},
+{
+    "pk": 7,
+    "model": "gui.userprofile",
+    "fields": {
+        "companyid": "",
+        "taxid": "",
+        "currency": "EUR",
+        "postcode": "",
+        "bankid": "",
+        "city2": "",
+        "timezone": "UTC",
+        "jabber": "",
+        "phone2_verified": false,
+        "phone_token": "",
+        "middle_name": "",
+        "different_billing": false,
+        "title": "",
+        "email2": "",
+        "postcode2": "",
+        "state": "",
+        "country2": "",
+        "email2_verified": false,
+        "vatid": "",
+        "website": "",
+        "city": "",
+        "phone2": "",
+        "company": "ACME",
+        "newsletter_buss": false,
+        "street2_1": "",
+        "phone": "",
+        "newsletter_tech": false,
+        "phone_verified": false,
+        "street_1": "",
+        "street_2": "",
+        "email2_token": "",
+        "language": "en",
+        "state2": "",
+        "email_verified": false,
+        "email_token": "",
+        "phone2_token": "",
+        "usertype": 0,
+        "street2_2": "",
+        "country": "SK",
+        "tos_acceptation": true
+    }
+}
+]

@@ -1,0 +1,108 @@
+{% extends load_base %}
+{% load i18n %}
+{% load gui_utils %}
+
+{% block javascript %}
+<script type="text/javascript">
+  $(document).ready(function() {
+    filter_links();
+    report_table_init();
+  });
+</script>
+{% endblock %}
+
+{% block base_content %}
+<div class="container-fluid"  id="cloud_customers_report">
+  <div class="row-fluid">
+    <div class="span12">
+
+      <div class="tab-header" >
+        <i class="icon-cloud"></i> {% trans "Cloud Customers Transactions Items Report" %}
+      </div>
+
+      <table class="box table table-striped table-hover table-condensed table-responsive" id="cloud_customers_report_table">
+        <thead>
+          {% if items %}
+          <tr>
+            <th class="top chbox hidden-phone-small">
+              {% comment %}<!--
+              <div class="input">
+                <input type="checkbox" class="normal-check" id="id_all"/>
+                <label for="id_all"></label>
+              </div>
+              -->{% endcomment %}
+            </th>
+            <th>{% trans "User" %}</th>
+            <th>{% trans "Server" %}</th>
+            <th>{% trans "VCPUs" %}</th>
+            <th class="nowrap">{% trans "RAM" %}</th>
+            <th class="nowrap">{% trans "HDD" %}</th>
+            <th class="nowrap">{% trans "Fee" %} <span title="{% trans 'Price invoiced for server' %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-info-sign"></i></span></th>
+            <th class="nowrap">{% trans "Subscription" %} <span title="{% trans 'Subscription length in months' %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-info-sign"></i></span></th>
+            <th class="nowrap">{% trans "PpM" %} <span title="{% trans 'Calculated Price per Month' %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-info-sign"></i></span></th>
+            <th class="nowrap">{% trans "PpY" %} <span title="{% trans 'Calculated Price per Year' %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-info-sign"></i></span></th>
+            <th>{% trans "Status" %}</th>
+            <th>{% trans "Start" %}</th>
+            <th>{% trans "End" %}</th>
+            <th></th>
+          </tr>
+          {% endif %}
+        </thead>
+
+        <tbody>
+          {% for i in items %}
+          <tr class="grade">
+            <td class="top hidden-phone-small">
+              {% comment %}<!--
+              <div class="input">
+                <input type="checkbox" class="normal-check" id="id_{{ i.name }}_{{ i.id }}"/>
+                <label for="id_{{ i.name }}_{{ i.id }}"></label>
+              </div>
+              -->{% endcomment %}
+            </td>
+            <td class="nowrap" title="{{ i.transaction.user }}">{{ i.transaction.user|truncatechars:16 }} {% if i.transaction.user.userprofile.company %}<span title="{{ i.transaction.user.userprofile.company }}" data-toggle="tooltip" data-placement="right"><i class="icon-briefcase"></i></span>{% endif %}</td>
+            <td class="nowrap">{{ i.name }}</td>
+            {% with resources=i.vm.get_cpu_ram_disk %}
+            <td class="nowrap">{{ resources.0 }} <small>x</small></td>
+            <td class="nowrap">{{ resources.1 }} <small>MB</small></td>
+            <td class="nowrap">{{ resources.2|mb_to_gb }} <small>GB</small></td>
+            {% endwith %}
+            <td class="nowrap">{{ i.amount|floatformat:2 }} {{ i.transaction.get_currency_display }}</td>
+            <td class="nowrap">{{ i.period.length_nice }}</td>
+            <td class="nowrap">{{ i.ppm|floatformat:2 }} {{ i.transaction.get_currency_display }} </td>
+            <td class="nowrap">{{ i.ppy|floatformat:2 }} {{ i.transaction.get_currency_display }}</td>
+            <td>{{ i.get_status_display }}</td>
+            <td>{{ i.date_begin|date:"SHORT_DATETIME_FORMAT" }}</td>
+            <td>{{ i.date_next_period|date:"SHORT_DATETIME_FORMAT" }}</td>
+            <td></td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="14"><p class="msg">{% trans "No items available" %}</p></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+
+        <tfoot>
+          {% if items %}
+          <tr>
+            <th class="top hidden-phone-small"></th>
+            <th colspan="2">Total</th>
+            <th>{{ totals.vcpu }}</th>
+            <th>{{ totals.ram|multiply:1048576|filesizeformat }}</th>
+            <th>{{ totals.hdd|multiply:1048576|filesizeformat }}</th>
+            <th>{{ totals.amount.amount__sum|floatformat:2 }}</th>
+            <th>{{ totals.subscription.period__length__sum }}</th>
+            <th>{{ totals.ppm|floatformat:2 }}</th>
+            <th>{{ totals.ppy|floatformat:2 }}</th>
+            <th colspan="4"></th>
+          </tr>
+          {% endif %}
+        </tfoot>
+      </table>
+
+    </div> <!-- end span12 -->
+  </div> <!-- end row-fluid -->
+</div> <!-- end container-fluid -->
+{% endblock %}
+

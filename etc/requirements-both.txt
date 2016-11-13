@@ -1,0 +1,14 @@
+### que
+setuptools==28.6.1
+six==1.10.0
+psutil==4.4.2
+celery==3.1.25
+billiard==3.3.0.23
+amqp==1.4.9
+kombu==3.0.37
+anyjson==0.3.3
+redis==2.10.5
+pytz==2016.7
+librabbitmq==1.6.1
+simplejson==3.10.0
+frozendict==1.2

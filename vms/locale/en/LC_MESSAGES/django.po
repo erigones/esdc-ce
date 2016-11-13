@@ -1,0 +1,810 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-11-02 20:31+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: admin.py:44 admin.py:75 admin.py:118 admin_forms.py:11
+msgid "JSON"
+msgstr ""
+
+#: admin.py:68
+msgid "Resources"
+msgstr ""
+
+#: admin.py:71
+msgid "Info"
+msgstr ""
+
+#: admin.py:111
+msgid "Status information"
+msgstr ""
+
+#: admin.py:114 admin_forms.py:60
+msgid "VM information"
+msgstr ""
+
+#: admin.py:122 admin_forms.py:57
+msgid "Active JSON"
+msgstr ""
+
+#: admin.py:126
+msgid "Replication"
+msgstr ""
+
+#: admin_forms.py:11
+msgid "JSON configuration."
+msgstr ""
+
+#: admin_forms.py:27
+msgid "Invalid JSON format."
+msgstr ""
+
+#: admin_forms.py:57
+msgid "Active JSON configuration."
+msgstr ""
+
+#: admin_forms.py:60
+msgid "Running VM information."
+msgstr ""
+
+#: forms/fields.py:16
+msgid "Enter a valid UUID."
+msgstr ""
+
+#: forms/fields.py:41
+msgid "Enter only valid UUIDs separated by commas."
+msgstr ""
+
+#: mixins.py:30 models/backup.py:122 models/dc.py:37 models/node.py:58
+#: models/storage.py:150 models/vm.py:214
+msgid "Datacenter"
+msgstr ""
+
+#: models/backup.py:23
+msgid "Dataset"
+msgstr ""
+
+#: models/backup.py:24
+msgid "File"
+msgstr ""
+
+#: models/backup.py:31
+msgid "None"
+msgstr ""
+
+#: models/backup.py:43 models/backup.py:123 models/ipaddress.py:25
+#: models/ipaddress.py:30 models/ipaddress.py:35 models/snapshot.py:18
+#: models/snapshot.py:90
+msgid "Server"
+msgstr ""
+
+#: models/backup.py:44 models/backup.py:128 models/base.py:346
+#: models/snapshot.py:19 models/snapshot.py:93
+msgid "Name"
+msgstr ""
+
+#: models/backup.py:45 models/backup.py:132 models/ipaddress.py:29
+#: models/node.py:75 models/node.py:712 models/vm.py:213
+msgid "Node"
+msgstr ""
+
+#: models/backup.py:46 models/backup.py:133 models/snapshot.py:96
+#: models/storage.py:147
+msgid "Zpool"
+msgstr ""
+
+#: models/backup.py:47 models/backup.py:134 models/snapshot.py:94
+msgid "Type"
+msgstr ""
+
+#: models/backup.py:48 models/base.py:348 models/snapshot.py:20
+msgid "Description"
+msgstr ""
+
+#: models/backup.py:49
+msgid "Bandwidth limit"
+msgstr ""
+
+#: models/backup.py:50 models/snapshot.py:21
+msgid "Retention"
+msgstr ""
+
+#: models/backup.py:51
+msgid "Compression"
+msgstr ""
+
+#: models/backup.py:52 models/backup.py:139 models/snapshot.py:22
+#: models/snapshot.py:99
+msgid "Application-Consistent?"
+msgstr ""
+
+#: models/backup.py:56 models/backup.py:126
+msgid "Backup definition"
+msgstr ""
+
+#: models/backup.py:57
+msgid "Backup definitions"
+msgstr ""
+
+#: models/backup.py:114 models/image.py:88 models/iso.py:24
+#: models/snapshot.py:80
+msgid "ok"
+msgstr ""
+
+#: models/backup.py:115 models/image.py:89 models/iso.py:25
+#: models/snapshot.py:81 models/vm.py:168
+msgid "pending"
+msgstr ""
+
+#: models/backup.py:116
+msgid "restore"
+msgstr ""
+
+#: models/backup.py:117 models/snapshot.py:83
+msgid "lost"
+msgstr ""
+
+#: models/backup.py:124
+msgid "Server hostname"
+msgstr ""
+
+#: models/backup.py:129 models/image.py:119 models/iso.py:32 models/node.py:55
+#: models/snapshot.py:95 models/vm.py:211
+msgid "Status"
+msgstr ""
+
+#: models/backup.py:130
+msgid "File path"
+msgstr ""
+
+#: models/backup.py:131
+msgid "Checksum"
+msgstr ""
+
+#: models/backup.py:135 models/snapshot.py:97
+msgid "Size"
+msgstr ""
+
+#: models/backup.py:136
+msgid "Duration"
+msgstr ""
+
+#: models/backup.py:137 models/ipaddress.py:37 models/snapshot.py:98
+msgid "Note"
+msgstr ""
+
+#: models/backup.py:138
+msgid "Last?"
+msgstr ""
+
+#: models/backup.py:143 models/node.py:70
+msgid "Backup"
+msgstr ""
+
+#: models/backup.py:144
+msgid "Backups"
+msgstr ""
+
+#: models/base.py:208
+msgid "Last status change"
+msgstr ""
+
+#: models/base.py:209 models/base.py:351
+msgid "Created"
+msgstr ""
+
+#: models/base.py:210 models/base.py:352
+msgid "Last changed"
+msgstr ""
+
+#: models/base.py:299
+msgid "Linux"
+msgstr ""
+
+#: models/base.py:300
+msgid "SunOS"
+msgstr ""
+
+#: models/base.py:301
+msgid "BSD"
+msgstr ""
+
+#: models/base.py:302
+msgid "Windows"
+msgstr ""
+
+#: models/base.py:303
+msgid "SunOS Zone"
+msgstr ""
+
+#: models/base.py:304
+msgid "Linux Zone"
+msgstr ""
+
+#: models/base.py:336 models/dc.py:22 models/image.py:80 models/iso.py:17
+#: models/storage.py:98 models/subnet.py:21 models/vmtemplate.py:78
+msgid "Public"
+msgstr ""
+
+#: models/base.py:337
+msgid "Disabled"
+msgstr ""
+
+#: models/base.py:338 models/dc.py:23 models/image.py:81 models/iso.py:18
+#: models/storage.py:99 models/subnet.py:22 models/vmtemplate.py:79
+msgid "Private"
+msgstr ""
+
+#: models/base.py:339 models/image.py:82 models/subnet.py:23
+#: models/vmtemplate.py:80
+msgid "Deleted"
+msgstr ""
+
+#: models/base.py:340
+msgid "Internal"
+msgstr ""
+
+#: models/base.py:347
+msgid "Alias"
+msgstr ""
+
+#: models/base.py:349 models/node.py:56 models/vm.py:212
+msgid "Owner"
+msgstr ""
+
+#: models/base.py:350
+msgid "Access"
+msgstr ""
+
+#: models/base.py:498
+msgid "Disk ID"
+msgstr ""
+
+#: models/dc.py:27
+msgid "Site hostname"
+msgstr ""
+
+#: models/dc.py:38
+msgid "Datacenters"
+msgstr ""
+
+#: models/fields.py:26
+#, python-format
+msgid "'%(value)s' is not a valid UUID."
+msgstr ""
+
+#: models/fields.py:70
+msgid "Comma-separated list of UUIDs"
+msgstr ""
+
+#: models/image.py:44 models/image.py:53 models/image.py:62 models/image.py:71
+msgid "Install your favourite OS from ISO image."
+msgstr ""
+
+#: models/image.py:96
+msgid "ready"
+msgstr ""
+
+#: models/image.py:97
+msgid "importing"
+msgstr ""
+
+#: models/image.py:98
+msgid "deleting"
+msgstr ""
+
+#: models/image.py:112 models/node.py:52 models/subnet.py:30 models/vm.py:206
+msgid "UUID"
+msgstr ""
+
+#: models/image.py:113
+msgid "Image version"
+msgstr ""
+
+#: models/image.py:114
+msgid "Image size (MB)"
+msgstr ""
+
+#: models/image.py:115
+msgid "Exact same value as in imgadm manifest attribute image_size."
+msgstr ""
+
+#: models/image.py:116 models/iso.py:33 models/vm.py:210
+#: models/vmtemplate.py:87
+msgid "Guest OS type"
+msgstr ""
+
+#: models/image.py:117
+msgid "Deploy required?"
+msgstr ""
+
+#: models/image.py:118
+msgid "Resizable?"
+msgstr ""
+
+#: models/image.py:123
+msgid "Image"
+msgstr ""
+
+#: models/image.py:124 models/storage.py:151
+msgid "Images"
+msgstr ""
+
+#: models/image.py:160
+msgid "Coming Soon"
+msgstr ""
+
+#: models/imagestore.py:78
+msgid "ImageStore"
+msgstr ""
+
+#: models/ipaddress.py:26
+msgid "Other"
+msgstr ""
+
+#: models/ipaddress.py:33
+msgid "IP Address"
+msgstr ""
+
+#: models/ipaddress.py:34
+msgid "Subnet"
+msgstr ""
+
+#: models/ipaddress.py:36
+msgid "Usage"
+msgstr ""
+
+#: models/ipaddress.py:41
+msgid "IP address"
+msgstr ""
+
+#: models/ipaddress.py:42
+msgid "IP addresses"
+msgstr ""
+
+#: models/iso.py:38
+msgid "ISO image"
+msgstr ""
+
+#: models/iso.py:39
+msgid "ISO images"
+msgstr ""
+
+#: models/node.py:36
+msgid "online"
+msgstr ""
+
+#: models/node.py:37
+msgid "offline"
+msgstr ""
+
+#: models/node.py:38
+msgid "unreachable"
+msgstr ""
+
+#: models/node.py:39
+msgid "unlicensed"
+msgstr ""
+
+#: models/node.py:53 models/vm.py:207
+msgid "Hostname"
+msgstr ""
+
+#: models/node.py:54
+msgid "Address"
+msgstr ""
+
+#: models/node.py:59
+msgid "Config"
+msgstr ""
+
+#: models/node.py:60 models/node.py:702
+msgid "CPUs"
+msgstr ""
+
+#: models/node.py:60 models/node.py:702
+msgid "Total number of CPUs (cores)."
+msgstr ""
+
+#: models/node.py:61 models/node.py:703
+msgid "RAM (MB)"
+msgstr ""
+
+#: models/node.py:61 models/node.py:703
+msgid "Total RAM size in MB."
+msgstr ""
+
+#: models/node.py:62
+msgid "CPUs coefficient"
+msgstr ""
+
+#: models/node.py:63
+msgid "Coefficient for calculating the the total number of virtual CPUs."
+msgstr ""
+
+#: models/node.py:64
+msgid "RAM coefficient"
+msgstr ""
+
+#: models/node.py:65
+msgid ""
+"Coefficient for calculating the maximum amount of memory for virtual "
+"machines."
+msgstr ""
+
+#: models/node.py:67 models/node.py:705
+msgid "Free CPUs"
+msgstr ""
+
+#: models/node.py:68 models/node.py:706
+msgid "Free RAM (MB)"
+msgstr ""
+
+#: models/node.py:69
+msgid "Compute"
+msgstr ""
+
+#: models/node.py:71
+msgid "Head node"
+msgstr ""
+
+#: models/node.py:76 models/node.py:713
+msgid "Nodes"
+msgstr ""
+
+#: models/node.py:691
+msgid "Shared"
+msgstr ""
+
+#: models/node.py:692
+msgid "Shared with limit"
+msgstr ""
+
+#: models/node.py:693
+msgid "Reserved"
+msgstr ""
+
+#: models/node.py:699
+msgid "Priority"
+msgstr ""
+
+#: models/node.py:700
+msgid ""
+"Higher priority means that the automatic node chooser will more likely "
+"choose this node."
+msgstr ""
+
+#: models/node.py:704 models/storage.py:117
+msgid "Disk pool size (MB)"
+msgstr ""
+
+#: models/node.py:704
+msgid "Size of the local disk pool."
+msgstr ""
+
+#: models/node.py:707 models/storage.py:121
+msgid "Free disk pool size (MB)"
+msgstr ""
+
+#: models/node.py:708
+msgid "Resource strategy"
+msgstr ""
+
+#: models/slave_vm.py:22
+msgid "disabled"
+msgstr ""
+
+#: models/slave_vm.py:23
+msgid "paused"
+msgstr ""
+
+#: models/slave_vm.py:24
+msgid "enabled"
+msgstr ""
+
+#: models/slave_vm.py:28
+msgid "Master server"
+msgstr ""
+
+#: models/slave_vm.py:29
+msgid "Slave name"
+msgstr ""
+
+#: models/slave_vm.py:30
+msgid "Replication status"
+msgstr ""
+
+#: models/slave_vm.py:31
+msgid "Last synced"
+msgstr ""
+
+#: models/slave_vm.py:35 models/slave_vm.py:36
+msgid "Slave VM"
+msgstr ""
+
+#: models/snapshot.py:26 models/snapshot.py:91
+msgid "Snapshot definition"
+msgstr ""
+
+#: models/snapshot.py:27
+msgid "Snapshot definitions"
+msgstr ""
+
+#: models/snapshot.py:71
+msgid "Automatic"
+msgstr ""
+
+#: models/snapshot.py:72
+msgid "Manual"
+msgstr ""
+
+#: models/snapshot.py:82
+msgid "rollback"
+msgstr ""
+
+#: models/snapshot.py:103
+msgid "Snapshot"
+msgstr ""
+
+#: models/snapshot.py:104
+msgid "Snapshots"
+msgstr ""
+
+#: models/storage.py:107
+msgid "Local"
+msgstr ""
+
+#: models/storage.py:109
+msgid "iSCSI"
+msgstr ""
+
+#: models/storage.py:110
+msgid "Fiber Channel"
+msgstr ""
+
+#: models/storage.py:116
+msgid "Storage type"
+msgstr ""
+
+#: models/storage.py:118
+msgid "Disk pool size coefficient"
+msgstr ""
+
+#: models/storage.py:119
+msgid ""
+"Coefficient for calculating the maximum amount of disk space for virtual "
+"machines."
+msgstr ""
+
+#: models/storage.py:125 models/storage.py:149 models/storage.py:155
+msgid "Storage"
+msgstr ""
+
+#: models/storage.py:126 models/storage.py:156
+msgid "Storages"
+msgstr ""
+
+#: models/storage.py:148
+msgid "Compute node"
+msgstr ""
+
+#: models/subnet.py:31
+msgid "NIC Tag"
+msgstr ""
+
+#: models/subnet.py:32
+msgid "VLAN ID"
+msgstr ""
+
+#: models/subnet.py:33 models/subnet.py:46
+msgid "Network"
+msgstr ""
+
+#: models/subnet.py:34
+msgid "Netmask"
+msgstr ""
+
+#: models/subnet.py:35
+msgid "Gateway"
+msgstr ""
+
+#: models/subnet.py:36
+msgid "Resolvers"
+msgstr ""
+
+#: models/subnet.py:37
+msgid "List of DNS servers separated by commas."
+msgstr ""
+
+#: models/subnet.py:38
+msgid "DNS Domain"
+msgstr ""
+
+#: models/subnet.py:39
+msgid "DNS search domain."
+msgstr ""
+
+#: models/subnet.py:40
+msgid "PTR Domain"
+msgstr ""
+
+#: models/subnet.py:41
+msgid "Name of a Pdns Domain."
+msgstr ""
+
+#: models/subnet.py:42
+msgid "DHCP Passthrough"
+msgstr ""
+
+#: models/subnet.py:47
+msgid "Networks"
+msgstr ""
+
+#: models/tasklog.py:39
+msgid "time"
+msgstr ""
+
+#: models/tasklog.py:40
+msgid "task ID"
+msgstr ""
+
+#: models/tasklog.py:41
+msgid "task type"
+msgstr ""
+
+#: models/tasklog.py:42
+msgid "task status"
+msgstr ""
+
+#: models/tasklog.py:43
+msgid "user ID"
+msgstr ""
+
+#: models/tasklog.py:44 models/tasklog.py:211
+msgid "username"
+msgstr ""
+
+#: models/tasklog.py:45
+msgid "owner ID"
+msgstr ""
+
+#: models/tasklog.py:47
+msgid "object ID"
+msgstr ""
+
+#: models/tasklog.py:48 models/tasklog.py:219
+msgid "object name"
+msgstr ""
+
+#: models/tasklog.py:49 models/tasklog.py:227
+msgid "object alias"
+msgstr ""
+
+#: models/tasklog.py:50
+msgid "action flag"
+msgstr ""
+
+#: models/tasklog.py:51
+msgid "message"
+msgstr ""
+
+#: models/tasklog.py:52
+msgid "detail"
+msgstr ""
+
+#: models/tasklog.py:56
+msgid "Task Log Entry"
+msgstr ""
+
+#: models/tasklog.py:57
+msgid "Task Log"
+msgstr ""
+
+#: models/vm.py:38
+msgid "Server Tag"
+msgstr ""
+
+#: models/vm.py:39
+msgid "Server Tags"
+msgstr ""
+
+#: models/vm.py:135
+msgid "stopped"
+msgstr ""
+
+#: models/vm.py:136
+msgid "running"
+msgstr ""
+
+#: models/vm.py:137
+msgid "stopping"
+msgstr ""
+
+#: models/vm.py:138
+msgid "notready"
+msgstr ""
+
+#: models/vm.py:139 models/vm.py:140 models/vm.py:141 models/vm.py:142
+msgid "deploying"
+msgstr ""
+
+#: models/vm.py:143
+msgid "frozen"
+msgstr ""
+
+#: models/vm.py:144
+msgid "notcreated"
+msgstr ""
+
+#: models/vm.py:145
+msgid "stopped-"
+msgstr ""
+
+#: models/vm.py:146
+msgid "running-"
+msgstr ""
+
+#: models/vm.py:147
+msgid "frozen-"
+msgstr ""
+
+#: models/vm.py:148
+msgid "notcreated-"
+msgstr ""
+
+#: models/vm.py:149
+msgid "error"
+msgstr ""
+
+#: models/vm.py:169
+msgid "unknown"
+msgstr ""
+
+#: models/vm.py:208
+msgid "User alias"
+msgstr ""
+
+#: models/vm.py:209
+msgid "VNC port"
+msgstr ""
+
+#: models/vm.py:216 models/vmtemplate.py:91
+msgid "Template"
+msgstr ""
+
+#: models/vm.py:217
+msgid "Aggregated uptime"
+msgstr ""
+
+#: models/vm.py:218
+msgid "Last update of aggregated uptime"
+msgstr ""
+
+#: models/vm.py:227
+msgid "Slave servers"
+msgstr ""
+
+#: models/vm.py:231
+msgid "VM"
+msgstr ""
+
+#: models/vm.py:232
+msgid "Virtual machines"
+msgstr ""
+
+#: models/vmtemplate.py:92
+msgid "Templates"
+msgstr ""

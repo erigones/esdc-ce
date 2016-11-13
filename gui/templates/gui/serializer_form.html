@@ -1,0 +1,16 @@
+{% load gui_utils %}
+{% csrf_token %}
+{% for error in form.non_field_errors %}
+<div class="alert alert-error"><i class="icon-warning-sign"></i> {{ error }}</div>
+{% endfor %}
+{% empty_list as advanced_fields %}
+{% for field in form %}
+{% if field.name in form.not_advanced %}
+{% include "gui/serializer_form_field.html" with field=field %}
+{% else %}{{ advanced_fields|append:field }}
+{% endif %}{% endfor %}
+<div class="advanced hide">
+{% for field in advanced_fields %}
+{% include "gui/serializer_form_field.html" with field=field %}{% endfor %}
+</div>
+{% if error %}{% include "gui/messages.html" with messages=error %}{% endif %}

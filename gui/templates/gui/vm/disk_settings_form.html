@@ -1,0 +1,24 @@
+{% load i18n %}
+{% csrf_token %}
+{% for error in disk_settingsform.non_field_errors %}
+<div class="alert alert-error"><i class="icon-warning-sign"></i> {{ error }}</div>
+{% endfor %}
+
+{% include "gui/form_field.html" with field=disk_settingsform.disk_id %}
+
+{% if disk_settingsform.admin %}
+{% if vm.is_kvm %}{% include "gui/form_field.html" with field=disk_settingsform.model %}{% endif %}
+{% include "gui/form_field.html" with field=disk_settingsform.image %}
+{% include "gui/form_field.html" with field=disk_settingsform.size addon=" MB" %}
+<div class="advanced hide">
+{% comment %}refreservation disabledd
+{% if vm.is_kvm %}{% include "gui/form_field.html" with field=disk_settingsform.refreservation addon=" MB" %}{% endif %}
+{% endcomment %}
+{% if vm.is_kvm %}{% include "gui/form_field_checkbox.html" with field=disk_settingsform.boot %}{% endif %}
+{% include "gui/form_field.html" with field=disk_settingsform.compression %}
+{% include "gui/form_field.html" with field=disk_settingsform.zpool class="thin" %}
+</div>
+{% else %}
+{% if vm.is_kvm %}{% include "gui/form_field.html" with field=disk_settingsform.model class="thin" %}{% endif %}
+<div class="advanced hide"></div>
+{% endif %}

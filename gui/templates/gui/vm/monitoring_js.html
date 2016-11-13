@@ -1,0 +1,21 @@
+{% load i18n %}
+{% load gui_utils %}
+<script type="text/javascript">
+  HISTORY_GRAPH_OBJECTS = {}; {# Clear object cache #}
+  var VM = {
+    '{{ vm.hostname }}': {
+      'tasks': {} {# Always start with empty task dict, because we are not interested in older running tasks => we do not want to update the graphs for graphs requested in the past #}
+    }
+  };
+  {% if vm_operational %}
+  $(document).ready(function() { vm_history_init('{{ vm.hostname }}', {{ graphs|json|safe }} ); });
+  {% endif %}
+</script>
+
+<script type="text/html" id="template-graph-tooltip-trend"><small>{% templatetag openvariable %} time {% templatetag closevariable %}</small>
+{% trans "Average" %}: {% templatetag openvariable %} value_avg {% templatetag closevariable %}
+{% trans "Maximum" %}: {% templatetag openvariable %} value_max {% templatetag closevariable %}
+{% trans "Minimum" %}: {% templatetag openvariable %} value_min {% templatetag closevariable %}</script>
+
+<script type="text/html" id="template-graph-tooltip-history"><small>{% templatetag openvariable %} time {% templatetag closevariable %}</small>
+{% trans "Value" %}: {% templatetag openvariable %} value {% templatetag closevariable %}</script>

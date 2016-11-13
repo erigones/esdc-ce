@@ -1,0 +1,30 @@
+@import "compass";
+
+@media (max-width: 768px) {
+  body {
+    padding: 0;
+  }
+
+  .notifications {
+    right: 20px;
+    left: 20px;
+    width: auto;
+  }
+
+  .modal2 {
+    position: fixed;
+    top: 50px;
+    left: 80px;
+    right: 80px;
+    width: auto;
+    margin: 0;
+  }
+
+  .vm_hostname {
+    font-size: 10px;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 747px) {
+  table.table-responsive th, table.table-responsive td { max-width: 250px; }
+}

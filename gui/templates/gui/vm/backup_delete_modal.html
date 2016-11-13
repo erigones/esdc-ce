@@ -1,0 +1,23 @@
+{% load i18n %}
+<div id="vm_snapshots_delete_modal" class="black-box modal hide fade vm_modal">
+  <div class="modal-head tab-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <span><i class="icon-warning-sign"></i> {% trans "Delete Backups" %}</span>
+  </div>
+  <div class="modal-body separator">
+    <div class="alert alert-error modal_error hide"><i class="icon-warning-sign"></i> <span></span></div>
+    <div class="vm_modal_text modal-text-header">
+        {% trans "Hostname" %}: {% if vm %}{{ vm.hostname }}{% else %}__hostname__{% endif %}<br>
+        {% trans "Backups: <strong>__name__</strong><br>Disk ID: <strong>__disk_id__</strong>" %}
+    </div>
+    <form id="vm_backup_delete_form">
+      <div class="vm_modal_force_text">{% trans "Deleting a backup will only remove the data of the backup." %}</div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <div class="inner-well">
+      <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
+      <a class="vm_modal_yes button red no-ajax">{% trans "Delete backups" %}</a>
+    </div>
+  </div>
+</div>

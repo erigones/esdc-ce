@@ -1,0 +1,24 @@
+{% load i18n %}{% load gui_utils %}
+<div class="row-fluid">
+  <div class="span12 tabbable black-box">
+    <ul class="nav nav-tabs vm_control vm_control_nohide">
+      <li class="{{ li_details }}"><a href="{% url 'vm_details' vm.hostname %}" data-toggle="tab" title="{% trans "Show server details" %}"><i class="icon-hdd"></i> {% trans "Details" %}</a></li>
+      {% if vm.is_kvm %}
+      <li id="vm_console__{{ vm.hostname }}" class="{{ li_console }}"><a href="{% url 'vm_console' vm.hostname %}" data-toggle="tab" title="{% trans "Show server native console" %}"><i class="icon-picture"></i> {% trans "Console" %}</a></li>
+      {% endif %}
+      {% if dc_settings.VMS_VM_SNAPSHOT_ENABLED %}
+      <li id="vm_snapshot__{{ vm.hostname }}" class="{{ li_snapshot }}"><a href="{% url 'vm_snapshot' vm.hostname %}" data-toggle="tab" title="{% trans "Show server snapshots" %}"><i class="icon-copy"></i> {% trans "Snapshots" %}</a></li>
+      {% endif %}
+      {% if dc_settings.VMS_VM_BACKUP_ENABLED %}
+      <li id="vm_backup__{{ vm.hostname }}" class="{{ li_backup }}"><a href="{% url 'vm_backup' vm.hostname %}" data-toggle="tab" title="{% trans "Show server backups" %}"><i class="icon-paste"></i> {% trans "Backups" %}</a></li>
+      {% endif %}
+      {% if dc_settings.MON_ZABBIX_ENABLED %}
+      <li id="vm_monitoring__{{ vm.hostname }}" class="{{ li_monitoring }}"><a href="{% url 'vm_monitoring' vm.hostname %}" data-toggle="tab" title="{% trans "Show server monitoring details" %}"><i class="icon-bar-chart"></i> {% trans "Monitoring" %}</a></li>
+      {% endif %}
+      <li id="vm_tasklog__{{ vm.hostname }}" class="{{ li_tasklog }}"><a href="{% url 'vm_tasklog' vm.hostname %}" data-toggle="tab" title="{% trans "Show server related task log" %}"><i class="icon-tasks"></i> {% trans "Task Log" %}</a></li>
+      {% if vm_top_menu %}{% for item in vm_top_menu %}
+        <li class="{{ item.class }}"><a href="{{ item.url }}" data-toggle="tab" title="{{ item.desc }}"><i class="{{ item.icon }}"></i> {{ item.title }}</a></li>
+      {% endfor %}{% endif %}
+    </ul>
+  </div>
+</div>

@@ -1,0 +1,17 @@
+{% load i18n %}
+{% csrf_token %}
+{% for error in form.non_field_errors %}
+<div class="alert alert-error"><i class="icon-warning-sign"></i> {{ error }}</div>
+{% endfor %}
+
+{% include "gui/vm/form_field_hostname.html" with field=form.hostname %}
+{% include "gui/form_field.html" with field=form.name %}
+{% include "gui/form_field.html" with field=form.disk_id %}
+{% include "gui/form_field.html" with field=form.schedule %}
+{% include "gui/form_field.html" with field=form.retention %}
+{% include "gui/form_field_checkbox.html" with field=form.active %}
+{% include "gui/form_field.html" with field=form.desc %}
+
+<div class="advanced hide">
+{% if vm.is_kvm %}{% include "gui/form_field_checkbox.html" with field=form.fsfreeze %}{% endif %}
+</div>

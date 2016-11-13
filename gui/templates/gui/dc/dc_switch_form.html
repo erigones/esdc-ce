@@ -1,0 +1,6 @@
+{% csrf_token %}
+{% for error in dcs_form.non_field_errors %}
+<div class="alert alert-error"><i class="icon-warning-sign"></i> {{ error }}</div>
+{% endfor %}
+{% include "gui/form_field.html" with field=dcs_form.name class="thin" %}
+<input type='hidden' name='referrer' value='{{ request.path }}' />

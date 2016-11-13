@@ -1,0 +1,59 @@
+[
+{
+    "pk": 1, 
+    "model": "djcelery.intervalschedule", 
+    "fields": {
+        "every": 7200, 
+        "period": "seconds"
+    }
+},
+{
+    "pk": 2, 
+    "model": "djcelery.intervalschedule", 
+    "fields": {
+        "every": 3600, 
+        "period": "seconds"
+    }
+},
+
+{
+    "model": "djcelery.periodictask", 
+    "fields": {
+        "task": "api.vm.status.tasks.vm_uptime_all", 
+        "name": "api.vm.status.tasks.vm_uptime_all", 
+        "exchange": null, 
+        "last_run_at": null, 
+        "args": "[]", 
+        "enabled": true, 
+        "routing_key": null, 
+        "crontab": null, 
+        "interval": 2, 
+        "queue": "mgmt", 
+        "total_run_count": 0, 
+        "expires": null, 
+        "kwargs": "{}", 
+        "date_changed": "2014-07-17T13:00:37.111Z", 
+        "description": ""
+    }
+},
+{
+    "model": "djcelery.periodictask", 
+    "fields": {
+        "task": "api.node.snapshot.tasks.node_vm_snapshot_sync_all",
+        "name": "api.node.snapshot.tasks.node_vm_snapshot_sync_all", 
+        "exchange": null, 
+        "last_run_at": null, 
+        "args": "[]", 
+        "enabled": true, 
+        "routing_key": null, 
+        "crontab": null, 
+        "interval": 2, 
+        "queue": "mgmt", 
+        "total_run_count": 0, 
+        "expires": null, 
+        "kwargs": "{}", 
+        "date_changed": "2014-07-17T13:00:37.111Z", 
+        "description": ""
+    }
+}
+]

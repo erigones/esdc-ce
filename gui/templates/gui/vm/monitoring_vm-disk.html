@@ -1,0 +1,54 @@
+{% extends load_base %}
+{% load i18n %}
+{% load gui_utils %}
+
+{% block javascript %}
+{% include "gui/vm/monitoring_js.html" with graphs=graphs %}
+{% endblock %}
+
+{% block base_nav %}
+{% include "gui/vm/navigation.html" with li_monitoring="active" %}
+{% include "gui/vm/monitoring_navigation.html" with mon_vm_disk="active" %}
+{% endblock %}
+
+{% block base_content %}
+<div id="graph_tooltip" class="tooltip right"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>
+
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span12" id="vm_history_vm-disk-logical-throughput_{{ vm.hostname }}">
+      <div class="tab-header">
+        <i class="icon-bar-chart"></i> {{ vm.alias }} &rsaquo; {% trans "VM disk logical throughput" %}
+        {% include "gui/vm/monitoring_graph.html" with desc=graph_items|keyvalue:'vm-disk-logical-throughput'|keyvalue:'desc' %}
+    </div>
+  </div>
+  <div class="row-fluid">
+    <div class="span12" id="vm_history_vm-disk-logical-io_{{ vm.hostname }}">
+      <div class="tab-header">
+        <i class="icon-bar-chart"></i> {{ vm.alias }} &rsaquo; {% trans "VM disk logical I/O" %}
+        {% include "gui/vm/monitoring_graph.html" with desc=graph_items|keyvalue:'vm-disk-logical-io'|keyvalue:'desc' %}
+    </div>
+  </div>
+  <div class="row-fluid">
+    <div class="span12" id="vm_history_vm-disk-physical-throughput_{{ vm.hostname }}">
+      <div class="tab-header">
+        <i class="icon-bar-chart"></i> {{ vm.alias }} &rsaquo; {% trans "VM disk physical throughput" %}
+        {% include "gui/vm/monitoring_graph.html" with desc=graph_items|keyvalue:'vm-disk-physical-throughput'|keyvalue:'desc' %}
+    </div>
+  </div>
+  <div class="row-fluid">
+    <div class="span12" id="vm_history_vm-disk-physical-io_{{ vm.hostname }}">
+      <div class="tab-header">
+        <i class="icon-bar-chart"></i> {{ vm.alias }} &rsaquo; {% trans "VM disk physical I/O" %}
+        {% include "gui/vm/monitoring_graph.html" with desc=graph_items|keyvalue:'vm-disk-physical-io'|keyvalue:'desc' %}
+    </div>
+  </div>
+  <div class="row-fluid">
+    <div class="span12" id="vm_history_vm-disk-io-operations_{{ vm.hostname }}">
+      <div class="tab-header">
+        <i class="icon-bar-chart"></i> {{ vm.alias }} &rsaquo; {% trans "VM disk I/O operations by latency" %}
+        {% include "gui/vm/monitoring_graph.html" with desc=graph_items|keyvalue:'vm-disk-io-operations'|keyvalue:'desc' %}
+    </div>
+  </div>
+</div> <!-- end container-fluid -->
+{% endblock %}

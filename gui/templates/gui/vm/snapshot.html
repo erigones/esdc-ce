@@ -1,0 +1,223 @@
+{% extends load_base %}
+{% load i18n %}
+{% load gui_utils %}
+
+{% block javascript %}
+<script type="text/javascript">
+  var VM = {
+    '{{ vm.hostname }}': {
+      'tasks': {{ vm.tasks|json|safe }}
+    }
+  };
+
+  $(document).ready(function() {
+    create_snapshot_list('{{ vm.hostname }}');
+    vm_tasks_update('{{ vm.hostname }}');
+    vm_control_update('{{ vm.hostname }}', '{{ vm.status_display }}');
+  });
+</script>
+{% endblock %}
+
+{% block base_nav %}{% include "gui/vm/navigation.html" with li_snapshot="active" %}{% endblock %}
+
+{% block base_content %}{% with json=vm.json %}
+<div id="vm_snapshot_modal" class="black-box modal hide fade vm_modal">
+  <div class="modal-head tab-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <span><i class="icon-plus"></i> {% trans "Create Snapshot" %}</span>
+  </div>
+  <div class="modal-body separator">
+    {% if cannot_snapshot %}
+    <div class="vm_modal_text">{% trans "Snapshot functionality is available for installed server only." %}</div>
+    {% else %}
+    <div class="vm_modal_text">{% trans "Please enter the name and select the disk ID of the new snapshot." %}</div>
+    <form id="vm_snapshot_form" class="form-horizontal" action="#" data-source="{% url 'vm_snapshot_form' vm.hostname %}" method="POST">
+      {% include "gui/vm/snapshot_form.html" with snapform=snapform_create %}
+    </form>
+    {% endif %}
+  </div>
+  <div class="modal-footer">
+    <div class="inner-well">
+      <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
+      <a class="vm_modal_yes button red no-ajax{% if cannot_snapshot %} disabled{% endif %}" data-enter="true">{% trans "Create snapshot" %}</a>
+    </div>
+  </div>
+</div>
+
+<div id="vm_snapshot_update_modal" class="black-box modal hide fade vm_modal">
+  <div class="modal-head tab-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <span><i class="icon-edit"></i> {% trans "Update Snapshot" %}</span>
+  </div>
+  <div class="modal-body separator">
+    {% if cannot_snapshot %}
+    <div class="vm_modal_text">{% trans "Snapshot functionality is available for installed server only." %}</div>
+    {% else %}
+    <div class="vm_modal_text">{% trans "Update snapshot information (note only)." %}</div>
+    <form id="vm_snapshot_update_form" class="form-horizontal" action="#" data-source="{% url 'vm_snapshot_form' vm.hostname %}" method="POST">
+      <input type='hidden' name='update' value='1' />
+      {% include "gui/vm/snapshot_form.html" with snapform=snapform_update %}
+    </form>
+    {% endif %}
+  </div>
+  <div class="modal-footer">
+    <div class="inner-well">
+      <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
+      <a class="vm_modal_yes button red no-ajax{% if cannot_snapshot %} disabled{% endif %}" data-enter="true">{% trans "Update snapshot" %}</a>
+    </div>
+  </div>
+</div>
+
+<div id="vm_snapshot_rollback_modal" class="black-box modal hide fade vm_modal">
+  <div class="modal-head tab-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <span><i class="icon-warning-sign"></i> {% trans "Delete or Rollback Snapshot" %}</span>
+  </div>
+  <div class="modal-body separator">
+    <div class="alert alert-error modal_error hide"><i class="icon-warning-sign"></i> <span></span></div>
+    <div class="vm_modal_text modal-text-header">
+        {% trans "Hostname" %}: {{ vm.hostname }}<br>
+        {% trans "Snapshot: <strong>__name__</strong><br>Disk ID: <strong>__disk_id__</strong>" %}
+    </div>
+    <form id="vm_snapshot_rollback_form">
+      <div class="vm_modal_force_text">{% trans "Deleting a snapshot will only remove the data of the snapshot." %}</div>
+      <div class="vm_modal_force_text">{% trans "A snapshot rollback will restore your data from the snapshot. <strong>All your data created after the snapshot will be lost!</strong>" %}
+        <span class="vm_modal_force_force">{% trans "Do you wan't to <strong>delete every newer snapshot</strong> and restore data from this snapshot?" %} <input type="checkbox" id="vm_snapshot_rollback_force" class="big-check" /></span>
+      </div>
+    </form>
+    <div class="alert alert-error vm_modal_alert"><i class="icon-warning-sign"></i> {% trans "Server has to be stopped and not locked in order to perform a rollback." %}</div>
+  </div>
+  <div class="modal-footer">
+    <div class="inner-well">
+      {% if can_image %}
+      <span class="pull-left"><a href="#" id="image_snapshot_link" class="btn btn-small btn-inverse no-ajax obj_add" data-prefix="img">{% trans "Create Image" %}</a></span>
+      {% endif %}
+      <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
+      <a class="vm_modal_yes button red no-ajax">{% trans "Delete snapshot" %}</a>
+      <a class="vm_modal_yes_force button red no-ajax">{% trans "Rollback snapshot" %}</a>
+    </div>
+  </div>
+</div>
+
+<div id="vm_snapshots_delete_modal" class="black-box modal hide fade vm_modal">
+  <div class="modal-head tab-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <span><i class="icon-warning-sign"></i> {% trans "Delete Snapshots" %}</span>
+  </div>
+  <div class="modal-body separator">
+    <div class="alert alert-error modal_error hide"><i class="icon-warning-sign"></i> <span></span></div>
+    <div class="vm_modal_text modal-text-header">
+        {% trans "Hostname" %}: {{ vm.hostname }}<br>
+        {% trans "Snapshots: <strong>__name__</strong><br>Disk ID: <strong>__disk_id__</strong>" %}
+    </div>
+    <form id="vm_snapshot_delete_form">
+      <div class="vm_modal_force_text">{% trans "Deleting a snapshot will only remove the data of the snapshot." %}</div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <div class="inner-well">
+      <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
+      <a class="vm_modal_yes button red no-ajax">{% trans "Delete snapshots" %}</a>
+    </div>
+  </div>
+</div>
+
+{% if can_edit %}
+<div id="vm_snapshot_define_modal_create" class="black-box modal hide fade vm_modal">
+  <div class="modal-head tab-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <span><i class="icon-plus"></i> {% trans "Create Snapshot Definition" %}</span>
+  </div>
+  <div class="modal-body separator">
+    <div class="vm_modal_text"></div>
+    <form class="form-horizontal" action="#" data-source="{% url 'vm_snapshot_define_form' vm.hostname %}" method="POST">
+      {% include "gui/vm/snapshot_define_form.html" with form=snapdeform_create %}
+    </form>
+  </div>
+  <div class="modal-footer">
+    <div class="inner-well">
+      {% if vm.is_kvm %}<span class="pull-left"><a class="vm_modal_more btn btn-small btn-inverse no-ajax">{% trans "Show advanced settings" %}</a></span>{% endif %}
+      <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
+      <a class="vm_modal_create button green no-ajax" data-enter="true">{% trans "Create definition" %}</a>
+    </div>
+  </div>
+</div>
+
+<div id="vm_snapshot_define_modal" class="black-box modal hide fade vm_modal">
+  <div class="modal-head tab-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <span><i class="icon-edit"></i> {% trans "Update or delete Snapshot Definition" %}</span>
+  </div>
+  <div class="modal-body separator">
+    <div class="vm_modal_text"></div>
+    <form class="form-horizontal" action="#" data-source="{% url 'vm_snapshot_define_form' vm.hostname %}" method="POST">
+      {% include "gui/vm/snapshot_define_form.html" with form=snapdeform_update %}
+    </form>
+  </div>
+  <div class="modal-footer">
+    <div class="inner-well">
+      {% if vm.is_kvm %}<span class="pull-left"><a class="vm_modal_more btn btn-small btn-inverse no-ajax">{% trans "Show advanced settings" %}</a></span>{% endif %}
+      <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
+      <a class="vm_modal_update button green no-ajax" data-enter="true">{% trans "Update definition" %}</a>
+      <a class="vm_modal_delete button red no-ajax">{% trans "Delete definition" %}</a>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% if can_image %}
+<div id="image_snapshot_modal" class="black-box modal hide fade vm_modal">
+  <div class="modal-head tab-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <span class="title_edit"></span>
+    <span class="title_add"><i class="icon-save"></i> {% trans "Create Disk Image from Server Snapshot" %}</span>
+  </div>
+  <div class="modal-body separator">
+    <div class="text_edit"></div>
+    <div class="text_add"></div>
+    <form class="form-horizontal" action="#" data-source="{% url 'vm_snapshot_image_form' vm.hostname %}" method="POST">
+      {% include "gui/vm/image_snapshot_form.html" with form=imgform %}
+    </form>
+  </div>
+  <div class="modal-footer">
+    <div class="inner-well">
+      <span class="pull-left"><a class="vm_modal_more btn btn-small btn-inverse no-ajax">{% trans "Show advanced settings" %}</a></span>
+      <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
+      <a class="vm_modal_create button red no-ajax" data-enter="true">{% trans "Create disk Image" %}</a>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<div class="container-fluid">
+
+  {% if can_edit or snapdefs %}
+  <div class="row-fluid">
+    <div class="span10">
+      {% if json %}
+      <div class="tab-header">
+        <i class="icon-time"></i> {{ vm.alias }} &rsaquo; {% trans "snapshot definitions" %}
+      </div>
+      <div id="vm_snapshot_define_{{ vm.hostname }}">
+        {% include "gui/vm/snapshot_define_list.html" %}
+      </div>
+      {% endif %}
+    </div> <!-- end span12 -->
+  </div> <!-- end row-fluid -->
+  {% endif %}
+
+  <div class="row-fluid">
+    <div class="span12">
+      {% if json %}
+      <div class="tab-header" id="vm_header_snapshots_{{ vm.hostname }}">
+        <i class="icon-copy"></i> {{ vm.alias }} &rsaquo; {% trans "snapshots" %}
+      </div>
+      <div id="vm_snapshots_{{ vm.hostname }}" data-source="{% url 'vm_snapshot_list' vm.hostname %}" data-page="{{ pager.number }}" data-order_by="{{ order_by|join:',' }}">
+        {% include "gui/vm/snapshot_list.html" %}
+      </div>
+      {% endif %}
+    </div> <!-- end span12 -->
+  </div> <!-- end row-fluid -->
+
+</div> <!-- end container-fluid -->
+{% endwith %}{% endblock %}

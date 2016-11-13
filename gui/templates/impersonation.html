@@ -1,0 +1,11 @@
+{% load i18n %}
+<div id="impersonate" style="position: fixed; bottom: 0; left: 0; background-color: #B80000; color: #fff; opacity: 0.6; width: 100%; padding: 0;">
+  <p style="float: right;">
+    {% if request.real_user %}
+    {% trans "Changed identity from user" %} <b>{{ request.real_user }}</b>.
+    {% elif request.new_user %}
+    {% trans "Logged in GUI as" %} <b>{{ request.new_user }}</b>.
+    {% endif %}
+    <a href="{% url 'stop_impersonation' %}" class="no-ajax" style="color: lime;">{% trans "Cancel impersonation" %}</a>.
+  </p>
+</div>

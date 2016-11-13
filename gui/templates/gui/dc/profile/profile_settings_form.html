@@ -1,0 +1,28 @@
+{% load i18n %}
+{% csrf_token %}
+<table class="table box table-striped form">
+  <thead>
+  </thead>
+  <tbody>
+    {% include "gui/profile/profile_user_field_checkbox.html" with field=uform.dc_bound %}
+    {% include "gui/profile/profile_user_field.html" with field=uform.groups %}
+    {% include "gui/profile/profile_user_field_checkbox.html" with field=uform.is_super_admin %}
+    {% include "gui/profile/profile_user_field_checkbox.html" with field=uform.is_active %}
+    {% include "gui/profile/profile_user_field_checkbox.html" with field=uform.api_access %}
+    {% include "gui/profile/profile_user_field.html" with field=upform.language %}
+    {% include "gui/profile/profile_user_field.html" with field=upform.timezone %}
+    {% include "gui/profile/profile_user_field.html" with field=upform.currency %}
+    {% if upform.newsletter_tech %}{% include "gui/profile/profile_user_field_checkbox.html" with field=upform.newsletter_tech %}{% endif %}
+    {% if upform.newsletter_buss %}{% include "gui/profile/profile_user_field_checkbox.html" with field=upform.newsletter_buss %}{% endif %}
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="2">
+        <div class="vm_control">
+          {% for error in upform.non_field_errors %}<div class="alert alert-error"><i class="icon-warning-sign"></i> {{ error }}</div>{% endfor %}
+          <a href="#" id="profile_update2" class="button gray no-ajax profile_control"><i class="icon-check"></i> {% trans "Update profile" %}</a>
+        </div>
+      </td>
+    </tr>
+  </tfoot>
+</table>

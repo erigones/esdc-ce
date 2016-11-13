@@ -1,0 +1,16 @@
+{% load i18n %}
+      <tr>
+        {% if field.field.required %}<td class="input-required"><b>{{ field.label }}:</b></td>{% else %}<td>{{ field.label }}:</td>{% endif %}
+        <td class="span5">
+          <div class="input{% if field.errors %} error wobble animated{% endif %}">
+            {{ field }}
+            {% for error in field.errors %}
+            <span class="help-inline error pull-left"><i class="icon-warning-sign"></i> {{ error }}</span>
+            {% empty %}{% if field.help_text == 'notverified' %}
+            <span class="help-inline error pull-left"><i class="icon-warning-sign"></i> {{ field.label }} {% trans "is not verified." %} <a href="#" id="profile_verify{{ field.name }}" class="button red mini no-ajax profile_control" data-modal_nohide="true"><i class="icon-check"></i> {% trans "Verify" %}</a></span>
+            {% elif field.help_text %}
+            <span class="help-inline note pull-left"><i class="icon-info-sign"></i> {{ field.help_text }}</span>
+            {% endif %}{% endfor %}
+          </div>
+        </td>
+      </tr>

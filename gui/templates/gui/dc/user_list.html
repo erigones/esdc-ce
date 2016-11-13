@@ -1,0 +1,133 @@
+{% extends load_base %}
+{% load i18n %}
+{% load gui_utils %}
+
+{% block javascript %}
+<script type="text/javascript">
+  $(document).ready(function() {
+    DC_USERS = new DcUserList({% if all %}true{% else %}false{% endif %});
+  });
+</script>
+{% endblock %}
+
+{% block base_content %}
+{% if can_edit %}
+<div id="obj_form_modal"  class="black-box modal hide fade vm_modal">
+  <div class="modal-head tab-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <span class="title_edit"><i class="icon-user"></i> {% trans "Update or Delete User" %}</span>
+    <span class="title_add"><i class="icon-user"></i> {% trans "Create new User" %}</span>
+  </div>
+  <div class="modal-body separator">
+    <div class="text_edit"></div>
+    <div class="text_add"></div>
+    <form class="form-horizontal" action="#" data-source="{{ url_form_admin }}" method="POST">
+      {% include "gui/dc/user_dc_form.html" with form=form_admin %}
+    </form>
+  </div>
+  <div class="modal-footer">
+    <div class="inner-well">
+      <span class="pull-left">
+        <a class="vm_modal_more btn btn-small btn-inverse no-ajax">{% trans "Show password fields" %}</a>
+        <a class="vm_modal_profile btn btn-small btn-inverse no-ajax" data-dismiss="modal">{% trans "Edit profile" %}</a>
+      </span>
+      <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
+      <a class="vm_modal_create button green no-ajax" data-enter="true">{% trans "Add User" %}</a>
+      <a class="vm_modal_update button green no-ajax" data-enter="true">{% trans "Update" %}</a>
+      <a class="vm_modal_delete button red no-ajax">{% trans "Delete User" %}</a>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<div class="container-fluid">
+  <div class="row-fluid">
+
+    <div class="span12">
+      <div class="tab-header">
+        <span class="options window-control pull-right">
+          <i class="icon-cloud"></i> {{ request.dc.alias }}
+        </span>
+        <i class="icon-user"></i> {% trans "Users" %}
+      </div>
+      <table class="table box table-striped table-hover table-responsive" id="etable">
+
+        <thead>
+          {% if can_edit %}
+          <tr>
+            <th colspan="8">
+              <div class="pull-right">
+                {% if active %}
+                <a href="{{ request.path }}?{{ qs|qs_set:'inactive' }}" class="btn btn-mini active" title="{% trans "Show/Hide deactivated users" %}" data-toggle="tooltip" data-placement="left"><i class="icon-check"></i> {% trans "Show active" %}</a>
+                {% else %}
+                <a href="{{ request.path }}?{{ qs|qs_del:'inactive' }}" class="btn btn-mini" title="{% trans "Show/Hide deactivated users" %}" data-toggle="tooltip" data-placement="left"><i class="icon-check-empty"></i> {% trans "Show active" %}</a>
+                {% endif %}
+                {% if is_staff %}{% include "gui/dc/dc_all_toggle.html" %}{% endif %}
+              </div>
+            </th>
+          </tr>
+          {% endif %}
+          {% if users %}
+          <tr>
+            <th>{% trans "Username" %}</th>
+            <th>{% trans "First name" %}</th>
+            <th>{% trans "Last name" %}</th>
+            <th class="hidden-phone">{% trans "DC bound?" %}</th>
+            <th>{% trans "Groups" %}</th>
+            <th class="hidden-phone">{% trans "API access?" %}</th>
+            <th class="hidden-phone">{% trans "SuperAdmin?" %}</th>
+            {% if all %}
+            <th class="hidden-phone">{% trans "Datacenters" %}</th>
+            {% else %}
+            <th class="hidden-phone">{% trans "Joined" %}</th>
+            {% endif %}
+          </tr>
+          {% endif %}
+        </thead>
+
+        <tbody>
+          {% for user in users %}
+          <tr>
+            <td>
+              {% if is_staff or can_edit and user.dc_bound == request.dc %}
+              <a href="#" class="btn-link btn-icon-edit no-ajax obj_edit{% if all and user.pk not in dc_users %} italic{% endif %}" title="{% trans "Update or delete user" %}" data-toggle="tooltip" data-placement="bottom" data-form='{{ user.web_data|jsondata }}' data-prefix="adm" data-profile-url='{% url 'dc_user_profile' username=user.username %}'>{{ user.username }}</a>
+              {% else %}{{ user.username }}{% endif %}
+              {% if user == request.dc.owner %}<span title="{% trans "User is owner of this datacenter" %}" data-toggle="tooltip" data-placement="bottom" class="item_flags"><i class="icon-flag"></i></span>{% endif %}
+              {% if user.username != user.email %}<br /><small>({{ user.email }})</small>{% endif %}
+            </td>
+            <td>{{ user.first_name }}</td>
+            <td>{{ user.last_name }}</td>
+            <td class="hidden-phone"><i class="icon-{{ user.dc_bound_bool|yesno:"ok,remove" }}"></i></td>
+            <td><small class="vm_hostname">{{ user.roles_api|groupify }}</small></td>
+            <td class="hidden-phone"><i class="icon-{{ user.api_access|yesno:"ok,remove" }}"></i></td>
+            <td class="hidden-phone"><i class="icon-{{ user.is_staff|yesno:"ok,remove" }}"></i></td>
+            {% if all %}
+            <td class="hidden-phone"><small class="vm_hostname">{{ user.dcs|dcify }}</small></td>
+            {% else %}
+            <td class="hidden-phone">{{ user.date_joined|date:"SHORT_DATETIME_FORMAT" }}</td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </tbody>
+
+        <tfoot>
+          <tr>
+            <td colspan="8">
+              <span class="pull-right">
+                {% trans "Total" %}: {{ users|length }}&nbsp;
+              </span>
+              <div class="vm_control">
+                {% if can_edit %}
+                <a href="#" class="button gray no-ajax obj_add obj_add_admin" title="{% trans "Create new user" %}" data-toggle="tooltip" data-placement="top"><i class="icon-plus"></i> {% trans "Add User" %}</a>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+        </tfoot>
+
+      </table>
+    </div>
+
+  </div> <!-- end row-fluid -->
+</div> <!-- end container-fluid -->
+{% endblock %}

@@ -1,0 +1,20 @@
+{% load i18n %}
+{% csrf_token %}
+{% for error in form.non_field_errors %}
+<div class="alert alert-error"><i class="icon-warning-sign"></i> {{ error }}</div>
+{% endfor %}
+
+{% with field=form.ips %}
+<div class="input{% if field.errors %} error wobble animated{% endif %}">
+  <div class="control-group thinner">
+    <label class="control-label" for="id_ips-network">{% trans "Network" %}:</label>
+    <div class="controls">
+      <input class="uneditable-input narrow" id="id_ips-network" name="ips-network" type="text" disabled="disabled" value="{{ net.name }}" />
+      {{ field }}
+      {% for error in field.errors %}
+      <span class="help-inline error"><i class="icon-warning-sign"></i> {{ error }}</span>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endwith %}
