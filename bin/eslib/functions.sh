@@ -52,12 +52,7 @@ QGA_SNAPSHOT=${QGA_SNAPSHOT:-"${ERIGONES_HOME}/bin/qga-snapshot"}
 ###############################################################
 # Arguments passed to ssh
 ###############################################################
-# NOTICE:
-# If we use SunSSH, we can use arcfour safely. If we use OpenSSH
-# >6.7, we have to explicitly enable arcfour, because it's disabled
-# by default
-###############################################################
-SSH_ARGS=${SSH_ARGS:-"-c arcfour256 -o BatchMode=yes -o StrictHostKeyChecking=no "}
+SSH_ARGS=${SSH_ARGS:-"-c chacha20-poly1305@openssh.com -o BatchMode=yes -o StrictHostKeyChecking=no "}
 
 ###############################################################
 # Arguments passed to mbuffer
