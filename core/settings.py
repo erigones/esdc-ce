@@ -478,7 +478,7 @@ _MON_ZABBIX_ITS_TRIGGERS_NODE = (  # global, internal, hidden
 )
 
 _MON_ZABBIX_HOSTGROUP_VM = 'Virtual machines'  # global, internal, hidden
-_MON_ZABBIX_HOSTGROUPS_VM = ()  # global, internal, hidden
+_MON_ZABBIX_HOSTGROUPS_VM = ('Notifications',)  # global, internal, hidden
 MON_ZABBIX_HOSTGROUP_VM = _MON_ZABBIX_HOSTGROUP_VM  # local, external
 MON_ZABBIX_HOSTGROUPS_VM = ('Notifications',)  # local, external
 MON_ZABBIX_HOSTGROUPS_VM_RESTRICT = True  # local, external
