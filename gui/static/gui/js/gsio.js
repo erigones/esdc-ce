@@ -456,7 +456,7 @@ function message_callback(code, res, view, method, args, kwargs, apiview, apidat
         }
 
         if (method == 'DELETE' || method == 'PUT') {
-          if (!data.vm) { // -> object is backup node or target VM and source VM does not exist anymore
+          if ((method == 'PUT') && !data.vm) { // -> object is backup node or target VM and source VM does not exist anymore
             hostname = '';
           }
           vm_backup_modal_update(hostname, null); // hide modal if shown (empty hostname is OK)
