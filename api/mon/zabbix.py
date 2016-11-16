@@ -656,7 +656,7 @@ class _Zabbix(object):
         log = log or self.log
 
         try:
-            res = self.zapi.host.delete([{'hostid': hostid}])
+            res = self.zapi.host.delete([hostid])
         except ZabbixAPIException as e:
             log(ERROR, 'Zabbix API Error in delete_host(%s): %s', hostid, e)
             return False
