@@ -21,8 +21,8 @@ SSH_KEY_TYPES = (
     'ecdsa-sha2-nistp521',
     'ssh-ed25519'
 )
-RE_PEM_KEY_BEGIN = re.compile(r'^-----BEGIN \w+ PRIVATE KEY-----', re.MULTILINE)
-RE_PEM_KEY_END = re.compile(r'^-----END \w+ PRIVATE KEY-----', re.MULTILINE)
+RE_PEM_KEY_BEGIN = re.compile(r'^-----BEGIN( | \w+ )PRIVATE KEY-----', re.MULTILINE)
+RE_PEM_KEY_END = re.compile(r'^-----END( | \w+ )PRIVATE KEY-----', re.MULTILINE)
 RE_PEM_CRT_BEGIN = re.compile(r'^-----BEGIN CERTIFICATE-----', re.MULTILINE)
 RE_PEM_CRT_END = re.compile(r'^-----END CERTIFICATE-----', re.MULTILINE)
 
