@@ -14,7 +14,9 @@ from api.image.tasks import *
 from api.mon.tasks import *
 
 for third_party_app in settings.THIRD_PARTY_APPS:
+    # noinspection PyBroadException
     try:
-        import_module(third_party_app + '.tasks', '*')
-    except ImportError:
+        module = import_module(third_party_app + '.tasks')
+        globals().update({name: module.__dict__[name] for name in module.__all__})
+    except:
         pass

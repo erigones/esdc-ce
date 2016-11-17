@@ -33,7 +33,7 @@ def collect_third_party_apps_and_settings(settings):
         for _, name, is_pkg in pkgutil.iter_modules([apps_dir]):
             if not is_pkg:
                 SETTINGS_THIRD_PARTY_APPS.append(name.replace('_', '.'))
-                module = import_module('core.external.apps.' + name, '*')
+                module = import_module('core.external.apps.' + name)
 
                 for setting in dir(module):
                     if setting == 'DC_MODULES':

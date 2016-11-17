@@ -21,7 +21,9 @@ from api.vm.qga.views import *
 
 for third_party_app in settings.THIRD_PARTY_APPS:
     if third_party_app.startswith('api.vm.'):
+        # noinspection PyBroadException
         try:
-            import_module(third_party_app + '.views', '*')
-        except ImportError:
+            module = import_module(third_party_app + '.views')
+            globals().update({name: module.__dict__[name] for name in module.__all__})
+        except:
             pass
