@@ -302,6 +302,8 @@ def vm_snapshot_sync_cb(result, task_id, vm_uuid=None, disk_id=None):
     snap_prefix = Snapshot.USER_PREFIX
     new_snaps = {snap: node_snaps.pop(snap) for snap in tuple(node_snaps.keys()) if snap.startswith(snap_prefix)}
 
+    ns = vm.get_node_storage(disk_id)
+
     if new_snaps:
         logger.warn('VM %s has following snapshots on disk ID %s, which are not defined in DB: %s',
                     vm, disk_id, new_snaps.keys())
@@ -316,7 +318,7 @@ def vm_snapshot_sync_cb(result, task_id, vm_uuid=None, disk_id=None):
 
             try:
                 Snapshot.create_from_zfs_name(zfs_name, name=name, timestamp=int(info[0]), vm=vm, disk_id=disk_id,
-                                              size=t_long(info[1]), note='Found by snapshot sync')
+                                              zpool=ns, size=t_long(info[1]), note='Found by snapshot sync')
             except Exception as exc:
                 logger.error('Could not recreate snapshot %s (vm=%s, disk_id=%s). Error: %s',
                              zfs_name, vm, disk_id, exc)
@@ -325,7 +327,6 @@ def vm_snapshot_sync_cb(result, task_id, vm_uuid=None, disk_id=None):
 
     logger.info('VM %s has following internal/service snapshots on disk ID %s: %s', vm, disk_id, node_snaps.keys())
     # Update node storage snapshot size counters
-    ns = vm.get_node_storage(disk_id)
     Snapshot.update_resources(ns, vm)
 
     try:
