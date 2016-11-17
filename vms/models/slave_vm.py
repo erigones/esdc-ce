@@ -254,7 +254,7 @@ class SlaveVm(_JsonPickleModel):
             # Update relations
             # noinspection PyProtectedMember
             for rel in old_vm._meta.get_all_related_objects():
-                if rel.model == self.__class__:
+                if rel.name in ('slavevm', 'slave_vm'):
                     continue
                 rel_set = getattr(old_vm, rel.get_accessor_name())
                 rel_set.update(**{rel.field.name: new_vm})
