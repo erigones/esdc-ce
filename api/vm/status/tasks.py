@@ -86,7 +86,7 @@ def vm_status_one(task_id, vm):
     """
     logger.info('Running vm_status_one for VM %s by %s', vm, task_id)
     node = vm.node
-    tid, err = execute(ERIGONES_TASK_USER, None, 'vmadm list -p -H -o state,zoneid uuid=' + vm.uuid,
+    tid, err = execute(ERIGONES_TASK_USER, None, 'vmadm list -p -H -o uuid,state,zoneid uuid=' + vm.uuid,
                        callback=('api.vm.status.tasks.vm_status_all_cb', {'node_uuid': node.uuid}),
                        queue=node.fast_queue, nolog=True, ping_worker=False, check_user_tasks=False)
 
