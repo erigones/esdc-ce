@@ -1104,9 +1104,17 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
         return self._get_nics(self.json_active)
 
     @staticmethod
-    def _get_ips(nics):
+    def _get_ips(nics, allowed_ips=True):
         """Return list of VM IPs from json.nics list"""
-        return [nic['ip'] for nic in nics if is_ip(nic)]
+        ips = []
+
+        for nic in nics:
+            if is_ip(nic):
+                ips.append(nic['ip'])
+            if allowed_ips:
+                ips.extend(nic.get('allowed_ips', []))
+
+        return ips
 
     def json_get_ips(self):
         """Get IPs on all nics from json."""

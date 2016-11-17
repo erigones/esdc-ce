@@ -14,6 +14,7 @@ class NetworkIPSerializer(s.Serializer):
     """
     ip = s.IPAddressField(strict=True)
     hostname = s.CharField(read_only=True, required=False)
+    hostnames = s.ArrayField(read_only=True, required=False)
     dc = s.CharField(source='vm.dc', read_only=True, required=False)
     mac = s.CharField(read_only=True, required=False)
     nic_id = s.IntegerField(read_only=True, required=False)
@@ -69,7 +70,7 @@ class NetworkIPSerializer(s.Serializer):
         except KeyError:
             pass
         else:
-            if self.object and self.object.vm and value != IPAddress.VM:
+            if self.object and (self.object.vm or self.object.vms.exists()) and value != IPAddress.VM:
                 raise s.ValidationError(_('IP address is already used by some VM.'))
 
         return attrs
