@@ -190,7 +190,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
     RESERVED_MDATA_KEYS = frozenset(['resize_needed'])  # Bug #chili-721
 
     _DISKS_REMOVE_EMPTY = ()
-    _NICS_REMOVE_EMPTY = ('gateway',)
+    _NICS_REMOVE_EMPTY = (('gateway', ''), ('allowed_ips', ()))
 
     _pk_key = 'vm_uuid'  # _UserTasksModel
     _log_name_attr = 'hostname'  # _UserTasksModel
@@ -849,7 +849,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
             if not kvm and 'model' in nic:
                 del nics[i]['model']
             # Remove if empty
-            for e in self._NICS_REMOVE_EMPTY:
+            for e, _ in self._NICS_REMOVE_EMPTY:
                 if e in nic and not nic[e]:
                     del nics[i][e]
 
