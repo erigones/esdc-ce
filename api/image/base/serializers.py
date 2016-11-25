@@ -142,6 +142,10 @@ class ImportImageSerializer(s.Serializer):
             img.ostype = Image.os_to_ostype(manifest)
             img.size = int(manifest.get('image_size', Image.DEFAULT_SIZE))
             img.desc = manifest.get('description', '')[:128]
+            tags = manifest.pop('tags', {})
+            img.tags = tags.get(Image.TAGS_KEY, [])
+            img.deploy = tags.get('deploy', False)
+            img.resize = tags.get('resize', img.ostype in img.ZONE)
         except Exception:
             raise s.ValidationError(_('Invalid image manifest.'))
 

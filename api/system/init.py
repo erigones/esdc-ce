@@ -66,7 +66,7 @@ def _init_images(images, default_dc, admin_dc):
             img.desc = manifest.get('desc', '')[:128]
             img.status = Image.OK
             img.manifest = img.manifest_active = manifest
-            tags = manifest.get('tags', {})
+            tags = manifest.pop('tags', {})
             img.tags = tags.get(Image.TAGS_KEY, [])
             img.deploy = tags.get('deploy', False)
             img.resize = tags.get('resize', img.ostype in img.ZONE)
