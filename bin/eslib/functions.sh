@@ -10,7 +10,7 @@
 # Paths
 export ERIGONES_HOME=${ERIGONES_HOME:-"/opt/erigones"}
 export PYTHONPATH=${PYTHONPATH:-"${ERIGONES_HOME}:${ERIGONES_HOME}/envs/lib/python2.7/site-packages"}
-export PATH="${ERIGONES_HOME}/bin:/usr/bin:/usr/sbin:/opt/local/bin:/opt/local/sbin:/opt/local/gcc47/bin:/usr/local/bin:/usr/local/sbin:/bin:/sbin"
+export PATH="${ERIGONES_HOME}/bin:/opt/local/bin:/opt/local/sbin:/opt/local/gcc49/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin"
 
 # Exit codes
 declare -ri _ERR_INPUT=1
