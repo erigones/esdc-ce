@@ -62,8 +62,8 @@ def _init_images(images, default_dc, admin_dc):
             img.name = img.alias = manifest['name']
             img.version = manifest['version']
             img.ostype = Image.os_to_ostype(manifest)
-            img.size = int(manifest.get('image_size', 1024))
-            img.desc = manifest.get('desc', '')[:128]
+            img.size = int(manifest.get('image_size', Image.DEFAULT_SIZE))
+            img.desc = manifest.get('description', '')[:128]
             img.status = Image.OK
             img.manifest = img.manifest_active = manifest
             tags = manifest.pop('tags', {})
