@@ -227,7 +227,13 @@ class Image(_VirtModel, _JsonPickleModel, _OSType, _DcMixin, _UserTasksModel):
 
         if u'tags' not in manifest:
             manifest[u'tags'] = {}
-        manifest[u'tags'][self.TAGS_KEY] = self.tags
+
+        manifest[u'tags'].update({
+            self.TAGS_KEY: self.tags,
+            'resize': self.resize,
+            'deploy': self.deploy,
+            'internal': self.access == self.INTERNAL,
+        })
 
         if self.ostype in self.ZONE:
             for i in ('image_size', 'nic_driver', 'disk_driver', 'cpu_type'):
