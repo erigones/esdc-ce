@@ -51,7 +51,7 @@ class ImageStoreImageView(APIView):
     def post(self):
         img = self.get_image()
         data = self.data
-        data['manifest_url'] = self.repo.get_image_manifes_url(img['uuid'])
+        data['manifest_url'] = self.repo.get_image_manifest_url(img['uuid'])
         data.pop('file_url', None)
         name = data.get('name', None)
 

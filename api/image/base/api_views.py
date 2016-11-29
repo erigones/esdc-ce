@@ -231,8 +231,9 @@ class ImageView(TaskAPIView):
         img.alias = img.name        # Default alias (can be changed)
         img.status = Image.OK       # Set status for preliminary checks
 
-        for img_field in ('version', 'desc'):  # More default fields retrieved from the downloaded image manifest
-            if not data.get(img_field, None):
+        # More default fields retrieved from the downloaded image manifest
+        for img_field in ('version', 'desc', 'resize', 'deploy', 'tags'):
+            if img_field not in data:
                 def_value = getattr(img, img_field, None)
                 if def_value:
                     data[img_field] = def_value
