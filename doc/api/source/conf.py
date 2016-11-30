@@ -98,13 +98,14 @@ pygments_style = 'sphinx'
 
 rst_epilog = """
 .. |minor_version| replace:: %(minor_version)s
-.. |es example| replace:: `es example <es.html>`__
+.. |es example| replace:: `es example <../es.html>`__
+.. |es example top| replace:: `es example <es.html>`__
 .. |yes| replace:: %(yes)s
 .. |no| replace:: %(no)s
-.. |dc-yes| replace:: `%(yes)s <dc.html#dc-bound>`__
-.. |dc-no| replace:: `%(no)s <dc.html#dc-unbound>`__
-.. |async-yes| replace:: `%(yes)s <api.html#async-yes>`__
-.. |async-no| replace:: `%(no)s <api.html#async-no>`__
+.. |dc-yes| replace:: `%(yes)s <../dc.html#dc-bound>`__
+.. |dc-no| replace:: `%(no)s <../dc.html#dc-unbound>`__
+.. |async-yes| replace:: `%(yes)s <../api.html#async-yes>`__
+.. |async-no| replace:: `%(no)s <../api.html#async-no>`__
 .. |Admin| replace:: `Admin <%(perm)s>`__
 .. |NetworkAdmin| replace:: `NetworkAdmin <%(perm)s>`__
 .. |ImageAdmin| replace:: `ImageAdmin <%(perm)s>`__
@@ -125,7 +126,7 @@ rst_epilog = """
     'yes': u'\u2713',
     'no': u'\u2717',
     'nbsp': u'\u00A0',
-    'perm': 'perm.html#api-permissions',
+    'perm': '../perm.html#api-permissions',
 }
 
 # -- Options for HTML output ---------------------------------------------------
