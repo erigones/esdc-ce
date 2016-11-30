@@ -27,7 +27,7 @@ Most of the API modules and functions show, create, modify or delete virtual obj
 
 To specify a virtual datacenter, the :ref:`resource <es-resources>` must be prefixed with the ``/dc/(dc)`` path. Optionally, when using :ref:`es <es-tool>`, the current virtual datacenter can be set by using a ``-dc (dc)`` :ref:`parameter <es-parameters>`.
 
-    |es example|:
+    |es example top|:
 
     .. sourcecode:: bash
 

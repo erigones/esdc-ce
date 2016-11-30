@@ -14,6 +14,7 @@ Bugs
 
 - Fixed broken link to http-routingtable.html - `#5 <https://github.com/erigones/esdc-ce/issues/5>`__
 - Fixed broken 404 page - `#5 <https://github.com/erigones/esdc-ce/issues/5>`__
+- Fixed multiple broken links in API documentation - `#10 <https://github.com/erigones/esdc-ce/issues/10>`__
 
 - Fixed ``KeyError: 'get_image_manifes_url'`` error during POST imagestore_image_manage - `#8 <https://github.com/erigones/esdc-ce/issues/8>`__
 - Added support for Danube Cloud (erigones) image tags into POST image_manage - `#7 <https://github.com/erigones/esdc-ce/issues/7>`__
