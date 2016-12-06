@@ -205,7 +205,7 @@ class AdminServerSettingsForm(ServerSettingsForm):
 
     tags = TagField(label=_('Tags'), required=False,
                     widget=TagWidget(attrs={'class': 'tags-select2 narrow'}),
-                    help_text=_("The tag will be created in case it does not exist."))
+                    help_text=_('The tag will be created in case it does not exist.'))
     node = forms.TypedChoiceField(label=_('Node'), required=False, coerce=str, empty_value=None,
                                   widget=forms.Select(attrs={'class': 'narrow input-select2'}))
     template = forms.TypedChoiceField(label=_('Template'), required=False, coerce=str, empty_value=None,
