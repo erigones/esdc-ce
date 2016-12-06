@@ -8,6 +8,7 @@ Changelog
 Features
 --------
 
+- Added explanatory help text to the tags field - `#2 <https://github.com/erigones/esdc-ce/issues/2>`__
 
 Bugs
 ----
