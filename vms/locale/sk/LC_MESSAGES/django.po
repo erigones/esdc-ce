@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Erigones VMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-11-02 20:31+0000\n"
+"POT-Creation-Date: 2016-12-05 14:10+0100\n"
 "PO-Revision-Date: 2014-02-26 20:42+0100\n"
 "Last-Translator: Erigones, s. r. o. <erigones@erigones.com>\n"
 "Language-Team: Erigones, s. r. o. <erigones@erigones.com>\n"
@@ -214,28 +214,31 @@ msgid "Last changed"
 msgstr "Dátum a čas poslednej zmeny"
 
 #: models/base.py:299
-msgid "Linux"
-msgstr "Linux"
+#| msgid "Linux"
+msgid "Linux VM"
+msgstr ""
 
 #: models/base.py:300
-msgid "SunOS"
-msgstr "SunOS"
+#| msgid "SunOS"
+msgid "SunOS VM"
+msgstr ""
 
 #: models/base.py:301
-msgid "BSD"
-msgstr "BSD"
+msgid "BSD VM"
+msgstr ""
 
 #: models/base.py:302
-msgid "Windows"
-msgstr "Windows"
+#| msgid "Windows"
+msgid "Windows VM"
+msgstr ""
 
 #: models/base.py:303
 msgid "SunOS Zone"
-msgstr "SunOS Zóna"
+msgstr ""
 
 #: models/base.py:304
 msgid "Linux Zone"
-msgstr "Linuxová Zóna"
+msgstr ""
 
 #: models/base.py:336 models/dc.py:22 models/image.py:80 models/iso.py:17
 #: models/storage.py:98 models/subnet.py:21 models/vmtemplate.py:78
@@ -350,7 +353,7 @@ msgstr ""
 msgid "Coming Soon"
 msgstr "Už čoskoro"
 
-#: models/imagestore.py:78
+#: models/imagestore.py:83
 msgid "ImageStore"
 msgstr ""
 
@@ -815,6 +818,9 @@ msgstr ""
 #: models/vmtemplate.py:92
 msgid "Templates"
 msgstr "Šablóny"
+
+#~ msgid "BSD"
+#~ msgstr "BSD"
 
 #~ msgid "Disk image"
 #~ msgstr "Obraz disku"
