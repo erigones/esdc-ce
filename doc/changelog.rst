@@ -7,6 +7,7 @@ Changelog
 
 Features
 --------
+- Updated names of KVM OS types - `#1 <https://github.com/erigones/esdc-ce/issues/1>`__
 
 
 Bugs
