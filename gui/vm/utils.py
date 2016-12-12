@@ -19,13 +19,6 @@ from api.utils.views import call_api_view
 logger = getLogger(__name__)
 
 
-def qs_filter(qs, attr, value):
-    """
-    Queryset no DB filter.
-    """
-    return [i for i in qs if getattr(i, attr) == value]
-
-
 def get_vm(request, hostname, exists_ok=True, noexists_fail=True, auto_dc_switch=True, sr=('dc', 'owner')):
     """
     Get VM object or raise 404.
