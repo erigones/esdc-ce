@@ -583,7 +583,7 @@ _es() {
 		;;
 
 		/network/*)
-			[[ "${action}" == "create" ]] || [[ "${action}" == "set" ]] && params="-alias -access -owner -desc -network -netmask -gateway -nic_tag -vlan_id -resolvers"
+			[[ "${action}" == "create" ]] || [[ "${action}" == "set" ]] && params="-alias -access -owner -desc -network -netmask -gateway -nic_tag -vlan_id -resolvers -dc_bound"
 			[[ "${action}" == "get" ]] && params="-full -extended"
 		;;
 
