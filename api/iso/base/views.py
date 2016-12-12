@@ -80,8 +80,8 @@ ISO images need to be manually distributed across all compute nodes.
         :type data.owner: string
         :arg data.desc: ISO image description
         :type data.desc: string
-        :arg data.ostype: Operating system type (null - all OS types, 1 - Linux, 2 - SunOS, 3 - BSD, 4 - Windows) \
-(default: null)
+        :arg data.ostype: Operating system type (null - all OS types, 1 - Linux VM, 2 - SunOS VM, 3 - BSD VM, \
+4 - Windows VM) (default: null)
         :type data.ostype: integer
         :arg data.dc_bound: Whether the ISO image is bound to a datacenter (requires |SuperAdmin| permission) \
 (default: true)
@@ -114,7 +114,8 @@ ISO images need to be manually distributed across all compute nodes.
         :type data.owner: string
         :arg data.desc: ISO image description
         :type data.desc: string
-        :arg data.ostype: Operating system type (null - all OS types, 1 - Linux, 2 - SunOS, 3 - BSD, 4 - Windows)
+        :arg data.ostype: Operating system type (null - all OS types, 1 - Linux VM, 2 - SunOS VM, 3 - BSD VM, \
+4 - Windows VM)
         :type data.ostype: integer
         :arg data.dc_bound: Whether the ISO image is bound to a datacenter (requires |SuperAdmin| permission)
         :type data.dc_bound: boolean

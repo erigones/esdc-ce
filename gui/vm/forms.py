@@ -279,12 +279,13 @@ class AdminServerSettingsForm(ServerSettingsForm):
                 self.fields['zpool'].widget.attrs['class'] += ' disable_created2'
         else:
             empty_template_data = self.initial
-            ostype = list(Vm.OSTYPE)
-            del ostype[-1]  # Remove Linux Zone support (lx brand)
+            # Remove Linux Zone support (lx brand)
+            ostype = [i for i in Vm.OSTYPE if i[0] != Vm.LINUX_ZONE]
 
             # Disable zone support _only_ when adding new VM (zone must be available in edit mode) - Issue #chili-461
             if not request.dc.settings.VMS_ZONE_ENABLED:
-                del ostype[-1]  # Remove SunOS Zone support
+                # Remove SunOS Zone support
+                ostype = [i for i in ostype if i[0] != Vm.SUNOS_ZONE]
 
             self.fields['ostype'].choices = ostype
 

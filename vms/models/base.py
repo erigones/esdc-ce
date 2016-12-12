@@ -296,10 +296,10 @@ class _OSType(models.Model):
     LINUX_ZONE = 6
 
     OSTYPE = (
-        (LINUX, _('Linux')),
-        (SUNOS, _('SunOS')),
-        (BSD, _('BSD')),
-        (WINDOWS, _('Windows')),
+        (LINUX, _('Linux VM')),
+        (SUNOS, _('SunOS VM')),
+        (BSD, _('BSD VM')),
+        (WINDOWS, _('Windows VM')),
         (SUNOS_ZONE, _('SunOS Zone')),
         (LINUX_ZONE, _('Linux Zone')),
     )
