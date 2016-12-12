@@ -10,10 +10,10 @@ from vms.models import Storage, NodeStorage, Node, Vm, VmTemplate, Image, Subnet
 QNodeNullOrLicensed = Q(node__isnull=True) | ~Q(node__status=Node.UNLICENSED)
 
 
-def get_vm(request, hostname, attrs=None, where=None, exists_ok=False, noexists_fail=False, sr=('node',), api=True,
+def get_vm(request, hostname_or_uuid, attrs=None, where=None, exists_ok=False, noexists_fail=False, sr=('node',), api=True,
            extra=None, check_node_status=('POST', 'PUT', 'DELETE')):
     """
-    Call get_object for Vm model identified by hostname or uuid. If attributes are not
+    Call get_object for Vm model identified by hostname_or_uuid or uuid. If attributes are not
     specified then set them to check owner and node status.
     Also acts as IsVmOwner permission.
     """
@@ -31,7 +31,7 @@ def get_vm(request, hostname, attrs=None, where=None, exists_ok=False, noexists_
     if not request.user.is_admin(request):
         attrs['owner'] = request.user
 
-    attrs['hostname'] = hostname
+    attrs['hostname'] = hostname_or_uuid
     attrs['dc'] = request.dc
     attrs['slavevm__isnull'] = True
 
@@ -40,7 +40,7 @@ def get_vm(request, hostname, attrs=None, where=None, exists_ok=False, noexists_
     except (ObjectNotFound, ObjectAlreadyExists, Vm.DoesNotExist) as original_exception:
         # Checking whether user is not using uuid instead of the hostname, if not, throwing the original exception
         del attrs['hostname']
-        attrs['uuid'] = hostname
+        attrs['uuid'] = hostname_or_uuid
         try:
             vm = _get_vm_from_db(api, attrs, exists_ok, extra, noexists_fail, request, sr, where)
         except Exception:
