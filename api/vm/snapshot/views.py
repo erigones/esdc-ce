@@ -238,13 +238,13 @@ creating snapshot (requires QEMU Guest Agent) (default: false)
 @api_view(('GET', 'PUT', 'DELETE'))
 @request_data()  # get_vm() = IsVmOwner
 @setting_required('VMS_VM_SNAPSHOT_ENABLED')
-def vm_snapshot_list(request, hostname, data=None):
+def vm_snapshot_list(request, hostname_or_uuid, data=None):
     """
-    List (:http:get:`GET </vm/(hostname)/snapshot>`) all VM snapshots or
-    synchronize (:http:put:`PUT </vm/(hostname)/snapshot>`) snapshots of VM's disk on compute node
+    List (:http:get:`GET </vm/(hostname_or_uuid)/snapshot>`) all VM snapshots or
+    synchronize (:http:put:`PUT </vm/(hostname_or_uuid)/snapshot>`) snapshots of VM's disk on compute node
     with snapshots saved in database.
 
-    .. http:get:: /vm/(hostname)/snapshot
+    .. http:get:: /vm/(hostname_or_uuid)/snapshot
 
         :DC-bound?:
             * |dc-yes|
@@ -252,8 +252,8 @@ def vm_snapshot_list(request, hostname, data=None):
             * |VmOwner|
         :Asynchronous?:
             * |async-no|
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
         :arg data.full: Return list of objects with all snapshot details (default: false)
         :type data.full: boolean
         :arg data.disk_id: Filter by disk number/ID
@@ -270,7 +270,7 @@ def vm_snapshot_list(request, hostname, data=None):
         :status 404: VM not found
         :status 412: Invalid disk_id / Invalid snapshot type
 
-    .. http:put:: /vm/(hostname)/snapshot
+    .. http:put:: /vm/(hostname_or_uuid)/snapshot
 
         :DC-bound?:
             * |dc-yes|
@@ -278,8 +278,8 @@ def vm_snapshot_list(request, hostname, data=None):
             * |VmOwner|
         :Asynchronous?:
             * |async-yes|
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
         :arg data.disk_id: **required** - Disk number/ID (default: 1)
         :type data.disk_id: integer
         :status 200: SUCCESS
@@ -292,7 +292,7 @@ def vm_snapshot_list(request, hostname, data=None):
         :status 428: VM is not installed
 
     """
-    return VmSnapshotList(request, hostname, data).response()
+    return VmSnapshotList(request, hostname_or_uuid, data).response()
 
 
 #: vm_status:   GET:
@@ -302,15 +302,15 @@ def vm_snapshot_list(request, hostname, data=None):
 @api_view(('GET', 'POST', 'PUT', 'DELETE'))
 @request_data()  # get_vm() = IsVmOwner
 @setting_required('VMS_VM_SNAPSHOT_ENABLED')
-def vm_snapshot(request, hostname, snapname, data=None):
+def vm_snapshot(request, hostname_or_uuid, snapname, data=None):
     """
-    Show (:http:get:`GET </vm/(hostname)/snapshot/(snapname)>`),
-    create (:http:post:`POST </vm/(hostname)/snapshot/(snapname)>`),
-    destroy (:http:delete:`DELETE </vm/(hostname)/snapshot/(snapname)>`) or
-    rollback (:http:put:`PUT </vm/(hostname)/snapshot/(snapname)>`)
+    Show (:http:get:`GET </vm/(hostname_or_uuid)/snapshot/(snapname)>`),
+    create (:http:post:`POST </vm/(hostname_or_uuid)/snapshot/(snapname)>`),
+    destroy (:http:delete:`DELETE </vm/(hostname_or_uuid)/snapshot/(snapname)>`) or
+    rollback (:http:put:`PUT </vm/(hostname_or_uuid)/snapshot/(snapname)>`)
     a snapshot of VM's disk.
 
-    .. http:get:: /vm/(hostname)/snapshot/(snapname)
+    .. http:get:: /vm/(hostname_or_uuid)/snapshot/(snapname)
 
         :DC-bound?:
             * |dc-yes|
@@ -318,8 +318,8 @@ def vm_snapshot(request, hostname, snapname, data=None):
             * |VmOwner|
         :Asynchronous?:
             * |async-no|
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
         :arg snapname: **required** - Snapshot name
         :type snapname: string
         :arg data.disk_id: **required** - Disk number/ID (default: 1)
@@ -329,7 +329,7 @@ def vm_snapshot(request, hostname, snapname, data=None):
         :status 404: VM not found / Snapshot not found
         :status 412: Invalid disk_id
 
-    .. http:post:: /vm/(hostname)/snapshot/(snapname)
+    .. http:post:: /vm/(hostname_or_uuid)/snapshot/(snapname)
 
         :DC-bound?:
             * |dc-yes|
@@ -337,8 +337,8 @@ def vm_snapshot(request, hostname, snapname, data=None):
             * |VmOwner|
         :Asynchronous?:
             * |async-yes|
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
         :arg snapname: **required** - Snapshot name
         :type snapname: string
         :arg data.disk_id: **required** - Disk number/ID (default: 1)
@@ -359,7 +359,7 @@ creating snapshot (requires QEMU Guest Agent) (default: false)
         :status 417: VM snapshot limit reached / VM snapshot size limit reached / DC snapshot size limit reached
         :status 428: VM is not installed
 
-    .. http:put:: /vm/(hostname)/snapshot/(snapname)
+    .. http:put:: /vm/(hostname_or_uuid)/snapshot/(snapname)
 
         .. warning:: A snapshot rollback will restore disk data from the snapshot; \
 All data created after the snapshot will be lost (including all newer snapshots)!
@@ -371,8 +371,8 @@ All data created after the snapshot will be lost (including all newer snapshots)
         :Asynchronous?:
             * |async-yes| - Rollback snapshot
             * |async-no| - Update snapshot note
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
         :arg snapname: **required** - Snapshot name
         :type snapname: string
         :arg data.disk_id: **required** - Disk number/ID (default: 1)
@@ -391,7 +391,7 @@ All data created after the snapshot will be lost (including all newer snapshots)
         :status 417: VM snapshot status is not OK / VM has more recent snapshots (force=false)
         :status 423: Node is not operational / VM is not operational / VM is not stopped / VM is locked or has slave VMs
 
-    .. http:delete:: /vm/(hostname)/snapshot/(snapname)
+    .. http:delete:: /vm/(hostname_or_uuid)/snapshot/(snapname)
 
         :DC-bound?:
             * |dc-yes|
@@ -399,8 +399,8 @@ All data created after the snapshot will be lost (including all newer snapshots)
             * |VmOwner|
         :Asynchronous?:
             * |async-yes|
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
         :arg snapname: **required** - Snapshot name
         :type snapname: string
         :arg data.disk_id: **required** - Disk number/ID (default: 1)
@@ -415,4 +415,4 @@ All data created after the snapshot will be lost (including all newer snapshots)
         :status 423: Node is not operational / VM is not operational
 
     """
-    return VmSnapshot(request, hostname, snapname, data).response()
+    return VmSnapshot(request, hostname_or_uuid, snapname, data).response()

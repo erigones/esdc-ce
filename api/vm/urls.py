@@ -5,20 +5,20 @@ urlpatterns = patterns(
     'api.vm.views',
 
     # other
-    # /vm/<hostname>/screenshot - get, create
+    # /vm/<hostname_or_uuid>/screenshot - get, create
     url(r'^(?P<hostname_or_uuid>[A-Za-z0-9\._-]+)/screenshot/$',
         'vm_screenshot', name='api_vm_screenshot'),
 
     # qga
-    # /vm/<hostname>/qga/<command> - set
+    # /vm/<hostname_or_uuid>/qga/<command> - set
     url(r'^(?P<hostname_or_uuid>[A-Za-z0-9\._-]+)/qga/(?P<command>[A-Za-z0-9_-]+)/$',
         'vm_qga', name='api_vm_qga'),
 
     # migrate
-    # /vm/<hostname>/migrate/dc - set
+    # /vm/<hostname_or_uuid>/migrate/dc - set
     url(r'^(?P<hostname_or_uuid>[A-Za-z0-9\._-]+)/migrate/dc/$',
         'vm_dc', name='api_vm_dc'),
-    # /vm/<hostname>/migrate - set
+    # /vm/<hostname_or_uuid>/migrate - set
     url(r'^(?P<hostname_or_uuid>[A-Za-z0-9\._-]+)/migrate/$',
         'vm_migrate', name='api_vm_migrate'),
 
@@ -27,22 +27,22 @@ urlpatterns = patterns(
         'vm_define_snapshot_list_all', name='api_vm_define_snapshot_list_all'),
 
     # snapshot
-    # /vm/<hostname>/snapshot - get, set, delete
-    url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/snapshot/$',
+    # /vm/<hostname_or_uuid>/snapshot - get, set, delete
+    url(r'^(?P<hostname_or_uuid>[A-Za-z0-9\._-]+)/snapshot/$',
         'vm_snapshot_list', name='api_vm_snapshot_list'),
-    # /vm/<hostname>/snapshot/<snapname> - get, create, set, delete
-    url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/snapshot/(?P<snapname>[A-Za-z0-9\._-]+)/$',
+    # /vm/<hostname_or_uuid>/snapshot/<snapname> - get, create, set, delete
+    url(r'^(?P<hostname_or_uuid>[A-Za-z0-9\._-]+)/snapshot/(?P<snapname>[A-Za-z0-9\._-]+)/$',
         'vm_snapshot', name='api_vm_snapshot'),
 
     # status
     # /vm/status - get
     url(r'^status/$',
         'vm_status_list', name='api_vm_status_list'),
-    # /vm/<hostname>/status - get
-    url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/status/$',
+    # /vm/<hostname_or_uuid>/status - get
+    url(r'^(?P<hostname_or_uuid>[A-Za-z0-9\._-]+)/status/$',
         'vm_status', name='api_vm_status'),
-    # /vm/<hostname>/status/{current|start|stop|restart} - get, set
-    url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/status/(?P<action>(current|start|stop|reboot))/$',
+    # /vm/<hostname_or_uuid>/status/{current|start|stop|restart} - get, set
+    url(r'^(?P<hostname_or_uuid>[A-Za-z0-9\._-]+)/status/(?P<action>(current|start|stop|reboot))/$',
         'vm_status', name='api_vm_status'),
 
     # define
