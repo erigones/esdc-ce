@@ -9,16 +9,16 @@ __all__ = ('mon_vm_define', 'mon_vm_sla', 'mon_vm_history')
 #: vm_status:   PUT: notcreated, running, stopped, stopping
 @api_view(('GET', 'PUT'))
 @request_data(permissions=(IsAdminOrReadOnly,))  # get_vm() = IsVmOwner
-def mon_vm_define(request, hostname, data=None):
+def mon_vm_define(request, hostname_or_uuid, data=None):
     """
-    Show (:http:get:`GET </mon/vm/(hostname)/monitoring>`) or
-    update (:http:put:`PUT </mon/vm/(hostname)/monitoring>`)
+    Show (:http:get:`GET </mon/vm/(hostname_or_uuid)/monitoring>`) or
+    update (:http:put:`PUT </mon/vm/(hostname_or_uuid)/monitoring>`)
     a VM's monitoring interface definition.
 
     .. note:: A VM's monitoring interface is automatically created for \
 every :py:func:`monitored VM <api.vm.define.views.vm_define>`.
 
-    .. http:get:: /mon/vm/(hostname)/monitoring
+    .. http:get:: /mon/vm/(hostname_or_uuid)/monitoring
 
         :DC-bound?:
             * |dc-yes|
@@ -26,17 +26,17 @@ every :py:func:`monitored VM <api.vm.define.views.vm_define>`.
             * |VmOwner|
         :Asynchronous?:
             * |async-no|
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
         :arg data.active: Display currently active VM monitoring definition in the monitoring system (default: false)
         :type data.active: boolean
         :status 200: SUCCESS
         :status 403: Forbidden
         :status 404: VM not found
 
-    .. http:put:: /mon/vm/(hostname)/monitoring
+    .. http:put:: /mon/vm/(hostname_or_uuid)/monitoring
 
-        .. note:: Please use :http:put:`/vm/(hostname)` to update the monitoring interface definition of an already \
+        .. note:: Please use :http:put:`/vm/(hostname_or_uuid)` to update the monitoring interface definition of an already \
 deployed VM after changing any of the VM's monitoring interface attributes.
 
         .. note:: By setting the value of ``port``, ``dns``, ``useip`` and/or ``proxy`` parameter(s) to ``null``, the \
@@ -48,8 +48,8 @@ parameter(s) will be set to a default value.
             * |Admin|
         :Asynchronous?:
             * |async-no|
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
         :arg data.ip: IPv4 address used for monitoring (automatically updated \
 by :py:func:`~api.vm.define.views.vm_define_nic`)
         :type data.ip: string
@@ -75,7 +75,7 @@ or ``ip`` is not set (default: ``hostname``)
         :status 404: VM not found
         :status 423: VM is not operational / VM is locked or has slave VMs
     """
-    return VmMonitoringView(request, hostname, data).response()
+    return VmMonitoringView(request, hostname_or_uuid, data).response()
 
 
 #: vm_status:   GET: Vm.STATUS_OPERATIONAL
@@ -84,12 +84,12 @@ or ``ip`` is not set (default: ``hostname``)
 @request_data()  # get_vm() = IsVmOwner
 @setting_required('MON_ZABBIX_ENABLED')
 @setting_required('MON_ZABBIX_VM_SLA')
-def mon_vm_sla(request, hostname, yyyymm, data=None):
+def mon_vm_sla(request, hostname_or_uuid, yyyymm, data=None):
     """
-    Get (:http:get:`GET </mon/vm/(hostname)/sla/(yyyymm)>`) SLA for
+    Get (:http:get:`GET </mon/vm/(hostname_or_uuid)/sla/(yyyymm)>`) SLA for
     requested server and month.
 
-    .. http:get:: /mon/vm/(hostname)/sla/(yyyymm)
+    .. http:get:: /mon/vm/(hostname_or_uuid)/sla/(yyyymm)
 
         :DC-bound?:
             * |dc-yes|
@@ -98,8 +98,8 @@ def mon_vm_sla(request, hostname, yyyymm, data=None):
         :Asynchronous?:
             * |async-yes| - SLA value is retrieved from monitoring server
             * |async-no| - SLA value is cached
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
         :arg yyyymm: **required** - Time period in YYYYMM format
         :type yyyymm: integer
         :status 200: SUCCESS
@@ -112,19 +112,19 @@ def mon_vm_sla(request, hostname, yyyymm, data=None):
         :status 423: VM is not operational
 
     """
-    return VmSLAView(request, hostname, yyyymm, data).get()
+    return VmSLAView(request, hostname_or_uuid, yyyymm, data).get()
 
 
 #: vm_status:   GET: Vm.STATUS_OPERATIONAL
 @api_view(('GET',))
 @request_data()  # get_vm() = IsVmOwner
 @setting_required('MON_ZABBIX_ENABLED')
-def mon_vm_history(request, hostname, graph, data=None):
+def mon_vm_history(request, hostname_or_uuid, graph, data=None):
     """
-    Get (:http:get:`GET </mon/vm/(hostname)/history/(graph)>`) monitoring history
+    Get (:http:get:`GET </mon/vm/(hostname_or_uuid)/history/(graph)>`) monitoring history
     for requested server and graph name.
 
-    .. http:get:: /mon/vm/(hostname)/history/(graph)
+    .. http:get:: /mon/vm/(hostname_or_uuid)/history/(graph)
 
         :DC-bound?:
             * |dc-yes|
@@ -132,8 +132,8 @@ def mon_vm_history(request, hostname, graph, data=None):
             * |VmOwner|
         :Asynchronous?:
             * |async-yes|
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
         :arg graph: **required** - Graph identificator. One of:
 
         |  *cpu-usage* - Total compute node CPU consumed by the VM.
@@ -174,4 +174,4 @@ the virtual hard drive.
         :status 423: VM is not operational
 
     """
-    return VmHistoryView(request, hostname, graph, data).get()
+    return VmHistoryView(request, hostname_or_uuid, graph, data).get()

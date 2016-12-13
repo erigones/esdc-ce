@@ -21,11 +21,11 @@ class VmBackup(TaskAPIView):
     """
     LOCK = 'vm_backup vm:%s disk:%s'
 
-    def __init__(self, request, hostname, bkpname, data):
+    def __init__(self, request, hostname_or_uuid, bkpname, data):
         super(VmBackup, self).__init__(request)
 
         if request.method == 'POST':  # Got bkpdef instead of bkpname
-            vm = get_vm(request, hostname, exists_ok=True, noexists_fail=True)
+            vm = get_vm(request, hostname_or_uuid, exists_ok=True, noexists_fail=True)
             disk_id, real_disk_id, zfs_filesystem = get_disk_id(request, vm, data)
             # TODO: check indexes
             define = get_object(request, BackupDefine, {'name': bkpname, 'vm': vm, 'disk_id': real_disk_id},
@@ -38,10 +38,10 @@ class VmBackup(TaskAPIView):
                 if 'hostname' in data:  # Force original hostname
                     raise ObjectNotFound
                 # Only target VM status and backup node status are important
-                vm = get_vm(request, hostname, exists_ok=True, noexists_fail=True, check_node_status=None)
+                vm = get_vm(request, hostname_or_uuid, exists_ok=True, noexists_fail=True, check_node_status=None)
             except ObjectNotFound:
                 vm = None
-                bkp_get = {'name': bkpname, 'vm_hostname': hostname}
+                bkp_get = {'name': bkpname, 'vm_hostname': hostname_or_uuid}
             else:
                 bkp_get = {'vm': vm, 'name': bkpname}
 
