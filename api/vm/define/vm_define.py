@@ -130,9 +130,9 @@ class VmDefineView(VmDefineBaseView):
 
     # noinspection PyUnusedLocal
     @atomic
-    def post(self, vm, data, hostname=None):
+    def post(self, vm, data, hostname_or_uuid=None):
         """Create VM definition"""
-        ser = VmDefineSerializer(self.request, data=data, hostname=hostname)
+        ser = VmDefineSerializer(self.request, data=data, hostname=vm.hostname)
 
         if ser.is_valid():
             ser.object.save(sync_json=True, update_node_resources=ser.update_node_resources)

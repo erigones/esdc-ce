@@ -49,44 +49,44 @@ urlpatterns = patterns(
     # /vm/define - get
     url(r'^define/$',
         'vm_define_list', name='api_vm_define_list'),
-    # /vm/<hostname>/define - get, create, set, delete
-    url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/define/$',
+    # /vm/<hostname_or_uuid>/define - get, create, set, delete
+    url(r'^(?P<hostname_or_uuid>[A-Za-z0-9\._-]+)/define/$',
         'vm_define', name='api_vm_define'),
-    # /vm/<hostname>/define/revert - set
-    url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/define/(undo|revert)/$',
+    # /vm/<hostname_or_uuid>/define/revert - set
+    url(r'^(?P<hostname_or_uuid>[A-Za-z0-9\._-]+)/define/(undo|revert)/$',
         'vm_define_revert', name='api_vm_define_revert'),
-    # /vm/<hostname>/define/disk - get
-    url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/define/disk/$',
+    # /vm/<hostname_or_uuid>/define/disk - get
+    url(r'^(?P<hostname_or_uuid>[A-Za-z0-9\._-]+)/define/disk/$',
         'vm_define_disk_list', name='api_vm_define_disk_list'),
-    # /vm/<hostname>/define/disk/<disk_id> - get, create, set, delete
-    url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/define/disk/(?P<disk_id>\d)/$',
+    # /vm/<hostname_or_uuid>/define/disk/<disk_id> - get, create, set, delete
+    url(r'^(?P<hostname_or_uuid>[A-Za-z0-9\._-]+)/define/disk/(?P<disk_id>\d)/$',
         'vm_define_disk', name='api_vm_define_disk'),
-    # /vm/<hostname>/define/nic - get
-    url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/define/nic/$',
+    # /vm/<hostname_or_uuid>/define/nic - get
+    url(r'^(?P<hostname_or_uuid>[A-Za-z0-9\._-]+)/define/nic/$',
         'vm_define_nic_list', name='api_vm_define_nic_list'),
-    # /vm/<hostname>/define/nic/<nic_id> - get, create, set, delete
-    url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/define/nic/(?P<nic_id>\d)/$',
+    # /vm/<hostname_or_uuid>/define/nic/<nic_id> - get, create, set, delete
+    url(r'^(?P<hostname_or_uuid>[A-Za-z0-9\._-]+)/define/nic/(?P<nic_id>\d)/$',
         'vm_define_nic', name='api_vm_define_nic'),
 
     # define snapshot
-    # /vm/<hostname>/define/snapshot - get
-    url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/define/snapshot/$',
+    # /vm/<hostname_or_uuid>/define/snapshot - get
+    url(r'^(?P<hostname_or_uuid>[A-Za-z0-9\._-]+)/define/snapshot/$',
         'vm_define_snapshot_list', name='api_vm_define_snapshot_list'),
-    # /vm/<hostname>/define/snapshot/<snapdef> - get, create, set, delete
-    url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/define/snapshot/(?P<snapdef>[A-Za-z0-9\._-]+)/$',
+    # /vm/<hostname_or_uuid>/define/snapshot/<snapdef> - get, create, set, delete
+    url(r'^(?P<hostname_or_uuid>[A-Za-z0-9\._-]+)/define/snapshot/(?P<snapdef>[A-Za-z0-9\._-]+)/$',
         'vm_define_snapshot', name='api_vm_define_snapshot'),
 
     # image from snapshot
-    # /vm/<hostname>/snapshot/<snapname>/image/<name> - create
-    url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/snapshot/(?P<snapname>[A-Za-z0-9\._-]+)/image/(?P<name>[A-Za-z0-9\._-]+)/$',
+    # /vm/<hostname_or_uuid>/snapshot/<snapname>/image/<name> - create
+    url(r'^(?P<hostname_or_uuid>[A-Za-z0-9\._-]+)/snapshot/(?P<snapname>[A-Za-z0-9\._-]+)/image/(?P<name>[A-Za-z0-9\._-]+)/$',
         'image_snapshot', name='api_image_snapshot'),
 
     # base
     # /vm - get
     url(r'^$',
         'vm_list', name='api_vm_list'),
-    # /vm/<hostname> - get, create, set, delete
-    url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/$',
+    # /vm/<hostname_or_uuid> - get, create, set, delete
+    url(r'^(?P<hostname_or_uuid>[A-Za-z0-9\._-]+)/$',
         'vm_manage', name='api_vm_manage'),
 )
 
