@@ -46,6 +46,7 @@ class VmSerializer(VmBaseSerializer):
     VM details (read-only)
     """
     hostname = s.Field()
+    uuid = s.CharField(read_only=True)
     alias = s.Field()
     node = s.SlugRelatedField(slug_field='hostname', read_only=True, required=False)
     owner = s.SlugRelatedField(slug_field='username', read_only=True)
