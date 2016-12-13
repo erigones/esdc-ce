@@ -16,12 +16,12 @@ class VmQGA(APIView):
     """
     api.vm.qga.views.vm_qga
     """
-    def __init__(self, request, hostname, command, data):
+    def __init__(self, request, hostname_or_uuid, command, data):
         super(VmQGA, self).__init__(request)
-        self.hostname = hostname
+        self.hostname_or_uuid = hostname_or_uuid
         self.command = command
         self.data = data
-        self.vm = get_vm(request, hostname, exists_ok=True, noexists_fail=True)
+        self.vm = get_vm(request, hostname_or_uuid, exists_ok=True, noexists_fail=True)
 
     def put(self):
         request, vm, command = self.request, self.vm, self.command

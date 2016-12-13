@@ -6,20 +6,20 @@ urlpatterns = patterns(
 
     # other
     # /vm/<hostname>/screenshot - get, create
-    url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/screenshot/$',
+    url(r'^(?P<hostname_or_uuid>[A-Za-z0-9\._-]+)/screenshot/$',
         'vm_screenshot', name='api_vm_screenshot'),
 
     # qga
     # /vm/<hostname>/qga/<command> - set
-    url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/qga/(?P<command>[A-Za-z0-9_-]+)/$',
+    url(r'^(?P<hostname_or_uuid>[A-Za-z0-9\._-]+)/qga/(?P<command>[A-Za-z0-9_-]+)/$',
         'vm_qga', name='api_vm_qga'),
 
     # migrate
     # /vm/<hostname>/migrate/dc - set
-    url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/migrate/dc/$',
+    url(r'^(?P<hostname_or_uuid>[A-Za-z0-9\._-]+)/migrate/dc/$',
         'vm_dc', name='api_vm_dc'),
     # /vm/<hostname>/migrate - set
-    url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/migrate/$',
+    url(r'^(?P<hostname_or_uuid>[A-Za-z0-9\._-]+)/migrate/$',
         'vm_migrate', name='api_vm_migrate'),
 
     # define snapshot report
