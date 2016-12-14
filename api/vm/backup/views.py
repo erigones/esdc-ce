@@ -248,11 +248,11 @@ creating backup snapshot (requires QEMU Guest Agent) (default: false)
 @api_view(('GET', 'DELETE'))
 @request_data(permissions=(IsAdminOrReadOnly,))  # get_vm() = IsVmOwner
 @setting_required('VMS_VM_BACKUP_ENABLED')
-def vm_backup_list(request, hostname, data=None):
+def vm_backup_list(request, hostname_or_uuid, data=None):
     """
-    List (:http:get:`GET </vm/(hostname)/backup>`) all VM backups.
+    List (:http:get:`GET </vm/(hostname_or_uuid)/backup>`) all VM backups.
 
-    .. http:get:: /vm/(hostname)/backup
+    .. http:get:: /vm/(hostname_or_uuid)/backup
 
         :DC-bound?:
             * |dc-yes|
@@ -260,8 +260,8 @@ def vm_backup_list(request, hostname, data=None):
             * |VmOwner|
         :Asynchronous?:
             * |async-no|
-        :arg hostname: **required** - Original server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Original server hostname or uuid
+        :type hostname_or_uuid: string
         :arg data.full: Return list of objects with all backup details (default: false)
         :type data.full: boolean
         :arg data.disk_id: Filter by original disk number/ID
@@ -275,7 +275,7 @@ def vm_backup_list(request, hostname, data=None):
         :status 403: Forbidden
         :status 412: Invalid disk_id
     """
-    return VmBackupList(request, hostname, data).response()
+    return VmBackupList(request, hostname_or_uuid, data).response()
 
 
 #: vm_status:   GET:
@@ -320,7 +320,7 @@ def vm_backup(request, hostname_or_uuid, bkpname, data=None):
             * |Admin|
         :Asynchronous?:
             * |async-yes|
-        :arg hostname_or_uuid: **required** - Server hostname_or_uuid
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
         :type hostname_or_uuid: string
         :arg bkpname.bkpdef: **required** - Backup definition name
         :type bkpname.bkpdef: string
@@ -351,7 +351,7 @@ All data created after the backup (including all existing snapshots) on target s
         :Asynchronous?:
             * |async-yes| - Restore backup
             * |async-no| - Update backup note
-        :arg hostname_or_uuid: **required** - Original server hostname_or_uuid
+        :arg hostname_or_uuid: **required** - Original server hostname or uuid
         :type hostname_or_uuid: string
         :arg bkpname: **required** - Backup name
         :type bkpname: string
@@ -384,7 +384,7 @@ All data created after the backup (including all existing snapshots) on target s
             * |Admin|
         :Asynchronous?:
             * |async-no|
-        :arg hostname_or_uuid: **required** - Original server hostname_or_uuid
+        :arg hostname_or_uuid: **required** - Original server hostname or uuid
         :type hostname_or_uuid: string
         :arg bkpname: **required** - Backup name
         :type bkpname: string

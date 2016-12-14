@@ -98,11 +98,11 @@ if settings.VMS_VM_BACKUP_ENABLED:
         url(r'^define/backup/$',
             'vm_define_backup_list_all', name='api_vm_define_backup_list_all'),
         # backup
-        # /vm/<hostname>/backup - get, delete
-        url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/backup/$',
+        # /vm/<hostname_or_uuid>/backup - get, delete
+        url(r'^(?P<hostname_or_uuid>[A-Za-z0-9\._-]+)/backup/$',
             'vm_backup_list', name='api_vm_backup_list'),
         # /vm/<hostname>/backup/<bkpname> - get, create, set, delete
-        url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/backup/(?P<bkpname>[A-Za-z0-9\._-]+)/$',
+        url(r'^(?P<hostname_or_uuid>[A-Za-z0-9\._-]+)/backup/(?P<bkpname>[A-Za-z0-9\._-]+)/$',
             'vm_backup', name='api_vm_backup'),
         # define backup
         # /vm/<hostname_or_uuid>/define/backup - get

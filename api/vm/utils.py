@@ -10,6 +10,26 @@ from vms.models import Storage, NodeStorage, Node, Vm, VmTemplate, Image, Subnet
 QNodeNullOrLicensed = Q(node__isnull=True) | ~Q(node__status=Node.UNLICENSED)
 
 
+def _get_vm_from_db(api, attrs, exists_ok, extra, noexists_fail, request, sr, where):
+    """
+    Used in get_vm below.
+    """
+    if api:
+        vm = get_object(request, Vm, attrs, where=where, exists_ok=exists_ok, noexists_fail=noexists_fail, sr=sr,
+                        extra=extra)
+    else:
+        if sr:
+            qs = Vm.objects.select_related(*sr)
+        else:
+            qs = Vm.objects
+
+        if where:
+            vm = qs.filter(where).get(**attrs)
+        else:
+            vm = qs.get(**attrs)
+    return vm
+
+
 def get_vm(request, hostname_or_uuid, attrs=None, where=None, exists_ok=False, noexists_fail=False, sr=('node',), api=True,
            extra=None, check_node_status=('POST', 'PUT', 'DELETE')):
     """
@@ -49,23 +69,7 @@ def get_vm(request, hostname_or_uuid, attrs=None, where=None, exists_ok=False, n
     if check_node_status and request.method in check_node_status:
         if vm.node and vm.node.status not in Node.STATUS_OPERATIONAL:
             raise NodeIsNotOperational
-    return vm
 
-
-def _get_vm_from_db(api, attrs, exists_ok, extra, noexists_fail, request, sr, where):
-    if api:
-        vm = get_object(request, Vm, attrs, where=where, exists_ok=exists_ok, noexists_fail=noexists_fail, sr=sr,
-                        extra=extra)
-    else:
-        if sr:
-            qs = Vm.objects.select_related(*sr)
-        else:
-            qs = Vm.objects
-
-        if where:
-            vm = qs.filter(where).get(**attrs)
-        else:
-            vm = qs.get(**attrs)
     return vm
 
 
