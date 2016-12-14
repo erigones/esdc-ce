@@ -203,8 +203,10 @@ class RegisterForm(forms.ModelForm):
                 raise forms.ValidationError(_('This email address is already in use. Please supply a different email '
                                               'address.'))
 
-        if re.match("^[A-Za-z0-9@.+_-]+$", email) is None:
-            raise forms.ValidationError(_('This email address is not valid.'))
+        regex = re.compile("^[A-Za-z0-9@.+_-]+$")
+
+        if regex.match(email) is None:
+            raise forms.ValidationError(_('Sorry. Your email address did not pass the validity test.'))
 
         return email
 
