@@ -84,9 +84,9 @@ def vm_define(request, hostname_or_uuid, data=None):
             * |Admin|
         :Asynchronous?:
             * |async-no|
-        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :arg hostname_or_uuid: **required** - Server hostname
         :type hostname_or_uuid: string
-        :arg data.alias: Short server name (default: ``hostname_or_uuid``)
+        :arg data.alias: Short server name (default: ``hostname``)
         :type data.alias: string
         :arg data.template: VM template name (default: null)
         :type data.template: string
@@ -149,7 +149,7 @@ Items will be set as static routes in the OS (SunOS Zone only, default: {})
             * |async-no|
         :arg hostname_or_uuid: **required** - Server hostname or uuid
         :type hostname_or_uuid: string
-        :arg data.alias: Short server name (default: hostname_or_uuid)
+        :arg data.alias: Short server name
         :type data.alias: string
         :arg data.template: VM template name
         :type data.template: string
