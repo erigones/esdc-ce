@@ -10,6 +10,6 @@ urlpatterns = patterns(
     url(r'^password/$', 'password_change', name='profile_password'),
     url(r'^activate/$', 'activation', name='profile_activation'),
     url(r'^ssh_key/(?P<action>add|delete)/$', 'sshkey', name='profile_sshkey'),
-    url(r'^impersonate/user/(?P<username>[A-Za-z0-9\@\._-]+)/$', 'start_impersonation', name='start_impersonation'),
+    url(r'^impersonate/user/(?P<username>[A-Za-z0-9@.+_-]+)/$', 'start_impersonation', name='start_impersonation'),
     url(r'^impersonate/cancel/$', 'stop_impersonation', name='stop_impersonation'),
 )

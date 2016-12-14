@@ -14,6 +14,7 @@ Features
 Bugs
 ----
 
+- Fixed user details broken page (email address validation problem) - `#14 <https://github.com/erigones/esdc-ce/issues/14>`__
 - Fixed broken link to http-routingtable.html - `#5 <https://github.com/erigones/esdc-ce/issues/5>`__
 - Fixed broken 404 page - `#5 <https://github.com/erigones/esdc-ce/issues/5>`__
 - Fixed multiple broken links in API documentation - `#10 <https://github.com/erigones/esdc-ce/issues/10>`__
