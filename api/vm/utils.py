@@ -1,7 +1,7 @@
 from django.db.models import Q
 from django.conf import settings
 
-from api.exceptions import NodeIsNotOperational
+from api.exceptions import NodeIsNotOperational, ObjectNotFound
 from api.utils.db import get_object
 from gui.models import User
 from vms.models import Storage, NodeStorage, Node, Vm, VmTemplate, Image, Subnet, Iso
@@ -56,7 +56,18 @@ def get_vm(request, hostname_or_uuid, attrs=None, where=None, exists_ok=False, n
     attrs['dc'] = request.dc
     attrs['slavevm__isnull'] = True
 
-    vm = _get_vm_from_db(api, attrs, exists_ok, extra, noexists_fail, request, sr, where)
+    try:
+        vm = _get_vm_from_db(api, attrs, exists_ok, extra, noexists_fail, request, sr, where)
+    except (ObjectNotFound, Vm.DoesNotExist) as original_exception:
+        del attrs['hostname']
+        attrs['uuid'] = hostname_or_uuid
+        try:
+            vm = _get_vm_from_db(api, attrs, exists_ok, extra, noexists_fail, request, sr, where)
+        except Exception:
+            # Return to original state and re-raise the original exception
+            del attrs['uuid']
+            attrs['hostname'] = hostname_or_uuid
+            raise original_exception
 
     if check_node_status and request.method in check_node_status:
         if vm.node and vm.node.status not in Node.STATUS_OPERATIONAL:
