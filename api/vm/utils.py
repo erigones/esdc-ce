@@ -1,7 +1,7 @@
 from django.db.models import Q
 from django.conf import settings
 
-from api.exceptions import NodeIsNotOperational, ObjectNotFound, ObjectAlreadyExists
+from api.exceptions import NodeIsNotOperational
 from api.utils.db import get_object
 from gui.models import User
 from vms.models import Storage, NodeStorage, Node, Vm, VmTemplate, Image, Subnet, Iso
@@ -18,22 +18,23 @@ def _get_vm_from_db(api, attrs, exists_ok, extra, noexists_fail, request, sr, wh
         vm = get_object(request, Vm, attrs, where=where, exists_ok=exists_ok, noexists_fail=noexists_fail, sr=sr,
                         extra=extra)
     else:
+        qs = Vm.objects
+
         if sr:
-            qs = Vm.objects.select_related(*sr)
-        else:
-            qs = Vm.objects
+            qs = qs.select_related(*sr)
 
         if where:
-            vm = qs.filter(where).get(**attrs)
-        else:
-            vm = qs.get(**attrs)
+            qs = qs.filter(where)
+
+        vm = qs.get(**attrs)
+
     return vm
 
 
-def get_vm(request, hostname_or_uuid, attrs=None, where=None, exists_ok=False, noexists_fail=False, sr=('node',), api=True,
-           extra=None, check_node_status=('POST', 'PUT', 'DELETE')):
+def get_vm(request, hostname_or_uuid, attrs=None, where=None, exists_ok=False, noexists_fail=False, sr=('node',),
+           api=True, extra=None, check_node_status=('POST', 'PUT', 'DELETE')):
     """
-    Call get_object for Vm model identified by hostname_or_uuid or uuid. If attributes are not
+    Call get_object for Vm model identified by hostname or uuid. If attributes are not
     specified then set them to check owner and node status.
     Also acts as IsVmOwner permission.
     """
@@ -55,16 +56,7 @@ def get_vm(request, hostname_or_uuid, attrs=None, where=None, exists_ok=False, n
     attrs['dc'] = request.dc
     attrs['slavevm__isnull'] = True
 
-    try:
-        vm = _get_vm_from_db(api, attrs, exists_ok, extra, noexists_fail, request, sr, where)
-    except (ObjectNotFound, ObjectAlreadyExists, Vm.DoesNotExist) as original_exception:
-        # Checking whether user is not using uuid instead of the hostname, if not, throwing the original exception
-        del attrs['hostname']
-        attrs['uuid'] = hostname_or_uuid
-        try:
-            vm = _get_vm_from_db(api, attrs, exists_ok, extra, noexists_fail, request, sr, where)
-        except Exception:
-            raise original_exception
+    vm = _get_vm_from_db(api, attrs, exists_ok, extra, noexists_fail, request, sr, where)
 
     if check_node_status and request.method in check_node_status:
         if vm.node and vm.node.status not in Node.STATUS_OPERATIONAL:
