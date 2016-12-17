@@ -2,14 +2,12 @@ Changelog
 #########
 
 
-2.3.1 (unreleased)
 2.3.2 (unreleased)
 ========================================
 
 Features
 --------
 
-- Added support for nics.*.allowed_ips (multiple IPs per NIC) - `#3 <https://github.com/erigones/esdc-ce/issues/3>`__
 - Added info about Danube Cloud release edition into output of GET system_version - `#21 <https://github.com/erigones/esdc-ce/issues/21>`__
 
 Bugs
