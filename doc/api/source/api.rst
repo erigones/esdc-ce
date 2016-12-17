@@ -30,7 +30,7 @@ User Callbacks
 
 All asynchronous functions support user-defined callbacks where the result of a *PENDING* or *STARTED* task is sent once it has finished. Function parameters required to create a callback are ``cb_url`` and ``cb_method``. The task result is sent as a JSON-encoded string in the body of an HTTP request to the URL provided in the ``cb_url`` parameter. Valid choices for the ``cb_method`` parameter are :http:method:`GET`/:http:method:`POST`/:http:method:`PUT`/:http:method:`DELETE`. The default value is ``POST``.
 
-    |es example|:
+    |es example top|:
 
     .. sourcecode:: bash
 

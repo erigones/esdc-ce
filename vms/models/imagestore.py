@@ -46,12 +46,17 @@ class ImageStoreObject(dict):
     def web_data(self):
         """Return dict used in web templates"""
         manifest = self['manifest']
+        tags = manifest.get('tags', {})
+
         return {
             'name': manifest['name'],
             'alias': manifest['name'],
             'version': manifest['version'],
             'desc': manifest.get('description', '')[:128],
             'dc_bound': False,
+            'tags': tags.get(Image.TAGS_KEY, []),
+            'deploy': tags.get('deploy', False),
+            'resize': tags.get('resize', self['ostype'] in Image.ZONE),
             'manifest_url': self['manifest_url'],
         }
 

@@ -123,7 +123,7 @@ The default output is a JSON object with following attributes:
 * text - HTTP output in JSON format
 
 
-    |es example|:
+    |es example top|:
 
     .. sourcecode:: bash
 
@@ -145,7 +145,7 @@ csv
 
 Uses the python built-in csv module to print the API results in CSV (Comma Separated Values) format using the semicolon (``;``) as a field delimiter.
 
-    |es example|:
+    |es example top|:
 
     .. sourcecode:: bash
 
@@ -174,7 +174,7 @@ The tabulate output formatter requires `python tabulate <https://bitbucket.org/a
 * latex_booktabs
 
 
-    |es example|:
+    |es example top|:
 
     .. sourcecode:: bash
 

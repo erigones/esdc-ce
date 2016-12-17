@@ -88,11 +88,12 @@ def image_manage(request, name, data=None):
         :arg data.version: Image version (default: read from manifest)
         :type data.version: string
         :arg data.resize: Whether the image is able to resize the disk during an initial start or deploy process \
-(default: false)
+(default: read from manifest / true for OS zones, otherwise false)
         :type data.resize: boolean
-        :arg data.deploy: Whether the image is able to shut down the server after an initial start (default: false)
+        :arg data.deploy: Whether the image is able to shut down the server after an initial start \
+(default: read from manifest / false)
         :type data.deploy: boolean
-        :arg data.tags: Image tags will be inherited by VMs which will use this image (default: [])
+        :arg data.tags: Image tags will be inherited by VMs which will use this image (default: read from manifest)
         :type data.tags: array
         :arg data.dc_bound: Whether the disk image is bound to a datacenter (requires |SuperAdmin| permission) \
 (default: true)

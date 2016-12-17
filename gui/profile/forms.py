@@ -9,12 +9,12 @@ from gui.countries import COUNTRIES
 from gui.models import UserProfile
 from gui.widgets import EmailInput, URLInput, TelPrefixInput
 from gui.forms import SerializerForm
+from gui.utils import user_profile_company_only_form
 from gui.profile.utils import get_user_serializer, get_userprofile_serializer
 from api.accounts.user.base.views import user_manage
 from api.accounts.user.profile.views import userprofile_manage
 from api.accounts.user.sshkey.views import sshkey_manage
 from api.utils.views import call_api_view
-from core.utils import user_profile_company_only_form
 
 logger = getLogger(__name__)
 

@@ -27,7 +27,7 @@
       }
 
       .wrapper {
-        width: 320px;
+        width: 420px;
 
         line-height: 35px;
         -webkit-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.6), inset 1px 0px 0px rgba(255, 255, 255, 0.1), inset -1px 0px 0px rgba(255, 255, 255, 0.1), inset 0px -1px 0px rgba(255, 255, 255, 0.1);
@@ -56,11 +56,13 @@
 
 <body>
 
-  <div class="wrapper">
-    <h2>404</h2>
-    <div class="desc">{% trans "You seem to be lost in space" %}<br>
-      <a href="/">{% trans "Click here" %}</a> {% trans "to go home" %}.</div>
-  </div>
+  <a href="/">
+    <span class="wrapper">
+      <h2>404</h2>
+      <div class="desc">{% trans "Your ship has run ashore!" %}<br>
+      {% trans "Click here to return to mighty Danube Cloud current" %}.</div>
+    </span>
+  </a>
 
 </body>
 </html>

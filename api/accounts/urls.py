@@ -12,15 +12,15 @@ urlpatterns = patterns(
     # /accounts/user/profile - get
     url(r'^user/profile/$', 'userprofile_list', name='api_userprofile_list'),
     # /accounts/user/<username> - get, create, delete
-    url(r'^user/(?P<username>[A-Za-z0-9\@\._-]+)/$', 'user_manage', name='api_user_manage'),
+    url(r'^user/(?P<username>[A-Za-z0-9@.+_-]+)/$', 'user_manage', name='api_user_manage'),
     # /accounts/user/<username>/apikeys - get, set
-    url(r'^user/(?P<username>[A-Za-z0-9\@\._-]+)/apikeys/$', 'user_apikeys', name='api_use_apikeys'),
+    url(r'^user/(?P<username>[A-Za-z0-9@.+_-]+)/apikeys/$', 'user_apikeys', name='api_use_apikeys'),
     # /accounts/user/<username>/profile - get, set
-    url(r'^user/(?P<username>[A-Za-z0-9\@\._-]+)/profile/$', 'userprofile_manage', name='api_userprofile_manage'),
+    url(r'^user/(?P<username>[A-Za-z0-9@.+_-]+)/profile/$', 'userprofile_manage', name='api_userprofile_manage'),
     # /accounts/user/<username>/sshkey - get
-    url(r'^user/(?P<username>[A-Za-z0-9\@\._-]+)/sshkey/$', 'sshkey_list', name='api_sshkey_list'),
+    url(r'^user/(?P<username>[A-Za-z0-9@.+_-]+)/sshkey/$', 'sshkey_list', name='api_sshkey_list'),
     # /accounts/user/<username>/sshkey/<title> - get, create, delete
-    url(r'^user/(?P<username>[A-Za-z0-9\@\._-]+)/sshkey/(?P<title>[A-Za-z0-9\@\._-]+)/$', 'sshkey_manage',
+    url(r'^user/(?P<username>[A-Za-z0-9@.+_-]+)/sshkey/(?P<title>[A-Za-z0-9@.+_-]+)/$', 'sshkey_manage',
         name='api_sshkey_manage'),
 )
 

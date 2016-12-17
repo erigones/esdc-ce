@@ -79,6 +79,7 @@ class APINamespace(BaseNamespace):
 
     def log(self, msg, *args, **kwargs):
         if args:
+            # noinspection PyAugmentAssignment
             msg = msg % args
         level = kwargs.get('level', INFO)
         logger.log(level, '[%s - %s - %s] %s', self.username, self.session_key, self.sess_id, msg)

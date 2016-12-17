@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-11-11 20:50+0000\n"
+"POT-Creation-Date: 2016-12-06 16:37+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -449,8 +449,8 @@ msgstr ""
 
 #: dc/base/serializers.py:278
 msgid ""
-"Default operating system type. One of: 1 - Linux, 2 - SunOS, 3 - BSD, 4 - "
-"Windows, 5 - SunOS Zone,6 - Linux Zone."
+"Default operating system type. One of: 1 - Linux VM, 2 - SunOS VM, 3 - BSD "
+"VM, 4 - Windows VM, 5 - SunOS Zone, 6 - Linux Zone."
 msgstr ""
 
 #: dc/base/serializers.py:282
@@ -908,7 +908,7 @@ msgstr ""
 msgid "Default VM domain cannot be removed from datacenter"
 msgstr ""
 
-#: dc/image/api_views.py:72 image/base/api_views.py:308
+#: dc/image/api_views.py:72 image/base/api_views.py:309
 #: node/image/api_views.py:210
 msgid "Image is used by some VMs"
 msgstr "Image is used by some servers"
@@ -1361,16 +1361,16 @@ msgstr ""
 msgid "Could not parse image manifest."
 msgstr ""
 
-#: image/base/serializers.py:146
+#: image/base/serializers.py:150
 msgid "Invalid image manifest."
 msgstr ""
 
-#: image/base/serializers.py:157
+#: image/base/serializers.py:161
 #, python-format
 msgid "Image UUID is already registered by image \"%(name)s\"."
 msgstr ""
 
-#: image/base/serializers.py:176
+#: image/base/serializers.py:180
 #, python-format
 msgid "Image file URL is unreachable (%s)."
 msgstr ""

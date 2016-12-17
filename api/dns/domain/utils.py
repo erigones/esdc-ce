@@ -29,6 +29,7 @@ def get_domain(request, name, attrs=None, api=True, fetch_dc=False, data=None, c
             dom_filter = Q(user=user.id)
 
             if user.has_permission(request, DnsAdminPermission.name) and request.dcs:
+                # noinspection PyAugmentAssignment
                 dom_filter = dom_filter | Q(dc_bound__in=[dc.id for dc in request.dcs])
 
         if count_records:
@@ -97,6 +98,7 @@ def get_domains(request, prefetch_owner=False, prefetch_dc=False, count_records=
         dom_filter = Q(user=request.user.id)
 
         if request.user.has_permission(request, DnsAdminPermission.name) and request.dcs:
+            # noinspection PyAugmentAssignment
             dom_filter = dom_filter | Q(dc_bound__in=[dc.id for dc in request.dcs])
 
         qs = Domain.objects.order_by(*order_by).filter(dom_filter).exclude(access=Domain.INTERNAL)

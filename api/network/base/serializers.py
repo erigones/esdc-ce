@@ -35,7 +35,7 @@ class NetworkSerializer(s.InstanceSerializer):
     resolvers = s.IPAddressArrayField(source='resolvers_api', required=False, max_items=8)
     dns_domain = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\._-]*$', max_length=250, required=False)  # can be blank
     ptr_domain = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\._-]*$', max_length=250, required=False)  # can be blank
-    dhcp_passthrough = s.BooleanField()
+    dhcp_passthrough = s.BooleanField(default=False)
     dc_bound = s.BooleanField(source='dc_bound_bool', default=True)
     created = s.DateTimeField(read_only=True, required=False)
 
