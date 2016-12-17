@@ -92,6 +92,7 @@ def get_virt_objects(request, model, order_by, dc=None, include=(), **kwargs):
         qf = (Q(access__in=(model.PUBLIC, model.DISABLED))) | (Q(owner=request.user.pk) & Q(access=model.PRIVATE))
 
     if include:
+        # noinspection PyAugmentAssignment
         qf = qf | Q(pk__in=include)
 
     return qs.filter(qf).order_by(*order_by)

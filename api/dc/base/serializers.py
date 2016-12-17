@@ -448,6 +448,7 @@ class DcSettingsSerializer(s.InstanceSerializer):
                                                        'monitor all monitored virtual servers.'))
 
     def __init__(self, request, dc, *args, **kwargs):
+        # noinspection PyNoneFunctionAssignment
         global_settings = self.get_global_settings()
 
         if global_settings and not dc.is_default():  # Displaying global settings for non default DC

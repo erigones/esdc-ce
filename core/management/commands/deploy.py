@@ -22,11 +22,12 @@ class Command(BuildCommand):
             if update:
                 self.ctlsh('db_sync', '--force')
                 self.ctlsh('post_update')
-                self.display('You can now restart all Danube Cloud services:\n'
-                             '\tsystemctl restart erigonesd.service\n'
-                             '\tsystemctl restart esdc@gunicorn-api.service\n'
-                             '\tsystemctl restart esdc@gunicorn-gui.service\n'
-                             '\tsystemctl restart esdc@gunicorn-sio.service\n'
+                self.display(
+                    'You can now restart all Danube Cloud services:\n'
+                    '\tsystemctl restart erigonesd.service\n'
+                    '\tsystemctl restart esdc@gunicorn-api.service\n'
+                    '\tsystemctl restart esdc@gunicorn-gui.service\n'
+                    '\tsystemctl restart esdc@gunicorn-sio.service\n'
                 )
             else:
                 self.ctlsh('secret_key')
