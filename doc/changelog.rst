@@ -11,6 +11,8 @@ Features
 Bugs
 ----
 
+- Fixed post-update reload of application (api, sio) web services - `#20 <https://github.com/erigones/esdc-ce/issues/20>`__
+
 
 2.3.1 (released on 2016-12-15)
 ========================================
