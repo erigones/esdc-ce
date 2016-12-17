@@ -154,8 +154,8 @@ def system_update(state, version=None, key=None, cert=None):
 # noinspection PyUnusedLocal
 @Panel.register
 def system_version(state):
-    from core.version import __version__
-    return __version__
+    from core.utils import get_version
+    return get_version()
 
 
 # noinspection PyUnusedLocal

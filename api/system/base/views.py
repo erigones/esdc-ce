@@ -26,8 +26,8 @@ def system_version(request, data=None):
         :status 200: SUCCESS
         :status 403: Forbidden
     """
-    from core.version import __version__
-    return SuccessTaskResponse(request, {'hostname': socket.gethostname(), 'version': __version__}, dc_bound=False)
+    from core.utils import get_version
+    return SuccessTaskResponse(request, {'hostname': socket.gethostname(), 'version': get_version()}, dc_bound=False)
 
 
 # noinspection PyUnusedLocal

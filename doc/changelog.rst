@@ -8,6 +8,8 @@ Changelog
 Features
 --------
 
+- Added info about Danube Cloud release edition into output of GET system_version - `#21 <https://github.com/erigones/esdc-ce/issues/21>`__
+
 Bugs
 ----
 
