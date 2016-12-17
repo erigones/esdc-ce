@@ -12,6 +12,7 @@ Bugs
 ----
 
 - Fixed post-update reload of application (api, sio) web services - `#20 <https://github.com/erigones/esdc-ce/issues/20>`__
+- Fixed problem when reading big log files via GET system_logs and system_node_logs - `#22 <https://github.com/erigones/esdc-ce/issues/22>`__
 
 
 2.3.1 (released on 2016-12-15)

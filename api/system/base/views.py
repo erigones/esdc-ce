@@ -40,7 +40,7 @@ def system_logs(request, data=None):
     .. http:get:: /system/logs
 
         In case of a success, the response contains an object with log names as keys and contents of \
-log files as values. If the file does not exist the object values will be ``null``.
+log files (limited to last 10 kB) as values. If the file does not exist the object values will be ``null``.
 
         :DC-bound?:
             * |dc-no|

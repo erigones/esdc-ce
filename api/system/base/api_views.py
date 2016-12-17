@@ -6,6 +6,7 @@ from django.conf import settings
 from api.api_views import APIView
 from api.exceptions import ObjectNotFound
 from api.task.response import SuccessTaskResponse
+from que.utils import read_file
 
 logger = getLogger(__name__)
 
@@ -53,7 +54,7 @@ class SystemLogsView(APIView):
 
             try:
                 with open(abs_path_name) as f:
-                    log_files_result[log] = f.read()
+                    log_files_result[log] = read_file(f)
             except IOError as exc:
                 logger.error('Error retrieving log file %s (%s)', abs_path_name, exc)
                 # return an empty string for the log file which raised the exception

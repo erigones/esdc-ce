@@ -26,6 +26,7 @@ DEFAULT_DC = cq.conf.ERIGONES_DEFAULT_DC
 DEFAULT_TASK_PREFIX = [None, TT_EXEC, '1', TG_DC_BOUND, DEFAULT_DC]
 
 RE_TASK_PREFIX = re.compile(r'([a-zA-Z]+)')
+DEFAULT_FILE_READ_SIZE = 102400
 
 logger = getLogger(__name__)
 
@@ -517,3 +518,18 @@ def fetch_node_uuid():
         return validate_uuid(json.loads(stdout)['UUID'])
     except Exception as exc:
         raise NodeError('Could not fetch node UUID: %s' % exc)
+
+
+def read_file(fp, limit=DEFAULT_FILE_READ_SIZE):
+    """
+    Return output of fp.read() limited to `limit` bytes of output from the end of file.
+    """
+    fp.seek(0, 2)  # Go to EOF
+    total = fp.tell()
+
+    if total > limit:
+        fp.seek(total-limit)
+    else:
+        fp.seek(0)
+
+    return fp.read()
