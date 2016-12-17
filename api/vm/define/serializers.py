@@ -17,6 +17,7 @@ from api.dns.record.api_views import RecordView
 
 PERMISSION_DENIED = _('Permission denied')
 INVALID_HOSTNAMES = frozenset(['define', 'status', 'backup', 'snapshot'])
+NIC_ALLOWED_IPS_MAX = 8
 
 logger = getLogger(__name__)
 
@@ -932,7 +933,7 @@ class VmDefineNicSerializer(s.Serializer):
     allow_mac_spoofing = s.BooleanField(default=False)
     allow_restricted_traffic = s.BooleanField(default=False)
     allow_unfiltered_promisc = s.BooleanField(default=False)
-    allowed_ips = s.IPAddressArrayField(default=[], max_items=8)
+    allowed_ips = s.IPAddressArrayField(default=[], max_items=NIC_ALLOWED_IPS_MAX)
     monitoring = s.BooleanField(default=False)
     set_gateway = s.BooleanField(default=True)
 
