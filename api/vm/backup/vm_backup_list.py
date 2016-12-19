@@ -19,9 +19,9 @@ class VmBackupList(TaskAPIView):
     order_by_field_map = {'created': 'id', 'hostname': 'vm_hostname', 'disk_id': 'vm_disk_id'}
     LOCK = 'vm_backup vm:%s disk:%s'
 
-    def __init__(self, request, hostname, data, node=None):
+    def __init__(self, request, hostname_or_uuid, data, node=None):
         super(VmBackupList, self).__init__(request)
-        self.hostname = hostname
+        self.hostname_or_uuid = hostname_or_uuid
         self.data = data
         self.node = node
 
@@ -46,17 +46,17 @@ class VmBackupList(TaskAPIView):
         self.bkp_filter = self.filter_backup_vm(bkp_filter, data)
 
     def _init_vm(self):
-        request, data, hostname = self.request, self.data, self.hostname
+        request, data, hostname_or_uuid = self.request, self.data, self.hostname_or_uuid
         bkp_filter = {'dc': request.dc}
 
         try:
             if 'hostname' in data:  # Force original hostname
                 raise ObjectNotFound
             # No need to check vm.node.status; only backup node status is important
-            vm = get_vm(request, hostname, exists_ok=True, noexists_fail=True, check_node_status=None)
+            vm = get_vm(request, hostname_or_uuid, exists_ok=True, noexists_fail=True, check_node_status=None)
         except ObjectNotFound:
             vm = None
-            bkp_filter['vm_hostname'] = hostname
+            bkp_filter['vm_hostname'] = hostname_or_uuid
         else:
             bkp_filter['vm'] = vm
 
@@ -123,7 +123,7 @@ class VmBackupList(TaskAPIView):
         return 'api.vm.backup.tasks.vm_backup_list_cb', {self.obj._pk_key: self.obj.pk, 'bkp_ids': bkp_ids}
 
     def _apiview(self):
-        return {'view': 'vm_backup_list', 'method': self.request.method, 'hostname': self.hostname,
+        return {'view': 'vm_backup_list', 'method': self.request.method, 'hostname': self.bkp.vm_hostname_real,
                 'disk_id': self.disk_id, 'bkpnames': self.bkpnames, 'vm': bool(self.bkp.vm)}
 
     def _detail(self, bkpnames=None):
@@ -145,7 +145,6 @@ class VmBackupList(TaskAPIView):
         bkp = bkps[0]
         vm = bkp.vm
         self.bkp = bkp
-        self.hostname = bkp.vm_hostname_real
         self.disk_id = bkp.array_disk_id
 
         if vm:

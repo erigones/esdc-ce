@@ -178,12 +178,12 @@ def image_manage(request, name, data=None):
 
 @api_view(('POST',))
 @request_data(permissions=(IsImageAdmin,))
-def image_snapshot(request, hostname, snapname, name, data=None):
+def image_snapshot(request, hostname_or_uuid, snapname, name, data=None):
     """
-    Create (:http:post:`POST </vm/(hostname)/snapshot/(snapname)/image/(name)>`)
+    Create (:http:post:`POST </vm/(hostname_or_uuid)/snapshot/(snapname)/image/(name)>`)
     a server disk image from a disk snapshot.
 
-    .. http:post:: /vm/(hostname)/snapshot/(snapname)/image/(name)
+    .. http:post:: /vm/(hostname_or_uuid)/snapshot/(snapname)/image/(name)
 
         :DC-bound?:
             * |dc-yes|
@@ -193,8 +193,8 @@ def image_snapshot(request, hostname, snapname, name, data=None):
             * |async-yes|
         :arg name: **required** - Server disk image name
         :type name: string
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
         :arg snapname: **required** - Snapshot name
         :type snapname: string
         :arg data.disk_id: **required** - Disk number/ID (default: 1)
@@ -230,7 +230,7 @@ def image_snapshot(request, hostname, snapname, name, data=None):
     from api.vm.snapshot.utils import get_disk_id
     from vms.models import Snapshot
 
-    vm = get_vm(request, hostname, exists_ok=True, noexists_fail=True)
+    vm = get_vm(request, hostname_or_uuid, exists_ok=True, noexists_fail=True)
     disk_id, real_disk_id, zfs_filesystem = get_disk_id(request, vm, data)
     snap = get_object(request, Snapshot, {'name': snapname, 'vm': vm, 'disk_id': real_disk_id},
                       exists_ok=True, noexists_fail=True)

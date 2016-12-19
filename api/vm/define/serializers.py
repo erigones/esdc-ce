@@ -68,6 +68,7 @@ def validate_nic_tags(vm, new_node=None, new_net=None):
 
 
 class VmDefineSerializer(VmBaseSerializer):
+    uuid = s.CharField(read_only=True)
     hostname = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\.-]+[A-Za-z0-9]$', max_length=128, min_length=4)
     alias = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\.-]+[A-Za-z0-9]$', max_length=24, min_length=4, required=False)
     ostype = s.IntegerChoiceField(choices=Vm.OSTYPE, default=settings.VMS_VM_OSTYPE_DEFAULT)

@@ -20,10 +20,10 @@ class VmSnapshotList(APIView):
     order_by_field_map = {'created': 'id', 'hostname': 'vm__hostname'}
     LOCK = 'vm_snapshot vm:%s disk:%s'
 
-    def __init__(self, request, hostname, data):
+    def __init__(self, request, hostname_or_uuid, data):
         super(VmSnapshotList, self).__init__(request)
         self.data = data
-        self.vm = get_vm(request, hostname, exists_ok=True, noexists_fail=True)
+        self.vm = get_vm(request, hostname_or_uuid, exists_ok=True, noexists_fail=True)
 
     def _check_vm_status(self):
         request, vm = self.request, self.vm

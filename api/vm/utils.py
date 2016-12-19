@@ -1,7 +1,7 @@
 from django.db.models import Q
 from django.conf import settings
 
-from api.exceptions import NodeIsNotOperational
+from api.exceptions import NodeIsNotOperational, ObjectNotFound
 from api.utils.db import get_object
 from gui.models import User
 from vms.models import Storage, NodeStorage, Node, Vm, VmTemplate, Image, Subnet, Iso
@@ -10,10 +10,31 @@ from vms.models import Storage, NodeStorage, Node, Vm, VmTemplate, Image, Subnet
 QNodeNullOrLicensed = Q(node__isnull=True) | ~Q(node__status=Node.UNLICENSED)
 
 
-def get_vm(request, hostname, attrs=None, where=None, exists_ok=False, noexists_fail=False, sr=('node',), api=True,
-           extra=None, check_node_status=('POST', 'PUT', 'DELETE')):
+def _get_vm_from_db(api, attrs, exists_ok, extra, noexists_fail, request, sr, where):
     """
-    Call get_object for Vm model identified by hostname. If attributes are not
+    Used in get_vm below.
+    """
+    if api:
+        vm = get_object(request, Vm, attrs, where=where, exists_ok=exists_ok, noexists_fail=noexists_fail, sr=sr,
+                        extra=extra)
+    else:
+        qs = Vm.objects
+
+        if sr:
+            qs = qs.select_related(*sr)
+
+        if where:
+            qs = qs.filter(where)
+
+        vm = qs.get(**attrs)
+
+    return vm
+
+
+def get_vm(request, hostname_or_uuid, attrs=None, where=None, exists_ok=False, noexists_fail=False, sr=('node',),
+           api=True, extra=None, check_node_status=('POST', 'PUT', 'DELETE')):
+    """
+    Call get_object for Vm model identified by hostname or uuid. If attributes are not
     specified then set them to check owner and node status.
     Also acts as IsVmOwner permission.
     """
@@ -31,23 +52,22 @@ def get_vm(request, hostname, attrs=None, where=None, exists_ok=False, noexists_
     if not request.user.is_admin(request):
         attrs['owner'] = request.user
 
-    attrs['hostname'] = hostname
+    attrs['hostname'] = hostname_or_uuid
     attrs['dc'] = request.dc
     attrs['slavevm__isnull'] = True
 
-    if api:
-        vm = get_object(request, Vm, attrs, where=where, exists_ok=exists_ok, noexists_fail=noexists_fail, sr=sr,
-                        extra=extra)
-    else:
-        if sr:
-            qs = Vm.objects.select_related(*sr)
-        else:
-            qs = Vm.objects
-
-        if where:
-            vm = qs.filter(where).get(**attrs)
-        else:
-            vm = qs.get(**attrs)
+    try:
+        vm = _get_vm_from_db(api, attrs, exists_ok, extra, noexists_fail, request, sr, where)
+    except (ObjectNotFound, Vm.DoesNotExist) as original_exception:
+        del attrs['hostname']
+        attrs['uuid'] = hostname_or_uuid
+        try:
+            vm = _get_vm_from_db(api, attrs, exists_ok, extra, noexists_fail, request, sr, where)
+        except Exception:
+            # Return to original state and re-raise the original exception
+            del attrs['uuid']
+            attrs['hostname'] = hostname_or_uuid
+            raise original_exception
 
     if check_node_status and request.method in check_node_status:
         if vm.node and vm.node.status not in Node.STATUS_OPERATIONAL:

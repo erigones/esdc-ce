@@ -33,15 +33,15 @@ def vm_status_list(request, data=None):
 #: vm_status:   PUT: running, stopped, stopping, frozen
 @api_view(('GET', 'PUT'))
 @request_data()  # get_vm() = IsVmOwner
-def vm_status(request, hostname, action=None, data=None):
+def vm_status(request, hostname_or_uuid, action=None, data=None):
     """
-    Get (:http:get:`GET </vm/(hostname)/status>`) or
-    set (:http:put:`PUT </vm/(hostname)/status/start>`) VM status by using
-    :http:put:`start </vm/(hostname)/status/start>`,
-    :http:put:`stop </vm/(hostname)/status/stop>` or
-    :http:put:`reboot </vm/(hostname)/status/reboot>` action.
+    Get (:http:get:`GET </vm/(hostname_or_uuid)/status>`) or
+    set (:http:put:`PUT </vm/(hostname_or_uuid)/status/start>`) VM status by using
+    :http:put:`start </vm/(hostname_or_uuid)/status/start>`,
+    :http:put:`stop </vm/(hostname_or_uuid)/status/stop>` or
+    :http:put:`reboot </vm/(hostname_or_uuid)/status/reboot>` action.
 
-    .. http:get:: /vm/(hostname)/status
+    .. http:get:: /vm/(hostname_or_uuid)/status
 
         Retrieves current status from database.
 
@@ -51,15 +51,15 @@ def vm_status(request, hostname, action=None, data=None):
             * |VmOwner|
         :Asynchronous?:
             * |async-no|
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
         :status 200: SUCCESS
         :status 400: FAILURE
         :status 403: Forbidden
         :status 404: VM not found
         :status 423: Node is not operational / VM is not operational
 
-    .. http:get:: /vm/(hostname)/status/current
+    .. http:get:: /vm/(hostname_or_uuid)/status/current
 
         Retrieves current status from compute node.
 
@@ -69,8 +69,8 @@ def vm_status(request, hostname, action=None, data=None):
             * |VmOwner|
         :Asynchronous?:
             * |async-yes|
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
         :status 200: SUCCESS
         :status 201: PENDING
         :status 400: FAILURE
@@ -78,7 +78,7 @@ def vm_status(request, hostname, action=None, data=None):
         :status 404: VM not found
         :status 423: Node is not operational / VM is not operational
 
-    .. http:put:: /vm/(hostname)/status/start
+    .. http:put:: /vm/(hostname_or_uuid)/status/start
 
         :DC-bound?:
             * |dc-yes|
@@ -86,8 +86,8 @@ def vm_status(request, hostname, action=None, data=None):
             * |VmOwner|
         :Asynchronous?:
             * |async-yes|
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
         :arg data.update: Update VM configuration (if changed) on compute node (default: true)
         :type data.update: boolean
         :arg data.cdimage: Name of the primary ISO image to boot from (default: null)
@@ -106,7 +106,7 @@ def vm_status(request, hostname, action=None, data=None):
         :status 423: Node is not operational / VM is not operational
         :status 428: VM must be updated first / VM is not installed
 
-    .. http:put:: /vm/(hostname)/status/stop
+    .. http:put:: /vm/(hostname_or_uuid)/status/stop
 
         :DC-bound?:
             * |dc-yes|
@@ -115,8 +115,8 @@ def vm_status(request, hostname, action=None, data=None):
             * |Admin| `(only for freeze=true or unfreeze=true)`
         :Asynchronous?:
             * |async-yes|
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
         :arg data.force: Force change of the status (default: false)
         :type data.force: boolean
         :arg data.freeze: Set frozen status after successful stop action (default: false)
@@ -131,7 +131,7 @@ def vm_status(request, hostname, action=None, data=None):
         :status 417: Bad action
         :status 423: Node is not operational / VM is not operational / VM is already stopping
 
-    .. http:put:: /vm/(hostname)/status/reboot
+    .. http:put:: /vm/(hostname_or_uuid)/status/reboot
 
         :DC-bound?:
             * |dc-yes|
@@ -139,8 +139,8 @@ def vm_status(request, hostname, action=None, data=None):
             * |VmOwner|
         :Asynchronous?:
             * |async-yes|
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
         :arg data.force: Force change of the status (default: false)
         :type data.force: boolean
         :status 200: SUCCESS
@@ -152,4 +152,4 @@ def vm_status(request, hostname, action=None, data=None):
         :status 423: Node is not operational / VM is not operational / VM is already stopping
 
     """
-    return VmStatus(request, hostname, action, data).response()
+    return VmStatus(request, hostname_or_uuid, action, data).response()
