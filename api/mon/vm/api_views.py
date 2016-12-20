@@ -18,7 +18,7 @@ class VmMonitoringView(APIView):
     """
     def __init__(self, request, hostname_or_uuid, data):
         super(VmMonitoringView, self).__init__(request)
-        self.vm = get_vm(request, hostname_or_uuid, sr=('dc',))
+        self.vm = get_vm(request, hostname_or_uuid, sr=('dc',), exists_ok=True, noexists_fail=True)
         self.data = data
 
     def get(self, many=False):
@@ -56,7 +56,7 @@ class VmMonitoringView(APIView):
 class VmSLAView(APIView):
     def __init__(self, request, hostname_or_uuid, yyyymm, data):
         super(VmSLAView, self).__init__(request)
-        self.vm = get_vm(request, hostname_or_uuid, sr=())
+        self.vm = get_vm(request, hostname_or_uuid, sr=(), exists_ok=True, noexists_fail=True)
         self.yyyymm = yyyymm
         self.data = data
 
@@ -90,7 +90,7 @@ class VmHistoryView(APIView):
 
     def __init__(self, request, hostname_or_uuid, graph_type, data):
         super(VmHistoryView, self).__init__(request)
-        self.vm = get_vm(request, hostname_or_uuid, sr=('dc',))
+        self.vm = get_vm(request, hostname_or_uuid, sr=('dc',), exists_ok=True, noexists_fail=True)
         self.graph_type = graph_type
         self.data = data
 

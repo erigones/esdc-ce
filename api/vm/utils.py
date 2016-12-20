@@ -4,19 +4,19 @@ from django.conf import settings
 from api.exceptions import NodeIsNotOperational, ObjectNotFound
 from api.utils.db import get_object
 from gui.models import User
+from que.utils import validate_uuid
 from vms.models import Storage, NodeStorage, Node, Vm, VmTemplate, Image, Subnet, Iso
-
 
 QNodeNullOrLicensed = Q(node__isnull=True) | ~Q(node__status=Node.UNLICENSED)
 
 
-def _get_vm_from_db(api, attrs, exists_ok, extra, noexists_fail, request, sr, where):
+def _get_vm_from_db(request, api, attrs, sr, where, **kwargs):
     """
     Used in get_vm below.
     """
     if api:
-        vm = get_object(request, Vm, attrs, where=where, exists_ok=exists_ok, noexists_fail=noexists_fail, sr=sr,
-                        extra=extra)
+        vm = get_object(request, Vm, attrs, where=where, sr=sr,
+                        **kwargs)
     else:
         qs = Vm.objects
 
@@ -57,12 +57,19 @@ def get_vm(request, hostname_or_uuid, attrs=None, where=None, exists_ok=False, n
     attrs['slavevm__isnull'] = True
 
     try:
-        vm = _get_vm_from_db(api, attrs, exists_ok, extra, noexists_fail, request, sr, where)
+        vm = _get_vm_from_db(request, api=api, attrs=attrs, exists_ok=exists_ok, extra=extra,
+                             noexists_fail=noexists_fail, sr=sr, where=where)
     except (ObjectNotFound, Vm.DoesNotExist) as original_exception:
+        try:
+            validate_uuid(hostname_or_uuid)
+        except ValueError:
+            raise original_exception
+
         del attrs['hostname']
         attrs['uuid'] = hostname_or_uuid
         try:
-            vm = _get_vm_from_db(api, attrs, exists_ok, extra, noexists_fail, request, sr, where)
+            vm = _get_vm_from_db(request, api=api, attrs=attrs, exists_ok=exists_ok, extra=extra,
+                                 noexists_fail=noexists_fail, sr=sr, where=where)
         except Exception:
             # Return to original state and re-raise the original exception
             del attrs['uuid']
@@ -112,7 +119,7 @@ def get_virt_objects(request, model, order_by, dc=None, include=(), **kwargs):
         qf = (Q(access__in=(model.PUBLIC, model.DISABLED))) | (Q(owner=request.user.pk) & Q(access=model.PRIVATE))
 
     if include:
-        qf = qf | Q(pk__in=include)
+        qf |= Q(pk__in=include)
 
     return qs.filter(qf).order_by(*order_by)
 

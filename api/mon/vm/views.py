@@ -36,8 +36,8 @@ every :py:func:`monitored VM <api.vm.define.views.vm_define>`.
 
     .. http:put:: /mon/vm/(hostname_or_uuid)/monitoring
 
-        .. note:: Please use :http:put:`/vm/(hostname_or_uuid)` to update the monitoring interface definition of an already \
-deployed VM after changing any of the VM's monitoring interface attributes.
+        .. note:: Please use :http:put:`/vm/(hostname_or_uuid)` to update the monitoring interface definition of \
+an already deployed VM after changing any of the VM's monitoring interface attributes.
 
         .. note:: By setting the value of ``port``, ``dns``, ``useip`` and/or ``proxy`` parameter(s) to ``null``, the \
 parameter(s) will be set to a default value.

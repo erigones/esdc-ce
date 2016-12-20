@@ -69,7 +69,7 @@ def vm_define_snapshot_list(request, hostname_or_uuid, data=None):
         :Asynchronous?:
             * |async-no|
         :arg hostname_or_uuid: **required** - Server hostname or uuid
-        :typehostname_or_uuid: string
+        :type hostname_or_uuid: string
         :arg data.full: Return list of objects with all snapshot definition details (default: false)
         :type data.full: boolean
         :arg data.disk_id: Filter by disk number/ID
@@ -84,7 +84,7 @@ def vm_define_snapshot_list(request, hostname_or_uuid, data=None):
         :status 404: VM not found
         :status 412: Invalid disk_id
     """
-    vm = get_vm(request,hostname_or_uuid, exists_ok=True, noexists_fail=True, sr=('node', 'owner'))
+    vm = get_vm(request, hostname_or_uuid, exists_ok=True, noexists_fail=True, sr=('node', 'owner'))
 
     query_filter = {'vm': vm}
     query_filter = filter_disk_id(vm, query_filter, data)
@@ -124,7 +124,7 @@ def vm_define_snapshot(request, hostname_or_uuid, snapdef, data=None):
         :Asynchronous?:
             * |async-no|
         :arg hostname_or_uuid: **required** - Server hostname or uuid
-        :type hostname: string
+        :type hostname_or_uuid: string
         :arg snapdef: **required** - Snapshot definition name
         :type snapdef: string
         :arg data.disk_id: **required** - Disk number/ID (default: 1)

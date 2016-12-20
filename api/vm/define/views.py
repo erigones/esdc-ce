@@ -213,7 +213,8 @@ Items will be set as static routes in the OS (SunOS Zone only)
         :status 404: VM not found
         :status 423: VM is not operational / VM is not notcreated / VM is locked or has slave VMs
     """
-    vm = get_vm(request, hostname_or_uuid, sr=('owner', 'node', 'template'), check_node_status=None)
+    vm = get_vm(request, hostname_or_uuid, sr=('owner', 'node', 'template'), check_node_status=None,
+                noexists_fail=False, exists_ok=False)
 
     return VmDefineView(request).response(vm, data, hostname_or_uuid=hostname_or_uuid)
 
@@ -225,7 +226,8 @@ def vm_define_user(request, hostname_or_uuid, data=None):
     vm_define alternative used only for updating hostname and alias.
     Used by non-admin VM owners from GUI.
     """
-    vm = get_vm(request, hostname_or_uuid, sr=('owner', 'node', 'template'), check_node_status=None)
+    vm = get_vm(request, hostname_or_uuid, sr=('owner', 'node', 'template'), check_node_status=None,
+                exists_ok=True, noexists_fail=True)
     allowed = {'hostname', 'alias', 'installed'}
 
     for i in data.keys():  # A copy of keys, because dict can change during iteration
