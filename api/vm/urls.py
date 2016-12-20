@@ -78,7 +78,8 @@ urlpatterns = patterns(
 
     # image from snapshot
     # /vm/<hostname_or_uuid>/snapshot/<snapname>/image/<name> - create
-    url(r'^(?P<hostname_or_uuid>[A-Za-z0-9\._-]+)/snapshot/(?P<snapname>[A-Za-z0-9\._-]+)/image/(?P<name>[A-Za-z0-9\._-]+)/$',
+    url(r'^(?P<hostname_or_uuid>[A-Za-z0-9\._-]+)'
+        r'/snapshot/(?P<snapname>[A-Za-z0-9\._-]+)/image/(?P<name>[A-Za-z0-9\._-]+)/$',
         'image_snapshot', name='api_image_snapshot'),
 
     # base

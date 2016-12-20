@@ -11,7 +11,8 @@ __all__ = ('vm_migrate', 'vm_dc')
 @request_data(permissions=(IsAdmin,))
 def vm_migrate(request, hostname_or_uuid, data=None):
     """
-    Migrate (:http:put:`PUT </vm/(hostname_or_uuid)/migrate>`) server to another compute node and/or disks to another storage.
+    Migrate (:http:put:`PUT </vm/(hostname_or_uuid)/migrate>`) server to another compute node and/or disks to another \
+storage.
 
     .. note:: A dummy (DB only) slave server is created during the migration process to reserve the same amount of \
 resources on target compute node in server's datacenter.
