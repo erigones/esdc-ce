@@ -1285,7 +1285,7 @@ class VmDefineNicSerializer(s.Serializer):
                     self._ips_old = self._ips.exclude(ip__in=ip_list)
 
                 self._ips = _ips
-                attrs['allowed_ips'] = ip_list
+                attrs['allowed_ips'] = list(ip_list)
         else:
             # changing net + allowed_ips not specified, but already set on nic (with old net)
             if self._net_old and self._ips:
