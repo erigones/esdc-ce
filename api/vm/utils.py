@@ -1,16 +1,15 @@
 from django.db.models import Q
 from django.conf import settings
 
-from api.exceptions import NodeIsNotOperational, ObjectNotFound
+from api.exceptions import NodeIsNotOperational
 from api.utils.db import get_object
 from gui.models import User
-from que.utils import validate_uuid
 from vms.models import Storage, NodeStorage, Node, Vm, VmTemplate, Image, Subnet, Iso
 
 QNodeNullOrLicensed = Q(node__isnull=True) | ~Q(node__status=Node.UNLICENSED)
 
 
-def _get_vm_from_db(request, api, attrs, sr, where, **kwargs):
+def _get_vm_from_db(request, attrs, where, sr, api, **kwargs):
     """
     Used in get_vm below.
     """
@@ -52,29 +51,18 @@ def get_vm(request, hostname_or_uuid, attrs=None, where=None, exists_ok=False, n
     if not request.user.is_admin(request):
         attrs['owner'] = request.user
 
-    attrs['hostname'] = hostname_or_uuid
     attrs['dc'] = request.dc
     attrs['slavevm__isnull'] = True
 
+    adjusted_where = (Q(hostname=hostname_or_uuid) | Q(uuid=hostname_or_uuid)) & where
+
     try:
         vm = _get_vm_from_db(request, api=api, attrs=attrs, exists_ok=exists_ok, extra=extra,
+                             noexists_fail=noexists_fail, sr=sr, where=adjusted_where)
+    except Vm.MultipleObjectsReturned:
+        attrs['hostname'] = hostname_or_uuid
+        vm = _get_vm_from_db(request, api=api, attrs=attrs, exists_ok=exists_ok, extra=extra,
                              noexists_fail=noexists_fail, sr=sr, where=where)
-    except (ObjectNotFound, Vm.DoesNotExist) as original_exception:
-        try:
-            validate_uuid(hostname_or_uuid)
-        except ValueError:
-            raise original_exception
-
-        del attrs['hostname']
-        attrs['uuid'] = hostname_or_uuid
-        try:
-            vm = _get_vm_from_db(request, api=api, attrs=attrs, exists_ok=exists_ok, extra=extra,
-                                 noexists_fail=noexists_fail, sr=sr, where=where)
-        except Exception:
-            # Return to original state and re-raise the original exception
-            del attrs['uuid']
-            attrs['hostname'] = hostname_or_uuid
-            raise original_exception
 
     if check_node_status and request.method in check_node_status:
         if vm.node and vm.node.status not in Node.STATUS_OPERATIONAL:
