@@ -26,8 +26,8 @@ def system_version(request, data=None):
         :status 200: SUCCESS
         :status 403: Forbidden
     """
-    from core.version import __version__
-    return SuccessTaskResponse(request, {'hostname': socket.gethostname(), 'version': __version__}, dc_bound=False)
+    from core.utils import get_version
+    return SuccessTaskResponse(request, {'hostname': socket.gethostname(), 'version': get_version()}, dc_bound=False)
 
 
 # noinspection PyUnusedLocal
@@ -40,7 +40,7 @@ def system_logs(request, data=None):
     .. http:get:: /system/logs
 
         In case of a success, the response contains an object with log names as keys and contents of \
-log files as values. If the file does not exist the object values will be ``null``.
+log files (limited to last 10 kB) as values. If the file does not exist the object values will be ``null``.
 
         :DC-bound?:
             * |dc-no|

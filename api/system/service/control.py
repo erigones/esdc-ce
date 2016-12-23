@@ -204,11 +204,11 @@ class SystemReloadThread(Thread):
         return 'erigonesd:mgmt'
 
     def reload_service(self, name):
-        # erigonesd:mgmt does not support reloading
-        if name == 'erigonesd:mgmt':
-            self.sctrl.restart(name)
-        else:
+        # Reload gunicorn-gui and restart gunicorn-{sio|api} and erigonesd - issue esdc-ce#20
+        if name == 'app-gui':
             self.sctrl.reload(name)
+        else:
+            self.sctrl.restart(name)
 
     def reload_all(self):
         last = None

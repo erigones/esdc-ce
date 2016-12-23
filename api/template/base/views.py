@@ -79,8 +79,8 @@ def template_manage(request, name, data=None):
         :type data.owner: string
         :arg data.desc: Template image description
         :type data.desc: string
-        :arg data.ostype: Operating system type (null - all OS types, 1 - Linux, 2 - SunOS, 3 - BSD, 4 - Windows, \
-5 - SunOS Zone, 6 - Linux Zone) (default: null)
+        :arg data.ostype: Operating system type (null - all OS types, 1 - Linux VM, 2 - SunOS VM, 3 - BSD VM, \
+4 - Windows VM, 5 - SunOS Zone, 6 - Linux Zone) (default: null)
         :type data.ostype: integer
         :arg data.dc_bound: Whether the server template is bound to a datacenter (requires |SuperAdmin| permission) \
 (default: true)
@@ -127,8 +127,8 @@ def template_manage(request, name, data=None):
         :type data.owner: string
         :arg data.desc: Template image description
         :type data.desc: string
-        :arg data.ostype: Operating system type (null - all OS types, 1 - Linux, 2 - SunOS, 3 - BSD, 4 - Windows, \
-5 - SunOS Zone, 6 - Linux Zone)
+        :arg data.ostype: Operating system type (null - all OS types, 1 - Linux VM, 2 - SunOS VM, 3 - BSD VM, \
+4 - Windows VM, 5 - SunOS Zone, 6 - Linux Zone)
         :type data.ostype: integer
         :arg data.dc_bound: Whether the server template is bound to a datacenter (requires |SuperAdmin| permission)
         :type data.dc_bound: boolean

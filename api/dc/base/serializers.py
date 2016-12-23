@@ -275,9 +275,9 @@ class DcSettingsSerializer(s.InstanceSerializer):
                                       help_text=_('Whether to enable support for SunOS zones in '
                                                   'this virtual datacenter.'))
     VMS_VM_OSTYPE_DEFAULT = s.IntegerChoiceField(label='VMS_VM_OSTYPE_DEFAULT', choices=Vm.OSTYPE,
-                                                 help_text=_('Default operating system type. One of: 1 - Linux, '
-                                                             '2 - SunOS, 3 - BSD, 4 - Windows, 5 - SunOS Zone,'
-                                                             '6 - Linux Zone.'))
+                                                 help_text=_('Default operating system type. One of: 1 - Linux VM, '
+                                                             '2 - SunOS VM, 3 - BSD VM, 4 - Windows VM, '
+                                                             '5 - SunOS Zone, 6 - Linux Zone.'))
     VMS_VM_MONITORED_DEFAULT = s.BooleanField(label='VMS_VM_MONITORED_DEFAULT',
                                               help_text=_('Controls whether server synchronization with the monitoring '
                                                           'system is enabled by default.'))
@@ -448,6 +448,7 @@ class DcSettingsSerializer(s.InstanceSerializer):
                                                        'monitor all monitored virtual servers.'))
 
     def __init__(self, request, dc, *args, **kwargs):
+        # noinspection PyNoneFunctionAssignment
         global_settings = self.get_global_settings()
 
         if global_settings and not dc.is_default():  # Displaying global settings for non default DC

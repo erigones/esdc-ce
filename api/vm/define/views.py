@@ -90,8 +90,8 @@ def vm_define(request, hostname_or_uuid, data=None):
         :type data.alias: string
         :arg data.template: VM template name (default: null)
         :type data.template: string
-        :arg data.ostype: Operating system type (1 - Linux, 2 - SunOS, 3 - BSD, 4 - Windows, 5 - SunOS Zone, \
-6 - Linux Zone) (default: 1 [if not specified in template])
+        :arg data.ostype: Operating system type (1 - Linux VM, 2 - SunOS VM, 3 - BSD VM, 4 - Windows VM, \
+5 - SunOS Zone, 6 - Linux Zone) (default: 1 [if not specified in template])
         :type data.ostype: integer
         :arg data.vcpus: **required** (if not specified in template) - Number of virtual CPUs inside VM (1 - 64)
         :type data.vcpus: integer

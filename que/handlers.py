@@ -9,7 +9,7 @@ from celery.worker.control import Panel
 
 from que import Q_FAST, Q_MGMT
 from que.erigonesd import cq
-from que.utils import generate_internal_task_id, log_task_callback, fetch_node_uuid
+from que.utils import generate_internal_task_id, log_task_callback, fetch_node_uuid, read_file
 from que.tasks import execute_sysinfo
 from que.exceptions import NodeError
 
@@ -154,8 +154,8 @@ def system_update(state, version=None, key=None, cert=None):
 # noinspection PyUnusedLocal
 @Panel.register
 def system_version(state):
-    from core.version import __version__
-    return __version__
+    from core.utils import get_version
+    return get_version()
 
 
 # noinspection PyUnusedLocal
@@ -172,7 +172,7 @@ def system_read_logs(state, log_files):
 
         try:
             with open(abs_path_name) as f:
-                log_files_result[log] = f.read()
+                log_files_result[log] = read_file(f)
         except IOError as exc:
             logger.error('Error retrieving log file %s (%s)', abs_path_name, exc)
             # return an empty string for the log file which raised the exception

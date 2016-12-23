@@ -301,6 +301,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
         alias = alias.strip().lower()
         suffix = ''
         i = 0
+        # noinspection PyUnusedLocal
         hostname = alias
 
         while True:

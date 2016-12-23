@@ -73,6 +73,7 @@ class TaskLock(object):
 
     def _set_reverse(self, lock_value, timeout=None):
         """Store reverse relation: lock value -> lock key - always fail silently"""
+        # noinspection PyNoneFunctionAssignment
         rkey = self._reverse_key(lock_value)
 
         try:
@@ -85,6 +86,7 @@ class TaskLock(object):
 
     def _delete_reverse(self, lock_value):
         """Delete reverse relation for lock value - always fail silently"""
+        # noinspection PyNoneFunctionAssignment
         rkey = self._reverse_key(lock_value)
 
         try:

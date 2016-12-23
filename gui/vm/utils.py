@@ -482,7 +482,8 @@ class ImportExportBase(object):
                 # },
             ],
             'os type': None,  # **required** (if not specified in template) - Operating system type
-                              # (1 - Linux, 2 - SunOS, 3 - BSD, 4 - Windows, 5 - SunOS Container)
+                              # (1 - Linux VM, 2 - SunOS VM, 3 - BSD VM, 4 - Windows VM, 5 - SunOS Zone,
+                              #  6 - Linux Zone)
             'tags': None,   # VM tags name (default: null)
             'node': None,   # Name of the host system
                             # (default: null => will be chosen automatically just before the VM is created)

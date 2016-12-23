@@ -12,7 +12,7 @@ ExcludeInternalUsers = ~Q(id=settings.SYSTEM_USER)
 ExcludeInternalProfileUsers = ~Q(user__id=settings.SYSTEM_USER)
 
 
-def get_user(request, username, where=None, **kwargs):
+def get_user(request, username, where=None, sr=('dc_bound',), **kwargs):
     user = request.user
 
     if where:
@@ -22,11 +22,11 @@ def get_user(request, username, where=None, **kwargs):
 
     if getattr(request, 'is_profile_owner', False):
         if user.username == username:  # IsProfileOwner
-            return get_object(request, User, {'username': username}, where=where, **kwargs)
+            return get_object(request, User, {'username': username}, where=where, sr=sr, **kwargs)
         else:
             raise PermissionDenied
     else:  # Is SuperAdmin or UserAdmin
-        return get_virt_object(request, User, get_attrs={'username': username}, where=where, **kwargs)
+        return get_virt_object(request, User, sr=sr, get_attrs={'username': username}, where=where, **kwargs)
 
 
 def get_users(request, where=None, **kwargs):

@@ -49,7 +49,7 @@ class UserSerializer(ApiKeysSerializer):
                        'callback_key', 'groups', 'dc_bound', 'password')
     _default_fields_ = ('username', 'is_super_admin', 'is_active', 'api_access', 'password')
 
-    username = s.RegexField(r'^[A-Za-z0-9\@\._-]*$', max_length=254)
+    username = s.RegexField(r'^[A-Za-z0-9@.+_-]*$', max_length=254)
     email = s.EmailField(max_length=254)
     first_name = s.SafeCharField(max_length=30)
     last_name = s.SafeCharField(max_length=30)
