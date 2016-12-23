@@ -53,12 +53,12 @@ def get_vm(request, hostname_or_uuid, attrs=None, where=None, exists_ok=False, n
 
     attrs['dc'] = request.dc
     attrs['slavevm__isnull'] = True
-
-    adjusted_where = (Q(hostname=hostname_or_uuid) | Q(uuid=hostname_or_uuid)) & where
+    # We want to filter hostname or uuid in one query instead of putting them one by one in the get attributes
+    hostname_or_uuid_query = (Q(hostname=hostname_or_uuid) | Q(uuid=hostname_or_uuid)) & where
 
     try:
         vm = _get_vm_from_db(request, api=api, attrs=attrs, exists_ok=exists_ok, extra=extra,
-                             noexists_fail=noexists_fail, sr=sr, where=adjusted_where)
+                             noexists_fail=noexists_fail, sr=sr, where=hostname_or_uuid_query)
     except Vm.MultipleObjectsReturned:
         attrs['hostname'] = hostname_or_uuid
         vm = _get_vm_from_db(request, api=api, attrs=attrs, exists_ok=exists_ok, extra=extra,
