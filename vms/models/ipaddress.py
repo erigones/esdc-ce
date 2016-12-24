@@ -65,6 +65,13 @@ class IPAddress(models.Model):
         return self.ip_interface(self.ip)
 
     @property
+    def vm_uuid(self):
+        if self.vm:
+            return self.vm.uuid
+        else:
+            return None
+
+    @property
     def hostname(self):
         if self.usage == self.NODE:
             return self.note
@@ -73,8 +80,14 @@ class IPAddress(models.Model):
         else:
             return None
 
+    def additional_vm_uuids(self):
+        if self.usage in (self.VM, self.VM_REAL):
+            return [vm.uuid for vm in self.vms.all()]  # Faster because of prefetch_related('vms')
+        else:
+            return []
+
     @property
-    def hostnames(self):
+    def additional_vm_hostnames(self):
         if self.usage in (self.VM, self.VM_REAL):
             return [vm.hostname for vm in self.vms.all()]  # Faster because of prefetch_related('vms')
         else:

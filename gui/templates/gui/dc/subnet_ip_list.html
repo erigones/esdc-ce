@@ -76,7 +76,7 @@
         </thead>
 
         <tbody>
-          {% for ip in ips %}{% with hostnames=vm.hostnames %}
+          {% for ip in ips %}{% with hostnames=ip.additional_vm_hostnames %}
           <tr>
             <td class="nowrap">{{ ip.ip }}</td>
             <td>{{ ip.get_usage_display }}</td>
@@ -88,7 +88,7 @@
             <td class="hidden-phone nowrap"><span class="vm_hostname"><i class="icon-cloud"></i>&nbsp;{{ ip.vm.dc.alias }}</span></td>
             {% elif hostnames %}
             <td class="nowrap">
-              <small>{% for vm in ip.vms.all %}<a href="{% url 'dc_vm_details' vm.dc ip.vm.hostname %}" class="btn-link"><i class="icon-hdd"></i>&nbsp;{{ vm.alias }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</small>
+              <small>{% for vm in ip.vms.all %}<a href="{% url 'dc_vm_details' vm.dc vm.hostname %}" class="btn-link"><i class="icon-hdd"></i>&nbsp;{{ vm.alias }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</small>
             </td>
             <td class="hidden-phone nowrap"><small>{% for hostname in hostnames %}<span class="vm_hostname">{{ hostname }}</span>{% if not forloop.last %}, {% endif %}{% endfor %}</small></td>
             <td class="hidden-phone nowrap"><span class="vm_hostname"><i class="icon-cloud"></i>&nbsp;{{ ip.vms.all.0.dc.alias }}</span></td>

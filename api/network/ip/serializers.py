@@ -14,7 +14,9 @@ class NetworkIPSerializer(s.Serializer):
     """
     ip = s.IPAddressField(strict=True)
     hostname = s.CharField(read_only=True, required=False)
-    hostnames = s.ArrayField(read_only=True, required=False)
+    vm_uuid = s.CharField(read_only=True, required=False)
+    additional_vm_uuids = s.ArrayField(read_only=True, required=False)
+    additional_vm_hostnames = s.ArrayField(read_only=True, required=False)
     dc = s.CharField(source='vm.dc', read_only=True, required=False)
     mac = s.CharField(read_only=True, required=False)
     nic_id = s.IntegerField(read_only=True, required=False)

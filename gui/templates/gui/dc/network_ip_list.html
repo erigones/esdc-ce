@@ -202,7 +202,7 @@
         </thead>
 
         <tbody>
-          {% for ip in ips %}{% with vm=ip.vm hostnames=ip.hostnames is_node_address=ip.is_node_address %}
+          {% for ip in ips %}{% with vm=ip.vm hostnames=ip.additional_vm_hostnames is_node_address=ip.is_node_address %}
           <tr>
             {% if can_edit %}
             {% if is_node_address %}
