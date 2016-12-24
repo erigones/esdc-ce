@@ -19,10 +19,10 @@ class VmSnapshot(APIView):
     """
     LOCK = 'vm_snapshot vm:%s disk:%s'
 
-    def __init__(self, request, hostname, snapname, data):
+    def __init__(self, request, hostname_or_uuid, snapname, data):
         super(VmSnapshot, self).__init__(request)
         self.data = data
-        self.vm = vm = get_vm(request, hostname, exists_ok=True, noexists_fail=True,
+        self.vm = vm = get_vm(request, hostname_or_uuid, exists_ok=True, noexists_fail=True,
                               check_node_status=('POST', 'DELETE'))  # custom node check inside put()
         self.disk_id, real_disk_id, self.zfs_filesystem = get_disk_id(request, vm, data)
         self.snap = get_object(request, Snapshot, {'name': snapname, 'vm': vm, 'disk_id': real_disk_id}, sr=('define',))

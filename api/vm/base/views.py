@@ -40,15 +40,15 @@ def vm_list(request, data=None):
 #: vm_status:DELETE: stopped, frozen
 @api_view(('GET', 'POST', 'PUT', 'DELETE'))
 @request_data()  # get_vm() = IsVmOwner + More security inside view
-def vm_manage(request, hostname, data=None):
+def vm_manage(request, hostname_or_uuid, data=None):
     """
-    Get (:http:get:`GET </vm/(hostname)>`),
-    create (deploy) (:http:post:`POST </vm/(hostname)>`),
-    update (:http:put:`PUT </vm/(hostname)>`) or
-    delete (:http:delete:`DELETE </vm/(hostname)>`)
+    Get (:http:get:`GET </vm/(hostname_or_uuid)>`),
+    create (deploy) (:http:post:`POST </vm/(hostname_or_uuid)>`),
+    update (:http:put:`PUT </vm/(hostname_or_uuid)>`) or
+    delete (:http:delete:`DELETE </vm/(hostname_or_uuid)>`)
     a VM on a compute node. The VM must be defined.
 
-    .. http:get:: /vm/(hostname)
+    .. http:get:: /vm/(hostname_or_uuid)
 
         :DC-bound?:
             * |dc-yes|
@@ -64,7 +64,7 @@ def vm_manage(request, hostname, data=None):
         :status 403: Forbidden
         :status 404: VM not found
 
-    .. http:post:: /vm/(hostname)
+    .. http:post:: /vm/(hostname_or_uuid)
 
         :DC-bound?:
             * |dc-yes|
@@ -74,8 +74,8 @@ def vm_manage(request, hostname, data=None):
         :Asynchronous?:
             * |async-yes| - Update on compute node, when VM definition has changed
             * |async-no| - Update in DB only, when VM definition was not changed
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
         :arg data.recreate: Delete and create the VM from scratch (default: false)
         :type data.recreate: boolean
         :arg data.force: Must be true to force recreate (default: false)
@@ -93,7 +93,7 @@ VM is locked or has slave VMs (recreate=true)
         :status 428: VM has no bootable disk / Could not find node with free resources / \
 VM owner has no SSH keys available
 
-    .. http:put:: /vm/(hostname)
+    .. http:put:: /vm/(hostname_or_uuid)
 
         :DC-bound?:
             * |dc-yes|
@@ -101,8 +101,8 @@ VM owner has no SSH keys available
             * |Admin|
         :Asynchronous?:
             * |async-yes|
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
         :status 200: SUCCESS
         :status 201: PENDING
         :status 400: FAILURE
@@ -114,7 +114,7 @@ VM owner has no SSH keys available
         :status 424: Cannot import required image
         :status 428: VM has to be stopped when updating disks or NICs
 
-    .. http:delete:: /vm/(hostname)
+    .. http:delete:: /vm/(hostname_or_uuid)
 
         :DC-bound?:
             * |dc-yes|
@@ -122,8 +122,8 @@ VM owner has no SSH keys available
             * |Admin|
         :Asynchronous?:
             * |async-yes|
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
         :status 200: SUCCESS
         :status 201: PENDING
         :status 400: FAILURE
@@ -133,4 +133,4 @@ VM owner has no SSH keys available
         :status 423: Node is not operational / VM is not stopped / VM is locked or has slave VMs
 
     """
-    return VmManage(request, hostname, data).response()
+    return VmManage(request, hostname_or_uuid, data).response()

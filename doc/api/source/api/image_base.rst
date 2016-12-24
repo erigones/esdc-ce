@@ -11,8 +11,8 @@
 
 .. autofunction:: api.image.base.views.image_manage
 
-/vm/*(hostname)*/snapshot/*(snapname)*/image/*(name)*
------------------------------------------------------
+/vm/*(hostname_or_uuid)*/snapshot/*(snapname)*/image/*(name)*
+-------------------------------------------------------------
 
 .. autofunction:: api.image.base.views.image_snapshot
 

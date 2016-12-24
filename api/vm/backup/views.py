@@ -54,11 +54,11 @@ def vm_define_backup_list_all(request, data=None):
 @api_view(('GET',))
 @request_data(permissions=(IsAdminOrReadOnly,))  # get_vm() = IsVmOwner
 @setting_required('VMS_VM_BACKUP_ENABLED')
-def vm_define_backup_list(request, hostname, data=None):
+def vm_define_backup_list(request, hostname_or_uuid, data=None):
     """
-    List (:http:get:`GET </vm/(hostname)/define/backup>`) all VM backup definitions.
+    List (:http:get:`GET </vm/(hostname_or_uuid)/define/backup>`) all VM backup definitions.
 
-    .. http:get:: /vm/(hostname)/define/backup
+    .. http:get:: /vm/(hostname_or_uuid)/define/backup
 
         :DC-bound?:
             * |dc-yes|
@@ -66,8 +66,8 @@ def vm_define_backup_list(request, hostname, data=None):
             * |VmOwner|
         :Asynchronous?:
             * |async-no|
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
         :arg data.full: Return list of objects with all backup definition details (default: false)
         :type data.full: boolean
         :arg data.disk_id: Filter by disk number/ID
@@ -82,7 +82,7 @@ def vm_define_backup_list(request, hostname, data=None):
         :status 404: VM not found
         :status 412: Invalid disk_id
     """
-    vm = get_vm(request, hostname, exists_ok=True, noexists_fail=True, sr=('node', 'owner'))
+    vm = get_vm(request, hostname_or_uuid, exists_ok=True, noexists_fail=True, sr=('node', 'owner'))
 
     query_filter = {'vm': vm}
     query_filter = filter_disk_id(vm, query_filter, data)
@@ -105,15 +105,15 @@ def vm_define_backup_list(request, hostname, data=None):
 @api_view(('GET', 'POST', 'PUT', 'DELETE'))
 @request_data(permissions=(IsAdminOrReadOnly,))  # get_vm() = IsVmOwner
 @setting_required('VMS_VM_BACKUP_ENABLED')
-def vm_define_backup(request, hostname, bkpdef, data=None):
+def vm_define_backup(request, hostname_or_uuid, bkpdef, data=None):
     """
-    Show (:http:get:`GET </vm/(hostname)/define/backup/(bkpdef)>`),
-    create (:http:post:`POST </vm/(hostname)/define/backup/(bkpdef)>`),
-    remove (:http:delete:`DELETE </vm/(hostname)/define/backup/(bkpdef)>`) or
-    update (:http:put:`PUT </vm/(hostname)/define/backup/(bkpdef)>`)
+    Show (:http:get:`GET </vm/(hostname_or_uuid)/define/backup/(bkpdef)>`),
+    create (:http:post:`POST </vm/(hostname_or_uuid)/define/backup/(bkpdef)>`),
+    remove (:http:delete:`DELETE </vm/(hostname_or_uuid)/define/backup/(bkpdef)>`) or
+    update (:http:put:`PUT </vm/(hostname_or_uuid)/define/backup/(bkpdef)>`)
     a VM backup definition and schedule.
 
-    .. http:get:: /vm/(hostname)/define/backup/(bkpdef)
+    .. http:get:: /vm/(hostname_or_uuid)/define/backup/(bkpdef)
 
         :DC-bound?:
             * |dc-yes|
@@ -121,8 +121,8 @@ def vm_define_backup(request, hostname, bkpdef, data=None):
             * |VmOwner|
         :Asynchronous?:
             * |async-no|
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
         :arg bkpdef: **required** - Backup definition name
         :type bkpdef: string
         :arg data.disk_id: **required** - Disk number/ID (default: 1)
@@ -134,7 +134,7 @@ def vm_define_backup(request, hostname, bkpdef, data=None):
         :status 404: VM not found / Backup definition not found
         :status 412: Invalid disk_id
 
-    .. http:post:: /vm/(hostname)/define/backup/(bkpdef)
+    .. http:post:: /vm/(hostname_or_uuid)/define/backup/(bkpdef)
 
         :DC-bound?:
             * |dc-yes|
@@ -142,8 +142,8 @@ def vm_define_backup(request, hostname, bkpdef, data=None):
             * |Admin|
         :Asynchronous?:
             * |async-no|
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
         :arg bkpdef: **required** - Backup definition name (predefined: hourly, daily, weekly, monthly)
         :type bkpdef: string
         :arg data.disk_id: **required** - Disk number/ID (default: 1)
@@ -177,7 +177,7 @@ creating backup snapshot (requires QEMU Guest Agent) (default: false)
         :status 412: Invalid disk_id
         :status 423: Node is not operational / VM is not operational
 
-    .. http:put:: /vm/(hostname)/define/backup/(bkpdef)
+    .. http:put:: /vm/(hostname_or_uuid)/define/backup/(bkpdef)
 
         :DC-bound?:
             * |dc-yes|
@@ -185,8 +185,8 @@ creating backup snapshot (requires QEMU Guest Agent) (default: false)
             * |Admin|
         :Asynchronous?:
             * |async-no|
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
         :arg bkpdef: **required** - Backup definition name
         :type bkpdef: string
         :arg data.disk_id: **required** - Disk number/ID (default: 1)
@@ -210,7 +210,7 @@ creating backup snapshot (requires QEMU Guest Agent) (default: false)
         :status 412: Invalid disk_id
         :status 423: Node is not operational / VM is not operational
 
-    .. http:delete:: /vm/(hostname)/define/backup/(bkpdef)
+    .. http:delete:: /vm/(hostname_or_uuid)/define/backup/(bkpdef)
 
         :DC-bound?:
             * |dc-yes|
@@ -218,8 +218,8 @@ creating backup snapshot (requires QEMU Guest Agent) (default: false)
             * |Admin|
         :Asynchronous?:
             * |async-no|
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
         :arg bkpdef: **required** - Backup definition name
         :type bkpdef: string
         :arg data.disk_id: **required** - Disk number/ID (default: 1)
@@ -232,7 +232,7 @@ creating backup snapshot (requires QEMU Guest Agent) (default: false)
         :status 423: Node is not operational / VM is not operational
 
     """
-    vm = get_vm(request, hostname, exists_ok=True, noexists_fail=True)
+    vm = get_vm(request, hostname_or_uuid, exists_ok=True, noexists_fail=True)
 
     disk_id, real_disk_id, zfs_filesystem = get_disk_id(request, vm, data)
 
@@ -248,11 +248,11 @@ creating backup snapshot (requires QEMU Guest Agent) (default: false)
 @api_view(('GET', 'DELETE'))
 @request_data(permissions=(IsAdminOrReadOnly,))  # get_vm() = IsVmOwner
 @setting_required('VMS_VM_BACKUP_ENABLED')
-def vm_backup_list(request, hostname, data=None):
+def vm_backup_list(request, hostname_or_uuid, data=None):
     """
-    List (:http:get:`GET </vm/(hostname)/backup>`) all VM backups.
+    List (:http:get:`GET </vm/(hostname_or_uuid)/backup>`) all VM backups.
 
-    .. http:get:: /vm/(hostname)/backup
+    .. http:get:: /vm/(hostname_or_uuid)/backup
 
         :DC-bound?:
             * |dc-yes|
@@ -260,8 +260,8 @@ def vm_backup_list(request, hostname, data=None):
             * |VmOwner|
         :Asynchronous?:
             * |async-no|
-        :arg hostname: **required** - Original server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Original server hostname or uuid
+        :type hostname_or_uuid: string
         :arg data.full: Return list of objects with all backup details (default: false)
         :type data.full: boolean
         :arg data.disk_id: Filter by original disk number/ID
@@ -275,7 +275,7 @@ def vm_backup_list(request, hostname, data=None):
         :status 403: Forbidden
         :status 412: Invalid disk_id
     """
-    return VmBackupList(request, hostname, data).response()
+    return VmBackupList(request, hostname_or_uuid, data).response()
 
 
 #: vm_status:   GET:
@@ -285,15 +285,15 @@ def vm_backup_list(request, hostname, data=None):
 @api_view(('GET', 'POST', 'PUT', 'DELETE'))
 @request_data(permissions=(IsAdminOrReadOnly,))  # get_vm() = IsVmOwner
 @setting_required('VMS_VM_BACKUP_ENABLED')
-def vm_backup(request, hostname, bkpname, data=None):
+def vm_backup(request, hostname_or_uuid, bkpname, data=None):
     """
-    Show (:http:get:`GET </vm/(hostname)/backup/(bkpname)>`),
-    create (:http:post:`POST </vm/(hostname)/backup/(bkpdef)>`),
-    delete (:http:delete:`DELETE </vm/(hostname)/backup/(bkpname)>`) or
-    restore (:http:put:`PUT </vm/(hostname)/backup/(bkpname)>`)
+    Show (:http:get:`GET </vm/(hostname_or_uuid)/backup/(bkpname)>`),
+    create (:http:post:`POST </vm/(hostname_or_uuid)/backup/(bkpdef)>`),
+    delete (:http:delete:`DELETE </vm/(hostname_or_uuid)/backup/(bkpname)>`) or
+    restore (:http:put:`PUT </vm/(hostname_or_uuid)/backup/(bkpname)>`)
     a backup of VM's disk.
 
-    .. http:get:: /vm/(hostname)/backup/(bkpname)
+    .. http:get:: /vm/(hostname_or_uuid)/backup/(bkpname)
 
         :DC-bound?:
             * |dc-yes|
@@ -301,8 +301,8 @@ def vm_backup(request, hostname, bkpname, data=None):
             * |VmOwner|
         :Asynchronous?:
             * |async-no|
-        :arg hostname: **required** - Original server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Original server hostname or uuid
+        :type hostname_or_uuid: string
         :arg bkpname: **required** - Backup name
         :type bkpname: string
         :arg data.disk_id: **required** - Original disk number/ID (default: 1)
@@ -312,7 +312,7 @@ def vm_backup(request, hostname, bkpname, data=None):
         :status 404: Backup not found
         :status 412: Invalid disk_id
 
-    .. http:post:: /vm/(hostname)/backup/(bkpdef)
+    .. http:post:: /vm/(hostname_or_uuid)/backup/(bkpdef)
 
         :DC-bound?:
             * |dc-yes|
@@ -320,8 +320,8 @@ def vm_backup(request, hostname, bkpname, data=None):
             * |Admin|
         :Asynchronous?:
             * |async-yes|
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
         :arg bkpname.bkpdef: **required** - Backup definition name
         :type bkpname.bkpdef: string
         :arg data.disk_id: **required** - Disk number/ID (default: 1)
@@ -339,7 +339,7 @@ def vm_backup(request, hostname, bkpname, data=None):
         :status 423: Node is not operational / VM is not operational
         :status 428: VM is not installed
 
-    .. http:put:: /vm/(hostname)/backup/(bkpname)
+    .. http:put:: /vm/(hostname_or_uuid)/backup/(bkpname)
 
         .. warning:: A backup restore will restore disk data from the backup into target disk; \
 All data created after the backup (including all existing snapshots) on target server will be lost!
@@ -351,8 +351,8 @@ All data created after the backup (including all existing snapshots) on target s
         :Asynchronous?:
             * |async-yes| - Restore backup
             * |async-no| - Update backup note
-        :arg hostname: **required** - Original server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Original server hostname or uuid
+        :type hostname_or_uuid: string
         :arg bkpname: **required** - Backup name
         :type bkpname: string
         :arg data.disk_id: **required** - Original disk number/ID (default: 1)
@@ -376,7 +376,7 @@ All data created after the backup (including all existing snapshots) on target s
         :status 423: Node is not operational / VM is not operational / VM is not stopped / VM is locked or has slave VMs
         :status 428: VM brand mismatch / Disk size mismatch / Not enough free space on target storage
 
-    .. http:delete:: /vm/(hostname)/backup/(bkpname)
+    .. http:delete:: /vm/(hostname_or_uuid)/backup/(bkpname)
 
         :DC-bound?:
             * |dc-yes|
@@ -384,8 +384,8 @@ All data created after the backup (including all existing snapshots) on target s
             * |Admin|
         :Asynchronous?:
             * |async-no|
-        :arg hostname: **required** - Original server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Original server hostname or uuid
+        :type hostname_or_uuid: string
         :arg bkpname: **required** - Backup name
         :type bkpname: string
         :arg data.disk_id: **required** - Original disk number/ID (default: 1)
@@ -400,4 +400,4 @@ All data created after the backup (including all existing snapshots) on target s
         :status 423: Node is not operational / VM is not operational
 
     """
-    return VmBackup(request, hostname, bkpname, data).response()
+    return VmBackup(request, hostname_or_uuid, bkpname, data).response()

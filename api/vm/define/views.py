@@ -47,15 +47,15 @@ def vm_define_list(request, data=None):
 #: vm_status:DELETE: notcreated
 @api_view(('GET', 'POST', 'PUT', 'DELETE'))
 @request_data(permissions=(IsAdminOrReadOnly,))  # get_vm() = IsVmOwner
-def vm_define(request, hostname, data=None):
+def vm_define(request, hostname_or_uuid, data=None):
     """
-    Show (:http:get:`GET </vm/(hostname)/define>`),
-    create (:http:post:`POST </vm/(hostname)/define>`),
-    change (:http:put:`PUT </vm/(hostname)/define>`) or
-    delete (:http:delete:`DELETE </vm/(hostname)/define>`)
+    Show (:http:get:`GET </vm/(hostname_or_uuid)/define>`),
+    create (:http:post:`POST </vm/(hostname_or_uuid)/define>`),
+    change (:http:put:`PUT </vm/(hostname_or_uuid)/define>`) or
+    delete (:http:delete:`DELETE </vm/(hostname_or_uuid)/define>`)
     a VM definition.
 
-    .. http:get:: /vm/(hostname)/define
+    .. http:get:: /vm/(hostname_or_uuid)/define
 
         :DC-bound?:
             * |dc-yes|
@@ -63,8 +63,8 @@ def vm_define(request, hostname, data=None):
             * |VmOwner|
         :Asynchronous?:
             * |async-no|
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
         :arg data.full: Display full VM definition (including disk and nic lists) (default: false)
         :type data.full: boolean
         :arg data.active: Display currently active VM definition on compute node (default: false)
@@ -76,7 +76,7 @@ def vm_define(request, hostname, data=None):
         :status 403: Forbidden
         :status 404: VM not found
 
-    .. http:post:: /vm/(hostname)/define
+    .. http:post:: /vm/(hostname_or_uuid)/define
 
         :DC-bound?:
             * |dc-yes|
@@ -84,8 +84,8 @@ def vm_define(request, hostname, data=None):
             * |Admin|
         :Asynchronous?:
             * |async-no|
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Server hostname
+        :type hostname_or_uuid: string
         :arg data.alias: Short server name (default: ``hostname``)
         :type data.alias: string
         :arg data.template: VM template name (default: null)
@@ -139,7 +139,7 @@ Items will be set as static routes in the OS (SunOS Zone only, default: {})
         :status 403: Forbidden
         :status 406: VM already exists
 
-    .. http:put:: /vm/(hostname)/define
+    .. http:put:: /vm/(hostname_or_uuid)/define
 
         :DC-bound?:
             * |dc-yes|
@@ -147,9 +147,9 @@ Items will be set as static routes in the OS (SunOS Zone only, default: {})
             * |Admin|
         :Asynchronous?:
             * |async-no|
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
-        :arg data.alias: Short server name (default: hostname)
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
+        :arg data.alias: Short server name
         :type data.alias: string
         :arg data.template: VM template name
         :type data.template: string
@@ -197,7 +197,7 @@ Items will be set as static routes in the OS (SunOS Zone only)
         :status 404: VM not found
         :status 423: VM is not operational / VM is locked or has slave VMs
 
-    .. http:delete:: /vm/(hostname)/define
+    .. http:delete:: /vm/(hostname_or_uuid)/define
 
         :DC-bound?:
             * |dc-yes|
@@ -205,45 +205,47 @@ Items will be set as static routes in the OS (SunOS Zone only)
             * |Admin|
         :Asynchronous?:
             * |async-no|
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
         :status 200: SUCCESS
         :status 400: FAILURE
         :status 403: Forbidden
         :status 404: VM not found
         :status 423: VM is not operational / VM is not notcreated / VM is locked or has slave VMs
     """
-    vm = get_vm(request, hostname, sr=('owner', 'node', 'template'), check_node_status=None)
+    vm = get_vm(request, hostname_or_uuid, sr=('owner', 'node', 'template'), check_node_status=None,
+                noexists_fail=False, exists_ok=False)
 
-    return VmDefineView(request).response(vm, data, hostname=hostname)
+    return VmDefineView(request).response(vm, data, hostname_or_uuid=hostname_or_uuid)
 
 
 @api_view(('PUT',))
 @request_data()  # get_vm() = IsVmOwner
-def vm_define_user(request, hostname, data=None):
+def vm_define_user(request, hostname_or_uuid, data=None):
     """
     vm_define alternative used only for updating hostname and alias.
     Used by non-admin VM owners from GUI.
     """
-    vm = get_vm(request, hostname, sr=('owner', 'node', 'template'), check_node_status=None)
+    vm = get_vm(request, hostname_or_uuid, sr=('owner', 'node', 'template'), check_node_status=None,
+                exists_ok=True, noexists_fail=True)
     allowed = {'hostname', 'alias', 'installed'}
 
     for i in data.keys():  # A copy of keys, because dict can change during iteration
         if i not in allowed:
             del data[i]
 
-    return VmDefineView(request).put(vm, data, hostname=hostname)
+    return VmDefineView(request).put(vm, data)
 
 
 #: vm_status:   GET:
 # noinspection PyUnusedLocal
 @api_view(('GET',))
 @request_data(permissions=(IsAdminOrReadOnly,))  # get_vm() = IsVmOwner
-def vm_define_disk_list(request, hostname, data=None):
+def vm_define_disk_list(request, hostname_or_uuid, data=None):
     """
-    List (:http:get:`GET </vm/(hostname)/define/disk>`) VM disk definitions.
+    List (:http:get:`GET </vm/(hostname_or_uuid)/define/disk>`) VM disk definitions.
 
-    .. http:get:: /vm/(hostname)/define/disk
+    .. http:get:: /vm/(hostname_or_uuid)/define/disk
 
         :DC-bound?:
             * |dc-yes|
@@ -251,15 +253,15 @@ def vm_define_disk_list(request, hostname, data=None):
             * |VmOwner|
         :Asynchronous?:
             * |async-no|
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
         :arg data.active: Display currently active VM disk definitions on compute node (default: false)
         :type data.active: boolean
         :status 201: SUCCESS
         :status 403: Forbidden
         :status 404: VM not found
     """
-    vm = get_vm(request, hostname, exists_ok=True, noexists_fail=True, check_node_status=None)
+    vm = get_vm(request, hostname_or_uuid, exists_ok=True, noexists_fail=True, check_node_status=None)
 
     return VmDefineDiskView(request).get(vm, None, None, many=True)
 
@@ -270,15 +272,15 @@ def vm_define_disk_list(request, hostname, data=None):
 #: vm_status:DELETE: notcreated, running, stopped, stopping
 @api_view(('GET', 'POST', 'PUT', 'DELETE'))
 @request_data(permissions=(IsAdminOrReadOnly,))  # get_vm() = IsVmOwner
-def vm_define_disk(request, hostname, disk_id=None, data=None):
+def vm_define_disk(request, hostname_or_uuid, disk_id=None, data=None):
     """
-    Show (:http:get:`GET </vm/(hostname)/define/disk/(disk_id)>`),
-    create (:http:post:`POST </vm/(hostname)/define/disk/(disk_id)>`),
-    change (:http:put:`PUT </vm/(hostname)/define/disk/(disk_id)>`) or
-    delete (:http:delete:`DELETE </vm/(hostname)/define/disk/(disk_id)>`)
+    Show (:http:get:`GET </vm/(hostname_or_uuid)/define/disk/(disk_id)>`),
+    create (:http:post:`POST </vm/(hostname_or_uuid)/define/disk/(disk_id)>`),
+    change (:http:put:`PUT </vm/(hostname_or_uuid)/define/disk/(disk_id)>`) or
+    delete (:http:delete:`DELETE </vm/(hostname_or_uuid)/define/disk/(disk_id)>`)
     a VM disk definition.
 
-    .. http:get:: /vm/(hostname)/define/disk/(disk_id)
+    .. http:get:: /vm/(hostname_or_uuid)/define/disk/(disk_id)
 
         :DC-bound?:
             * |dc-yes|
@@ -286,8 +288,8 @@ def vm_define_disk(request, hostname, disk_id=None, data=None):
             * |VmOwner|
         :Asynchronous?:
             * |async-no|
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
         :arg disk_id: **required** - Disk number/ID (1 - 2)
         :type disk_id: integer
         :arg data.active: Display currently active VM disk definition on compute node (default: false)
@@ -300,7 +302,7 @@ def vm_define_disk(request, hostname, disk_id=None, data=None):
         :status 404: VM not found
         :status 406: VM disk out of range
 
-    .. http:post:: /vm/(hostname)/define/disk/(disk_id)
+    .. http:post:: /vm/(hostname_or_uuid)/define/disk/(disk_id)
 
         :DC-bound?:
             * |dc-yes|
@@ -308,8 +310,8 @@ def vm_define_disk(request, hostname, disk_id=None, data=None):
             * |Admin|
         :Asynchronous?:
             * |async-no|
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
         :arg disk_id: **required** - Disk number/ID (1 - 2)
         :type disk_id: integer
         :arg data.size: **required** (if not specified in image) - Disk size (1 - 268435456 MB)
@@ -335,7 +337,7 @@ def vm_define_disk(request, hostname, disk_id=None, data=None):
         :status 406: VM disk out of range / VM disk already exists
         :status 423: VM is not operational / VM is locked or has slave VMs
 
-    .. http:put:: /vm/(hostname)/define/disk/(disk_id)
+    .. http:put:: /vm/(hostname_or_uuid)/define/disk/(disk_id)
 
         :DC-bound?:
             * |dc-yes|
@@ -343,8 +345,8 @@ def vm_define_disk(request, hostname, disk_id=None, data=None):
             * |Admin|
         :Asynchronous?:
             * |async-no|
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
         :arg disk_id: **required** - Disk number/ID (1 - 2)
         :type disk_id: integer
         :arg data.size: Disk size (1 - 268435456 MB)
@@ -368,7 +370,7 @@ def vm_define_disk(request, hostname, disk_id=None, data=None):
         :status 406: VM disk out of range
         :status 423: VM is not operational / VM is locked or has slave VMs
 
-    .. http:delete:: /vm/(hostname)/define/disk/(disk_id)
+    .. http:delete:: /vm/(hostname_or_uuid)/define/disk/(disk_id)
 
         :DC-bound?:
             * |dc-yes|
@@ -376,8 +378,8 @@ def vm_define_disk(request, hostname, disk_id=None, data=None):
             * |Admin|
         :Asynchronous?:
             * |async-no|
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
         :arg disk_id: **required** - Disk number/ID (1 - 2)
         :type disk_id: integer
         :arg data.image_tags_inherit: Whether to update VM tags from image tags (default: true)
@@ -390,7 +392,7 @@ def vm_define_disk(request, hostname, disk_id=None, data=None):
         :status 423: VM is not operational / VM is locked or has slave VMs
 
     """
-    vm = get_vm(request, hostname, exists_ok=True, noexists_fail=True, sr=('node', 'owner', 'template'),
+    vm = get_vm(request, hostname_or_uuid, exists_ok=True, noexists_fail=True, sr=('node', 'owner', 'template'),
                 check_node_status=None)
 
     try:
@@ -405,11 +407,11 @@ def vm_define_disk(request, hostname, disk_id=None, data=None):
 # noinspection PyUnusedLocal
 @api_view(('GET',))
 @request_data(permissions=(IsAdminOrReadOnly,))  # get_vm() = IsVmOwner
-def vm_define_nic_list(request, hostname, data=None):
+def vm_define_nic_list(request, hostname_or_uuid, data=None):
     """
-    List (:http:get:`GET </vm/(hostname)/define/nic>`) VM NIC definitions.
+    List (:http:get:`GET </vm/(hostname_or_uuid)/define/nic>`) VM NIC definitions.
 
-    .. http:get:: /vm/(hostname)/define/nic
+    .. http:get:: /vm/(hostname_or_uuid)/define/nic
 
         :DC-bound?:
             * |dc-yes|
@@ -417,15 +419,15 @@ def vm_define_nic_list(request, hostname, data=None):
             * |VmOwner|
         :Asynchronous?:
             * |async-no|
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
         :arg data.active: Display currently active VM NIC definitions on compute node (default: false)
         :type data.active: boolean
         :status 200: SUCCESS
         :status 403: Forbidden
         :status 404: VM not found
     """
-    vm = get_vm(request, hostname, exists_ok=True, noexists_fail=True, check_node_status=None)
+    vm = get_vm(request, hostname_or_uuid, exists_ok=True, noexists_fail=True, check_node_status=None)
 
     return VmDefineNicView(request).get(vm, None, None, many=True)
 
@@ -436,15 +438,15 @@ def vm_define_nic_list(request, hostname, data=None):
 #: vm_status:DELETE: notcreated, running, stopped, stopping
 @api_view(('GET', 'POST', 'PUT', 'DELETE'))
 @request_data(permissions=(IsAdminOrReadOnly,))  # get_vm() = IsVmOwner
-def vm_define_nic(request, hostname, nic_id=None, data=None):
+def vm_define_nic(request, hostname_or_uuid, nic_id=None, data=None):
     """
-    Show (:http:get:`GET </vm/(hostname)/define/nic/(nic_id)>`),
-    create (:http:post:`POST </vm/(hostname)/define/nic/(nic_id)>`),
-    change (:http:put:`PUT </vm/(hostname)/define/nic/(nic_id)>`) or
-    delete (:http:delete:`DELETE </vm/(hostname)/define/nic/(nic_id)>`)
+    Show (:http:get:`GET </vm/(hostname_or_uuid)/define/nic/(nic_id)>`),
+    create (:http:post:`POST </vm/(hostname_or_uuid)/define/nic/(nic_id)>`),
+    change (:http:put:`PUT </vm/(hostname_or_uuid)/define/nic/(nic_id)>`) or
+    delete (:http:delete:`DELETE </vm/(hostname_or_uuid)/define/nic/(nic_id)>`)
     a VM NIC definition.
 
-    .. http:get:: /vm/(hostname)/define/nic/(nic_id)
+    .. http:get:: /vm/(hostname_or_uuid)/define/nic/(nic_id)
 
         :DC-bound?:
             * |dc-yes|
@@ -452,8 +454,8 @@ def vm_define_nic(request, hostname, nic_id=None, data=None):
             * |VmOwner|
         :Asynchronous?:
             * |async-no|
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
         :arg nic_id: **required** - NIC number/ID (1 - 6)
         :type nic_id: integer
         :arg data.active: Display currently active VM NIC definition on compute node (default: false)
@@ -466,7 +468,7 @@ def vm_define_nic(request, hostname, nic_id=None, data=None):
         :status 404: VM not found
         :status 406: VM NIC out of range
 
-    .. http:post:: /vm/(hostname)/define/nic/(nic_id)
+    .. http:post:: /vm/(hostname_or_uuid)/define/nic/(nic_id)
 
         :DC-bound?:
             * |dc-yes|
@@ -474,8 +476,8 @@ def vm_define_nic(request, hostname, nic_id=None, data=None):
             * |Admin|
         :Asynchronous?:
             * |async-no|
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
         :arg nic_id: **required** - NIC number/ID (1 - 6)
         :type nic_id: integer
         :arg data.net: **required** - Name of a virtual network
@@ -521,7 +523,7 @@ other VMs. Useful for floating/shared IPs (default: [])
         :status 406: VM NIC out of range / VM NIC already exists
         :status 423: VM is not operational / VM is locked or has slave VMs
 
-    .. http:put:: /vm/(hostname)/define/nic/(nic_id)
+    .. http:put:: /vm/(hostname_or_uuid)/define/nic/(nic_id)
 
         :DC-bound?:
             * |dc-yes|
@@ -529,8 +531,8 @@ other VMs. Useful for floating/shared IPs (default: [])
             * |Admin|
         :Asynchronous?:
             * |async-no|
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
         :arg nic_id: **required** - NIC number/ID (1 - 6)
         :type nic_id: integer
         :arg data.net: Name of a virtual network
@@ -576,7 +578,7 @@ other VMs. Useful for floating/shared IPs
         :status 406: VM NIC out of range
         :status 423: VM is not operational / VM is locked or has slave VMs
 
-    .. http:delete:: /vm/(hostname)/define/nic/(nic_id)
+    .. http:delete:: /vm/(hostname_or_uuid)/define/nic/(nic_id)
 
         :DC-bound?:
             * |dc-yes|
@@ -584,8 +586,8 @@ other VMs. Useful for floating/shared IPs
             * |Admin|
         :Asynchronous?:
             * |async-no|
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
         :arg nic_id: **required** - NIC number/ID (1 - 6)
         :type nic_id: integer
         :status 200: SUCCESS
@@ -596,7 +598,7 @@ other VMs. Useful for floating/shared IPs
         :status 423: VM is not operational / VM is locked or has slave VMs
 
     """
-    vm = get_vm(request, hostname, exists_ok=True, noexists_fail=True, sr=('node', 'owner', 'template'),
+    vm = get_vm(request, hostname_or_uuid, exists_ok=True, noexists_fail=True, sr=('node', 'owner', 'template'),
                 check_node_status=None)
 
     try:
@@ -610,12 +612,12 @@ other VMs. Useful for floating/shared IPs
 #: vm_status:   PUT: running, stopped, stopping
 @api_view(('PUT',))
 @request_data(permissions=(IsAdminOrReadOnly,))  # get_vm() = IsVmOwner
-def vm_define_revert(request, hostname, data=None):
+def vm_define_revert(request, hostname_or_uuid, data=None):
     """
-    Revert (:http:put:`PUT </vm/(hostname)/define/revert>`)
+    Revert (:http:put:`PUT </vm/(hostname_or_uuid)/define/revert>`)
     whole VM definition (including disks and nics) to currently active VM definition on compute node.
 
-    .. http:put:: /vm/(hostname)/define/revert
+    .. http:put:: /vm/(hostname_or_uuid)/define/revert
 
         .. warning:: The DNS settings for server's hostname and IP addresses won't be reverted.
 
@@ -625,8 +627,8 @@ def vm_define_revert(request, hostname, data=None):
             * |VmOwner|
         :Asynchronous?:
             * |async-no|
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
         :status 200: SUCCESS
         :status 403: Forbidden
         :status 404: VM not found
@@ -634,7 +636,7 @@ def vm_define_revert(request, hostname, data=None):
         :status 417: VM definition unchanged
         :status 423: VM is not operational / VM is not created / VM is locked or has slave VMs
     """
-    vm = get_vm(request, hostname, exists_ok=True, noexists_fail=True, sr=('node', 'owner', 'template'),
+    vm = get_vm(request, hostname_or_uuid, exists_ok=True, noexists_fail=True, sr=('node', 'owner', 'template'),
                 check_node_status=None)
 
     return VmDefineRevertView(request).put(vm, data)

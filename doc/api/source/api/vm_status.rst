@@ -33,8 +33,8 @@
             }
         }
 
-/vm/*(hostname)*/status/*(action)*
-----------------------------------
+/vm/*(hostname_or_uuid)*/status/*(action)*
+------------------------------------------
 
 .. autofunction:: api.vm.status.views.vm_status
 

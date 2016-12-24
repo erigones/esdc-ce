@@ -1,5 +1,6 @@
 from logging import getLogger
 
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from django.utils.six import iteritems
 from django.core import validators
@@ -69,6 +70,7 @@ def validate_nic_tags(vm, new_node=None, new_net=None):
 
 
 class VmDefineSerializer(VmBaseSerializer):
+    uuid = s.CharField(read_only=True)
     hostname = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\.-]+[A-Za-z0-9]$', max_length=128, min_length=4)
     alias = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\.-]+[A-Za-z0-9]$', max_length=24, min_length=4, required=False)
     ostype = s.IntegerChoiceField(choices=Vm.OSTYPE, default=settings.VMS_VM_OSTYPE_DEFAULT)
@@ -281,9 +283,9 @@ class VmDefineSerializer(VmBaseSerializer):
         except KeyError:
             pass
         else:
-            if self.object and self.object.hostname == value:
-                pass  # Do not check if the same hostname was provided
-            elif Vm.objects.filter(hostname__iexact=value).exists():
+            if self.object and (self.object.hostname == value or self.object.uuid == value):
+                pass  # Do not check if the same hostname or uuid was provided
+            elif Vm.objects.filter(Q(hostname__iexact=value) | Q(uuid__iexact=value)).exists():
                 raise ObjectAlreadyExists(model=Vm)
             elif '..' in value or '--' in value or value in INVALID_HOSTNAMES:
                 raise s.ValidationError(s.WritableField.default_error_messages['invalid'])
@@ -803,8 +805,8 @@ class _VmDefineDiskSerializer(s.Serializer):
                 self._errors['size'] = s.ErrorList([_('Cannot define disk size other than image size (%s), '
                                                       'because image does not support resizing.') % self.img.size])
             elif size < self.img.size:
-                self._errors['size'] = s. ErrorList([_('Cannot define smaller disk size than '
-                                                       'image size (%s).') % self.img.size])
+                self._errors['size'] = s.ErrorList([_('Cannot define smaller disk size than '
+                                                      'image size (%s).') % self.img.size])
 
             if self.vm.is_notcreated():
                 # Check disk_driver in image manifest (bug #chili-605) only if server is not created;
@@ -868,6 +870,7 @@ class KVmDefineDiskSerializer(_VmDefineDiskSerializer):
     model = s.ChoiceField(choices=Vm.DISK_MODEL, default=settings.VMS_DISK_MODEL_DEFAULT)
     image = s.CharField(required=False, default=settings.VMS_DISK_IMAGE_DEFAULT, max_length=64)
     refreservation = s.IntegerField(default=0, max_value=268435456, min_value=0)  # default set below
+
     # nocreate = s.BooleanField(default=False)  # processed in save_disks()
 
     def __init__(self, request, vm, *args, **kwargs):
