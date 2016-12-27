@@ -1468,10 +1468,10 @@ class VmDefineNicSerializer(s.Serializer):
 
     @staticmethod
     def _remove_vm_ip_association(vm, ip_old, many=False):
-        logger.info('Removing association old IP %s to vm %s.', ip_old, vm)
+        logger.info('Removing association of old IP %s with vm %s.', ip_old, vm)
 
         if ip_old.usage == IPAddress.VM_REAL:  # IP is set on hypervisor
-            logger.info(' ^ Removing association of old IP %s to vm %s will be delayed after PUT vm_manage.',
+            logger.info(' ^ Removing association of old IP %s to vm %s will be delayed until PUT vm_manage is done.',
                         ip_old, vm)
         else:  # DB only operation
             if many:
@@ -1518,9 +1518,7 @@ class VmDefineNicSerializer(s.Serializer):
         else:
             assert ip
 
-        if update and not ip_old:
-            pass
-        else:
+        if not update or ip_old:
             if ip_old:
                 self._remove_vm_ip_association(vm, ip_old)
 
@@ -1535,9 +1533,7 @@ class VmDefineNicSerializer(s.Serializer):
             if ip and self._net and self._net.ptr_domain:
                 self.save_ptr(self.request, task_id, vm, ip, self._net, delete=delete)  # fails silently
 
-        if update and not allowed_ips_old:
-            pass
-        else:
+        if not update or allowed_ips_old:
             for _ip_old in allowed_ips_old:
                 self._remove_vm_ip_association(vm, _ip_old, many=True)
 

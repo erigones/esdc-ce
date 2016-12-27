@@ -123,6 +123,10 @@ class Subnet(_VirtModel, _DcMixin, _UserTasksModel):
         }
 
     def is_used_by_vms(self, dc=None):
+        # Since this function returns a boolean value, we can use the association between an IPAddress and a VM
+        # to quickly find out whether there is a VM that uses this Subnet. In case there is no relationship we
+        # have to inspect each VM's json (and json_active) in order to find used network uuids and compare them
+        # to this subnet's uuid.
         if dc:
             if dc.vm_set.filter(ipaddress__subnet=self).exists():  # Quick check
                 return True
