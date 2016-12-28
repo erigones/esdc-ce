@@ -1213,18 +1213,21 @@ class VmDefineNicSerializer(s.Serializer):
             if ipaddress.ip in self.vm.json_get_ips():  # check if selected address is not on another interface
                 return _('Object with name=%s is already used.') % ip
         else:
-            if ipaddress.usage != IPAddress.VM:  # check if selected address can be used for virtual servers
-                return _('Object with name=%s is not available.') % ip
-
             if ipaddress.vm is not None:  # check if selected address is free in this subnet
                 return _('Object with name=%s is already used as default address.') % ip
 
             if allowed_ips:
+                if ipaddress.usage not in (IPAddress.VM, IPAddress.VM_REAL):  # check if selected IP can be used for VMs
+                    return _('Object with name=%s is not available.') % ip
+
                 for other_vm in ipaddress.vms.exclude(uuid=self.vm.uuid):
                     if other_vm.dc != self.vm.dc:
                         return _('Object with name=%s is already used as additional address in '
                                  'another virtual datacenter.') % ip
             else:
+                if ipaddress.usage != IPAddress.VM:  # check if selected address can be used for virtual servers
+                    return _('Object with name=%s is not available.') % ip
+
                 if ipaddress.vms.exists():  # IP address is already used as allowed_ips
                     return _('Object with name=%s is already used as additional address.') % ip
 
