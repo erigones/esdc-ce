@@ -19,6 +19,7 @@ class Command(DanubeCloudCommand):
             raise CommandError('Running on compute node, did you forget to specify "--node"?')
 
         ctlsh(*pip_install)
+        ctlsh('compile')
 
         if not que_only:
             ctlsh('patch_envs')

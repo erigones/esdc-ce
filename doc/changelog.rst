@@ -2,6 +2,19 @@ Changelog
 #########
 
 
+2.3.3 (unreleased)
+========================================
+
+Features
+--------
+
+Bugs
+----
+
+- Fixed permission problems during byte-compilation of modules in production - `#28 <https://github.com/erigones/esdc-ce/issues/28>`__
+
+
+
 2.3.2 (released on 2016-12-17)
 ========================================
 
