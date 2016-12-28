@@ -26,6 +26,14 @@ def vm_delete_snapshots_of_removed_disks(vm):
     return removed_disk_ids
 
 
+def _reset_allowed_ip_usage(vm, ip):
+    """Helper function used below. It sets the IP usage back to VM [1] only if other VMs, which use the address in
+    allowed_ips are in notcreated state."""
+    if all(other_vm.is_notcreated() for other_vm in ip.vms.exclude(uuid=vm.uuid)):
+        ip.usage = IPAddress.VM
+        ip.save()
+
+
 def vm_update_ipaddress_usage(vm):
     """
     This helper function is responsible for updating IPAddress.usage and IPAddress.vm of server IPs (#chili-615,1029),
@@ -35,25 +43,30 @@ def vm_update_ipaddress_usage(vm):
 
     Always call this function _only_ after vm.json_active is synced with vm.json!!!
     """
-    allowed_ips = vm.allowed_ips.all()
-    current_ips = set(vm.json_active_get_ips(allowed_ips=False))
-    current_ips.update(vm.json_get_ips(allowed_ips=False))
-    current_ips.update(allowed_ips.values_list('ip', flat=True))
+    current_ips = set(vm.json_active_get_ips(primary_ips=True, allowed_ips=False))
+    current_ips.update(vm.json_get_ips(primary_ips=True, allowed_ips=False))
+    current_allowed_ips = set(vm.json_active_get_ips(primary_ips=False, allowed_ips=True))
+    current_allowed_ips.update(vm.json_get_ips(primary_ips=False, allowed_ips=True))
+
     # Return old IPs back to IP pool, so they can be used again
     vm.ipaddress_set.exclude(ip__in=current_ips).update(vm=None, usage=IPAddress.VM)
+
+    # Remove association of removed vm.allowed_ips
+    for ip in vm.allowed_ips.exclude(ip__in=current_allowed_ips):
+        ip.vms.remove(vm)
+        _reset_allowed_ip_usage(vm, ip)
 
     if vm.is_notcreated():
         # Server was deleted from hypervisor
         vm.ipaddress_set.filter(usage=IPAddress.VM_REAL).update(usage=IPAddress.VM)
 
-        for ip in allowed_ips.filter(usage=IPAddress.VM_REAL):
-            if all(other_vm.is_notcreated() for other_vm in ip.vms.exclude(uuid=vm.uuid)):
-                ip.usage = IPAddress.VM
-                ip.save()
+        for ip in vm.allowed_ips.filter(usage=IPAddress.VM_REAL):
+            _reset_allowed_ip_usage(vm, ip)
+
     else:
         # Server was updated or created
         vm.ipaddress_set.filter(usage=IPAddress.VM).update(usage=IPAddress.VM_REAL)
-        allowed_ips.filter(usage=IPAddress.VM).update(usage=IPAddress.VM_REAL)
+        vm.allowed_ips.filter(usage=IPAddress.VM).update(usage=IPAddress.VM_REAL)
 
 
 def vm_deploy(vm, force_stop=False):
