@@ -509,6 +509,9 @@ than specified in ``ip`` (requires |SuperAdmin| permission) (default: false)
         :arg data.allow_unfiltered_promisc: Allow VM to have multiple MAC addresses. Use with caution! \
 (requires |SuperAdmin| permission) (default: false)
         :type data.allow_unfiltered_promisc: boolean
+        :arg data.allowed_ips: List of additional IP addresses that can be used by this VM's NIC and also by \
+other VMs. Useful for floating/shared IPs (default: [])
+        :type data.allowed_ips: array
         :arg data.monitoring: Use this NIC for external monitoring (default: true for first NIC, otherwise false)
         :type data.monitoring: boolean
         :arg data.set_gateway: Whether to set gateway from network (``data.net``) settings (default: true)
@@ -561,6 +564,9 @@ than specified in ``ip`` (requires |SuperAdmin| permission)
         :arg data.allow_unfiltered_promisc: Allow VM to have multiple MAC addresses. Use with caution! \
 (requires |SuperAdmin| permission)
         :type data.allow_unfiltered_promisc: boolean
+        :arg data.allowed_ips: List of additional IP addresses that can be used by this VM's NIC and also by \
+other VMs. Useful for floating/shared IPs
+        :type data.allowed_ips: array
         :arg data.monitoring: Use this NIC for external monitoring
         :type data.monitoring: boolean
         :arg data.set_gateway: Whether to set gateway from network (``data.net``) settings

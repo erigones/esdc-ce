@@ -156,11 +156,19 @@ class NetworkSerializer(s.InstanceSerializer):
 
 
 class ExtendedNetworkSerializer(NetworkSerializer):
-    _free_ip_subquery = '''"vms_ipaddress"."vm_id" is NULL AND "vms_ipaddress"."usage" = %d''' % IPAddress.VM
-    ips_free_query = 'SELECT COUNT(*) FROM "vms_ipaddress" WHERE "vms_subnet"."uuid" = "vms_ipaddress"."subnet_id" '\
+    _free_ip_subquery = '"vms_ipaddress"."vm_id" IS NULL AND "vms_ipaddress"."usage" = %d '\
+                        'AND "vms_ipaddress_vms"."vm_id" IS NULL' % IPAddress.VM
+
+    ips_free_query = 'SELECT COUNT(*) FROM "vms_ipaddress" LEFT OUTER JOIN '\
+                     '"vms_ipaddress_vms" ON ("vms_ipaddress"."id" = "vms_ipaddress_vms"."ipaddress_id") ' \
+                     'WHERE "vms_subnet"."uuid" = "vms_ipaddress"."subnet_id" '\
                      'AND %s' % _free_ip_subquery
-    ips_used_query = 'SELECT COUNT(*) FROM "vms_ipaddress" WHERE "vms_subnet"."uuid" = "vms_ipaddress"."subnet_id" '\
+
+    ips_used_query = 'SELECT COUNT(*) FROM "vms_ipaddress" LEFT OUTER JOIN '\
+                     '"vms_ipaddress_vms" ON ("vms_ipaddress"."id" = "vms_ipaddress_vms"."ipaddress_id") ' \
+                     'WHERE "vms_subnet"."uuid" = "vms_ipaddress"."subnet_id" '\
                      'AND NOT (%s)' % _free_ip_subquery
+
     extra_select = frozendict({'ips_free': ips_free_query, 'ips_used': ips_used_query})
 
     dcs = s.DcsField()

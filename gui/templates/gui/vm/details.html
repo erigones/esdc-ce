@@ -422,7 +422,7 @@
             {% if is_kvm %}
             <td class="hidden-phone-small">{{ nic.model }}</td>
             {% endif %}
-            {% with netmask=nic|keyvalue:"netmask" %}<td>{% if ip %}{{ ip|cidr:netmask }}{% endif %}</td>{% endwith %}
+            {% with netmask=nic|keyvalue:"netmask" allowed_ips=nic|keyvalue:"allowed_ips" %}<td>{% if ip %}{{ ip|cidr:netmask }}{% endif %}{% if allowed_ips %}<br><small>({{ allowed_ips|join:", " }})</small>{% endif %}</td>{% endwith %}
             <td>{{ nic.gateway|default:"" }}</td>
             <td>{{ nic.net }}{% if not ip %} <span title="{% trans "IP addresses for this network are managed by an external service" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-info-sign"></i></span>{% endif %}</td>
           </tr>

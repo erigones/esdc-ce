@@ -35,17 +35,25 @@ def vm_update_ipaddress_usage(vm):
 
     Always call this function _only_ after vm.json_active is synced with vm.json!!!
     """
-    current_ips = set(vm.json_active_get_ips())
-    current_ips.update(vm.json_get_ips())
+    allowed_ips = vm.allowed_ips.all()
+    current_ips = set(vm.json_active_get_ips(allowed_ips=False))
+    current_ips.update(vm.json_get_ips(allowed_ips=False))
+    current_ips.update(allowed_ips.values_list('ip', flat=True))
     # Return old IPs back to IP pool, so they can be used again
     vm.ipaddress_set.exclude(ip__in=current_ips).update(vm=None, usage=IPAddress.VM)
 
     if vm.is_notcreated():
         # Server was deleted from hypervisor
         vm.ipaddress_set.filter(usage=IPAddress.VM_REAL).update(usage=IPAddress.VM)
+
+        for ip in allowed_ips.filter(usage=IPAddress.VM_REAL):
+            if all(other_vm.is_notcreated() for other_vm in ip.vms.exclude(uuid=vm.uuid)):
+                ip.usage = IPAddress.VM
+                ip.save()
     else:
         # Server was updated or created
         vm.ipaddress_set.filter(usage=IPAddress.VM).update(usage=IPAddress.VM_REAL)
+        allowed_ips.filter(usage=IPAddress.VM).update(usage=IPAddress.VM_REAL)
 
 
 def vm_deploy(vm, force_stop=False):
