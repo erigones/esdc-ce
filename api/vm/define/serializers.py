@@ -946,13 +946,24 @@ class VmDefineNicSerializer(s.Serializer):
         self.dc_settings = dc_settings = vm.dc.settings
         self.nic_id = kwargs.pop('nic_id', None)
         self.resolvers = vm.resolvers
+        # List of DNS Record objects, where the content is equal to this NIC's IP address
         self._dns = []
+        # Subnet object currently set in this NIC
         self._net = None
+        # New Subnet object that is going to be replaced by self._net
         self._net_old = None
+        # The self._ip attribute holds the IPAddress object that is currently associated with this NIC
+        # In case the related network object has dhcp_passthrough=True the value of self._ip will be False.
         self._ip = None
+        # self._ip_old holds the IPAddress object which is currently associated with this NIC, but is going to be
+        # changed by a new IP (self._ip). The purpose of this attribute is to clean up old DNS and IP relations after
+        # the VM is updated (save_ip()).
         self._ip_old = None
+        # The self._ips and self._ips_old have the same purpose ajs self._ip and self._ip_old but in relation to
+        # the allowed_ips array.
         self._ips = ()
         self._ips_old = ()
+        # This attribute is True if vm.monitoring_ip equals to nic['ip']
         self._monitoring_old = None
 
         if len(args) > 0:  # GET, PUT
@@ -1467,44 +1478,38 @@ class VmDefineNicSerializer(s.Serializer):
         return RecordView.internal_response(request, method, ptr, data, task_id=task_id, related_obj=vm)
 
     @staticmethod
-    def _remove_vm_ip_association(vm, ip_old, many=False):
-        logger.info('Removing association of old IP %s with vm %s.', ip_old, vm)
+    def _remove_vm_ip_association(vm, ip, many=False):
+        logger.info('Removing association of IP %s with vm %s.', ip, vm)
 
-        if ip_old.usage == IPAddress.VM_REAL:  # IP is set on hypervisor
-            logger.info(' ^ Removing association of old IP %s to vm %s will be delayed until PUT vm_manage is done.',
-                        ip_old, vm)
+        if ip.usage == IPAddress.VM_REAL:  # IP is set on hypervisor
+            logger.info(' ^ Removal of association of IP %s with vm %s will be delayed until PUT vm_manage is done.',
+                        ip, vm)
         else:  # DB only operation
             if many:
-                ip_old.vms.remove(vm)
+                ip.vms.remove(vm)
             else:
-                ip_old.vm = None
-                ip_old.save()
+                ip.vm = None
+                ip.save()
 
     @staticmethod
-    def _update_vm_ip_association(vm, ip, delete=False, many=False):
-        if delete:
-            logger.info('Removing association IP %s to vm %s.', ip, vm)
+    def _create_vm_ip_association(vm, ip, many=False):
+        logger.info('Creating association of IP %s with vm %s.', ip, vm)
 
-            if ip.usage == IPAddress.VM_REAL:  # IP is set on hypervisor
-                logger.info(' ^ Removing association of IP %s to vm %s will be delayed after PUT vm_manage.',
-                            ip, vm)
-            else:  # DB only operation
-                if many:
-                    ip.vms.remove(vm)
-                else:
-                    ip.vm = None
-                    ip.save()
+        if ip.vm:
+            raise APIError(detail='Unexpected problem with IP address association.')
+
+        if many:
+            ip.vms.add(vm)
         else:
-            logger.info('Creating association IP %s to vm %s.', ip, vm)
+            ip.vm = vm
+            ip.save()
 
-            if ip.vm:
-                raise APIError(detail='Unexpected problem with IP address association.')
-
-            if many:
-                ip.vms.add(vm)
-            else:
-                ip.vm = vm
-                ip.save()
+    @classmethod
+    def _update_vm_ip_association(cls, vm, ip, delete=False, many=False):
+        if delete:
+            cls._remove_vm_ip_association(vm, ip, many=many)
+        else:
+            cls._create_vm_ip_association(vm, ip, many=many)
 
     def save_ip(self, task_id, delete=False, update=False):
         vm = self.vm
