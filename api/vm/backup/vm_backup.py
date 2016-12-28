@@ -190,10 +190,10 @@ class VmBackup(TaskAPIView):
 
         # Prepare vm for restore
         request, data, bkp, vm = self.request, self.data, self.bkp, self.vm
-        target_hostname = data.get('target_hostname', None)
+        target_hostname_or_uuid = data.get('target_hostname_or_uuid', None)
 
-        if target_hostname:
-            vm = get_vm(request, target_hostname, exists_ok=True, noexists_fail=True, check_node_status=None)
+        if target_hostname_or_uuid:
+            vm = get_vm(request, target_hostname_or_uuid, exists_ok=True, noexists_fail=True, check_node_status=None)
         elif not vm:
             raise ObjectNotFound(model=Vm)
 
