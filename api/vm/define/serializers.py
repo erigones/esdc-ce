@@ -963,6 +963,8 @@ class VmDefineNicSerializer(s.Serializer):
         # the allowed_ips array.
         self._ips = ()
         self._ips_old = ()
+        # Helper attribute for self.save_ip()
+        self._changing_allowed_ips = False
         # This attribute is True if vm.monitoring_ip equals to nic['ip']
         self._monitoring_old = None
 
@@ -1213,18 +1215,21 @@ class VmDefineNicSerializer(s.Serializer):
             if ipaddress.ip in self.vm.json_get_ips():  # check if selected address is not on another interface
                 return _('Object with name=%s is already used.') % ip
         else:
-            if ipaddress.usage != IPAddress.VM:  # check if selected address can be used for virtual servers
-                return _('Object with name=%s is not available.') % ip
-
             if ipaddress.vm is not None:  # check if selected address is free in this subnet
                 return _('Object with name=%s is already used as default address.') % ip
 
             if allowed_ips:
+                if ipaddress.usage not in (IPAddress.VM, IPAddress.VM_REAL):  # check if selected IP can be used for VM
+                    return _('Object with name=%s is not available.') % ip
+
                 for other_vm in ipaddress.vms.exclude(uuid=self.vm.uuid):
                     if other_vm.dc != self.vm.dc:
                         return _('Object with name=%s is already used as additional address in '
                                  'another virtual datacenter.') % ip
             else:
+                if ipaddress.usage != IPAddress.VM:  # check if selected address can be used for virtual servers
+                    return _('Object with name=%s is not available.') % ip
+
                 if ipaddress.vms.exists():  # IP address is already used as allowed_ips
                     return _('Object with name=%s is already used as additional address.') % ip
 
@@ -1300,13 +1305,16 @@ class VmDefineNicSerializer(s.Serializer):
                     self._ips_old = self._ips.exclude(ip__in=ip_list)
 
                 self._ips = _ips
+                self._changing_allowed_ips = True
                 attrs['allowed_ips'] = list(ip_list)
         else:
             # changing net + allowed_ips not specified, but already set on nic (with old net)
+            # or settings empty allowed_ips (=> user wants to remove allowed_ips)
             if self._ips and (self._net_old or 'allowed_ips' in attrs):
                 attrs['allowed_ips'] = []
                 self._ips_old = self._ips
                 self._ips = ()
+                self._changing_allowed_ips = True
 
         if net.dhcp_passthrough:
             # no dns and monitoring for this NIC
@@ -1482,7 +1490,7 @@ class VmDefineNicSerializer(s.Serializer):
     def _remove_vm_ip_association(vm, ip, many=False):
         logger.info('Removing association of IP %s with vm %s.', ip, vm)
 
-        if ip.usage == IPAddress.VM_REAL:  # IP is set on hypervisor
+        if ip.usage == IPAddress.VM_REAL and vm.is_deployed():  # IP is set on hypervisor
             logger.info(' ^ Removal of association of IP %s with vm %s will be delayed until PUT vm_manage is done.',
                         ip, vm)
         else:  # DB only operation
@@ -1516,9 +1524,6 @@ class VmDefineNicSerializer(s.Serializer):
         vm = self.vm
         ip = self._ip
         ip_old = self._ip_old
-        allowed_ips = self._ips
-        allowed_ips_old = self._ips_old
-        changing_allowed_ips = allowed_ips != allowed_ips_old
 
         if ip is False:  # means that the new IP uses a network with dhcp_passthrough
             assert self._net.dhcp_passthrough
@@ -1540,11 +1545,11 @@ class VmDefineNicSerializer(s.Serializer):
             if ip and self._net and self._net.ptr_domain:
                 self.save_ptr(self.request, task_id, vm, ip, self._net, delete=delete)  # fails silently
 
-        if (not update or changing_allowed_ips) or allowed_ips_old:
-            for _ip_old in allowed_ips_old:
+        if self._changing_allowed_ips:
+            for _ip_old in self._ips_old:
                 self._remove_vm_ip_association(vm, _ip_old, many=True)
 
-            for _ip in allowed_ips:
+            for _ip in self._ips:
                 self._update_vm_ip_association(vm, _ip, delete=delete, many=True)
 
         # Create DNS A Record if dns setting is True
