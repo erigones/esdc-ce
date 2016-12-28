@@ -959,7 +959,7 @@ class VmDefineNicSerializer(s.Serializer):
         # changed by a new IP (self._ip). The purpose of this attribute is to clean up old DNS and IP relations after
         # the VM is updated (save_ip()).
         self._ip_old = None
-        # The self._ips and self._ips_old have the same purpose ajs self._ip and self._ip_old but in relation to
+        # The self._ips and self._ips_old have the same purpose as self._ip and self._ip_old but in relation to
         # the allowed_ips array.
         self._ips = ()
         self._ips_old = ()
@@ -1303,7 +1303,7 @@ class VmDefineNicSerializer(s.Serializer):
                 attrs['allowed_ips'] = list(ip_list)
         else:
             # changing net + allowed_ips not specified, but already set on nic (with old net)
-            if self._net_old and self._ips:
+            if self._ips and (self._net_old or 'allowed_ips' in attrs):
                 attrs['allowed_ips'] = []
                 self._ips_old = self._ips
                 self._ips = ()
@@ -1518,6 +1518,7 @@ class VmDefineNicSerializer(s.Serializer):
         ip_old = self._ip_old
         allowed_ips = self._ips
         allowed_ips_old = self._ips_old
+        changing_allowed_ips = allowed_ips != allowed_ips_old
 
         if ip is False:  # means that the new IP uses a network with dhcp_passthrough
             assert self._net.dhcp_passthrough
@@ -1539,7 +1540,7 @@ class VmDefineNicSerializer(s.Serializer):
             if ip and self._net and self._net.ptr_domain:
                 self.save_ptr(self.request, task_id, vm, ip, self._net, delete=delete)  # fails silently
 
-        if not update or allowed_ips_old:
+        if (not update or changing_allowed_ips) or allowed_ips_old:
             for _ip_old in allowed_ips_old:
                 self._remove_vm_ip_association(vm, _ip_old, many=True)
 
