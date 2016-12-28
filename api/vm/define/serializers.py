@@ -1205,7 +1205,8 @@ class VmDefineNicSerializer(s.Serializer):
 
         return attrs
 
-    def _is_ip_used(self, ipaddress, allowed_ips=False):
+    def _check_ip_usage(self, ipaddress, allowed_ips=False):
+        """Returns an error message if IP address is used by some VM"""
         ip = ipaddress.ip
 
         if ipaddress.usage == IPAddress.VM_REAL and ipaddress.vm == self.vm:  # Trying to re-use our lost IP?
@@ -1246,7 +1247,7 @@ class VmDefineNicSerializer(s.Serializer):
                     self._errors['ip'] = s.ObjectDoesNotExist(ip).messages
                     return attrs
                 else:
-                    error = self._is_ip_used(_ip)
+                    error = self._check_ip_usage(_ip)
 
                     if error:
                         self._errors['ip'] = s.ErrorList([error])
@@ -1287,7 +1288,7 @@ class VmDefineNicSerializer(s.Serializer):
                     )
                     return attrs
 
-                errors = [err for err in (self._is_ip_used(ipaddress, allowed_ips=True) for ipaddress in _ips)
+                errors = [err for err in (self._check_ip_usage(ipaddress, allowed_ips=True) for ipaddress in _ips)
                           if err is not None]
 
                 if errors:
