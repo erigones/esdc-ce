@@ -1117,13 +1117,13 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
 
         return ips
 
-    def json_get_ips(self):
+    def json_get_ips(self, **kwargs):
         """Get IPs on all nics from json."""
-        return self._get_ips(self.json_get_nics())
+        return self._get_ips(self.json_get_nics(), **kwargs)
 
-    def json_active_get_ips(self):
+    def json_active_get_ips(self, **kwargs):
         """Get IPs on nics from json_active."""
-        return self._get_ips(self.json_active_get_nics())
+        return self._get_ips(self.json_active_get_nics(), **kwargs)
 
     @staticmethod
     def get_real_nic_id(nic):
