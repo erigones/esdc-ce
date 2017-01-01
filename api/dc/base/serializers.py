@@ -10,7 +10,7 @@ from api import serializers as s
 from api.validators import validate_owner, validate_alias, validate_mdata, validate_ssh_key
 from api.vm.utils import get_owners
 from api.sms.utils import get_services
-from api.mon.zabbix import VM_KWARGS
+from api.mon.zabbix import VM_KWARGS, VM_KWARGS_NIC, VM_KWARGS_DISK
 from gui.models import User, UserProfile, Role
 from vms.models import Dc, DefaultDc, Vm, BackupDefine, Subnet
 from vms.utils import DefAttrDict
@@ -561,11 +561,11 @@ class DcSettingsSerializer(s.InstanceSerializer):
 
     # noinspection PyMethodMayBeStatic,PyPep8Naming
     def validate_MON_ZABBIX_TEMPLATES_VM_NIC(self, attrs, source):
-        return validate_array_placeholders(attrs, source, VM_KWARGS.copy().update({'net': 1, 'nic_id': 2}))
+        return validate_array_placeholders(attrs, source, VM_KWARGS_NIC)
 
     # noinspection PyMethodMayBeStatic,PyPep8Naming
     def validate_MON_ZABBIX_TEMPLATES_VM_DISK(self, attrs, source):
-        return validate_array_placeholders(attrs, source, VM_KWARGS.copy().update({'disk': 1, 'disk_id': 2}))
+        return validate_array_placeholders(attrs, source, VM_KWARGS_DISK)
 
     def validate(self, attrs):
         # Check if it is possible to override a boolean setting
