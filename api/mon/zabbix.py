@@ -5,6 +5,7 @@ from subprocess import call
 from django.conf import settings as django_settings
 from django.core.cache import cache
 from django.utils.six import iteritems
+from frozendict import frozendict
 
 from zabbix_api import ZabbixAPI, ZabbixAPIException
 from api.decorators import catch_exception
@@ -12,10 +13,20 @@ from vms.models import DefaultDc
 
 logger = getLogger(__name__)
 
-VM_KWARGS = {'ostype': 1, 'ostype_text': 'test', 'dc_name': 'test', 'disk_image': 'test', 'disk_image_abbr': 'test'}
-VM_KWARGS_KEYS = VM_KWARGS.keys()
-NODE_KWARGS = {}
-NODE_KWARGS_KEYS = NODE_KWARGS.keys()
+_VM_KWARGS = (
+    ('ostype', 1),
+    ('ostype_text', 'test'),
+    ('dc_name', 'test'),
+    ('disk_image', 'test'),
+    ('disk_image_abbr', 'test'),
+)
+
+VM_KWARGS = frozendict(_VM_KWARGS)
+VM_KWARGS_KEYS = tuple(VM_KWARGS.keys())
+VM_KWARGS_NIC = frozendict(_VM_KWARGS + (('net', 1), ('nic_id', 2)))
+VM_KWARGS_DISK = frozendict(_VM_KWARGS + (('disk', 1), ('disk_id', 2)))
+NODE_KWARGS = frozendict()
+NODE_KWARGS_KEYS = tuple(NODE_KWARGS.keys())
 RESULT_CACHE_TIMEOUT = 3600
 
 __ZABBIX__ = {}  # This hold an instance of zabbix per DC
