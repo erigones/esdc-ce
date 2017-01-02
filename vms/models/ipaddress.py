@@ -80,15 +80,16 @@ class IPAddress(models.Model):
         else:
             return None
 
+    @property
     def additional_vm_uuids(self):
-        if self.usage in (self.VM, self.VM_REAL):
+        if self.pk and self.usage in (self.VM, self.VM_REAL):
             return [vm.uuid for vm in self.vms.all()]  # Faster because of prefetch_related('vms')
         else:
             return []
 
     @property
     def additional_vm_hostnames(self):
-        if self.usage in (self.VM, self.VM_REAL):
+        if self.pk and self.usage in (self.VM, self.VM_REAL):
             return [vm.hostname for vm in self.vms.all()]  # Faster because of prefetch_related('vms')
         else:
             return []
