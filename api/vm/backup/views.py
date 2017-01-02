@@ -350,7 +350,6 @@ All data created after the backup (including all existing snapshots) on target s
             * |Admin|
         :Asynchronous?:
             * |async-yes| - Restore backup
-            * |async-no| - Update backup note
         :arg hostname_or_uuid: **required** - Original server hostname or uuid
         :type hostname_or_uuid: string
         :arg bkpname: **required** - Backup name
@@ -363,8 +362,7 @@ All data created after the backup (including all existing snapshots) on target s
         :type data.target_disk_id: integer
         :arg data.force: Force restore and delete existing snapshots and backups (default: true)
         :type data.force: boolean
-        :arg data.note: Backup comment (change note instead of restore if specified)
-        :type data.note: string
+
         :status 200: SUCCESS
         :status 201: PENDING
         :status 400: FAILURE
@@ -375,6 +373,25 @@ All data created after the backup (including all existing snapshots) on target s
         :status 417: VM backup status is not OK / VM has snapshots (force=false)
         :status 423: Node is not operational / VM is not operational / VM is not stopped / VM is locked or has slave VMs
         :status 428: VM brand mismatch / Disk size mismatch / Not enough free space on target storage
+
+    .. http:put:: /vm/(hostname_or_uuid)/backup/(bkpname)
+
+        :DC-bound?:
+            * |dc-yes|
+        :Permissions:
+            * |Admin|
+        :Asynchronous?:
+            * |async-no| - Update backup note
+        :arg hostname_or_uuid: **required** - Original server hostname or uuid
+        :type hostname_or_uuid: string
+        :arg bkpname: **required** - Backup name
+        :type bkpname: string
+        :arg data.note: **required** - Backup comment (change note instead of restore if specified)
+        :type data.note: string
+        :status 200: SUCCESS
+        :status 400: FAILURE
+        :status 403: Forbidden
+        :status 404: Backup not found
 
     .. http:delete:: /vm/(hostname_or_uuid)/backup/(bkpname)
 

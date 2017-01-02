@@ -370,7 +370,6 @@ All data created after the snapshot will be lost (including all newer snapshots)
             * |VmOwner|
         :Asynchronous?:
             * |async-yes| - Rollback snapshot
-            * |async-no| - Update snapshot note
         :arg hostname_or_uuid: **required** - Server hostname or uuid
         :type hostname_or_uuid: string
         :arg snapname: **required** - Snapshot name
@@ -379,8 +378,6 @@ All data created after the snapshot will be lost (including all newer snapshots)
         :type data.disk_id: integer
         :arg data.force: Force recursive rollback (default: true)
         :type data.force: boolean
-        :arg data.note: Snapshot comment (change note instead of rollback if specified)
-        :type data.note: string
         :status 200: SUCCESS
         :status 201: PENDING
         :status 400: FAILURE
@@ -390,6 +387,26 @@ All data created after the snapshot will be lost (including all newer snapshots)
         :status 412: Invalid disk_id
         :status 417: VM snapshot status is not OK / VM has more recent snapshots (force=false)
         :status 423: Node is not operational / VM is not operational / VM is not stopped / VM is locked or has slave VMs
+
+    .. http:put:: /vm/(hostname_or_uuid)/snapshot/(snapname)
+
+        :DC-bound?:
+            * |dc-yes|
+        :Permissions:
+            * |VmOwner|
+        :Asynchronous?:
+            * |async-no| - Update snapshot note
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
+        :arg snapname: **required** - Snapshot name
+        :type snapname: string
+        :arg data.note: **required** - Snapshot comment
+        :type data.note: string
+        :status 200: SUCCESS
+        :status 201: PENDING
+        :status 400: FAILURE
+        :status 403: Forbidden
+        :status 404: VM not found / Snapshot not found
 
     .. http:delete:: /vm/(hostname_or_uuid)/snapshot/(snapname)
 
