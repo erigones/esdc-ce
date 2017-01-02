@@ -181,13 +181,12 @@ class VmBackup(TaskAPIView):
         return self.error_response
 
     def put(self):
-        ser = BackupRestoreSerializer(data=self.data)
+        if 'note' in self.data:  # Changing backup note instead of restore (not logging!)
+            return self.save_note()
 
+        ser = BackupRestoreSerializer(data=self.data)
         if not ser.is_valid():
             return FailureTaskResponse(self.request, ser.errors)
-
-        if ser.data['note']:  # Changing backup note instead of restore (not logging!)
-            return self.save_note()
 
         self._check_bkp()
         self._check_bkp_node()
@@ -208,7 +207,7 @@ class VmBackup(TaskAPIView):
             raise PreconditionRequired('VM brand mismatch')
 
         disk_id, real_disk_id, zfs_filesystem = get_disk_id(request, vm, self.data, key='target_disk_id',
-                                                            default=self.disk_id)
+                                                            default=None)
         tgt_disk = vm.json_active_get_disks()[disk_id - 1]
 
         if tgt_disk['size'] != bkp.disk_size:

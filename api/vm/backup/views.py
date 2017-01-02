@@ -355,11 +355,11 @@ All data created after the backup (including all existing snapshots) on target s
         :type hostname_or_uuid: string
         :arg bkpname: **required** - Backup name
         :type bkpname: string
-        :arg data.disk_id: **required** - Original disk number/ID (default: 1)
+        :arg data.disk_id: Original disk number/ID (default: 1)
         :type data.disk_id: integer
         :arg data.target_hostname_or_uuid: **required** - Target server hostname or uuid
         :type data.target_hostname_or_uuid: string
-        :arg data.target_disk_id: - Target disk number/ID (default: ``disk_id``)
+        :arg data.target_disk_id: **required** - Target disk number/ID
         :type data.target_disk_id: integer
         :arg data.force: Force restore and delete existing snapshots and backups (default: true)
         :type data.force: boolean
