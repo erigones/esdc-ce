@@ -14,6 +14,8 @@ Features
 Bugs
 ----
 
+- Fixed bug with monitoring synchronization called twice during new VM deployment - `#32 <https://github.com/erigones/esdc-ce/issues/32>`__
+
 
 2.3.3 (unreleased)
 ========================================
@@ -26,6 +28,7 @@ Bugs
 
 - Fixed permission problems during byte-compilation of modules in production - `#28 <https://github.com/erigones/esdc-ce/issues/28>`__
 - Fixed validation of MON_ZABBIX_TEMPLATES_VM_NIC and MON_ZABBIX_TEMPLATES_VM_DISK DC settings - `#31 <https://github.com/erigones/esdc-ce/issues/31>`__
+
 
 2.3.2 (released on 2016-12-17)
 ========================================

@@ -120,7 +120,7 @@ def vm_create_cb(result, task_id, vm_uuid=None):
             # save all
             vm.save(update_node_resources=True, update_storage_resources=True)
             vm_update_ipaddress_usage(vm)
-            vm_json_active_changed.send(task_id, vm=vm)  # Signal!
+            # vm_json_active_changed.send(task_id, vm=vm)  # Signal! -> not needed because vm_deployed is called below
             vm_created.send(task_id, vm=vm)  # Signal!
 
             if msg.find('Successfully started') < 0:  # VM was created, but could not be started
