@@ -400,7 +400,7 @@ All data created after the backup (including all existing snapshots) on target s
         :Permissions:
             * |Admin|
         :Asynchronous?:
-            * |async-no|
+            * |async-yes|
         :arg hostname_or_uuid: **required** - Original server hostname or uuid
         :type hostname_or_uuid: string
         :arg bkpname: **required** - Backup name

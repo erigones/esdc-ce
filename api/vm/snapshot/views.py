@@ -403,7 +403,6 @@ All data created after the snapshot will be lost (including all newer snapshots)
         :arg data.note: **required** - Snapshot comment
         :type data.note: string
         :status 200: SUCCESS
-        :status 201: PENDING
         :status 400: FAILURE
         :status 403: Forbidden
         :status 404: VM not found / Snapshot not found
