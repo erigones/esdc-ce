@@ -5,6 +5,7 @@ from vms.models import Vm, Node, Iso
 
 class VmStatusSerializer(s.Serializer):
     hostname = s.CharField(read_only=True)
+    uuid = s.CharField(read_only=True)
     alias = s.CharField(read_only=True)
     status = s.DisplayChoiceField(choices=Vm.STATUS, read_only=True)
     status_change = s.DateTimeField(read_only=True)
