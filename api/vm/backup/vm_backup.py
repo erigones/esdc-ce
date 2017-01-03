@@ -1,16 +1,15 @@
 from django.utils.translation import ugettext_noop as _
 
-from vms.models import Vm, Snapshot, BackupDefine, Backup
+from vms.models import Snapshot, BackupDefine, Backup
 from que import TT_EXEC, TT_AUTO
 from api.api_views import TaskAPIView
 from api.task.response import SuccessTaskResponse, FailureTaskResponse
-from api.serializers import ForceSerializer
 from api.exceptions import (VmIsNotOperational, NodeIsNotOperational, PreconditionRequired, ExpectationFailed,
                             ObjectNotFound, VmHasPendingTasks, VmIsLocked)
 from api.utils.db import get_object
 from api.vm.utils import get_vm
 from api.vm.messages import LOG_BKP_CREATE, LOG_BKP_UPDATE, LOG_BKP_DELETE
-from api.vm.backup.serializers import BackupSerializer
+from api.vm.backup.serializers import BackupSerializer, BackupRestoreSerializer
 from api.vm.backup.utils import BACKUP_TASK_EXPIRES, get_backup_cmd
 from api.vm.snapshot.utils import get_disk_id, filter_disk_id
 
@@ -185,17 +184,18 @@ class VmBackup(TaskAPIView):
         if 'note' in self.data:  # Changing backup note instead of restore (not logging!)
             return self.save_note()
 
+        ser = BackupRestoreSerializer(data=self.data)
+        if not ser.is_valid():
+            return FailureTaskResponse(self.request, ser.errors)
+
         self._check_bkp()
         self._check_bkp_node()
 
         # Prepare vm for restore
-        request, data, bkp, vm = self.request, self.data, self.bkp, self.vm
-        target_hostname = data.get('target_hostname', None)
+        request, bkp = self.request, self.bkp
 
-        if target_hostname:
-            vm = get_vm(request, target_hostname, exists_ok=True, noexists_fail=True, check_node_status=None)
-        elif not vm:
-            raise ObjectNotFound(model=Vm)
+        vm = get_vm(request, ser.data['target_hostname_or_uuid'], exists_ok=True, noexists_fail=True,
+                    check_node_status=None)
 
         if vm.node.status not in vm.node.STATUS_OPERATIONAL:
             raise NodeIsNotOperational
@@ -206,8 +206,8 @@ class VmBackup(TaskAPIView):
         if vm.brand != bkp.vm_brand:
             raise PreconditionRequired('VM brand mismatch')
 
-        disk_id, real_disk_id, zfs_filesystem = get_disk_id(request, vm, data, key='target_disk_id',
-                                                            default=self.disk_id)
+        disk_id, real_disk_id, zfs_filesystem = get_disk_id(request, vm, self.data, key='target_disk_id',
+                                                            default=None)
         tgt_disk = vm.json_active_get_disks()[disk_id - 1]
 
         if tgt_disk['size'] != bkp.disk_size:
@@ -219,11 +219,8 @@ class VmBackup(TaskAPIView):
         if bkp.disk_size > target_ns.storage.size_free:
             raise PreconditionRequired('Not enough free space on target storage')
 
-        force = bool(ForceSerializer(data=data, default=True))
-
-        if not force:
-            if Snapshot.objects.only('id').filter(vm=vm, disk_id=real_disk_id).exists():
-                raise ExpectationFailed('VM has snapshots')
+        if not ser.data['force'] and Snapshot.objects.only('id').filter(vm=vm, disk_id=real_disk_id).exists():
+            raise ExpectationFailed('VM has snapshots')
 
         if vm.status != vm.STOPPED:
             raise VmIsNotOperational(_('VM is not stopped'))
@@ -241,7 +238,7 @@ class VmBackup(TaskAPIView):
         self._detail_ += ", target_hostname='%s', target_disk_id=%s" % (vm.hostname, disk_id)
         self._apiview_['target_hostname'] = vm.hostname
         self._apiview_['target_disk_id'] = disk_id
-        self._apiview_['force'] = force
+        self._apiview_['force'] = ser.data['force']
 
         if bkp.vm:
             self._apiview_['source_hostname'] = bkp.vm.hostname

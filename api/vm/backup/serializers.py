@@ -129,3 +129,10 @@ class BackupSerializer(_HideNodeSerializer):
         super(BackupSerializer, self).__init__(request, instance, *args, **kwargs)
         if not node_view:
             del self.fields['dc']
+
+
+class BackupRestoreSerializer(s.Serializer):
+    target_hostname_or_uuid = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\._-]*$', required=True)
+    target_disk_id = s.IntegerField(max_value=DISK_ID_MAX, min_value=DISK_ID_MIN, required=True)
+    disk_id = s.IntegerField(max_value=DISK_ID_MAX, min_value=DISK_ID_MIN, default=1, required=True)
+    force = s.BooleanField(default=True)
