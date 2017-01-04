@@ -1,3 +1,6 @@
+import operator
+from functools import reduce
+
 from django.db.models import Q
 from django.db.transaction import atomic
 from django.utils.translation import ugettext_lazy as _
@@ -26,24 +29,18 @@ class NetworkIPView(APIView):
         self.many = many
         self.dc = dc
         net_filter = {'name': name}
-        ip_filter = {}
-        ip_exclude = {}
-        where = None
+        ip_filter = []
 
         if dc:
             net_filter['dc'] = dc
-            ip_filter['usage__in'] = [IPAddress.VM, IPAddress.VM_REAL]
-            ip_filter['vm__dc'] = dc
-            ip_filter['vm__isnull'] = False
+            ip_filter.append(Q(usage__in=[IPAddress.VM, IPAddress.VM_REAL]))
+            ip_filter.append((Q(vm__isnull=False) & Q(vm__dc=dc)) | (~Q(vms=None) & Q(vms__dc=dc)))
         elif not request.user.is_staff:
-            if many:
-                ip_exclude['usage'] = IPAddress.NODE
-            else:
-                where = ~Q(usage=IPAddress.NODE)
+            ip_filter.append(~Q(usage=IPAddress.NODE))
 
         self.net = net = get_virt_object(request, Subnet, data=data, sr=('dc_bound',), get_attrs=net_filter,
                                          exists_ok=True, noexists_fail=True)
-        ip_filter['subnet'] = net
+        ip_filter.append(Q(subnet=net))
 
         if many:
             self.ips = ips = data.get('ips', None)
@@ -51,7 +48,7 @@ class NetworkIPView(APIView):
             if ips is not None:
                 if not isinstance(ips, (tuple, list)):
                     raise InvalidInput('Invalid ips')
-                ip_filter['ip__in'] = ips
+                ip_filter.append(Q(ip__in=ips))
 
             if request.method == 'GET':
                 usage = data.get('usage', None)
@@ -64,19 +61,20 @@ class NetworkIPView(APIView):
                     except ValueError:
                         raise InvalidInput('Invalid usage')
                     else:
-                        ip_filter['usage'] = usage
+                        ip_filter.append(Q(usage=usage))
 
             try:
+                ip_filter = reduce(operator.and_, ip_filter)
                 self.ip = IPAddress.objects.select_related('vm', 'vm__dc', 'subnet')\
-                                           .exclude(**ip_exclude)\
-                                           .filter(**ip_filter)\
-                                           .order_by(*self.order_by)
+                                           .prefetch_related('vms', 'vms__dc')\
+                                           .filter(ip_filter)\
+                                           .order_by(*self.order_by).distinct()
             except TypeError:
                 raise InvalidInput('Invalid ips')
 
         else:
-            ip_filter['ip'] = ip
-            self.ip = get_object(request, IPAddress, ip_filter, where=where, sr=('vm', 'vm__dc', 'subnet'))
+            ip_filter = reduce(operator.and_, ip_filter)
+            self.ip = get_object(request, IPAddress, {'ip': ip}, where=ip_filter, sr=('vm', 'vm__dc', 'subnet'))
 
     def get(self):
         if self.many:
@@ -163,7 +161,7 @@ class NetworkIPView(APIView):
             if not ip:  # SELECT count(*) from IPAddress ???
                 raise ObjectNotFound(model=IPAddress)
             for i in ip:  # SELECT * from IPAddress
-                if i.vm:
+                if i.vm or i.vms.exists():
                     raise PreconditionRequired(_('IP address "%s" is used by VM') % i.ip)
                 if i.is_node_address():
                     raise PreconditionRequired(_('IP address "%s" is used by Compute node') % i.ip)
@@ -172,7 +170,7 @@ class NetworkIPView(APIView):
             dd = {'ips': ','.join(i.ip for i in ip)}
 
         else:
-            if ip.vm:
+            if ip.vm or ip.vms.exists():
                 raise PreconditionRequired(_('IP address is used by VM'))
             if ip.is_node_address():
                 raise PreconditionRequired(_('IP address is used by Compute node'))
@@ -198,7 +196,7 @@ class NetworkIPPlanView(APIView):
         super(NetworkIPPlanView, self).__init__(request)
         self.data = data
         self.dc = dc
-        ip_filter = {}
+        ip_filter = []
 
         if subnet:
             try:
@@ -217,12 +215,11 @@ class NetworkIPPlanView(APIView):
             if not nets.exists():
                 raise ObjectNotFound(model=Subnet)
 
-            ip_filter['subnet__in'] = nets
+            ip_filter.append(Q(subnet__in=nets))
 
         if dc:
-            ip_filter['usage'] = IPAddress.VM
-            ip_filter['vm__dc'] = dc
-            ip_filter['vm__isnull'] = False
+            ip_filter.append(Q(usage=IPAddress.VM))
+            ip_filter.append((Q(vm__isnull=False) & Q(vm__dc=dc)) | (~Q(vms=None) & Q(vms__dc=dc)))
 
         usage = data.get('usage', None)
         if usage and not dc:
@@ -233,10 +230,17 @@ class NetworkIPPlanView(APIView):
             except ValueError:
                 raise InvalidInput('Invalid usage')
             else:
-                ip_filter['usage'] = usage
+                ip_filter.append(Q(usage=usage))
 
-        self.ips = IPAddress.objects.select_related('vm', 'vm__dc', 'subnet').filter(**ip_filter)\
-                                                                             .order_by(*self.order_by)
+        if ip_filter:
+            ip_filter = reduce(operator.and_, ip_filter)
+        else:
+            ip_filter = Q()
+
+        self.ips = IPAddress.objects.select_related('vm', 'vm__dc', 'subnet')\
+                                    .prefetch_related('vms', 'vms__dc')\
+                                    .filter(ip_filter)\
+                                    .order_by(*self.order_by).distinct()
 
     def get(self):
         if self.full:

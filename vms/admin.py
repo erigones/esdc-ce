@@ -148,7 +148,7 @@ class IPAddressInline(admin.TabularInline):
     model = IPAddress
     can_delete = False
     extra = 0
-    readonly_fields = ('vm', )
+    readonly_fields = ('vm', 'vms')
 
     # noinspection PyClassHasNoInit
     class Media:

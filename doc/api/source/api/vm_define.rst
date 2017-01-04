@@ -36,8 +36,8 @@
             }
         }
 
-/vm/*(hostname)*/define
------------------------
+/vm/*(hostname_or_uuid)*/define
+-------------------------------
 
 .. autofunction:: api.vm.define.views.vm_define
 
@@ -70,8 +70,8 @@
         }
 
 
-/vm/*(hostname)*/define/disk
-----------------------------
+/vm/*(hostname_or_uuid)*/define/disk
+------------------------------------
 
 .. autofunction:: api.vm.define.views.vm_define_disk_list
 
@@ -103,8 +103,8 @@
             }
         }
 
-/vm/*(hostname)*/define/disk/*(disk_id)*
-----------------------------------------
+/vm/*(hostname_or_uuid)*/define/disk/*(disk_id)*
+------------------------------------------------
 
 .. autofunction:: api.vm.define.views.vm_define_disk
 
@@ -135,8 +135,8 @@
         }
 
 
-/vm/*(hostname)*/define/nic
----------------------------
+/vm/*(hostname_or_uuid)*/define/nic
+-----------------------------------
 
 .. autofunction:: api.vm.define.views.vm_define_nic_list
 
@@ -170,8 +170,8 @@
             }
         }
 
-/vm/*(hostname)*/define/nic/*(nic_id)*
---------------------------------------
+/vm/*(hostname_or_uuid)*/define/nic/*(nic_id)*
+----------------------------------------------
 
 .. autofunction:: api.vm.define.views.vm_define_nic
 
@@ -203,8 +203,8 @@
             }
         }
 
-/vm/*(hostname)*/define/revert
-------------------------------
+/vm/*(hostname_or_uuid)*/define/revert
+--------------------------------------
 
 .. autofunction:: api.vm.define.views.vm_define_revert
 

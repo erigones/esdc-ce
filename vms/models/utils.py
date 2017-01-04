@@ -47,9 +47,9 @@ def diff_dict_nested(old, new, key, remove_empty=()):
     for k in new.keys():
         if k in old:  # key exists in both
             if new[k] != old[k]:  # some settings have changed
-                for i in remove_empty:
+                for i, empty_val in remove_empty:
                     if i not in new[k] and i in old[k]:
-                        new[k][i] = ''
+                        new[k][i] = empty_val
                 for i, new_i in new[k].items():  # remove same attributes
                     if i != key and i in old[k] and new_i == old[k][i]:
                         del new[k][i]

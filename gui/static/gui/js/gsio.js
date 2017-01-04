@@ -139,7 +139,7 @@ function vm_restore_backup(hostname, bkpname, disk_id, force, vm_hostname, targe
     kwargs['data']['force'] = force;
   }
   if (typeof(target_hostname) !== 'undefined' && target_hostname) {
-    kwargs['data']['target_hostname'] = target_hostname;
+    kwargs['data']['target_hostname_or_uuid'] = target_hostname;
   }
   if (typeof(target_disk_id) !== 'undefined' && target_disk_id) {
     kwargs['data']['target_disk_id'] = target_disk_id;

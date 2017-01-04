@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from uuid import uuid4
 # noinspection PyCompatibility
@@ -122,12 +123,16 @@ class Subnet(_VirtModel, _DcMixin, _UserTasksModel):
         }
 
     def is_used_by_vms(self, dc=None):
+        # Since this function returns a boolean value, we can use the association between an IPAddress and a VM
+        # to quickly find out whether there is a VM that uses this Subnet. In case there is no relationship we
+        # have to inspect each VM's json (and json_active) in order to find used network uuids and compare them
+        # to this subnet's uuid.
         if dc:
             if dc.vm_set.filter(ipaddress__subnet=self).exists():  # Quick check
                 return True
             vms = dc.vm_set.all()
         else:
-            if self.ipaddress_set.filter(vm__isnull=False).exists():  # Quick check
+            if self.ipaddress_set.filter(Q(vm__isnull=False) | ~Q(vms=None)).exists():  # Quick check
                 return True
             vms = Vm.objects.filter(dc__in=self.dc.all())
 

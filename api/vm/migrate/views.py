@@ -9,14 +9,15 @@ __all__ = ('vm_migrate', 'vm_dc')
 #: vm_status:   PUT: stopped, running
 @api_view(('PUT',))
 @request_data(permissions=(IsAdmin,))
-def vm_migrate(request, hostname, data=None):
+def vm_migrate(request, hostname_or_uuid, data=None):
     """
-    Migrate (:http:put:`PUT </vm/(hostname)/migrate>`) server to another compute node and/or disks to another storage.
+    Migrate (:http:put:`PUT </vm/(hostname_or_uuid)/migrate>`) server to another compute node and/or disks to another \
+storage.
 
     .. note:: A dummy (DB only) slave server is created during the migration process to reserve the same amount of \
 resources on target compute node in server's datacenter.
 
-    .. http:put:: /vm/(hostname)/migrate
+    .. http:put:: /vm/(hostname_or_uuid)/migrate
 
         :DC-bound?:
             * |dc-yes|
@@ -24,8 +25,8 @@ resources on target compute node in server's datacenter.
             * |Admin|
         :Asynchronous?:
             * |async-yes|
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
         :arg data.node: Target compute node hostname
         :type data.node: string
         :arg data.root_zpool: New zpool for the VM zone or OS zone including data disk
@@ -43,19 +44,19 @@ resources on target compute node in server's datacenter.
         :status 428: VM definition has changed
 
     """
-    return VmMigrate(request, hostname, data).put()
+    return VmMigrate(request, hostname_or_uuid, data).put()
 
 
 #: vm_status:   PUT: stopped, running, undefined
 @api_view(('PUT',))
 @request_data(permissions=(IsSuperAdmin,))
-def vm_dc(request, hostname, data=None):
+def vm_dc(request, hostname_or_uuid, data=None):
     """
-    Migrate (:http:put:`PUT </vm/(hostname)/migrate/dc>`) server to another datacenter.
+    Migrate (:http:put:`PUT </vm/(hostname_or_uuid)/migrate/dc>`) server to another datacenter.
 
     .. warning:: EXPERIMENTAL API function.
 
-    .. http:put:: /vm/(hostname)/migrate/dc
+    .. http:put:: /vm/(hostname_or_uuid)/migrate/dc
 
         :DC-bound?:
             * |dc-yes|
@@ -63,8 +64,8 @@ def vm_dc(request, hostname, data=None):
             * |SuperAdmin|
         :Asynchronous?:
             * |async-no|
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
         :arg data.target_dc: Target datacenter
         :type data.target_dc: string
         :status 200: SUCCESS
@@ -76,4 +77,4 @@ def vm_dc(request, hostname, data=None):
         :status 428: VM definition has changed
 
     """
-    return VmDc(request, hostname, data).put()
+    return VmDc(request, hostname_or_uuid, data).put()
