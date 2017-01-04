@@ -123,6 +123,7 @@ class BackupSerializer(_HideNodeSerializer):
     status = s.IntegerChoiceField(choices=Backup.STATUS, read_only=True, required=False)
     size = s.IntegerField(read_only=True)
     time = s.IntegerField(read_only=True)
+    file_path = s.CharField(read_only=True)
     note = s.SafeCharField(max_length=128, required=False)
 
     def __init__(self, request, instance, node_view=False, *args, **kwargs):
