@@ -7,6 +7,7 @@ Changelog
 Features
 --------
 
+- Reveal snapshot and backup IDs - `#24 <https://github.com/erigones/esdc-ce/issues/24>`__
 - Changed all VM-related API calls to be able to handle UUID-based requests instead of only hostname - `#16 <https://github.com/erigones/esdc-ce/issues/16>`__
 - Added support for nics.*.allowed_ips (multiple IPs per NIC) - `#3 <https://github.com/erigones/esdc-ce/issues/3>`__
 - Added VM UUID output value across all relevant API calls - `#23 <https://github.com/erigones/esdc-ce/issues/23>`__
