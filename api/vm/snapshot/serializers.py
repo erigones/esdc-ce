@@ -130,4 +130,4 @@ class SnapshotSerializer(s.InstanceSerializer):
     created = s.DateTimeField(read_only=True, required=False)
     status = s.IntegerChoiceField(choices=Snapshot.STATUS, read_only=True, required=False)
     size = s.IntegerField(read_only=True)
-    zfs_name = s.SafeCharField(read_only=True)
+    id = s.SafeCharField(read_only=True)
