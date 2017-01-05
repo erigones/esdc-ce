@@ -3,13 +3,16 @@ Changelog
 
 
 2.4.0 (unreleased)
-========================================
-
+==================
 Features
 --------
 
 - Changed all VM-related API calls to be able to handle UUID-based requests instead of only hostname - `#16 <https://github.com/erigones/esdc-ce/issues/16>`__
 - Added support for nics.*.allowed_ips (multiple IPs per NIC) - `#3 <https://github.com/erigones/esdc-ce/issues/3>`__
+- Added VM UUID output value across all relevant API calls - `#23 <https://github.com/erigones/esdc-ce/issues/23>`__
+- Backup restore and snapshot restore accepts VM UUID besides hostname as a parameter `#26 <https://github.com/erigones/esdc-ce/issues/26>`__
+- Backup restore API call has no default target vm and disk anymore, which makes the call less error-prone `#26 <https://github.com/erigones/esdc-ce/issues/26>`__
+
 
 Bugs
 ----
@@ -18,7 +21,7 @@ Bugs
 
 
 2.3.3 (unreleased)
-========================================
+==================
 
 Features
 --------
@@ -31,7 +34,7 @@ Bugs
 
 
 2.3.2 (released on 2016-12-17)
-========================================
+==============================
 
 Features
 --------
@@ -46,7 +49,7 @@ Bugs
 
 
 2.3.1 (released on 2016-12-15)
-========================================
+==============================
 
 Features
 --------
@@ -68,7 +71,7 @@ Bugs
 
 
 2.3.0 (released on 2016-11-14)
-========================================
+==============================
 
 Features
 --------
