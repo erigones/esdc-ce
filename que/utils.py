@@ -407,8 +407,10 @@ def delete_task(task_id, force=False, mega_force=False):
 
         # "Proper" task inspection
         i = cq.control.inspect()
-        task_ids_active = frozenset(t['id'] for tasks in i.active().values() for t in tasks)
-        task_ids_reserved = frozenset(t['id'] for tasks in i.reserved().values() for t in tasks)
+        tasks_active = i.active() or {}
+        tasks_reserved = i.reserved() or {}
+        task_ids_active = frozenset(t['id'] for tasks in tasks_active.values() for t in tasks)
+        task_ids_reserved = frozenset(t['id'] for tasks in tasks_reserved.values() for t in tasks)
 
         for t in tasks:
             if t.task_id in task_ids_active:

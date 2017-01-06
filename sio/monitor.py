@@ -2,12 +2,11 @@ from __future__ import print_function
 
 from blinker import signal
 from gevent import sleep
-# noinspection PyCompatibility
-from psycopg2 import Error as DBError
 
 from que.erigonesd import cq
 from que.utils import task_prefix_from_task_id
 from gui.models import User
+from api.exceptions import OPERATIONAL_ERRORS
 
 
 def que_monitor(app, _info=print, _debug=print):
@@ -81,7 +80,7 @@ def que_monitor_loop(server, worker):
     while True:
         try:
             que_monitor(cq, _info=log.info, _debug=log.debug)
-        except DBError as ex:
+        except OPERATIONAL_ERRORS as ex:
             log.exception(ex)
             log.critical('Dedicated que event monitor terminated. Closing DB connection and restarting in 1 second...')
             from django import db

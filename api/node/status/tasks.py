@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from api.signals import node_status_changed, node_unreachable, node_online
 from api.task.utils import task_log_success, mgmt_lock
 from api.task.internal import InternalTask
@@ -21,6 +23,10 @@ logger = get_task_logger(__name__)
 def node_worker_status_update(task_id, hostname, queue=None, status=None, **kwargs):
     """Check (ping) and update compute node status (called by MgmtDaemon)"""
     logger.debug('Received %s (%s) node worker status: %s', hostname, queue, status)
+
+    if settings.DEBUG:
+        logger.warning('DEBUG mode on => skipping status checking of node worker %s@%s', queue, hostname)
+        return
 
     try:
         node = Node.objects.get(hostname=hostname)
@@ -83,6 +89,10 @@ def node_worker_status_update(task_id, hostname, queue=None, status=None, **kwar
 @mgmt_lock(timeout=60, wait_for_release=True)
 def node_worker_status_check_all(task_id, **kwargs):
     """Run node_worker_status_update() for all licensed compute nodes; called by que.handlers.mgmt_worker_start"""
+    if settings.DEBUG:
+        logger.warning('DEBUG mode on => skipping status checking of all node workers')
+        return
+
     for node in Node.objects.exclude(status__in=(Node.UNLICENSED, Node.OFFLINE)):
         node_worker_status_update.call(node.hostname, queue=Q_FAST, status='unknown')
         vm_status_all(task_id, node)  # Also run VM status checks on compute node

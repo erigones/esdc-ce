@@ -9,6 +9,7 @@ from django.db.models import F
 from celery import states
 
 from que.tasks import cq, execute, get_task_logger
+from que.mgmt import MgmtCallbackTask
 from que.utils import task_id_from_task_id
 from que.internal import InternalTask
 from que.exceptions import TaskException
@@ -390,7 +391,7 @@ def vm_status_event_cb(result, task_id):
                      state_cache=state_cache, zoneid_cache=zoneid_cache, change_time=change_time)
 
 
-@cq.task(name='api.vm.status.tasks.vm_status_current_cb')
+@cq.task(name='api.vm.status.tasks.vm_status_current_cb', base=MgmtCallbackTask, bind=True)
 @callback()
 def vm_status_current_cb(result, task_id, vm_uuid=None):
     """
@@ -440,7 +441,7 @@ def _vm_status_cb_failed(result, task_id, vm):
         vm_status_one(task_id, vm)
 
 
-@cq.task(name='api.vm.status.tasks.vm_status_cb')
+@cq.task(name='api.vm.status.tasks.vm_status_cb', base=MgmtCallbackTask, bind=True)
 @callback()
 def vm_status_cb(result, task_id, vm_uuid=None):
     """

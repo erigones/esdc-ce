@@ -202,7 +202,7 @@ class MgmtDaemon(_PeriodicTaskDaemon):
 
     def __init__(self, parent, **kwargs):
         conf = parent.app.conf
-        self.enabled = conf.ERIGONES_MGMT_DAEMON_ENABLED and parent.hostname in conf.ERIGONES_MGMT_WORKERS
+        self.enabled = conf.ERIGONES_MGMT_DAEMON_ENABLED and parent.hostname.startswith(Q_MGMT + '@')
         super(MgmtDaemon, self).__init__(parent, **kwargs)
 
         if self.enabled:

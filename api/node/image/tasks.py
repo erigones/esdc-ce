@@ -1,5 +1,6 @@
 from que import TG_DC_UNBOUND
 from que.tasks import cq, get_task_logger, execute
+from que.mgmt import MgmtCallbackTask
 from que.exceptions import TaskException
 from vms.models import NodeStorage, Image, ImageVm
 from api.task.tasks import task_log_cb_success
@@ -21,7 +22,7 @@ def _node_image_cb_failed(result, task_id, ns, img):
     img.del_ns_status(ns)
 
 
-@cq.task(name='api.node.image.tasks.node_image_cb')
+@cq.task(name='api.node.image.tasks.node_image_cb', base=MgmtCallbackTask, bind=True)
 @callback()
 def node_image_cb(result, task_id, nodestorage_id=None, zpool=None, img_uuid=None):
     """

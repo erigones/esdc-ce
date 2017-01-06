@@ -4,6 +4,7 @@ from gevent import sleep
 
 from vms.models import Image, Snapshot
 from que.tasks import cq, get_task_logger
+from que.mgmt import MgmtCallbackTask
 from que.exceptions import TaskException
 from que.user_tasks import UserTasks
 from api.task.utils import callback
@@ -34,7 +35,7 @@ def _image_manage_cb_failed(result, task_id, img, action, snap=None):
         img.save_status(Image.OK)
 
 
-@cq.task(name='api.image.base.tasks.image_manage_cb')
+@cq.task(name='api.image.base.tasks.image_manage_cb', base=MgmtCallbackTask, bind=True)
 @callback()
 def image_manage_cb(result, task_id, image_uuid=None, vm_uuid=None, snap_id=None, delete_node_image_tasks=None):
     """

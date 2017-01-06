@@ -17,6 +17,7 @@ from que.utils import (is_dummy_task, task_prefix_from_task_id, task_id_from_req
 from que.exceptions import TaskException
 from que.user_tasks import UserTasks
 from api import status
+from api.exceptions import OPERATIONAL_ERRORS
 from api.decorators import catch_exception
 from api.task.log import log, task_type_from_task_prefix, task_flag_from_task_msg
 from api.task.callback import UserCallback
@@ -212,7 +213,7 @@ def callback(log_exception=True, update_user_tasks=True, check_parent_status=Tru
     """
     def wrap(fun):
         @wraps(fun, assigned=available_attrs(fun))
-        def inner(result, task_id, *args, **kwargs):
+        def inner(task_obj, result, task_id, *args, **kwargs):
             try:  # Just in case, there will be probably no callback information at this point
                 del result['meta']['callback']
             except KeyError:
@@ -224,7 +225,8 @@ def callback(log_exception=True, update_user_tasks=True, check_parent_status=Tru
                 result['meta'].update(meta_kwargs)
 
             # Issue #chili-512
-            if check_parent_status:
+            # + skipping checking of parent task status when task is being retried
+            if check_parent_status and not task_obj.request.retries:
                 cb_name = fun.__name__
                 logger.debug('Waiting for parent task %s status, before running %s', task_id, cb_name)
                 timer = 0
@@ -245,6 +247,8 @@ def callback(log_exception=True, update_user_tasks=True, check_parent_status=Tru
 
             try:
                 return fun(result, task_id, *args, **kwargs)
+            except OPERATIONAL_ERRORS as exc:
+                raise exc  # Caught by que.mgmt.MgmtCallbackTask
             except Exception as e:
                 logger.exception(e)
                 logger.error('Task %s failed', task_id)
