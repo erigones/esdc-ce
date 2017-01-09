@@ -7,7 +7,7 @@ from core.external.decorators import (
     third_party_apps_dc_modules_and_settings, third_party_apps_default_dc_modules_and_settings
 )
 from api import serializers as s
-from api.validators import validate_owner, validate_alias, validate_mdata, validate_ssh_key
+from api.validators import validate_owner, validate_alias, validate_mdata, validate_ssh_key, placeholder_validator
 from api.vm.utils import get_owners
 from api.sms.utils import get_services
 from api.mon.zabbix import VM_KWARGS, VM_KWARGS_NIC, VM_KWARGS_DISK
@@ -19,14 +19,6 @@ from pdns.models import Domain
 
 SENSITIVE_FIELD_NAMES = ('PASSWORD', 'PRIVATE_KEY')
 SENSITIVE_FIELD_VALUE = '***'
-
-
-def placeholder_validator(value, **valid_placeholders):
-    """Helper for checking if the value has acceptable placeholders"""
-    try:
-        return value.format(**valid_placeholders)
-    except (KeyError, ValueError, TypeError):
-        raise s.ValidationError(_('Invalid placeholders.'))
 
 
 def validate_array_placeholders(attrs, source, valid_placeholders):
