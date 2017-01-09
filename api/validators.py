@@ -25,6 +25,7 @@ RE_PEM_KEY_BEGIN = re.compile(r'^-----BEGIN( | \w+ )PRIVATE KEY-----', re.MULTIL
 RE_PEM_KEY_END = re.compile(r'^-----END( | \w+ )PRIVATE KEY-----', re.MULTILINE)
 RE_PEM_CRT_BEGIN = re.compile(r'^-----BEGIN CERTIFICATE-----', re.MULTILINE)
 RE_PEM_CRT_END = re.compile(r'^-----END CERTIFICATE-----', re.MULTILINE)
+RE_PLACEHOLDER = re.compile(r'\{(.*?)\}+', re.MULTILINE)
 
 
 def validate_owner(obj, new_owner, model_name):
@@ -198,3 +199,19 @@ def validate_pem_key(value):
     """Search for PEM private key boundaries"""
     if not (RE_PEM_KEY_BEGIN.search(value) and RE_PEM_KEY_END.search(value)):
         raise ValidationError(_('Private key is missing standard PEM header/footer.'))
+
+
+def placeholder_validator(value, **valid_placeholders):
+    """Helper for checking if the value has acceptable placeholders"""
+
+    # findall placeholders in value parameter string and store them as set
+    placeholders = set(RE_PLACEHOLDER.findall(value))
+
+    # check if placeholders is non-empty and if elements are subset of keys in valid_placeholders
+    if not placeholders.issubset(valid_placeholders.keys()):
+        raise ValidationError(_('Invalid placeholders.'))
+
+    try:
+        return value.format(**valid_placeholders)
+    except (KeyError, ValueError, TypeError, IndexError):
+        raise ValidationError(_('Invalid placeholders.'))
