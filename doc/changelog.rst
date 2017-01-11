@@ -19,6 +19,7 @@ Bugs
 ----
 
 - Fixed bug with monitoring synchronization called twice during new VM deployment - `#32 <https://github.com/erigones/esdc-ce/issues/32>`__
+- Patched celery beat to achieve correct behavior during program termination - `#40 <https://github.com/erigones/esdc-ce/issues/40>`__
 
 
 2.3.3 (unreleased)
