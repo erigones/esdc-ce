@@ -1,0 +1,16 @@
+diff -Naur celery.orig/backends/base.py celery/backends/base.py
+--- celery.orig/backends/base.py	2016-12-22 12:28:37.000000000 +0100
++++ celery/backends/base.py	2017-01-05 18:03:35.000000000 +0100
+@@ -87,10 +87,10 @@
+     persistent = True
+ 
+     retry_policy = {
+-        'max_retries': 20,
++        'max_retries': 0,
+         'interval_start': 0,
+         'interval_step': 1,
+-        'interval_max': 1,
++        'interval_max': 10,
+     }
+ 
+     def __init__(self, app,

@@ -4,6 +4,7 @@ Changelog
 
 2.4.0 (unreleased)
 ==================
+
 Features
 --------
 
@@ -11,8 +12,9 @@ Features
 - Changed all VM-related API calls to be able to handle UUID-based requests instead of only hostname - `#16 <https://github.com/erigones/esdc-ce/issues/16>`__
 - Added support for nics.*.allowed_ips (multiple IPs per NIC) - `#3 <https://github.com/erigones/esdc-ce/issues/3>`__
 - Added VM UUID output value across all relevant API calls - `#23 <https://github.com/erigones/esdc-ce/issues/23>`__
-- Backup restore and snapshot restore accept VM UUID besides hostname as a parameter `#26 <https://github.com/erigones/esdc-ce/issues/26>`__
-- Backup restore API call has no default target vm and disk anymore, which makes the call less error-prone `#26 <https://github.com/erigones/esdc-ce/issues/26>`__
+- Backup restore and snapshot restore accept VM UUID besides hostname as a parameter - `#26 <https://github.com/erigones/esdc-ce/issues/26>`__
+- Backup restore API call has no default target vm and disk anymore, which makes the call less error-prone - `#26 <https://github.com/erigones/esdc-ce/issues/26>`__
+- Implemented task retries after operational errors (mgmt callbacks) - `#38 <https://github.com/erigones/esdc-ce/issues/38>`__
 
 
 Bugs
@@ -69,8 +71,8 @@ Bugs
 - Fixed multiple broken links in API documentation - `#10 <https://github.com/erigones/esdc-ce/issues/10>`__
 - Fixed ``KeyError: 'get_image_manifes_url'`` error during POST imagestore_image_manage - `#8 <https://github.com/erigones/esdc-ce/issues/8>`__
 - Added support for Danube Cloud (erigones) image tags into POST image_manage - `#7 <https://github.com/erigones/esdc-ce/issues/7>`__
-- Fixed dhcp_passthrough missing default value in POST net_manage `#15 <https://github.com/erigones/esdc-ce/issues/15>`__
-- Fixed error causing inability of SuperAdmin user to add SSH key for another user `#18 <https://github.com/erigones/esdc-ce/issues/18>`__
+- Fixed dhcp_passthrough missing default value in POST net_manage - `#15 <https://github.com/erigones/esdc-ce/issues/15>`__
+- Fixed error causing inability of SuperAdmin user to add SSH key for another user - `#18 <https://github.com/erigones/esdc-ce/issues/18>`__
 
 
 2.3.0 (released on 2016-11-14)

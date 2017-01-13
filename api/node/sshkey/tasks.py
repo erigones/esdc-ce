@@ -4,6 +4,7 @@ from api.task.internal import InternalTask
 from vms.models import Node, DefaultDc
 from que import TG_DC_UNBOUND
 from que.tasks import cq, execute, get_task_logger
+from que.mgmt import MgmtCallbackTask
 
 __all__ = ('node_authorized_keys_sync', 'node_authorized_keys_sync_cb')
 
@@ -65,7 +66,7 @@ def node_authorized_keys_sync(task_id, sender, **kwargs):
     run_node_authorized_keys_sync()
 
 
-@cq.task(name='api.node.sshkey.tasks.node_authorized_keys_sync_cb')
+@cq.task(name='api.node.sshkey.tasks.node_authorized_keys_sync_cb', base=MgmtCallbackTask, bind=True)
 @callback(log_exception=False, update_user_tasks=False)
 def node_authorized_keys_sync_cb(result, task_id, node_uuid=None):
     """

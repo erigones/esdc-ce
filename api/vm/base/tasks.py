@@ -1,6 +1,7 @@
 from gevent import sleep
 
 from que.tasks import cq, get_task_logger
+from que.mgmt import MgmtCallbackTask
 from que.utils import user_id_from_task_id
 from que.exceptions import TaskException
 from gui.models import User
@@ -88,7 +89,7 @@ def _vm_error(task_id, vm):
     vm_status_one(task_id, vm)
 
 
-@cq.task(name='api.vm.base.tasks.vm_create_cb')
+@cq.task(name='api.vm.base.tasks.vm_create_cb', base=MgmtCallbackTask, bind=True)
 @callback()
 def vm_create_cb(result, task_id, vm_uuid=None):
     """
@@ -194,7 +195,7 @@ def vm_create_cb(result, task_id, vm_uuid=None):
     return result
 
 
-@cq.task(name='api.vm.base.tasks.vm_update_cb')
+@cq.task(name='api.vm.base.tasks.vm_update_cb', base=MgmtCallbackTask, bind=True)
 @callback()
 def vm_update_cb(result, task_id, vm_uuid=None):
     """
@@ -230,7 +231,7 @@ def vm_update_cb(result, task_id, vm_uuid=None):
     return result
 
 
-@cq.task(name='api.vm.base.tasks.vm_delete_cb')
+@cq.task(name='api.vm.base.tasks.vm_delete_cb', base=MgmtCallbackTask, bind=True)
 @callback()
 def vm_delete_cb(result, task_id, vm_uuid=None):
     """
@@ -257,7 +258,7 @@ def vm_delete_cb(result, task_id, vm_uuid=None):
 
 
 # noinspection PyUnusedLocal
-@cq.task(name='api.vm.base.tasks.vm_deploy_cb')
+@cq.task(name='api.vm.base.tasks.vm_deploy_cb', base=MgmtCallbackTask, bind=True)
 @callback()
 def vm_deploy_cb(result, task_id, vm_uuid=None):
     """

@@ -4,6 +4,7 @@ from logging import getLogger
 from requests.exceptions import RequestException
 
 from que.tasks import cq
+from que.mgmt import MgmtCallbackTask
 from que.exceptions import TaskException
 from que.internal import InternalTask
 from que.utils import user_id_from_task_id
@@ -72,7 +73,7 @@ def task_log_cb_error(*args, **kwargs):
     return task_log_cb(*args, **kwargs)
 
 
-@cq.task(name='api.task.tasks.task_log_cb')
+@cq.task(name='api.task.tasks.task_log_cb', base=MgmtCallbackTask, bind=True)
 @callback()
 def _task_log_cb(result, task_id, **kwargs):
     """

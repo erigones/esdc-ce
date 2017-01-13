@@ -1,4 +1,5 @@
 from que.tasks import cq, get_task_logger
+from que.mgmt import MgmtCallbackTask
 from que.utils import dc_id_from_task_id
 from que.exceptions import TaskException
 from api.utils.request import get_dummy_request
@@ -27,7 +28,7 @@ def _vm_update(vm):
         logger.error('PUT vm_manage(%s) failed: %s (%s): %s', vm, res.status_code, res.status_text, res.data)
 
 
-@cq.task(name='api.node.vm.tasks.harvest_vm_cb')
+@cq.task(name='api.node.vm.tasks.harvest_vm_cb', base=MgmtCallbackTask, bind=True)
 @callback()
 def harvest_vm_cb(result, task_id, node_uuid=None):
     node = Node.objects.get(uuid=node_uuid)
