@@ -9,6 +9,7 @@ from gui.utils import collect_view_data, reverse, redirect, get_query_string, ge
 from gui.models.permission import DnsAdminPermission
 from gui.dc.dns.forms import DcDomainForm, AdminDomainForm, DnsRecordFilterForm, DnsRecordForm, MultiDnsRecordForm
 from gui.dc.dns.utils import get_domain
+from api.decorators import setting_required
 from api.dns.domain.utils import prefetch_domain_owner, prefetch_domain_dcs
 from api.dns.record.api_views import RecordView
 from pdns.models import Domain, Record
@@ -17,6 +18,7 @@ from pdns.models import Domain, Record
 @login_required
 @admin_required
 @profile_required
+@setting_required('DNS_ENABLED')
 def dc_domain_list(request):
     """
     DNS Domain/Record <-> Dc management.
@@ -67,6 +69,7 @@ def dc_domain_list(request):
 @staff_required
 @ajax_required
 @require_POST
+@setting_required('DNS_ENABLED')
 def dc_domain_form(request):
     """
     Ajax page for attaching and detaching DNS domains.
@@ -110,6 +113,7 @@ def dc_domain_form(request):
 @permission_required(DnsAdminPermission)
 @ajax_required
 @require_POST
+@setting_required('DNS_ENABLED')
 def admin_domain_form(request):
     """
     Ajax page for updating, removing and adding DNS domains.
@@ -142,6 +146,7 @@ def admin_domain_form(request):
 @login_required
 @admin_required  # SuperAdmin or DCAdmin+DnsAdmin
 @permission_required(DnsAdminPermission)
+@setting_required('DNS_ENABLED')
 def dc_domain_record_list(request):
     """
     List/filter DNS records for a DNS domain (domain parameter in querystring).
@@ -185,6 +190,7 @@ def dc_domain_record_list(request):
 @permission_required(DnsAdminPermission)
 @ajax_required
 @require_POST
+@setting_required('DNS_ENABLED')
 def domain_record_form(request, name):
     """
     Ajax page for updating, removing and adding DNS records.

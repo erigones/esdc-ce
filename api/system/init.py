@@ -177,9 +177,13 @@ def init_mgmt(head_node, images=None):
 
     # We can change the default resolvers after we've harvested the VMS_VM_DNS01 (#831)
     try:
-        vm_dns01_ip = Vm.objects.get(uuid=settings.VMS_VM_DNS01).ips[0]
-        api_put(dc_settings, main, VMS_VM_RESOLVERS_DEFAULT=[vm_dns01_ip])
-        api_put(dc_settings, admin, VMS_VM_RESOLVERS_DEFAULT=[vm_dns01_ip])
+        try:
+            vm_dns01_ip = Vm.objects.get(uuid=settings.VMS_VM_DNS01).ips[0]
+        except Vm.DoesNotExist:
+            logger.warning('DNS VM (%s) not found - using default DNS servers', settings.VMS_VM_DNS01)
+        else:
+            api_put(dc_settings, main, VMS_VM_RESOLVERS_DEFAULT=[vm_dns01_ip])
+            api_put(dc_settings, admin, VMS_VM_RESOLVERS_DEFAULT=[vm_dns01_ip])
     except Exception as e:
         logger.exception(e)
 
