@@ -6,7 +6,7 @@ from api.dc.node.views import dc_node
 from gui.forms import SerializerForm
 from gui.widgets import NumberInput
 
-add_storage_choices = Storage.ACCESS + ((9, _('(all)')), (0, _('(none)')))
+add_storage_choices = Storage.ACCESS + ((DcNode.NS_ATTACH_ALL, _('(all)')), (DcNode.NS_ATTACH_NONE, _('(none)')))
 
 
 class DcNodeForm(SerializerForm):
