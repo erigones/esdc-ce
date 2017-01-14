@@ -63,7 +63,7 @@ def harvest_vm_cb(result, task_id, node_uuid=None):
                 logger.warning('Ignoring VM %s found in harvest_vm(%s)', vm_uuid, node)
                 continue
         try:
-            vm = vm_from_json(request, task_id, json, dc, owner=1, template=True, save=True,
+            vm = vm_from_json(request, task_id, json, dc, template=True, save=True,
                               update_ips=True, update_dns=True)
         except Exception as e:
             logger.exception(e)

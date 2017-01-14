@@ -19,6 +19,7 @@ class NodeDefineSerializer(s.InstanceSerializer):
                        'monitoring_hostgroups', 'monitoring_templates')
 
     hostname = s.Field()
+    uuid = s.Field()
     address = s.Field()
     status = s.IntegerChoiceField(choices=Node.STATUS_DB)
     node_status = s.DisplayChoiceField(source='status', choices=Node.STATUS_DB, read_only=True)
