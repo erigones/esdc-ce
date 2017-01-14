@@ -127,7 +127,7 @@ def node_sysinfo_cb(result, task_id, node_uuid=None):
             logger.exception(e)
 
     try:
-        run_node_img_sources_sync(node, img_sources)
+        run_node_img_sources_sync(node, node_img_sources=img_sources)
     except Exception as e:
         logger.exception(e)
 

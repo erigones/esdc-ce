@@ -19,7 +19,11 @@
   </div>
   <div class="modal-body separator">
     <div class="text_edit"></div>
+    {% if image_vm %}
     <div class="text_add"></div>
+    {% else %}
+    <div class="text_add">{% trans "<strong>Note:</strong> Image server support is disabled. All operations are currently performed only at database level." %}</div>
+    {% endif %}
     <form class="form-horizontal" action="#" data-source="{{ url_form_admin }}" method="POST">
       {% include "gui/dc/image_admin_form.html" with form=form_admin %}
     </form>

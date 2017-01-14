@@ -13,6 +13,10 @@ class ImageSerializer(s.InstanceSerializer):
     vms.models.Image
     Also used in api.dc.image.serializers.
     """
+    _backup_attrs_map_ = {
+        'owner': 'owner_id',
+        'dc_bound': 'dc_bound_id',
+    }
     _model_ = Image
     _update_fields_ = ('alias', 'version', 'dc_bound', 'owner', 'access', 'desc', 'resize', 'deploy', 'tags')
     # TODO: 'nic_model', 'disk_model'
@@ -43,6 +47,12 @@ class ImageSerializer(s.InstanceSerializer):
             self._dc_bound = img.dc_bound
             self.fields['owner'].queryset = get_owners(request, all=True)
 
+    def create_img_backup(self):
+        """Creates a dictionary that maps Image object attributes to its values;
+        this will be used as a backup in case the update should fail"""
+        items = self._backup_attrs_map_
+        return {items.get(attr, attr): getattr(self.object, items.get(attr, attr)) for attr in self._update_fields_}
+
     def _normalize(self, attr, value):
         if attr == 'dc_bound':
             return self._dc_bound
@@ -67,9 +77,9 @@ class ImageSerializer(s.InstanceSerializer):
         return attrs
 
     def validate(self, attrs):
-        manifest_keys = {'name', 'alias', 'version', 'access', 'desc', 'tags'}
+        db_only_manifest_keys = {'dc_bound', 'dc_bound_bool', 'owner'}
 
-        if manifest_keys.isdisjoint(attrs.keys()):
+        if db_only_manifest_keys.issuperset(attrs.keys()):
             self.update_manifest = False
 
         try:

@@ -11,6 +11,7 @@ from api.exceptions import (PermissionDenied, PreconditionRequired, ExpectationF
 from api.task.response import SuccessTaskResponse, FailureTaskResponse, TaskResponse
 from api.utils.db import get_virt_object
 from api.image.base.serializers import ImageSerializer, ExtendedImageSerializer, ImportImageSerializer
+from api.image.base.utils import wait_for_delete_node_image_tasks
 from api.image.messages import LOG_IMAGE_IMPORT, LOG_IMAGE_CREATE, LOG_IMAGE_UPDATE, LOG_IMAGE_DELETE
 from api.node.image.api_views import IMAGE_TASK_EXPIRES, NodeImageView
 from api.dc.utils import attach_dc_virt_object
@@ -61,14 +62,25 @@ class ImageView(TaskAPIView):
 
         return SuccessTaskResponse(self.request, res, dc_bound=False)
 
-    def _check_img_server(self):
+    def _check_img_server(self, must_exist=False):
         try:
             self.img_server = ImageVm()
+
+            if self.img_server:
+                img_vm = self.img_server.vm
+
+                if img_vm.status not in (img_vm.RUNNING, img_vm.STOPPED):
+                    raise ObjectDoesNotExist
+            elif must_exist:
+                raise ObjectDoesNotExist
+            else:
+                logger.warning('Image server is disabled!')
+
         except ObjectDoesNotExist:
             raise PreconditionRequired(_('Image server is not available'))
 
     def _check_img_node(self):
-        if self.img_server.node_status != self.img_server.node.ONLINE:
+        if self.img_server and self.img_server.node.status != self.img_server.node.ONLINE:
             raise NodeIsNotOperational
         # The vm.node should be checked by get_vm()
 
@@ -76,10 +88,11 @@ class ImageView(TaskAPIView):
         if self.img.status != Image.OK:
             raise ExpectationFailed('Image status is not OK')
 
-    def _run_checks(self):
-        self._check_img_server()
+    def _run_checks(self, img_server_must_exist=False):
+        self._check_img_server(must_exist=img_server_must_exist)
         self._check_img_node()
         self._check_img()
+        # self.img_server is set to ImageVm() at this point, but this does not mean that we have an image server
 
     def _run_execute(self, msg, cmd, recover_on_error=False, delete_on_error=False, error_fun=None, vm=None, snap=None,
                      detail_dict=None, stdin=None, cmd_add=None, cb_add=None):
@@ -136,6 +149,9 @@ class ImageView(TaskAPIView):
             img.delete()
         else:
             if recover_on_error:
+                for attr, value in img.backup.items():
+                    setattr(img, attr, value)
+
                 img.manifest = img.manifest_active
                 img.status = Image.OK
                 img.save()
@@ -175,7 +191,7 @@ class ImageView(TaskAPIView):
             return FailureTaskResponse(request, ser.errors, dc_bound=self.dc_bound)
 
         # Preliminary checks
-        self._run_checks()
+        self._run_checks(img_server_must_exist=True)  # This sets self.img_server to ImageVm()
 
         if vm.status not in (vm.RUNNING, vm.STOPPED, vm.STOPPING, vm.FROZEN):
             raise VmIsNotOperational
@@ -246,18 +262,26 @@ class ImageView(TaskAPIView):
 
         # Preliminary checks
         self._run_checks()
-        # Build manifest and set PENDING status
+        # Build new manifest
         img.manifest = img.build_manifest()
-        img.status = Image.PENDING
-        img.save()
         # Add URL into detail dict
-        # noinspection PyUnusedLocal
-        data = ser.data
+        ser_data = ser.data
         dd = ser.detail_dict()
         dd.update(ser_import.detail_dict())
 
-        return self._run_execute(LOG_IMAGE_IMPORT, 'esimg import -f %s' % ser_import.img_file_url,
-                                 stdin=img.manifest.dump(), delete_on_error=True, detail_dict=dd)
+        if self.img_server:
+            img.status = Image.PENDING
+            img.save()
+
+            return self._run_execute(LOG_IMAGE_IMPORT, 'esimg import -f %s' % ser_import.img_file_url,
+                                     stdin=img.manifest.dump(), delete_on_error=True, detail_dict=dd)
+        else:
+            img.status = Image.OK
+            img.manifest_active = img.manifest
+            img.save()
+
+            return SuccessTaskResponse(self.request, ser_data, obj=img, msg=LOG_IMAGE_IMPORT,
+                                       detail_dict=dd, dc_bound=self.dc_bound)
 
     def put(self):
         """Update [PUT] image manifest in DB and on image server if needed.
@@ -266,33 +290,35 @@ class ImageView(TaskAPIView):
             - dc_bound=False:   task DC is default DC
             - dc_bound=[DC]:    task DC is dc_bound DC
         The callback is responsible for restoring the active manifest if something goes wrong.
-        TODO: The dc_bound, resize, deploy and other non-manifest attributes can _not_ be restored when
-        a failure occurs during the task/callback process.
         """
         img = self.img
         ser = ImageSerializer(self.request, img, self.data, partial=True)
+        img_backup = ser.create_img_backup()
 
         if not ser.is_valid():
             return FailureTaskResponse(self.request, ser.errors, dc_bound=self.dc_bound)
 
         # Preliminary checks
-        self._run_checks()
-        data = ser.data
+        self._run_checks()  # This sets self.img_server to ImageVm()
+        ser_data = ser.data
 
         if ser.update_manifest:
-            # Rebuild manifest and set PENDING status
+            # Rebuild manifest
             img.manifest = img.build_manifest()
-            img.status = Image.PENDING
-            img.save()
 
-            return self._run_execute(LOG_IMAGE_UPDATE, 'esimg update', stdin=img.manifest.dump(), recover_on_error=True,
-                                     detail_dict=ser.detail_dict())
+        if self.img_server and ser.update_manifest:
+            img.status = Image.PENDING
+            img.save(backup=img_backup)
+
+            return self._run_execute(LOG_IMAGE_UPDATE, 'esimg update', stdin=img.manifest.dump(),
+                                     recover_on_error=img_backup, detail_dict=ser.detail_dict())
         else:
             # Just save new data
+            img.manifest_active = img.manifest
             img.save()
 
-            return SuccessTaskResponse(self.request, data, obj=img, detail_dict=ser.detail_dict(),
-                                       msg=LOG_IMAGE_UPDATE, dc_bound=self.dc_bound)
+            return SuccessTaskResponse(self.request, ser_data, obj=img, msg=LOG_IMAGE_UPDATE,
+                                       detail_dict=ser.detail_dict(), dc_bound=self.dc_bound)
 
     def delete(self):
         """Delete [DELETE] image from DB and from Image server.
@@ -309,7 +335,7 @@ class ImageView(TaskAPIView):
             raise PreconditionRequired(_('Image is used by some VMs'))
 
         # Preliminary checks
-        self._run_checks()
+        self._run_checks()  # This sets self.img_server to ImageVm()
 
         request.disable_throttling = True
         delete_node_image_tasks = []
@@ -337,8 +363,20 @@ class ImageView(TaskAPIView):
             else:
                 return res
 
-        # Set PENDING status
-        img.save_status(Image.PENDING)
+        if self.img_server:
+            # Set PENDING status
+            img.save_status(Image.PENDING)
 
-        return self._run_execute(LOG_IMAGE_DELETE, 'esimg delete -u %s' % img.uuid,
-                                 cb_add={'delete_node_image_tasks': delete_node_image_tasks})
+            return self._run_execute(LOG_IMAGE_DELETE, 'esimg delete -u %s' % img.uuid,
+                                     cb_add={'delete_node_image_tasks': delete_node_image_tasks})
+
+        else:
+            if wait_for_delete_node_image_tasks(img, delete_node_image_tasks, timeout=30):
+                obj = img.log_list
+                owner = img.owner
+                img.delete()
+
+                return SuccessTaskResponse(self.request, None, obj=obj, owner=owner, msg=LOG_IMAGE_DELETE,
+                                           dc_bound=self.dc_bound)
+            else:
+                raise PreconditionRequired(_('Image is being deleted from compute node storages; Try again later'))

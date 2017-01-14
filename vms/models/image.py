@@ -12,6 +12,7 @@ from vms.mixins import _DcMixin
 # noinspection PyProtectedMember
 from vms.models.base import _VirtModel, _JsonPickleModel, _OSType, _UserTasksModel
 from vms.models.vm import Vm
+from vms.models.dc import DefaultDc
 from vms.models.snapshot import Snapshot
 
 
@@ -182,6 +183,14 @@ class Image(_VirtModel, _JsonPickleModel, _OSType, _DcMixin, _UserTasksModel):
         return ','.join(map(unicode, sorted(self.tags)))
 
     @property
+    def backup(self):
+        return PickleDict(self.json.get('backup', {}))
+
+    @backup.setter
+    def backup(self, value):
+        self.save_item('backup', value, save=False)
+
+    @property
     def manifest(self):
         return PickleDict(self.json.get('manifest', {}))
 
@@ -290,6 +299,10 @@ class Image(_VirtModel, _JsonPickleModel, _OSType, _DcMixin, _UserTasksModel):
             'deploy': self.deploy,
             'tags': self.tag_list,
         }
+
+    def save(self, backup=None, **kwargs):
+        self.backup = backup or {}
+        return super(Image, self).save(**kwargs)
 
     def save_status(self, new_status=None, **kwargs):
         """Just update the status field (and other related fields)"""
@@ -421,67 +434,66 @@ class ImageVm(object):
     """
     Image server.
     """
-    _cache_key = 'image:vm'
     vm = None
 
     def __init__(self):
         # Initialize image server VM
-        self.vm = self._get_vm()
+        self.init()
 
-    def _get_vm(self):
+    def init(self, reset=False):
         from vms.models import Vm
 
-        vm = cache.get(self._cache_key)
+        if self.vm is None or reset:
+            image_vm_uuid = self.get_uuid()
 
-        if not vm:
-            vm = Vm.objects.select_related('node').get(uuid=settings.VMS_IMAGE_VM)
-            cache.set(self._cache_key, vm)
+            if image_vm_uuid:
+                vm = Vm.objects.select_related('node').get(uuid=image_vm_uuid)
+            else:
+                vm = False
 
-        return vm
+            self.vm = vm
 
-    @classmethod
-    def reset(cls):
-        cache.delete(cls._cache_key)
+    def __nonzero__(self):
+        return bool(self.vm)
+    __bool__ = __nonzero__
+
+    @staticmethod
+    def get_uuid():
+        return DefaultDc().settings.VMS_IMAGE_VM  # dc1_settings
+
+    @staticmethod
+    def get_additional_sources():
+        return DefaultDc().settings.VMS_IMAGE_SOURCES  # dc1_settings
 
     @property
     def node(self):
-        return self.vm.node
-
-    @property
-    def node_status(self):
-        node = self.node
-        return node.__class__.objects.only('status').get(pk=node.pk).status
-
-    @property
-    def vm_status(self):
-        return self.vm.__class__.objects.only('status').get(pk=self.vm.pk).status
+        if self:
+            return self.vm.node
+        else:
+            return None
 
     @property
     def datasets_dir(self):
-        return '/%s/root/datasets' % self.vm.json_active['zfs_filesystem']
+        return settings.VMS_IMAGE_VM_DATASETS_DIR.format(zfs_filesystem=self.vm.json_active['zfs_filesystem'])
 
     @property
     def sources(self):
-        try:
-            src = ['http://%s' % self.vm.ips[0]]
-        except IndexError:
-            src = []
+        src = []
 
-        src.extend(settings.VMS_IMAGE_SOURCES)
+        if self:
+            try:
+                src = ['http://%s' % self.vm.ips[0]]
+            except IndexError:
+                pass
+
+        src.extend(self.get_additional_sources())
 
         return src
 
-    def sources_update(self, imgadm_sources):
-        if self.vm:
-            wanted = set(self.sources)
-        else:
-            wanted = set(settings.VMS_IMAGE_SOURCES)
+    @staticmethod
+    def get_imgadm_conf(sources):
+        conf = PickleDict(settings.VMS_IMAGE_IMGADM_CONF)  # PickleDict because it has a dump() method (to json)
+        system_sources = conf.get('sources', [])
+        conf['sources'] = [{'type': 'imgapi', 'url': url} for url in sources] + system_sources
 
-        current = set(imgadm_sources)
-        add = wanted - current
-        rem = current - wanted
-
-        if add or rem:
-            return add, rem
-
-        return None
+        return conf
