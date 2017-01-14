@@ -11,7 +11,7 @@ from api.utils.request import get_dummy_request
 from api.utils.views import call_api_view
 from api.system.utils import get_local_netinfo
 from api.dns.domain.utils import reverse_domain_from_network
-from vms.models import Dc, Image, Vm
+from vms.models import Dc, Image, Vm, DcNode
 
 logger = getLogger(__name__)
 
@@ -55,6 +55,9 @@ def _es_api_url(site_link):
 
 def _init_images(images, default_dc, admin_dc):
     """Import manifests of initial images"""
+    # noinspection PyProtectedMember
+    image_desc_max_length = Image._meta.get_field('desc').max_length
+
     for manifest in images:
         try:
             img = Image(uuid=manifest['uuid'])
@@ -63,7 +66,7 @@ def _init_images(images, default_dc, admin_dc):
             img.version = manifest['version']
             img.ostype = Image.os_to_ostype(manifest)
             img.size = int(manifest.get('image_size', Image.DEFAULT_SIZE))
-            img.desc = manifest.get('description', '')[:128]
+            img.desc = manifest.get('description', '')[:image_desc_max_length]
             img.status = Image.OK
             img.manifest = img.manifest_active = manifest
             tags = manifest.pop('tags', {})
@@ -164,7 +167,7 @@ def init_mgmt(head_node, images=None):
         logger.exception(e)
 
     # Add head node + all its storages into admin DC
-    api_post(dc_node, head_node.hostname, strategy=1, add_storage=9, dc=admin)
+    api_post(dc_node, head_node.hostname, strategy=DcNode.SHARED, add_storage=9, dc=admin)
 
     logger.warning('Admin datacenter "%s" was successfully initialized', admin_dc)
 
