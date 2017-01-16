@@ -6,9 +6,10 @@ from api.task.response import mgmt_task_response, FailureTaskResponse, SuccessTa
 from api.vm.utils import get_vm
 from api.mon.messages import LOG_MONDEF_UPDATE
 from api.mon.node.utils import parse_yyyymm
-from api.mon.vm.tasks import mon_vm_sla as t_mon_vm_sla, mon_vm_history as t_mon_vm_history
-from api.mon.vm.serializers import VmMonitoringSerializer, MonVmHistorySerializer
+from api.mon.validators import parse_graph_vm
 from api.mon.vm.graphs import GRAPH_ITEMS
+from api.mon.vm.serializers import VmMonitoringSerializer, MonVmHistorySerializer
+from api.mon.vm.tasks import mon_vm_sla as t_mon_vm_sla, mon_vm_history as t_mon_vm_history
 from api.vm.define.utils import VM_STATUS_OPERATIONAL
 
 
@@ -104,7 +105,7 @@ class VmHistoryView(APIView):
             raise VmIsNotOperational
 
         # Validate graph identificator
-        graph_category, item_id = MonVmHistorySerializer.parse_graph(vm, graph)
+        graph_category, item_id = parse_graph_vm(vm, graph)
 
         try:
             if not graph_category:
