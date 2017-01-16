@@ -1,0 +1,8 @@
+- name: upgrading to {{ tasklist|basename }}
+  set_fact:
+      upgrading_to: "{{ tasklist|basename }}"
+
+- include: "{{ upg_dir }}/{{ upgrading_to }}/main.yml"
+
+- name: bumping appliance version
+  shell: echo "{{ upgrading_to }}" > "{{ versionfile }}"

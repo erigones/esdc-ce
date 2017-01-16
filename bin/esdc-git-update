@@ -120,6 +120,9 @@ git checkout "${VERSION_REF}" || die $FAILED_CHECKOUT "${ERR_MSG}"
 
 if [[ "$(uname -s)" == "SunOS" ]] && [[ -f /usr/bin/zonename ]] && [[ "$(/usr/bin/zonename)" == "global" ]]; then
 	DEPLOY_CMD="${DEPLOY_CMD} --node"
+else
+	# run appliance upgrade
+	${ERIGONES_HOME}/ans/upgrade/runupgrade.sh
 fi
 
 # Running ctl.sh deploy --update

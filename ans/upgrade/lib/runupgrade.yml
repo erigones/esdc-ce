@@ -1,0 +1,21 @@
+- name: Run appliance upgrade
+  hosts: {{hosts}}
+  #connection: local
+  vars:
+    appliance: 'mgmt'   # default, overriden by extra-vars
+    upg_base: "{{ lookup('env','UPG_BASE')|default('/opt/erigones/ans/upgrade') }}"
+    # directory with the actual upgrade tasks (per appliance version):
+    upg_dir: "{{ upg_base }}/{{ appliance }}"
+    versionfile: /etc/esdc.version
+  tasks:
+  - name: extracting current appliance version
+    shell: if [ -f "{{ versionfile }}" ]; then cat "{{ versionfile }}"; else echo 'v1.0.0'; fi
+    register: appliance_version
+  - name: getting list of upgrades
+    shell: find "{{ upg_dir }}" -maxdepth 1 -type d -name 'v*' | sort --version-sort
+    register: upg_subdirs
+  - include: "{{ upg_base }}/lib/runtasks.yml"
+    with_items: "{{ upg_subdirs.stdout.split('\n') }}"
+    when: ( tasklist | basename ) > appliance_version.stdout
+    loop_control:
+      loop_var: tasklist
