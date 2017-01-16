@@ -45,7 +45,7 @@ class VmMonitoringSerializer(s.InstanceSerializer):
 
 class MonVmHistorySerializer(s.Serializer):
     """
-    Used by mon_vm_history to parse graph type and time period input.
+    Used by mon_vm_history to validate time period input.
     """
     since = s.TimeStampField(required=False)
     until = s.TimeStampField(required=False)

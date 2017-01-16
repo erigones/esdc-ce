@@ -40,3 +40,7 @@ class NodeSLAView(APIView):
                                   tidlock=tidlock, cache_result=tidlock, cache_timeout=cache_timeout)
 
         return mgmt_task_response(request, *ter, obj=node, api_view=_apiview_, dc_bound=False, data=self.data)
+
+
+class NodeHistoryView(APIView):
+    raise NotImplemented

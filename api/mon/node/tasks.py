@@ -87,3 +87,23 @@ node_json_changed.connect(mon_node_sync.call)  # also used in api.node.define.no
 # gunicorn context signals are connected in api.signals:
 # mon_node_status_sync
 # mon_node_delete
+
+
+# noinspection PyUnusedLocal
+@cq.task(name='api.mon.node.tasks.mon_node_history', base=MgmtTask)
+@mgmt_task()
+def mon_node_history(task_id, node_uuid, items, zhistory, result, items_search, **kwargs):
+    """
+    Return node's historical data for selected graph and period.
+
+    :arg:
+    """
+    try:
+        history = getZabbix(DefaultDc()).node_history(node_uuid, items, zhistory, result['since'], result['until'],
+                                                      items_search=items_search)
+    except ZabbixError as exc:
+        raise MgmtTaskException(text_type(exc))
+
+    result.update(history)
+
+    return result
