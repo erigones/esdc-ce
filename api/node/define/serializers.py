@@ -18,9 +18,9 @@ class NodeDefineSerializer(s.InstanceSerializer):
     _update_fields_ = ('status', 'owner', 'is_compute', 'is_backup', 'cpu_coef', 'ram_coef',
                        'monitoring_hostgroups', 'monitoring_templates')
 
-    hostname = s.Field()
-    uuid = s.Field()
-    address = s.Field()
+    hostname = s.CharField(read_only=True)
+    uuid = s.CharField(read_only=True)
+    address = s.CharField(read_only=True)
     status = s.IntegerChoiceField(choices=Node.STATUS_DB)
     node_status = s.DisplayChoiceField(source='status', choices=Node.STATUS_DB, read_only=True)
     owner = s.SlugRelatedField(slug_field='username', queryset=User.objects, read_only=False)
@@ -34,7 +34,7 @@ class NodeDefineSerializer(s.InstanceSerializer):
     cpu_free = s.IntegerField(read_only=True)
     ram_free = s.IntegerField(read_only=True)
     ram_kvm_overhead = s.IntegerField(read_only=True)
-    sysinfo = s.Field(source='api_sysinfo')
+    sysinfo = s.Field(source='api_sysinfo')  # Field is read_only=True by default
     monitoring_hostgroups = s.ArrayField(max_items=16, default=[])
     monitoring_templates = s.ArrayField(max_items=32, default=[])
     created = s.DateTimeField(read_only=True, required=False)
