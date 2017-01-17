@@ -23,6 +23,7 @@ class ImageSerializer(s.InstanceSerializer):
     _default_fields_ = ('name', 'alias', 'owner')
 
     name = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\._-]*$', max_length=32)
+    uuid = s.CharField(read_only=True)
     alias = s.SafeCharField(max_length=32)
     version = s.SafeCharField(max_length=16, default='1.0')
     owner = s.SlugRelatedField(slug_field='username', queryset=User.objects)

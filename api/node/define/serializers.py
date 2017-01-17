@@ -1,4 +1,7 @@
+from logging import getLogger
+
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 
 from api import serializers as s
 from api.validators import validate_owner
@@ -6,6 +9,8 @@ from api.vm.utils import get_owners
 from api.node.status.utils import node_ping
 from vms.models import Node
 from gui.models import User
+
+logger = getLogger(__name__)
 
 
 class NodeDefineSerializer(s.InstanceSerializer):
@@ -18,8 +23,9 @@ class NodeDefineSerializer(s.InstanceSerializer):
     _update_fields_ = ('status', 'owner', 'is_compute', 'is_backup', 'cpu_coef', 'ram_coef',
                        'monitoring_hostgroups', 'monitoring_templates')
 
-    hostname = s.Field()
-    address = s.Field()
+    hostname = s.CharField(read_only=True)
+    uuid = s.CharField(read_only=True)
+    address = s.CharField(read_only=True)
     status = s.IntegerChoiceField(choices=Node.STATUS_DB)
     node_status = s.DisplayChoiceField(source='status', choices=Node.STATUS_DB, read_only=True)
     owner = s.SlugRelatedField(slug_field='username', queryset=User.objects, read_only=False)
@@ -33,7 +39,7 @@ class NodeDefineSerializer(s.InstanceSerializer):
     cpu_free = s.IntegerField(read_only=True)
     ram_free = s.IntegerField(read_only=True)
     ram_kvm_overhead = s.IntegerField(read_only=True)
-    sysinfo = s.Field(source='api_sysinfo')
+    sysinfo = s.Field(source='api_sysinfo')  # Field is read_only=True by default
     monitoring_hostgroups = s.ArrayField(max_items=16, default=[])
     monitoring_templates = s.ArrayField(max_items=32, default=[])
     created = s.DateTimeField(read_only=True, required=False)
@@ -72,7 +78,9 @@ class NodeDefineSerializer(s.InstanceSerializer):
                 raise s.ValidationError(_('Cannot change status. Please add a valid license first.'))
 
             if node.is_unreachable() or node.is_offline():          # Manual switch from unreachable and offline state
-                if not node_ping(self.object, all_workers=False):   # requires that node is really online
+                if settings.DEBUG:
+                    logger.warning('DEBUG mode on => skipping status checking of node %s', self.object)
+                elif not node_ping(self.object, all_workers=False):   # requires that node is really online
                     raise s.ValidationError(_('Cannot change status. Compute node is down.'))
 
             self.clear_cache = True

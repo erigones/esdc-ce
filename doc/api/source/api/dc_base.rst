@@ -87,6 +87,7 @@
                     "API_LOG_USER_CALLBACK": true,
                     "COMPANY_NAME": "Erigones, s. r. o.", 
                     "DEFAULT_FROM_EMAIL": "noreply@example.com", 
+                    "DNS_ENABLED": true,
                     "DNS_HOSTMASTER": "hostmaster@example.com", 
                     "DNS_NAMESERVERS": [
                         "ns1.local"

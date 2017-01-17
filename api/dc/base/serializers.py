@@ -223,6 +223,7 @@ class DcSettingsSerializer(s.InstanceSerializer):
     VMS_VM_SNAPSHOT_ENABLED = s.BooleanField(label=_('Snapshots'))
     VMS_VM_BACKUP_ENABLED = s.BooleanField(label=_('Backups'))
     MON_ZABBIX_ENABLED = s.BooleanField(label=_('Monitoring'))
+    DNS_ENABLED = s.BooleanField(label=_('DNS'))
     SUPPORT_ENABLED = s.BooleanField(label=_('Support'))
     REGISTRATION_ENABLED = s.BooleanField(label=_('Registration'))
     FAQ_ENABLED = s.BooleanField(label=_('FAQ'))  # Not part of MODULES (can be overridden even if disabled in settings)
