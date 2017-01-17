@@ -70,9 +70,9 @@ class DcNodeView(APIView):
 
         # Used in GUI
         try:
-            add_storage = int(data.pop('add_storage', 0))
+            add_storage = int(data.pop('add_storage', DcNode.NS_ATTACH_NONE))
         except ValueError:
-            add_storage = 0
+            add_storage = DcNode.NS_ATTACH_NONE
 
         ser = DcNodeSerializer(request, dcnode, data=data)
 
@@ -88,7 +88,7 @@ class DcNodeView(APIView):
             from api.dc.storage.views import dc_storage
             ns = NodeStorage.objects.filter(node=node)
 
-            if add_storage != 9:
+            if add_storage != DcNode.NS_ATTACH_ALL:
                 ns = ns.filter(storage__access=add_storage)
 
             for zpool in ns.values_list('zpool', flat=True):

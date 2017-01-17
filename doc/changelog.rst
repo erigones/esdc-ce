@@ -15,6 +15,8 @@ Features
 - Backup restore and snapshot restore accept VM UUID besides hostname as a parameter - `#26 <https://github.com/erigones/esdc-ce/issues/26>`__
 - Backup restore API call has no default target vm and disk anymore, which makes the call less error-prone - `#26 <https://github.com/erigones/esdc-ce/issues/26>`__
 - Implemented task retries after operational errors (mgmt callbacks) - `#38 <https://github.com/erigones/esdc-ce/issues/38>`__
+- Added DNS_ENABLED module into DC settings (API & GUI) - `#45 <https://github.com/erigones/esdc-ce/issues/45>`__
+- Exposed compute node, network and image UUIDs via API - `#49 <https://github.com/erigones/esdc-ce/issues/49>`__
 - Added harvest_vm function into API documentation - `#51 <https://github.com/erigones/esdc-ce/issues/51>`__
 
 
