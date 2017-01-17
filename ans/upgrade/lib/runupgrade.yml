@@ -18,3 +18,8 @@
     when: ( tasklist | basename ) > appliance_version.stdout
     loop_control:
       loop_var: tasklist
+  handlers:
+  - name: reload systemd
+    shell: /bin/systemctl daemon-reload
+  - name: restart postgresql95
+    service: name=postgresql-9.5 state=restarted
