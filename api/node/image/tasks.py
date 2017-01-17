@@ -62,7 +62,7 @@ def node_image_cb(result, task_id, nodestorage_id=None, zpool=None, img_uuid=Non
 def run_node_img_sources_sync(node, new_img_sources=None, node_img_sources=None):
     """
     Update imgadm sources on compute node.
-    Called by
+    Always called by node_sysinfo_cb after the sysinfo data is processed (even if no node data is changed).
     """
     if new_img_sources is None:
         image_vm = ImageVm()

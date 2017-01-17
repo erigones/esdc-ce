@@ -24,6 +24,7 @@ def _image_manage_cb_failed(result, task_id, img, action, snap=None):
         for attr, value in img.backup.items():
             setattr(img, attr, value)
 
+        img.backup = {}  # Remove backup
         img.status = Image.OK
         img.manifest = img.manifest_active
         img.save()

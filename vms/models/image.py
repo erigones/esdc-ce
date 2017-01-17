@@ -300,10 +300,6 @@ class Image(_VirtModel, _JsonPickleModel, _OSType, _DcMixin, _UserTasksModel):
             'tags': self.tag_list,
         }
 
-    def save(self, backup=None, **kwargs):
-        self.backup = backup or {}
-        return super(Image, self).save(**kwargs)
-
     def save_status(self, new_status=None, **kwargs):
         """Just update the status field (and other related fields)"""
         if new_status is not None:

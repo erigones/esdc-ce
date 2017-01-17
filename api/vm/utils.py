@@ -36,6 +36,9 @@ def get_vm(request, hostname_or_uuid, attrs=None, where=None, exists_ok=False, n
     Call get_object for Vm model identified by hostname or uuid. If attributes are not
     specified then set them to check owner and node status.
     Also acts as IsVmOwner permission.
+    By using dc_bound=False the current request.dc is ignored and the returned VM may not reside in
+    the current working DC; This is only used by internal DC-unbound APIs, which need to check whether a VM is defined
+    in the system. DC-bound API calls must use the default dc_bound=True!
     """
     # Quickly return vm, if set in request (shortcut from GUI)
     vm = getattr(request, '_api_vm', None)
@@ -77,6 +80,9 @@ def get_vms(request, where=None, sr=('node',), order_by=('hostname',), dc_bound=
     """
     Return queryset of VMs for current user or all if admin.
     Also acts as IsVmOwner permission.
+    By using dc_bound=False the current request.dc is ignored and the returned VMs may not reside in
+    the current working DC; This is only used by internal DC-unbound APIs, which need to list all VMs defined
+    in the system. DC-bound API calls must use the default dc_bound=True!
     """
     if where is None:
         where = QNodeNullOrLicensed

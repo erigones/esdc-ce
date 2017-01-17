@@ -152,6 +152,7 @@ class ImageView(TaskAPIView):
                 for attr, value in img.backup.items():
                     setattr(img, attr, value)
 
+                img.backup = {}  # Remove backup
                 img.manifest = img.manifest_active
                 img.status = Image.OK
                 img.save()
@@ -308,7 +309,8 @@ class ImageView(TaskAPIView):
 
         if self.img_server and ser.update_manifest:
             img.status = Image.PENDING
-            img.save(backup=img_backup)
+            img.backup = img_backup
+            img.save()
 
             return self._run_execute(LOG_IMAGE_UPDATE, 'esimg update', stdin=img.manifest.dump(),
                                      recover_on_error=img_backup, detail_dict=ser.detail_dict())

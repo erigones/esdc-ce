@@ -177,9 +177,9 @@ def init_mgmt(head_node, images=None):
 
     # Let's update the default image server after we've harvested the VMS_VM_IMG01
     try:
-        try:
-            vm_img01_uuid = Vm.objects.get(uuid=settings.VMS_VM_IMG01).uuid
-        except Vm.DoesNotExist:
+        if Vm.objects.filter(uuid=settings.VMS_VM_IMG01).exists():
+            vm_img01_uuid = settings.VMS_VM_IMG01
+        else:
             vm_img01_uuid = None
 
         if settings.VMS_IMAGE_VM == vm_img01_uuid:
