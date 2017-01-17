@@ -1,0 +1,52 @@
+{
+    "zabbix_export": {
+        "date": "2015-12-03T21:45:20Z",
+        "templates": [
+            {
+                "templates": [
+                    {
+                        "name": "t_icmp"
+                    },
+                    {
+                        "name": "t_linux"
+                    },
+                    {
+                        "name": "t_linux-disk"
+                    },
+                    {
+                        "name": "t_zabbix-agent"
+                    },
+                    {
+                        "name": "t_zabbix-db"
+                    },
+                    {
+                        "name": "t_zabbix-server"
+                    }
+                ],
+                "name": "t_role-mon",
+                "macros": [
+                    {
+                        "macro": "{$SWAP_FREE_THRESHOLD}",
+                        "value": "0M"
+                    }
+                ],
+                "items": [],
+                "screens": [],
+                "applications": [],
+                "discovery_rules": [],
+                "groups": [
+                    {
+                        "name": "Templates"
+                    }
+                ],
+                "template": "t_role-mon"
+            }
+        ],
+        "version": "2.0",
+        "groups": [
+            {
+                "name": "Templates"
+            }
+        ]
+    }
+}

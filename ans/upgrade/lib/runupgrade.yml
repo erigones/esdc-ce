@@ -2,6 +2,8 @@
   hosts: "{{ runhosts }}"
   vars:
     appliance_type: 'mgmt'   # default, overriden by extra-vars
+    erigones_home: "{{ lookup('env','ERIGONES_HOME')|default('/opt/erigones') }}"
+    #erigones_home: /opt/erigones
     upg_base: "{{ lookup('env','UPG_BASE')|default('/opt/erigones/ans/upgrade') }}"
     # directory with the actual upgrade tasks (per appliance version):
     upg_dir: "{{ upg_base }}/{{ appliance_type }}"
@@ -11,11 +13,13 @@
     shell: if [ -f "{{ versionfile }}" ]; then cat "{{ versionfile }}"; else echo 'v1.0.0'; fi
     register: appliance_version
   - name: getting list of upgrades
-    shell: find "{{ upg_dir }}" -maxdepth 1 -type d -name 'v*' | sort --version-sort
+    local_action:
+        module: shell
+        args: find "{{ upg_dir }}" -maxdepth 1 -type d -name 'v*' | sort --version-sort
     register: upg_subdirs
   - include: "{{ upg_base }}/lib/runtasks.yml"
     with_items: "{{ upg_subdirs.stdout.split('\n') }}"
-    when: ( tasklist | basename ) > appliance_version.stdout
+    when: ( tasklist | basename | version_compare(appliance_version.stdout, '>'))
     loop_control:
       loop_var: tasklist
   handlers:

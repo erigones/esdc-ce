@@ -12,6 +12,10 @@ INVENTORY="${ERIGONES_HOME}/ans/hosts"
 ANSIBLE_CFG="${ERIGONES_HOME}/ans/ansiblecfg"
 export ERIGONES_HOME UPG_BASE
 
+PYTHONPATH="$ERIGONES_HOME:$PYTHONPATH:$ERIGONES_HOME/envs/lib/python2.7/site-packages"
+VIRTUAL_ENV="$ERIGONES_HOME/envs"
+export PYTHONPATH VIRTUAL_ENV PATH
+
 # load ansible config
 if [ -f "$ANSIBLE_CFG" ]; then
 	. "$ANSIBLE_CFG"
@@ -35,5 +39,5 @@ MYHOSTNAME=$(hostname -s)				# e.g: mgmt01
 APPLIANCE_NUMBER="${MYHOSTNAME:(-2)}"	# e.g: "01"
 
 /usr/bin/ansible-playbook -i "${INVENTORY}" "${UPG_BASE}/lib/runupgrade.yml" --extra-vars="runhosts='mgmt${APPLIANCE_NUMBER}' appliance_type=mgmt"
-#/usr/bin/ansible-playbook -i "${INVENTORY}" "${UPG_BASE}/lib/runupgrade.yml" --extra-vars="runhosts='mon${APPLIANCE_NUMBER}' appliance_type=mon"
+/usr/bin/ansible-playbook -i "${INVENTORY}" "${UPG_BASE}/lib/runupgrade.yml" --extra-vars="runhosts='mon${APPLIANCE_NUMBER}' appliance_type=mon"
 
