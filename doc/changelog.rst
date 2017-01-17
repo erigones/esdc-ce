@@ -26,6 +26,7 @@ Bugs
 
 - Fixed bug with monitoring synchronization called twice during new VM deployment - `#32 <https://github.com/erigones/esdc-ce/issues/32>`__
 - Patched celery beat to achieve correct behavior during program termination - `#40 <https://github.com/erigones/esdc-ce/issues/40>`__
+- Updated message box that displays information about unavailable nodes to show/hide dynamically - `#35 <https://github.com/erigones/esdc-ce/issues/35>`__
 
 
 2.3.3 (unreleased)

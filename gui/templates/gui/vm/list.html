@@ -36,8 +36,7 @@
 
 <div class="container-fluid">
 
-  {% if vms_node_not_online %}
-  <div class="row-fluid">
+  <div class="row-fluid{% if vms_node_online %} hide{% endif %}" id="msg_node_status">
     <div class="span8 offset2">
       <div class="box">
         <div class="tab-header tab-header-light">
@@ -49,7 +48,6 @@
       </div>
     </div>
   </div>
-  {% endif %}
 
   <div class="row-fluid">
 
