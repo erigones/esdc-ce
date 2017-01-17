@@ -178,7 +178,21 @@ def init_mgmt(head_node, images=None):
     logger.info('Sleeping for 60 seconds after admin datacenter initialization')
     sleep(60)
 
-    # We can change the default resolvers after we've harvested the VMS_VM_DNS01 (#831)
+    # Let's update the default image server after we've harvested the VMS_VM_IMG01
+    try:
+        if Vm.objects.filter(uuid=settings.VMS_VM_IMG01).exists():
+            vm_img01_uuid = settings.VMS_VM_IMG01
+        else:
+            vm_img01_uuid = None
+
+        if settings.VMS_IMAGE_VM == vm_img01_uuid:
+            logger.info('The current image server (VMS_IMAGE_VM) is already set to %s', vm_img01_uuid)
+        else:
+            api_put(dc_settings, main, VMS_IMAGE_VM=vm_img01_uuid)
+    except Exception as e:
+        logger.exception(e)
+
+    # We can change the default resolvers after we've harvested the VMS_VM_DNS01 (#chili-831)
     try:
         try:
             vm_dns01_ip = Vm.objects.get(uuid=settings.VMS_VM_DNS01).ips[0]

@@ -58,6 +58,10 @@ def image_manage(request, name, data=None):
         :status 403: Forbidden
         :status 404: Image not found
 
+    .. note:: The behaviour of the following API functions depends on whether a global image server \
+(:http:put:`VMS_IMAGE_VM </dc/(dc)/settings>`) is configured in the system. With no image server configured all \
+operations will be performed at database level only.
+
     .. http:post:: /image/(name)
 
         .. note:: You can also import images from remote disk image repositories by using the \
@@ -70,7 +74,8 @@ def image_manage(request, name, data=None):
             * |ImageImportAdmin| - ``dc_bound=true``
             * |SuperAdmin| - ``dc_bound=false``
         :Asynchronous?:
-            * |async-yes|
+            * |async-yes| - Image server support is enabled in the system (default)
+            * |async-no| - Image server support is disabled in the system
         :arg name: **required** - Server disk image name
         :type name: string
         :arg data.manifest_url: **required** - Disk image manifest URL
@@ -119,10 +124,10 @@ def image_manage(request, name, data=None):
             * |ImageAdmin| - ``dc_bound=true``
             * |SuperAdmin| - ``dc_bound=false``
         :Asynchronous?:
-            * |async-yes| - Image is updated on image server when one of the following attributes has changed: \
-``name``, ``alias``, ``version``, ``access``, ``desc``
-            * |async-no| - Image is updated in DB only when none of the following attributes was changed: \
-``name``, ``alias``, ``version``, ``access``, ``desc``
+            * |async-yes| - Image is updated on image server when at least one attribute except ``dc_bound`` \
+has changed and image server support is enabled in the system
+            * |async-no| - Image is updated in DB only when only the ``dc_bound`` attribute has changed or \
+image server support is disabled in the system
         :arg name: **required** - Server disk image name
         :type name: string
         :arg data.alias: Short image name
@@ -182,6 +187,8 @@ def image_snapshot(request, hostname_or_uuid, snapname, name, data=None):
     """
     Create (:http:post:`POST </vm/(hostname_or_uuid)/snapshot/(snapname)/image/(name)>`)
     a server disk image from a disk snapshot.
+
+    .. note:: A global image server (:http:put:`VMS_IMAGE_VM </dc/(dc)/settings>`) must be configured in the system.
 
     .. http:post:: /vm/(hostname_or_uuid)/snapshot/(snapname)/image/(name)
 

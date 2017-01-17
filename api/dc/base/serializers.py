@@ -7,8 +7,9 @@ from core.external.decorators import (
     third_party_apps_dc_modules_and_settings, third_party_apps_default_dc_modules_and_settings
 )
 from api import serializers as s
+from api.exceptions import ObjectNotFound
 from api.validators import validate_owner, validate_alias, validate_mdata, validate_ssh_key, placeholder_validator
-from api.vm.utils import get_owners
+from api.vm.utils import get_vm, get_owners
 from api.sms.utils import get_services
 from api.mon.zabbix import VM_KWARGS, VM_KWARGS_NIC, VM_KWARGS_DISK
 from gui.models import User, UserProfile, Role
@@ -211,6 +212,7 @@ class DcSettingsSerializer(s.InstanceSerializer):
         'VMS_VM_BACKUP_LIMIT',
         'VMS_VM_BACKUP_DC_SIZE_LIMIT',
         'VMS_NET_LIMIT',
+        'VMS_IMAGE_VM',
         'VMS_IMAGE_LIMIT',
         'VMS_ISO_LIMIT'
     })
@@ -593,6 +595,13 @@ class DefaultDcSettingsSerializer(DcSettingsSerializer):
     VMS_NET_NIC_TAGS = s.ArrayField(label='VMS_NET_NIC_TAGS', min_items=1, max_items=24,
                                     help_text=_('List of aliases of network devices configured on compute nodes.'))
 
+    VMS_IMAGE_VM = s.SafeCharField(label='VMS_IMAGE_VM', required=False,
+                                   help_text=_('Global image server (hostname or uuid) - primary IMGAPI source on all '
+                                               'compute nodes. Empty value means that most of the image-related '
+                                               'operations will be performed only in the DB.'))
+    VMS_IMAGE_SOURCES = s.ArrayField(label='VMS_IMAGE_SOURCES', required=False, max_items=16,
+                                     help_text=_('List of additional IMGAPI sources that will be set on all '
+                                                 'compute nodes.'))
     VMS_IMAGE_REPOSITORIES = s.URLDictField(label='VMS_IMAGE_REPOSITORIES', required=False, max_items=16,
                                             help_text=_('Object (key=name, value=URL) with remote disk image '
                                                         'repositories available in every virtual datacenter.'))
@@ -672,6 +681,29 @@ class DefaultDcSettingsSerializer(DcSettingsSerializer):
         else:
             for key in value:
                 validate_ssh_key(key)
+
+        return attrs
+
+    # noinspection PyPep8Naming
+    def validate_VMS_IMAGE_VM(self, attrs, source):
+        try:
+            value = attrs[source]
+        except KeyError:
+            pass
+        else:
+            if value:
+                try:
+                    vm = get_vm(self.request, value, exists_ok=True, noexists_fail=True, dc_bound=False)
+                except ObjectNotFound as exc:
+                    raise s.ValidationError(exc.detail)
+                else:
+                    if vm.status not in (Vm.RUNNING, Vm.STOPPED):
+                        raise s.ValidationError(_('Invalid VM status; VM must be running or stopped.'))
+
+                    if vm.ostype != Vm.SUNOS_ZONE:
+                        raise s.ValidationError(_('Invalid OS type; VM must be a SunOS Zone.'))
+
+                    attrs[source] = vm.uuid
 
         return attrs
 

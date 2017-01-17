@@ -6,7 +6,7 @@ from frozendict import frozendict
 from vms.models import Dc, Image
 from api.dc.base.views import dc_manage, dc_settings
 from api.dc.base.serializers import DcSettingsSerializer, DefaultDcSettingsSerializer
-from api.vm.utils import get_owners, get_images, get_subnets, get_zpools
+from api.vm.utils import get_vms, get_owners, get_images, get_subnets, get_zpools
 from api.mon.zabbix import getZabbix
 from gui.forms import SerializerForm
 from gui.fields import ArrayAreaField
@@ -65,6 +65,8 @@ class DcSettingsForm(SerializerForm):
         'VMS_VM_DOMAIN_DEFAULT': forms.ChoiceField,
         'VMS_DISK_IMAGE_DEFAULT': forms.ChoiceField,
         'VMS_DISK_IMAGE_ZONE_DEFAULT': forms.ChoiceField,
+        'VMS_IMAGE_SOURCES': ArrayAreaField,
+        'VMS_IMAGE_VM': forms.ChoiceField,
         'VMS_NET_DEFAULT': forms.ChoiceField,
         'VMS_STORAGE_DEFAULT': forms.ChoiceField,
         'VMS_VM_SSH_KEYS_DEFAULT': ArrayAreaField,
@@ -74,6 +76,8 @@ class DcSettingsForm(SerializerForm):
         'VMS_VM_DOMAIN_DEFAULT': forms.Select,
         'VMS_DISK_IMAGE_DEFAULT': forms.Select,
         'VMS_DISK_IMAGE_ZONE_DEFAULT': forms.Select,
+        'VMS_IMAGE_SOURCES': ArrayAreaWidget,
+        'VMS_IMAGE_VM': forms.Select,
         'VMS_NET_DEFAULT': forms.Select,
         'VMS_STORAGE_DEFAULT': forms.Select,
         'VMS_VM_SSH_KEYS_DEFAULT': ArrayAreaWidget,
@@ -84,6 +88,7 @@ class DcSettingsForm(SerializerForm):
         'VMS_VM_DOMAIN_DEFAULT': select_widget,
         'VMS_DISK_IMAGE_DEFAULT': select_widget,
         'VMS_DISK_IMAGE_ZONE_DEFAULT': select_widget,
+        'VMS_IMAGE_VM': select_widget,
         'VMS_NET_DEFAULT': select_widget,
         'VMS_STORAGE_DEFAULT': select_widget,
         'SITE_SIGNATURE': {'rows': 2},
@@ -172,3 +177,8 @@ class DefaultDcSettingsForm(DcSettingsForm):
 
     default_dc_third_party_modules = set(DefaultDcSettingsSerializer.default_dc_third_party_modules)
     default_dc_third_party_settings = DefaultDcSettingsSerializer.default_dc_third_party_settings
+
+    def __init__(self, request, *args, **kwargs):
+        super(DefaultDcSettingsForm, self).__init__(request, *args, **kwargs)
+        all_vms = get_vms(request, dc_bound=False).values_list('uuid', 'hostname')
+        self.fields['VMS_IMAGE_VM'].choices = [('', _('(none)'))] + list(all_vms)

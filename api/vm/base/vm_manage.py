@@ -3,7 +3,7 @@ from logging import getLogger
 from django.utils.six import iteritems
 
 from que.tasks import execute
-from vms.models import Image
+from vms.models import Image, ImageVm
 from api.api_views import APIView
 from api.exceptions import (PermissionDenied, VmIsNotOperational, VmIsLocked, VmHasPendingTasks, PreconditionRequired,
                             ExpectationFailed)
@@ -363,6 +363,9 @@ class VmManage(APIView):
         # only admin
         if not (request.user and request.user.is_admin(request)):
             raise PermissionDenied
+
+        if vm.uuid == ImageVm.get_uuid():
+            raise VmIsLocked('VM is image server')
 
         if vm.locked:
             raise VmIsLocked
