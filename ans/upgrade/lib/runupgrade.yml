@@ -1,4 +1,4 @@
-- name: Run appliance upgrade
+- name: "Running appliance upgrade of hosts {{ runhosts }}"
   hosts: "{{ runhosts }}"
   vars:
     appliance_type: 'mgmt'   # default, overriden by extra-vars

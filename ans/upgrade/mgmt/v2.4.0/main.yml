@@ -3,7 +3,7 @@
   lineinfile: dest=/etc/hosts line="127.0.0.1   mgmt01" state=absent
 
 - name: Delete hardcoded hostname from /etc/hostname
-  copy: dest=/etc/hostname content='localhost.localdomain' mode='u=rw,g=r,o=r'
+  copy: dest=/etc/hostname content='localhost.localdomain\n' mode='u=rw,g=r,o=r'
 
 - name: Update post-deploy script
   copy: src="{{ upg_dir }}/{{ upgrading_to }}/50-es-post-deploy.sh" dest=/var/lib/rc-scripts/50-es-post-deploy.sh
