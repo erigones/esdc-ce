@@ -53,4 +53,4 @@ pip-log.txt
 celerybeat-schedule*
 
 # Ansible
-ans/hosts
+ans/hosts.cfg

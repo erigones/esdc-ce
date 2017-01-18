@@ -1,4 +1,4 @@
-# This task searches for directory zabbix_templates in current task dir (e.g. v2.4.0)
+# This task searches for directory zabbix_templates in current task dir (e.g. v2.4.0/zabbix_templates)
 # and imports all .json files that are present there.
 # Required variables: upg_dir, upgrading_to
 

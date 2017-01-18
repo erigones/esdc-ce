@@ -1,5 +1,0 @@
-# ansible config
-export ANSIBLE_HOST_KEY_CHECKING=false
-export ANSIBLE_SSH_PIPELINING=true
-export ANSIBLE_RETRY_FILES_ENABLED=false
-export ANSIBLE_LIBRARY="${ERIGONES_HOME:="/opt/erigones"}/ans/library"
