@@ -172,29 +172,37 @@ def import_template(module, zbx, filename, fmt):
             "source": data,
             "rules": {
                 "items": {
-                    "createMissing": True
+                    "createMissing": True,
+                    "updateExisting": True
                 },
                 "graphs": {
-                    "createMissing": True
+                    "createMissing": True,
+                    "updateExisting": True
                 },
                 "applications": {
-                    "createMissing": True
+                    "createMissing": True,
+                    "updateExisting": True
                 },
                 "triggers": {
-                    "createMissing": True
+                    "createMissing": True,
+                    "updateExisting": True
                 },
                 "templates": {
-                    "createMissing": True
+                    "createMissing": True,
+                    "updateExisting": True
                 },
                 "templateScreens": {
-                    "createMissing": True
+                    "createMissing": True,
+                    "updateExisting": True
                 },
                 "templateLinkage": {
-                    "createMissing": True
+                    "createMissing": True,
+                    "updateExisting": True
                 },
                 "discoveryRules": {
-                    "createMissing": True
-                }
+                    "createMissing": True,
+                    "updateExisting": True
+                },
             }
         })
     except BaseException as e:
@@ -301,10 +309,15 @@ def main():
         module.fail_json(msg="Invalid state: '%s'" % state)
         raise AssertionError
 
-    if check_template(module, zbx, template_name):
-        if module.check_mode:
-            changed = True
+    if module.check_mode:
+        module.exit_json(changed=True)
 
+    if state in ('present', 'import'):
+        # noinspection PyUnboundLocalVariable
+        import_template(module, zbx, template_filename, fmt)
+        module.exit_json(changed=True)
+
+    if check_template(module, zbx, template_name):
         if state == 'absent':
             template_id = get_template_id(module, zbx, template_name)
             remove_template(module, zbx, template_id)
@@ -314,14 +327,7 @@ def main():
             template_id = get_template_id(module, zbx, template_name)
             export_template(module, zbx, template_id, target, fmt)
             changed = True
-    else:
-        if module.check_mode:
-            changed = True
 
-        if state in ('present', 'import'):
-            # noinspection PyUnboundLocalVariable
-            import_template(module, zbx, template_filename, fmt)
-            changed = True
 
     module.exit_json(changed=changed)
 

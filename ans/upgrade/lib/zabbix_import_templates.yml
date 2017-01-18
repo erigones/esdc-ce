@@ -12,15 +12,11 @@
     args: find "{{ tmpl_dir }}" -name \*.json -type f -exec basename {} \;
   register: tmpl_list
   
-#- name: Prepare destination temp folder
-#  file: state=directory path=/tmp/templates owner=root mode=0700
-#
-##- name: Copy templates to temp folder
-#  copy: src="{{ tmpl_dir }}/{{ item }}"
-#        dest="/tmp/templates/{{ item }}"
-#  with_items: "{{ tmpl_list.stdout.split('\n') }}"
-
-- name: Query Zabbix credentials (user)
+# output is 3 lines:
+# 1: zabbix api url
+# 2: user
+# 3: pass
+- name: Query Zabbix credentials
   local_action:
     module: shell
     args: python -c 'from vms.models import DefaultDc; print(DefaultDc().settings.MON_ZABBIX_SERVER); print(DefaultDc().settings.MON_ZABBIX_USERNAME); print(DefaultDc().settings.MON_ZABBIX_PASSWORD);'
@@ -40,9 +36,6 @@
                    login_password="{{ zabbix_credentials.stdout_lines[2] }}"
                    state=import
                    format=json
-                   template=/tmp/templates/{{ item }}
+                   template="{{ tmpl_dir }}/{{ item }}"
   with_items: "{{ tmpl_list.stdout.split('\n') }}"
 
-
-#- name: Remove destination temp folder
-#  file: state=absent path=/tmp/templates

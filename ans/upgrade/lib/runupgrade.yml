@@ -1,11 +1,10 @@
 - name: "Running appliance upgrade of hosts {{ runhosts }}"
   hosts: "{{ runhosts }}"
   vars:
-    appliance_type: 'mgmt'   # default, overriden by extra-vars
+    appliance_type: 'mgmt'   # default, overridden by extra-vars
     erigones_home: "{{ lookup('env','ERIGONES_HOME')|default('/opt/erigones') }}"
-    #erigones_home: /opt/erigones
-    upg_base: "{{ lookup('env','UPG_BASE')|default('/opt/erigones/ans/upgrade') }}"
-    # directory with the actual upgrade tasks (per appliance version):
+    upg_base: "{{ erigones_home }}/ans/upgrade"
+    # directory with the actual upgrade steps:
     upg_dir: "{{ upg_base }}/{{ appliance_type }}"
     versionfile: /etc/esdc.version
   tasks:
