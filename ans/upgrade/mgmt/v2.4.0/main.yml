@@ -16,3 +16,6 @@
   copy: src="{{ upg_dir }}/{{ upgrading_to }}/pg-ansible.conf" dest=/var/lib/pgsql/9.5/data/conf.d/ansible.conf
   notify: restart postgresql95
 
+- name: Remove default rabbitmq guest user
+  rabbitmq_user: user=guest state=absent
+
