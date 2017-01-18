@@ -55,7 +55,7 @@ function node_label_update(hostname, state, status_display) {
 
 // Callback for node status change event
 function node_status_update(hostname, state, status_display) {
-  var msg_node_status = $('#msg_node_status');
+  var msg_node_status = $('#msg_node_status, ' + jq('msg_node_status_' + hostname));
 
   if (!node_refresh_page(hostname)) {
     node_label_update(hostname, state, status_display);
