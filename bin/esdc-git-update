@@ -21,6 +21,7 @@ NO_MATCH=3
 UP_TO_DATE=4
 FAILED_CHECKOUT=5
 POST_DEPLOY_FAILED=6
+UPGRADE_FAILED=6
 
 # #####################
 # Positional arguments
@@ -120,6 +121,9 @@ git checkout "${VERSION_REF}" || die $FAILED_CHECKOUT "${ERR_MSG}"
 
 if [[ "$(uname -s)" == "SunOS" ]] && [[ -f /usr/bin/zonename ]] && [[ "$(/usr/bin/zonename)" == "global" ]]; then
 	DEPLOY_CMD="${DEPLOY_CMD} --node"
+else
+	# run appliance upgrade
+	"${ERIGONES_HOME}/bin/esdc-appliance-update" || die $UPGRADE_FAILED "Appliance upgrade failed"
 fi
 
 # Running ctl.sh deploy --update

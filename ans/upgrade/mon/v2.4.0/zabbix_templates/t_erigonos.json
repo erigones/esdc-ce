@@ -1,0 +1,3319 @@
+{
+    "zabbix_export": {
+        "templates": [
+            {
+                "templates": [],
+                "name": "t_erigonos",
+                "macros": [
+                    {
+                        "macro": "{$CPU_LOAD_THRESHOLD}",
+                        "value": "30"
+                    },
+                    {
+                        "macro": "{$CPU_SYSTEM_UTILIZATION}",
+                        "value": "50"
+                    },
+                    {
+                        "macro": "{$CPU_USER_UTILIZATION}",
+                        "value": "50"
+                    },
+                    {
+                        "macro": "{$CPU_UTILIZATION_THRESHOLD}",
+                        "value": "80"
+                    },
+                    {
+                        "macro": "{$FS_USED_THRESHOLD}",
+                        "value": "10G"
+                    },
+                    {
+                        "macro": "{$MEMORY_FREE_THRESHOLD}",
+                        "value": "100M"
+                    },
+                    {
+                        "macro": "{$PROC_NUM_THRESHOLD}",
+                        "value": "5000"
+                    },
+                    {
+                        "macro": "{$SWAP_FREE_THRESHOLD}",
+                        "value": "100M"
+                    }
+                ],
+                "items": [
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "0",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "sps",
+                        "value_type": "3",
+                        "key": "system.cpu.switches",
+                        "delta": "1",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "CPU Context switches per second",
+                        "applications": [
+                            {
+                                "name": "CPU"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "0",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "ips",
+                        "value_type": "3",
+                        "key": "system.cpu.intr",
+                        "delta": "1",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "CPU Interrupts per second",
+                        "applications": [
+                            {
+                                "name": "CPU"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "30",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "%",
+                        "value_type": "0",
+                        "key": "system.cpu.util[,idle,]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "CPU Utilitzation - idle",
+                        "applications": [
+                            {
+                                "name": "CPU"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "30",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "0",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "%",
+                        "value_type": "0",
+                        "key": "system.cpu.util[,system,]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "CPU Utilitzation - system",
+                        "applications": [
+                            {
+                                "name": "CPU"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "30",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "0",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "%",
+                        "value_type": "0",
+                        "key": "system.cpu.util[,user,]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "CPU Utilitzation - user",
+                        "applications": [
+                            {
+                                "name": "CPU"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "",
+                        "value_type": "3",
+                        "key": "net.tcp.dns[,erigones.com]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "DNS resolution of erigones.com",
+                        "applications": [
+                            {
+                                "name": "General"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "300",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "",
+                        "value_type": "3",
+                        "key": "fma.faulty",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "FMA: faulty resources",
+                        "applications": [
+                            {
+                                "name": "System"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "6",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "3600",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "",
+                        "value_type": "1",
+                        "key": "system.uname",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Host information",
+                        "applications": [
+                            {
+                                "name": "General"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "0",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "unixtime",
+                        "value_type": "3",
+                        "key": "system.localtime",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Host localtime",
+                        "applications": [
+                            {
+                                "name": "General"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "0",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "3600",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "",
+                        "value_type": "1",
+                        "key": "system.hostname",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Host name",
+                        "applications": [
+                            {
+                                "name": "General"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "uptime",
+                        "value_type": "3",
+                        "key": "system.uptime",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Host uptime (in sec)",
+                        "applications": [
+                            {
+                                "name": "General"
+                            },
+                            {
+                                "name": "Server uptime"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "B",
+                        "value_type": "0",
+                        "key": "vm.memory.size[available]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Memory Usage - free",
+                        "applications": [
+                            {
+                                "name": "Memory"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "3600",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "0",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "B",
+                        "value_type": "0",
+                        "key": "vm.memory.size[total]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Memory Usage - total",
+                        "applications": [
+                            {
+                                "name": "Memory"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "B",
+                        "value_type": "3",
+                        "key": "vm.memory.size[used]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Memory Usage - used",
+                        "applications": [
+                            {
+                                "name": "Memory"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "",
+                        "value_type": "3",
+                        "key": "proc.num[]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Number of processes",
+                        "applications": [
+                            {
+                                "name": "Processes"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "",
+                        "value_type": "3",
+                        "key": "proc.num[,,run]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Number of running processes",
+                        "applications": [
+                            {
+                                "name": "Processes"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "0",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "",
+                        "value_type": "3",
+                        "key": "proc.num[ntpd]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Number of running processes $1",
+                        "applications": [
+                            {
+                                "name": "Processes"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "",
+                        "value_type": "3",
+                        "key": "proc.num[vmadmd]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Number of running processes vmadmd",
+                        "applications": [
+                            {
+                                "name": "Processes"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "",
+                        "value_type": "0",
+                        "key": "system.cpu.load[,avg1]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Processor load",
+                        "applications": [
+                            {
+                                "name": "CPU"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "",
+                        "value_type": "3",
+                        "key": "smf.maintenance",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "SMF maintenance state",
+                        "applications": [
+                            {
+                                "name": "System"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "",
+                        "value_type": "1",
+                        "key": "smf.status[cron]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "SMF state - cron",
+                        "applications": [
+                            {
+                                "name": "Processes"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "",
+                        "value_type": "1",
+                        "key": "smf.status[ntp]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "SMF state - ntp",
+                        "applications": [
+                            {
+                                "name": "Processes"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "",
+                        "value_type": "1",
+                        "key": "smf.status[system-log:default]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "SMF state - rsyslogd",
+                        "applications": [
+                            {
+                                "name": "Processes"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "1",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "",
+                        "value_type": "1",
+                        "key": "smf.status[sendmail]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "SMF state - sendmail",
+                        "applications": [
+                            {
+                                "name": "Processes"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "",
+                        "value_type": "1",
+                        "key": "smf.status[ssh]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "SMF state - sshd",
+                        "applications": [
+                            {
+                                "name": "Processes"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "",
+                        "value_type": "1",
+                        "key": "smf.status[vmadmd]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "SMF state - vmadmd",
+                        "applications": [
+                            {
+                                "name": "Processes"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "300",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "",
+                        "value_type": "3",
+                        "key": "net.tcp.service[ssh]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "SSH port open (check from inside by Zabbix agent)",
+                        "applications": [
+                            {
+                                "name": "General"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "B",
+                        "value_type": "3",
+                        "key": "system.swap.size[,free]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Swap Usage - free",
+                        "applications": [
+                            {
+                                "name": "Memory"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "3600",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "0",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "B",
+                        "value_type": "3",
+                        "key": "system.swap.size[,total]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Swap Usage - total",
+                        "applications": [
+                            {
+                                "name": "Memory"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    }
+                ],
+                "screens": [
+                    {
+                        "vsize": "3",
+                        "name": "System performance",
+                        "hsize": "1",
+                        "screen_items": [
+                            {
+                                "application": "",
+                                "style": "0",
+                                "rowspan": "1",
+                                "resource": {
+                                    "host": "t_erigonos",
+                                    "name": "CPU Utilization"
+                                },
+                                "sort_triggers": "0",
+                                "halign": "0",
+                                "resourcetype": "0",
+                                "colspan": "1",
+                                "dynamic": "0",
+                                "height": "100",
+                                "width": "500",
+                                "elements": "0",
+                                "url": "",
+                                "valign": "0",
+                                "y": "0",
+                                "x": "0"
+                            },
+                            {
+                                "application": "",
+                                "style": "0",
+                                "rowspan": "1",
+                                "resource": {
+                                    "host": "t_erigonos",
+                                    "name": "Memory Usage"
+                                },
+                                "sort_triggers": "0",
+                                "halign": "0",
+                                "resourcetype": "0",
+                                "colspan": "1",
+                                "dynamic": "0",
+                                "height": "100",
+                                "width": "500",
+                                "elements": "0",
+                                "url": "",
+                                "valign": "0",
+                                "y": "1",
+                                "x": "0"
+                            }
+                        ]
+                    }
+                ],
+                "applications": [
+                    {
+                        "name": "CPU"
+                    },
+                    {
+                        "name": "Filesystems"
+                    },
+                    {
+                        "name": "General"
+                    },
+                    {
+                        "name": "Memory"
+                    },
+                    {
+                        "name": "Network interfaces"
+                    },
+                    {
+                        "name": "Processes"
+                    },
+                    {
+                        "name": "Server uptime"
+                    },
+                    {
+                        "name": "Swap"
+                    },
+                    {
+                        "name": "System"
+                    },
+                    {
+                        "name": "ZFS pools"
+                    }
+                ],
+                "discovery_rules": [
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "lifetime": "1",
+                        "graph_prototypes": [],
+                        "trigger_prototypes": [
+                            {
+                                "status": "0",
+                                "description": "Partition {#FSNAME} is consuming too much space and might be using space needed by VMs.",
+                                "url": "",
+                                "type": "0",
+                                "priority": "4",
+                                "expression": "{t_erigonos:vfs.fs.size[{#FSNAME}, used].last(0)}>{$FS_USED_THRESHOLD}",
+                                "name": "Volume {#FSNAME} is consuming more than {$FS_USED_THRESHOLD}B"
+                            }
+                        ],
+                        "item_prototypes": [
+                            {
+                                "username": "",
+                                "snmpv3_contextname": "",
+                                "inventory_link": "0",
+                                "multiplier": "0",
+                                "trends": "365",
+                                "snmpv3_authpassphrase": "",
+                                "snmp_oid": "",
+                                "snmpv3_securitylevel": "0",
+                                "port": "",
+                                "logtimefmt": "",
+                                "delay": "300",
+                                "publickey": "",
+                                "params": "",
+                                "snmpv3_securityname": "",
+                                "formula": "1",
+                                "type": "0",
+                                "snmpv3_authprotocol": "0",
+                                "valuemap": [],
+                                "ipmi_sensor": "",
+                                "status": "0",
+                                "authtype": "0",
+                                "snmp_community": "",
+                                "description": "",
+                                "data_type": "0",
+                                "delay_flex": "",
+                                "units": "B",
+                                "value_type": "3",
+                                "key": "vfs.fs.size[{#FSNAME}, used]",
+                                "delta": "0",
+                                "password": "",
+                                "snmpv3_privpassphrase": "",
+                                "snmpv3_privprotocol": "0",
+                                "name": "Used disk space on {#FSNAME}",
+                                "applications": [
+                                    {
+                                        "name": "Filesystems"
+                                    }
+                                ],
+                                "privatekey": "",
+                                "allowed_hosts": "",
+                                "history": "7"
+                            }
+                        ],
+                        "delay": "3600",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "Discovery of file systems of different types as defined in global regular expression \"File systems for discovery by FSNAME (SmartOS)\".",
+                        "host_prototypes": [],
+                        "delay_flex": "",
+                        "key": "vfs.fs.discovery",
+                        "ipmi_sensor": "",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Mounted filesystem discovery",
+                        "privatekey": "",
+                        "filter": "{#FSNAME}:@File systems for discovery by FSNAME (SmartOS)",
+                        "allowed_hosts": ""
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "lifetime": "5",
+                        "graph_prototypes": [
+                            {
+                                "show_3d": "0",
+                                "graph_items": [
+                                    {
+                                        "calc_fnc": "2",
+                                        "color": "3333FF",
+                                        "item": {
+                                            "host": "t_erigonos",
+                                            "key": "net.if.out[{#IFNAME},errors]"
+                                        },
+                                        "sortorder": "1",
+                                        "drawtype": "5",
+                                        "type": "0",
+                                        "yaxisside": "0"
+                                    },
+                                    {
+                                        "calc_fnc": "2",
+                                        "color": "00AA00",
+                                        "item": {
+                                            "host": "t_erigonos",
+                                            "key": "net.if.in[{#IFNAME},errors]"
+                                        },
+                                        "sortorder": "0",
+                                        "drawtype": "5",
+                                        "type": "0",
+                                        "yaxisside": "0"
+                                    }
+                                ],
+                                "ymin_type_1": "1",
+                                "name": "Network errors on {#IFNAME}",
+                                "percent_left": "0.0000",
+                                "type": "0",
+                                "ymax_type_1": "0",
+                                "height": "300",
+                                "yaxismax": "100.0000",
+                                "width": "900",
+                                "show_legend": "1",
+                                "show_work_period": "1",
+                                "ymax_item_1": "0",
+                                "ymin_item_1": "0",
+                                "show_triggers": "1",
+                                "yaxismin": "0.0000",
+                                "percent_right": "0.0000"
+                            },
+                            {
+                                "show_3d": "0",
+                                "graph_items": [
+                                    {
+                                        "calc_fnc": "2",
+                                        "color": "87B457",
+                                        "item": {
+                                            "host": "t_erigonos",
+                                            "key": "net.if.in[{#IFNAME}]"
+                                        },
+                                        "sortorder": "0",
+                                        "drawtype": "5",
+                                        "type": "0",
+                                        "yaxisside": "1"
+                                    },
+                                    {
+                                        "calc_fnc": "2",
+                                        "color": "BDDA83",
+                                        "item": {
+                                            "host": "t_erigonos",
+                                            "key": "net.if.in[{#IFNAME},packets]"
+                                        },
+                                        "sortorder": "2",
+                                        "drawtype": "0",
+                                        "type": "0",
+                                        "yaxisside": "0"
+                                    },
+                                    {
+                                        "calc_fnc": "2",
+                                        "color": "98D6E7",
+                                        "item": {
+                                            "host": "t_erigonos",
+                                            "key": "net.if.out[{#IFNAME},packets]"
+                                        },
+                                        "sortorder": "3",
+                                        "drawtype": "0",
+                                        "type": "0",
+                                        "yaxisside": "0"
+                                    },
+                                    {
+                                        "calc_fnc": "2",
+                                        "color": "5299AD",
+                                        "item": {
+                                            "host": "t_erigonos",
+                                            "key": "net.if.out[{#IFNAME}]"
+                                        },
+                                        "sortorder": "1",
+                                        "drawtype": "5",
+                                        "type": "0",
+                                        "yaxisside": "1"
+                                    }
+                                ],
+                                "ymin_type_1": "1",
+                                "name": "Network traffic on {#IFNAME}",
+                                "percent_left": "0.0000",
+                                "type": "0",
+                                "ymax_type_1": "0",
+                                "height": "200",
+                                "yaxismax": "100.0000",
+                                "width": "900",
+                                "show_legend": "1",
+                                "show_work_period": "1",
+                                "ymax_item_1": "0",
+                                "ymin_item_1": "0",
+                                "show_triggers": "1",
+                                "yaxismin": "0.0000",
+                                "percent_right": "95.0000"
+                            }
+                        ],
+                        "trigger_prototypes": [],
+                        "item_prototypes": [
+                            {
+                                "username": "",
+                                "snmpv3_contextname": "",
+                                "inventory_link": "0",
+                                "multiplier": "0",
+                                "trends": "365",
+                                "snmpv3_authpassphrase": "",
+                                "snmp_oid": "",
+                                "snmpv3_securitylevel": "0",
+                                "port": "",
+                                "logtimefmt": "",
+                                "delay": "60",
+                                "publickey": "",
+                                "params": "",
+                                "snmpv3_securityname": "",
+                                "formula": "1",
+                                "type": "0",
+                                "snmpv3_authprotocol": "0",
+                                "valuemap": [],
+                                "ipmi_sensor": "",
+                                "status": "0",
+                                "authtype": "0",
+                                "snmp_community": "",
+                                "description": "",
+                                "data_type": "0",
+                                "delay_flex": "50/1-7,00:00-24:00",
+                                "units": "",
+                                "value_type": "3",
+                                "key": "net.if.in[{#IFNAME},errors]",
+                                "delta": "1",
+                                "password": "",
+                                "snmpv3_privpassphrase": "",
+                                "snmpv3_privprotocol": "0",
+                                "name": "Incoming errors on $1",
+                                "applications": [
+                                    {
+                                        "name": "Network interfaces"
+                                    }
+                                ],
+                                "privatekey": "",
+                                "allowed_hosts": "",
+                                "history": "30"
+                            },
+                            {
+                                "username": "",
+                                "snmpv3_contextname": "",
+                                "inventory_link": "0",
+                                "multiplier": "1",
+                                "trends": "365",
+                                "snmpv3_authpassphrase": "",
+                                "snmp_oid": "",
+                                "snmpv3_securitylevel": "0",
+                                "port": "",
+                                "logtimefmt": "",
+                                "delay": "60",
+                                "publickey": "",
+                                "params": "",
+                                "snmpv3_securityname": "",
+                                "formula": "8",
+                                "type": "0",
+                                "snmpv3_authprotocol": "0",
+                                "valuemap": [],
+                                "ipmi_sensor": "",
+                                "status": "0",
+                                "authtype": "0",
+                                "snmp_community": "",
+                                "description": "",
+                                "data_type": "0",
+                                "delay_flex": "50/1-7,00:00-24:00",
+                                "units": "bps",
+                                "value_type": "3",
+                                "key": "net.if.in[{#IFNAME}]",
+                                "delta": "1",
+                                "password": "",
+                                "snmpv3_privpassphrase": "",
+                                "snmpv3_privprotocol": "0",
+                                "name": "Incoming network traffic on $1",
+                                "applications": [
+                                    {
+                                        "name": "Network interfaces"
+                                    }
+                                ],
+                                "privatekey": "",
+                                "allowed_hosts": "",
+                                "history": "30"
+                            },
+                            {
+                                "username": "",
+                                "snmpv3_contextname": "",
+                                "inventory_link": "0",
+                                "multiplier": "1",
+                                "trends": "365",
+                                "snmpv3_authpassphrase": "",
+                                "snmp_oid": "",
+                                "snmpv3_securitylevel": "0",
+                                "port": "",
+                                "logtimefmt": "",
+                                "delay": "60",
+                                "publickey": "",
+                                "params": "",
+                                "snmpv3_securityname": "",
+                                "formula": "8",
+                                "type": "0",
+                                "snmpv3_authprotocol": "0",
+                                "valuemap": [],
+                                "ipmi_sensor": "",
+                                "status": "0",
+                                "authtype": "0",
+                                "snmp_community": "",
+                                "description": "",
+                                "data_type": "0",
+                                "delay_flex": "50/1-7,00:00-24:00",
+                                "units": "pps",
+                                "value_type": "3",
+                                "key": "net.if.in[{#IFNAME},packets]",
+                                "delta": "1",
+                                "password": "",
+                                "snmpv3_privpassphrase": "",
+                                "snmpv3_privprotocol": "0",
+                                "name": "Incoming packets on $1",
+                                "applications": [
+                                    {
+                                        "name": "Network interfaces"
+                                    }
+                                ],
+                                "privatekey": "",
+                                "allowed_hosts": "",
+                                "history": "30"
+                            },
+                            {
+                                "username": "",
+                                "snmpv3_contextname": "",
+                                "inventory_link": "0",
+                                "multiplier": "0",
+                                "trends": "365",
+                                "snmpv3_authpassphrase": "",
+                                "snmp_oid": "",
+                                "snmpv3_securitylevel": "0",
+                                "port": "",
+                                "logtimefmt": "",
+                                "delay": "60",
+                                "publickey": "",
+                                "params": "",
+                                "snmpv3_securityname": "",
+                                "formula": "1",
+                                "type": "0",
+                                "snmpv3_authprotocol": "0",
+                                "valuemap": [],
+                                "ipmi_sensor": "",
+                                "status": "0",
+                                "authtype": "0",
+                                "snmp_community": "",
+                                "description": "",
+                                "data_type": "0",
+                                "delay_flex": "50/1-7,00:00-24:00",
+                                "units": "",
+                                "value_type": "3",
+                                "key": "net.if.out[{#IFNAME},errors]",
+                                "delta": "1",
+                                "password": "",
+                                "snmpv3_privpassphrase": "",
+                                "snmpv3_privprotocol": "0",
+                                "name": "Outgoing errors on $1",
+                                "applications": [
+                                    {
+                                        "name": "Network interfaces"
+                                    }
+                                ],
+                                "privatekey": "",
+                                "allowed_hosts": "",
+                                "history": "30"
+                            },
+                            {
+                                "username": "",
+                                "snmpv3_contextname": "",
+                                "inventory_link": "0",
+                                "multiplier": "1",
+                                "trends": "365",
+                                "snmpv3_authpassphrase": "",
+                                "snmp_oid": "",
+                                "snmpv3_securitylevel": "0",
+                                "port": "",
+                                "logtimefmt": "",
+                                "delay": "60",
+                                "publickey": "",
+                                "params": "",
+                                "snmpv3_securityname": "",
+                                "formula": "8",
+                                "type": "0",
+                                "snmpv3_authprotocol": "0",
+                                "valuemap": [],
+                                "ipmi_sensor": "",
+                                "status": "0",
+                                "authtype": "0",
+                                "snmp_community": "",
+                                "description": "",
+                                "data_type": "0",
+                                "delay_flex": "",
+                                "units": "bps",
+                                "value_type": "3",
+                                "key": "net.if.out[{#IFNAME}]",
+                                "delta": "1",
+                                "password": "",
+                                "snmpv3_privpassphrase": "",
+                                "snmpv3_privprotocol": "0",
+                                "name": "Outgoing network traffic on $1",
+                                "applications": [
+                                    {
+                                        "name": "Network interfaces"
+                                    }
+                                ],
+                                "privatekey": "",
+                                "allowed_hosts": "",
+                                "history": "30"
+                            },
+                            {
+                                "username": "",
+                                "snmpv3_contextname": "",
+                                "inventory_link": "0",
+                                "multiplier": "1",
+                                "trends": "365",
+                                "snmpv3_authpassphrase": "",
+                                "snmp_oid": "",
+                                "snmpv3_securitylevel": "0",
+                                "port": "",
+                                "logtimefmt": "",
+                                "delay": "60",
+                                "publickey": "",
+                                "params": "",
+                                "snmpv3_securityname": "",
+                                "formula": "8",
+                                "type": "0",
+                                "snmpv3_authprotocol": "0",
+                                "valuemap": [],
+                                "ipmi_sensor": "",
+                                "status": "0",
+                                "authtype": "0",
+                                "snmp_community": "",
+                                "description": "",
+                                "data_type": "0",
+                                "delay_flex": "50/1-7,00:00-24:00",
+                                "units": "pps",
+                                "value_type": "3",
+                                "key": "net.if.out[{#IFNAME},packets]",
+                                "delta": "1",
+                                "password": "",
+                                "snmpv3_privpassphrase": "",
+                                "snmpv3_privprotocol": "0",
+                                "name": "Outgoing packets on $1",
+                                "applications": [
+                                    {
+                                        "name": "Network interfaces"
+                                    }
+                                ],
+                                "privatekey": "",
+                                "allowed_hosts": "",
+                                "history": "30"
+                            }
+                        ],
+                        "delay": "3600",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "Discovery of network interfaces as defined in global regular expression \"Network interfaces for discovery\".",
+                        "host_prototypes": [],
+                        "delay_flex": "",
+                        "key": "net.if.discovery",
+                        "ipmi_sensor": "",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Network interface discovery",
+                        "privatekey": "",
+                        "filter": "{#IFNAME}:@Network interfaces for discovery (SmartOS)",
+                        "allowed_hosts": ""
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "lifetime": "5",
+                        "graph_prototypes": [
+                            {
+                                "show_3d": "0",
+                                "graph_items": [
+                                    {
+                                        "calc_fnc": "2",
+                                        "color": "6B9BD4",
+                                        "item": {
+                                            "host": "t_erigonos",
+                                            "key": "zfs.usedsnap[{#ZPOOL}]"
+                                        },
+                                        "sortorder": "2",
+                                        "drawtype": "0",
+                                        "type": "0",
+                                        "yaxisside": "0"
+                                    },
+                                    {
+                                        "calc_fnc": "2",
+                                        "color": "5299AD",
+                                        "item": {
+                                            "host": "t_erigonos",
+                                            "key": "zfs.usedds[{#ZPOOL}]"
+                                        },
+                                        "sortorder": "0",
+                                        "drawtype": "0",
+                                        "type": "0",
+                                        "yaxisside": "0"
+                                    },
+                                    {
+                                        "calc_fnc": "2",
+                                        "color": "5D549A",
+                                        "item": {
+                                            "host": "t_erigonos",
+                                            "key": "zfs.usedrefreserv[{#ZPOOL}]"
+                                        },
+                                        "sortorder": "1",
+                                        "drawtype": "0",
+                                        "type": "0",
+                                        "yaxisside": "0"
+                                    }
+                                ],
+                                "ymin_type_1": "0",
+                                "name": "ZFS pool {#ZPOOL} disk space usage by type",
+                                "percent_left": "0.0000",
+                                "type": "1",
+                                "ymax_type_1": "0",
+                                "height": "400",
+                                "yaxismax": "100.0000",
+                                "width": "900",
+                                "show_legend": "1",
+                                "show_work_period": "0",
+                                "ymax_item_1": "0",
+                                "ymin_item_1": "0",
+                                "show_triggers": "0",
+                                "yaxismin": "0.0000",
+                                "percent_right": "0.0000"
+                            },
+                            {
+                                "show_3d": "0",
+                                "graph_items": [
+                                    {
+                                        "calc_fnc": "2",
+                                        "color": "98D6E7",
+                                        "item": {
+                                            "host": "t_erigonos",
+                                            "key": "zpool.iostat[{#ZPOOL},reads]"
+                                        },
+                                        "sortorder": "0",
+                                        "drawtype": "0",
+                                        "type": "0",
+                                        "yaxisside": "0"
+                                    },
+                                    {
+                                        "calc_fnc": "2",
+                                        "color": "87B457",
+                                        "item": {
+                                            "host": "t_erigonos",
+                                            "key": "zpool.iostat[{#ZPOOL},writes]"
+                                        },
+                                        "sortorder": "1",
+                                        "drawtype": "0",
+                                        "type": "0",
+                                        "yaxisside": "0"
+                                    },
+                                    {
+                                        "calc_fnc": "2",
+                                        "color": "87B457",
+                                        "item": {
+                                            "host": "t_erigonos",
+                                            "key": "zpool.iostat[{#ZPOOL},nwritten]"
+                                        },
+                                        "sortorder": "3",
+                                        "drawtype": "5",
+                                        "type": "0",
+                                        "yaxisside": "1"
+                                    },
+                                    {
+                                        "calc_fnc": "2",
+                                        "color": "335098",
+                                        "item": {
+                                            "host": "t_erigonos",
+                                            "key": "zpool.iostat[{#ZPOOL},nread]"
+                                        },
+                                        "sortorder": "2",
+                                        "drawtype": "5",
+                                        "type": "0",
+                                        "yaxisside": "1"
+                                    }
+                                ],
+                                "ymin_type_1": "0",
+                                "name": "ZFS pool {#ZPOOL} I/O",
+                                "percent_left": "0.0000",
+                                "type": "0",
+                                "ymax_type_1": "0",
+                                "height": "200",
+                                "yaxismax": "100.0000",
+                                "width": "900",
+                                "show_legend": "1",
+                                "show_work_period": "1",
+                                "ymax_item_1": "0",
+                                "ymin_item_1": "0",
+                                "show_triggers": "1",
+                                "yaxismin": "0.0000",
+                                "percent_right": "0.0000"
+                            },
+                            {
+                                "show_3d": "0",
+                                "graph_items": [
+                                    {
+                                        "calc_fnc": "2",
+                                        "color": "00C800",
+                                        "item": {
+                                            "host": "t_erigonos",
+                                            "key": "zpool.iostat[{#ZPOOL},writes]"
+                                        },
+                                        "sortorder": "1",
+                                        "drawtype": "1",
+                                        "type": "0",
+                                        "yaxisside": "0"
+                                    },
+                                    {
+                                        "calc_fnc": "2",
+                                        "color": "C80000",
+                                        "item": {
+                                            "host": "t_erigonos",
+                                            "key": "zpool.iostat[{#ZPOOL},reads]"
+                                        },
+                                        "sortorder": "0",
+                                        "drawtype": "1",
+                                        "type": "0",
+                                        "yaxisside": "0"
+                                    }
+                                ],
+                                "ymin_type_1": "0",
+                                "name": "ZFS pool {#ZPOOL} I/O count",
+                                "percent_left": "0.0000",
+                                "type": "0",
+                                "ymax_type_1": "0",
+                                "height": "200",
+                                "yaxismax": "100.0000",
+                                "width": "900",
+                                "show_legend": "1",
+                                "show_work_period": "1",
+                                "ymax_item_1": "0",
+                                "ymin_item_1": "0",
+                                "show_triggers": "1",
+                                "yaxismin": "0.0000",
+                                "percent_right": "0.0000"
+                            },
+                            {
+                                "show_3d": "0",
+                                "graph_items": [
+                                    {
+                                        "calc_fnc": "2",
+                                        "color": "C800C8",
+                                        "item": {
+                                            "host": "t_erigonos",
+                                            "key": "zpool.iostat[{#ZPOOL},nwritten]"
+                                        },
+                                        "sortorder": "1",
+                                        "drawtype": "5",
+                                        "type": "0",
+                                        "yaxisside": "0"
+                                    },
+                                    {
+                                        "calc_fnc": "2",
+                                        "color": "0000C8",
+                                        "item": {
+                                            "host": "t_erigonos",
+                                            "key": "zpool.iostat[{#ZPOOL},nread]"
+                                        },
+                                        "sortorder": "0",
+                                        "drawtype": "5",
+                                        "type": "0",
+                                        "yaxisside": "0"
+                                    }
+                                ],
+                                "ymin_type_1": "0",
+                                "name": "ZFS pool {#ZPOOL} I/O throughput",
+                                "percent_left": "0.0000",
+                                "type": "0",
+                                "ymax_type_1": "0",
+                                "height": "200",
+                                "yaxismax": "100.0000",
+                                "width": "900",
+                                "show_legend": "1",
+                                "show_work_period": "1",
+                                "ymax_item_1": "0",
+                                "ymin_item_1": "0",
+                                "show_triggers": "1",
+                                "yaxismin": "0.0000",
+                                "percent_right": "0.0000"
+                            },
+                            {
+                                "show_3d": "0",
+                                "graph_items": [
+                                    {
+                                        "calc_fnc": "9",
+                                        "color": "5D549A",
+                                        "item": {
+                                            "host": "t_erigonos",
+                                            "key": "zpool.write.ratio[{#ZPOOL}]"
+                                        },
+                                        "sortorder": "1",
+                                        "drawtype": "0",
+                                        "type": "0",
+                                        "yaxisside": "0"
+                                    },
+                                    {
+                                        "calc_fnc": "9",
+                                        "color": "5299AD",
+                                        "item": {
+                                            "host": "t_erigonos",
+                                            "key": "zpool.read.ratio[{#ZPOOL}]"
+                                        },
+                                        "sortorder": "0",
+                                        "drawtype": "0",
+                                        "type": "0",
+                                        "yaxisside": "0"
+                                    }
+                                ],
+                                "ymin_type_1": "0",
+                                "name": "ZFS pool {#ZPOOL} workload",
+                                "percent_left": "0.0000",
+                                "type": "2",
+                                "ymax_type_1": "0",
+                                "height": "200",
+                                "yaxismax": "0.0000",
+                                "width": "900",
+                                "show_legend": "1",
+                                "show_work_period": "0",
+                                "ymax_item_1": "0",
+                                "ymin_item_1": "0",
+                                "show_triggers": "0",
+                                "yaxismin": "0.0000",
+                                "percent_right": "0.0000"
+                            }
+                        ],
+                        "trigger_prototypes": [
+                            {
+                                "status": "0",
+                                "description": "",
+                                "url": "",
+                                "type": "0",
+                                "priority": "4",
+                                "expression": "{t_erigonos:zpool.list[{#ZPOOL}, capacity].max(#2)}>80",
+                                "name": "Free disk space on pool {#ZPOOL} is less than 20%"
+                            },
+                            {
+                                "status": "0",
+                                "description": "",
+                                "url": "",
+                                "type": "0",
+                                "priority": "3",
+                                "expression": "{t_erigonos:zpool.list[{#ZPOOL}, capacity].max(#2)}>70",
+                                "name": "Free disk space on pool {#ZPOOL} is less than 30%"
+                            },
+                            {
+                                "status": "0",
+                                "description": "",
+                                "url": "",
+                                "type": "0",
+                                "priority": "1",
+                                "expression": "{t_erigonos:zpool.list[{#ZPOOL}, capacity].max(#2)}>50",
+                                "name": "Free disk space on pool {#ZPOOL} is less than 50%"
+                            },
+                            {
+                                "status": "0",
+                                "description": "",
+                                "url": "",
+                                "type": "0",
+                                "priority": "4",
+                                "expression": "{t_erigonos:zfs.list[{#ZPOOL}, avail].max(#2)}<20*1024*1024*1024",
+                                "name": "Usable disk space on ZFS dataset {#ZPOOL} is below 20 GB"
+                            },
+                            {
+                                "status": "0",
+                                "description": "",
+                                "url": "",
+                                "type": "0",
+                                "priority": "2",
+                                "expression": "{t_erigonos:zfs.list[{#ZPOOL}, avail].max(#2)}<50*1024*1024*1024",
+                                "name": "Usable disk space on ZFS dataset {#ZPOOL} is below 50 GB"
+                            },
+                            {
+                                "status": "0",
+                                "description": "",
+                                "url": "",
+                                "type": "0",
+                                "priority": "4",
+                                "expression": "{t_erigonos:zpool.list[{#ZPOOL}, health].regexp(ONLINE)}=0",
+                                "name": "ZFS pool {#ZPOOL} is in {ITEM.LASTVALUE} state"
+                            }
+                        ],
+                        "item_prototypes": [
+                            {
+                                "username": "",
+                                "snmpv3_contextname": "",
+                                "inventory_link": "0",
+                                "multiplier": "0",
+                                "trends": "365",
+                                "snmpv3_authpassphrase": "",
+                                "snmp_oid": "",
+                                "snmpv3_securitylevel": "0",
+                                "port": "",
+                                "logtimefmt": "",
+                                "delay": "300",
+                                "publickey": "",
+                                "params": "",
+                                "snmpv3_securityname": "",
+                                "formula": "1",
+                                "type": "0",
+                                "snmpv3_authprotocol": "0",
+                                "valuemap": [],
+                                "ipmi_sensor": "",
+                                "status": "0",
+                                "authtype": "0",
+                                "snmp_community": "",
+                                "description": "",
+                                "data_type": "0",
+                                "delay_flex": "",
+                                "units": "B",
+                                "value_type": "3",
+                                "key": "zfs.list[{#ZPOOL}, avail]",
+                                "delta": "0",
+                                "password": "",
+                                "snmpv3_privpassphrase": "",
+                                "snmpv3_privprotocol": "0",
+                                "name": "ZFS dataset {#ZPOOL} available disk space",
+                                "applications": [
+                                    {
+                                        "name": "ZFS pools"
+                                    }
+                                ],
+                                "privatekey": "",
+                                "allowed_hosts": "",
+                                "history": "7"
+                            },
+                            {
+                                "username": "",
+                                "snmpv3_contextname": "",
+                                "inventory_link": "0",
+                                "multiplier": "0",
+                                "trends": "365",
+                                "snmpv3_authpassphrase": "",
+                                "snmp_oid": "",
+                                "snmpv3_securitylevel": "0",
+                                "port": "",
+                                "logtimefmt": "",
+                                "delay": "300",
+                                "publickey": "",
+                                "params": "",
+                                "snmpv3_securityname": "",
+                                "formula": "1",
+                                "type": "0",
+                                "snmpv3_authprotocol": "0",
+                                "valuemap": [],
+                                "ipmi_sensor": "",
+                                "status": "0",
+                                "authtype": "0",
+                                "snmp_community": "",
+                                "description": "",
+                                "data_type": "0",
+                                "delay_flex": "",
+                                "units": "B",
+                                "value_type": "3",
+                                "key": "zfs.usedds[{#ZPOOL}]",
+                                "delta": "0",
+                                "password": "",
+                                "snmpv3_privpassphrase": "",
+                                "snmpv3_privprotocol": "0",
+                                "name": "ZFS dataset {#ZPOOL} used data disk space",
+                                "applications": [
+                                    {
+                                        "name": "ZFS pools"
+                                    }
+                                ],
+                                "privatekey": "",
+                                "allowed_hosts": "",
+                                "history": "7"
+                            },
+                            {
+                                "username": "",
+                                "snmpv3_contextname": "",
+                                "inventory_link": "0",
+                                "multiplier": "0",
+                                "trends": "365",
+                                "snmpv3_authpassphrase": "",
+                                "snmp_oid": "",
+                                "snmpv3_securitylevel": "0",
+                                "port": "",
+                                "logtimefmt": "",
+                                "delay": "300",
+                                "publickey": "",
+                                "params": "",
+                                "snmpv3_securityname": "",
+                                "formula": "1",
+                                "type": "0",
+                                "snmpv3_authprotocol": "0",
+                                "valuemap": [],
+                                "ipmi_sensor": "",
+                                "status": "0",
+                                "authtype": "0",
+                                "snmp_community": "",
+                                "description": "",
+                                "data_type": "0",
+                                "delay_flex": "",
+                                "units": "B",
+                                "value_type": "3",
+                                "key": "zfs.list[{#ZPOOL}, used]",
+                                "delta": "0",
+                                "password": "",
+                                "snmpv3_privpassphrase": "",
+                                "snmpv3_privprotocol": "0",
+                                "name": "ZFS dataset {#ZPOOL} used disk space",
+                                "applications": [
+                                    {
+                                        "name": "ZFS pools"
+                                    }
+                                ],
+                                "privatekey": "",
+                                "allowed_hosts": "",
+                                "history": "7"
+                            },
+                            {
+                                "username": "",
+                                "snmpv3_contextname": "",
+                                "inventory_link": "0",
+                                "multiplier": "0",
+                                "trends": "365",
+                                "snmpv3_authpassphrase": "",
+                                "snmp_oid": "",
+                                "snmpv3_securitylevel": "0",
+                                "port": "",
+                                "logtimefmt": "",
+                                "delay": "300",
+                                "publickey": "",
+                                "params": "",
+                                "snmpv3_securityname": "",
+                                "formula": "1",
+                                "type": "0",
+                                "snmpv3_authprotocol": "0",
+                                "valuemap": [],
+                                "ipmi_sensor": "",
+                                "status": "0",
+                                "authtype": "0",
+                                "snmp_community": "",
+                                "description": "",
+                                "data_type": "0",
+                                "delay_flex": "",
+                                "units": "B",
+                                "value_type": "3",
+                                "key": "zfs.usedrefreserv[{#ZPOOL}]",
+                                "delta": "0",
+                                "password": "",
+                                "snmpv3_privpassphrase": "",
+                                "snmpv3_privprotocol": "0",
+                                "name": "ZFS dataset {#ZPOOL} used refreservation disk space",
+                                "applications": [
+                                    {
+                                        "name": "ZFS pools"
+                                    }
+                                ],
+                                "privatekey": "",
+                                "allowed_hosts": "",
+                                "history": "7"
+                            },
+                            {
+                                "username": "",
+                                "snmpv3_contextname": "",
+                                "inventory_link": "0",
+                                "multiplier": "0",
+                                "trends": "365",
+                                "snmpv3_authpassphrase": "",
+                                "snmp_oid": "",
+                                "snmpv3_securitylevel": "0",
+                                "port": "",
+                                "logtimefmt": "",
+                                "delay": "300",
+                                "publickey": "",
+                                "params": "",
+                                "snmpv3_securityname": "",
+                                "formula": "1",
+                                "type": "0",
+                                "snmpv3_authprotocol": "0",
+                                "valuemap": [],
+                                "ipmi_sensor": "",
+                                "status": "0",
+                                "authtype": "0",
+                                "snmp_community": "",
+                                "description": "",
+                                "data_type": "0",
+                                "delay_flex": "",
+                                "units": "B",
+                                "value_type": "3",
+                                "key": "zfs.usedsnap[{#ZPOOL}]",
+                                "delta": "0",
+                                "password": "",
+                                "snmpv3_privpassphrase": "",
+                                "snmpv3_privprotocol": "0",
+                                "name": "ZFS dataset {#ZPOOL} used snapshot disk space",
+                                "applications": [
+                                    {
+                                        "name": "ZFS pools"
+                                    }
+                                ],
+                                "privatekey": "",
+                                "allowed_hosts": "",
+                                "history": "7"
+                            },
+                            {
+                                "username": "",
+                                "snmpv3_contextname": "",
+                                "inventory_link": "0",
+                                "multiplier": "0",
+                                "trends": "365",
+                                "snmpv3_authpassphrase": "",
+                                "snmp_oid": "",
+                                "snmpv3_securitylevel": "0",
+                                "port": "",
+                                "logtimefmt": "",
+                                "delay": "300",
+                                "publickey": "",
+                                "params": "",
+                                "snmpv3_securityname": "",
+                                "formula": "1",
+                                "type": "0",
+                                "snmpv3_authprotocol": "0",
+                                "valuemap": [],
+                                "ipmi_sensor": "",
+                                "status": "0",
+                                "authtype": "0",
+                                "snmp_community": "",
+                                "description": "",
+                                "data_type": "0",
+                                "delay_flex": "",
+                                "units": "B",
+                                "value_type": "3",
+                                "key": "zpool.list[{#ZPOOL}, allocated]",
+                                "delta": "0",
+                                "password": "",
+                                "snmpv3_privpassphrase": "",
+                                "snmpv3_privprotocol": "0",
+                                "name": "ZFS pool {#ZPOOL} allocated disk space",
+                                "applications": [
+                                    {
+                                        "name": "ZFS pools"
+                                    }
+                                ],
+                                "privatekey": "",
+                                "allowed_hosts": "",
+                                "history": "14"
+                            },
+                            {
+                                "username": "",
+                                "snmpv3_contextname": "",
+                                "inventory_link": "0",
+                                "multiplier": "0",
+                                "trends": "365",
+                                "snmpv3_authpassphrase": "",
+                                "snmp_oid": "",
+                                "snmpv3_securitylevel": "0",
+                                "port": "",
+                                "logtimefmt": "",
+                                "delay": "300",
+                                "publickey": "",
+                                "params": "",
+                                "snmpv3_securityname": "",
+                                "formula": "1",
+                                "type": "0",
+                                "snmpv3_authprotocol": "0",
+                                "valuemap": [],
+                                "ipmi_sensor": "",
+                                "status": "0",
+                                "authtype": "0",
+                                "snmp_community": "",
+                                "description": "",
+                                "data_type": "0",
+                                "delay_flex": "",
+                                "units": "%",
+                                "value_type": "3",
+                                "key": "zpool.list[{#ZPOOL}, capacity]",
+                                "delta": "0",
+                                "password": "",
+                                "snmpv3_privpassphrase": "",
+                                "snmpv3_privprotocol": "0",
+                                "name": "ZFS pool {#ZPOOL} capacity",
+                                "applications": [
+                                    {
+                                        "name": "ZFS pools"
+                                    }
+                                ],
+                                "privatekey": "",
+                                "allowed_hosts": "",
+                                "history": "14"
+                            },
+                            {
+                                "username": "",
+                                "snmpv3_contextname": "",
+                                "inventory_link": "0",
+                                "multiplier": "0",
+                                "trends": "365",
+                                "snmpv3_authpassphrase": "",
+                                "snmp_oid": "",
+                                "snmpv3_securitylevel": "0",
+                                "port": "",
+                                "logtimefmt": "",
+                                "delay": "300",
+                                "publickey": "",
+                                "params": "",
+                                "snmpv3_securityname": "",
+                                "formula": "1",
+                                "type": "0",
+                                "snmpv3_authprotocol": "0",
+                                "valuemap": [],
+                                "ipmi_sensor": "",
+                                "status": "0",
+                                "authtype": "0",
+                                "snmp_community": "",
+                                "description": "",
+                                "data_type": "0",
+                                "delay_flex": "",
+                                "units": "",
+                                "value_type": "4",
+                                "key": "zpool.list[{#ZPOOL}, health]",
+                                "delta": "0",
+                                "password": "",
+                                "snmpv3_privpassphrase": "",
+                                "snmpv3_privprotocol": "0",
+                                "name": "ZFS pool {#ZPOOL} health",
+                                "applications": [
+                                    {
+                                        "name": "ZFS pools"
+                                    }
+                                ],
+                                "privatekey": "",
+                                "allowed_hosts": "",
+                                "history": "7"
+                            },
+                            {
+                                "username": "",
+                                "snmpv3_contextname": "",
+                                "inventory_link": "0",
+                                "multiplier": "0",
+                                "trends": "365",
+                                "snmpv3_authpassphrase": "",
+                                "snmp_oid": "",
+                                "snmpv3_securitylevel": "0",
+                                "port": "",
+                                "logtimefmt": "",
+                                "delay": "60",
+                                "publickey": "",
+                                "params": "",
+                                "snmpv3_securityname": "",
+                                "formula": "1",
+                                "type": "0",
+                                "snmpv3_authprotocol": "0",
+                                "valuemap": [],
+                                "ipmi_sensor": "",
+                                "status": "0",
+                                "authtype": "0",
+                                "snmp_community": "",
+                                "description": "",
+                                "data_type": "0",
+                                "delay_flex": "",
+                                "units": "Bps",
+                                "value_type": "3",
+                                "key": "zpool.iostat[{#ZPOOL},nread]",
+                                "delta": "1",
+                                "password": "",
+                                "snmpv3_privpassphrase": "",
+                                "snmpv3_privprotocol": "0",
+                                "name": "ZFS pool {#ZPOOL} read bytes",
+                                "applications": [
+                                    {
+                                        "name": "ZFS pools"
+                                    }
+                                ],
+                                "privatekey": "",
+                                "allowed_hosts": "",
+                                "history": "14"
+                            },
+                            {
+                                "username": "",
+                                "snmpv3_contextname": "",
+                                "inventory_link": "0",
+                                "multiplier": "0",
+                                "trends": "365",
+                                "snmpv3_authpassphrase": "",
+                                "snmp_oid": "",
+                                "snmpv3_securitylevel": "0",
+                                "port": "",
+                                "logtimefmt": "",
+                                "delay": "60",
+                                "publickey": "",
+                                "params": "",
+                                "snmpv3_securityname": "",
+                                "formula": "1",
+                                "type": "0",
+                                "snmpv3_authprotocol": "0",
+                                "valuemap": [],
+                                "ipmi_sensor": "",
+                                "status": "0",
+                                "authtype": "0",
+                                "snmp_community": "",
+                                "description": "",
+                                "data_type": "0",
+                                "delay_flex": "",
+                                "units": "iops",
+                                "value_type": "3",
+                                "key": "zpool.iostat[{#ZPOOL},reads]",
+                                "delta": "1",
+                                "password": "",
+                                "snmpv3_privpassphrase": "",
+                                "snmpv3_privprotocol": "0",
+                                "name": "ZFS pool {#ZPOOL} read operations",
+                                "applications": [
+                                    {
+                                        "name": "ZFS pools"
+                                    }
+                                ],
+                                "privatekey": "",
+                                "allowed_hosts": "",
+                                "history": "14"
+                            },
+                            {
+                                "username": "",
+                                "snmpv3_contextname": "",
+                                "inventory_link": "0",
+                                "multiplier": "0",
+                                "trends": "365",
+                                "snmpv3_authpassphrase": "",
+                                "snmp_oid": "",
+                                "snmpv3_securitylevel": "0",
+                                "port": "",
+                                "logtimefmt": "",
+                                "delay": "60",
+                                "publickey": "",
+                                "params": "(last(\"zpool.iostat[{#ZPOOL},reads]\")/\r\n(last(\"zpool.iostat[{#ZPOOL},reads]\")+last(\"zpool.iostat[{#ZPOOL},writes]\")))*100",
+                                "snmpv3_securityname": "",
+                                "formula": "1",
+                                "type": "15",
+                                "snmpv3_authprotocol": "0",
+                                "valuemap": [],
+                                "ipmi_sensor": "",
+                                "status": "0",
+                                "authtype": "0",
+                                "snmp_community": "",
+                                "description": "",
+                                "data_type": "0",
+                                "delay_flex": "",
+                                "units": "%",
+                                "value_type": "0",
+                                "key": "zpool.read.ratio[{#ZPOOL}]",
+                                "delta": "0",
+                                "password": "",
+                                "snmpv3_privpassphrase": "",
+                                "snmpv3_privprotocol": "0",
+                                "name": "ZFS pool {#ZPOOL} read ratio",
+                                "applications": [
+                                    {
+                                        "name": "ZFS pools"
+                                    }
+                                ],
+                                "privatekey": "",
+                                "allowed_hosts": "",
+                                "history": "7"
+                            },
+                            {
+                                "username": "",
+                                "snmpv3_contextname": "",
+                                "inventory_link": "0",
+                                "multiplier": "0",
+                                "trends": "365",
+                                "snmpv3_authpassphrase": "",
+                                "snmp_oid": "",
+                                "snmpv3_securitylevel": "0",
+                                "port": "",
+                                "logtimefmt": "",
+                                "delay": "60",
+                                "publickey": "",
+                                "params": "",
+                                "snmpv3_securityname": "",
+                                "formula": "1",
+                                "type": "0",
+                                "snmpv3_authprotocol": "0",
+                                "valuemap": [],
+                                "ipmi_sensor": "",
+                                "status": "0",
+                                "authtype": "0",
+                                "snmp_community": "",
+                                "description": "",
+                                "data_type": "0",
+                                "delay_flex": "",
+                                "units": "iops",
+                                "value_type": "3",
+                                "key": "zpool.iostat[{#ZPOOL},writes]",
+                                "delta": "1",
+                                "password": "",
+                                "snmpv3_privpassphrase": "",
+                                "snmpv3_privprotocol": "0",
+                                "name": "ZFS pool {#ZPOOL} write operations",
+                                "applications": [
+                                    {
+                                        "name": "ZFS pools"
+                                    }
+                                ],
+                                "privatekey": "",
+                                "allowed_hosts": "",
+                                "history": "14"
+                            },
+                            {
+                                "username": "",
+                                "snmpv3_contextname": "",
+                                "inventory_link": "0",
+                                "multiplier": "0",
+                                "trends": "365",
+                                "snmpv3_authpassphrase": "",
+                                "snmp_oid": "",
+                                "snmpv3_securitylevel": "0",
+                                "port": "",
+                                "logtimefmt": "",
+                                "delay": "60",
+                                "publickey": "",
+                                "params": "100-last(\"zpool.read.ratio[{#ZPOOL}]\")",
+                                "snmpv3_securityname": "",
+                                "formula": "1",
+                                "type": "15",
+                                "snmpv3_authprotocol": "0",
+                                "valuemap": [],
+                                "ipmi_sensor": "",
+                                "status": "0",
+                                "authtype": "0",
+                                "snmp_community": "",
+                                "description": "",
+                                "data_type": "0",
+                                "delay_flex": "",
+                                "units": "%",
+                                "value_type": "0",
+                                "key": "zpool.write.ratio[{#ZPOOL}]",
+                                "delta": "0",
+                                "password": "",
+                                "snmpv3_privpassphrase": "",
+                                "snmpv3_privprotocol": "0",
+                                "name": "ZFS pool {#ZPOOL} write ratio",
+                                "applications": [
+                                    {
+                                        "name": "ZFS pools"
+                                    }
+                                ],
+                                "privatekey": "",
+                                "allowed_hosts": "",
+                                "history": "7"
+                            },
+                            {
+                                "username": "",
+                                "snmpv3_contextname": "",
+                                "inventory_link": "0",
+                                "multiplier": "0",
+                                "trends": "365",
+                                "snmpv3_authpassphrase": "",
+                                "snmp_oid": "",
+                                "snmpv3_securitylevel": "0",
+                                "port": "",
+                                "logtimefmt": "",
+                                "delay": "60",
+                                "publickey": "",
+                                "params": "",
+                                "snmpv3_securityname": "",
+                                "formula": "1",
+                                "type": "0",
+                                "snmpv3_authprotocol": "0",
+                                "valuemap": [],
+                                "ipmi_sensor": "",
+                                "status": "0",
+                                "authtype": "0",
+                                "snmp_community": "",
+                                "description": "",
+                                "data_type": "0",
+                                "delay_flex": "",
+                                "units": "Bps",
+                                "value_type": "3",
+                                "key": "zpool.iostat[{#ZPOOL},nwritten]",
+                                "delta": "1",
+                                "password": "",
+                                "snmpv3_privpassphrase": "",
+                                "snmpv3_privprotocol": "0",
+                                "name": "ZFS pool {#ZPOOL} written bytes",
+                                "applications": [
+                                    {
+                                        "name": "ZFS pools"
+                                    }
+                                ],
+                                "privatekey": "",
+                                "allowed_hosts": "",
+                                "history": "14"
+                            }
+                        ],
+                        "delay": "3600",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "host_prototypes": [],
+                        "delay_flex": "",
+                        "key": "zpool.discovery",
+                        "ipmi_sensor": "",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "ZFS pool discovery",
+                        "privatekey": "",
+                        "filter": ":",
+                        "allowed_hosts": ""
+                    }
+                ],
+                "groups": [
+                    {
+                        "name": "Templates"
+                    }
+                ],
+                "template": "t_erigonos"
+            }
+        ],
+        "triggers": [
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "3",
+                "dependencies": [
+                    {
+                        "expression": "{t_zabbix-agent:agent.ping.nodata(3m)}=1",
+                        "name": "Zabbix agent on {HOST.NAME} is unreachable for 3 minutes"
+                    }
+                ],
+                "expression": "{t_erigonos:vm.memory.size[available].max(3m)}<{$MEMORY_FREE_THRESHOLD}",
+                "name": "Available memory is below {$MEMORY_FREE_THRESHOLD}"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "4",
+                "dependencies": [
+                    {
+                        "expression": "{t_zabbix-agent:agent.ping.nodata(3m)}=1",
+                        "name": "Zabbix agent on {HOST.NAME} is unreachable for 3 minutes"
+                    }
+                ],
+                "expression": "{t_erigonos:net.tcp.dns[,erigones.com].max(3m)}<1",
+                "name": "DNS resolution problem"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "4",
+                "dependencies": [
+                    {
+                        "expression": "{t_zabbix-agent:agent.ping.nodata(3m)}=1",
+                        "name": "Zabbix agent on {HOST.NAME} is unreachable for 3 minutes"
+                    }
+                ],
+                "expression": "{t_erigonos:fma.faulty.min(2m)}>0",
+                "name": "Fault Management reports an issue"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "3",
+                "dependencies": [
+                    {
+                        "expression": "{t_zabbix-agent:agent.ping.nodata(3m)}=1",
+                        "name": "Zabbix agent on {HOST.NAME} is unreachable for 3 minutes"
+                    }
+                ],
+                "expression": "{t_erigonos:system.swap.size[,free].max(3m)}<{$SWAP_FREE_THRESHOLD}",
+                "name": "Free swap space is below {$SWAP_FREE_THRESHOLD}"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "4",
+                "dependencies": [
+                    {
+                        "expression": "{t_zabbix-agent:agent.ping.nodata(3m)}=1",
+                        "name": "Zabbix agent on {HOST.NAME} is unreachable for 3 minutes"
+                    },
+                    {
+                        "expression": "{t_erigonos:smf.status[ntp].regexp(online)}=0",
+                        "name": "SMF service ntp is in {ITEM.LASTVALUE} state"
+                    }
+                ],
+                "expression": "{t_erigonos:proc.num[ntpd].max(3m)}<1",
+                "name": "ntpd is not running"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "1",
+                "dependencies": [
+                    {
+                        "expression": "{t_zabbix-agent:agent.ping.nodata(3m)}=1",
+                        "name": "Zabbix agent on {HOST.NAME} is unreachable for 3 minutes"
+                    }
+                ],
+                "expression": "{t_erigonos:system.cpu.load[,avg1].min(10m)}>{$CPU_LOAD_THRESHOLD}",
+                "name": "Processor load is over {$CPU_LOAD_THRESHOLD}"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "1",
+                "dependencies": [
+                    {
+                        "expression": "{t_zabbix-agent:agent.ping.nodata(3m)}=1",
+                        "name": "Zabbix agent on {HOST.NAME} is unreachable for 3 minutes"
+                    }
+                ],
+                "expression": "{t_erigonos:system.cpu.util[,system,].avg(5m)}>{$CPU_SYSTEM_UTILIZATION}",
+                "name": "Processor system utilization is over {$CPU_SYSTEM_UTILIZATION}%"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "1",
+                "dependencies": [
+                    {
+                        "expression": "{t_zabbix-agent:agent.ping.nodata(3m)}=1",
+                        "name": "Zabbix agent on {HOST.NAME} is unreachable for 3 minutes"
+                    }
+                ],
+                "expression": "{t_erigonos:system.cpu.util[,user,].avg(5m)}>{$CPU_USER_UTILIZATION}",
+                "name": "Processor user utilization is over {$CPU_USER_UTILIZATION}%"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "3",
+                "dependencies": [
+                    {
+                        "expression": "{t_zabbix-agent:agent.ping.nodata(3m)}=1",
+                        "name": "Zabbix agent on {HOST.NAME} is unreachable for 3 minutes"
+                    }
+                ],
+                "expression": "(100 - {t_erigonos:system.cpu.util[,idle,].avg(5m)}) >{$CPU_UTILIZATION_THRESHOLD}",
+                "name": "Processor utilization is over {$CPU_UTILIZATION_THRESHOLD}%"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "2",
+                "dependencies": [
+                    {
+                        "expression": "{t_zabbix-agent:agent.ping.nodata(3m)}=1",
+                        "name": "Zabbix agent on {HOST.NAME} is unreachable for 3 minutes"
+                    }
+                ],
+                "expression": "{t_erigonos:system.uptime.last(0)}<600",
+                "name": "Server has just been restarted"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "3",
+                "dependencies": [
+                    {
+                        "expression": "{t_zabbix-agent:agent.ping.nodata(3m)}=1",
+                        "name": "Zabbix agent on {HOST.NAME} is unreachable for 3 minutes"
+                    }
+                ],
+                "expression": "{t_erigonos:smf.maintenance.last(0)}>0",
+                "name": "SMF reports {ITEM.LASTVALUE} items in maintenance state"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "5",
+                "dependencies": [
+                    {
+                        "expression": "{t_zabbix-agent:agent.ping.nodata(3m)}=1",
+                        "name": "Zabbix agent on {HOST.NAME} is unreachable for 3 minutes"
+                    }
+                ],
+                "expression": "{t_erigonos:smf.status[cron].regexp(online)}=0",
+                "name": "SMF service cron is in {ITEM.LASTVALUE} state"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "5",
+                "dependencies": [
+                    {
+                        "expression": "{t_zabbix-agent:agent.ping.nodata(3m)}=1",
+                        "name": "Zabbix agent on {HOST.NAME} is unreachable for 3 minutes"
+                    }
+                ],
+                "expression": "{t_erigonos:smf.status[ntp].regexp(online)}=0",
+                "name": "SMF service ntp is in {ITEM.LASTVALUE} state"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "5",
+                "dependencies": [
+                    {
+                        "expression": "{t_zabbix-agent:agent.ping.nodata(3m)}=1",
+                        "name": "Zabbix agent on {HOST.NAME} is unreachable for 3 minutes"
+                    }
+                ],
+                "expression": "{t_erigonos:smf.status[system-log:default].regexp(online)}=0",
+                "name": "SMF service rsyslogd is in {ITEM.LASTVALUE} state"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "5",
+                "dependencies": [
+                    {
+                        "expression": "{t_zabbix-agent:agent.ping.nodata(3m)}=1",
+                        "name": "Zabbix agent on {HOST.NAME} is unreachable for 3 minutes"
+                    }
+                ],
+                "expression": "{t_erigonos:smf.status[sendmail].regexp(online)}=0",
+                "name": "SMF service sendmail is in {ITEM.LASTVALUE} state"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "5",
+                "dependencies": [
+                    {
+                        "expression": "{t_zabbix-agent:agent.ping.nodata(3m)}=1",
+                        "name": "Zabbix agent on {HOST.NAME} is unreachable for 3 minutes"
+                    }
+                ],
+                "expression": "{t_erigonos:smf.status[ssh].regexp(online)}=0",
+                "name": "SMF service ssh is in {ITEM.LASTVALUE} state"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "5",
+                "dependencies": [
+                    {
+                        "expression": "{t_zabbix-agent:agent.ping.nodata(3m)}=1",
+                        "name": "Zabbix agent on {HOST.NAME} is unreachable for 3 minutes"
+                    }
+                ],
+                "expression": "{t_erigonos:smf.status[vmadmd].regexp(online)}=0",
+                "name": "SMF service vmadmd is in {ITEM.LASTVALUE} state"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "4",
+                "dependencies": [
+                    {
+                        "expression": "{t_zabbix-agent:agent.ping.nodata(3m)}=1",
+                        "name": "Zabbix agent on {HOST.NAME} is unreachable for 3 minutes"
+                    }
+                ],
+                "expression": "{t_erigonos:net.tcp.service[ssh].max(3m)}<1",
+                "name": "SSH port NOT open (check from inside by Zabbix agent)"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "4",
+                "dependencies": [
+                    {
+                        "expression": "{t_erigonos:proc.num[ntpd].max(3m)}<1",
+                        "name": "ntpd is not running"
+                    }
+                ],
+                "expression": "{t_erigonos:system.localtime.fuzzytime(20)}=0",
+                "name": "Time is not synchronized"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "1",
+                "dependencies": [
+                    {
+                        "expression": "{t_zabbix-agent:agent.ping.nodata(3m)}=1",
+                        "name": "Zabbix agent on {HOST.NAME} is unreachable for 3 minutes"
+                    }
+                ],
+                "expression": "{t_erigonos:proc.num[].max(5m)}>{$PROC_NUM_THRESHOLD}",
+                "name": "Too many processes"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "3",
+                "dependencies": [
+                    {
+                        "expression": "{t_zabbix-agent:agent.ping.nodata(3m)}=1",
+                        "name": "Zabbix agent on {HOST.NAME} is unreachable for 3 minutes"
+                    }
+                ],
+                "expression": "{t_erigonos:proc.num[,,run].min(5m)}>15",
+                "name": "Too many processes running"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "5",
+                "dependencies": [
+                    {
+                        "expression": "{t_erigonos:smf.status[vmadmd].regexp(online)}=0",
+                        "name": "SMF service vmadmd is in {ITEM.LASTVALUE} state"
+                    }
+                ],
+                "expression": "{t_erigonos:proc.num[vmadmd].max(3m)}=0",
+                "name": "vmadmd is not running"
+            }
+        ],
+        "graphs": [
+            {
+                "show_3d": "0",
+                "graph_items": [
+                    {
+                        "calc_fnc": "2",
+                        "color": "009900",
+                        "item": {
+                            "host": "t_erigonos",
+                            "key": "system.cpu.switches"
+                        },
+                        "sortorder": "0",
+                        "drawtype": "0",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "000099",
+                        "item": {
+                            "host": "t_erigonos",
+                            "key": "system.cpu.intr"
+                        },
+                        "sortorder": "1",
+                        "drawtype": "0",
+                        "type": "0",
+                        "yaxisside": "0"
+                    }
+                ],
+                "ymin_type_1": "0",
+                "name": "CPU Jumps",
+                "percent_left": "0.0000",
+                "type": "0",
+                "ymax_type_1": "0",
+                "height": "200",
+                "yaxismax": "100.0000",
+                "width": "900",
+                "show_legend": "1",
+                "show_work_period": "1",
+                "ymax_item_1": "0",
+                "ymin_item_1": "0",
+                "show_triggers": "1",
+                "yaxismin": "0.0000",
+                "percent_right": "0.0000"
+            },
+            {
+                "show_3d": "0",
+                "graph_items": [
+                    {
+                        "calc_fnc": "2",
+                        "color": "EEEE00",
+                        "item": {
+                            "host": "t_erigonos",
+                            "key": "system.cpu.util[,system,]"
+                        },
+                        "sortorder": "1",
+                        "drawtype": "1",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "6666FF",
+                        "item": {
+                            "host": "t_erigonos",
+                            "key": "system.cpu.util[,idle,]"
+                        },
+                        "sortorder": "0",
+                        "drawtype": "1",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "00EE00",
+                        "item": {
+                            "host": "t_erigonos",
+                            "key": "system.cpu.util[,user,]"
+                        },
+                        "sortorder": "2",
+                        "drawtype": "1",
+                        "type": "0",
+                        "yaxisside": "0"
+                    }
+                ],
+                "ymin_type_1": "1",
+                "name": "CPU Utilization",
+                "percent_left": "0.0000",
+                "type": "1",
+                "ymax_type_1": "1",
+                "height": "200",
+                "yaxismax": "100.0000",
+                "width": "900",
+                "show_legend": "1",
+                "show_work_period": "0",
+                "ymax_item_1": "0",
+                "ymin_item_1": "0",
+                "show_triggers": "0",
+                "yaxismin": "0.0000",
+                "percent_right": "0.0000"
+            },
+            {
+                "show_3d": "0",
+                "graph_items": [
+                    {
+                        "calc_fnc": "2",
+                        "color": "FFFFFF",
+                        "item": {
+                            "host": "t_erigonos",
+                            "key": "vm.memory.size[total]"
+                        },
+                        "sortorder": "0",
+                        "drawtype": "1",
+                        "type": "0",
+                        "yaxisside": "1"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "6666FF",
+                        "item": {
+                            "host": "t_erigonos",
+                            "key": "vm.memory.size[available]"
+                        },
+                        "sortorder": "1",
+                        "drawtype": "1",
+                        "type": "0",
+                        "yaxisside": "0"
+                    }
+                ],
+                "ymin_type_1": "0",
+                "name": "Memory Usage",
+                "percent_left": "0.0000",
+                "type": "1",
+                "ymax_type_1": "2",
+                "height": "200",
+                "yaxismax": "0.0000",
+                "width": "900",
+                "show_legend": "1",
+                "show_work_period": "0",
+                "ymax_item_1": {
+                    "host": "t_erigonos",
+                    "key": "vm.memory.size[total]"
+                },
+                "ymin_item_1": "0",
+                "show_triggers": "0",
+                "yaxismin": "0.0000",
+                "percent_right": "0.0000"
+            }
+        ],
+        "version": "2.0",
+        "groups": [
+            {
+                "name": "Templates"
+            }
+        ],
+        "date": "2015-12-03T21:45:08Z"
+    }
+}
