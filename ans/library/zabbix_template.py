@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
-# (c) 2012-2014, Erigones, s. r. o
+# (c) 2012-2016, Erigones, s. r. o
 # noinspection PyPep8Naming
 import xml.etree.ElementTree as ET
 import os

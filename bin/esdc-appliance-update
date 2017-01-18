@@ -2,6 +2,11 @@
 
 set -e
 
+if [[ "$(id -u)" != "0" ]]; then
+	echo "This script must be run as root"
+	exit 6
+fi
+
 # ensure ansible is installed
 if ! [ -x /usr/bin/ansible-playbook ]; then
 	echo "Installing ansible package"
@@ -9,13 +14,13 @@ if ! [ -x /usr/bin/ansible-playbook ]; then
 fi
 
 MAINDIR="$(cd "$(dirname "$0")/.." ; pwd -P)"
-ERIGONES_HOME=${ERIGONES_HOME:-"${MAINDIR}"}
+ERIGONES_HOME="${ERIGONES_HOME:-"${MAINDIR}"}"
 ANS_BASE="${ERIGONES_HOME}/ans"
 UPG_BASE="${ERIGONES_HOME}/ans/upgrade"
 export ERIGONES_HOME UPG_BASE
 
-PYTHONPATH="$ERIGONES_HOME:$PYTHONPATH:$ERIGONES_HOME/envs/lib/python2.7/site-packages"
-VIRTUAL_ENV="$ERIGONES_HOME/envs"
+PYTHONPATH="${ERIGONES_HOME}:${PYTHONPATH}:${ERIGONES_HOME}/envs/lib/python2.7/site-packages"
+VIRTUAL_ENV="${ERIGONES_HOME}/envs"
 export PYTHONPATH VIRTUAL_ENV
 
 # Update ansible inventory
