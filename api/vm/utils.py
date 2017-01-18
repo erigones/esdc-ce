@@ -31,11 +31,14 @@ def _get_vm_from_db(request, attrs, where, sr, api, **kwargs):
 
 
 def get_vm(request, hostname_or_uuid, attrs=None, where=None, exists_ok=False, noexists_fail=False, sr=('node',),
-           api=True, extra=None, check_node_status=('POST', 'PUT', 'DELETE')):
+           api=True, extra=None, check_node_status=('POST', 'PUT', 'DELETE'), dc_bound=True):
     """
     Call get_object for Vm model identified by hostname or uuid. If attributes are not
     specified then set them to check owner and node status.
     Also acts as IsVmOwner permission.
+    By using dc_bound=False the current request.dc is ignored and the returned VM may not reside in
+    the current working DC; This is only used by internal DC-unbound APIs, which need to check whether a VM is defined
+    in the system. DC-bound API calls must use the default dc_bound=True!
     """
     # Quickly return vm, if set in request (shortcut from GUI)
     vm = getattr(request, '_api_vm', None)
@@ -51,7 +54,9 @@ def get_vm(request, hostname_or_uuid, attrs=None, where=None, exists_ok=False, n
     if not request.user.is_admin(request):
         attrs['owner'] = request.user
 
-    attrs['dc'] = request.dc
+    if dc_bound:
+        attrs['dc'] = request.dc
+
     attrs['slavevm__isnull'] = True
     # We want to filter hostname or uuid in one query instead of putting them one by one in the get attributes
     hostname_or_uuid_query = (Q(hostname=hostname_or_uuid) | Q(uuid=hostname_or_uuid)) & where
@@ -71,10 +76,13 @@ def get_vm(request, hostname_or_uuid, attrs=None, where=None, exists_ok=False, n
     return vm
 
 
-def get_vms(request, where=None, sr=('node',), order_by=('hostname',)):
+def get_vms(request, where=None, sr=('node',), order_by=('hostname',), dc_bound=True):
     """
     Return queryset of VMs for current user or all if admin.
     Also acts as IsVmOwner permission.
+    By using dc_bound=False the current request.dc is ignored and the returned VMs may not reside in
+    the current working DC; This is only used by internal DC-unbound APIs, which need to list all VMs defined
+    in the system. DC-bound API calls must use the default dc_bound=True!
     """
     if where is None:
         where = QNodeNullOrLicensed
@@ -85,7 +93,10 @@ def get_vms(request, where=None, sr=('node',), order_by=('hostname',)):
         qs = Vm.objects
 
     if request.user.is_admin(request):
-        return qs.filter(dc=request.dc, slavevm__isnull=True).filter(where).order_by(*order_by)
+        if dc_bound:
+            qs = qs.filter(dc=request.dc)
+
+        return qs.filter(slavevm__isnull=True).filter(where).order_by(*order_by)
     else:
         return qs.filter(where).filter(dc=request.dc, owner=request.user, slavevm__isnull=True).order_by(*order_by)
 

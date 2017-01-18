@@ -18,6 +18,7 @@
 {% endif %}
 {% include "gui/table_form_field_checkbox.html" with field=form.VMS_VM_SNAPSHOT_ENABLED %}
 {% include "gui/table_form_field_checkbox.html" with field=form.VMS_VM_BACKUP_ENABLED %}
+{% include "gui/table_form_field_checkbox.html" with field=form.DNS_ENABLED %}
 {% include "gui/table_form_field_checkbox.html" with field=form.MON_ZABBIX_ENABLED %}
 {% include "gui/table_form_field_checkbox.html" with field=form.SUPPORT_ENABLED %}
 {% include "gui/table_form_field_checkbox.html" with field=form.REGISTRATION_ENABLED %}
@@ -91,6 +92,8 @@
 <tr><td colspan="2" class="row-header"><i class="icon-save"></i> {% trans "Images" %}</td></tr>
 {% include "gui/table_form_field.html" with field=form.VMS_IMAGE_LIMIT %}
 {% if all %}
+{% include "gui/table_form_field.html" with field=form.VMS_IMAGE_VM trclass="setting" %}
+{% include "gui/table_form_field.html" with field=form.VMS_IMAGE_SOURCES trclass="setting" %}
 {% include "gui/table_form_field.html" with field=form.VMS_IMAGE_REPOSITORIES trclass="setting" %}
 {% endif %}
 

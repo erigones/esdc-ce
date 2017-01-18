@@ -23,6 +23,7 @@ class NetworkSerializer(s.InstanceSerializer):
 
     # min_length because of API URL: /network/ip/
     name = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\._-]*$', min_length=3, max_length=32)
+    uuid = s.CharField(read_only=True)
     alias = s.SafeCharField(max_length=32)
     owner = s.SlugRelatedField(slug_field='username', queryset=User.objects, required=False)
     access = s.IntegerChoiceField(choices=Subnet.ACCESS, default=Subnet.PRIVATE)

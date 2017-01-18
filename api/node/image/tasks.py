@@ -2,9 +2,10 @@ from que import TG_DC_UNBOUND
 from que.tasks import cq, get_task_logger, execute
 from que.mgmt import MgmtCallbackTask
 from que.exceptions import TaskException
-from vms.models import NodeStorage, Image, ImageVm
+from vms.models import Node, NodeStorage, Image, ImageVm
 from api.task.tasks import task_log_cb_success
-from api.task.utils import callback
+from api.task.utils import callback, mgmt_lock
+from api.task.internal import InternalTask
 from api.node.messages import LOG_IMG_IMPORT, LOG_IMG_DELETE
 
 __all__ = ('node_image_cb',)
@@ -58,24 +59,48 @@ def node_image_cb(result, task_id, nodestorage_id=None, zpool=None, img_uuid=Non
     raise TaskException(result, 'Got bad return code (%s). Error: %s' % (result['returncode'], msg))
 
 
-def run_node_img_sources_sync(node, imgadm_sources):
+def run_node_img_sources_sync(node, new_img_sources=None, node_img_sources=None):
     """
     Update imgadm sources on compute node.
+    Always called by node_sysinfo_cb after the sysinfo data is processed (even if no node data is changed).
     """
-    add_rem = ImageVm().sources_update(imgadm_sources)
+    if new_img_sources is None:
+        image_vm = ImageVm()
+        new_img_sources = image_vm.sources
 
-    if not add_rem:
-        logger.debug('Image sources already synced for node %s - skipping update', node)
+    if node_img_sources is not None and new_img_sources == node_img_sources:
+        logger.info('Image sources already synced for node %s - skipping update', node)
         return
 
     logger.warn('Image sources are not synchronized on node %s - creating imgadm sources synchronization task', node)
-    add, rem = add_rem
-    cmd = ';'.join(['imgadm sources -f -a %s' % i for i in add] + ['imgadm sources -d %s' % i for i in rem])
+    stdin = ImageVm.get_imgadm_conf(new_img_sources).dump()
+    cmd = 'cat /dev/stdin > /var/imgadm/imgadm.conf'
     lock = 'node %s imgadm_sources' % node.uuid
 
-    tid, err = execute(ERIGONES_TASK_USER, None, cmd, callback=False, lock=lock, queue=node.fast_queue,
+    tid, err = execute(ERIGONES_TASK_USER, None, cmd, stdin=stdin, callback=False, lock=lock, queue=node.fast_queue,
                        expires=180, nolog=True, tg=TG_DC_UNBOUND, ping_worker=False, check_user_tasks=False)
     if err:
         logger.error('Got error (%s) when running task %s for updating imgadm sources on node %s', err, tid, node)
     else:
         logger.info('Created task %s for updating imgadm sources on node %s', tid, node)
+
+
+# noinspection PyUnusedLocal
+@cq.task(name='api.node.image.tasks.node_img_sources_sync', base=InternalTask)
+@mgmt_lock(timeout=3600, wait_for_release=True)
+def node_img_sources_sync(task_id, sender, **kwargs):
+    """
+    Task for updating imgadm sources on one or every compute node.
+    Called by dc_settings_changed signal.
+    """
+    new_img_sources = ImageVm().sources
+
+    for node in Node.all():
+        # We update imgadm sources only on online nodes
+        # But we will also run run_node_img_sources_sync() whenever node status is changed to online because
+        # the node_startup handler runs the sysinfo update task
+        if not node.is_online():
+            logger.warn('Excluding node %s from updating imgadm sources because it is not in online state', node)
+            continue
+
+        run_node_img_sources_sync(node, new_img_sources=new_img_sources)

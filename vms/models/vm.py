@@ -706,20 +706,12 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
         else:
             return not self.is_blank()
 
-    def _reset_image_server_if_necessary(self):
-        """Clear cache if VM is image server"""
-        if self.uuid == settings.VMS_IMAGE_VM:
-            from vms.models import ImageVm
-            ImageVm.reset()
-
     # noinspection PyUnusedLocal
     @staticmethod
     def post_delete(sender, instance, **kwargs):
         """Remove cache items and cleanup node and storage resources"""
         cache.delete(instance.zoneid_change_key(instance.uuid))
         cache.delete(instance.zoneid_key(instance.uuid))
-        # noinspection PyProtectedMember
-        instance._reset_image_server_if_necessary()
 
         if instance.node:
             instance.node.update_resources(save=True)
@@ -749,7 +741,6 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
         # Classic django model.save()
         ret = super(Vm, self).save(**kwargs)
         self._update_changed = False
-        self._reset_image_server_if_necessary()
 
         # Save tags if set
         if self._tags is not None:

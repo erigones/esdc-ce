@@ -200,6 +200,7 @@ MODULES = [
     'ACL_ENABLED',
     'API_ENABLED',
     'MON_ZABBIX_ENABLED',
+    'DNS_ENABLED',
     'REGISTRATION_ENABLED',
     'SUPPORT_ENABLED',
     'VMS_DC_ENABLED',
@@ -569,6 +570,12 @@ VMS_NET_VLAN_RESTRICT = True
 VMS_NET_VLAN_ALLOWED = []
 VMS_NET_LIMIT = None
 VMS_IMAGE_VM = VMS_VM_IMG01
+VMS_IMAGE_VM_DATASETS_DIR = '/{zfs_filesystem}/root/datasets'  # Image upload directory on ImageVm's compute node
+VMS_IMAGE_IMGADM_CONF = {
+    'dockerImportSkipUuids': True,
+    'upgradedToVer': '3.0.0',
+    'sources': [],
+}
 VMS_IMAGE_SOURCES = []
 VMS_IMAGE_LIMIT = None
 VMS_IMAGE_REPOSITORIES = {
