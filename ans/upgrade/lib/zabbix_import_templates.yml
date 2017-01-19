@@ -4,7 +4,7 @@
 
 - name: Preparing to update zabbix monitoring templates
   set_fact:
-      tmpl_dir: '{{ upg_dir }}/{{ upgrading_to }}/zabbix_templates'
+      tmpl_dir: '{{ upg_dir }}/{{ upgrading_to }}/files/zabbix_templates'
 
 - name: Get list of new templates
   local_action:

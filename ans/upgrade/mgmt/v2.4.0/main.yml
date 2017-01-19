@@ -6,14 +6,14 @@
   copy: dest=/etc/hostname content='localhost.localdomain\n' mode='u=rw,g=r,o=r'
 
 - name: Update post-deploy script
-  copy: src="{{ upg_dir }}/{{ upgrading_to }}/50-es-post-deploy.sh" dest=/var/lib/rc-scripts/50-es-post-deploy.sh
+  copy: src="{{ upg_dir }}/{{ upgrading_to }}/files/50-es-post-deploy.sh" dest=/var/lib/rc-scripts/50-es-post-deploy.sh
 
 - name: Update post-deploy script unit file
-  copy: src="{{ upg_dir }}/{{ upgrading_to }}/rc-scripts.service" dest=/etc/systemd/system/rc-scripts.service
+  copy: src="{{ upg_dir }}/{{ upgrading_to }}/files/rc-scripts.service" dest=/etc/systemd/system/rc-scripts.service
   notify: reload systemd
 
 - name: Update postgresql config
-  copy: src="{{ upg_dir }}/{{ upgrading_to }}/pg-ansible.conf" dest=/var/lib/pgsql/9.5/data/conf.d/ansible.conf
+  copy: src="{{ upg_dir }}/{{ upgrading_to }}/files/pg-ansible.conf" dest=/var/lib/pgsql/9.5/data/conf.d/ansible.conf
   notify: restart postgresql95
 
 - name: Remove default rabbitmq guest user
