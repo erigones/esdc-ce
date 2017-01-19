@@ -131,7 +131,15 @@ if [[ "$(uname -s)" == "SunOS" ]] && [[ -f /usr/bin/zonename ]] && [[ "$(/usr/bi
 else
 	# run appliance upgrade
 	if [[ -x "${APPLIANCE_UPDATE_CMD}" ]]; then
-		"${APPLIANCE_UPDATE_CMD}" || die $UPGRADE_FAILED "Appliance upgrade failed"
+		echo "Upgrading appliances (please wait) ..."
+		appliance_update_output=$("${APPLIANCE_UPDATE_CMD}" 2>&1)
+
+		if [[ ${?} -eq 0 ]]; then
+			echo "Appliance upgrade was successful"
+		else
+			echo "${appliance_update_output}" >&2
+			die $UPGRADE_FAILED "Appliance upgrade failed"
+		fi
 	fi
 fi
 
