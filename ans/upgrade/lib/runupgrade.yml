@@ -26,3 +26,5 @@
     shell: /bin/systemctl daemon-reload
   - name: restart postgresql95
     service: name=postgresql-9.5 state=restarted
+  - name: restart erigonesd-beat
+    service: name=erigonesd-beat state=restarted
