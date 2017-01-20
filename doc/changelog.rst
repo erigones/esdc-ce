@@ -20,6 +20,7 @@ Features
 - Added harvest_vm function into API documentation - `#51 <https://github.com/erigones/esdc-ce/issues/51>`__
 - Made image server optional and configurable (``VMS_IMAGE_VM``) - `#52 <https://github.com/erigones/esdc-ce/issues/52>`__
 - Implemented update mechanism of Danube Cloud infrastructure/OS services - `#44 <https://github.com/erigones/esdc-ce/issues/44>`__
+- Added explanations to DC settings GUI section - `#56 <https://github.com/erigones/esdc-ce/pull/56>`__
 
 
 
