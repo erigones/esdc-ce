@@ -12,14 +12,16 @@ class Command(DanubeCloudCommand):
         """Helper for the build and build_que commands"""
         ctlsh = self.ctlsh
         pip_install = ['pip_install', '--update']
+        compile_cmd = ['compile']
 
         if que_only:
             pip_install.append('--node')
+            compile_cmd.append('--node')
         elif self.local('uname -s', capture=True, raise_on_error=False).strip() == 'SunOS':
             raise CommandError('Running on compute node, did you forget to specify "--node"?')
 
         ctlsh(*pip_install)
-        ctlsh('compile')
+        ctlsh(*compile_cmd)
 
         if not que_only:
             ctlsh('patch_envs')

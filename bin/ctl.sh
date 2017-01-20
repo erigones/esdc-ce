@@ -41,7 +41,7 @@ set_django_settings() {
 			DJANGO_SETTINGS_MODULE="core.node_settings"
 	else
 		case "${1}" in
-			bin_*|db_dump|gendoc|git_*|*_envs|pip_*|secret_key|build|deploy)
+			bin_*|db_dump|gendoc|git_*|*_envs|pip_*|secret_key|build|deploy|compile)
 				DJANGO_SETTINGS_MODULE="core.minimal_settings"
 				;;
 			*)
