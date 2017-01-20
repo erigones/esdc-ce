@@ -1,5 +1,11 @@
       <tr class="{{ trclass }}">
-        <td class="{% if field.field.required %}input-required{% endif %}">{{ field.label }}:</td>
+        <td class="{% if field.field.required %}input-required{% endif %}">
+          {{ field.label }}:
+          {% if trclass == "setting" %}
+            <br>
+            <span class="help-inline note"><i class="icon-info-sign"></i> {{ msg_global_setting }}</span>
+          {% endif %}
+        </td>
         <td class="span8 {{ tdclass }}">
           <div class="input{% if field.errors %} error wobble animated{% endif %} append-transparent">
             {{ field }}{% if addon %} <span class="add-on">{{ addon }}</span>{% endif %}
