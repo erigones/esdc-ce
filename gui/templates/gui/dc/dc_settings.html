@@ -5,7 +5,7 @@
 {% block javascript %}
 <script type="text/javascript">
   $(document).ready(function() {
-    DC_SETTINGS = new DcSettings();
+    DC_SETTINGS = new DcSettings("This is a global setting and it can only be changed from the main data center");
   });
 </script>
 {% endblock %}
