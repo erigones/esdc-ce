@@ -1,5 +1,5 @@
 var DC_SETTINGS = null;
-function DcSettings(input_tooltip_diabled_msg) {
+function DcSettings(input_tooltip_disabled_msg) {
   var self = this;
   var table = $('#dc_settings_table');
   var form = $('#dc_settings_form');
@@ -55,7 +55,7 @@ function DcSettings(input_tooltip_diabled_msg) {
   form.on('keypress', {btn_enter: btn_update}, enter_click).find(':input:enabled:visible:first').focus();
 
   // set tooltip text for the global settings
-  table.find('input:disabled, textarea:disabled').tooltip({title:input_tooltip_diabled_msg, placement: 'left'});
-  table.find('input:disabled').parents('.span9').tooltip({title: input_tooltip_diabled_msg, placement: 'left'})
+  table.find('input:disabled, textarea:disabled').tooltip({title:input_tooltip_disabled_msg, placement: 'left'});
+  table.find('input:disabled').parents('.span9').tooltip({title: input_tooltip_disabled_msg, placement: 'left'})
 
 } // DcSettings
