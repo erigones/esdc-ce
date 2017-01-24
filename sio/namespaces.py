@@ -8,7 +8,7 @@ from django.db import close_old_connections
 from django.utils.six import iteritems
 
 from que import TT_MGMT, TT_INTERNAL, TG_DC_UNBOUND
-from que.utils import task_prefix_from_task_id, task_id_from_request, has_callback, is_callback, is_logtask
+from que.utils import task_prefix_from_task_id, task_id_from_request, get_callback, is_callback, is_logtask
 from que.tasks import cq
 from api.utils.views import call_api_view
 from gui.accounts.utils import get_client_ip
@@ -234,7 +234,7 @@ class APINamespace(BaseNamespace):
 
         task = cq.AsyncResult(task_id)
 
-        if has_callback(task):
+        if get_callback(task):
             self.log('Ignoring task %s, because it has a callback', task_id, level=DEBUG)
             return
 
