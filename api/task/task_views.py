@@ -64,7 +64,7 @@ def task_details(request, task_id=None, data=None):
             * |SuperAdmin|
         :Asynchronous?:
             * |async-no|
-        :arg data.force: Force task deletion. Experimental feature. USE WITH CAUTION! (default: false)
+        :arg data.force: Force task deletion. EXPERIMENTAL feature. USE WITH CAUTION! (default: false)
         :type data.force: boolean
         :status 200: Delete pending
         :status 403: Forbidden

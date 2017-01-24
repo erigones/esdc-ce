@@ -302,7 +302,7 @@ def cancel_task(task_id, terminate=False, signal=None, force=False):
     if not force and (get_callback(task_id) or is_callback(task_id)):
         # Parent task has finished
         return False
-
+    # Don't forget that this triggers also signal
     return cq.control.revoke(task_id, terminate=terminate, signal=signal)
 
 
@@ -371,15 +371,12 @@ def delete_task(task_id, force=False):
     """
     Delete task from UserTasks. Only for tasks which started, but failed to finish and are stuck in DB.
     """
-    # You have to use the parent task ID instead of the callback task ID
-    if is_callback(task_id):
-        logger.warning('Task is a callback.')
 
     if force:
         logger.warning('Trying to delete task %s by using force.', task_id)
         logger.warning('Forcing task deletion results in undefined behavior.')
     else:
-        return None, "Safe task delete is not implemented."
+        return None, "Safe task deletion is not implemented."
 
     # The task has a callback, which probably means that it has already finished on compute node.
     callback = get_callback(task_id)
