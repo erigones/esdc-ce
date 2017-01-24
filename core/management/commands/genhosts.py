@@ -23,8 +23,8 @@ class Command(DanubeCloudCommand):
             qs = qs.all()
 
         # print VMs in admin DC
-		if dc != '':
-			print('[%s]' % dc)
+        if dc != '':
+            print('[%s]' % dc)
 
         for vm in qs:
             try:
@@ -47,9 +47,9 @@ class Command(DanubeCloudCommand):
 
             for node in nodes:
                 line = [
-					node.hostname,
-					'ansible_ssh_host=%s' % node.ip_address.ip,
-					'ansible_python_interpreter=/opt/local/bin/python'
-				]
+                    node.hostname,
+                    'ansible_ssh_host=%s' % node.ip_address.ip,
+                    'ansible_python_interpreter=/opt/local/bin/python'
+                    ]
                 print(' '.join(line))
 
