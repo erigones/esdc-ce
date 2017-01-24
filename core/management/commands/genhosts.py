@@ -11,7 +11,7 @@ class Command(DanubeCloudCommand):
     )
 
     def handle(self, dc=None, **options):
-        from vms.models import Vm
+        from vms.models import Vm, Node
 
         qs = Vm.objects
 
@@ -20,6 +20,8 @@ class Command(DanubeCloudCommand):
         else:
             qs = qs.all()
 
+        # print VMs in admin DC
+        print '[admin]'
         for vm in qs:
             try:
                 ip = vm.ips[0]
@@ -32,3 +34,15 @@ class Command(DanubeCloudCommand):
                 line.append('ansible_python_interpreter=/opt/local/bin/python')
 
             print(' '.join(line))
+
+        # print all nodes
+        print ''
+        print '[nodes]'
+        nodes = Node.objects.all()
+        for node in nodes:
+
+            line = [node.hostname, 'ansible_ssh_host=%s' % node.ip_address.ip]
+            line.append('ansible_python_interpreter=/opt/local/bin/python')
+
+            print(' '.join(line))
+
