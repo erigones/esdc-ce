@@ -23,7 +23,8 @@ class Command(DanubeCloudCommand):
             qs = qs.all()
 
         # print VMs in admin DC
-        print('[admin]')
+		if dc != '':
+			print('[%s]' % dc)
 
         for vm in qs:
             try:
