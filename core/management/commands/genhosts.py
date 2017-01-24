@@ -8,11 +8,11 @@ class Command(DanubeCloudCommand):
     options = (
         CommandOption('--dc', dest='dc', default=DC_ADMIN,
                       help='List hosts from a specific virtual datacenter. Defaults to "%s".' % DC_ADMIN),
-        CommandOption('--include-phys', action='store_true', dest='phys', default=False,
+        CommandOption('--include-nodes', action='store_true', dest='include_nodes', default=False,
                       help='Include also list of physical nodes.'),
     )
 
-    def handle(self, dc=None, phys=False, **options):
+    def handle(self, dc=None, include_nodes=False, **options):
         from vms.models import Vm, Node
 
         qs = Vm.objects
@@ -23,7 +23,8 @@ class Command(DanubeCloudCommand):
             qs = qs.all()
 
         # print VMs in admin DC
-        print '[admin]'
+        print('[admin]')
+
         for vm in qs:
             try:
                 ip = vm.ips[0]
@@ -37,15 +38,17 @@ class Command(DanubeCloudCommand):
 
             print(' '.join(line))
 
-        if phys:
+        if include_nodes:
             # print all nodes
-            print ''
-            print '[nodes]'
+            print('')
+            print('[nodes]')
             nodes = Node.objects.all()
+
             for node in nodes:
-
-                line = [node.hostname, 'ansible_ssh_host=%s' % node.ip_address.ip]
-                line.append('ansible_python_interpreter=/opt/local/bin/python')
-
+                line = [
+					node.hostname,
+					'ansible_ssh_host=%s' % node.ip_address.ip,
+					'ansible_python_interpreter=/opt/local/bin/python'
+				]
                 print(' '.join(line))
 
