@@ -19,8 +19,8 @@ from que.erigonesd import cq
 from que.lock import NoLock, TaskLock
 from que.exceptions import TaskRetry
 from que.user_tasks import UserTasks
-from que.utils import task_id_from_request, task_id_from_task_id, send_task_forever, queue_to_hostnames, ping
-
+from que.utils import task_id_from_request, task_id_from_task_id, send_task_forever, queue_to_hostnames, ping, \
+    queue_to_hostname
 
 LOGTASK = cq.conf.ERIGONES_LOGTASK
 EXPIRES = cq.conf.ERIGONES_TASK_DEFAULT_EXPIRES
@@ -264,6 +264,8 @@ def execute(request, owner_id, cmd, stdin=None, meta=None, callback=None, lock=N
 
     if meta is None:
         meta = {}
+    if queue:
+        meta['apiview']['worker'] = queue_to_hostname(queue)
 
     if ping_worker and queue:
         # callback=None means, that an automatic log task callback will run

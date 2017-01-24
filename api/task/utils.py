@@ -13,7 +13,8 @@ from que import TT_ERROR
 from que.tasks import cq
 from que.lock import TaskLock
 from que.utils import (is_dummy_task, task_prefix_from_task_id, task_id_from_request, dc_id_from_task_id,
-                       follow_callback, get_result, cancel_task as _cancel_task, delete_task as _delete_task)
+                       follow_callback, get_result, cancel_task as _cancel_task, delete_task as _delete_task,
+                       DeleteTaskProcessException)
 from que.exceptions import TaskException
 from que.user_tasks import UserTasks
 from api import status
@@ -585,11 +586,15 @@ def cancel_task(task_id, force=False):
     return _cancel_task(task_id, terminate=True, signal=signal)
 
 
-def delete_task(task_id, force=False):
+def delete_task(task_id, task_result, force=False):
     """
     Delete task. It's like cancel, but only for tasks which started, but failed to finish and are stuck in DB.
     """
-    return _delete_task(task_id, force=force)
+    try:
+        _delete_task(task_id, task_result, force=force)
+    except DeleteTaskProcessException as e:
+        return e.message
+
 
 
 def get_system_task_user(request=None):

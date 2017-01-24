@@ -12,6 +12,7 @@ from vms.models.base import _JsonPickleModel, _StatusModel, _UserTasksModel, _OS
 from vms.models.dc import Dc
 from vms.models.storage import Storage, NodeStorage
 from gui.models import User
+from que.utils import queue_to_hostname
 
 
 NODES_ALL_KEY = 'nodes_list'
@@ -648,7 +649,7 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
         return product.replace('Server', '').strip()
 
     def worker(self, queue):
-        return self._get_queue(queue).replace('.', '@', 1)
+        return queue_to_hostname(self._get_queue(queue))
 
     @property
     def system_version(self):

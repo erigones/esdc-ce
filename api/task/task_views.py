@@ -75,7 +75,7 @@ def task_details(request, task_id=None, data=None):
     user_id, owner_id, dc_id = user_owner_dc_ids_from_task_id(task_id)
     res = UserTasks(owner_id).get(task_id)
 
-    if not res or int(dc_id) != request.dc.id:
+    if not res or int(dc_id) != request.dc.id:  # TODO maybe let also delete callbacks when user has the task_id
         return TaskFailureResponse(request, 'Task does not exist', status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
@@ -86,7 +86,7 @@ def task_details(request, task_id=None, data=None):
 
     elif request.method == 'DELETE':
         force = ForceSerializer(data=data, default=False).is_true()
-        tid, err = delete_task(task_id, force=force)
+        err = delete_task(task_id, task_result=res, force=force)
 
         if err:
             return TaskFailureResponse(request, err, status=status.HTTP_406_NOT_ACCEPTABLE)

@@ -367,38 +367,81 @@ def log_task_callback(task_id, task_status=states.REVOKED, cleanup=True, detail=
     return t
 
 
-def delete_task(task_id, force=False):
+class DeleteTaskProcessException(Exception):
+    pass
+
+
+def _check_whether_task_is_not_running(task_id, worker):
+    i = cq.control.inspect([worker])
+    active_tasks = i.active()
+    if not active_tasks:
+        raise DeleteTaskProcessException('Worker %s is not responding' % worker)
+
+    # TODO workers are prefetching tasks, we have to change CELERY_ACKS_LATE in the config.py to not prefetch
+    assert not i.reserved()[worker], 'Worker %s is improperly configured, workers should not prefetch tasks' % worker
+
+    for task in active_tasks[worker]:
+        assert 'id' in task
+        if task['id'] == task_id:
+            raise DeleteTaskProcessException('Task %s is running' % task_id)
+
+
+def _get_callback_from_async_result(ar):
+    return ar.result['meta'].get('callback', None) if 'meta' in ar.result else None
+
+
+def _gather_tasks_to_delete(ar, callback_id=None):
+    tasks_to_delete = [ar]
+    if callback_id:
+        callback_result = _get_ar(callback_id)
+        tasks_to_delete.append(callback_result)
+    return tasks_to_delete
+
+
+def delete_task(task_id, task_meta, force=False):
     """
     Delete task from UserTasks. Only for tasks which started, but failed to finish and are stuck in DB.
     """
 
+    task_result = _get_ar(task_id)
+    callback_id = _get_callback_from_async_result(task_result)
+    tasks_to_delete = _gather_tasks_to_delete(task_result, callback_id)
     if force:
         logger.warning('Trying to delete task %s by using force.', task_id)
         logger.warning('Forcing task deletion results in undefined behavior.')
     else:
-        return None, "Safe task deletion is not implemented."
+        # Only proceed if any of the tasks is in PENDING or STARTED state.
+        # When all tasks are FINISHED there is nothing to delete
+        if all(t.ready() for t in tasks_to_delete):
+            raise DeleteTaskProcessException('Bad task status')
 
-    # The task has a callback, which probably means that it has already finished on compute node.
-    callback = get_callback(task_id)
-    if callback:
-        logger.warning('Task has a callback: %s', callback)
+        worker = task_meta.get('apiview', {}).get('worker', None)
+        assert worker, 'Cannot look for a task when I don\'t know which worker to ask'
+
+        _check_whether_task_is_not_running(task_id, worker)
+
+        if callback_id:
+            logger.warning('Task has a callback: %s', callback_id)
+            for mgmt_worker in cq.conf.ERIGONES_MGMT_WORKERS:
+                _check_whether_task_is_not_running(callback_id, mgmt_worker)
 
     logger.warning('Going to delete task %s!', task_id)
     # Revoke before proceeding (should not do anything, but won't harm)
-    cancel_task(task_id, force=force)
+    cancel_task(task_id, force=True)
 
     # So, a task with STARTED state, but is not running and is not a callback (or did not start a callback).
     # In order to delete the task we need to simulate task revoking and create a callback log task for doing a proper
     # cleanup. The log callback will then remove the task from UserTasks.
-    try:
-        t = log_task_callback(task_id, detail='vanished', send_forever=False)
-    except Exception as ex:
-        return None, str(ex)
-
+    t = log_task_callback(task_id, detail='vanished', send_forever=False)
     if t:
-        return t.id, None
+        return t.id
     else:
-        return None, 'Unknown error'
+        raise DeleteTaskProcessException('Unknown error')
+
+
+def queue_to_hostname(queue):
+    assert '.' in queue
+    return queue.replace('.', '@', 1)
 
 
 def queue_to_hostnames(queue):
@@ -409,7 +452,7 @@ def queue_to_hostnames(queue):
         return cq.conf.ERIGONES_MGMT_WORKERS
 
     # noinspection PyRedundantParentheses
-    return (queue.replace('.', '@', 1),)
+    return (queue_to_hostname(queue),)
 
 
 def ping(queue, timeout=True, count=1):
