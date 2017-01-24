@@ -5,7 +5,7 @@
 {% block javascript %}
 <script type="text/javascript">
   $(document).ready(function() {
-    DC_SETTINGS = new DcSettings();
+    DC_SETTINGS = new DcSettings({% trans "This is a global setting and it can only be changed from the main data center" %});
   });
 </script>
 {% endblock %}
@@ -47,7 +47,7 @@
             <tr>
               <th colspan="2">
                 <div class="pull-right">
-                  {% include "gui/dc/dc_all_toggle.html" %}
+                  {% include "gui/dc/dc_global_toggle.html" %}
                 </div>
               </th>
             </tr>

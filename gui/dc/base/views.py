@@ -119,6 +119,7 @@ def _dc_settings_table(request, data=None):
         'all': _all,
         'form': form,
         'qs': get_query_string(request, all=_all).urlencode(),
+        'msg_global_setting': _('Global setting')
     }
 
 

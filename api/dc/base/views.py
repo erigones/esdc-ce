@@ -135,6 +135,8 @@ def dc_settings(request, dc, data=None):
     Show (:http:get:`GET </dc/(dc)/settings>`) or update (:http:put:`PUT </dc/(dc)/settings>`)
     settings of a virtual datacenter.
 
+    .. note:: Global settings can only be changed from the main data center.
+
     .. http:get:: /dc/(dc)/settings
 
         :DC-bound?:

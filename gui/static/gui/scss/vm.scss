@@ -23,14 +23,8 @@
  * VM Control *
  **************/
 
-tr.setting td:first-child:after {
-  font-family: FontAwesome;
-  font-weight: normal;
-  font-style: normal;
-  display: inline-block;
-  text-decoration: inherit;
-  float: right;
-  content: "\f013";
+tr.setting td:first-child span.note {
+  color: #444;
 }
 
 table.form {
