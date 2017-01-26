@@ -43,7 +43,10 @@
       <td class="hidden-phone-small">{{ bkp.get_status_display }}{% if bkp.fsfreeze %}&nbsp;<i class="icon-flag"></i>{% endif %}</td>
       <td class="hidden-phone">{{ bkp.time|timeformat }}</td>
       <td class="hidden-phone">{{ bkp.size|filesizeformat }}</td>
-      <td class="hidden-phone"><small class="vm_snapshot_note">{{ bkp.note|wordwrap:44 }}</small> <a href="#" class="btn-link btn-icon-edit icon-active no-ajax vm_snapshot_note" title="{% trans "Update backup information" %}" data-toggle="tooltip" data-placement="bottom"></a></td>
+        <td class="hidden-phone">
+            <small class="vm_snapshot_note">{{ bkp.note|wordwrap:44 }}</small>
+            <a href="#" class="button mini icon-active no-ajax vm_snapshot_note"
+               title="{% trans "Update backup information" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-pencil"></i> {% trans "Edit" %}</a></td>
     </tr>
     {% endwith %}{% endfor %}
   </tbody>

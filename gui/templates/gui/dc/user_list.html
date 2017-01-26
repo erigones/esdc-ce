@@ -89,11 +89,22 @@
           {% for user in users %}
           <tr>
             <td>
-              {% if is_staff or can_edit and user.dc_bound == request.dc %}
-              <a href="#" class="btn-link btn-icon-edit no-ajax obj_edit{% if all and user.pk not in dc_users %} italic{% endif %}" title="{% trans "Update or delete user" %}" data-toggle="tooltip" data-placement="bottom" data-form='{{ user.web_data|jsondata }}' data-prefix="adm" data-profile-url='{% url 'dc_user_profile' username=user.username %}'>{{ user.username }}</a>
-              {% else %}{{ user.username }}{% endif %}
-              {% if user == request.dc.owner %}<span title="{% trans "User is owner of this datacenter" %}" data-toggle="tooltip" data-placement="bottom" class="item_flags"><i class="icon-flag"></i></span>{% endif %}
-              {% if user.username != user.email %}<br /><small>({{ user.email }})</small>{% endif %}
+                {{ user.username }}
+                {% if user.username != user.email %}
+                    <small>({{ user.email }})</small>
+                {% endif %}
+                {% if user == request.dc.owner %}
+                    <span title="{% trans "User is owner of this datacenter" %}" data-toggle="tooltip"
+                          data-placement="bottom" class="item_flags"><i class="icon-flag"></i></span>
+                {% endif %}
+                {% if is_staff or can_edit and user.dc_bound == request.dc %}
+                    <a href="#"
+                       class="button mini no-ajax obj_edit{% if all and user.pk not in dc_users %} italic{% endif %}"
+                       title="{% trans "Update or delete user" %}" data-toggle="tooltip" data-placement="bottom"
+                       data-form='{{ user.web_data|jsondata }}' data-prefix="adm"
+                       data-profile-url='{% url 'dc_user_profile' username=user.username %}'>
+                        <i class="icon-pencil"></i> {% trans "Edit" %}</a>
+                {% endif %}
             </td>
             <td>{{ user.first_name }}</td>
             <td>{{ user.last_name }}</td>

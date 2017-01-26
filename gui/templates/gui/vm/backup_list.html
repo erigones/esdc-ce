@@ -31,11 +31,12 @@
         </div>
       </td>
       <td>
-        {% if can_edit and not bkp.locked %}
-        <a href="#" class="btn-link no-ajax vm_snapshot_name" data-backup="true" title="{% trans "Delete or restore this backup" %}" data-toggle="tooltip" data-placement="bottom">{{ bkp.name }}</a>
-        {% else %}
-        {{ bkp.name }}
-        {% endif %}
+      {{ bkp.name }}
+          {% if can_edit and not bkp.locked %}
+              <a href="#" class="button mini no-ajax vm_snapshot_name" data-backup="true"
+                 title="{% trans "Delete or restore this backup" %}" data-toggle="tooltip" data-placement="bottom"><i
+                      class="icon-pencil"></i> {% trans "Edit" %}</a>
+          {% endif %}
       </td>
       <td>{{ disk_id }} <small>({{ disk_size|multiply:1048576|filesizeformat }})</small></td>
       <td class="hidden-phone">{{ bkp.get_type_display }}</td>
@@ -43,7 +44,14 @@
       <td class="hidden-phone-small">{{ bkp.get_status_display }}{% if bkp.fsfreeze %}&nbsp;<i class="icon-flag"></i>{% endif %}</td>
       <td class="hidden-phone">{{ bkp.time|timeformat }}</td>
       <td class="hidden-phone">{{ bkp.size|filesizeformat }}</td>
-      <td class="hidden-phone"><small class="vm_snapshot_note">{{ bkp.note|wordwrap:44 }}</small>{% if can_edit %} <a href="#" class="btn-link btn-icon-edit icon-active no-ajax vm_snapshot_note" title="{% trans "Update backup information" %}" data-toggle="tooltip" data-placement="bottom"></a>{% endif %}</td>
+        <td class="hidden-phone">
+            <small class="vm_snapshot_note">{{ bkp.note|wordwrap:44 }}</small>
+            {% if can_edit %}
+            <a href="#" class="button mini icon-active no-ajax vm_snapshot_note"
+               title="{% trans "Update backup information" %}" data-toggle="tooltip"
+               data-placement="bottom"><i class="icon-pencil"></i> {% trans "Edit" %}</a>
+            {% endif %}
+        </td>
     </tr>
     {% endwith %}{% endfor %}
   </tbody>

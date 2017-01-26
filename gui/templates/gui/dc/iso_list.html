@@ -110,13 +110,21 @@
         <tbody>
           {% for i in isos %}
           <tr>
-            <td>
-              {% if is_staff or can_edit and i.dc_bound %}{% if all and i.pk in can_add %}
-              <a href="#" class="btn-link btn-icon-link no-ajax obj_edit_or_add_dc italic" title="{% trans "Attach, update or delete ISO Image" %}" data-toggle="tooltip" data-placement="bottom" data-form='{{ i.web_data|jsondata }}' data-prefix="adm">{{ i.alias }}</a>
-              {% else %}
-              <a href="#" class="btn-link btn-icon-edit no-ajax obj_edit" title="{% if is_staff %}{% trans "Detach, update or delete ISO Image" %}{% else %}{% trans "Update or delete ISO Image" %}{% endif %}" data-toggle="tooltip" data-placement="bottom" data-form='{{ i.web_data|jsondata }}' data-prefix="adm">{{ i.alias }}</a>
-              {% endif %}
-              {% else %}{{ i.alias }}{% endif %} <small>({{ i.name }})</small>
+            <td>{{ i.alias }} <small>({{ i.name }})</small>
+            {% if is_staff or can_edit and i.dc_bound %}
+                {% if all and i.pk in can_add %}
+                    <a href="#" class="button mini no-ajax obj_edit_or_add_dc"
+                       title="{% trans "Attach, update or delete ISO Image" %}" data-toggle="tooltip"
+                       data-placement="bottom" data-form='{{ i.web_data|jsondata }}' data-prefix="adm">
+                        <i class="icon-link"></i> {% trans "Attach" %}</a>
+                {% else %}
+                    <a href="#" class="button mini no-ajax obj_edit" title="
+                            {% if is_staff %}{% trans "Detach, update or delete ISO Image" %}{% else %}{% trans "Update or delete ISO Image" %}{% endif %}"
+                       data-toggle="tooltip" data-placement="bottom" data-form='{{ i.web_data|jsondata }}'
+                       data-prefix="adm"><i class="icon-pencil"></i> {% trans "Edit" %}</a>
+                {% endif %}
+            {% endif %}
+
             </td>
             <td>{{ i.get_access_display }}</td>
             <td class="nowrap"><span class="vm_hostname" title="{{ i.owner }}"><i class="icon-user"></i> {{ i.owner|truncatechars:16 }}</span></td>

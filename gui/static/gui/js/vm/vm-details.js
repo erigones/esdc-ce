@@ -393,14 +393,11 @@ function vm_lock_toggle(locked) {
 
   if (elem_locked.length) {
     elem_unlocked = $('a.vm_unlocked');
-
     if (locked === true) {
       elem_locked.show();
-      elem_unlocked.removeClass('btn-icon-edit');
       $('a.vm_lock_disable').addClass('disabled', 'stay_disabled');
     } else if (locked === false) {
       elem_locked.hide();
-      elem_unlocked.addClass('btn-icon-edit');
     }
   }
 }
