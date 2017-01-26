@@ -56,6 +56,6 @@ function DcSettings(input_tooltip_disabled_msg) {
 
   // set tooltip text for the global settings
   table.find('input:disabled, textarea:disabled').tooltip({title:input_tooltip_disabled_msg, placement: 'left'});
-  table.find('input:disabled').parents('.span9').tooltip({title: input_tooltip_disabled_msg, placement: 'left'})
+  table.find('input:disabled').parents('.span9').tooltip({title: input_tooltip_disabled_msg, placement: 'left'});
 
 } // DcSettings
