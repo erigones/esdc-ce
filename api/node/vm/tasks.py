@@ -68,7 +68,8 @@ def harvest_vm_cb(result, task_id, node_uuid=None):
         except Exception as e:
             logger.exception(e)
             logger.error('Could not load VM from json:\n"""%s"""', json)
-            task_log_cb_error({'message': 'Could not load server %s' % vm_uuid}, task_id, obj=node, **result['meta'])
+            err_msg = 'Could not load server %s. Error: %s' % (vm_uuid, e)
+            task_log_cb_error({'message': err_msg}, task_id, obj=node, **result['meta'])
             vms_err.append(vm_uuid)
         else:
             logger.info('Successfully saved new VM %s after harvest_vm(%s)', vm, node)
