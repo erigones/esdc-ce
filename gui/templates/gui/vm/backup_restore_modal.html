@@ -13,7 +13,7 @@
     <form id="vm_backup_restore_form" class="form-horizontal">
       <div class="vm_modal_force_text">{% trans "Deleting a backup will only remove the data of the backup." %}</div>
       <div class="vm_modal_force_text">{% trans "A backup restore will restore your data from the backup. <strong>All your data created after the backup (including all existing snapshots) on target server will be lost!</strong>" %}
-        <span class="vm_modal_force_force">{% trans "Do you wan't to <strong>delete existing data and snapshots on target server</strong> and restore data from this backup?" %} <input type="checkbox" id="vm_snapshot_rollback_force" class="big-check" /></span>
+        <span class="vm_modal_force_force">{% trans "Do you want to <strong>delete existing data and snapshots on target server</strong> and restore data from this backup?" %} <input type="checkbox" id="vm_snapshot_rollback_force" class="big-check" /></span>
       </div>
       <div class="vm_modal_force_text">
         {% include "gui/form_field.html" with field=bkpform_restore.target_hostname %}
