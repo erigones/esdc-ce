@@ -16,8 +16,8 @@ echo "||||"
 echo "||||"
 (cat /root/.ssh/id_rsa.pub)
 echo "||||"
-if /bin/bootparams | grep "^headnode=true" > /dev/null 2>&1; then
-	find /usbkey/datasets -type f -name '*.imgmanifest' -exec json -f {} \; | json -g
+if [[ -n "$1" ]]; then
+	(imgadm list -H -o uuid,zpool | while read uuid zpool; do imgadm get -P "${zpool}" "${uuid}"; done | json -g)
 else
 	echo '[]'
 fi
