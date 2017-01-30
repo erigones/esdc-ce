@@ -11,7 +11,8 @@
   <tbody>
     {% for key in ssh_keys %}
     <tr>
-      <td><a href="#" id="profile_deletesshkey_{{ key.fingerprint_id }}" class="btn-link no-ajax profile_control" data-name="{{ key.title }}" data-modal_text="{{ key.title }} ({{ key.fingerprint }})" title="{% trans "Delete this SSH key" %}" data-toggle="tooltip" data-placement="bottom">{{ key.title }}</a></td>
+      <td>{{ key.title }}
+          <a href="#" id="profile_deletesshkey_{{ key.fingerprint_id }}" class="button mini no-ajax profile_control" data-name="{{ key.title }}" data-modal_text="{{ key.title }} ({{ key.fingerprint }})" title="{% trans "Delete this SSH key" %}" data-toggle="tooltip" data-placement="bottom"> <i class="icon-pencil"></i> {% trans "Delete" %}</a></td>
       <td>{{ key.display_fingerprint|safe }}</td>
     </tr>
     {% endfor %}

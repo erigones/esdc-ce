@@ -122,10 +122,9 @@
                     <a href="#" class="button mini no-ajax obj_edit_or_add_dc italic"
                        title="{% trans "Attach, update or delete Network" %}" data-toggle="tooltip"
                        data-placement="bottom" data-form='{{ net.web_data_admin|jsondata }}'
-                       data-prefix="adm"><i class="icon-link"></i> {% trans "Attach" %}</a>
+                       data-prefix="adm"><i class="icon-link"></i> {% trans "Edit" %}</a>
                 {% else %}
-                    <a href="#" class="button mini no-ajax obj_edit" title="
-                            {% if is_staff %}{% trans "Detach, update or delete Network" %}{% else %}{% trans "Update or delete Network" %}{% endif %}"
+                    <a href="#" class="button mini no-ajax obj_edit" title="{% if is_staff %}{% trans "Detach, update or delete Network" %}{% else %}{% trans "Update or delete Network" %}{% endif %}"
                        data-toggle="tooltip" data-placement="bottom" data-form='{{ net.web_data_admin|jsondata }}'
                        data-prefix="adm"><i class="icon-pencil"></i> {% trans "Edit" %}</a>
                 {% endif %}

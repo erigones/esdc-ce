@@ -30,10 +30,9 @@
         </div>
       </td>
       <td>
-        {% if snap.locked %}
         {{ snap.name }}
-        {% else %}
-        <a href="#" class="btn-link no-ajax vm_snapshot_name"{% if disk_id not in lastsnap %}{{ lastsnap|append:disk_id }} data-rollback="true"{% endif %} data-backup="" title="{% trans "Delete or rollback this snapshot" %}" data-toggle="tooltip" data-placement="bottom">{{ snap.name }}</a>
+        {% if not snap.locked %}
+        <a href="#" class="button mini no-ajax vm_snapshot_name"{% if disk_id not in lastsnap %}{{ lastsnap|append:disk_id }} data-rollback="true"{% endif %} data-backup="" title="{% trans "Delete or rollback this snapshot" %}" data-toggle="tooltip" data-placement="bottom"> <i class="icon-pencil"></i> {% trans "Delete or rollback" %}</a>
         {% endif %}
       </td>
       <td>{{ disk_id }} <small>({{ snap.disk_size|multiply:1048576|filesizeformat }})</small></td>

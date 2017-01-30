@@ -126,16 +126,18 @@
                 {% if is_staff or can_edit and img.dc_bound %}
                     {% if all and img.pk in can_add %}
                         <a href="#"
-                           class="button mini no-ajax obj_edit_or_add_dc {% if not img.is_ok %} disabled{% endif %}"
+                           class="button mini no-ajax obj_edit_or_add_dc italic{% if not img.is_ok %} disabled{% endif %}"
                            title="{% trans "Attach, update or delete disk Image" %}" data-toggle="tooltip"
                            data-placement="bottom" data-form='{{ img.web_data_admin|jsondata }}'
-                           data-prefix="adm"><i class="icon-link"></i> {% trans "Attach" %}</a>
+                           data-prefix="adm">
+                            <i class="icon-link"></i> {% trans "Edit" %}</a>
                     {% else %}
                         <a href="#"
                            class="button mini no-ajax obj_edit{% if not img.is_ok %} disabled{% endif %}" title="
                                 {% if is_staff %}{% trans "Detach, update or delete disk Image" %}{% else %}{% trans "Update or delete disk Image" %}{% endif %}"
                            data-toggle="tooltip" data-placement="bottom" data-form='{{ img.web_data_admin|jsondata }}'
-                           data-prefix="adm"><i class="icon-pencil"></i> {% trans "Edit" %}</a>
+                           data-prefix="adm">
+                            <i class="icon-pencil"></i> {% trans "Edit" %}</a>
                     {% endif %}
                 {% endif %}
 

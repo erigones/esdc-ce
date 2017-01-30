@@ -32,10 +32,9 @@
         </div>
       </td>
       <td>
-        {% if node.is_online and not bkp.locked and request.dc == bkp.dc %}
-        <a href="#" class="btn-link no-ajax vm_snapshot_name" data-backup="true" title="{% trans "Delete or restore this backup" %}" data-toggle="tooltip" data-placement="bottom">{{ bkp.name }}</a>
-        {% else %}
         {{ bkp.name }}
+        {% if node.is_online and not bkp.locked and request.dc == bkp.dc %}
+        <a href="#" class="button mini no-ajax vm_snapshot_name" data-backup="true" title="{% trans "Delete or restore this backup" %}" data-toggle="tooltip" data-placement="bottom"> <i class="icon-pencil"></i> {% trans "Delete or restore" %}</a>
         {% endif %}
       </td>
       <td><span class="vm_hostname">{{ bkp.vm_hostname }}<br><i class="icon-cloud"></i> {{ bkp.dc.alias }}</span></td>

@@ -112,10 +112,10 @@
 
             {% if is_staff or can_edit and group.dc_bound %}
                 {% if all and group.pk in can_add %}
-                    <a href="#" class="button mini no-ajax obj_edit_or_add_dc"
+                    <a href="#" class="button mini no-ajax obj_edit_or_add_dc italic"
                        title="{% trans "Attach, update or delete User Group" %}" data-toggle="tooltip"
                        data-placement="bottom" data-form='{{ group.web_data|jsondata }}'
-                       data-prefix="adm"><i class="icon-link"></i> {% trans "Attach" %} </a>
+                       data-prefix="adm"><i class="icon-link"></i> {% trans "Edit" %} </a>
                 {% else %}
                     <a href="#" class="button mini no-ajax obj_edit" title="{% if is_staff %}{% trans "Detach, update or delete User Group" %}{% else %}{% trans "Update or delete User Group" %}{% endif %}"
                        data-toggle="tooltip" data-placement="bottom" data-form='{{ group.web_data|jsondata }}'

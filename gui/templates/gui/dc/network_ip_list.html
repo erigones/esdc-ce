@@ -108,8 +108,8 @@
             <td>{{ net.alias }}
                 {% if can_edit %}<a href="#" id="network_edit" class="button mini no-ajax"
                                     title="{% trans "Update or delete Network" %}" data-toggle="tooltip"
-                                    data-placement="bottom" data-prefix="adm"
-                ><i class="icon-pencil"></i>{% trans "Edit" %}</a>
+                                    data-placement="bottom" data-prefix="adm">
+                    <i class="icon-pencil"></i> {% trans "Edit" %}</a>
                 {% endif %}</td>
         </tr>
           <tr><th>{% trans "Name" %}:</th><td>{{ net.name }}</td></tr>
@@ -225,9 +225,9 @@
                 <label for="id_{{ ip.ip }}"></label>
               </div>
             </td>
-                <td class="nowrap">{{ ip.ip }}<a href="#" class="button mini no-ajax obj_edit" title="{% trans "Update or delete IP address" %}"
+                <td class="nowrap">{{ ip.ip }} <a href="#" class="button mini no-ajax obj_edit" title="{% trans "Update or delete IP address" %}"
                        data-toggle="tooltip" data-placement="bottom"
-                       data-form='{{ ip.web_data|jsondata }}'><i class="icon-pencil"></i> {% trans "Edit" %}</a></td>
+                       data-form='{{ ip.web_data|jsondata }}'> <i class="icon-pencil"></i> {% trans "Edit" %}</a></td>
             {% endif %}{% else %}
             <td class="nowrap">{{ ip.ip }}</td>
             {% endif %}
