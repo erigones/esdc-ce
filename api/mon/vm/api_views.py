@@ -149,7 +149,7 @@ class VmHistoryView(APIView):
 
         history = graph_settings['history']
         ter = t_mon_vm_history.call(request, vm.owner.id, (vm.uuid, items, history, result, items_search),
-                                    kwargs={'vm_uuid': vm.uuid}, meta={'apiview': _apiview_}, tidlock=tidlock)
+                                    meta={'apiview': _apiview_}, tidlock=tidlock)
         # NOTE: cache_result=tidlock, cache_timeout=60)
         # Caching is disable here, because it makes no real sense.
         # The latest graphs must be fetched from zabbix and the older are requested only seldom.
