@@ -59,7 +59,8 @@ def node_worker_start(sender):
             logger.exception(exc)
             return
 
-        tid, err = execute_sysinfo(ERIGONES_TASK_USER, ERIGONES_TASK_USER, queue=queue, node_uuid=node_uuid)
+        tid, err = execute_sysinfo(ERIGONES_TASK_USER, ERIGONES_TASK_USER, queue=queue, node_uuid=node_uuid,
+                                   initial=True)
         if err:
             logger.error('Error creating internal %s task: %s in %s queue', SYSINFO_TASK, err, queue)
         else:

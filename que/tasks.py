@@ -315,7 +315,7 @@ def execute(request, owner_id, cmd, stdin=None, meta=None, callback=None, lock=N
         return task.id, None
 
 
-def execute_sysinfo(request, owner_id, queue, node_uuid, meta=None, check_user_tasks=False):
+def execute_sysinfo(request, owner_id, queue, node_uuid, meta=None, check_user_tasks=False, initial=False):
     """
     Wrapper around the execute() function calling command esysinfo on a node.
 
@@ -331,10 +331,16 @@ def execute_sysinfo(request, owner_id, queue, node_uuid, meta=None, check_user_t
     :type meta: dict
     :param check_user_tasks: Waiting for task to appear in UserTasks
     :type check_user_tasks: bool
+    :param initial: Whether the esysinfo command is run during first start of erigonesd:fast
+    :type initial: bool
 
     :return: tuple (task_id, error) i.e. same values as execute() function
     """
-    esysinfo_cmd = 'esysinfo 2> /dev/null'
+    if initial:
+        esysinfo_cmd = 'esysinfo init 2> /dev/null'
+    else:
+        esysinfo_cmd = 'esysinfo 2> /dev/null'
+
     lock = 'node_sysinfo node_queue:%s' % queue
     callback = (SYSINFO_TASK, {'node_uuid': node_uuid})
 
