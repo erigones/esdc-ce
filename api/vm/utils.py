@@ -17,11 +17,6 @@ def get_vm(request, hostname, attrs=None, where=None, exists_ok=False, noexists_
     specified then set them to check owner and node status.
     Also acts as IsVmOwner permission.
     """
-    # Quickly return vm, if set in request (shortcut from GUI)
-    vm = getattr(request, '_api_vm', None)
-    if api and vm:
-        return vm
-
     if where is None:
         where = QNodeNullOrLicensed
 
