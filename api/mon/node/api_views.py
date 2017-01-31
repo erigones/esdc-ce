@@ -1,9 +1,12 @@
+from api.mon.node.graphs import GRAPH_ITEMS
 from api.api_views import APIView
-from api.exceptions import NodeIsNotOperational
-from api.task.response import mgmt_task_response
-from api.node.utils import get_node
-from api.mon.node.tasks import mon_node_sla as t_mon_node_sla
+from api.exceptions import NodeIsNotOperational, InvalidInput
+from api.mon.node.tasks import mon_node_sla as t_mon_node_sla, mon_node_history as t_mon_node_history
 from api.mon.node.utils import parse_yyyymm
+from api.mon.validators import parse_graph_vm
+from api.mon.node.serializers import MonNodeHistorySerializer
+from api.node.utils import get_node
+from api.task.response import mgmt_task_response
 from que import TG_DC_UNBOUND
 
 
@@ -43,4 +46,71 @@ class NodeSLAView(APIView):
 
 
 class NodeHistoryView(APIView):
-    raise NotImplemented
+    """ """
+    def __init__(self, request, hostname, graph_type, data):
+        self.request = request
+        self.node = get_node(request, hostname)
+        self.graph_type = graph_type
+        self.data = data
+
+    def get(self):
+        request, node, graph = self.request, self.node, self.graph_type
+
+        if node.status not in node.STATUS_OPERATIONAL:
+            raise NodeIsNotOperational
+
+        # Validate graph identificator
+        graph_category, item_id = parse_graph_vm(node, graph)
+
+        try:
+            if not graph_category:
+                raise KeyError
+            graph_settings = GRAPH_ITEMS.get_options(graph_category, node)
+        except KeyError:
+            raise InvalidInput('Invalid graph')
+        else:
+            required_ostype = graph_settings.get('required_ostype', None)
+
+            if required_ostype is not None and node.ostype not in required_ostype:
+                raise InvalidInput('Invalid OS type')
+
+        _apiview_ = {'view': 'mon_node_history',
+                     'method': request.method,
+                     'hostname': node.zabbix_name,
+                     'graph': graph}
+
+        ser = MonNodeHistorySerializer(data=self.data)
+
+        if not ser.is_valid():
+            return FailureTaskResponse(request, ser.errors, obj=node)
+
+        result = ser.object.copy()
+        result['desc'] = graph_settings.get('desc', '')
+        result['hostname'] = node.zabbix_name
+        result['graph'] = graph
+        result['options'] = graph_settings.get('options', {})
+        result['update_interval'] = graph_settings.get('update_interval', None)
+        tidlock = 'mon_node_history node:%s graph:%s since:%d until:%d' % (node.uuid, graph,
+                                                                       round(ser.object['since'], -2),
+                                                                       round(ser.object['until'], -2))
+
+        if item_id is None:
+            items = graph_settings['items']
+        else:
+            item_dict = {'id': item_id}
+            items = [i % item_dict for i in graph_settings['items']]
+
+        if 'items_search_fun' in graph_settings:
+            # noinspection PyCallingNonCallable
+            items_search = graph_settings['items_search_fun'](graph_settings, item_id)
+        else:
+            items_search = None
+
+        history = graph_settings['history']
+        ter = t_mon_node_history.call(request, node.owner.id, (node.uuid, items, history, result, items_search),
+                                    meta={'apiview': _apiview_}, tidlock=tidlock)
+        # NOTE: cache_result=tidlock, cache_timeout=60)
+        # Caching is disable here, because it makes no real sense.
+        # The latest graphs must be fetched from zabbix and the older are requested only seldom.
+
+        return mgmt_task_response(request, *ter, obj=node, api_view=_apiview_, data=self.data)
