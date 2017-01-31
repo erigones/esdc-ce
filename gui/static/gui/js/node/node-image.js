@@ -26,7 +26,7 @@ function NodeImage(hostname, zpool) {
       // define custom obj_form_modal handler
       var mod = self.list.modal.mod;
 
-      if (e.data.action == 'delete') {
+      if (e.data.action == 'delete' && !$(this).hasClass('disabled')) {
         node_delete_image(hostname, zpool, $('#id_name').val());  // Run task!
         mod.modal('hide');
       }
