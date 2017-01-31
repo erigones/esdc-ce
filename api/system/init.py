@@ -61,11 +61,14 @@ def _save_image(manifest, default_dc, admin_dc):
     image_name_max_length = Image._meta.get_field('name').max_length
     name = manifest['name'][:image_name_max_length]
     i = 0
+    i_str = str(i)
 
-    while Image.objects.filter(name=name).exists():
+    while Image.objects.filter(name=name).exists() and len(i_str) < image_name_max_length:
         i += 1
-        name = name[:(image_name_max_length - len(str(i)))] + str(i)
-        # TODO: What if len(str(i)) >= image_name_max_length
+        i_str = str(i)
+        # Create new name by appending a number to the existing name
+        # (optionally stripping n-number of characters from end of the name)
+        name = name[:(image_name_max_length - len(i_str))] + i_str
 
     img = Image(uuid=manifest['uuid'])
     img.owner_id = settings.ADMIN_USER
