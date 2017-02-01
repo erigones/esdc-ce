@@ -28,8 +28,8 @@
             }
         }
 
-/vm/*(hostname)*
-----------------
+/vm/*(hostname_or_uuid)*
+------------------------
 
 .. autofunction:: api.vm.base.views.vm_manage
 

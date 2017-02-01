@@ -2,6 +2,21 @@ Changelog
 #########
 
 
+2.4.0 (unreleased)
+========================================
+
+Features
+--------
+
+- Changed all VM-related API calls to be able to handle UUID-based requests instead of only hostname - `#16 <https://github.com/erigones/esdc-ce/issues/16>`__
+- Added support for nics.*.allowed_ips (multiple IPs per NIC) - `#3 <https://github.com/erigones/esdc-ce/issues/3>`__
+
+Bugs
+----
+
+- Fixed bug with monitoring synchronization called twice during new VM deployment - `#32 <https://github.com/erigones/esdc-ce/issues/32>`__
+
+
 2.3.3 (unreleased)
 ========================================
 

@@ -180,8 +180,8 @@ def dc_network_ip_list(request, name):
     qs['ips'] = 1
     context['qs'] = qs.urlencode()
     ips_used = Q(usage__in=[IPAddress.VM, IPAddress.VM_REAL])
-    ips_vm = Q(vm__isnull=False)
-    ips_vm_dc = Q(vm__dc=dc)
+    ips_vm = (Q(vm__isnull=False) | ~Q(vms=None))
+    ips_vm_dc = (Q(vm__dc=dc) | Q(vms__dc=dc))
 
     if can_edit:
         if is_staff:
@@ -221,9 +221,12 @@ def dc_network_ip_list(request, name):
         ip_filter = Q(subnet=net) & ips_vm_dc & ips_used & ips_vm
 
     context['order_by'], order_by = get_order_by(request, api_view=NetworkIPView, db_default=('ip',))
-    ips = IPAddress.objects.select_related('vm', 'vm__dc', 'subnet').filter(ip_filter).order_by(*order_by)
+    ips = IPAddress.objects.select_related('vm', 'vm__dc', 'subnet')\
+                           .prefetch_related('vms')\
+                           .filter(ip_filter)\
+                           .order_by(*order_by).distinct()
     context['ips'] = context['pager'] = pager = get_pager(request, ips, per_page=50)
-    context['free'] = net.ipaddress_set.filter(usage=IPAddress.VM, vm__isnull=True).count()
+    context['free'] = net.ipaddress_set.filter(usage=IPAddress.VM, vm__isnull=True, vms=None).count()
 
     if can_edit:
         context['total'] = net.ipaddress_set.count()
@@ -295,9 +298,12 @@ def dc_subnet_ip_list(request, network, netmask, vlan_id):
         raise Http404  # Invalid user input - made-up IPv4network
 
     context['order_by'], order_by = get_order_by(request, api_view=NetworkIPPlanView)
-    ips = IPAddress.objects.select_related('vm', 'vm__dc', 'subnet').filter(subnet__in=nets).order_by(*order_by)
+    ips = IPAddress.objects.select_related('vm', 'vm__dc', 'subnet')\
+                           .prefetch_related('vms')\
+                           .filter(subnet__in=nets)\
+                           .order_by(*order_by).distinct()
     context['ips'] = context['pager'] = pager = get_pager(request, ips, per_page=50)
     context['total'] = pager.paginator.count
-    context['free'] = ips.filter(usage=IPAddress.VM, vm__isnull=True).count()
+    context['free'] = ips.filter(usage=IPAddress.VM, vm__isnull=True, vms=None).count()
 
     return render(request, 'gui/dc/subnet_ip_list.html', context)

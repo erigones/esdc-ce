@@ -74,8 +74,8 @@ class ImageStore(_DummyModel):
     )
     CACHE_PREFIX_REPO = 'imagestore:'
     CACHE_SUFFIX_IMAGES = ':images'
-    IMAGE_LIST_URI = '/images'
-    IMAGE_URI = '/images/%s'
+    IMAGE_LIST_URI = 'images'
+    IMAGE_URI = 'images/%s'
 
     # noinspection PyPep8Naming
     class Meta:

@@ -1,8 +1,8 @@
 :mod:`api.vm.other`
 ===================
 
-/vm/*(hostname)*/screenshot
----------------------------
+/vm/*(hostname_or_uuid)*/screenshot
+-----------------------------------
 
 .. autofunction:: api.vm.other.views.vm_screenshot
 

@@ -1,8 +1,8 @@
 :mod:`api.vm.qga`
 =================
 
-/vm/*(hostname)*/qga/*(command)*
---------------------------------
+/vm/*(hostname_or_uuid)*/qga/*(command)*
+----------------------------------------
 
 .. autofunction:: api.vm.qga.views.vm_qga
 

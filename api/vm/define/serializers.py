@@ -1,5 +1,6 @@
 from logging import getLogger
 
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from django.utils.six import iteritems
 from django.core import validators
@@ -17,6 +18,7 @@ from api.dns.record.api_views import RecordView
 
 PERMISSION_DENIED = _('Permission denied')
 INVALID_HOSTNAMES = frozenset(['define', 'status', 'backup', 'snapshot'])
+NIC_ALLOWED_IPS_MAX = 8
 
 logger = getLogger(__name__)
 
@@ -68,6 +70,7 @@ def validate_nic_tags(vm, new_node=None, new_net=None):
 
 
 class VmDefineSerializer(VmBaseSerializer):
+    uuid = s.CharField(read_only=True)
     hostname = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\.-]+[A-Za-z0-9]$', max_length=128, min_length=4)
     alias = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\.-]+[A-Za-z0-9]$', max_length=24, min_length=4, required=False)
     ostype = s.IntegerChoiceField(choices=Vm.OSTYPE, default=settings.VMS_VM_OSTYPE_DEFAULT)
@@ -280,9 +283,9 @@ class VmDefineSerializer(VmBaseSerializer):
         except KeyError:
             pass
         else:
-            if self.object and self.object.hostname == value:
-                pass  # Do not check if the same hostname was provided
-            elif Vm.objects.filter(hostname__iexact=value).exists():
+            if self.object and (self.object.hostname == value or self.object.uuid == value):
+                pass  # Do not check if the same hostname or uuid was provided
+            elif Vm.objects.filter(Q(hostname__iexact=value) | Q(uuid__iexact=value)).exists():
                 raise ObjectAlreadyExists(model=Vm)
             elif '..' in value or '--' in value or value in INVALID_HOSTNAMES:
                 raise s.ValidationError(s.WritableField.default_error_messages['invalid'])
@@ -802,8 +805,8 @@ class _VmDefineDiskSerializer(s.Serializer):
                 self._errors['size'] = s.ErrorList([_('Cannot define disk size other than image size (%s), '
                                                       'because image does not support resizing.') % self.img.size])
             elif size < self.img.size:
-                self._errors['size'] = s. ErrorList([_('Cannot define smaller disk size than '
-                                                       'image size (%s).') % self.img.size])
+                self._errors['size'] = s.ErrorList([_('Cannot define smaller disk size than '
+                                                      'image size (%s).') % self.img.size])
 
             if self.vm.is_notcreated():
                 # Check disk_driver in image manifest (bug #chili-605) only if server is not created;
@@ -867,6 +870,7 @@ class KVmDefineDiskSerializer(_VmDefineDiskSerializer):
     model = s.ChoiceField(choices=Vm.DISK_MODEL, default=settings.VMS_DISK_MODEL_DEFAULT)
     image = s.CharField(required=False, default=settings.VMS_DISK_IMAGE_DEFAULT, max_length=64)
     refreservation = s.IntegerField(default=0, max_value=268435456, min_value=0)  # default set below
+
     # nocreate = s.BooleanField(default=False)  # processed in save_disks()
 
     def __init__(self, request, vm, *args, **kwargs):
@@ -932,7 +936,7 @@ class VmDefineNicSerializer(s.Serializer):
     allow_mac_spoofing = s.BooleanField(default=False)
     allow_restricted_traffic = s.BooleanField(default=False)
     allow_unfiltered_promisc = s.BooleanField(default=False)
-    # allowed_ips = IPAddressArrayField(default=[])  # TODO: IPAddress model association for each additional IP address
+    allowed_ips = s.IPAddressArrayField(default=[], max_items=NIC_ALLOWED_IPS_MAX)
     monitoring = s.BooleanField(default=False)
     set_gateway = s.BooleanField(default=True)
 
@@ -942,11 +946,26 @@ class VmDefineNicSerializer(s.Serializer):
         self.dc_settings = dc_settings = vm.dc.settings
         self.nic_id = kwargs.pop('nic_id', None)
         self.resolvers = vm.resolvers
+        # List of DNS Record objects, where the content is equal to this NIC's IP address
         self._dns = []
+        # Subnet object currently set in this NIC
         self._net = None
+        # New Subnet object that is going to be replaced by self._net
         self._net_old = None
+        # The self._ip attribute holds the IPAddress object that is currently associated with this NIC
+        # In case the related network object has dhcp_passthrough=True the value of self._ip will be False.
         self._ip = None
+        # self._ip_old holds the IPAddress object which is currently associated with this NIC, but is going to be
+        # changed by a new IP (self._ip). The purpose of this attribute is to clean up old DNS and IP relations after
+        # the VM is updated (save_ip()).
         self._ip_old = None
+        # The self._ips and self._ips_old have the same purpose as self._ip and self._ip_old but in relation to
+        # the allowed_ips array.
+        self._ips = ()
+        self._ips_old = ()
+        # Helper attribute for self.save_ip()
+        self._changing_allowed_ips = False
+        # This attribute is True if vm.monitoring_ip equals to nic['ip']
         self._monitoring_old = None
 
         if len(args) > 0:  # GET, PUT
@@ -1021,6 +1040,11 @@ class VmDefineNicSerializer(s.Serializer):
             except IPAddress.DoesNotExist:
                 raise APIError(detail='Unknown ip in NIC definition.')
 
+        allowed_ips = data.get('allowed_ips', None)
+
+        if allowed_ips is not None:
+            self._ips = IPAddress.objects.filter(ip__in=allowed_ips, subnet=self._net)
+
         # dns is True if a valid DNS A record exists and points this NICs IP
         data['dns'] = False
         if ip and self.vm.hostname_is_valid_fqdn():  # will return False if DNS_ENABLED is False
@@ -1083,6 +1107,7 @@ class VmDefineNicSerializer(s.Serializer):
             ret['ip'] = self.object.get('ip', None)
             ret['netmask'] = self.object.get('netmask', None)
             ret['gateway'] = self.object.get('gateway', None)
+            ret['allowed_ips'] = self.object.get('allowed_ips', [])
 
         return ret
 
@@ -1182,6 +1207,34 @@ class VmDefineNicSerializer(s.Serializer):
 
         return attrs
 
+    def _check_ip_usage(self, ipaddress, allowed_ips=False):
+        """Returns an error message if IP address is used by some VM"""
+        ip = ipaddress.ip
+
+        if ipaddress.usage == IPAddress.VM_REAL and ipaddress.vm == self.vm:  # Trying to re-use our lost IP?
+            if ipaddress.ip in self.vm.json_get_ips():  # check if selected address is not on another interface
+                return _('Object with name=%s is already used.') % ip
+        else:
+            if ipaddress.vm is not None:  # check if selected address is free in this subnet
+                return _('Object with name=%s is already used as default address.') % ip
+
+            if allowed_ips:
+                if ipaddress.usage not in (IPAddress.VM, IPAddress.VM_REAL):  # check if selected IP can be used for VM
+                    return _('Object with name=%s is not available.') % ip
+
+                for other_vm in ipaddress.vms.exclude(uuid=self.vm.uuid):
+                    if other_vm.dc != self.vm.dc:
+                        return _('Object with name=%s is already used as additional address in '
+                                 'another virtual datacenter.') % ip
+            else:
+                if ipaddress.usage != IPAddress.VM:  # check if selected address can be used for virtual servers
+                    return _('Object with name=%s is not available.') % ip
+
+                if ipaddress.vms.exists():  # IP address is already used as allowed_ips
+                    return _('Object with name=%s is already used as additional address.') % ip
+
+        return None
+
     def validate(self, attrs):
         net = self._net
         assert net
@@ -1199,18 +1252,11 @@ class VmDefineNicSerializer(s.Serializer):
                     self._errors['ip'] = s.ObjectDoesNotExist(ip).messages
                     return attrs
                 else:
-                    if _ip.usage == IPAddress.VM_REAL and _ip.vm == self.vm:  # Trying to re-use our lost IP?
-                        if _ip.ip in self.vm.json_get_ips():  # check if selected address is not on another interface
-                            self._errors['ip'] = s.ErrorList([_('Object with name=%s is already used.') % ip])
-                            return attrs
-                    else:
-                        if _ip.usage != IPAddress.VM:  # check if selected address can be used for virtual servers
-                            self._errors['ip'] = s.ErrorList([_('Object with name=%s is not available.') % ip])
-                            return attrs
+                    error = self._check_ip_usage(_ip)
 
-                        if _ip.vm is not None:  # check if selected address is free in this subnet
-                            self._errors['ip'] = s.ErrorList([_('Object with name=%s is already taken.') % ip])
-                            return attrs
+                    if error:
+                        self._errors['ip'] = s.ErrorList([error])
+                        return attrs
 
                     if self._ip and self._ip != _ip:  # changing ip is tricky
                         self._ip_old = self._ip
@@ -1223,6 +1269,52 @@ class VmDefineNicSerializer(s.Serializer):
             if self._net_old or not attrs.get('ip', True):
                 self._ip_old = self._ip
                 self._ip = None
+
+        allowed_ips = attrs.get('allowed_ips', [])
+
+        if allowed_ips:
+            allowed_ips = set(allowed_ips)
+            _ips = IPAddress.objects.filter(ip__in=allowed_ips, subnet=net)
+
+            if self.object and not self._net_old and self._ips and self._ips == _ips:
+                pass  # Input allowed_ips are the same as in DB
+            else:
+                ip_list = _ips.values_list('ip', flat=True)
+
+                if len(ip_list) != len(allowed_ips):
+                    self._errors['allowed_ips'] = s.ErrorList(
+                        [_('Object with name=%s does not exist.') % i for i in allowed_ips if i not in ip_list]
+                    )
+                    return attrs
+
+                if self._ip and self._ip.ip in allowed_ips:
+                    self._errors['allowed_ips'] = s.ErrorList(
+                        [_('The default IP address must not be among allowed_ips.')]
+                    )
+                    return attrs
+
+                errors = [err for err in (self._check_ip_usage(ipaddress, allowed_ips=True) for ipaddress in _ips)
+                          if err is not None]
+
+                if errors:
+                    self._errors['allowed_ips'] = s.ErrorList(errors)
+                    return attrs
+
+                if self._ips and self._ips != _ips:  # changing allowed_ips is tricky
+                    # noinspection PyUnresolvedReferences
+                    self._ips_old = self._ips.exclude(ip__in=ip_list)
+
+                self._ips = _ips
+                self._changing_allowed_ips = True
+                attrs['allowed_ips'] = list(ip_list)
+        else:
+            # changing net + allowed_ips not specified, but already set on nic (with old net)
+            # or settings empty allowed_ips (=> user wants to remove allowed_ips)
+            if self._ips and (self._net_old or 'allowed_ips' in attrs):
+                attrs['allowed_ips'] = []
+                self._ips_old = self._ips
+                self._ips = ()
+                self._changing_allowed_ips = True
 
         if net.dhcp_passthrough:
             # no dns and monitoring for this NIC
@@ -1256,8 +1348,8 @@ class VmDefineNicSerializer(s.Serializer):
                 attrs['gateway'] = None
             else:
                 try:
-                    self._ip = IPAddress.objects.filter(subnet=net, vm__isnull=True, usage=IPAddress.VM)\
-                                                .order_by('?')[0:1].get()
+                    self._ip = IPAddress.objects.filter(subnet=net, vm__isnull=True, vms=None, usage=IPAddress.VM)\
+                                                .exclude(ip__in=allowed_ips).order_by('?')[0:1].get()
                 except IPAddress.DoesNotExist:
                     raise s.ValidationError(_('Cannot find free IP address for net %s.') % net.name)
                 else:
@@ -1394,6 +1486,40 @@ class VmDefineNicSerializer(s.Serializer):
 
         return RecordView.internal_response(request, method, ptr, data, task_id=task_id, related_obj=vm)
 
+    @staticmethod
+    def _remove_vm_ip_association(vm, ip, many=False):
+        logger.info('Removing association of IP %s with vm %s.', ip, vm)
+
+        if ip.usage == IPAddress.VM_REAL and vm.is_deployed():  # IP is set on hypervisor
+            logger.info(' ^ Removal of association of IP %s with vm %s will be delayed until PUT vm_manage is done.',
+                        ip, vm)
+        else:  # DB only operation
+            if many:
+                ip.vms.remove(vm)
+            else:
+                ip.vm = None
+                ip.save()
+
+    @staticmethod
+    def _create_vm_ip_association(vm, ip, many=False):
+        logger.info('Creating association of IP %s with vm %s.', ip, vm)
+
+        if ip.vm:
+            raise APIError(detail='Unexpected problem with IP address association.')
+
+        if many:
+            ip.vms.add(vm)
+        else:
+            ip.vm = vm
+            ip.save()
+
+    @classmethod
+    def _update_vm_ip_association(cls, vm, ip, delete=False, many=False):
+        if delete:
+            cls._remove_vm_ip_association(vm, ip, many=many)
+        else:
+            cls._create_vm_ip_association(vm, ip, many=many)
+
     def save_ip(self, task_id, delete=False, update=False):
         vm = self.vm
         ip = self._ip
@@ -1404,37 +1530,12 @@ class VmDefineNicSerializer(s.Serializer):
         else:
             assert ip
 
-        if update and not ip_old:
-            pass
-        else:
+        if not update or ip_old:
             if ip_old:
-                logger.info('Removing association old IP %s to vm %s.', ip_old, vm)
-
-                if ip_old.usage == IPAddress.VM_REAL:  # IP is set on hypervisor
-                    logger.info(' ^ Removing association of old IP %s to vm %s will be delayed after PUT vm_manage.',
-                                ip_old, vm)
-                else:  # DB only operation
-                    ip_old.vm = None
-                    ip_old.save()
+                self._remove_vm_ip_association(vm, ip_old)
 
             if ip:
-                if delete:
-                    logger.info('Removing association IP %s to vm %s.', ip, vm)
-
-                    if ip.usage == IPAddress.VM_REAL:  # IP is set on hypervisor
-                        logger.info(' ^ Removing association of IP %s to vm %s will be delayed after PUT vm_manage.',
-                                    ip, vm)
-                    else:  # DB only operation
-                        ip.vm = None
-                else:
-                    logger.info('Creating association IP %s to vm %s.', ip, vm)
-
-                    if ip.vm:
-                        raise APIError(detail='Unexpected problem with IP address association.')
-
-                    ip.vm = vm
-
-                ip.save()
+                self._update_vm_ip_association(vm, ip, delete=delete)
 
             # Delete PTR Record for old IP
             if ip_old and ip_old.subnet.ptr_domain:
@@ -1443,6 +1544,13 @@ class VmDefineNicSerializer(s.Serializer):
             # Create PTR Record only if a PTR domain is defined
             if ip and self._net and self._net.ptr_domain:
                 self.save_ptr(self.request, task_id, vm, ip, self._net, delete=delete)  # fails silently
+
+        if self._changing_allowed_ips:
+            for _ip_old in self._ips_old:
+                self._remove_vm_ip_association(vm, _ip_old, many=True)
+
+            for _ip in self._ips:
+                self._update_vm_ip_association(vm, _ip, delete=delete, many=True)
 
         # Create DNS A Record if dns setting is True
         # or Remove dns if dns settings was originally True, but now is set to False

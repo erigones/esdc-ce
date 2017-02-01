@@ -7,11 +7,11 @@ __all__ = ('vm_qga',)
 #: vm_status:  PUT: running, stopping
 @api_view(('PUT',))
 @request_data()  # get_vm() = IsVmOwner
-def vm_qga(request, hostname, command, data=None):
+def vm_qga(request, hostname_or_uuid, command, data=None):
     """
-    Run (:http:put:`PUT </vm/(hostname)/qga/(command)>`) a command via Qemu Guest Agent.
+    Run (:http:put:`PUT </vm/(hostname_or_uuid)/qga/(command)>`) a command via Qemu Guest Agent.
 
-    .. http:put:: /vm/(hostname)/qga/(command)
+    .. http:put:: /vm/(hostname_or_uuid)/qga/(command)
 
         :DC-bound?:
             * |dc-yes|
@@ -19,8 +19,8 @@ def vm_qga(request, hostname, command, data=None):
             * |VmOwner|
         :Asynchronous?:
             * |async-yes|
-        :arg hostname: **required** - Server hostname
-        :type hostname: string
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
         :arg command: **required** - QGA command. Available commands are:
 
             * ``fsfreeze`` ``<status|freeze|thaw>``
@@ -45,4 +45,4 @@ def vm_qga(request, hostname, command, data=None):
         :status 501: Operation not supported
 
     """
-    return VmQGA(request, hostname, command, data).put()
+    return VmQGA(request, hostname_or_uuid, command, data).put()
