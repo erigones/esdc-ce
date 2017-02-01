@@ -191,7 +191,8 @@ nav#secondary {
 
 .datacenter-nav {
   margin-top: 5px;
-  margin-left: 30px;
+  margin-left: 10px;
+  margin-right: 10px;
 }
 
 .secondary-sub-menu > ul {
@@ -302,13 +303,13 @@ label.input-navigation {
  **************************************/
 
 .profile-menu {
-  height: 80px;
+  height: 100px;
 
   .title {
     @include emphasis-text;
-    font-size: 14px;
-    margin-top: 10px;
-    margin-bottom: 5px;
+    font-size: 12px;
+    margin-top: 7px;
+    margin-bottom: 7px;
   }
 
   border-top: 1px solid transparent;
