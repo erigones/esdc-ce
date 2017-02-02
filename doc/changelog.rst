@@ -15,6 +15,7 @@ Bugs
 - Fixed validation of MON_ZABBIX_TEMPLATES_VM_NIC and MON_ZABBIX_TEMPLATES_VM_DISK DC settings - `#31 <https://github.com/erigones/esdc-ce/issues/31>`__
 - Fixed validation of placeholders supported in DC Settings - `#34 <https://github.com/erigones/esdc-ce/issues/34>`__
 - Fixed update script to call its NEW self - `#44 <https://github.com/erigones/esdc-ce/issues/44>`__
+- Removed DB object caching between GUI<->API internal requests - `#62 <https://github.com/erigones/esdc-ce/issues/62>`__
 
 
 2.3.2 (released on 2016-12-17)
