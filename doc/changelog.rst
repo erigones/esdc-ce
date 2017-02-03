@@ -8,6 +8,8 @@ Changelog
 Features
 --------
 
+- Updated design of node color - commit `ed9534f <https://github.com/erigones/esdc-ce/commit/ed9534f223e56fd7a7a7074b71fe0e48f98691e0>`__
+
 Bugs
 ----
 
