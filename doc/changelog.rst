@@ -34,10 +34,8 @@ Bugs
 - Fixed initial VM harvest problem with temporary unreachable worker - `#61 <https://github.com/erigones/esdc-ce/issues/61>`__
 
 
-2.3.3 (unreleased)
-==================
 2.3.3 (released on 2017-02-04)
-========================================
+==============================
 
 Features
 --------
