@@ -1,8 +1,8 @@
 :mod:`api.vm.migrate`
 =====================
 
-/vm/*(hostname)*/migrate
-------------------------
+/vm/*(hostname_or_uuid)*/migrate
+--------------------------------
 
 .. autofunction:: api.vm.migrate.views.vm_migrate
 
@@ -29,8 +29,8 @@
         }
 
 
-/vm/*(hostname)*/migrate/dc
----------------------------
+/vm/*(hostname_or_uuid)*/migrate/dc
+-----------------------------------
 
 .. autofunction:: api.vm.migrate.views.vm_dc
 

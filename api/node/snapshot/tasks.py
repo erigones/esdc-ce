@@ -1,5 +1,6 @@
 from vms.models import NodeStorage, Snapshot, Node
 from que.tasks import cq, get_task_logger
+from que.mgmt import MgmtCallbackTask
 from que.exceptions import TaskException
 from api.task.utils import callback
 from api.task.tasks import task_log_cb_success
@@ -11,7 +12,7 @@ __all__ = ('node_vm_snapshot_sync_cb', 'node_vm_snapshot_sync_all')
 logger = get_task_logger(__name__)
 
 
-@cq.task(name='api.node.snapshot.tasks.node_vm_snapshot_sync_cb')
+@cq.task(name='api.node.snapshot.tasks.node_vm_snapshot_sync_cb', base=MgmtCallbackTask, bind=True)
 @callback()
 def node_vm_snapshot_sync_cb(result, task_id, nodestorage_id=None):
     """

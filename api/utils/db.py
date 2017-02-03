@@ -21,10 +21,10 @@ def get_object(request, model, attrs, where=None, exists_ok=False, noexists_fail
     obj = None
 
     try:
+        qs = model.objects
+
         if sr:
-            qs = model.objects.select_related(*sr)
-        else:
-            qs = model.objects
+            qs = qs.select_related(*sr)
 
         if pr:
             qs = qs.prefetch_related(*pr)
@@ -36,9 +36,9 @@ def get_object(request, model, attrs, where=None, exists_ok=False, noexists_fail
             qs = qs.extra(**extra)
 
         if where:
-            obj = qs.filter(where).get(**attrs)
-        else:
-            obj = qs.get(**attrs)
+            qs = qs.filter(where)
+
+        obj = qs.get(**attrs)
 
     except model.DoesNotExist:
         if request.method in ('GET', 'PUT', 'DELETE') or noexists_fail:

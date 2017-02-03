@@ -684,6 +684,10 @@ class DcNode(_JsonPickleModel):
     RAM_KVM_OVERHEAD_KEY = 'kvm_memory_overhead-dcnode:%s'  # %s = DcNode.id
     PRIORITY = 100
 
+    # Internal API/GUI constants used for automatic attachment of related node storages when attaching a node into a Dc
+    NS_ATTACH_NONE = 0
+    NS_ATTACH_ALL = 9
+
     SHARED = 1
     SHARED_LIMIT = 2
     RESERVED = 3

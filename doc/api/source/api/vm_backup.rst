@@ -7,8 +7,8 @@
 .. autofunction:: api.vm.backup.views.vm_define_backup_list_all
 
 
-/vm/*(hostname)*/define/backup
-------------------------------
+/vm/*(hostname_or_uuid)*/define/backup
+--------------------------------------
 
 .. autofunction:: api.vm.backup.views.vm_define_backup_list
 
@@ -44,8 +44,8 @@
             }
         }
 
-/vm/*(hostname)*/define/backup/*(bkpdef)*
------------------------------------------
+/vm/*(hostname_or_uuid)*/define/backup/*(bkpdef)*
+-------------------------------------------------
 
 .. autofunction:: api.vm.backup.views.vm_define_backup
 
@@ -79,8 +79,8 @@
             }
         }
 
-/vm/*(hostname)*/backup
------------------------
+/vm/*(hostname_or_uuid)*/backup
+-------------------------------
 
 .. autofunction:: api.vm.backup.views.vm_backup_list
 
@@ -116,8 +116,8 @@
             }
         }
 
-/vm/*(hostname)*/backup/*(bkpname)*
------------------------------------
+/vm/*(hostname_or_uuid)*/backup/*(bkpname)*
+-------------------------------------------
 
 .. autofunction:: api.vm.backup.views.vm_backup
 

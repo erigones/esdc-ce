@@ -192,8 +192,8 @@
             {% endif %}
             <th data-field="ip">{% trans "IP address" %}</th>
             <th>{% trans "Usage" %}</th>
-            <th data-field="hostname">{% trans "Server" %}</th>
-            <th class="hidden-phone" data-field="hostname">{% trans "Hostname" %}</th>
+            <th data-field="hostname">{% trans "Server(s)" %}</th>
+            <th class="hidden-phone" data-field="hostname">{% trans "Hostname(s)" %}</th>
             {% if all %}<th class="hidden-phone">{% trans "Datacenter" %}</th>{% endif %}
             <th class="hidden-phone">{% trans "MAC address" %}</th>
             <th class="hidden-phone">{% trans "Note" %}</th>
@@ -202,7 +202,7 @@
         </thead>
 
         <tbody>
-          {% for ip in ips %}{% with vm=ip.vm is_node_address=ip.is_node_address %}
+          {% for ip in ips %}{% with vm=ip.vm hostnames=ip.additional_vm_hostnames is_node_address=ip.is_node_address %}
           <tr>
             {% if can_edit %}
             {% if is_node_address %}
@@ -216,7 +216,7 @@
             {% else %}
             <td class="top chbox hidden-phone-small">
               <div class="input">
-                <input type="checkbox" class="normal-check" id="id_{{ ip.ip }}"{% if ip.vm %} disabled="disabled" readonly="true"{% endif %} />
+                <input type="checkbox" class="normal-check" id="id_{{ ip.ip }}"{% if vm or hostnames %} disabled="disabled" readonly="true"{% endif %} />
                 <label for="id_{{ ip.ip }}"></label>
               </div>
             </td>
@@ -227,17 +227,25 @@
             <td class="nowrap">{{ ip.ip }}</td>
             {% endif %}
             <td>{{ ip.get_usage_display }}</td>
+
             {% if vm %}
             <td class="nowrap">
               {% if all %}<a href="{% url 'dc_vm_details' vm.dc vm.hostname %}" class="btn-link">{% else %}<a href="{% url 'vm_details' vm.hostname %}" class="btn-link">{% endif %}<i class="icon-hdd"></i>&nbsp;{{ vm.alias }}</a>
             </td>
             <td class="hidden-phone nowrap"><span class="vm_hostname">{{ vm.hostname }}</span></td>
             {% if all %}<td class="hidden-phone nowrap"><span class="vm_hostname"><i class="icon-cloud"></i> {{ vm.dc.alias }}</span></td>{% endif %}
+            {% elif hostnames %}
+            <td class="nowrap">
+              <small>{% for vm in ip.vms.all %}{% if all %}<a href="{% url 'dc_vm_details' vm.dc vm.hostname %}" class="btn-link">{% else %}<a href="{% url 'vm_details' vm.hostname %}" class="btn-link">{% endif %}<i class="icon-hdd"></i>&nbsp;{{ vm.alias }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</small>
+            </td>
+            <td class="hidden-phone nowrap"><small>{% for hostname in hostnames %}<span class="vm_hostname">{{ hostname }}</span>{% if not forloop.last %}, {% endif %}{% endfor %}</small></td>
+            {% if all %}<td class="hidden-phone nowrap"><span class="vm_hostname"><i class="icon-cloud"></i> {{ ip.vms.all.0.dc.alias }}</span></td>{% endif %}
             {% else %}
             <td></td>
             <td class="hidden-phone nowrap">{% if is_node_address %}<span class="vm_hostname">{{ ip.hostname }}</span>{% endif %}</td>
             {% if all %}<td class="hidden-phone"></td>{% endif %} {# other IPs have no DC relation #}
             {% endif %}
+
             <td class="hidden-phone nowrap"><span class="vm_hostname">{{ ip.mac }}</span></td>
             <td class="hidden-phone"><small class="vm_snapshot_note">{{ ip.api_note|wordwrap:44 }}</small></td>
           </tr>

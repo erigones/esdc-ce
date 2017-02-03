@@ -2,6 +2,7 @@ from django.db.utils import DatabaseError
 
 from vms.models import Vm, Snapshot, SnapshotDefine
 from que.tasks import cq, get_task_logger
+from que.mgmt import MgmtCallbackTask
 from que.utils import task_id_from_task_id
 from que.exceptions import TaskException
 from api.status import HTTP_423_LOCKED
@@ -86,7 +87,7 @@ def _delete_oldest(model, define, view_function, view_item, task_id, msg):
     return res
 
 
-@cq.task(name='api.vm.snapshot.tasks.vm_snapshot_list_cb')
+@cq.task(name='api.vm.snapshot.tasks.vm_snapshot_list_cb', base=MgmtCallbackTask, bind=True)
 @callback()
 def vm_snapshot_list_cb(result, task_id, vm_uuid=None, snap_ids=None):
     """
@@ -135,7 +136,7 @@ def _vm_snapshot_cb_alert(result, task_id, snap_id=None, task_exception=None, **
                 snap.name, vm.hostname, snap.array_disk_id, action_msg))
 
 
-@cq.task(name='api.vm.snapshot.tasks.vm_snapshot_cb')
+@cq.task(name='api.vm.snapshot.tasks.vm_snapshot_cb', base=MgmtCallbackTask, bind=True)
 @callback(error_fun=_vm_snapshot_cb_alert)
 def vm_snapshot_cb(result, task_id, vm_uuid=None, snap_id=None):
     """
@@ -278,7 +279,7 @@ def sync_snapshots(db_snaps, node_snaps):
     return lost
 
 
-@cq.task(name='api.vm.snapshot.tasks.vm_snapshot_sync_cb')
+@cq.task(name='api.vm.snapshot.tasks.vm_snapshot_sync_cb', base=MgmtCallbackTask, bind=True)
 @callback()
 def vm_snapshot_sync_cb(result, task_id, vm_uuid=None, disk_id=None):
     """

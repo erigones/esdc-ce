@@ -1,9 +1,11 @@
 from logging import getLogger
 
+from django.conf import settings
+
 from vms.models import Vm, VmTemplate, Image, Subnet, IPAddress
 from gui.models import User
 from api.vm.base.utils import vm_update_ipaddress_usage
-from api.vm.define.serializers import VmDefineNicSerializer
+from api.vm.define.serializers import VmDefineSerializer, VmDefineNicSerializer
 
 logger = getLogger(__name__)
 
@@ -23,7 +25,30 @@ def get_vms(request, where=None, sr=('node',), order_by=('hostname',), **kwargs)
         return qs.order_by(*order_by)
 
 
-def vm_from_json(request, task_id, json, dc, owner=1, template=True, save=False, update_ips=True, update_dns=True):
+def _vm_save_ip_from_json(vm, net, ipaddress, allowed_ips=False):
+    try:
+        ip = net.ipaddress_set.get(ip=ipaddress)
+    except IPAddress.DoesNotExist:
+        ip = IPAddress(subnet=net, ip=ipaddress, usage=IPAddress.VM_REAL)
+        logger.warning('Adding new IP %s into subnet %s for server %s', ip.ip, net.name, vm)
+    else:
+        if ip.vm:
+            err = 'IP %s in subnet %s for server %s is already taken!' % (ip.ip, net.name, vm)
+            return ip, err
+
+    if allowed_ips:
+        ip.vms.add(vm)
+    else:
+        ip.vm = vm
+        ip.save()
+
+    logger.info('Server %s association with IP %s (%s) was successfully saved', vm, ip.ip, net.name)
+
+    return ip, None
+
+
+def vm_from_json(request, task_id, json, dc, owner=settings.ADMIN_USER, template=True, save=False,
+                 update_ips=True, update_dns=True):
     """Parse json a create new Vm object
 
     @param dict json: loaded json dictionary obtained via vmadm get
@@ -36,8 +61,12 @@ def vm_from_json(request, task_id, json, dc, owner=1, template=True, save=False,
     @param bool update_dns: Try to update/create DNS record for server's primary IP. Only performed if save is True.
     @return: new Vm instance
     """
+    # noinspection PyUnresolvedReferences
+    hostname_length = VmDefineSerializer.base_fields['hostname'].max_length
+    # noinspection PyUnresolvedReferences
+    alias_length = VmDefineSerializer.base_fields['alias'].max_length
     # basic information (KeyError)
-    vm = Vm(uuid=json['uuid'], hostname=json['hostname'][:128], status=Vm.STATUS_DICT[json['state']], dc=dc)
+    vm = Vm(uuid=json['uuid'], hostname=json['hostname'][:hostname_length], status=Vm.STATUS_DICT[json['state']], dc=dc)
     vm.new = True
     brand = json['brand']
     zoneid = json.get('zoneid', None)
@@ -51,14 +80,14 @@ def vm_from_json(request, task_id, json, dc, owner=1, template=True, save=False,
 
     # alias
     try:
-        vm.alias = json['internal_metadata']['alias'][:24]
+        vm.alias = json['internal_metadata']['alias'][:alias_length]
     except KeyError:
         try:
             alias = json['alias']
         except KeyError:
             alias = vm.hostname
 
-        vm.alias = alias.split('.')[0][:24]
+        vm.alias = alias.split('.')[0][:alias_length]
         logger.warning('Alias for new VM %s could not be auto-detected. Fallback to alias=%s', vm, vm.alias)
 
     # ostype
@@ -130,24 +159,23 @@ def vm_from_json(request, task_id, json, dc, owner=1, template=True, save=False,
                         logger.info('Server %s NIC ID %s uses an externally managed network %s', vm, i, net.name)
                         continue
 
-                try:
-                    ip = net.ipaddress_set.get(ip=nic['ip'])
-                except IPAddress.DoesNotExist:
-                    ip = IPAddress(subnet=net, ip=nic['ip'], usage=IPAddress.VM_REAL)
-                    logger.warning('Adding new IP %s into subnet %s for server %s', ip.ip, net.name, vm)
-                else:
-                    if ip.vm:
-                        err = 'IP %s in subnet %s for server %s is already taken!' % (ip.ip, net.name, vm)
-                        logger.critical(err)
-                        exc = SystemError(err)
-                        break
+                ip, err = _vm_save_ip_from_json(vm, net, nic['ip'], allowed_ips=False)
 
-                ip.vm = vm
-                ip.save()
-                logger.info('Server %s association with IP %s (%s) was successfully saved', vm, ip.ip, net.name)
+                if err:
+                    logger.critical(err)
+                    exc = SystemError(err)
+                    break
 
                 if i == 0:
                     primary_ip = ip
+
+                for ipaddress in nic.get('allowed_ips', ()):
+                    _, err = _vm_save_ip_from_json(vm, net, ipaddress, allowed_ips=True)
+
+                    if err:
+                        logger.critical(err)
+                        exc = SystemError(err)
+                        break
 
         if exc:
             vm.delete()

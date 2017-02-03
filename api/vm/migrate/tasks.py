@@ -1,4 +1,5 @@
 from que.tasks import cq, get_task_logger
+from que.mgmt import MgmtCallbackTask
 from que.exceptions import TaskException
 from api.task.utils import callback
 from api.task.tasks import task_log_cb_success
@@ -19,7 +20,7 @@ def _vm_migrate_cb_failed(result, task_id, vm, ghost_vm):
     ghost_vm.delete()
 
 
-@cq.task(name='api.vm.migrate.tasks.vm_migrate_cb')
+@cq.task(name='api.vm.migrate.tasks.vm_migrate_cb', base=MgmtCallbackTask, bind=True)
 @callback()
 def vm_migrate_cb(result, task_id, vm_uuid=None, slave_vm_uuid=None):
     """

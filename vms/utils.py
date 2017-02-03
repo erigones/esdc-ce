@@ -72,7 +72,14 @@ class PickleDict(AttrDict):
     @classmethod
     def load(cls, string):
         # noinspection PyCallingNonCallable
-        return cls(json.loads(string))
+        pickle_dict = cls(json.loads(string))
+
+        # Related to https://github.com/joyent/smartos-live/pull/313
+        for nic in pickle_dict.get('nics', ()):
+            if nic.get('allowed_ips', None) == ['']:
+                nic['allowed_ips'] = []
+
+        return pickle_dict
 
     def dump(self):
         return json.dumps(self, indent=4)

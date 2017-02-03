@@ -11,6 +11,7 @@ from PIL import Image
 
 from vms.models import Vm
 from que.tasks import cq, get_task_logger
+from que.mgmt import MgmtCallbackTask
 from que.exceptions import TaskException
 from api.task.utils import callback
 
@@ -19,7 +20,7 @@ __all__ = ('vm_screenshot_cb',)
 logger = get_task_logger(__name__)
 
 
-@cq.task(name='api.vm.other.tasks.vm_screenshot_cb')
+@cq.task(name='api.vm.other.tasks.vm_screenshot_cb', base=MgmtCallbackTask, bind=True)
 @callback(log_exception=False)
 def vm_screenshot_cb(result, task_id, vm_uuid=None):
     """

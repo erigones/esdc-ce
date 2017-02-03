@@ -14,7 +14,7 @@ from gui.dc.image.forms import ImageForm, AdminImageForm
 from api.response import JSONResponse
 from api.utils.views import call_api_view
 from api.imagestore.views import imagestore_manage
-from vms.models import Image, ImageStore
+from vms.models import Image, ImageVm, ImageStore
 
 
 @login_required
@@ -34,6 +34,7 @@ def dc_image_list(request):
     context['deleted'] = _deleted = can_edit and request.GET.get('deleted', False)
     context['qs'] = qs = get_query_string(request, all=_all, deleted=_deleted).urlencode()
     context['task_id'] = request.GET.get('task_id', '')
+    context['image_vm'] = ImageVm.get_uuid()
 
     if _deleted:
         imgs = imgs.exclude(access=Image.INTERNAL)
@@ -150,6 +151,7 @@ def admin_image_form(request):
 def imagestore_list(request, repo=None):
     user, dc = request.user, request.dc
     context = collect_view_data(request, 'dc_image_list')
+    context['image_vm'] = ImageVm.get_uuid()
     context['is_staff'] = is_staff = user.is_staff
     context['all'] = _all = is_staff and request.GET.get('all', False)
     context['qs'] = qs = get_query_string(request, all=_all).urlencode()
@@ -214,4 +216,3 @@ def imagestore_update(request, repo):
             status = res.status_code
 
         return JSONResponse(res.data, status=status)
-

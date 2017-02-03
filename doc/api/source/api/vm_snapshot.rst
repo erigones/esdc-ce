@@ -7,8 +7,8 @@
 .. autofunction:: api.vm.snapshot.views.vm_define_snapshot_list_all
 
 
-/vm/*(hostname)*/define/snapshot
---------------------------------
+/vm/*(hostname_or_uuid)*/define/snapshot
+----------------------------------------
 
 .. autofunction:: api.vm.snapshot.views.vm_define_snapshot_list
 
@@ -41,8 +41,8 @@
             }
         }
 
-/vm/*(hostname)*/define/snapshot/*(snapdef)*
---------------------------------------------
+/vm/*(hostname_or_uuid)*/define/snapshot/*(snapdef)*
+----------------------------------------------------
 
 .. autofunction:: api.vm.snapshot.views.vm_define_snapshot
 
@@ -73,8 +73,8 @@
             }
         }
 
-/vm/*(hostname)*/snapshot
--------------------------
+/vm/*(hostname_or_uuid)*/snapshot
+---------------------------------
 
 .. autofunction:: api.vm.snapshot.views.vm_snapshot_list
 
@@ -108,8 +108,8 @@
             }
         }
 
-/vm/*(hostname)*/snapshot/*(snapname)*
---------------------------------------
+/vm/*(hostname_or_uuid)*/snapshot/*(snapname)*
+----------------------------------------------
 
 .. autofunction:: api.vm.snapshot.views.vm_snapshot
 

@@ -3,7 +3,7 @@ from logging import getLogger
 from django.utils.six import iteritems
 
 from que.tasks import execute
-from vms.models import Image
+from vms.models import Image, ImageVm
 from api.api_views import APIView
 from api.exceptions import (PermissionDenied, VmIsNotOperational, VmIsLocked, VmHasPendingTasks, PreconditionRequired,
                             ExpectationFailed)
@@ -29,15 +29,15 @@ class VmManage(APIView):
     """
     order_by_default = order_by_fields = ('hostname',)
 
-    def __init__(self, request, hostname, data):
+    def __init__(self, request, hostname_or_uuid, data):
         super(VmManage, self).__init__(request)
-        self.hostname = hostname
+        self.hostname_or_uuid = hostname_or_uuid
         self.data = data
 
         if request.method == 'GET':  # get() uses different methods for getting vm(s) object(s)
             self.vm = None
         else:
-            self.vm = get_vm(request, hostname, exists_ok=True, noexists_fail=True)
+            self.vm = get_vm(request, hostname_or_uuid, exists_ok=True, noexists_fail=True)
 
     @staticmethod
     def fix_create(vm):
@@ -140,7 +140,6 @@ class VmManage(APIView):
 
     def get(self, many=False):
         request = self.request
-        hostname = self.hostname
         active = self.data.get('active', False)
         sr = ['owner', 'node']
 
@@ -176,7 +175,7 @@ class VmManage(APIView):
                 res = list(get_vms(request, order_by=self.order_by).values_list('hostname', flat=True))
 
         else:
-            vm = get_vm(request, hostname, exists_ok=True, noexists_fail=True, sr=sr, extra=extra)
+            vm = get_vm(request, self.hostname_or_uuid, exists_ok=True, noexists_fail=True, sr=sr, extra=extra)
 
             if active:
                 set_active(vm)
@@ -364,6 +363,9 @@ class VmManage(APIView):
         # only admin
         if not (request.user and request.user.is_admin(request)):
             raise PermissionDenied
+
+        if vm.uuid == ImageVm.get_uuid():
+            raise VmIsLocked('VM is image server')
 
         if vm.locked:
             raise VmIsLocked

@@ -87,6 +87,7 @@
                     "API_LOG_USER_CALLBACK": true,
                     "COMPANY_NAME": "Erigones, s. r. o.", 
                     "DEFAULT_FROM_EMAIL": "noreply@example.com", 
+                    "DNS_ENABLED": true,
                     "DNS_HOSTMASTER": "hostmaster@example.com", 
                     "DNS_NAMESERVERS": [
                         "ns1.local"
@@ -167,6 +168,11 @@
                     "VMS_NET_LIMIT": null,
                     "VMS_ISO_LIMIT": null,
                     "VMS_IMAGE_LIMIT": null,
+                    "VMS_IMAGE_REPOSITORIES": {
+                        "danubecloud": "https://images.erigones.org"
+                    },
+                    "VMS_IMAGE_SOURCES": [],
+                    "VMS_IMAGE_VM": "15bc0839-c49d-4489-a01b-4570d518fc9f",
                     "VMS_NIC_MONITORING_DEFAULT": 1,
                     "VMS_NIC_MODEL_DEFAULT": "virtio", 
                     "VMS_NODE_SSH_KEYS_SYNC": true,

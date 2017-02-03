@@ -4,7 +4,6 @@ from django.http import QueryDict
 from django.utils.dateparse import parse_datetime
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
-from django.core.serializers.json import DjangoJSONEncoder
 from json import dumps
 from datetime import datetime, timedelta
 
@@ -13,6 +12,7 @@ import pytz
 # noinspection PyCompatibility
 import ipaddress
 
+from api.utils.encoders import JSONEncoder
 from pdns.models import Record
 
 register = template.Library()
@@ -154,11 +154,11 @@ def minus(value, arg=1):
 @register.filter
 def json(value, arg=0):
     """Unsafe json filter"""
-    return dumps(value, indent=arg, cls=DjangoJSONEncoder)
+    return dumps(value, indent=arg, cls=JSONEncoder)
 
 
 def _jsondata(value):
-    return mark_safe(conditional_escape(dumps(value, indent=None, cls=DjangoJSONEncoder)))
+    return mark_safe(conditional_escape(dumps(value, indent=None, cls=JSONEncoder)))
 
 
 @register.filter
