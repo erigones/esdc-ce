@@ -110,19 +110,25 @@
         <tbody>
           {% for i in isos %}
           <tr>
-            <td>{{ i.alias }} <small>({{ i.name }})</small>
+            <td>
             {% if is_staff or can_edit and i.dc_bound %}
                 {% if all and i.pk in can_add %}
-                    <a href="#" class="button mini no-ajax obj_edit_or_add_dc italic"
+                    <span class="italic">
+                    {{ i.alias }} <small>({{ i.name }})</small>
+                    </span>
+                    <a href="#" class="button mini no-ajax obj_edit_or_add_dc"
                        title="{% trans "Attach, update or delete ISO Image" %}" data-toggle="tooltip"
                        data-placement="bottom" data-form='{{ i.web_data|jsondata }}' data-prefix="adm">
                         <i class="icon-link"></i> {% trans "Edit" %}</a>
                 {% else %}
+                    {{ i.alias }} <small>({{ i.name }})</small>
                     <a href="#" class="button mini no-ajax obj_edit" title="
                             {% if is_staff %}{% trans "Detach, update or delete ISO Image" %}{% else %}{% trans "Update or delete ISO Image" %}{% endif %}"
                        data-toggle="tooltip" data-placement="bottom" data-form='{{ i.web_data|jsondata }}'
                        data-prefix="adm"> <i class="icon-pencil"></i> {% trans "Edit" %}</a>
                 {% endif %}
+                {% else %}
+                {{ i.alias }} <small>({{ i.name }})</small>
             {% endif %}
 
             </td>
