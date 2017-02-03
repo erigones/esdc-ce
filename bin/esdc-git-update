@@ -8,7 +8,7 @@
 #
 # author:       Miroslav Bagljas
 # email:        miroslav.bagljas@erigones.com
-# copyright:    Copyright 2016, Erigones, s. r. o.
+# copyright:    Copyright 2016-2017, Erigones, s. r. o.
 
 set -o pipefail
 

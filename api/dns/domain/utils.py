@@ -2,6 +2,7 @@ from logging import getLogger
 
 from django.db.models import Q
 
+from api.exceptions import PermissionDenied
 from api.dc.utils import get_dc
 from api.utils.db import get_object
 from pdns.models import Domain
@@ -11,37 +12,38 @@ from gui.models.permission import DnsAdminPermission
 logger = getLogger(__name__)
 
 
-def get_domain(request, name, attrs=None, api=True, fetch_dc=False, data=None, count_records=False, **kwargs):
+def get_domain(request, name, attrs=None, fetch_dc=False, data=None, count_records=False, **kwargs):
     """Return Domain object according to name. SuperAdmins have access to all domains and
     users can access only domain which they own. This function also acts as IsDomainOwner permission."""
     user = request.user
-    # Quickly return Domain, if set in request (shortcut from GUI)
-    domain = getattr(request, '_api_domain', None)
 
-    if not (api and domain):
+    if attrs is None:
+        attrs = {}
 
-        if attrs is None:
-            attrs = {}
+    if user.is_staff:
+        dom_filter = None
+    else:
+        dom_filter = Q(user=user.id)
 
-        if user.is_staff:
-            dom_filter = None
-        else:
-            dom_filter = Q(user=user.id)
+        if request.dcs:
+            # noinspection PyAugmentAssignment
+            dom_filter = dom_filter | Q(dc_bound__in=[dc.id for dc in request.dcs])
 
-            if user.has_permission(request, DnsAdminPermission.name) and request.dcs:
-                # noinspection PyAugmentAssignment
-                dom_filter = dom_filter | Q(dc_bound__in=[dc.id for dc in request.dcs])
+    if count_records:
+        kwargs['extra'] = {
+            'select': {'records': 'SELECT COUNT(*) FROM "records" WHERE "records"."domain_id" = "domains"."id"'}
+        }
 
-        if count_records:
-            kwargs['extra'] = {
-                'select': {'records': 'SELECT COUNT(*) FROM "records" WHERE "records"."domain_id" = "domains"."id"'}
-            }
-
-        attrs['name'] = name.lower()  # The domain name must be always lowercased (DB requirement)
-        domain = get_object(request, Domain, attrs, where=dom_filter, **kwargs)
+    attrs['name'] = name.lower()  # The domain name must be always lowercased (DB requirement)
+    domain = get_object(request, Domain, attrs, where=dom_filter, **kwargs)
 
     if domain.new:
         domain.dc_bound = get_dc(request, data.get('dc', request.dc.name)).id
+
+    if not (user.is_staff or domain.user == user.id):
+        # request.dcs is brought by IsAnyDcPermission
+        if not (domain.dc_bound and Dc.objects.get_by_id(domain.dc_bound) in request.dcs):
+            raise PermissionDenied  # only DC-bound objects are visible by non-superadmin users
 
     if domain.dc_bound:  # Change DC according to domain.dc_bound flag
         if request.dc.id != domain.dc_bound:
@@ -97,7 +99,7 @@ def get_domains(request, prefetch_owner=False, prefetch_dc=False, count_records=
     else:
         dom_filter = Q(user=request.user.id)
 
-        if request.user.has_permission(request, DnsAdminPermission.name) and request.dcs:
+        if request.dcs:
             # noinspection PyAugmentAssignment
             dom_filter = dom_filter | Q(dc_bound__in=[dc.id for dc in request.dcs])
 

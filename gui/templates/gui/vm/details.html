@@ -302,7 +302,7 @@
               {% if can_edit %}
               <i class="icon-sitemap vm_node_color" style="color: {{ vm.node.color }};"></i>&nbsp;<span class="vm_node_hostname dynatext">{{ vm.node.hostname }}</span>
               {% else %}
-              <span data-toggle="tooltip" title="{% trans "Every compute node is identified by its unique color" %}" data-placement="right"><i class="icon-sitemap"></i> <div class="vm_node_color" style="width: 48px; height: 18px; background-color: {{ vm.node.color }}; display:inline-block;">&nbsp;</div></span>
+              <span data-toggle="tooltip" title="{% trans "Every compute node is identified by its unique color" %}" data-placement="right"><i class="icon-sitemap"></i>&nbsp;&nbsp;<div class="vm_node_color" style="background-color: {{ vm.node.color }};">&nbsp;</div></span>
               {% endif %}
             </td>
           </tr>
