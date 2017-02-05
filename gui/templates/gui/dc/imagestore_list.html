@@ -71,11 +71,10 @@
                 <input type="search" results="5" id="image_search" class="quick-search" name="image_search" placeholder="{% trans "search by image name" %}">
               </div>
               <div class="btn-group">
-                {% with qs=qs|qs_del:'created_since' %}
-                <a href="{{ request.path }}?{{ qs }}&created_since=30" class="btn btn-mini{% if created_since == 30 %} active{% endif %}" title="{% trans "Show images published during last month" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-list-ol"></i> {% trans "Last month" %}</a>
-                <a href="{{ request.path }}?{{ qs }}&created_since=365" class="btn btn-mini{% if created_since == 365 %} active{% endif %}" title="{% trans "Show images published during last year" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-list-ol"></i> {% trans "Last year" %}</a>
-                <a href="{{ request.path }}?{{ qs }}&created_since=0" class="btn btn-mini{% if created_since == 0 %} active{% endif %}" title="{% trans "Show all published images" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-list-ol"></i> {% trans "All" %}</a>
-                {% endwith %}
+                <a href="{{ request.path }}?{{ qs_image_filter }}&last={{ default_limit }}" class="btn btn-mini{% if limit == default_limit %} active{% endif %}" title="{% blocktrans %}Show last {{ default_limit }} published images{% endblocktrans %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-list-ol"></i> {% blocktrans %}Last {{ default_limit }}{% endblocktrans %}</a>
+                <a href="{{ request.path }}?{{ qs_image_filter }}&created_since=30" class="btn btn-mini{% if created_since == 30 %} active{% endif %}" title="{% trans "Show images published during last month" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-list-ol"></i> {% trans "Last month" %}</a>
+                <a href="{{ request.path }}?{{ qs_image_filter }}&created_since=365" class="btn btn-mini{% if created_since == 365 %} active{% endif %}" title="{% trans "Show images published during last year" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-list-ol"></i> {% trans "Last year" %}</a>
+                <a href="{{ request.path }}?{{ qs_image_filter }}&created_since=0&last=0" class="btn btn-mini{% if not created_since and not limit %} active{% endif %}" title="{% trans "Show all published images" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-list-ol"></i> {% trans "All" %}</a>
               </div>
               <div class="pull-right">
                 <form method="POST" action="#" data-source="{% url 'imagestore_update' imagestore.name %}?{{ qs }}" id="imagestore-refresh-form" class="nospace">
