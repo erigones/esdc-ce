@@ -58,7 +58,7 @@ _es() {
 
 			"get"|"create"|"set"|"delete"|"options")
 				if [ ${COMP_CWORD} -lt 3 ]; then
-					COMPREPLY=( $( compgen -W "/vm/define /vm/define/snapshot /vm/define/backup /vm/status /vm/ /vm/(hostname) /node/ /node/(hostname) /dc/ /dc/(dc) /network/ /network/ip/ /network/(name) /image/ /image/(name) /imagestore/ /imagestore/(name) /template/ /template/(name) /iso/ /iso/(name) /dns/domain/ /dns/domain/(name) /task/log /task/ /task/(task_id) /system/ /accounts/login /accounts/logout /accounts/user /accounts/permission /accounts/group" -- "${cur}" ) )
+					COMPREPLY=( $( compgen -W "/vm/define /vm/define/snapshot /vm/define/backup /vm/status /vm/ /vm/(hostname) /mon/ /mon/vm/ /mon/node/ /node/ /node/(hostname) /dc/ /dc/(dc) /network/ /network/ip/ /network/(name) /image/ /image/(name) /imagestore/ /imagestore/(name) /template/ /template/(name) /iso/ /iso/(name) /dns/domain/ /dns/domain/(name) /task/log /task/ /task/(task_id) /system/ /accounts/login /accounts/logout /accounts/user /accounts/permission /accounts/group" -- "${cur}" ) )
 				fi
 			;;
 			*)
@@ -503,6 +503,34 @@ _es() {
 		/dc|/dc/*)
 			[[ "${action}" == "create" ]] || [[ "${action}" == "set" ]] && params="-alias -access -owner -desc -site -groups"
 			[[ "${action}" == "get" ]] && params="-full -extended"
+		;;
+
+		/mon/vm/*/sla/|/mon/node/*/sla/)
+			if [ ${COMP_CWORD} -eq 2 ]; then
+				COMPREPLY=( $(compgen -P "${cur%/*}" -W "/ /(yyyymm)" -- "/${cur##*/}" ) )
+			fi
+			[[ "${action}" == "get" ]] || [[ "${action}" == "set" ]]
+		;;
+
+		/mon/vm/*/history/|/mon/node/*/history/)
+			if [ ${COMP_CWORD} -eq 2 ]; then
+				COMPREPLY=( $(compgen -P "${cur%/*}" -W "/ /(graph)" -- "/${cur##*/}" ) )
+			fi
+			[[ "${action}" == "get" ]] || [[ "${action}" == "set" ]]
+		;;
+
+		/mon/vm/*/*|/mon/node/*/*)
+			if [ ${COMP_CWORD} -eq 2 ]; then
+				COMPREPLY=( $(compgen -P "${cur%/*}" -W "/ /monitoring /sla/ /history/" -- "/${cur##*/}" ) )
+			fi
+			[[ "${action}" == "get" ]] || [[ "${action}" == "set" ]]
+		;;
+
+		/mon/vm/*|/mon/node/*)
+			if [ ${COMP_CWORD} -eq 2 ]; then
+				COMPREPLY=( $(compgen -P "${cur%/*}" -W "/ /(hostname)/" -- "/${cur##*/}" ) )
+			fi
+			[[ "${action}" == "get" ]] || [[ "${action}" == "set" ]]
 		;;
 
 		/node/*/storage)
