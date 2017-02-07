@@ -32,7 +32,7 @@
       <td>
         {{ snap.name }}
         {% if not snap.locked %}
-        <a href="#" class="button mini no-ajax vm_snapshot_name"{% if disk_id not in lastsnap %}{{ lastsnap|append:disk_id }} data-rollback="true"{% endif %} data-backup="" title="{% trans "Delete or rollback this snapshot" %}" data-toggle="tooltip" data-placement="bottom"> <i class="icon-pencil"></i> {% trans "Delete or rollback" %}</a>
+          <a href="#" class="button mini no-ajax vm_snapshot_name" {% if disk_id not in lastsnap %}{{ lastsnap|append:disk_id }} data-rollback="true"{% endif %} data-backup="" title="{% trans "Delete or rollback this snapshot" %}" data-toggle="tooltip" data-placement="bottom"> <i class="icon-pencil"></i> {% trans "Delete or rollback" %}</a>
         {% endif %}
       </td>
       <td>{{ disk_id }} <small>({{ snap.disk_size|multiply:1048576|filesizeformat }})</small></td>
@@ -40,10 +40,10 @@
       <td>{{ snap.created|date:"SHORT_DATETIME_FORMAT" }}</td>
       <td class="hidden-phone-small">{{ snap.get_status_display }}{% if snap.fsfreeze %}&nbsp;<i class="icon-flag"></i>{% endif %}</td>
       <td class="hidden-phone">{{ snap.size|filesizeformat }}</td>
-        <td class="hidden-phone">
-            <small class="vm_snapshot_note">{{ snap.note|wordwrap:50 }}</small>
-            <a href="#" class="button mini icon-active no-ajax vm_snapshot_note"
-               title="{% trans "Update snapshot information" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-pencil"></i> {% trans "Edit" %}</a></td>
+      <td class="hidden-phone">
+        <small class="vm_snapshot_note">{{ snap.note|wordwrap:50 }}</small>
+        <a href="#" class="button mini icon-active no-ajax vm_snapshot_note" title="{% trans "Update snapshot information" %}" data-toggle="tooltip" data-placement="bottom"> <i class="icon-pencil"></i> {% trans "Edit" %}</a>
+      </td>
     </tr>
     {% endwith %}{% endfor %}
   </tbody>

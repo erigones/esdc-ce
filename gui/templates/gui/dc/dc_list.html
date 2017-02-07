@@ -91,17 +91,14 @@
         <tbody>
           {% for dc in dcs %}{% with dc_settings=dc.settings %}
           <tr>
-              <td>{{ dc.alias }}
-              <small>({{ dc.name }})</small>
-                  {% if can_edit %}<a href="#"
-                                      class="button mini no-ajax obj_edit{% if dc.vms or dc.dcnodes %} no-delete{% endif %}"
-                                      title="{% trans "Update or delete Datacenter" %}" data-toggle="tooltip"
-                                      data-placement="bottom"
-                                      data-form='{{ dc.web_data|jsondata }}'><i class="icon-pencil"></i> {% trans "Edit" %}
-                  </a>
-                      {% endif %}
-
-              </td>
+            <td>
+              {{ dc.alias }} <small>({{ dc.name }})</small>
+              {% if can_edit %}
+                <a href="#" class="button mini no-ajax obj_edit{% if dc.vms or dc.dcnodes %} no-delete{% endif %}" title="{% trans "Update or delete Datacenter" %}" data-toggle="tooltip" data-placement="bottom" data-form='{{ dc.web_data|jsondata }}'>
+                  <i class="icon-pencil"></i> {% trans "Edit" %}
+                </a>
+              {% endif %}
+            </td>
             <td class="nowrap"><span class="vm_hostname">{{ dc.site }}</span></td>
             <td>{{ dc.get_access_display }}</td>
             <td class="nowrap"><span class="vm_hostname" title="{{ dc.owner }}"><i class="icon-user"></i> {{ dc.owner|truncatechars:16 }}</span></td>
@@ -114,26 +111,18 @@
             <td class="hidden-phone"></td>
             <td class="hidden-phone"></td>
             {% endif %}
-              <td class="hidden-phone">
-                  {% if can_edit %}
-
-                      <a href="#" class="button mini no-ajax obj_more" title="{% trans "Change Datacenter settings" %}"
-                         data-toggle="tooltip" data-placement="bottom" data-form='{% form_data settings_form dc %}'>
-                          <i class="icon-copy {{ dc_settings.VMS_VM_SNAPSHOT_ENABLED|yesno }}"
-                             title="{% trans "Snapshots" %}"></i>
-                          <i class="icon-paste {{ dc_settings.VMS_VM_BACKUP_ENABLED|yesno }}"
-                             title="{% trans "Backups" %}"></i>
-                          <i class="icon-bar-chart {{ dc_settings.MON_ZABBIX_ENABLED|yesno }}"
-                             title="{% trans "Monitoring" %}"></i>
-                          <i class="icon-wrench {{ dc_settings.SUPPORT_ENABLED|yesno }}"
-                             title="{% trans "Support" %}"></i>
-                          <i class="icon-signin {{ dc_settings.REGISTRATION_ENABLED|yesno }}"
-                             title="{% trans "User Registration" %}"></i>
-                          <i class="icon-question-sign {{ dc_settings.FAQ_ENABLED|yesno }}"
-                             title="{% trans "FAQ" %}"></i>
-                      </a>
-                  {% endif %}
-              </td>
+            <td class="hidden-phone">
+              {% if can_edit %}
+                <a href="#" class="button mini no-ajax obj_more" title="{% trans "Change Datacenter settings" %}" data-toggle="tooltip" data-placement="bottom" data-form='{% form_data settings_form dc %}'>
+                  <i class="icon-copy {{ dc_settings.VMS_VM_SNAPSHOT_ENABLED|yesno }}" title="{% trans "Snapshots" %}"></i>
+                  <i class="icon-paste {{ dc_settings.VMS_VM_BACKUP_ENABLED|yesno }}" title="{% trans "Backups" %}"></i>
+                  <i class="icon-bar-chart {{ dc_settings.MON_ZABBIX_ENABLED|yesno }}" title="{% trans "Monitoring" %}"></i>
+                  <i class="icon-wrench {{ dc_settings.SUPPORT_ENABLED|yesno }}" title="{% trans "Support" %}"></i>
+                  <i class="icon-signin {{ dc_settings.REGISTRATION_ENABLED|yesno }}" title="{% trans "User Registration" %}"></i>
+                  <i class="icon-question-sign {{ dc_settings.FAQ_ENABLED|yesno }}" title="{% trans "FAQ" %}"></i>
+                </a>
+              {% endif %}
+            </td>
             <td class="hidden-phone"><small class="vm_snapshot_note">{{ dc.desc|wordwrap:44 }}</small></td>
           </tr>
           {% endwith %}{% endfor %}

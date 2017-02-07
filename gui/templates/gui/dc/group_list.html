@@ -109,24 +109,17 @@
           {% for group in groups %}
           <tr>
             <td>
-
-            {% if is_staff or can_edit and group.dc_bound %}
+              {% if is_staff or can_edit and group.dc_bound %}
                 {% if all and group.pk in can_add %}
-                    <span class="italic">{{ group.alias }} <small>({{ group.name }})</small></span>
-                    <a href="#" class="button mini no-ajax obj_edit_or_add_dc"
-                       title="{% trans "Attach, update or delete User Group" %}" data-toggle="tooltip"
-                       data-placement="bottom" data-form='{{ group.web_data|jsondata }}'
-                       data-prefix="adm"><i class="icon-link"></i> {% trans "Edit" %} </a>
+                  <span class="italic">{{ group.alias }} <small>({{ group.name }})</small></span>
+                  <a href="#" class="button mini no-ajax obj_edit_or_add_dc" title="{% trans "Attach, update or delete User Group" %}" data-toggle="tooltip" data-placement="bottom" data-form='{{ group.web_data|jsondata }}' data-prefix="adm"><i class="icon-link"></i> {% trans "Edit" %}</a>
                 {% else %}
-                    {{ group.alias }} <small>({{ group.name }})</small>
-                    <a href="#" class="button mini no-ajax obj_edit" title="{% if is_staff %}{% trans "Detach, update or delete User Group" %}{% else %}{% trans "Update or delete User Group" %}{% endif %}"
-                       data-toggle="tooltip" data-placement="bottom" data-form='{{ group.web_data|jsondata }}'
-                       data-prefix="adm"><i class="icon-pencil"></i> {% trans "Edit" %}
-                    </a>
+                  {{ group.alias }} <small>({{ group.name }})</small>
+                  <a href="#" class="button mini no-ajax obj_edit" title="{% if is_staff %}{% trans "Detach, update or delete User Group" %}{% else %}{% trans "Update or delete User Group" %}{% endif %}" data-toggle="tooltip" data-placement="bottom" data-form='{{ group.web_data|jsondata }}' data-prefix="adm"><i class="icon-pencil"></i> {% trans "Edit" %}</a>
                 {% endif %}
-                {% else %}
+              {% else %}
                 {{ group.alias }} <small>({{ group.name }})</small>
-            {% endif %}
+              {% endif %}
             </td>
             <td class="hidden-phone"><i class="icon-{{ group.dc_bound_bool|yesno:"ok,remove" }}"></i></td>
             <td><small class="vm_hostname">{{ group.user_set.all|userify }}</small></td>

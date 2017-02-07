@@ -106,12 +106,10 @@
                 <label for="id_{{ record.id }}"></label>
               </div>
             </td>
-              <td>
-                  {{ record.name }}
-                  <a href="#" class="button mini no-ajax obj_edit" title="{% trans "Update or delete DNS record" %}"
-                     data-toggle="tooltip" data-placement="bottom"
-                     data-form='{{ record.web_data|jsondata }}'> <i class="icon-pencil"></i> {% trans "Edit" %}</a>
-              </td>
+            <td>
+              {{ record.name }}
+              <a href="#" class="button mini no-ajax obj_edit" title="{% trans "Update or delete DNS record" %}" data-toggle="tooltip" data-placement="bottom" data-form='{{ record.web_data|jsondata }}'><i class="icon-pencil"></i> {% trans "Edit" %}</a>
+            </td>
             <td class="nowrap">{{ record.type }}</td>
             <td>{{ record.full_content|default_if_none:"" }}</td>
             <td class="hidden-tablet">{{ record.ttl }}</td>

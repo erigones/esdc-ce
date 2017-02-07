@@ -107,7 +107,12 @@
         <tbody>
           {% for img in images %}
           <tr>
-            <td>{{ img.name }} ({{ img.version }}) <a href="#" class="button mini obj_add imagestore-image" data-prefix="adm" data-form="{{ img.web_data|jsondata }}"> <i class="icon-pencil"></i> {% trans "Edit" %}</a><br><small>{{ img.uuid }}</small></td>
+            <td>{{ img.name }} ({{ img.version }})
+              <a href="#" class="button mini obj_add imagestore-image" data-prefix="adm" data-form="{{ img.web_data|jsondata }}">
+                <i class="icon-pencil"></i> {% trans "Edit" %}
+              </a>
+              <br><small>{{ img.uuid }}</small>
+            </td>
             <td>{{ img.get_ostype_display }}</td>
             <td class="hidden-phone">{{ img.size|mb_to_gb }} <small>GB</small><br><small>({{ img.download_size|b_to_mb }}&nbsp;MB)</small></td>
             <td class="hidden-phone-small">{{ img.state }}</td>

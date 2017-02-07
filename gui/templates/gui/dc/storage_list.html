@@ -83,22 +83,18 @@
         <tbody>
           {% for ns in storages %}{% with st=ns.storage node=ns.node %}
           <tr>
-              <td>
-                  <span class="{% if can_edit %}{% if all and ns.pk in dc_storages %}{% if node.hostname in node_zpool %}italic{% endif %}{% endif %}{% endif %}">{{ st.alias }} <small>({{ ns.zpool }})</small></span>
-                  {% if can_edit %}
-                      {% if all and ns.pk in dc_storages %}
-                          {% if node.hostname in node_zpool %}
-                              <a href="#" class="button mini no-ajax obj_add"
-                                 title="{% trans "Attach Storage" %}" data-toggle="tooltip" data-placement="bottom"
-                                 data-form='{{ ns.web_data|jsondata }}'><i class="icon-link"></i> {% trans "Edit" %}</a>
-                          {% endif %}
-                      {% else %}
-                          <a href="#" class="button mini no-ajax obj_edit"
-                             title="{% trans "Update or detach Storage" %}" data-toggle="tooltip" data-placement="bottom"
-                             data-form='{{ ns.web_data|jsondata }}'><i class="icon-pencil"></i> {% trans "Edit" %}</a>
-                      {% endif %}
+            <td>
+              <span class="{% if can_edit %}{% if all and ns.pk in dc_storages %}{% if node.hostname in node_zpool %}italic{% endif %}{% endif %}{% endif %}">{{ st.alias }} <small>({{ ns.zpool }})</small></span>
+              {% if can_edit %}
+                {% if all and ns.pk in dc_storages %}
+                  {% if node.hostname in node_zpool %}
+                    <a href="#" class="button mini no-ajax obj_add" title="{% trans "Attach Storage" %}" data-toggle="tooltip" data-placement="bottom" data-form='{{ ns.web_data|jsondata }}'> <i class="icon-link"></i> {% trans "Edit" %}</a>
                   {% endif %}
-              </td>
+                {% else %}
+                  <a href="#" class="button mini no-ajax obj_edit" title="{% trans "Update or detach Storage" %}" data-toggle="tooltip" data-placement="bottom" data-form='{{ ns.web_data|jsondata }}'><i class="icon-pencil"></i> {% trans "Edit" %}</a>
+                {% endif %}
+              {% endif %}
+            </td>
             <td class="nowrap"><span class="vm_hostname"><i class="icon-sitemap vm_node_color" style="color: {{ node.color }};"></i> {{ node.hostname }}</span></td>
             <td>{{ st.get_access_display }}</td>
             <td class="nowrap"><span class="vm_hostname" title="{{ st.owner }}"><i class="icon-user"></i> {{ st.owner|truncatechars:16 }}</span></td>

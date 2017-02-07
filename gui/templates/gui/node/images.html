@@ -100,15 +100,11 @@
           {% for img in images %}{% with vms=image_vms|keyvalue:img.uuid ns_status=img|img_ns_status_display:ns %}
           {% with vms_count=vms|length %}
           <tr id="ns_image_{{ img.name }}">
-              <td>{{ img.alias_version }} <small>({{ img.name }})</small>
-                  <a href="#"
-                     class="button mini no-ajax obj_edit{% if ns_status.status != img.READY %} disabled{% endif %}"
-                     title="{% trans "Delete disk image from compute node storage" %}" data-toggle="tooltip"
-                     data-placement="bottom"
-                     data-form='{"name":{{ img.name|jsondata }}, "alias_version": {{ img.alias_version|jsondata }}}'
-                     data-vms="{{ vms_count }}"><i class="icon-pencil"></i> {% trans "Edit" %}</a>
-
-              </td>
+            <td>{{ img.alias_version }} <small>({{ img.name }})</small>
+              <a href="#" class="button mini no-ajax obj_edit{% if ns_status.status != img.READY %} disabled{% endif %}" title="{% trans "Delete disk image from compute node storage" %}" data-toggle="tooltip" data-placement="bottom" data-form='{"name":{{ img.name|jsondata }}, "alias_version": {{ img.alias_version|jsondata }}}' data-vms="{{ vms_count }}">
+                <i class="icon-pencil"></i> {% trans "Edit" %}
+              </a>
+            </td>
             <td class="hidden-tablet hidden-phone">{{ img.get_access_display }}</td>
             <td class="hidden-tablet hidden-phone nowrap"><span class="vm_hostname" title="{{ img.owner }}"><i class="icon-user"></i> {{ img.owner|truncatechars:16 }}</span></td>
             <td class="hidden-phone"><i class="icon-{{ img.dc_bound_bool|yesno:"ok,remove" }}"></i></td>

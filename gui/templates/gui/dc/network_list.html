@@ -116,38 +116,30 @@
           {% for net in networks %}
           <tr>
             <td>
-
-
-                {% if is_staff or can_edit and net.dc_bound %}{% if all and net.pk in can_add %}
-                    <span class="italic">
-                        {{ net.alias }} <small>({{ net.name }})</small>
-                    </span>
-                    <a href="#" class="button mini no-ajax obj_edit_or_add_dc"
-                       title="{% trans "Attach, update or delete Network" %}" data-toggle="tooltip"
-                       data-placement="bottom" data-form='{{ net.web_data_admin|jsondata }}'
-                       data-prefix="adm"><i class="icon-link"></i> {% trans "Edit" %}</a>
+              {% if is_staff or can_edit and net.dc_bound %}
+                {% if all and net.pk in can_add %}
+                  <span class="italic">{{ net.alias }} <small>({{ net.name }})</small></span>
+                  <a href="#" class="button mini no-ajax obj_edit_or_add_dc" title="{% trans "Attach, update or delete Network" %}" data-toggle="tooltip" data-placement="bottom" data-form='{{ net.web_data_admin|jsondata }}' data-prefix="adm"> <i class="icon-link"></i> {% trans "Edit" %}</a>
                 {% else %}
-                    {{ net.alias }} <small>({{ net.name }})</small>
-                    <a href="#" class="button mini no-ajax obj_edit" title="{% if is_staff %}{% trans "Detach, update or delete Network" %}{% else %}{% trans "Update or delete Network" %}{% endif %}"
-                       data-toggle="tooltip" data-placement="bottom" data-form='{{ net.web_data_admin|jsondata }}'
-                       data-prefix="adm"><i class="icon-pencil"></i> {% trans "Edit" %}</a>
+                  {{ net.alias }} <small>({{ net.name }})</small>
+                  <a href="#" class="button mini no-ajax obj_edit" title="{% if is_staff %}{% trans "Detach, update or delete Network" %}{% else %}{% trans "Update or delete Network" %}{% endif %}" data-toggle="tooltip" data-placement="bottom" data-form='{{ net.web_data_admin|jsondata }}' data-prefix="adm"> <i class="icon-pencil"></i> {% trans "Edit" %}</a>
                 {% endif %}
-                    {% else %}
-                    {{ net.alias }} <small>({{ net.name }})</small>
-                {% endif %}
-
+              {% else %}
+                {{ net.alias }} <small>({{ net.name }})</small>
+              {% endif %}
             </td>
             <td>{{ net.get_access_display }}</td>
-            <td class="nowrap"><span class="vm_hostname" title="{{ net.owner }}"><i class="icon-user"></i> {{ net.owner|truncatechars:16 }}</span></td>
+            <td class="nowrap">
+              <span class="vm_hostname" title="{{ net.owner }}"><i class="icon-user"></i> {{ net.owner|truncatechars:16 }}</span>
+            </td>
             <td class="hidden-phone"><i class="icon-{{ net.dc_bound_bool|yesno:"ok,remove" }}"></i></td>
-              <td class="nowrap"><a href="{% url 'dc_network_ip_list' net.name %}?{{ qs }}"
-                                    class="btn-link" title="{% trans "Show/edit network IP addresses" %}"
-                                    data-toggle="tooltip" data-placement="bottom">{{ net.network|cidr:net.netmask }}</a>
-                  {% if net.dhcp_passthrough %}&nbsp;
-                      <span title="{% trans "IP addresses for this network are managed by an external service" %}"
-                            data-toggle="tooltip" data-placement="bottom"><i
-                              class="icon-info-sign"></i></span>{% endif %}</td>
-              <td class="hidden-phone nowrap">{{ net.gateway }}</td>
+            <td class="nowrap">
+              <a href="{% url 'dc_network_ip_list' net.name %}?{{ qs }}" class="btn-link" title="{% trans "Show/edit network IP addresses" %}" data-toggle="tooltip" data-placement="bottom">{{ net.network|cidr:net.netmask }}</a>
+              {% if net.dhcp_passthrough %}&nbsp;
+                <span title="{% trans "IP addresses for this network are managed by an external service" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-info-sign"></i></span>
+              {% endif %}
+            </td>
+            <td class="hidden-phone nowrap">{{ net.gateway }}</td>
             <td class="nowrap">{{ net.vlan_id }}</td>
             <td class="hidden-phone">{{ net.ips_free }}</td>
             {% if all %}
@@ -166,15 +158,12 @@
                 {% trans "Total" %}: {{ networks|length }}&nbsp;
               </span>
               {% if can_edit %}
-              <div class="vm_control">
-                {% if is_staff %}
-                    <a href="#" class="button gray no-ajax obj_add obj_add_dc{% if not can_add %} disabled{% endif %}"
-                       title="{% trans "Associate Network with this Datacenter" %}" data-toggle="tooltip"
-                       data-placement="top" data-prefix="adm"><i class="icon-link"></i> {% trans "Attach Network" %}
-                    </a>
-                {% endif %}
-                <a href="#" class="button gray no-ajax obj_add obj_add_admin" title="{% trans "Create new Network" %}" data-toggle="tooltip" data-placement="top"><i class="icon-plus"></i> {% trans "Add Network" %}</a>
-              </div>
+                <div class="vm_control">
+                  {% if is_staff %}
+                    <a href="#" class="button gray no-ajax obj_add obj_add_dc{% if not can_add %} disabled{% endif %}" title="{% trans "Associate Network with this Datacenter" %}" data-toggle="tooltip" data-placement="top" data-prefix="adm"> <i class="icon-link"></i> {% trans "Attach Network" %}</a>
+                  {% endif %}
+                  <a href="#" class="button gray no-ajax obj_add obj_add_admin" title="{% trans "Create new Network" %}" data-toggle="tooltip" data-placement="top"> <i class="icon-plus"></i> {% trans "Add Network" %}</a>
+                </div>
               {% endif %}
             </td>
           </tr>

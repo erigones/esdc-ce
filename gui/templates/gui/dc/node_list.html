@@ -82,18 +82,14 @@
 
         <tbody>
           {% for dc_node in dc_nodes %}
-              <tr data-hostname="{{ dc_node.node.hostname }}">
-                  <td class="nowrap">
-                      <i class="icon-sitemap vm_node_color" style="color: {{ dc_node.node.color }};"></i>
-                        {{ dc_node.node.hostname }}
-                      {% if can_edit %}<a href="#"
-                                          class="button mini no-ajax obj_edit{% if dc_node.vms %} no-delete{% endif %}"
-                                          title="{% trans "Update or remove Compute Node association" %}"
-                                          data-toggle="tooltip" data-placement="bottom"
-                                          data-form='{{ dc_node.web_data|jsondata }}'><i class="icon-pencil"></i> {% trans "Edit" %}</a>
-
-                          {% endif %}
-                  </td>
+          <tr data-hostname="{{ dc_node.node.hostname }}">
+            <td class="nowrap">
+              <i class="icon-sitemap vm_node_color" style="color: {{ dc_node.node.color }};"></i>
+              {{ dc_node.node.hostname }}
+              {% if can_edit %}
+                <a href="#" class="button mini no-ajax obj_edit{% if dc_node.vms %} no-delete{% endif %}" title="{% trans "Update or remove Compute Node association" %}" data-toggle="tooltip" data-placement="bottom" data-form='{{ dc_node.web_data|jsondata }}'> <i class="icon-pencil"></i> {% trans "Edit" %}</a>
+              {% endif %}
+            </td>
             <td>{{ dc_node.get_strategy_display }}</td>
             <td>{{ dc_node.priority }}</td>
             <td class="hidden-phone nowrap">{{ dc_node.cpu }} <small>x</small></td>
@@ -113,16 +109,11 @@
 
           {% if all %}{% for node in can_add %}
           <tr>
-              <td class="nowrap">
-                  <i class="icon-sitemap vm_node_color" style="color: {{ node.color }};"></i>
-                  <span class="italic">
-                  {{ node.hostname }}
-                  </span>
-                  <a href="#" class="button mini no-ajax obj_add"
-                     title="{% trans "Attach Compute Node" %}" data-toggle="tooltip" data-placement="bottom"
-                     data-form='{"hostname":"{{ node.hostname }}"}'>
-                      <i class="icon-link"></i> {% trans "Edit" %}</a>
-              </td>
+            <td class="nowrap">
+              <i class="icon-sitemap vm_node_color" style="color: {{ node.color }};"></i>
+              <span class="italic">{{ node.hostname }}</span>
+              <a href="#" class="button mini no-ajax obj_add" title="{% trans "Attach Compute Node" %}" data-toggle="tooltip" data-placement="bottom" data-form='{"hostname":"{{ node.hostname }}"}'> <i class="icon-link"></i> {% trans "Edit" %}</a>
+            </td>
             <td></td>
             <td></td>
             <td class="hidden-phone"></td>
