@@ -54,6 +54,15 @@
 }
 
 nav.main-nav {
+  div.hr {
+	border-top: 1px solid #1D1E21;
+	border-bottom: 1px solid #4A4A54;
+	height: 2px;
+	padding: 0;
+	margin: 0;
+	box-sizing: border-box;
+  }
+
   > ul {
 
     border-bottom: 1px solid #4A4A54;
@@ -191,7 +200,12 @@ nav#secondary {
 
 .datacenter-nav {
   margin-top: 5px;
-  margin-left: 30px;
+  margin-left: 10px;
+  margin-right: 10px;
+
+  .button {
+	font-size: 12px;
+  }
 }
 
 .secondary-sub-menu > ul {
@@ -302,13 +316,13 @@ label.input-navigation {
  **************************************/
 
 .profile-menu {
-  height: 80px;
+  height: 100px;
 
   .title {
     @include emphasis-text;
-    font-size: 14px;
-    margin-top: 10px;
-    margin-bottom: 5px;
+    font-size: 12px;
+    margin-top: 7px;
+    margin-bottom: 7px;
   }
 
   border-top: 1px solid transparent;

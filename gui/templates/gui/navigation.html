@@ -14,13 +14,13 @@
   SUBMENU_AUTO = '{{ submenu_auto }}';
 
   {% if nodes %}
-  SUBMENU_GAP = 89;
+  SUBMENU_GAP = 109;
   VMS_TAGS = [];
   $(window).resize(update_submenu);
   $(document).ready(update_submenu);
 
   {% elif vms %}
-  SUBMENU_GAP = 135;
+  SUBMENU_GAP = 155;
   VMS_TAGS = {{ vms_tags|json:None|safe }};
   $(window).resize(update_submenu);
   $(document).ready(function() {
@@ -83,6 +83,15 @@
 {% block secondary-nav %}
 <nav id="secondary" class="main-nav">
   <div class="profile-menu">
+
+    {% with dc_alias=request.dc.alias %}
+    <div class="datacenter-nav">
+      <a href="#" class="button block gray inset no-ajax modal_nohide" id="dc-switch" title="{% blocktrans %}Working in {{ dc_alias }} datacenter. Click to change active datacenter{% endblocktrans %}" data-toggle="tooltip" data-placement="bottom">
+        <span class="pull-left"><i class="icon-cloud"></i> {{ dc_alias|truncatechars:21 }}</span>
+      </a>
+    </div>
+    {% endwith %}
+
     <div class="pull-left">
       <div class="avatar">
         <span class="logo" id="sio-status" title="{% trans "Socket.io connection status" %}" data-toggle="tooltip" data-placement="right">
@@ -97,21 +106,12 @@
 
     <div class="profile-buttons">
       <div class="title" title="{{ request.user.get_display_name }}">
-        {{ request.user.get_display_name|truncatechars:16 }}
+        <i class="icon-user"></i> {{ request.user.get_display_name|truncatechars:19 }}
       </div>
-      <div class="btn-group">
-        <a href="{% url 'profile' %}" class="button mini inset black{% if navi.view_name == 'profile' %} disabled{% endif %}" title="{% trans "My profile and settings" %}">{% trans "Profile" %}</a>
-      </div>
-      <div class="btn-group">
-        <a href="{% url 'logout' %}" class="no-ajax button mini inset black" title="{% trans "Logout" %}">{% trans "Logout" %}</a>
-      </div>
+      <a href="{% url 'profile' %}" class="button sharp-edge mini inset black{% if navi.view_name == 'profile' %} disabled{% endif %}" title="{% trans "My profile and settings" %}">{% trans "Profile" %}</a>
+      <a href="{% url 'logout' %}" class="no-ajax button sharp-edge mini inset black" title="{% trans "Logout" %}">{% trans "Logout" %}</a>
     </div>
 
-    {% with dc_alias=request.dc.alias %}
-    <div class="datacenter-nav">
-      <a href="#" class="btn-link no-ajax modal_nohide" id="dc-switch" title="{% blocktrans %}Working in {{ dc_alias }} datacenter. Click to change active datacenter{% endblocktrans %}" data-toggle="tooltip" data-placement="right"><i class="icon-cloud"></i> {{ dc_alias }}</a>
-    </div>
-    {% endwith %}
   </div>
 
   <ul class="secondary-nav-menu">
