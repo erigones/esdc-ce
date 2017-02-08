@@ -23,6 +23,7 @@ Features
 - Added explanations to DC settings GUI section - `#56 <https://github.com/erigones/esdc-ce/issues/56>`__
 - Changed system initialization to include all images imported on head node - `#61 <https://github.com/erigones/esdc-ce/issues/61>`__
 - Updated design of DC switch button - `#64 <https://github.com/erigones/esdc-ce/issues/64>`__
+- Changed image repository view to show last 30 images by default - `#66 <https://github.com/erigones/esdc-ce/issues/66>`__
 
 
 Bugs
