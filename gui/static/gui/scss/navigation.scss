@@ -54,6 +54,15 @@
 }
 
 nav.main-nav {
+  div.hr {
+	border-top: 1px solid #1D1E21;
+	border-bottom: 1px solid #4A4A54;
+	height: 2px;
+	padding: 0;
+	margin: 0;
+	box-sizing: border-box;
+  }
+
   > ul {
 
     border-bottom: 1px solid #4A4A54;
@@ -193,6 +202,10 @@ nav#secondary {
   margin-top: 5px;
   margin-left: 10px;
   margin-right: 10px;
+
+  .button {
+	font-size: 12px;
+  }
 }
 
 .secondary-sub-menu > ul {
