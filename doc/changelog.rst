@@ -22,6 +22,7 @@ Features
 - Implemented update mechanism of Danube Cloud infrastructure/OS services - `#44 <https://github.com/erigones/esdc-ce/issues/44>`__
 - Added explanations to DC settings GUI section - `#56 <https://github.com/erigones/esdc-ce/issues/56>`__
 - Changed system initialization to include all images imported on head node - `#61 <https://github.com/erigones/esdc-ce/issues/61>`__
+- Updated design of DC switch button - `#64 <https://github.com/erigones/esdc-ce/issues/64>`__
 
 
 Bugs

@@ -330,6 +330,18 @@ button.button {
     @include border-radius(10px);
   }
 
+  &.block {
+	width: 100%;
+  }
+
+  &.sharp-edge {
+    @include border-radius(0 0 0 0);
+  }
+
+  &.menu {
+	margin: 0;
+  }
+
   &.mini {
     padding: 0px 10px;
     line-height: 20px;
