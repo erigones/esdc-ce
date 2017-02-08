@@ -119,12 +119,12 @@ def mon_vm_sla(request, hostname, yyyymm, data=None):
 @api_view(('GET',))
 @request_data()  # get_vm() = IsVmOwner
 @setting_required('MON_ZABBIX_ENABLED')
-def mon_vm_history(request, hostname, graph, data=None):
+def mon_vm_history(request, hostname, graph, item_id=None, data=None):
     """
-    Get (:http:get:`GET </mon/vm/(hostname)/history/(graph)>`) monitoring history
+    Get (:http:get:`GET </mon/vm/(hostname)/history/(graph)/(item_id)>`) monitoring history
     for requested server and graph name.
 
-    .. http:get:: /mon/vm/(hostname)/history/(graph)
+    .. http:get:: /mon/vm/(hostname)/history/(graph)/(item_id)
 
         :DC-bound?:
             * |dc-yes|
@@ -141,14 +141,14 @@ def mon_vm_history(request, hostname, graph, data=None):
         |  *cpu-load* - 1-minute load average.
         |  *mem-usage* - Total compute node physical memory consumed by the VM.
         |  *swap-usage* - Total compute node swap space used by the VM.
-        |  *net-bandwidth-(nic_id)* - The amount of received and sent network traffic through \
+        |  *net-bandwidth* - The amount of received and sent network traffic through \
 the virtual network interface.
-        |  *net-packets-(nic_id)* - The amount of received and sent packets through the virtual network interface.
-        |  *disk-throughput-(disk_id)* (KVM only) - The amount of written and read data on the virtual hard drive.
-        |  *disk-io-(disk_id)* (KVM only) - The amount of write and read I/O operations performed on \
+        |  *net-packets* - The amount of received and sent packets through the virtual network interface.
+        |  *disk-throughput* (KVM only) - The amount of written and read data on the virtual hard drive.
+        |  *disk-io* (KVM only) - The amount of write and read I/O operations performed on \
 the virtual hard drive.
-        |  *fs-throughput-(disk_id)* (SunOS Zone only) - The amount of written and read data on the virtual hard drive.
-        |  *fs-io-(disk_id)* (SunOS Zone only) - The amount of write and read I/O operations performed on \
+        |  *fs-throughput* (SunOS Zone only) - The amount of written and read data on the virtual hard drive.
+        |  *fs-io* (SunOS Zone only) - The amount of write and read I/O operations performed on \
 the virtual hard drive.
         |  *vm-disk-logical-throughput* - Aggregated disk throughput on the logical layer \
 (with acceleration mechanisms included).
@@ -160,6 +160,9 @@ the virtual hard drive.
 (with acceleration mechanisms included).
 
         :type graph: string
+        :arg item_id: **optional** only used with **net-bandwidth**, **net-packets**, **disk-throughput**, \
+**disk-io**, **fs-throughput**, **fs-io** graphs to specify ID of the item for which graph should be retrieved.
+        :type item_id: integer
         :arg data.since: Return only values that have been received after the given timestamp (default: now - 1 hour)
         :type data.since: integer
         :arg data.until: Return only values that have been received before the given timestamp (default: now)
@@ -174,4 +177,4 @@ the virtual hard drive.
         :status 423: VM is not operational
 
     """
-    return VmHistoryView(request, hostname, graph, data).get()
+    return VmHistoryView(request, hostname, graph, item_id, data).get()

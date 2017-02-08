@@ -89,14 +89,15 @@ class VmSLAView(APIView):
 
 class VmHistoryView(APIView):
 
-    def __init__(self, request, hostname, graph_type, data):
+    def __init__(self, request, hostname, graph_type, item_id, data):
         super(VmHistoryView, self).__init__(request)
         self.vm = get_vm(request, hostname, sr=('dc',))
         self.graph_type = graph_type
+        self.item_id = item_id
         self.data = data
 
     def get(self):
-        request, vm, graph = self.request, self.vm, self.graph_type
+        request, vm, graph, item_id = self.request, self.vm, self.graph_type, self.item_id
 
         if not vm.is_zabbix_sync_active():
             raise ExpectationFailed('VM monitoring disabled')
@@ -104,13 +105,20 @@ class VmHistoryView(APIView):
         if vm.status not in vm.STATUS_OPERATIONAL:
             raise VmIsNotOperational
 
-        # Validate graph identificator
-        graph_category, item_id = parse_graph_vm(vm, graph)
+        # for selected graphs validate item_id, otherwise set it to None
+        if graph.startswith(('net-', 'disk-', 'fs-')):
+            if item_id is None:
+                raise InvalidInput('Missing item_id parameter in URI')
+            try:
+                item_id = int(item_id)
+            except Exception as e:
+                raise InvalidInput('Invalid input value for item_id, must be integer!')
+        else:
+            self.item_id = item_id = None
+
 
         try:
-            if not graph_category:
-                raise KeyError
-            graph_settings = GRAPH_ITEMS.get_options(graph_category, vm)
+            graph_settings = GRAPH_ITEMS.get_options(graph, vm)
         except KeyError:
             raise InvalidInput('Invalid graph')
         else:

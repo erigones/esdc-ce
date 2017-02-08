@@ -6,7 +6,7 @@ from api.mon.node.utils import parse_yyyymm
 from api.mon.validators import parse_graph_vm
 from api.mon.node.serializers import MonNodeHistorySerializer
 from api.node.utils import get_node
-from api.task.response import mgmt_task_response
+from api.task.response import mgmt_task_response, FailureTaskResponse
 from que import TG_DC_UNBOUND
 
 
@@ -47,25 +47,33 @@ class NodeSLAView(APIView):
 
 class NodeHistoryView(APIView):
     """ """
-    def __init__(self, request, hostname, graph_type, data):
+    def __init__(self, request, hostname, graph_type, item_id, data):
+        super(VMHistoryView, self).__init__(request)
         self.request = request
         self.node = get_node(request, hostname)
         self.graph_type = graph_type
+        self.item_id = item_id
         self.data = data
 
     def get(self):
-        request, node, graph = self.request, self.node, self.graph_type
+        request, node, graph, item_id = self.request, self.node, self.graph_type, self.item_id
 
         if node.status not in node.STATUS_OPERATIONAL:
             raise NodeIsNotOperational
 
-        # Validate graph identificator
-        graph_category, item_id = parse_graph_vm(node, graph)
+        # for selected graphs validate item_id, otherwise set it to None
+        if graph.startswith(('net-', 'disk-')):
+            if item_id is None:
+                raise InvalidInput('Missing item_id parameter in URI')
+            try:
+                item_id = int(item_id)
+            except Exception as e:
+                raise InvalidInput('Invalid input value for item_id, must be integer!')
+        else:
+            self.item_id = item_id = None
 
         try:
-            if not graph_category:
-                raise KeyError
-            graph_settings = GRAPH_ITEMS.get_options(graph_category, node)
+            graph_settings = GRAPH_ITEMS.get_options(graph, node)
         except KeyError:
             raise InvalidInput('Invalid graph')
         else:
@@ -91,8 +99,8 @@ class NodeHistoryView(APIView):
         result['options'] = graph_settings.get('options', {})
         result['update_interval'] = graph_settings.get('update_interval', None)
         tidlock = 'mon_node_history node:%s graph:%s since:%d until:%d' % (node.uuid, graph,
-                                                                       round(ser.object['since'], -2),
-                                                                       round(ser.object['until'], -2))
+                                                                           round(ser.object['since'], -2),
+                                                                           round(ser.object['until'], -2))
 
         if item_id is None:
             items = graph_settings['items']
@@ -108,7 +116,7 @@ class NodeHistoryView(APIView):
 
         history = graph_settings['history']
         ter = t_mon_node_history.call(request, node.owner.id, (node.uuid, items, history, result, items_search),
-                                    meta={'apiview': _apiview_}, tidlock=tidlock)
+                                      meta={'apiview': _apiview_}, tidlock=tidlock)
         # NOTE: cache_result=tidlock, cache_timeout=60)
         # Caching is disable here, because it makes no real sense.
         # The latest graphs must be fetched from zabbix and the older are requested only seldom.
