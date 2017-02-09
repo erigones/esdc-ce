@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Erigones GUI\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-11-11 20:52+0000\n"
+"POT-Creation-Date: 2017-02-09 13:35+0000\n"
 "PO-Revision-Date: 2014-02-27 10:46+0100\n"
 "Last-Translator: Erigones, s. r. o. <erigones@erigones.com>\n"
 "Language-Team: Erigones, s. r. o. <erigones@erigones.com>\n"
@@ -19,30 +19,30 @@ msgstr ""
 "X-Generator: Poedit 1.5.4\n"
 "X-Translated-Using: django-rosetta 0.7.3\n"
 
-#: accounts/forms.py:29
+#: accounts/forms.py:30
 msgid "username or email"
 msgstr "Login alebo email"
 
-#: accounts/forms.py:31
+#: accounts/forms.py:32
 msgid "Username or Email"
 msgstr "Login alebo email"
 
-#: accounts/forms.py:35 profile/forms.py:365 profile/forms.py:370
+#: accounts/forms.py:36 profile/forms.py:365 profile/forms.py:370
 msgid "Password"
 msgstr "Heslo"
 
-#: accounts/forms.py:56
+#: accounts/forms.py:57
 #, python-format
 msgid ""
 "You made %(attempts)s wrong login attempts, all further attempts will be "
 "ignored for %(timeout)s seconds."
 msgstr ""
 
-#: accounts/forms.py:78
+#: accounts/forms.py:79
 msgid "Your email address"
 msgstr "Vaša emailová adresa"
 
-#: accounts/forms.py:81
+#: accounts/forms.py:82
 msgid ""
 "You will receive a validation email with instruction on how to reset your "
 "password."
@@ -50,51 +50,55 @@ msgstr ""
 "Na Vašu emailovú adresu bude doručený email s presným postupom na zmenu "
 "hesla."
 
-#: accounts/forms.py:105
+#: accounts/forms.py:106
 #, python-format
 msgid ""
 "You have requested password reset %(attempts)s times. All further attempts "
 "will be ignored for %(timeout)s seconds."
 msgstr ""
 
-#: accounts/forms.py:113
+#: accounts/forms.py:114
 msgid ""
 "That email address doesn't have an associated user account. Are you sure "
 "you've registered?"
 msgstr ""
 
-#: accounts/forms.py:156
+#: accounts/forms.py:157
 #, python-format
 msgid "Your password at %(site_name)s has been reset to: %(password)s"
 msgstr "Vase heslo na stranke %(site_name)s bolo zmenene na: %(password)s"
 
-#: accounts/forms.py:169
+#: accounts/forms.py:170
 msgid "You will receive a validation email to activate your account."
 msgstr ""
 "Na Vašu emailovú adresu bude doručený potvrdzujúci email, ktorý slúži na "
 "aktivovanie Vášho použivateľského účtu."
 
-#: accounts/forms.py:176 dc/user/forms.py:75 profile/forms.py:42
+#: accounts/forms.py:177 dc/user/forms.py:75 profile/forms.py:42
 msgid "Email address"
 msgstr "Email"
 
-#: accounts/forms.py:180 dc/user/forms.py:71 profile/forms.py:30
+#: accounts/forms.py:181 dc/user/forms.py:71 profile/forms.py:30
 #: templates/gui/dc/user_list.html:73
 msgid "First name"
 msgstr "Meno"
 
-#: accounts/forms.py:184 dc/user/forms.py:73 profile/forms.py:36
+#: accounts/forms.py:185 dc/user/forms.py:73 profile/forms.py:36
 #: templates/gui/dc/user_list.html:74
 msgid "Last name"
 msgstr "Priezvisko"
 
-#: accounts/forms.py:202
+#: accounts/forms.py:203
 msgid ""
 "This email address is already in use. Please supply a different email "
 "address."
 msgstr "Zadaná emailová adresa sa už používa. Zadajte inú emailovú adresu."
 
-#: accounts/forms.py:214
+#: accounts/forms.py:209
+msgid "Sorry. Your email address did not pass the validity test."
+msgstr ""
+
+#: accounts/forms.py:221
 msgid ""
 "You will receive a text message with an auto-generated password which you "
 "can change after login."
@@ -102,23 +106,23 @@ msgstr ""
 "Na toto číslo Vám bude zaslaná SMS správa s vygenerovaným heslom, ktoré si "
 "môžete zmeniť po prvom prihlásení."
 
-#: accounts/forms.py:223 models/userprofile.py:47 profile/forms.py:86
+#: accounts/forms.py:230 models/userprofile.py:47 profile/forms.py:86
 msgid "Phone"
 msgstr "Mobilné tel. číslo"
 
-#: accounts/forms.py:229
+#: accounts/forms.py:236
 msgid "TOS Confirmation"
 msgstr "Potvrdenie TOS"
 
-#: accounts/forms.py:236 models/userprofile.py:82 profile/forms.py:190
+#: accounts/forms.py:243 models/userprofile.py:82 profile/forms.py:190
 msgid "Company"
 msgstr "Spoločnosť"
 
-#: accounts/forms.py:242 models/userprofile.py:83 profile/forms.py:197
+#: accounts/forms.py:249 models/userprofile.py:83 profile/forms.py:197
 msgid "Company ID"
 msgstr "IČO"
 
-#: accounts/forms.py:274
+#: accounts/forms.py:281
 msgid "In order to use this service, you have to accept the Terms of Service."
 msgstr ""
 
@@ -179,7 +183,7 @@ msgstr ""
 msgid "SSH Keys"
 msgstr "SSH klúče"
 
-#: admin.py:52 templates/gui/navigation.html:103
+#: admin.py:52 templates/gui/navigation.html:111
 msgid "Profile"
 msgstr "Profil"
 
@@ -1237,23 +1241,23 @@ msgstr "Zimbabwe"
 #: dc/iso/forms.py:36 dc/network/forms.py:45
 #: templates/gui/dc/domain_list.html:89
 #: templates/gui/dc/domain_record_list.html:90
-#: templates/gui/dc/network_ip_list.html:110
+#: templates/gui/dc/network_ip_list.html:115
 #: templates/gui/node/backup_list.html:13
 #: templates/gui/node/backup_list_all.html:8
 #: templates/gui/node/backup_list_novm.html:13
-#: templates/gui/node/details.html:183 templates/gui/node/details.html:231
-#: templates/gui/node/details.html:267 templates/gui/node/vms.html:88
+#: templates/gui/node/details.html:186 templates/gui/node/details.html:234
+#: templates/gui/node/details.html:270 templates/gui/node/vms.html:86
 #: templates/gui/profile/profile_sshkey_list.html:6
 #: templates/gui/vm/backup_define_list.html:8
-#: templates/gui/vm/backup_list.html:13 templates/gui/vm/details.html:272
-#: templates/gui/vm/list.html:98 templates/gui/vm/snapshot_define_list.html:8
-#: templates/gui/vm/snapshot_list.html:13 vm/forms.py:530
+#: templates/gui/vm/backup_list.html:13 templates/gui/vm/details.html:285
+#: templates/gui/vm/list.html:96 templates/gui/vm/snapshot_define_list.html:8
+#: templates/gui/vm/snapshot_list.html:13 vm/forms.py:515
 msgid "Name"
 msgstr "Názov"
 
 #: dc/base/forms.py:26 dc/group/forms.py:39 dc/image/forms.py:37
 #: dc/iso/forms.py:40 dc/network/forms.py:48 node/forms.py:86
-#: templates/gui/dc/network_ip_list.html:107
+#: templates/gui/dc/network_ip_list.html:106
 msgid "Alias"
 msgstr ""
 
@@ -1264,19 +1268,19 @@ msgstr ""
 #: dc/base/forms.py:31 dc/dns/forms.py:54 dc/image/forms.py:42
 #: dc/iso/forms.py:42 dc/network/forms.py:50 node/forms.py:35 node/forms.py:90
 #: templates/gui/dc/dc_list.html:81 templates/gui/dc/domain_list.html:91
-#: templates/gui/dc/image_list.html:100 templates/gui/dc/iso_list.html:98
+#: templates/gui/dc/image_list.html:105 templates/gui/dc/iso_list.html:98
 #: templates/gui/dc/network_list.html:100 templates/gui/dc/storage_list.html:67
-#: templates/gui/dc/template_list.html:65 templates/gui/node/details.html:66
+#: templates/gui/dc/template_list.html:65 templates/gui/node/details.html:69
 #: templates/gui/node/images.html:87 templates/gui/node/storages.html:54
-#: templates/gui/node/vms.html:91 templates/gui/vm/details.html:286
-#: templates/gui/vm/list.html:101 vm/forms.py:244
+#: templates/gui/node/vms.html:89 templates/gui/vm/details.html:312
+#: templates/gui/vm/list.html:99 vm/forms.py:228
 msgid "Owner"
 msgstr "Vlastník"
 
 #: dc/base/forms.py:33 dc/dns/forms.py:56 dc/image/forms.py:44
 #: dc/iso/forms.py:44 dc/network/forms.py:52 node/forms.py:92
 #: templates/gui/dc/dc_list.html:80 templates/gui/dc/domain_list.html:90
-#: templates/gui/dc/image_list.html:99 templates/gui/dc/iso_list.html:97
+#: templates/gui/dc/image_list.html:104 templates/gui/dc/iso_list.html:97
 #: templates/gui/dc/network_list.html:99 templates/gui/dc/storage_list.html:66
 #: templates/gui/dc/template_list.html:64 templates/gui/node/images.html:86
 #: templates/gui/node/storages.html:53
@@ -1292,19 +1296,20 @@ msgstr ""
 #: dc/base/forms.py:38 dc/dns/forms.py:58 dc/image/forms.py:46
 #: dc/iso/forms.py:49 dc/network/forms.py:54 node/forms.py:94
 #: templates/gui/dc/dc_list.html:86 templates/gui/dc/domain_list.html:97
-#: templates/gui/dc/image_list.html:110
-#: templates/gui/dc/imagestore_list.html:98 templates/gui/dc/iso_list.html:104
-#: templates/gui/dc/network_ip_list.html:128
+#: templates/gui/dc/image_list.html:115
+#: templates/gui/dc/imagestore_list.html:101 templates/gui/dc/iso_list.html:104
+#: templates/gui/dc/network_ip_list.html:133
 #: templates/gui/dc/network_list.html:109 templates/gui/dc/storage_list.html:77
 #: templates/gui/dc/template_list.html:71 templates/gui/node/images.html:94
 #: templates/gui/node/storages.html:63
 #: templates/gui/vm/backup_define_list.html:14
-#: templates/gui/vm/snapshot_define_list.html:13 vm/forms.py:548
+#: templates/gui/vm/snapshot_define_list.html:13 vm/forms.py:533
 msgid "Description"
 msgstr ""
 
-#: dc/base/forms.py:110 dc/iso/forms.py:47 dc/node/forms.py:9
-#: templates/gui/vm/details.html:485 vm/forms.py:290 vm/forms.py:364
+#: dc/base/forms.py:115 dc/base/forms.py:184 dc/iso/forms.py:47
+#: dc/node/forms.py:9 templates/gui/vm/details.html:632 vm/forms.py:275
+#: vm/forms.py:349
 msgid "(none)"
 msgstr "(žiaden)"
 
@@ -1314,6 +1319,10 @@ msgstr ""
 
 #: dc/base/views.py:23
 msgid "Datacenter settings were not updated. Please correct errors below"
+msgstr ""
+
+#: dc/base/views.py:122
+msgid "Global setting"
 msgstr ""
 
 #: dc/dns/forms.py:32 dc/dns/forms.py:85
@@ -1359,8 +1368,8 @@ msgstr ""
 msgid "Changed since"
 msgstr ""
 
-#: dc/dns/forms.py:156 templates/gui/vm/details.html:402
-#: templates/gui/vm/details.html.py:453
+#: dc/dns/forms.py:156 templates/gui/vm/details.html:509
+#: templates/gui/vm/details.html.py:585
 msgid "ID"
 msgstr "ID"
 
@@ -1390,8 +1399,8 @@ msgstr ""
 
 #: dc/forms.py:15 navigation.py:15 node/forms.py:156
 #: templates/gui/dc/dc_form_field.html:4
-#: templates/gui/dc/network_ip_list.html:197
-#: templates/gui/dc/subnet_ip_list.html:70 templates/gui/node/vms.html:90
+#: templates/gui/dc/network_ip_list.html:202
+#: templates/gui/dc/subnet_ip_list.html:70 templates/gui/node/vms.html:88
 #: templates/gui/support/add_ticket_email.txt:4
 msgid "Datacenter"
 msgstr ""
@@ -1415,8 +1424,8 @@ msgstr ""
 msgid "Permissions"
 msgstr "Oprávnenia"
 
-#: dc/image/forms.py:19 node/forms.py:142 templates/gui/vm/details.html:460
-#: vm/forms.py:334
+#: dc/image/forms.py:19 node/forms.py:142 templates/gui/vm/details.html:592
+#: vm/forms.py:319
 msgid "Image"
 msgstr "Obraz"
 
@@ -1443,7 +1452,7 @@ msgid ""
 "deploy."
 msgstr ""
 
-#: dc/image/forms.py:56 templates/gui/vm/details.html:290 vm/forms.py:206
+#: dc/image/forms.py:56 templates/gui/vm/details.html:316 vm/forms.py:189
 msgid "Tags"
 msgstr "Nálepky"
 
@@ -1459,7 +1468,7 @@ msgstr ""
 msgid "Image file URL"
 msgstr ""
 
-#: dc/image/views.py:206
+#: dc/image/views.py:224
 #, python-format
 msgid ""
 "Downloaded metadata for %(image_count)d images from image repository %(name)s"
@@ -1473,16 +1482,16 @@ msgstr ""
 msgid "ISO image file name (including file extension)."
 msgstr ""
 
-#: dc/iso/forms.py:46 templates/gui/vm/details.html:308 vm/forms.py:214
+#: dc/iso/forms.py:46 templates/gui/vm/details.html:334 vm/forms.py:198
 msgid "OS Type"
 msgstr "Typ OS"
 
 #: dc/network/forms.py:27 templates/gui/dc/network_ip_form.html:9
-#: templates/gui/dc/network_ip_list.html:111
+#: templates/gui/dc/network_ip_list.html:116
 #: templates/gui/dc/network_ips_form.html:10
 #: templates/gui/dc/subnet_ip_list.html:26
-#: templates/gui/dc/subnet_ip_list.html:73 templates/gui/vm/details.html:408
-#: vm/forms.py:439
+#: templates/gui/dc/subnet_ip_list.html:73 templates/gui/vm/details.html:515
+#: vm/forms.py:424
 msgid "Network"
 msgstr "Sieť"
 
@@ -1494,8 +1503,8 @@ msgstr "Sieť/Maska"
 msgid "IPv4 network address with netmask in CIDR format."
 msgstr ""
 
-#: dc/network/forms.py:59 templates/gui/dc/network_ip_list.html:113
-#: templates/gui/dc/network_list.html:103 templates/gui/vm/details.html:407
+#: dc/network/forms.py:59 templates/gui/dc/network_ip_list.html:118
+#: templates/gui/dc/network_list.html:103 templates/gui/vm/details.html:514
 msgid "Gateway"
 msgstr "Brána"
 
@@ -1503,7 +1512,7 @@ msgstr "Brána"
 msgid "IPv4 gateway in quad-dotted format."
 msgstr ""
 
-#: dc/network/forms.py:62 templates/gui/dc/network_ip_list.html:115
+#: dc/network/forms.py:62 templates/gui/dc/network_ip_list.html:120
 #: templates/gui/dc/subnet_ip_list.html:28
 msgid "VLAN ID"
 msgstr ""
@@ -1564,18 +1573,18 @@ msgstr "Počet"
 msgid "Number of IP addresses to create."
 msgstr ""
 
-#: dc/network/forms.py:154 templates/gui/dc/network_ip_list.html:194
+#: dc/network/forms.py:154 templates/gui/dc/network_ip_list.html:199
 #: templates/gui/dc/subnet_ip_list.html:67
 msgid "Usage"
 msgstr "Použitie"
 
-#: dc/network/forms.py:156 templates/gui/dc/network_ip_list.html:199
+#: dc/network/forms.py:156 templates/gui/dc/network_ip_list.html:204
 #: templates/gui/dc/subnet_ip_list.html:74
 #: templates/gui/node/backup_list.html:20
 #: templates/gui/node/backup_list_all.html:16
 #: templates/gui/node/backup_list_novm.html:21
 #: templates/gui/vm/backup_list.html:20 templates/gui/vm/snapshot_list.html:19
-#: vm/forms.py:638 vm/forms.py:756
+#: vm/forms.py:623 vm/forms.py:741
 msgid "Note"
 msgstr "Poznámka"
 
@@ -1603,19 +1612,18 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: dc/node/forms.py:9 templates/gui/node/vms.html:69
+#: dc/node/forms.py:9 templates/gui/node/vms.html:67
 msgid "(all)"
 msgstr ""
 
-#: dc/node/forms.py:18 node/forms.py:32
-#: templates/gui/dc/network_ip_list.html:196 templates/gui/dc/node_list.html:64
+#: dc/node/forms.py:18 node/forms.py:32 templates/gui/dc/node_list.html:64
 #: templates/gui/dc/subnet_ip_list.html:69
 #: templates/gui/node/backup_list_all.html:9
 #: templates/gui/node/backup_list_novm.html:14
 #: templates/gui/node/details.html:54 templates/gui/node/list.html:42
-#: templates/gui/node/vms.html:89 templates/gui/vm/backup_delete_modal.html:10
+#: templates/gui/node/vms.html:87 templates/gui/vm/backup_delete_modal.html:10
 #: templates/gui/vm/backup_restore_modal.html:10
-#: templates/gui/vm/details.html:280 templates/gui/vm/list.html:99
+#: templates/gui/vm/details.html:300 templates/gui/vm/list.html:97
 #: templates/gui/vm/snapshot.html:79 templates/gui/vm/snapshot.html.py:110
 #: vm/forms.py:82
 msgid "Hostname"
@@ -1641,10 +1649,10 @@ msgid "Total number of CPUs (cores)."
 msgstr ""
 
 #: dc/node/forms.py:31 templates/gui/dc/node_list.html:68
-#: templates/gui/node/list.html:47 templates/gui/node/vms.html:94
+#: templates/gui/node/list.html:47 templates/gui/node/vms.html:92
 #: templates/gui/reports/cloud_customers.html:39
-#: templates/gui/vm/details.html:317 templates/gui/vm/list.html:104
-#: vm/forms.py:220
+#: templates/gui/vm/details.html:345 templates/gui/vm/list.html:102
+#: vm/forms.py:204
 msgid "RAM"
 msgstr "RAM"
 
@@ -1666,8 +1674,8 @@ msgstr ""
 
 #: dc/storage/forms.py:15 node/forms.py:81 node/forms.py:137
 #: templates/gui/dc/storage_list.html:65
-#: templates/gui/node/image_multi_form.html:6 templates/gui/vm/details.html:294
-#: templates/gui/vm/list.html:100 vm/forms.py:208
+#: templates/gui/node/image_multi_form.html:6 templates/gui/vm/details.html:320
+#: templates/gui/vm/list.html:98 vm/forms.py:192
 msgid "Node"
 msgstr "Vypočtový uzol"
 
@@ -1675,7 +1683,7 @@ msgstr "Vypočtový uzol"
 msgid "Zpool"
 msgstr ""
 
-#: dc/template/forms.py:14 templates/gui/vm/details.html:304 vm/forms.py:210
+#: dc/template/forms.py:14 templates/gui/vm/details.html:330 vm/forms.py:194
 msgid "Template"
 msgstr "Šablóna"
 
@@ -2023,15 +2031,15 @@ msgstr ""
 
 #: navigation.py:26 templates/gui/dc/dc_list.html:71
 #: templates/gui/dc/domain_list.html:95 templates/gui/dc/group_list.html:102
-#: templates/gui/dc/image_list.html:108 templates/gui/dc/iso_list.html:102
+#: templates/gui/dc/image_list.html:113 templates/gui/dc/iso_list.html:102
 #: templates/gui/dc/network_list.html:107 templates/gui/dc/node_list.html:75
 #: templates/gui/dc/storage_list.html:75 templates/gui/dc/template_list.html:69
-#: templates/gui/dc/user_list.html:80 templates/gui/node/details.html:126
+#: templates/gui/dc/user_list.html:80 templates/gui/node/details.html:129
 #: templates/gui/node/images.html:93 templates/gui/node/storages.html:62
 msgid "Datacenters"
 msgstr ""
 
-#: navigation.py:32 templates/gui/dc/dc_settings_table.html:52
+#: navigation.py:32 templates/gui/dc/dc_settings_table.html:53
 msgid "Compute nodes"
 msgstr ""
 
@@ -2040,16 +2048,16 @@ msgstr ""
 msgid "Storages"
 msgstr ""
 
-#: navigation.py:44 templates/gui/dc/dc_settings_table.html:86
+#: navigation.py:44 templates/gui/dc/dc_settings_table.html:87
 #: templates/gui/dc/network_ip_list.html:99
-#: templates/gui/dc/network_ip_list.html:164
+#: templates/gui/dc/network_ip_list.html:169
 #: templates/gui/dc/network_list.html:81
 #: templates/gui/vm/monitoring_navigation.html:7
 msgid "Networks"
 msgstr ""
 
-#: navigation.py:50 templates/gui/dc/dc_settings_table.html:91
-#: templates/gui/dc/image_list.html:81 templates/gui/dc/imagestore_list.html:46
+#: navigation.py:50 templates/gui/dc/dc_settings_table.html:92
+#: templates/gui/dc/image_list.html:86 templates/gui/dc/imagestore_list.html:50
 #: templates/gui/node/image_multi_form.html:28
 #: templates/gui/node/navigation.html:7
 msgid "Images"
@@ -2063,7 +2071,7 @@ msgstr "Šablóny"
 msgid "ISO Images"
 msgstr ""
 
-#: navigation.py:81 templates/gui/dc/dc_settings_table.html:100
+#: navigation.py:81 templates/gui/dc/dc_settings_table.html:103
 msgid "DNS"
 msgstr ""
 
@@ -2072,23 +2080,23 @@ msgid "Nodes"
 msgstr ""
 
 #: navigation.py:100 templates/gui/dc/dc_list.html:84
-#: templates/gui/dc/dc_settings_table.html:57
+#: templates/gui/dc/dc_settings_table.html:58
 #: templates/gui/dc/node_list.html:77 templates/gui/dc/storage_list.html:70
-#: templates/gui/node/details.html:130 templates/gui/node/images.html:92
+#: templates/gui/node/details.html:133 templates/gui/node/images.html:92
 #: templates/gui/node/list.html:50 templates/gui/node/navigation.html:8
-#: templates/gui/node/storages.html:57 templates/gui/vm/list.html:61
+#: templates/gui/node/storages.html:57 templates/gui/vm/list.html:59
 msgid "Servers"
 msgstr "Servery"
 
 #: navigation.py:106 templates/gui/vm/add.html:35
 #: templates/gui/vm/add.html.py:48 templates/gui/vm/add.html:55
-#: templates/gui/vm/details.html:131 templates/gui/vm/list_control.html:7
+#: templates/gui/vm/details.html:133 templates/gui/vm/list_control.html:7
 #: templates/gui/vm/list_control.html:25
 msgid "Add Server"
 msgstr "Pridať server"
 
-#: navigation.py:114 templates/gui/dc/dc_list.html:114
-#: templates/gui/dc/dc_settings_table.html:118 templates/gui/vm/list.html:157
+#: navigation.py:114 templates/gui/dc/dc_list.html:119
+#: templates/gui/dc/dc_settings_table.html:121 templates/gui/vm/list.html:155
 #: templates/gui/vm/navigation.html:16
 msgid "Monitoring"
 msgstr "Monitoring"
@@ -2097,11 +2105,11 @@ msgstr "Monitoring"
 msgid "Task log"
 msgstr "Task log"
 
-#: navigation.py:131 templates/gui/dc/dc_list.html:115
+#: navigation.py:131 templates/gui/dc/dc_list.html:120
 msgid "Support"
 msgstr "Podpora"
 
-#: navigation.py:139 templates/gui/dc/dc_list.html:117
+#: navigation.py:139 templates/gui/dc/dc_list.html:122
 #: templates/gui/docs/faq.html:24
 msgid "FAQ"
 msgstr "FAQ"
@@ -2123,17 +2131,17 @@ msgid "More"
 msgstr ""
 
 #: node/forms.py:37 node/forms.py:162 tasklog/forms.py:13
-#: templates/gui/dc/image_list.html:104
-#: templates/gui/dc/imagestore_list.html:96
+#: templates/gui/dc/image_list.html:109
+#: templates/gui/dc/imagestore_list.html:99
 #: templates/gui/node/backup_list.html:17
 #: templates/gui/node/backup_list_all.html:13
 #: templates/gui/node/backup_list_novm.html:18
-#: templates/gui/node/details.html:150 templates/gui/node/images.html:91
-#: templates/gui/node/list.html:45 templates/gui/node/vms.html:92
+#: templates/gui/node/details.html:153 templates/gui/node/images.html:91
+#: templates/gui/node/list.html:45 templates/gui/node/vms.html:90
 #: templates/gui/reports/cloud_customers.html:45
 #: templates/gui/tasklog/tasklog_table.html:7
-#: templates/gui/vm/backup_list.html:17 templates/gui/vm/details.html:344
-#: templates/gui/vm/list.html:102 templates/gui/vm/snapshot_list.html:17
+#: templates/gui/vm/backup_list.html:17 templates/gui/vm/details.html:374
+#: templates/gui/vm/list.html:100 templates/gui/vm/snapshot_list.html:17
 msgid "Status"
 msgstr "Stav"
 
@@ -2163,19 +2171,19 @@ msgid ""
 "machines."
 msgstr ""
 
-#: node/forms.py:53 vm/forms.py:247
+#: node/forms.py:53 vm/forms.py:231
 msgid "Monitoring templates"
 msgstr ""
 
-#: node/forms.py:54 vm/forms.py:248
+#: node/forms.py:54 vm/forms.py:232
 msgid "Comma-separated list of custom monitoring templates."
 msgstr ""
 
-#: node/forms.py:56 vm/forms.py:250
+#: node/forms.py:56 vm/forms.py:234
 msgid "Monitoring hostgroups"
 msgstr ""
 
-#: node/forms.py:57 vm/forms.py:251
+#: node/forms.py:57 vm/forms.py:235
 msgid "Comma-separated list of custom monitoring hostgroups."
 msgstr ""
 
@@ -2190,19 +2198,18 @@ msgid ""
 msgstr ""
 
 #: node/forms.py:140 templates/gui/node/image_multi_form.html:16
-#: templates/gui/vm/details.html:462 vm/forms.py:242 vm/forms.py:350
-#: vm/forms.py:725
+#: templates/gui/vm/details.html:594 vm/forms.py:226 vm/forms.py:335
+#: vm/forms.py:710
 msgid "Storage"
 msgstr ""
 
-#: node/forms.py:158 templates/gui/dc/network_ip_list.html:195
-#: templates/gui/dc/subnet_ip_list.html:68
+#: node/forms.py:158 templates/gui/dc/subnet_ip_list.html:68
 #: templates/gui/reports/cloud_customers.html:37
 #: templates/gui/support/add_ticket_email.txt:5
 msgid "Server"
 msgstr "Server"
 
-#: node/forms.py:160 vm/forms.py:720
+#: node/forms.py:160 vm/forms.py:705
 msgid "Backup type"
 msgstr ""
 
@@ -2424,17 +2431,13 @@ msgstr ""
 msgid "The page you were looking for does not exist"
 msgstr ""
 
-#: templates/404.html:61
-msgid "You seem to be lost in space"
-msgstr "Vyzerá to tak, že Ste sa stratili vo vesmíre"
-
 #: templates/404.html:62
-msgid "Click here"
-msgstr "Kliknite sem"
+msgid "Your ship has run ashore!"
+msgstr ""
 
-#: templates/404.html:62
-msgid "to go home"
-msgstr "pre návrat domov"
+#: templates/404.html:63
+msgid "Click here to return to mighty Danube Cloud current"
+msgstr ""
 
 #: templates/50x.html:4
 msgid "The page is temporarily unavailable"
@@ -2484,8 +2487,8 @@ msgstr "OK"
 #: templates/gui/dc/domain_record_list.html:30
 #: templates/gui/dc/domain_record_list.html:64
 #: templates/gui/dc/group_list.html:36 templates/gui/dc/group_list.html:65
-#: templates/gui/dc/image_list.html:37 templates/gui/dc/image_list.html:66
-#: templates/gui/dc/imagestore_list.html:30 templates/gui/dc/iso_list.html:36
+#: templates/gui/dc/image_list.html:42 templates/gui/dc/image_list.html:71
+#: templates/gui/dc/imagestore_list.html:34 templates/gui/dc/iso_list.html:36
 #: templates/gui/dc/iso_list.html.py:65
 #: templates/gui/dc/network_ip_list.html:31
 #: templates/gui/dc/network_ip_list.html:53
@@ -2507,9 +2510,9 @@ msgstr "OK"
 #: templates/gui/vm/backup_restore_modal.html:26
 #: templates/gui/vm/backup_update_modal.html:16
 #: templates/gui/vm/details.html:43 templates/gui/vm/details.html.py:85
-#: templates/gui/vm/details.html:106 templates/gui/vm/details.html.py:127
-#: templates/gui/vm/details.html:152 templates/gui/vm/details.html.py:177
-#: templates/gui/vm/details.html:210 templates/gui/vm/import_modal.html:18
+#: templates/gui/vm/details.html:106 templates/gui/vm/details.html.py:129
+#: templates/gui/vm/details.html:156 templates/gui/vm/details.html.py:183
+#: templates/gui/vm/details.html:216 templates/gui/vm/import_modal.html:18
 #: templates/gui/vm/list.html:26 templates/gui/vm/snapshot.html:41
 #: templates/gui/vm/snapshot.html.py:65 templates/gui/vm/snapshot.html:95
 #: templates/gui/vm/snapshot.html.py:119 templates/gui/vm/snapshot.html:140
@@ -2689,6 +2692,19 @@ msgstr ""
 msgid "Show deleted"
 msgstr ""
 
+#: templates/gui/dc/dc_global_toggle.html:2
+#: templates/gui/dc/dc_global_toggle.html:4
+msgid ""
+"Global settings have an impact on the behavior of all virtual data centers "
+"and the Danube Cloud system, including objects that cannot be associated "
+"with a virtual data center (compute nodes)."
+msgstr ""
+
+#: templates/gui/dc/dc_global_toggle.html:2
+#: templates/gui/dc/dc_global_toggle.html:4
+msgid "Show global settings"
+msgstr ""
+
 #: templates/gui/dc/dc_list.html:22
 msgid "Update Datacenter"
 msgstr ""
@@ -2703,15 +2719,15 @@ msgstr ""
 
 #: templates/gui/dc/dc_list.html:36 templates/gui/dc/domain_list.html:32
 #: templates/gui/dc/domain_record_list.html:32
-#: templates/gui/dc/group_list.html:37 templates/gui/dc/image_list.html:38
+#: templates/gui/dc/group_list.html:37 templates/gui/dc/image_list.html:43
 #: templates/gui/dc/iso_list.html:37 templates/gui/dc/network_ip_list.html:32
 #: templates/gui/dc/network_ip_list.html:55
 #: templates/gui/dc/network_list.html:38 templates/gui/dc/node_list.html:32
 #: templates/gui/dc/user_list.html:36 templates/gui/node/details.html:36
 #: templates/gui/node/storages.html:33 templates/gui/vm/add.html:33
-#: templates/gui/vm/details.html:107 templates/gui/vm/details.html.py:128
-#: templates/gui/vm/details.html:153 templates/gui/vm/details.html.py:178
-#: templates/gui/vm/details.html:369 templates/gui/vm/list_control.html:16
+#: templates/gui/vm/details.html:107 templates/gui/vm/details.html.py:130
+#: templates/gui/vm/details.html:157 templates/gui/vm/details.html.py:184
+#: templates/gui/vm/details.html:443 templates/gui/vm/list_control.html:16
 msgid "Update"
 msgstr "Zmeniť"
 
@@ -2719,7 +2735,7 @@ msgstr "Zmeniť"
 msgid "Delete Datacenter"
 msgstr ""
 
-#: templates/gui/dc/dc_list.html:38 templates/gui/dc/dc_list.html.py:135
+#: templates/gui/dc/dc_list.html:38 templates/gui/dc/dc_list.html.py:140
 msgid "Add Datacenter"
 msgstr ""
 
@@ -2727,14 +2743,14 @@ msgstr ""
 msgid "Change Datacenter Settings"
 msgstr "Zmeniť nastavenia datacentra"
 
-#: templates/gui/dc/dc_list.html:58 templates/gui/dc/image_list.html:36
-#: templates/gui/dc/imagestore_list.html:29
+#: templates/gui/dc/dc_list.html:58 templates/gui/dc/image_list.html:41
+#: templates/gui/dc/imagestore_list.html:33
 #: templates/gui/dc/network_ip_list.html:30
 #: templates/gui/dc/network_list.html:36 templates/gui/node/details.html:34
 #: templates/gui/node/storages.html:31 templates/gui/vm/add.html:30
 #: templates/gui/vm/backup.html:65 templates/gui/vm/backup.html.py:85
-#: templates/gui/vm/details.html:126 templates/gui/vm/details.html.py:151
-#: templates/gui/vm/details.html:176 templates/gui/vm/snapshot.html:139
+#: templates/gui/vm/details.html:127 templates/gui/vm/details.html.py:154
+#: templates/gui/vm/details.html:181 templates/gui/vm/snapshot.html:139
 #: templates/gui/vm/snapshot.html.py:159 templates/gui/vm/snapshot.html:184
 msgid "Show advanced settings"
 msgstr ""
@@ -2744,7 +2760,7 @@ msgid "Update settings"
 msgstr ""
 
 #: templates/gui/dc/dc_list.html:78 templates/gui/dc/group_list.html:97
-#: templates/gui/dc/image_list.html:98 templates/gui/dc/iso_list.html:96
+#: templates/gui/dc/image_list.html:103 templates/gui/dc/iso_list.html:96
 #: templates/gui/dc/network_list.html:98 templates/gui/dc/template_list.html:63
 #: templates/gui/node/images.html:85
 msgid "Alias (name)"
@@ -2754,47 +2770,80 @@ msgstr ""
 msgid "Site"
 msgstr ""
 
-#: templates/gui/dc/dc_list.html:95
+#: templates/gui/dc/dc_list.html:97
 msgid "Update or delete Datacenter"
 msgstr ""
 
-#: templates/gui/dc/dc_list.html:111
+#: templates/gui/dc/dc_list.html:98 templates/gui/dc/domain_list.html:110
+#: templates/gui/dc/domain_list.html:113
+#: templates/gui/dc/domain_record_list.html:111
+#: templates/gui/dc/group_list.html:115 templates/gui/dc/group_list.html:118
+#: templates/gui/dc/image_list.html:129 templates/gui/dc/image_list.html:134
+#: templates/gui/dc/imagestore_list.html:111 templates/gui/dc/iso_list.html:120
+#: templates/gui/dc/iso_list.html.py:125
+#: templates/gui/dc/network_ip_list.html:110
+#: templates/gui/dc/network_ip_list.html:228
+#: templates/gui/dc/network_list.html:122
+#: templates/gui/dc/network_list.html:125 templates/gui/dc/node_list.html:90
+#: templates/gui/dc/node_list.html.py:115 templates/gui/dc/storage_list.html:91
+#: templates/gui/dc/storage_list.html:94 templates/gui/dc/template_list.html:84
+#: templates/gui/dc/template_list.html:87 templates/gui/dc/user_list.html:95
+#: templates/gui/node/backup_list.html:49
+#: templates/gui/node/backup_list_all.html:35
+#: templates/gui/node/backup_list_novm.html:51
+#: templates/gui/node/details.html:59 templates/gui/node/images.html:105
+#: templates/gui/node/storages.html:73
+#: templates/gui/vm/backup_define_list.html:24
+#: templates/gui/vm/backup_list.html:50 templates/gui/vm/details.html:292
+#: templates/gui/vm/details.html.py:528 templates/gui/vm/details.html:558
+#: templates/gui/vm/details.html.py:613
+#: templates/gui/vm/snapshot_define_list.html:23
+#: templates/gui/vm/snapshot_list.html:45
+msgid "Edit"
+msgstr ""
+
+#: templates/gui/dc/dc_list.html:116
 msgid "Change Datacenter settings"
 msgstr "Upraviť nastavenia datacentra"
 
-#: templates/gui/dc/dc_list.html:112 templates/gui/dc/storage_list.html:71
+#: templates/gui/dc/dc_list.html:117 templates/gui/dc/storage_list.html:71
 #: templates/gui/node/storages.html:58 templates/gui/vm/navigation.html:10
 msgid "Snapshots"
 msgstr "Snapshoty"
 
-#: templates/gui/dc/dc_list.html:113 templates/gui/dc/storage_list.html:72
+#: templates/gui/dc/dc_list.html:118 templates/gui/dc/storage_list.html:72
 #: templates/gui/node/navigation.html:10 templates/gui/node/storages.html:60
 #: templates/gui/vm/navigation.html:13
 msgid "Backups"
 msgstr "Zálohy"
 
-#: templates/gui/dc/dc_list.html:116
+#: templates/gui/dc/dc_list.html:121
 msgid "User Registration"
 msgstr ""
 
-#: templates/gui/dc/dc_list.html:130 templates/gui/dc/domain_list.html:131
-#: templates/gui/dc/group_list.html:130 templates/gui/dc/image_list.html:148
-#: templates/gui/dc/imagestore_list.html:127 templates/gui/dc/iso_list.html:138
-#: templates/gui/dc/network_ip_list.html:267
-#: templates/gui/dc/network_list.html:146 templates/gui/dc/node_list.html:131
-#: templates/gui/dc/storage_list.html:119
-#: templates/gui/dc/subnet_ip_list.html:107
-#: templates/gui/dc/template_list.html:105 templates/gui/dc/user_list.html:117
-#: templates/gui/node/backup_list_all.html:42
-#: templates/gui/node/images.html:123 templates/gui/node/storages.html:93
-#: templates/gui/vm/backup_define_list.html:41
-#: templates/gui/vm/snapshot_define_list.html:39
+#: templates/gui/dc/dc_list.html:135 templates/gui/dc/domain_list.html:148
+#: templates/gui/dc/group_list.html:136 templates/gui/dc/image_list.html:162
+#: templates/gui/dc/imagestore_list.html:135 templates/gui/dc/iso_list.html:149
+#: templates/gui/dc/network_ip_list.html:278
+#: templates/gui/dc/network_list.html:158 templates/gui/dc/node_list.html:135
+#: templates/gui/dc/storage_list.html:120
+#: templates/gui/dc/subnet_ip_list.html:112
+#: templates/gui/dc/template_list.html:110 templates/gui/dc/user_list.html:118
+#: templates/gui/node/backup_list_all.html:45
+#: templates/gui/node/images.html:125 templates/gui/node/storages.html:94
+#: templates/gui/vm/backup_define_list.html:40
+#: templates/gui/vm/snapshot_define_list.html:38
 msgid "Total"
 msgstr ""
 
-#: templates/gui/dc/dc_list.html:135
+#: templates/gui/dc/dc_list.html:140
 msgid "Create new Datacenter"
 msgstr "Vytvoriť nové datacentrum"
+
+#: templates/gui/dc/dc_settings.html:8
+msgid ""
+"This is a global setting and it can only be changed from the main data center"
+msgstr ""
 
 #: templates/gui/dc/dc_settings.html:24
 msgid "This might be dangerous!"
@@ -2819,23 +2868,23 @@ msgstr ""
 msgid "Modules"
 msgstr ""
 
-#: templates/gui/dc/dc_settings_table.html:29
+#: templates/gui/dc/dc_settings_table.html:30
 msgid "Email"
 msgstr ""
 
-#: templates/gui/dc/dc_settings_table.html:97
+#: templates/gui/dc/dc_settings_table.html:100
 msgid "ISO images"
 msgstr ""
 
-#: templates/gui/dc/dc_settings_table.html:111
+#: templates/gui/dc/dc_settings_table.html:114
 msgid "User accounts"
 msgstr ""
 
-#: templates/gui/dc/dc_settings_table.html:147
+#: templates/gui/dc/dc_settings_table.html:150
 msgid "API"
 msgstr ""
 
-#: templates/gui/dc/dc_settings_table.html:151
+#: templates/gui/dc/dc_settings_table.html:154
 msgid "SMS"
 msgstr ""
 
@@ -2867,7 +2916,7 @@ msgstr ""
 msgid "Add Domain"
 msgstr ""
 
-#: templates/gui/dc/domain_list.html:47 templates/gui/dc/domain_list.html:136
+#: templates/gui/dc/domain_list.html:47 templates/gui/dc/domain_list.html:153
 msgid "Attach DNS Domain"
 msgstr ""
 
@@ -2876,7 +2925,7 @@ msgid "DNS Domains"
 msgstr ""
 
 #: templates/gui/dc/domain_list.html:92 templates/gui/dc/group_list.html:98
-#: templates/gui/dc/image_list.html:101 templates/gui/dc/iso_list.html:99
+#: templates/gui/dc/image_list.html:106 templates/gui/dc/iso_list.html:99
 #: templates/gui/dc/network_list.html:101
 #: templates/gui/dc/template_list.html:66 templates/gui/dc/user_list.html:75
 #: templates/gui/node/images.html:88
@@ -2887,39 +2936,39 @@ msgstr ""
 msgid "Records"
 msgstr ""
 
-#: templates/gui/dc/domain_list.html:108
+#: templates/gui/dc/domain_list.html:110
 msgid "Attach, update or delete DNS Domain"
 msgstr ""
 
-#: templates/gui/dc/domain_list.html:110
+#: templates/gui/dc/domain_list.html:113
 msgid "Detach, update or delete DNS Domain"
 msgstr ""
 
-#: templates/gui/dc/domain_list.html:117
+#: templates/gui/dc/domain_list.html:126
 msgid "Show/edit domain DNS records"
 msgstr ""
 
-#: templates/gui/dc/domain_list.html:117
+#: templates/gui/dc/domain_list.html:126
 #, python-format
-msgid "%(counter)s record"
+msgid "%(counter)s record "
 msgid_plural "%(counter)s records"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: templates/gui/dc/domain_list.html:117
+#: templates/gui/dc/domain_list.html:128
 msgid "N/A"
 msgstr ""
 
-#: templates/gui/dc/domain_list.html:136
+#: templates/gui/dc/domain_list.html:153
 msgid "Associate DNS Domain with this Datacenter"
 msgstr ""
 
-#: templates/gui/dc/domain_list.html:138
+#: templates/gui/dc/domain_list.html:155
 msgid "Create new DNS Domain"
 msgstr ""
 
-#: templates/gui/dc/domain_list.html:138
+#: templates/gui/dc/domain_list.html:155
 msgid "Add DNS Domain"
 msgstr ""
 
@@ -2933,20 +2982,21 @@ msgstr ""
 
 #: templates/gui/dc/domain_record_list.html:31
 #: templates/gui/dc/domain_record_list.html:65
-#: templates/gui/dc/domain_record_list.html:136
+#: templates/gui/dc/domain_record_list.html:137
 #: templates/gui/dc/network_ip_list.html:54
 #: templates/gui/dc/network_ip_list.html:88
-#: templates/gui/dc/network_ip_list.html:263
-#: templates/gui/node/backup_list.html:67
-#: templates/gui/node/backup_list_novm.html:69
-#: templates/gui/node/details.html:37 templates/gui/vm/backup_list.html:69
-#: templates/gui/vm/details.html:372 templates/gui/vm/list_control.html:18
-#: templates/gui/vm/snapshot_list.html:68
+#: templates/gui/dc/network_ip_list.html:274
+#: templates/gui/node/backup_list.html:71
+#: templates/gui/node/backup_list_novm.html:73
+#: templates/gui/node/details.html:37
+#: templates/gui/profile/profile_sshkey_list.html:15
+#: templates/gui/vm/backup_list.html:75 templates/gui/vm/details.html:456
+#: templates/gui/vm/list_control.html:18 templates/gui/vm/snapshot_list.html:70
 msgid "Delete"
 msgstr ""
 
 #: templates/gui/dc/domain_record_list.html:33
-#: templates/gui/dc/domain_record_list.html:135
+#: templates/gui/dc/domain_record_list.html:136
 msgid "Add DNS record"
 msgstr ""
 
@@ -2967,11 +3017,11 @@ msgstr ""
 msgid "Changed"
 msgstr ""
 
-#: templates/gui/dc/domain_record_list.html:110
+#: templates/gui/dc/domain_record_list.html:111
 msgid "Update or delete DNS record"
 msgstr ""
 
-#: templates/gui/dc/domain_record_list.html:126
+#: templates/gui/dc/domain_record_list.html:127
 #, python-format
 msgid ""
 "Selected <span id=\"selected\">0</span> of <span id=\"total\">%(len)s</span> "
@@ -2989,11 +3039,11 @@ msgstr[2] ""
 "Označené <span id=\"selected\">0</span> z <span id=\"total\">%(len)s</span> "
 "DNS záznamov"
 
-#: templates/gui/dc/domain_record_list.html:135
+#: templates/gui/dc/domain_record_list.html:136
 msgid "Add new DNS record for this domain"
 msgstr ""
 
-#: templates/gui/dc/domain_record_list.html:136
+#: templates/gui/dc/domain_record_list.html:137
 msgid "Delete selected DNS records"
 msgstr ""
 
@@ -3018,7 +3068,7 @@ msgid "Detach User Group"
 msgstr ""
 
 #: templates/gui/dc/group_list.html:40 templates/gui/dc/group_list.html:54
-#: templates/gui/dc/group_list.html:66 templates/gui/dc/group_list.html:135
+#: templates/gui/dc/group_list.html:66 templates/gui/dc/group_list.html:141
 msgid "Attach User Group"
 msgstr ""
 
@@ -3026,27 +3076,27 @@ msgstr ""
 msgid "Delete User Group"
 msgstr ""
 
-#: templates/gui/dc/group_list.html:43 templates/gui/dc/group_list.html:137
+#: templates/gui/dc/group_list.html:43 templates/gui/dc/group_list.html:143
 msgid "Add User Group"
 msgstr ""
 
-#: templates/gui/dc/group_list.html:112
+#: templates/gui/dc/group_list.html:115
 msgid "Attach, update or delete User Group"
 msgstr ""
 
-#: templates/gui/dc/group_list.html:114
+#: templates/gui/dc/group_list.html:118
 msgid "Detach, update or delete User Group"
 msgstr ""
 
-#: templates/gui/dc/group_list.html:114
+#: templates/gui/dc/group_list.html:118
 msgid "Update or delete User Group"
 msgstr ""
 
-#: templates/gui/dc/group_list.html:135
+#: templates/gui/dc/group_list.html:141
 msgid "Associate User group with this Datacenter"
 msgstr ""
 
-#: templates/gui/dc/group_list.html:137
+#: templates/gui/dc/group_list.html:143
 msgid "Create new user group"
 msgstr ""
 
@@ -3066,160 +3116,177 @@ msgstr ""
 msgid "Import Disk Image"
 msgstr ""
 
-#: templates/gui/dc/image_list.html:40
+#: templates/gui/dc/image_list.html:32 templates/gui/dc/image_list.html:33
+#: templates/gui/dc/imagestore_list.html:25
+msgid ""
+"<strong>Note:</strong> Image server support is disabled. All operations are "
+"currently performed only at database level."
+msgstr ""
+
+#: templates/gui/dc/image_list.html:45
 msgid "Detach Image"
 msgstr ""
 
-#: templates/gui/dc/image_list.html:41 templates/gui/dc/image_list.html:67
+#: templates/gui/dc/image_list.html:46 templates/gui/dc/image_list.html:72
 msgid "Attach Image"
 msgstr ""
 
-#: templates/gui/dc/image_list.html:43
+#: templates/gui/dc/image_list.html:48
 msgid "Delete Image"
 msgstr ""
 
-#: templates/gui/dc/image_list.html:44 templates/gui/dc/imagestore_list.html:33
+#: templates/gui/dc/image_list.html:49 templates/gui/dc/imagestore_list.html:37
 msgid "Import Image"
 msgstr ""
 
-#: templates/gui/dc/image_list.html:55
+#: templates/gui/dc/image_list.html:60
 msgid "Attach Disk Image"
 msgstr ""
 
-#: templates/gui/dc/image_list.html:102 templates/gui/dc/storage_list.html:69
+#: templates/gui/dc/image_list.html:107 templates/gui/dc/storage_list.html:69
 #: templates/gui/node/backup_list.html:19
-#: templates/gui/node/backup_list.html:58
+#: templates/gui/node/backup_list.html:62
 #: templates/gui/node/backup_list_all.html:15
-#: templates/gui/node/backup_list_all.html:43
+#: templates/gui/node/backup_list_all.html:46
 #: templates/gui/node/backup_list_novm.html:20
-#: templates/gui/node/backup_list_novm.html:60
-#: templates/gui/node/details.html:268 templates/gui/node/images.html:89
+#: templates/gui/node/backup_list_novm.html:64
+#: templates/gui/node/details.html:271 templates/gui/node/images.html:89
 #: templates/gui/node/storages.html:56 templates/gui/vm/backup_list.html:19
-#: templates/gui/vm/backup_list.html:58 templates/gui/vm/details.html:459
+#: templates/gui/vm/backup_list.html:64 templates/gui/vm/details.html:591
 #: templates/gui/vm/snapshot_list.html:18
-#: templates/gui/vm/snapshot_list.html:58 vm/forms.py:338
+#: templates/gui/vm/snapshot_list.html:60 vm/forms.py:323
 msgid "Size"
 msgstr "Veľkosť"
 
-#: templates/gui/dc/image_list.html:103
-#: templates/gui/dc/imagestore_list.html:94 templates/gui/dc/iso_list.html:100
+#: templates/gui/dc/image_list.html:108
+#: templates/gui/dc/imagestore_list.html:97 templates/gui/dc/iso_list.html:100
 #: templates/gui/dc/template_list.html:67 templates/gui/node/images.html:90
 msgid "OS&nbsp;Type"
 msgstr "Typ&nbsp;OS"
 
-#: templates/gui/dc/image_list.html:105
+#: templates/gui/dc/image_list.html:110
 msgid "Deploy?"
 msgstr ""
 
-#: templates/gui/dc/image_list.html:106
+#: templates/gui/dc/image_list.html:111
 msgid "Resize?"
 msgstr ""
 
-#: templates/gui/dc/image_list.html:121
+#: templates/gui/dc/image_list.html:128
 msgid "Attach, update or delete disk Image"
 msgstr ""
 
-#: templates/gui/dc/image_list.html:123
+#: templates/gui/dc/image_list.html:133
 msgid "Detach, update or delete disk Image"
 msgstr ""
 
-#: templates/gui/dc/image_list.html:123
+#: templates/gui/dc/image_list.html:133
 msgid "Update or delete disk Image"
 msgstr ""
 
-#: templates/gui/dc/image_list.html:153
+#: templates/gui/dc/image_list.html:167
 msgid "Associate disk Image with this Datacenter"
 msgstr ""
 
-#: templates/gui/dc/image_list.html:153
+#: templates/gui/dc/image_list.html:167
 msgid "Attach disk Image"
 msgstr ""
 
-#: templates/gui/dc/image_list.html:155
+#: templates/gui/dc/image_list.html:169
 msgid "Import disk Image from external URL"
 msgstr ""
 
-#: templates/gui/dc/image_list.html:155
+#: templates/gui/dc/image_list.html:169
 msgid "Import disk Image from URL"
 msgstr ""
 
-#: templates/gui/dc/image_list.html:156
+#: templates/gui/dc/image_list.html:170
 msgid "Import disk Image from remote image repository"
 msgstr ""
 
-#: templates/gui/dc/image_list.html:156
+#: templates/gui/dc/image_list.html:170
 msgid "Import disk Image from repository"
 msgstr ""
 
-#: templates/gui/dc/imagestore_list.html:46
+#: templates/gui/dc/imagestore_list.html:50
 msgid "repository"
 msgstr ""
 
-#: templates/gui/dc/imagestore_list.html:55
+#: templates/gui/dc/imagestore_list.html:59
 #, python-format
 msgid ""
 "Show images available on the %(repo_name)s (%(repo_url)s) image repository"
 msgstr ""
 
-#: templates/gui/dc/imagestore_list.html:67
+#: templates/gui/dc/imagestore_list.html:71
 msgid "search by image name"
 msgstr ""
 
-#: templates/gui/dc/imagestore_list.html:71
+#: templates/gui/dc/imagestore_list.html:74
+#, python-format
+msgid "Show last %(default_limit)s published images"
+msgstr ""
+
+#: templates/gui/dc/imagestore_list.html:74
+#, python-format
+msgid "Last %(default_limit)s"
+msgstr ""
+
+#: templates/gui/dc/imagestore_list.html:75
 msgid "Show images published during last month"
 msgstr ""
 
-#: templates/gui/dc/imagestore_list.html:71
+#: templates/gui/dc/imagestore_list.html:75
 msgid "Last month"
 msgstr ""
 
-#: templates/gui/dc/imagestore_list.html:72
+#: templates/gui/dc/imagestore_list.html:76
 msgid "Show images published during last year"
 msgstr ""
 
-#: templates/gui/dc/imagestore_list.html:72
+#: templates/gui/dc/imagestore_list.html:76
 msgid "Last year"
 msgstr ""
 
-#: templates/gui/dc/imagestore_list.html:73
+#: templates/gui/dc/imagestore_list.html:77
 msgid "Show all published images"
 msgstr ""
 
-#: templates/gui/dc/imagestore_list.html:73
+#: templates/gui/dc/imagestore_list.html:77
 msgid "All"
 msgstr ""
 
-#: templates/gui/dc/imagestore_list.html:79
+#: templates/gui/dc/imagestore_list.html:82
 #, python-format
 msgid "Image repository %(repo_name)s was last updated on %(last_update)s"
 msgstr ""
 
-#: templates/gui/dc/imagestore_list.html:79
+#: templates/gui/dc/imagestore_list.html:82
 #, python-format
 msgid "Image repostiory %(repo_name)s was not updated yet"
 msgstr ""
 
-#: templates/gui/dc/imagestore_list.html:79 templates/gui/node/details.html:163
+#: templates/gui/dc/imagestore_list.html:82 templates/gui/node/details.html:166
 msgid "Refresh"
 msgstr ""
 
-#: templates/gui/dc/imagestore_list.html:93
+#: templates/gui/dc/imagestore_list.html:96
 msgid "Name (version)"
 msgstr ""
 
-#: templates/gui/dc/imagestore_list.html:95
+#: templates/gui/dc/imagestore_list.html:98
 msgid "Size (download)"
 msgstr ""
 
-#: templates/gui/dc/imagestore_list.html:97
+#: templates/gui/dc/imagestore_list.html:100
 msgid "Published at"
 msgstr ""
 
-#: templates/gui/dc/imagestore_list.html:126
+#: templates/gui/dc/imagestore_list.html:134
 msgid "Last updated"
 msgstr ""
 
-#: templates/gui/dc/imagestore_list.html:130
+#: templates/gui/dc/imagestore_list.html:138
 msgid "Return to image list"
 msgstr ""
 
@@ -3263,31 +3330,31 @@ msgstr ""
 msgid "Add ISO Image"
 msgstr ""
 
-#: templates/gui/dc/iso_list.html:115
+#: templates/gui/dc/iso_list.html:119
 msgid "Attach, update or delete ISO Image"
 msgstr ""
 
-#: templates/gui/dc/iso_list.html:117
+#: templates/gui/dc/iso_list.html:124
 msgid "Detach, update or delete ISO Image"
 msgstr ""
 
-#: templates/gui/dc/iso_list.html:117
+#: templates/gui/dc/iso_list.html:124
 msgid "Update or delete ISO Image"
 msgstr ""
 
-#: templates/gui/dc/iso_list.html:143
+#: templates/gui/dc/iso_list.html:154
 msgid "Associate ISO Image with this Datacenter"
 msgstr ""
 
-#: templates/gui/dc/iso_list.html:143
+#: templates/gui/dc/iso_list.html:154
 msgid "Attach ISO image"
 msgstr ""
 
-#: templates/gui/dc/iso_list.html:145
+#: templates/gui/dc/iso_list.html:156
 msgid "Create new ISO image"
 msgstr ""
 
-#: templates/gui/dc/iso_list.html:145
+#: templates/gui/dc/iso_list.html:156
 msgid "Add ISO image"
 msgstr ""
 
@@ -3310,7 +3377,7 @@ msgid "Add new IP address(es)"
 msgstr ""
 
 #: templates/gui/dc/network_ip_list.html:56
-#: templates/gui/dc/network_ip_list.html:262
+#: templates/gui/dc/network_ip_list.html:273
 msgid "Add IP address(es)"
 msgstr ""
 
@@ -3322,36 +3389,36 @@ msgstr ""
 msgid "IP Addresses"
 msgstr ""
 
-#: templates/gui/dc/network_ip_list.html:108
-#: templates/gui/dc/network_list.html:122
+#: templates/gui/dc/network_ip_list.html:109
+#: templates/gui/dc/network_list.html:125
 msgid "Update or delete Network"
 msgstr ""
 
-#: templates/gui/dc/network_ip_list.html:112
-#: templates/gui/dc/subnet_ip_list.html:27 templates/gui/vm/details.html:406
+#: templates/gui/dc/network_ip_list.html:117
+#: templates/gui/dc/subnet_ip_list.html:27 templates/gui/vm/details.html:513
 msgid "Netmask"
 msgstr "Maska"
 
-#: templates/gui/dc/network_ip_list.html:116
+#: templates/gui/dc/network_ip_list.html:121
 #: templates/gui/dc/subnet_ip_list.html:29
 msgid "First host address"
 msgstr ""
 
-#: templates/gui/dc/network_ip_list.html:117
+#: templates/gui/dc/network_ip_list.html:122
 #: templates/gui/dc/subnet_ip_list.html:30
 msgid "Last host address"
 msgstr ""
 
-#: templates/gui/dc/network_ip_list.html:119
+#: templates/gui/dc/network_ip_list.html:124
 #: templates/gui/dc/subnet_ip_list.html:32
 msgid "Usable / Registered / Free IPs"
 msgstr ""
 
-#: templates/gui/dc/network_ip_list.html:124
+#: templates/gui/dc/network_ip_list.html:129
 msgid "Total / Free IPs"
 msgstr ""
 
-#: templates/gui/dc/network_ip_list.html:131
+#: templates/gui/dc/network_ip_list.html:136
 #, python-format
 msgid ""
 "\n"
@@ -3369,48 +3436,56 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: templates/gui/dc/network_ip_list.html:140
-#: templates/gui/dc/network_list.html:129 templates/gui/vm/details.html:421
+#: templates/gui/dc/network_ip_list.html:145
+#: templates/gui/dc/network_list.html:139 templates/gui/vm/details.html:545
 msgid "IP addresses for this network are managed by an external service"
 msgstr ""
 
-#: templates/gui/dc/network_ip_list.html:149
+#: templates/gui/dc/network_ip_list.html:154
 #: templates/gui/dc/subnet_ip_list.html:48
 msgid "Return to network list"
 msgstr ""
 
-#: templates/gui/dc/network_ip_list.html:164
+#: templates/gui/dc/network_ip_list.html:169
 #: templates/gui/dc/subnet_ip_list.html:60
 msgid "IP addresses"
 msgstr ""
 
-#: templates/gui/dc/network_ip_list.html:174
-#: templates/gui/dc/network_ip_list.html:176
+#: templates/gui/dc/network_ip_list.html:179
+#: templates/gui/dc/network_ip_list.html:181
 msgid "Switch between showing all or only used IP addresses"
 msgstr ""
 
-#: templates/gui/dc/network_ip_list.html:174
-#: templates/gui/dc/network_ip_list.html:176
+#: templates/gui/dc/network_ip_list.html:179
+#: templates/gui/dc/network_ip_list.html:181
 msgid "Used IPs"
 msgstr ""
 
-#: templates/gui/dc/network_ip_list.html:193
-#: templates/gui/dc/subnet_ip_list.html:66 templates/gui/node/details.html:62
-#: templates/gui/node/details.html.py:186 templates/gui/node/details.html:234
+#: templates/gui/dc/network_ip_list.html:198
+#: templates/gui/dc/subnet_ip_list.html:66 templates/gui/node/details.html:65
+#: templates/gui/node/details.html.py:189 templates/gui/node/details.html:237
 msgid "IP address"
 msgstr "IP Adresa"
 
-#: templates/gui/dc/network_ip_list.html:198
-#: templates/gui/dc/subnet_ip_list.html:71 templates/gui/node/details.html:184
-#: templates/gui/node/details.html:232
+#: templates/gui/dc/network_ip_list.html:200
+msgid "Server(s)"
+msgstr ""
+
+#: templates/gui/dc/network_ip_list.html:201
+msgid "Hostname(s)"
+msgstr ""
+
+#: templates/gui/dc/network_ip_list.html:203
+#: templates/gui/dc/subnet_ip_list.html:71 templates/gui/node/details.html:187
+#: templates/gui/node/details.html:235
 msgid "MAC address"
 msgstr ""
 
-#: templates/gui/dc/network_ip_list.html:224
+#: templates/gui/dc/network_ip_list.html:228
 msgid "Update or delete IP address"
 msgstr ""
 
-#: templates/gui/dc/network_ip_list.html:253
+#: templates/gui/dc/network_ip_list.html:264
 #, python-format
 msgid ""
 "Selected <span id=\"selected\">0</span> of <span id=\"total\">%(len)s</span> "
@@ -3428,11 +3503,11 @@ msgstr[2] ""
 "Označené <span id=\"selected\">0</span> z <span id=\"total\">%(len)s</span> "
 "IP adries"
 
-#: templates/gui/dc/network_ip_list.html:262
+#: templates/gui/dc/network_ip_list.html:273
 msgid "Add IP address or range of IP addresses into this network"
 msgstr ""
 
-#: templates/gui/dc/network_ip_list.html:263
+#: templates/gui/dc/network_ip_list.html:274
 msgid "Delete selected IP addresses"
 msgstr ""
 
@@ -3453,11 +3528,11 @@ msgid "Detach Network"
 msgstr ""
 
 #: templates/gui/dc/network_list.html:41 templates/gui/dc/network_list.html:55
-#: templates/gui/dc/network_list.html:67 templates/gui/dc/network_list.html:151
+#: templates/gui/dc/network_list.html:67 templates/gui/dc/network_list.html:163
 msgid "Attach Network"
 msgstr ""
 
-#: templates/gui/dc/network_list.html:44 templates/gui/dc/network_list.html:153
+#: templates/gui/dc/network_list.html:44 templates/gui/dc/network_list.html:165
 msgid "Add Network"
 msgstr ""
 
@@ -3467,7 +3542,7 @@ msgstr ""
 msgid "Subnet"
 msgstr ""
 
-#: templates/gui/dc/network_list.html:104 templates/gui/node/details.html:235
+#: templates/gui/dc/network_list.html:104 templates/gui/node/details.html:238
 msgid "VLAN"
 msgstr ""
 
@@ -3475,23 +3550,23 @@ msgstr ""
 msgid "Free IPs"
 msgstr ""
 
-#: templates/gui/dc/network_list.html:120
+#: templates/gui/dc/network_list.html:122
 msgid "Attach, update or delete Network"
 msgstr ""
 
-#: templates/gui/dc/network_list.html:122
+#: templates/gui/dc/network_list.html:125
 msgid "Detach, update or delete Network"
 msgstr ""
 
-#: templates/gui/dc/network_list.html:129
+#: templates/gui/dc/network_list.html:137
 msgid "Show/edit network IP addresses"
 msgstr ""
 
-#: templates/gui/dc/network_list.html:151
+#: templates/gui/dc/network_list.html:163
 msgid "Associate Network with this Datacenter"
 msgstr ""
 
-#: templates/gui/dc/network_list.html:153
+#: templates/gui/dc/network_list.html:165
 msgid "Create new Network"
 msgstr ""
 
@@ -3500,7 +3575,7 @@ msgid "Update or detach Compute Node"
 msgstr ""
 
 #: templates/gui/dc/node_list.html:19 templates/gui/dc/node_list.html.py:34
-#: templates/gui/dc/node_list.html:111 templates/gui/dc/node_list.html:135
+#: templates/gui/dc/node_list.html:115 templates/gui/dc/node_list.html:139
 msgid "Attach Compute Node"
 msgstr ""
 
@@ -3520,7 +3595,7 @@ msgstr ""
 msgid "RAM Overhead"
 msgstr ""
 
-#: templates/gui/dc/node_list.html:70 vm/forms.py:42 vm/forms.py:806
+#: templates/gui/dc/node_list.html:70 vm/forms.py:42 vm/forms.py:791
 msgid "Disk"
 msgstr "Disk"
 
@@ -3540,11 +3615,11 @@ msgstr ""
 msgid "Estimated value - may not include size of images, backups and snapshots"
 msgstr ""
 
-#: templates/gui/dc/node_list.html:88
+#: templates/gui/dc/node_list.html:90
 msgid "Update or remove Compute Node association"
 msgstr ""
 
-#: templates/gui/dc/node_list.html:135
+#: templates/gui/dc/node_list.html:139
 msgid "Associate new Compute Node with this Datacenter"
 msgstr ""
 
@@ -3625,7 +3700,7 @@ msgstr "Zadajte názov a obsah Vášho verejného SSH klúča."
 
 #: templates/gui/dc/profile/user_profile.html:61
 #: templates/gui/profile/profile.html:66
-#: templates/gui/profile/profile_sshkey_list.html:23
+#: templates/gui/profile/profile_sshkey_list.html:25
 msgid "Add SSH key"
 msgstr "Pridaj SSH klúč"
 
@@ -3648,7 +3723,7 @@ msgstr "Odstráň SSH klúč"
 msgid "Update or detach Node Storage"
 msgstr ""
 
-#: templates/gui/dc/storage_list.html:19 templates/gui/dc/storage_list.html:123
+#: templates/gui/dc/storage_list.html:19 templates/gui/dc/storage_list.html:124
 msgid "Attach Node Storage"
 msgstr ""
 
@@ -3656,7 +3731,7 @@ msgstr ""
 msgid "Detach Storage"
 msgstr ""
 
-#: templates/gui/dc/storage_list.html:34 templates/gui/dc/storage_list.html:89
+#: templates/gui/dc/storage_list.html:34 templates/gui/dc/storage_list.html:91
 msgid "Attach Storage"
 msgstr ""
 
@@ -3672,7 +3747,7 @@ msgstr ""
 msgid "Update or detach Storage"
 msgstr ""
 
-#: templates/gui/dc/storage_list.html:123
+#: templates/gui/dc/storage_list.html:124
 msgid "Associate new Node Storage with this Datacenter"
 msgstr ""
 
@@ -3709,16 +3784,16 @@ msgid "Detach server Template"
 msgstr ""
 
 #: templates/gui/dc/template_list.html:32
-#: templates/gui/dc/template_list.html:82
-#: templates/gui/dc/template_list.html:109
+#: templates/gui/dc/template_list.html:84
+#: templates/gui/dc/template_list.html:114
 msgid "Attach server Template"
 msgstr ""
 
-#: templates/gui/dc/template_list.html:84
+#: templates/gui/dc/template_list.html:87
 msgid "Detach server Template from Datacenter"
 msgstr ""
 
-#: templates/gui/dc/template_list.html:109
+#: templates/gui/dc/template_list.html:114
 msgid "Associate server Template with this Datacenter"
 msgstr ""
 
@@ -3738,7 +3813,7 @@ msgstr ""
 msgid "Edit profile"
 msgstr ""
 
-#: templates/gui/dc/user_list.html:35 templates/gui/dc/user_list.html.py:121
+#: templates/gui/dc/user_list.html:35 templates/gui/dc/user_list.html.py:122
 msgid "Add User"
 msgstr ""
 
@@ -3766,15 +3841,15 @@ msgstr ""
 msgid "Joined"
 msgstr ""
 
-#: templates/gui/dc/user_list.html:93
-msgid "Update or delete user"
-msgstr ""
-
-#: templates/gui/dc/user_list.html:95
+#: templates/gui/dc/user_list.html:92
 msgid "User is owner of this datacenter"
 msgstr ""
 
-#: templates/gui/dc/user_list.html:121
+#: templates/gui/dc/user_list.html:94
+msgid "Update or delete user"
+msgstr ""
+
+#: templates/gui/dc/user_list.html:122
 msgid "Create new user"
 msgstr ""
 
@@ -3917,22 +3992,22 @@ msgstr ""
 msgid "Switch Datacenter"
 msgstr ""
 
-#: templates/gui/navigation.html:88
-msgid "Socket.io connection status"
-msgstr "Stav spojenia Socket.io"
-
-#: templates/gui/navigation.html:103
-msgid "My profile and settings"
-msgstr "Profil a nastavenia použivateľa"
-
-#: templates/gui/navigation.html:106
-msgid "Logout"
-msgstr "Odhlásiť"
-
-#: templates/gui/navigation.html:112
+#: templates/gui/navigation.html:89
 #, python-format
 msgid "Working in %(dc_alias)s datacenter. Click to change active datacenter"
 msgstr ""
+
+#: templates/gui/navigation.html:97
+msgid "Socket.io connection status"
+msgstr "Stav spojenia Socket.io"
+
+#: templates/gui/navigation.html:111
+msgid "My profile and settings"
+msgstr "Profil a nastavenia použivateľa"
+
+#: templates/gui/navigation.html:112
+msgid "Logout"
+msgstr "Odhlásiť"
 
 #: templates/gui/navigation.html:137
 msgid "Filter servers by tags"
@@ -3946,7 +4021,7 @@ msgstr "Filtre"
 msgid "Filter"
 msgstr "Filtruj"
 
-#: templates/gui/navigation_filter.html:11 templates/gui/vm/details.html:364
+#: templates/gui/navigation_filter.html:11 templates/gui/vm/details.html:424
 msgid "Reset"
 msgstr "Reset"
 
@@ -3971,22 +4046,28 @@ msgstr "ID&nbsp;disku"
 msgid "Duration"
 msgstr ""
 
-#: templates/gui/node/backup_list.html:35
-#: templates/gui/node/backup_list_novm.html:36
-#: templates/gui/vm/backup_list.html:35
+#: templates/gui/node/backup_list.html:36
+#: templates/gui/node/backup_list_novm.html:37
+#: templates/gui/vm/backup_list.html:36
 msgid "Delete or restore this backup"
 msgstr ""
 
-#: templates/gui/node/backup_list.html:46
-#: templates/gui/node/backup_list_all.html:33
-#: templates/gui/node/backup_list_novm.html:48
-#: templates/gui/vm/backup_list.html:46
+#: templates/gui/node/backup_list.html:37
+#: templates/gui/node/backup_list_novm.html:38
+#: templates/gui/vm/backup_list.html:37
+msgid "Delete or restore"
+msgstr ""
+
+#: templates/gui/node/backup_list.html:49
+#: templates/gui/node/backup_list_all.html:35
+#: templates/gui/node/backup_list_novm.html:51
+#: templates/gui/vm/backup_list.html:50
 msgid "Update backup information"
 msgstr ""
 
-#: templates/gui/node/backup_list.html:55
-#: templates/gui/node/backup_list_novm.html:57
-#: templates/gui/vm/backup_list.html:55
+#: templates/gui/node/backup_list.html:59
+#: templates/gui/node/backup_list_novm.html:61
+#: templates/gui/vm/backup_list.html:61
 #, python-format
 msgid ""
 "Selected <span id=\"selected\">0</span> of <span id=\"total\">%(len)s</span> "
@@ -4004,9 +4085,9 @@ msgstr[2] ""
 "Označené <span id=\"selected\">0</span> z <span id=\"total\">%(len)s</span> "
 "záloh"
 
-#: templates/gui/node/backup_list.html:67
-#: templates/gui/node/backup_list_novm.html:69
-#: templates/gui/vm/backup_list.html:69
+#: templates/gui/node/backup_list.html:71
+#: templates/gui/node/backup_list_novm.html:73
+#: templates/gui/vm/backup_list.html:75
 msgid "Delete selected backups"
 msgstr ""
 
@@ -4014,11 +4095,11 @@ msgstr ""
 msgid "Edit backups for this server"
 msgstr ""
 
-#: templates/gui/node/backups.html:30
+#: templates/gui/node/backups.html:29
 msgid "Unavailable backups"
 msgstr ""
 
-#: templates/gui/node/backups.html:33
+#: templates/gui/node/backups.html:32
 msgid ""
 "Backups are not visible or accessible, because the compute node is not in "
 "<strong>online state</strong>. Existing backups are kept untouched, but new "
@@ -4026,12 +4107,12 @@ msgid ""
 "the compute node returns to online state."
 msgstr ""
 
-#: templates/gui/node/backups.html:44 templates/gui/node/backups.html.py:52
-#: templates/gui/node/backups.html:60 templates/gui/vm/backup.html:116
+#: templates/gui/node/backups.html:42 templates/gui/node/backups.html.py:50
+#: templates/gui/node/backups.html:58 templates/gui/vm/backup.html:116
 msgid "backups"
 msgstr "zálohy"
 
-#: templates/gui/node/backups.html:52
+#: templates/gui/node/backups.html:50
 msgid "(no server)"
 msgstr ""
 
@@ -4039,72 +4120,72 @@ msgstr ""
 msgid "Update Compute Node Settings"
 msgstr ""
 
-#: templates/gui/node/details.html:48 templates/gui/vm/details.html:266
+#: templates/gui/node/details.html:48 templates/gui/vm/details.html:278
 msgid "details"
 msgstr "detaily"
-
-#: templates/gui/node/details.html:57
-msgid "Change node settings"
-msgstr ""
 
 #: templates/gui/node/details.html:57 templates/gui/node/list.html:67
 msgid "Head node"
 msgstr ""
 
-#: templates/gui/node/details.html:70 templates/gui/node/list.html:51
+#: templates/gui/node/details.html:58
+msgid "Change node settings"
+msgstr ""
+
+#: templates/gui/node/details.html:73 templates/gui/node/list.html:51
 msgid "Capabilities"
 msgstr ""
 
-#: templates/gui/node/details.html:72
+#: templates/gui/node/details.html:75
 msgid "Compute"
 msgstr ""
 
-#: templates/gui/node/details.html:73
+#: templates/gui/node/details.html:76
 msgid "Backup"
 msgstr "Zálohy"
 
-#: templates/gui/node/details.html:77
+#: templates/gui/node/details.html:80
 msgid "CPUs / Free"
 msgstr ""
 
-#: templates/gui/node/details.html:84
+#: templates/gui/node/details.html:87
 msgid "RAM / Free / "
 msgstr ""
 
-#: templates/gui/node/details.html:84
+#: templates/gui/node/details.html:87
 msgid "Aggregated memory overhead caused by KVM servers."
 msgstr ""
 
-#: templates/gui/node/details.html:84
+#: templates/gui/node/details.html:87
 msgid "Overhead"
 msgstr ""
 
-#: templates/gui/node/details.html:94
+#: templates/gui/node/details.html:97
 msgid "Manufacturer"
 msgstr ""
 
-#: templates/gui/node/details.html:98
+#: templates/gui/node/details.html:101
 msgid "Product"
 msgstr ""
 
-#: templates/gui/node/details.html:102
+#: templates/gui/node/details.html:105
 msgid "Serial Number"
 msgstr ""
 
-#: templates/gui/node/details.html:106
+#: templates/gui/node/details.html:109
 msgid "CPU Type"
 msgstr ""
 
-#: templates/gui/node/details.html:110
+#: templates/gui/node/details.html:113
 msgid "Uptime"
 msgstr ""
 
-#: templates/gui/node/details.html:113
+#: templates/gui/node/details.html:116
 msgid ""
 "The displayed uptime is based on the last known boot time of the compute node"
 msgstr ""
 
-#: templates/gui/node/details.html:114
+#: templates/gui/node/details.html:117
 #, python-format
 msgid ""
 "\n"
@@ -4118,47 +4199,47 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: templates/gui/node/details.html:131
+#: templates/gui/node/details.html:134
 msgid "Number of real servers (with slave/replication machines excluded)"
 msgstr ""
 
-#: templates/gui/node/details.html:136 templates/gui/vm/details.html:324
+#: templates/gui/node/details.html:139 templates/gui/vm/details.html:352
 msgid "SLA"
 msgstr "SLA"
 
-#: templates/gui/node/details.html:144
+#: templates/gui/node/details.html:147
 msgid "Actual monthly SLA for this compute node"
 msgstr "Aktuálna mesačná SLA pre tento výpočtový uzol"
 
-#: templates/gui/node/details.html:163
+#: templates/gui/node/details.html:166
 msgid "Refresh compute node information"
 msgstr ""
 
-#: templates/gui/node/details.html:178
+#: templates/gui/node/details.html:181
 msgid "network interfaces"
 msgstr ""
 
-#: templates/gui/node/details.html:185
+#: templates/gui/node/details.html:188
 msgid "Aggregation"
 msgstr ""
 
-#: templates/gui/node/details.html:187
+#: templates/gui/node/details.html:190
 msgid "NIC tags"
 msgstr ""
 
-#: templates/gui/node/details.html:226
+#: templates/gui/node/details.html:229
 msgid "virtual network interfaces"
 msgstr ""
 
-#: templates/gui/node/details.html:233
+#: templates/gui/node/details.html:236
 msgid "Interface"
 msgstr ""
 
-#: templates/gui/node/details.html:262
+#: templates/gui/node/details.html:265
 msgid "disk pools"
 msgstr ""
 
-#: templates/gui/node/details.html:269
+#: templates/gui/node/details.html:272
 msgid "Disk Configuration"
 msgstr ""
 
@@ -4203,15 +4284,15 @@ msgstr ""
 msgid "Delete disk image from compute node storage"
 msgstr ""
 
-#: templates/gui/node/images.html:112
+#: templates/gui/node/images.html:114
 msgid "DC"
 msgstr ""
 
-#: templates/gui/node/images.html:126
+#: templates/gui/node/images.html:128
 msgid "Remove all unused disk images imported on compute node storage"
 msgstr ""
 
-#: templates/gui/node/images.html:126
+#: templates/gui/node/images.html:128
 msgid "Delete unused images"
 msgstr ""
 
@@ -4231,8 +4312,8 @@ msgstr ""
 msgid "Vendor"
 msgstr ""
 
-#: templates/gui/node/list.html:44 templates/gui/vm/details.html:404
-#: templates/gui/vm/details.html.py:455 vm/forms.py:315 vm/forms.py:420
+#: templates/gui/node/list.html:44 templates/gui/vm/details.html:511
+#: templates/gui/vm/details.html.py:587 vm/forms.py:300 vm/forms.py:405
 msgid "Model"
 msgstr "Model"
 
@@ -4283,7 +4364,7 @@ msgid "Show compute node related task log"
 msgstr ""
 
 #: templates/gui/node/navigation.html:16 templates/gui/tasklog/tasklog.html:23
-#: templates/gui/vm/list.html:159 templates/gui/vm/navigation.html:18
+#: templates/gui/vm/list.html:157 templates/gui/vm/navigation.html:18
 msgid "Task Log"
 msgstr "Task Log"
 
@@ -4291,7 +4372,7 @@ msgstr "Task Log"
 msgid "Change node Storage Settings"
 msgstr ""
 
-#: templates/gui/node/storages.html:20 templates/gui/node/storages.html:96
+#: templates/gui/node/storages.html:20 templates/gui/node/storages.html:97
 msgid "Add new node Storage"
 msgstr ""
 
@@ -4311,11 +4392,11 @@ msgstr ""
 msgid "Replicated<br>snapshots"
 msgstr ""
 
-#: templates/gui/node/storages.html:72
+#: templates/gui/node/storages.html:73
 msgid "Update or delete node Storage"
 msgstr ""
 
-#: templates/gui/node/storages.html:96
+#: templates/gui/node/storages.html:97
 msgid "Add node Storage"
 msgstr ""
 
@@ -4333,38 +4414,38 @@ msgstr "Táto operácia môže byť nebezpečná"
 msgid "Force"
 msgstr "Vynútiť"
 
-#: templates/gui/node/vms.html:46
+#: templates/gui/node/vms.html:45
 msgid "Unavailable servers"
 msgstr ""
 
-#: templates/gui/node/vms.html:49
+#: templates/gui/node/vms.html:48
 msgid ""
 "Servers are not visible or accessible, because the compute node is not in "
 "<strong>online state</strong>. Servers are kept untouched. Full server "
 "control will be possible as soon as the compute node returns to online state."
 msgstr ""
 
-#: templates/gui/node/vms.html:59
+#: templates/gui/node/vms.html:57
 msgid "servers"
 msgstr ""
 
-#: templates/gui/node/vms.html:68
+#: templates/gui/node/vms.html:66
 msgid "Show servers stored on all zpools"
 msgstr ""
 
-#: templates/gui/node/vms.html:72
+#: templates/gui/node/vms.html:70
 #, python-format
 msgid "Show servers stored on %(zpool_name)s zpool"
 msgstr ""
 
-#: templates/gui/node/vms.html:93 templates/gui/reports/cloud_customers.html:38
-#: templates/gui/vm/details.html:313 templates/gui/vm/list.html:103
-#: vm/forms.py:217
+#: templates/gui/node/vms.html:91 templates/gui/reports/cloud_customers.html:38
+#: templates/gui/vm/details.html:339 templates/gui/vm/list.html:101
+#: vm/forms.py:201
 msgid "VCPUs"
 msgstr "vCPU"
 
-#: templates/gui/node/vms.html:95 templates/gui/reports/cloud_customers.html:40
-#: templates/gui/vm/list.html:105
+#: templates/gui/node/vms.html:93 templates/gui/reports/cloud_customers.html:40
+#: templates/gui/vm/list.html:103
 msgid "HDD"
 msgstr "HDD"
 
@@ -4419,7 +4500,7 @@ msgstr ""
 "Niektoré požadované polia nie sú vyplnené. Prosím zadajte všetky požadované "
 "informácie."
 
-#: templates/gui/profile/profile_sshkey_list.html:14
+#: templates/gui/profile/profile_sshkey_list.html:15
 msgid "Delete this SSH key"
 msgstr "Vymazanie tohto SSH klúča"
 
@@ -4464,7 +4545,7 @@ msgid "Calculated Price per Year"
 msgstr ""
 
 #: templates/gui/reports/cloud_customers.html:46
-#: templates/gui/vm/details.html:356 templates/gui/vm/list_control.html:8
+#: templates/gui/vm/details.html:391 templates/gui/vm/list_control.html:8
 msgid "Start"
 msgstr "Štart"
 
@@ -4599,7 +4680,7 @@ msgstr ""
 msgid "Import from file"
 msgstr ""
 
-#: templates/gui/vm/add.html:34 templates/gui/vm/details.html:130
+#: templates/gui/vm/add.html:34 templates/gui/vm/details.html:132
 msgid "Delete Server"
 msgstr ""
 
@@ -4668,25 +4749,25 @@ msgid "backup definitions"
 msgstr ""
 
 #: templates/gui/vm/backup_define_list.html:11
-#: templates/gui/vm/snapshot_define_list.html:10 vm/forms.py:537
+#: templates/gui/vm/snapshot_define_list.html:10 vm/forms.py:522
 msgid "Schedule"
 msgstr ""
 
 #: templates/gui/vm/backup_define_list.html:12
-#: templates/gui/vm/snapshot_define_list.html:11 vm/forms.py:542
+#: templates/gui/vm/snapshot_define_list.html:11 vm/forms.py:527
 msgid "Retention"
 msgstr ""
 
-#: templates/gui/vm/backup_define_list.html:23
+#: templates/gui/vm/backup_define_list.html:24
 msgid "Update or delete backup definition"
 msgstr ""
 
-#: templates/gui/vm/backup_define_list.html:45
+#: templates/gui/vm/backup_define_list.html:44
 msgid "Create new backup definition"
 msgstr ""
 
-#: templates/gui/vm/backup_define_list.html:45
-#: templates/gui/vm/snapshot_define_list.html:43
+#: templates/gui/vm/backup_define_list.html:44
+#: templates/gui/vm/snapshot_define_list.html:42
 msgid "Add definition"
 msgstr ""
 
@@ -4709,13 +4790,13 @@ msgstr ""
 msgid "Delete backups"
 msgstr ""
 
-#: templates/gui/vm/backup_list.html:68
+#: templates/gui/vm/backup_list.html:74
 msgid ""
 "Create backup of your disk. You will have to choose a backup definition to "
 "run"
 msgstr ""
 
-#: templates/gui/vm/backup_list.html:68
+#: templates/gui/vm/backup_list.html:74
 msgid "Backup now"
 msgstr "Zálohuj teraz"
 
@@ -4743,11 +4824,9 @@ msgstr ""
 
 #: templates/gui/vm/backup_restore_modal.html:16
 msgid ""
-"Do you wan't to <strong>delete existing data and snapshots on target server</"
+"Do you want to <strong>delete existing data and snapshots on target server</"
 "strong> and restore data from this backup?"
 msgstr ""
-"Želáte si <strong>vymazanie existujúcich dát na disku a snapshotov na "
-"cieľovom serveri</strong> a obnovu dát z tejto zálohy?"
 
 #: templates/gui/vm/backup_restore_modal.html:27
 msgid "Delete backup"
@@ -4801,7 +4880,7 @@ msgstr ""
 msgid "(Disabled)"
 msgstr ""
 
-#: templates/gui/vm/details.html:86 templates/gui/vm/details.html.py:362
+#: templates/gui/vm/details.html:86 templates/gui/vm/details.html.py:417
 msgid "Start server"
 msgstr "Spustiť server"
 
@@ -4817,72 +4896,72 @@ msgstr ""
 "Zadajte hodnotu pre reverzný DNS záznam smerujúci na IP adresu "
 "<strong>__ipaddr__</strong>."
 
-#: templates/gui/vm/details.html:130 templates/gui/vm/list_control.html:18
+#: templates/gui/vm/details.html:132 templates/gui/vm/list_control.html:18
 msgid ""
 "Are you sure that you want to delete the server definition from database?"
 msgstr ""
 
-#: templates/gui/vm/details.html:140
+#: templates/gui/vm/details.html:142
 msgid "Change NIC Settings"
 msgstr ""
 
-#: templates/gui/vm/details.html:141
+#: templates/gui/vm/details.html:143
 msgid "Add new NIC to Server"
 msgstr ""
 
-#: templates/gui/vm/details.html:155
+#: templates/gui/vm/details.html:159
 msgid "Delete NIC"
 msgstr ""
 
-#: templates/gui/vm/details.html:156 templates/gui/vm/details.html.py:439
+#: templates/gui/vm/details.html:160 templates/gui/vm/details.html.py:571
 msgid "Add NIC"
 msgstr ""
 
-#: templates/gui/vm/details.html:165
+#: templates/gui/vm/details.html:169
 msgid "Change Disk Settings"
 msgstr ""
 
-#: templates/gui/vm/details.html:166
+#: templates/gui/vm/details.html:170
 msgid "Add new Disk to Server"
 msgstr ""
 
-#: templates/gui/vm/details.html:178
+#: templates/gui/vm/details.html:184
 msgid ""
 "Changing disk size is dangerous! Are you sure you want to change the disk "
 "size?"
 msgstr ""
 
-#: templates/gui/vm/details.html:180
+#: templates/gui/vm/details.html:186
 msgid ""
 "Deleting the disk will result in data loss of this disk and its snapshots! "
 "Are you sure you want to delete this disk?"
 msgstr ""
 
-#: templates/gui/vm/details.html:180
+#: templates/gui/vm/details.html:186
 msgid "Delete Disk"
 msgstr ""
 
-#: templates/gui/vm/details.html:181 templates/gui/vm/details.html.py:504
+#: templates/gui/vm/details.html:187 templates/gui/vm/details.html.py:654
 msgid "Add Disk"
 msgstr ""
 
-#: templates/gui/vm/details.html:191
+#: templates/gui/vm/details.html:197
 msgid "Migrate Server to another Node"
 msgstr ""
 
-#: templates/gui/vm/details.html:198
+#: templates/gui/vm/details.html:204
 msgid "Please choose target compute node:"
 msgstr ""
 
-#: templates/gui/vm/details.html:211
+#: templates/gui/vm/details.html:217
 msgid "Migrate server"
 msgstr ""
 
-#: templates/gui/vm/details.html:234
+#: templates/gui/vm/details.html:240
 msgid "Server is Not Installed"
 msgstr "Server nie je naištalovaný"
 
-#: templates/gui/vm/details.html:237
+#: templates/gui/vm/details.html:243
 msgid ""
 "The server is marked as <strong>not installed</strong>. You have to start "
 "the server with an ISO image and install your favourite operating system. "
@@ -4894,11 +4973,11 @@ msgstr ""
 "<strong>Po úspešnom nainštalovaní OS</strong> je nutné server označiť ako "
 "nainštalovaný."
 
-#: templates/gui/vm/details.html:239
+#: templates/gui/vm/details.html:246
 msgid "Is the server installed?"
 msgstr "Je server nainštalovaný?"
 
-#: templates/gui/vm/details.html:239
+#: templates/gui/vm/details.html:247
 msgid ""
 "After marking the server as installed you <strong>won't be able to boot the "
 "server with an ISO image</strong>, only a rescue CD will be available. But "
@@ -4908,23 +4987,23 @@ msgstr ""
 "ľubovolným ISO obrazom</strong>, iba so záchranným CD. Avšak s "
 "nainštalovaným serverom je možné využívať funkcionalitu snapshotov."
 
-#: templates/gui/vm/details.html:239
+#: templates/gui/vm/details.html:248
 msgid "Not yet"
 msgstr "Ešte nie"
 
-#: templates/gui/vm/details.html:239
+#: templates/gui/vm/details.html:249
 msgid "Yes, server is installed"
 msgstr "Áno, server je nainštalovaný"
 
-#: templates/gui/vm/details.html:239
+#: templates/gui/vm/details.html:250
 msgid "Server is installed"
 msgstr "Server je nainštalovaný"
 
-#: templates/gui/vm/details.html:254
+#: templates/gui/vm/details.html:266
 msgid "Server is Frozen"
 msgstr "Server je zamknutý"
 
-#: templates/gui/vm/details.html:257
+#: templates/gui/vm/details.html:269
 msgid ""
 "The server is marked as frozen, which means that it is stopped and cannot be "
 "started unless a valid subscription is recognized."
@@ -4933,96 +5012,101 @@ msgstr ""
 "a nie je možné ho zapnúť, pokým k serveru nebude existovať predplatené "
 "obdobie."
 
-#: templates/gui/vm/details.html:275
+#: templates/gui/vm/details.html:291
 msgid "Change server settings"
 msgstr "Upraviť nastavenia servera"
 
-#: templates/gui/vm/details.html:275 templates/gui/vm/details.html.py:415
-#: templates/gui/vm/details.html:473
+#: templates/gui/vm/details.html:294 templates/gui/vm/details.html.py:530
+#: templates/gui/vm/details.html:615
 msgid ""
 "Server is locked or has slave servers, which means that server settings "
 "cannot be changed"
 msgstr ""
 
-#: templates/gui/vm/details.html:299
+#: templates/gui/vm/details.html:306
+msgid "UUID"
+msgstr ""
+
+#: templates/gui/vm/details.html:325
 msgid "Every compute node is identified by its unique color"
 msgstr "Každý vypočtový uzol je identifikovateľný svojou unikátnou farbou"
 
-#: templates/gui/vm/details.html:332
+#: templates/gui/vm/details.html:361
 msgid "Actual monthly SLA for this server"
 msgstr "Aktuálna mesačná SLA pre tento server"
 
-#: templates/gui/vm/details.html:356 templates/gui/vm/list_control.html:8
+#: templates/gui/vm/details.html:390 templates/gui/vm/list_control.html:8
 msgid "Immediately start a stopped server"
 msgstr "Okamžite zapnutie vypnutého servera"
 
-#: templates/gui/vm/details.html:357
+#: templates/gui/vm/details.html:393
 msgid ""
 "<i>Reboot</i> will send a reboot ACPI signal into the server, which "
 "initiates a reboot process. In case the reboot process takes longer than 3 "
 "minutes (e.g. there is no ACPI daemon) a Force Reboot will take place."
 msgstr ""
 
-#: templates/gui/vm/details.html:357
+#: templates/gui/vm/details.html:394
 msgid ""
 "<i>Force Reboot</i> will <strong>immediately reboot</strong> the server."
 msgstr ""
 "<i>Okamžitý reštart</i> <strong>ihneď reštartuje napájanie servera</strong>."
 
-#: templates/gui/vm/details.html:357 templates/gui/vm/list_control.html:9
+#: templates/gui/vm/details.html:395 templates/gui/vm/details.html.py:399
+#: templates/gui/vm/list_control.html:9
 msgid "Reboot"
 msgstr "Reštart"
 
-#: templates/gui/vm/details.html:357 templates/gui/vm/list_control.html:9
+#: templates/gui/vm/details.html:396 templates/gui/vm/list_control.html:9
 msgid "Force Reboot"
 msgstr "Okamžitý reštart"
 
-#: templates/gui/vm/details.html:357
+#: templates/gui/vm/details.html:397
 msgid ""
 "You can choose to forcefully reboot the server or to send a reboot ACPI "
 "signal into the system"
 msgstr ""
 
-#: templates/gui/vm/details.html:358
+#: templates/gui/vm/details.html:401
 msgid ""
 "<i>Shutdown</i> will send a shutdown ACPI signal into the server, which "
 "initiates a shutdown process. In case the shutdown process takes longer than "
 "3 minutes (e.g. there is no ACPI daemon) a Force Shutdown will take place."
 msgstr ""
 
-#: templates/gui/vm/details.html:358
+#: templates/gui/vm/details.html:402
 msgid ""
 "<i>Force shutdown</i> will <strong>immediately power off</strong> the server."
 msgstr ""
 "<i>Okamžité vypnutie</i> <strong>ihneď vypne napájanie servera</strong>."
 
-#: templates/gui/vm/details.html:358 templates/gui/vm/list_control.html:10
+#: templates/gui/vm/details.html:403 templates/gui/vm/list_control.html:10
 msgid "Shutdown"
 msgstr "Vypnutie"
 
-#: templates/gui/vm/details.html:358 templates/gui/vm/list_control.html:10
+#: templates/gui/vm/details.html:404 templates/gui/vm/list_control.html:10
 msgid "Force Shutdown"
 msgstr "Okamžité vypnutie"
 
-#: templates/gui/vm/details.html:358
+#: templates/gui/vm/details.html:405
 msgid ""
 "You can choose to forcefully shutdown the server or to send a shutdown ACPI "
 "signal into the system"
 msgstr ""
 
-#: templates/gui/vm/details.html:358 templates/gui/vm/list_control.html:10
+#: templates/gui/vm/details.html:407 templates/gui/vm/list_control.html:10
 msgid "Stop"
 msgstr "Stop"
 
-#: templates/gui/vm/details.html:360
+#: templates/gui/vm/details.html:410
 msgid "Boot server from ISO image"
 msgstr "Naštartuj server z CD"
 
-#: templates/gui/vm/details.html:360
+#: templates/gui/vm/details.html:411
 msgid "Boot CD"
 msgstr "Štart z CD"
 
-#: templates/gui/vm/details.html:362
+#: templates/gui/vm/details.html:416
 msgid ""
 "Boot the server from System Rescue CD. You will have to use the console and "
 "perform any rescue operation manually."
@@ -5030,15 +5114,15 @@ msgstr ""
 "Spustenie servera z System Rescue CD. Budete musieť použiť konzolu a vykonať "
 "zachrannú operáciu manuálne."
 
-#: templates/gui/vm/details.html:362
+#: templates/gui/vm/details.html:418
 msgid "Boot server from System Rescue CD"
 msgstr "Naštartuj server z System Rescue CD"
 
-#: templates/gui/vm/details.html:362
+#: templates/gui/vm/details.html:419
 msgid "Rescue CD"
 msgstr "Zachranné CD"
 
-#: templates/gui/vm/details.html:364
+#: templates/gui/vm/details.html:423
 msgid ""
 "Factory reset will <strong>completely delete the server and its snapshots</"
 "strong> and create it like it was on the first time. <strong>All your data "
@@ -5048,16 +5132,16 @@ msgstr ""
 "strong> a vytvorí ho nanovo tak, ako bol pred prvým použítím. <strong>Všetky "
 "Vaše dáta budú nenávratne stratené!</strong>"
 
-#: templates/gui/vm/details.html:364
+#: templates/gui/vm/details.html:425
 #, python-format
 msgid "Recreate %(alias)s"
 msgstr "Vytvor %(alias)s znova"
 
-#: templates/gui/vm/details.html:364 templates/gui/vm/details.html.py:373
+#: templates/gui/vm/details.html:426 templates/gui/vm/details.html.py:462
 msgid "Are you sure that you want completely delete your server data?"
 msgstr "Ste si naozaj istý, že je možné kompletne vymazať dáta servera?"
 
-#: templates/gui/vm/details.html:364
+#: templates/gui/vm/details.html:427
 msgid ""
 "Recreate the server. The server needs to be stopped in order to use this "
 "function. Use with caution!"
@@ -5065,171 +5149,173 @@ msgstr ""
 "Znovuvytvorenie servera vyžaduje aby bol server vypnutý. Budte opatrný pri "
 "použití tejto funkcie."
 
-#: templates/gui/vm/details.html:364
+#: templates/gui/vm/details.html:429
 msgid "Factory reset"
 msgstr "Továrenský reset"
 
-#: templates/gui/vm/details.html:369 templates/gui/vm/list_control.html:16
+#: templates/gui/vm/details.html:436 templates/gui/vm/list_control.html:16
 msgid ""
 "Update server configuration on compute node according to current server "
 "definition"
 msgstr ""
 
-#: templates/gui/vm/details.html:369
+#: templates/gui/vm/details.html:438
 msgid ""
 "The server definition has been modified and needs to be updated on compute "
 "node.<br><br><i>Update & Start</i> will first update the server "
 "configuration on compute node and then start the server."
 msgstr ""
 
-#: templates/gui/vm/details.html:369
+#: templates/gui/vm/details.html:439
 msgid "Update & Start"
 msgstr ""
 
-#: templates/gui/vm/details.html:369
+#: templates/gui/vm/details.html:440
 msgid ""
 "<i>Start (no update)</i> will just start the server without modifying the "
 "server configuration on compute node."
 msgstr ""
 
-#: templates/gui/vm/details.html:369
+#: templates/gui/vm/details.html:441
 msgid "Start (skip update)"
 msgstr ""
 
-#: templates/gui/vm/details.html:369
+#: templates/gui/vm/details.html:442
 msgid "Start and update Server"
 msgstr "Štart a update servera"
 
-#: templates/gui/vm/details.html:370
+#: templates/gui/vm/details.html:445
 msgid ""
 "Revert server configuration to currently active server configuration on "
 "compute node"
 msgstr ""
 
-#: templates/gui/vm/details.html:370
+#: templates/gui/vm/details.html:447
 msgid "Undo"
 msgstr ""
 
-#: templates/gui/vm/details.html:371 templates/gui/vm/list_control.html:17
+#: templates/gui/vm/details.html:449 templates/gui/vm/list_control.html:17
 msgid "Create server on compute node and start deploy process"
 msgstr ""
 
-#: templates/gui/vm/details.html:371 templates/gui/vm/list_control.html:17
+#: templates/gui/vm/details.html:451 templates/gui/vm/list_control.html:17
 msgid "Deploy"
 msgstr ""
 
-#: templates/gui/vm/details.html:372
+#: templates/gui/vm/details.html:453
 msgid ""
 "Are you sure that you want to delete the server definition from the "
 "inventory?"
 msgstr ""
 
-#: templates/gui/vm/details.html:372
+#: templates/gui/vm/details.html:454
 msgid "Remove server definition from inventory"
 msgstr ""
 
-#: templates/gui/vm/details.html:373
+#: templates/gui/vm/details.html:459
 msgid ""
 "<i>Destroy</i> will <strong>completely delete the server and its snapshots</"
 "strong> from the compute node. <strong>All your data will be lost!</strong>"
 msgstr ""
 
-#: templates/gui/vm/details.html:373 templates/gui/vm/list_control.html:19
+#: templates/gui/vm/details.html:460 templates/gui/vm/details.html.py:465
+#: templates/gui/vm/list_control.html:19
 msgid "Destroy"
 msgstr ""
 
-#: templates/gui/vm/details.html:373
+#: templates/gui/vm/details.html:461
 #, python-format
 msgid "Really destroy %(alias)s"
 msgstr ""
 
-#: templates/gui/vm/details.html:373 templates/gui/vm/list_control.html:19
+#: templates/gui/vm/details.html:463 templates/gui/vm/list_control.html:19
 msgid "Delete server and its data from compute node. Use with caution!"
 msgstr ""
 
-#: templates/gui/vm/details.html:374 templates/gui/vm/list_control.html:20
+#: templates/gui/vm/details.html:467 templates/gui/vm/list_control.html:20
 msgid ""
 "<i>Freeze</i> will send a shutdown signal into the server, which can "
 "initiate a shutdown process. In case the shutdown process takes longer than "
 "3 minutes a Force Shutdown will take place."
 msgstr ""
 
-#: templates/gui/vm/details.html:374 templates/gui/vm/list_control.html:20
+#: templates/gui/vm/details.html:468 templates/gui/vm/list_control.html:20
 msgid ""
 "<i>Force Freeze</i> will <strong>immediately power off</strong> the server."
 "<br><br>After the shutdown process is completed the server status will be "
 "set to <strong>frozen</strong>."
 msgstr ""
 
-#: templates/gui/vm/details.html:374 templates/gui/vm/list_control.html:20
+#: templates/gui/vm/details.html:469 templates/gui/vm/details.html.py:473
+#: templates/gui/vm/list_control.html:20
 msgid "Freeze"
 msgstr ""
 
-#: templates/gui/vm/details.html:374 templates/gui/vm/list_control.html:20
+#: templates/gui/vm/details.html:470 templates/gui/vm/list_control.html:20
 msgid "Force Freeze"
 msgstr ""
 
-#: templates/gui/vm/details.html:374 templates/gui/vm/list_control.html:20
+#: templates/gui/vm/details.html:471 templates/gui/vm/list_control.html:20
 msgid "Shutdown the server and set its status to frozen"
 msgstr ""
 
-#: templates/gui/vm/details.html:375 templates/gui/vm/list_control.html:21
+#: templates/gui/vm/details.html:475 templates/gui/vm/list_control.html:21
 msgid "Remove frozen server status"
 msgstr ""
 
-#: templates/gui/vm/details.html:375 templates/gui/vm/list_control.html:21
+#: templates/gui/vm/details.html:476 templates/gui/vm/list_control.html:21
 msgid "Unfreeze"
 msgstr ""
 
-#: templates/gui/vm/details.html:376
+#: templates/gui/vm/details.html:480
 msgid "Migrate server stopped to another compute node"
 msgstr ""
 
-#: templates/gui/vm/details.html:376
+#: templates/gui/vm/details.html:482
 msgid "Migrate"
 msgstr ""
 
-#: templates/gui/vm/details.html:397
+#: templates/gui/vm/details.html:504
 msgid "networks"
 msgstr "siete"
 
-#: templates/gui/vm/details.html:406
+#: templates/gui/vm/details.html:513
 msgid "IP"
 msgstr "IP"
 
-#: templates/gui/vm/details.html:415
+#: templates/gui/vm/details.html:526
 msgid "Change or Delete this NIC definition"
 msgstr ""
 
-#: templates/gui/vm/details.html:428
+#: templates/gui/vm/details.html:557
 msgid "Change reverse DNS record for this IP address"
 msgstr "Uprav reverzný DNS záznam pre túto IP adresu"
 
-#: templates/gui/vm/details.html:439
+#: templates/gui/vm/details.html:570
 msgid "Add new NIC into Server definition"
 msgstr ""
 
-#: templates/gui/vm/details.html:448
+#: templates/gui/vm/details.html:580
 msgid "disks"
 msgstr "disky"
 
-#: templates/gui/vm/details.html:457
+#: templates/gui/vm/details.html:589
 msgid "FS"
 msgstr ""
 
-#: templates/gui/vm/details.html:463 vm/forms.py:348 vm/forms.py:727
+#: templates/gui/vm/details.html:595 vm/forms.py:333 vm/forms.py:712
 msgid "Compression"
 msgstr ""
 
-#: templates/gui/vm/details.html:465 vm/forms.py:343
+#: templates/gui/vm/details.html:597 vm/forms.py:328
 msgid "Bootable"
 msgstr "Boot?"
 
-#: templates/gui/vm/details.html:473
+#: templates/gui/vm/details.html:609
 msgid "Change or Delete this disk definition"
 msgstr ""
 
-#: templates/gui/vm/details.html:504
+#: templates/gui/vm/details.html:652
 msgid "Add new disk into Server definition"
 msgstr ""
 
@@ -5245,11 +5331,11 @@ msgstr ""
 msgid "Import"
 msgstr ""
 
-#: templates/gui/vm/list.html:44
+#: templates/gui/vm/list.html:43
 msgid "Hidden servers"
 msgstr ""
 
-#: templates/gui/vm/list.html:47
+#: templates/gui/vm/list.html:46
 msgid ""
 "Some servers are not visible or accessible, because some compute nodes are "
 "not in <strong>online state</strong>. Servers are kept untouched. Full "
@@ -5257,35 +5343,35 @@ msgid ""
 "online state."
 msgstr ""
 
-#: templates/gui/vm/list.html:72
+#: templates/gui/vm/list.html:70
 msgid "enter server name or status"
 msgstr "zadajte názov alebo stav servera"
 
-#: templates/gui/vm/list.html:155 templates/gui/vm/navigation.html:7
+#: templates/gui/vm/list.html:153 templates/gui/vm/navigation.html:7
 msgid "Show server native console"
 msgstr "Zobraziť vlastnú konzolu servera"
 
-#: templates/gui/vm/list.html:155 templates/gui/vm/navigation.html:7
+#: templates/gui/vm/list.html:153 templates/gui/vm/navigation.html:7
 msgid "Console"
 msgstr "Konzola"
 
-#: templates/gui/vm/list.html:157 templates/gui/vm/navigation.html:16
+#: templates/gui/vm/list.html:155 templates/gui/vm/navigation.html:16
 msgid "Show server monitoring details"
 msgstr "Zobraziť údaje z monitoringu servera"
 
-#: templates/gui/vm/list.html:159 templates/gui/vm/navigation.html:18
+#: templates/gui/vm/list.html:157 templates/gui/vm/navigation.html:18
 msgid "Show server related task log"
 msgstr "Zobraziť task log pre tento server"
 
-#: templates/gui/vm/list.html:166
+#: templates/gui/vm/list.html:164
 msgid "You don't have any server yet"
 msgstr "Ešte nemáte vytvorený server"
 
-#: templates/gui/vm/list.html:166
+#: templates/gui/vm/list.html:164
 msgid "Please"
 msgstr "Prosím"
 
-#: templates/gui/vm/list.html:166
+#: templates/gui/vm/list.html:164
 msgid "create one"
 msgstr "vytvorte ho"
 
@@ -5543,7 +5629,7 @@ msgstr "Funkcionalita snapshotov je dostupná len pre nainštalovaný server."
 msgid "Please enter the name and select the disk ID of the new snapshot."
 msgstr "Zadajte názov a vyberte ID disku pre vytvorenie nového snapshotu."
 
-#: templates/gui/vm/snapshot.html:42 templates/gui/vm/snapshot_list.html:67
+#: templates/gui/vm/snapshot.html:42 templates/gui/vm/snapshot_list.html:69
 msgid "Create snapshot"
 msgstr "Vytvorenie snapshotu"
 
@@ -5584,11 +5670,9 @@ msgstr ""
 
 #: templates/gui/vm/snapshot.html:85
 msgid ""
-"Do you wan't to <strong>delete every newer snapshot</strong> and restore "
-"data from this snapshot?"
+"Do you want to <strong>delete every newer snapshot</strong> and restore data "
+"from this snapshot?"
 msgstr ""
-"Želáte si <strong>vymazanie novších snapshotov</strong> (staršie snapshoty "
-"ostanú zachované) a kompletné obnovenie tohto snapshotu?"
 
 #: templates/gui/vm/snapshot.html:88
 msgid "Server has to be stopped and not locked in order to perform a rollback."
@@ -5647,23 +5731,27 @@ msgstr ""
 msgid "snapshots"
 msgstr "snapshoty"
 
-#: templates/gui/vm/snapshot_define_list.html:22
+#: templates/gui/vm/snapshot_define_list.html:23
 msgid "Update or delete snapshot definition"
 msgstr ""
 
-#: templates/gui/vm/snapshot_define_list.html:43
+#: templates/gui/vm/snapshot_define_list.html:42
 msgid "Create new snapshot definition"
 msgstr ""
 
-#: templates/gui/vm/snapshot_list.html:36
+#: templates/gui/vm/snapshot_list.html:35
 msgid "Delete or rollback this snapshot"
 msgstr "Zrušenie alebo obnovenie snapshotu"
 
-#: templates/gui/vm/snapshot_list.html:44
+#: templates/gui/vm/snapshot_list.html:35
+msgid "Delete or rollback"
+msgstr ""
+
+#: templates/gui/vm/snapshot_list.html:45
 msgid "Update snapshot information"
 msgstr "Úprava informácií o snapshote"
 
-#: templates/gui/vm/snapshot_list.html:53
+#: templates/gui/vm/snapshot_list.html:55
 #, python-format
 msgid ""
 "Selected <span id=\"selected\">0</span> of <span id=\"total\">%(len)s</span> "
@@ -5681,20 +5769,20 @@ msgstr[2] ""
 "Označené <span id=\"selected\">0</span> z <span id=\"total\">%(len)s</span> "
 "snapshotov"
 
-#: templates/gui/vm/snapshot_list.html:56
+#: templates/gui/vm/snapshot_list.html:58
 msgid "Manual"
 msgstr ""
 
-#: templates/gui/vm/snapshot_list.html:57
+#: templates/gui/vm/snapshot_list.html:59
 msgid "Automatic"
 msgstr ""
 
-#: templates/gui/vm/snapshot_list.html:67
+#: templates/gui/vm/snapshot_list.html:69
 msgid ""
 "Create snapshot of your disk. You will have to choose a name for the snapshot"
 msgstr "Vytvorenie snapshotu disku. Budete musieť zadať názov snapshotu"
 
-#: templates/gui/vm/snapshot_list.html:68
+#: templates/gui/vm/snapshot_list.html:70
 msgid "Delete selected snapshots"
 msgstr ""
 
@@ -7470,220 +7558,224 @@ msgstr "UTC"
 msgid "Reverse DNS name"
 msgstr "Reverzný DNS záznam"
 
-#: vm/forms.py:112
+#: vm/forms.py:95
 msgid "Short server name"
 msgstr "Krátky názov servera"
 
-#: vm/forms.py:118
+#: vm/forms.py:101
 msgid "Server hostname"
 msgstr "Hostname servera"
 
-#: vm/forms.py:124
+#: vm/forms.py:107
 msgid "DNS domain name"
 msgstr "DNS doménový názov"
 
-#: vm/forms.py:211
+#: vm/forms.py:191
+msgid "The tag will be created in case it does not exist."
+msgstr ""
+
+#: vm/forms.py:195
 msgid ""
 "Setting template can modify lots of server attributes, e.g. disks, nics."
 msgstr ""
 
-#: vm/forms.py:223
+#: vm/forms.py:207
 msgid "Monitored?"
 msgstr ""
 
-#: vm/forms.py:225
+#: vm/forms.py:209
 msgid "Installed?"
 msgstr ""
 
-#: vm/forms.py:226
+#: vm/forms.py:210
 msgid "This field is used for informational purposes only."
 msgstr ""
 
-#: vm/forms.py:228
+#: vm/forms.py:212
 msgid "Snapshot count limit"
 msgstr ""
 
-#: vm/forms.py:230
+#: vm/forms.py:214
 msgid "Maximum number of manual server snapshots."
 msgstr ""
 
-#: vm/forms.py:231
+#: vm/forms.py:215
 msgid "Snapshot size limit"
 msgstr ""
 
-#: vm/forms.py:233
+#: vm/forms.py:217
 msgid "Maximum size of all server snapshots."
 msgstr ""
 
-#: vm/forms.py:234
+#: vm/forms.py:218
 msgid "CPU Shares"
 msgstr ""
 
-#: vm/forms.py:239
+#: vm/forms.py:223
 msgid "IO Priority"
 msgstr ""
 
-#: vm/forms.py:253
+#: vm/forms.py:237
 msgid "Metadata"
 msgstr ""
 
-#: vm/forms.py:255
+#: vm/forms.py:239
 msgid "key=value string pairs."
 msgstr ""
 
-#: vm/forms.py:263
+#: vm/forms.py:247
 msgid "(auto)"
 msgstr "(auto)"
 
-#: vm/forms.py:312 vm/forms.py:534 vm/forms.py:635 vm/forms.py:794
-#: vm/forms.py:868
+#: vm/forms.py:297 vm/forms.py:519 vm/forms.py:620 vm/forms.py:779
+#: vm/forms.py:853
 msgid "Disk ID"
 msgstr "ID disku"
 
-#: vm/forms.py:339
+#: vm/forms.py:324
 msgid ""
 "Changing disk size of created server is a dangerous operation and can cause "
 "data loss!"
 msgstr ""
 
-#: vm/forms.py:366
+#: vm/forms.py:351
 #, python-format
 msgid ""
 "Setting first disk storage to different value than server settings storage "
 "(%s) is not recommended."
 msgstr ""
 
-#: vm/forms.py:417
+#: vm/forms.py:402
 msgid "Nic ID"
 msgstr ""
 
-#: vm/forms.py:441
+#: vm/forms.py:426
 msgid "IP Address"
 msgstr "IP Adresa"
 
-#: vm/forms.py:443
+#: vm/forms.py:428
 msgid "Automatic allocation"
 msgstr ""
 
-#: vm/forms.py:444
+#: vm/forms.py:429
 msgid "Create DNS?"
 msgstr ""
 
-#: vm/forms.py:446
+#: vm/forms.py:431
 msgid "Use for monitoring?"
 msgstr ""
 
-#: vm/forms.py:448
+#: vm/forms.py:433
 msgid "MAC Address"
 msgstr ""
 
-#: vm/forms.py:450
+#: vm/forms.py:435
 msgid "Primary NIC?"
 msgstr ""
 
-#: vm/forms.py:452
+#: vm/forms.py:437
 msgid "Allow DHCP Spoofing?"
 msgstr ""
 
-#: vm/forms.py:454
+#: vm/forms.py:439
 msgid "Allow IP Spoofing?"
 msgstr ""
 
-#: vm/forms.py:456
+#: vm/forms.py:441
 msgid "Allow MAC Spoofing?"
 msgstr ""
 
-#: vm/forms.py:458
+#: vm/forms.py:443
 msgid "Allow Restricted Traffic?"
 msgstr ""
 
-#: vm/forms.py:503
+#: vm/forms.py:488
 msgid "File with servers"
 msgstr ""
 
-#: vm/forms.py:519
+#: vm/forms.py:504
 msgid "File type is not supported"
 msgstr ""
 
-#: vm/forms.py:538
+#: vm/forms.py:523
 msgid ""
 "Schedule in CRON format. Please use your local time for the hour field (will "
 "be internally converted into UTC)."
 msgstr ""
 
-#: vm/forms.py:543
+#: vm/forms.py:528
 msgid "Maximum number of snapshots to keep."
 msgstr ""
 
-#: vm/forms.py:546
+#: vm/forms.py:531
 msgid "Active?"
 msgstr ""
 
-#: vm/forms.py:550 vm/forms.py:654
+#: vm/forms.py:535 vm/forms.py:639
 msgid "Freeze filesystem?"
 msgstr ""
 
-#: vm/forms.py:551 vm/forms.py:655
+#: vm/forms.py:536 vm/forms.py:640
 msgid "Create application-consistent snapshot; Requires QEMU Guest Agent."
 msgstr ""
 
-#: vm/forms.py:630 vm/forms.py:865
+#: vm/forms.py:615 vm/forms.py:850
 msgid "Snapshot Name"
 msgstr ""
 
-#: vm/forms.py:632
+#: vm/forms.py:617
 msgid "backup1"
 msgstr "zaloha1"
 
-#: vm/forms.py:638
+#: vm/forms.py:623
 msgid "Optional snapshot comment."
 msgstr "Komentár k snapshotu (nepovinný)."
 
-#: vm/forms.py:652
+#: vm/forms.py:637
 msgid "All disks?"
 msgstr "Všetky disky?"
 
-#: vm/forms.py:676
+#: vm/forms.py:661
 msgid "Snapshot name is already used"
 msgstr "Názov snapshotu sa už používa"
 
-#: vm/forms.py:686
+#: vm/forms.py:671
 msgid "Snapshot limit reached"
 msgstr "Dosiahli ste maximálny počet povolených snapshotov"
 
-#: vm/forms.py:723
+#: vm/forms.py:708
 msgid "Backup Node"
 msgstr ""
 
-#: vm/forms.py:730
+#: vm/forms.py:715
 msgid "Bandwidth limit"
 msgstr ""
 
-#: vm/forms.py:731
+#: vm/forms.py:716
 msgid "Optional transfer rate limit in bytes."
 msgstr ""
 
-#: vm/forms.py:736
+#: vm/forms.py:721
 msgid "Maximum number of backups to keep."
 msgstr ""
 
-#: vm/forms.py:756
+#: vm/forms.py:741
 msgid "Optional backup comment."
 msgstr "Komentár k zálohe (nepovinný)."
 
-#: vm/forms.py:769
+#: vm/forms.py:754
 msgid "Definition"
 msgstr ""
 
-#: vm/forms.py:797
+#: vm/forms.py:782
 msgid "Backup Name"
 msgstr ""
 
-#: vm/forms.py:831
+#: vm/forms.py:816
 msgid "Restore to Server"
 msgstr ""
 
-#: vm/forms.py:833
+#: vm/forms.py:818
 msgid "Restore to Disk"
 msgstr ""
 
@@ -7692,7 +7784,7 @@ msgstr ""
 msgid "Uploaded file mimetype: \"%s\" has not been recognized!"
 msgstr ""
 
-#: vm/utils.py:318
+#: vm/utils.py:311
 msgid "Header does not match expected fields!"
 msgstr ""
 
@@ -7707,6 +7799,15 @@ msgstr ""
 #: widgets.py:173
 msgid "The phone number entered is not valid."
 msgstr "Telefónne číslo nie je v správnom formáte."
+
+#~ msgid "You seem to be lost in space"
+#~ msgstr "Vyzerá to tak, že Ste sa stratili vo vesmíre"
+
+#~ msgid "Click here"
+#~ msgstr "Kliknite sem"
+
+#~ msgid "to go home"
+#~ msgstr "pre návrat domov"
 
 #~ msgid "Billing"
 #~ msgstr "Platby"

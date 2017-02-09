@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Erigones VMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-05 14:10+0100\n"
+"POT-Creation-Date: 2017-02-09 13:31+0000\n"
 "PO-Revision-Date: 2014-02-26 20:42+0100\n"
 "Last-Translator: Erigones, s. r. o. <erigones@erigones.com>\n"
 "Language-Team: Erigones, s. r. o. <erigones@erigones.com>\n"
@@ -100,7 +100,7 @@ msgid "Name"
 msgstr "Názov"
 
 #: models/backup.py:45 models/backup.py:132 models/ipaddress.py:29
-#: models/node.py:75 models/node.py:712 models/vm.py:213
+#: models/node.py:75 models/node.py:716 models/vm.py:213
 msgid "Node"
 msgstr "Výpočtový uzol"
 
@@ -142,12 +142,12 @@ msgstr ""
 msgid "Backup definitions"
 msgstr ""
 
-#: models/backup.py:114 models/image.py:88 models/iso.py:24
+#: models/backup.py:114 models/image.py:89 models/iso.py:24
 #: models/snapshot.py:80
 msgid "ok"
 msgstr "ok"
 
-#: models/backup.py:115 models/image.py:89 models/iso.py:25
+#: models/backup.py:115 models/image.py:90 models/iso.py:25
 #: models/snapshot.py:81 models/vm.py:168
 msgid "pending"
 msgstr "pending"
@@ -164,7 +164,7 @@ msgstr ""
 msgid "Server hostname"
 msgstr ""
 
-#: models/backup.py:129 models/image.py:119 models/iso.py:32 models/node.py:55
+#: models/backup.py:129 models/image.py:120 models/iso.py:32 models/node.py:55
 #: models/snapshot.py:95 models/vm.py:211
 msgid "Status"
 msgstr "Stav"
@@ -185,7 +185,7 @@ msgstr ""
 msgid "Duration"
 msgstr ""
 
-#: models/backup.py:137 models/ipaddress.py:37 models/snapshot.py:98
+#: models/backup.py:137 models/ipaddress.py:38 models/snapshot.py:98
 msgid "Note"
 msgstr "Poznámka"
 
@@ -214,12 +214,10 @@ msgid "Last changed"
 msgstr "Dátum a čas poslednej zmeny"
 
 #: models/base.py:299
-#| msgid "Linux"
 msgid "Linux VM"
 msgstr ""
 
 #: models/base.py:300
-#| msgid "SunOS"
 msgid "SunOS VM"
 msgstr ""
 
@@ -228,7 +226,6 @@ msgid "BSD VM"
 msgstr ""
 
 #: models/base.py:302
-#| msgid "Windows"
 msgid "Windows VM"
 msgstr ""
 
@@ -240,8 +237,8 @@ msgstr ""
 msgid "Linux Zone"
 msgstr ""
 
-#: models/base.py:336 models/dc.py:22 models/image.py:80 models/iso.py:17
-#: models/storage.py:98 models/subnet.py:21 models/vmtemplate.py:78
+#: models/base.py:336 models/dc.py:22 models/image.py:81 models/iso.py:17
+#: models/storage.py:98 models/subnet.py:22 models/vmtemplate.py:78
 msgid "Public"
 msgstr "Verejný"
 
@@ -249,12 +246,12 @@ msgstr "Verejný"
 msgid "Disabled"
 msgstr "Zrušený"
 
-#: models/base.py:338 models/dc.py:23 models/image.py:81 models/iso.py:18
-#: models/storage.py:99 models/subnet.py:22 models/vmtemplate.py:79
+#: models/base.py:338 models/dc.py:23 models/image.py:82 models/iso.py:18
+#: models/storage.py:99 models/subnet.py:23 models/vmtemplate.py:79
 msgid "Private"
 msgstr "Súkromný"
 
-#: models/base.py:339 models/image.py:82 models/subnet.py:23
+#: models/base.py:339 models/image.py:83 models/subnet.py:24
 #: models/vmtemplate.py:80
 msgid "Deleted"
 msgstr "Vymazaný"
@@ -296,60 +293,60 @@ msgstr ""
 msgid "Comma-separated list of UUIDs"
 msgstr ""
 
-#: models/image.py:44 models/image.py:53 models/image.py:62 models/image.py:71
+#: models/image.py:45 models/image.py:54 models/image.py:63 models/image.py:72
 msgid "Install your favourite OS from ISO image."
 msgstr "Nainštalujte si vlastný OS z ISO súboru."
 
-#: models/image.py:96
+#: models/image.py:97
 msgid "ready"
 msgstr ""
 
-#: models/image.py:97
+#: models/image.py:98
 msgid "importing"
 msgstr ""
 
-#: models/image.py:98
+#: models/image.py:99
 msgid "deleting"
 msgstr ""
 
-#: models/image.py:112 models/node.py:52 models/subnet.py:30 models/vm.py:206
+#: models/image.py:113 models/node.py:52 models/subnet.py:31 models/vm.py:206
 msgid "UUID"
 msgstr "UUID"
 
-#: models/image.py:113
+#: models/image.py:114
 msgid "Image version"
 msgstr "Verzia diskového obrazu"
 
-#: models/image.py:114
+#: models/image.py:115
 msgid "Image size (MB)"
 msgstr "Veľkosť diskového obrazu (MB)"
 
-#: models/image.py:115
+#: models/image.py:116
 msgid "Exact same value as in imgadm manifest attribute image_size."
 msgstr ""
 
-#: models/image.py:116 models/iso.py:33 models/vm.py:210
+#: models/image.py:117 models/iso.py:33 models/vm.py:210
 #: models/vmtemplate.py:87
 msgid "Guest OS type"
 msgstr "Typ hosťovského OS"
 
-#: models/image.py:117
+#: models/image.py:118
 msgid "Deploy required?"
 msgstr "Vyžaduje deploy?"
 
-#: models/image.py:118
+#: models/image.py:119
 msgid "Resizable?"
 msgstr ""
 
-#: models/image.py:123
+#: models/image.py:124
 msgid "Image"
 msgstr ""
 
-#: models/image.py:124 models/storage.py:151
+#: models/image.py:125 models/storage.py:151
 msgid "Images"
 msgstr ""
 
-#: models/image.py:160
+#: models/image.py:161
 msgid "Coming Soon"
 msgstr "Už čoskoro"
 
@@ -370,14 +367,18 @@ msgid "Subnet"
 msgstr "Sieť"
 
 #: models/ipaddress.py:36
+msgid "Servers"
+msgstr "Servery"
+
+#: models/ipaddress.py:37
 msgid "Usage"
 msgstr "Použitie"
 
-#: models/ipaddress.py:41
+#: models/ipaddress.py:42
 msgid "IP address"
 msgstr "IP adresa"
 
-#: models/ipaddress.py:42
+#: models/ipaddress.py:43
 msgid "IP addresses"
 msgstr "IP adresy"
 
@@ -417,19 +418,19 @@ msgstr "Adresa"
 msgid "Config"
 msgstr ""
 
-#: models/node.py:60 models/node.py:702
+#: models/node.py:60 models/node.py:706
 msgid "CPUs"
 msgstr "Počet CPU"
 
-#: models/node.py:60 models/node.py:702
+#: models/node.py:60 models/node.py:706
 msgid "Total number of CPUs (cores)."
 msgstr "Celkový počet CPU jadier."
 
-#: models/node.py:61 models/node.py:703
+#: models/node.py:61 models/node.py:707
 msgid "RAM (MB)"
 msgstr "RAM (MB)"
 
-#: models/node.py:61 models/node.py:703
+#: models/node.py:61 models/node.py:707
 msgid "Total RAM size in MB."
 msgstr "Celková veľkosť RAM v MB."
 
@@ -452,11 +453,11 @@ msgid ""
 msgstr ""
 "Koeficient pre výpočet maximálnej veľkosti pamäte pre virtuálne stroje."
 
-#: models/node.py:67 models/node.py:705
+#: models/node.py:67 models/node.py:709
 msgid "Free CPUs"
 msgstr "Volné CPU"
 
-#: models/node.py:68 models/node.py:706
+#: models/node.py:68 models/node.py:710
 msgid "Free RAM (MB)"
 msgstr "Volná RAM (MB)"
 
@@ -468,27 +469,27 @@ msgstr ""
 msgid "Head node"
 msgstr ""
 
-#: models/node.py:76 models/node.py:713
+#: models/node.py:76 models/node.py:717
 msgid "Nodes"
 msgstr ""
 
-#: models/node.py:691
+#: models/node.py:695
 msgid "Shared"
 msgstr ""
 
-#: models/node.py:692
+#: models/node.py:696
 msgid "Shared with limit"
 msgstr ""
 
-#: models/node.py:693
+#: models/node.py:697
 msgid "Reserved"
 msgstr ""
 
-#: models/node.py:699
+#: models/node.py:703
 msgid "Priority"
 msgstr "Priorita"
 
-#: models/node.py:700
+#: models/node.py:704
 msgid ""
 "Higher priority means that the automatic node chooser will more likely "
 "choose this node."
@@ -496,19 +497,19 @@ msgstr ""
 "Vyššia priorita znamená, že automatický výber nódy s vyššou "
 "pravdepodobnosťou vyberie tento výpočtový uzol."
 
-#: models/node.py:704 models/storage.py:117
+#: models/node.py:708 models/storage.py:117
 msgid "Disk pool size (MB)"
 msgstr "Veľkosť diskového pola (MB)"
 
-#: models/node.py:704
+#: models/node.py:708
 msgid "Size of the local disk pool."
 msgstr "Veľkosť lokálneho poolu diskov."
 
-#: models/node.py:707 models/storage.py:121
+#: models/node.py:711 models/storage.py:121
 msgid "Free disk pool size (MB)"
 msgstr "Volná veľkosť diskového pola (MB)"
 
-#: models/node.py:708
+#: models/node.py:712
 msgid "Resource strategy"
 msgstr "Stratégia zdrojov"
 
@@ -611,55 +612,55 @@ msgstr ""
 msgid "Compute node"
 msgstr "Výpočtový uzol"
 
-#: models/subnet.py:31
+#: models/subnet.py:32
 msgid "NIC Tag"
 msgstr "NIC Tag"
 
-#: models/subnet.py:32
+#: models/subnet.py:33
 msgid "VLAN ID"
 msgstr "VLAN ID"
 
-#: models/subnet.py:33 models/subnet.py:46
+#: models/subnet.py:34 models/subnet.py:47
 msgid "Network"
 msgstr "Sieť"
 
-#: models/subnet.py:34
+#: models/subnet.py:35
 msgid "Netmask"
 msgstr "Maska siete"
 
-#: models/subnet.py:35
+#: models/subnet.py:36
 msgid "Gateway"
 msgstr "Brána siete"
 
-#: models/subnet.py:36
+#: models/subnet.py:37
 msgid "Resolvers"
 msgstr "Resolvery"
 
-#: models/subnet.py:37
+#: models/subnet.py:38
 msgid "List of DNS servers separated by commas."
 msgstr "Zoznam DNS serverov oddelených čiarkou."
 
-#: models/subnet.py:38
+#: models/subnet.py:39
 msgid "DNS Domain"
 msgstr "DNS doména"
 
-#: models/subnet.py:39
+#: models/subnet.py:40
 msgid "DNS search domain."
 msgstr "DNS search doména."
 
-#: models/subnet.py:40
+#: models/subnet.py:41
 msgid "PTR Domain"
 msgstr "Názov PTR domény"
 
-#: models/subnet.py:41
+#: models/subnet.py:42
 msgid "Name of a Pdns Domain."
 msgstr "Názov Pdns domény."
 
-#: models/subnet.py:42
+#: models/subnet.py:43
 msgid "DHCP Passthrough"
 msgstr ""
 
-#: models/subnet.py:47
+#: models/subnet.py:48
 msgid "Networks"
 msgstr "Siete"
 
@@ -830,9 +831,6 @@ msgstr "Šablóny"
 
 #~ msgid "Compute nodes"
 #~ msgstr "Výpočtové uzly"
-
-#~ msgid "Servers"
-#~ msgstr "Servery"
 
 #~ msgid "Disk number"
 #~ msgstr "Číslo disku"

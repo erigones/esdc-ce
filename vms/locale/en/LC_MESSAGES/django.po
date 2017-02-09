@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-05 14:10+0100\n"
+"POT-Creation-Date: 2017-02-09 13:31+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -97,7 +97,7 @@ msgid "Name"
 msgstr ""
 
 #: models/backup.py:45 models/backup.py:132 models/ipaddress.py:29
-#: models/node.py:75 models/node.py:712 models/vm.py:213
+#: models/node.py:75 models/node.py:716 models/vm.py:213
 msgid "Node"
 msgstr ""
 
@@ -139,12 +139,12 @@ msgstr ""
 msgid "Backup definitions"
 msgstr ""
 
-#: models/backup.py:114 models/image.py:88 models/iso.py:24
+#: models/backup.py:114 models/image.py:89 models/iso.py:24
 #: models/snapshot.py:80
 msgid "ok"
 msgstr ""
 
-#: models/backup.py:115 models/image.py:89 models/iso.py:25
+#: models/backup.py:115 models/image.py:90 models/iso.py:25
 #: models/snapshot.py:81 models/vm.py:168
 msgid "pending"
 msgstr ""
@@ -161,7 +161,7 @@ msgstr ""
 msgid "Server hostname"
 msgstr ""
 
-#: models/backup.py:129 models/image.py:119 models/iso.py:32 models/node.py:55
+#: models/backup.py:129 models/image.py:120 models/iso.py:32 models/node.py:55
 #: models/snapshot.py:95 models/vm.py:211
 msgid "Status"
 msgstr ""
@@ -182,7 +182,7 @@ msgstr ""
 msgid "Duration"
 msgstr ""
 
-#: models/backup.py:137 models/ipaddress.py:37 models/snapshot.py:98
+#: models/backup.py:137 models/ipaddress.py:38 models/snapshot.py:98
 msgid "Note"
 msgstr ""
 
@@ -234,8 +234,8 @@ msgstr ""
 msgid "Linux Zone"
 msgstr ""
 
-#: models/base.py:336 models/dc.py:22 models/image.py:80 models/iso.py:17
-#: models/storage.py:98 models/subnet.py:21 models/vmtemplate.py:78
+#: models/base.py:336 models/dc.py:22 models/image.py:81 models/iso.py:17
+#: models/storage.py:98 models/subnet.py:22 models/vmtemplate.py:78
 msgid "Public"
 msgstr ""
 
@@ -243,12 +243,12 @@ msgstr ""
 msgid "Disabled"
 msgstr ""
 
-#: models/base.py:338 models/dc.py:23 models/image.py:81 models/iso.py:18
-#: models/storage.py:99 models/subnet.py:22 models/vmtemplate.py:79
+#: models/base.py:338 models/dc.py:23 models/image.py:82 models/iso.py:18
+#: models/storage.py:99 models/subnet.py:23 models/vmtemplate.py:79
 msgid "Private"
 msgstr ""
 
-#: models/base.py:339 models/image.py:82 models/subnet.py:23
+#: models/base.py:339 models/image.py:83 models/subnet.py:24
 #: models/vmtemplate.py:80
 msgid "Deleted"
 msgstr ""
@@ -290,60 +290,60 @@ msgstr ""
 msgid "Comma-separated list of UUIDs"
 msgstr ""
 
-#: models/image.py:44 models/image.py:53 models/image.py:62 models/image.py:71
+#: models/image.py:45 models/image.py:54 models/image.py:63 models/image.py:72
 msgid "Install your favourite OS from ISO image."
 msgstr ""
 
-#: models/image.py:96
+#: models/image.py:97
 msgid "ready"
 msgstr ""
 
-#: models/image.py:97
+#: models/image.py:98
 msgid "importing"
 msgstr ""
 
-#: models/image.py:98
+#: models/image.py:99
 msgid "deleting"
 msgstr ""
 
-#: models/image.py:112 models/node.py:52 models/subnet.py:30 models/vm.py:206
+#: models/image.py:113 models/node.py:52 models/subnet.py:31 models/vm.py:206
 msgid "UUID"
 msgstr ""
 
-#: models/image.py:113
+#: models/image.py:114
 msgid "Image version"
 msgstr ""
 
-#: models/image.py:114
+#: models/image.py:115
 msgid "Image size (MB)"
 msgstr ""
 
-#: models/image.py:115
+#: models/image.py:116
 msgid "Exact same value as in imgadm manifest attribute image_size."
 msgstr ""
 
-#: models/image.py:116 models/iso.py:33 models/vm.py:210
+#: models/image.py:117 models/iso.py:33 models/vm.py:210
 #: models/vmtemplate.py:87
 msgid "Guest OS type"
 msgstr ""
 
-#: models/image.py:117
+#: models/image.py:118
 msgid "Deploy required?"
 msgstr ""
 
-#: models/image.py:118
+#: models/image.py:119
 msgid "Resizable?"
 msgstr ""
 
-#: models/image.py:123
+#: models/image.py:124
 msgid "Image"
 msgstr ""
 
-#: models/image.py:124 models/storage.py:151
+#: models/image.py:125 models/storage.py:151
 msgid "Images"
 msgstr ""
 
-#: models/image.py:160
+#: models/image.py:161
 msgid "Coming Soon"
 msgstr ""
 
@@ -364,14 +364,18 @@ msgid "Subnet"
 msgstr ""
 
 #: models/ipaddress.py:36
+msgid "Servers"
+msgstr ""
+
+#: models/ipaddress.py:37
 msgid "Usage"
 msgstr ""
 
-#: models/ipaddress.py:41
+#: models/ipaddress.py:42
 msgid "IP address"
 msgstr ""
 
-#: models/ipaddress.py:42
+#: models/ipaddress.py:43
 msgid "IP addresses"
 msgstr ""
 
@@ -411,19 +415,19 @@ msgstr ""
 msgid "Config"
 msgstr ""
 
-#: models/node.py:60 models/node.py:702
+#: models/node.py:60 models/node.py:706
 msgid "CPUs"
 msgstr ""
 
-#: models/node.py:60 models/node.py:702
+#: models/node.py:60 models/node.py:706
 msgid "Total number of CPUs (cores)."
 msgstr ""
 
-#: models/node.py:61 models/node.py:703
+#: models/node.py:61 models/node.py:707
 msgid "RAM (MB)"
 msgstr ""
 
-#: models/node.py:61 models/node.py:703
+#: models/node.py:61 models/node.py:707
 msgid "Total RAM size in MB."
 msgstr ""
 
@@ -445,11 +449,11 @@ msgid ""
 "machines."
 msgstr ""
 
-#: models/node.py:67 models/node.py:705
+#: models/node.py:67 models/node.py:709
 msgid "Free CPUs"
 msgstr ""
 
-#: models/node.py:68 models/node.py:706
+#: models/node.py:68 models/node.py:710
 msgid "Free RAM (MB)"
 msgstr ""
 
@@ -461,45 +465,45 @@ msgstr ""
 msgid "Head node"
 msgstr ""
 
-#: models/node.py:76 models/node.py:713
+#: models/node.py:76 models/node.py:717
 msgid "Nodes"
 msgstr ""
 
-#: models/node.py:691
+#: models/node.py:695
 msgid "Shared"
 msgstr ""
 
-#: models/node.py:692
+#: models/node.py:696
 msgid "Shared with limit"
 msgstr ""
 
-#: models/node.py:693
+#: models/node.py:697
 msgid "Reserved"
 msgstr ""
 
-#: models/node.py:699
+#: models/node.py:703
 msgid "Priority"
 msgstr ""
 
-#: models/node.py:700
+#: models/node.py:704
 msgid ""
 "Higher priority means that the automatic node chooser will more likely "
 "choose this node."
 msgstr ""
 
-#: models/node.py:704 models/storage.py:117
+#: models/node.py:708 models/storage.py:117
 msgid "Disk pool size (MB)"
 msgstr ""
 
-#: models/node.py:704
+#: models/node.py:708
 msgid "Size of the local disk pool."
 msgstr ""
 
-#: models/node.py:707 models/storage.py:121
+#: models/node.py:711 models/storage.py:121
 msgid "Free disk pool size (MB)"
 msgstr ""
 
-#: models/node.py:708
+#: models/node.py:712
 msgid "Resource strategy"
 msgstr ""
 
@@ -601,55 +605,55 @@ msgstr ""
 msgid "Compute node"
 msgstr ""
 
-#: models/subnet.py:31
+#: models/subnet.py:32
 msgid "NIC Tag"
 msgstr ""
 
-#: models/subnet.py:32
+#: models/subnet.py:33
 msgid "VLAN ID"
 msgstr ""
 
-#: models/subnet.py:33 models/subnet.py:46
+#: models/subnet.py:34 models/subnet.py:47
 msgid "Network"
 msgstr ""
 
-#: models/subnet.py:34
+#: models/subnet.py:35
 msgid "Netmask"
 msgstr ""
 
-#: models/subnet.py:35
+#: models/subnet.py:36
 msgid "Gateway"
 msgstr ""
 
-#: models/subnet.py:36
+#: models/subnet.py:37
 msgid "Resolvers"
 msgstr ""
 
-#: models/subnet.py:37
+#: models/subnet.py:38
 msgid "List of DNS servers separated by commas."
 msgstr ""
 
-#: models/subnet.py:38
+#: models/subnet.py:39
 msgid "DNS Domain"
 msgstr ""
 
-#: models/subnet.py:39
+#: models/subnet.py:40
 msgid "DNS search domain."
 msgstr ""
 
-#: models/subnet.py:40
+#: models/subnet.py:41
 msgid "PTR Domain"
 msgstr ""
 
-#: models/subnet.py:41
+#: models/subnet.py:42
 msgid "Name of a Pdns Domain."
 msgstr ""
 
-#: models/subnet.py:42
+#: models/subnet.py:43
 msgid "DHCP Passthrough"
 msgstr ""
 
-#: models/subnet.py:47
+#: models/subnet.py:48
 msgid "Networks"
 msgstr ""
 
