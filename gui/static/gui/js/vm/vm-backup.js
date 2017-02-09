@@ -212,7 +212,7 @@ function vm_backup_restore(hostname, btn, destroy_fun, rollback_fun) {
 
   var mod = $('#vm_snapshot_restore_modal');
   var err = mod.find('div.modal_error');
-  var name = btn.html();
+  var name = btn.parent().find('span.snapshot_name').html();
   var tr = btn.parent().parent();
   var disk_id = tr.data('disk_id');
   var disk_size = tr.data('disk_size');
@@ -339,7 +339,7 @@ function vm_snapshot_rollback(hostname, btn, destroy_fun, rollback_fun) {
 
   var mod = $('#vm_snapshot_rollback_modal');
   var err = mod.find('div.modal_error');
-  var name = btn.html();
+  var name = btn.parent().find('span.snapshot_name').html();
   var tr = btn.parent().parent();
   var disk_id = tr.data('disk_id');
   var vm_hostname = tr.data('hostname');

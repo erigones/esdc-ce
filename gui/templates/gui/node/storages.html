@@ -69,7 +69,8 @@
           {% for ns in storages %}{% with st=ns.storage %}
           <tr>
             <td class="nowrap">
-              <a href="#" class="btn-link btn-icon-edit no-ajax obj_edit" title="{% trans "Update or delete node Storage" %}" data-toggle="tooltip" data-placement="bottom" data-form='{{ ns.web_data|jsondata }}'>{{ st.alias }}</a> <small{% if ns.zpool in zpools_missing %} class="strikethrough"{% endif %}>({{ ns.zpool }})</small>
+              {{ st.alias }} <small{% if ns.zpool in zpools_missing %} class="strikethrough"{% endif %}>({{ ns.zpool }})</small>
+              <a href="#" class="button mini no-ajax obj_edit" title="{% trans "Update or delete node Storage" %}" data-toggle="tooltip" data-placement="bottom" data-form='{{ ns.web_data|jsondata }}'> <i class="icon-pencil"></i> {% trans "Edit" %}</a>
             </td>
             <td>{{ st.get_access_display }}</td>
             <td class="nowrap"><span class="vm_hostname" title="{{ st.owner }}"><i class="icon-user"></i> {{ st.owner|truncatechars:16 }}</span></td>

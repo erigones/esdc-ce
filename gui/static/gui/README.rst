@@ -6,5 +6,11 @@ In Fedora Linux:
         sudo dnf install rubygems ruby-devel
         sudo gem update --system
         sudo gem install compass
-        cd  $erigones_home/gui/static/gui
+        cd  $ERIGONES_HOME/gui/static/gui
         compass watch
+
+In Ubuntu Linux:
+        sudo apt-get install ruby-compass
+        cd  $ERIGONES_HOME/gui/static/gui
+        compass watch
+

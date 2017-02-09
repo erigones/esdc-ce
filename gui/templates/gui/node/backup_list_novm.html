@@ -32,10 +32,11 @@
         </div>
       </td>
       <td>
+        <span class="snapshot_name">{{ bkp.name }}</span>
         {% if node.is_online and not bkp.locked and request.dc == bkp.dc %}
-        <a href="#" class="btn-link no-ajax vm_snapshot_name" data-backup="true" title="{% trans "Delete or restore this backup" %}" data-toggle="tooltip" data-placement="bottom">{{ bkp.name }}</a>
-        {% else %}
-        {{ bkp.name }}
+          <a href="#" class="button mini no-ajax vm_snapshot_name" data-backup="true" title="{% trans "Delete or restore this backup" %}" data-toggle="tooltip" data-placement="bottom">
+            <i class="icon-pencil"></i> {% trans "Delete or restore" %}
+          </a>
         {% endif %}
       </td>
       <td><span class="vm_hostname">{{ bkp.vm_hostname }}<br><i class="icon-cloud"></i> {{ bkp.dc.alias }}</span></td>
@@ -45,7 +46,10 @@
       <td class="hidden-phone-small">{{ bkp.get_status_display }}{% if bkp.fsfreeze %}&nbsp;<i class="icon-flag"></i>{% endif %}</td>
       <td class="hidden-phone">{{ bkp.time|timeformat }}</td>
       <td class="hidden-phone">{{ bkp.size|filesizeformat }}</td>
-      <td class="hidden-phone"><small class="vm_snapshot_note">{{ bkp.note|wordwrap:44 }}</small> <a href="#" class="btn-link btn-icon-edit icon-active no-ajax vm_snapshot_note" title="{% trans "Update backup information" %}" data-toggle="tooltip" data-placement="bottom"></a></td>
+      <td class="hidden-phone">
+        <small class="vm_snapshot_note">{{ bkp.note|wordwrap:44 }}</small>
+        <a href="#" class="button mini icon-active no-ajax vm_snapshot_note" title="{% trans "Update backup information" %}" data-toggle="tooltip" data-placement="bottom"> <i class="icon-pencil"></i> {% trans "Edit" %}</a>
+      </td>
     </tr>
     {% endwith %}{% endfor %}
   </tbody>
