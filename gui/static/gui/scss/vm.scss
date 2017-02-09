@@ -874,3 +874,11 @@ textarea.uneditable-input, input[type="text"].uneditable-input, input[type="pass
   white-space: nowrap;
   margin-left: 3px;
 }
+
+div.vm_node_color {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid #999;
+}

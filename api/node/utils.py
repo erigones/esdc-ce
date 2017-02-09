@@ -6,11 +6,6 @@ def get_node(request, hostname, attrs=None, where=None, exists_ok=True, noexists
              dc=False, api=True, extra=None, annotate=None):
     """Call get_object for Node model identified by hostname.
     This function should be called by staff users or DC admins only."""
-    # Quickly return node, if set in request (shortcut from GUI)
-    node = getattr(request, '_api_node', None)
-    if api and node:
-        return node
-
     if attrs is None:
         attrs = {}
 

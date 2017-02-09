@@ -40,11 +40,6 @@ def get_vm(request, hostname_or_uuid, attrs=None, where=None, exists_ok=False, n
     the current working DC; This is only used by internal DC-unbound APIs, which need to check whether a VM is defined
     in the system. DC-bound API calls must use the default dc_bound=True!
     """
-    # Quickly return vm, if set in request (shortcut from GUI)
-    vm = getattr(request, '_api_vm', None)
-    if api and vm:
-        return vm
-
     if where is None:
         where = QNodeNullOrLicensed
 

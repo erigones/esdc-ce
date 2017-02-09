@@ -1,0 +1,5 @@
+- name: Remove chrony
+  yum: name=chrony state=absent
+
+- name: Enable ntpd
+  service: name=ntpd state=started enabled=yes

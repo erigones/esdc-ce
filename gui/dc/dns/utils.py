@@ -17,8 +17,5 @@ def get_domain(request, name):
         domain = qs.get(name=name)
     except Domain.DoesNotExist:
         raise Http404
-    else:
-        # Shortcut for repeated get_domain() call in API
-        request._api_domain = domain
 
     return domain

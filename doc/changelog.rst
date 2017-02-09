@@ -21,7 +21,9 @@ Features
 - Made image server optional and configurable (``VMS_IMAGE_VM``) - `#52 <https://github.com/erigones/esdc-ce/issues/52>`__
 - Implemented update mechanism of Danube Cloud infrastructure/OS services - `#44 <https://github.com/erigones/esdc-ce/issues/44>`__
 - Added explanations to DC settings GUI section - `#56 <https://github.com/erigones/esdc-ce/issues/56>`__
-
+- Changed system initialization to include all images imported on head node - `#61 <https://github.com/erigones/esdc-ce/issues/61>`__
+- Updated design of DC switch button - `#64 <https://github.com/erigones/esdc-ce/issues/64>`__
+- Changed image repository view to show last 30 images by default - `#66 <https://github.com/erigones/esdc-ce/issues/66>`__
 
 
 Bugs
@@ -30,13 +32,17 @@ Bugs
 - Fixed bug with monitoring synchronization called twice during new VM deployment - `#32 <https://github.com/erigones/esdc-ce/issues/32>`__
 - Patched celery beat to achieve correct behavior during program termination - `#40 <https://github.com/erigones/esdc-ce/issues/40>`__
 - Updated message box that displays information about unavailable nodes to show/hide dynamically - `#35 <https://github.com/erigones/esdc-ce/issues/35>`__
+- Fixed image import of images with same name - `#61 <https://github.com/erigones/esdc-ce/issues/61>`__
+- Fixed initial VM harvest problem with temporary unreachable worker - `#61 <https://github.com/erigones/esdc-ce/issues/61>`__
 
 
-2.3.3 (unreleased)
-==================
+2.3.3 (released on 2017-02-04)
+==============================
 
 Features
 --------
+
+- Updated design of node color - commit `ed9534f <https://github.com/erigones/esdc-ce/commit/ed9534f223e56fd7a7a7074b71fe0e48f98691e0>`__
 
 Bugs
 ----
@@ -45,6 +51,8 @@ Bugs
 - Fixed validation of MON_ZABBIX_TEMPLATES_VM_NIC and MON_ZABBIX_TEMPLATES_VM_DISK DC settings - `#31 <https://github.com/erigones/esdc-ce/issues/31>`__
 - Fixed validation of placeholders supported in DC Settings - `#34 <https://github.com/erigones/esdc-ce/issues/34>`__
 - Fixed update script to call its NEW self - `#44 <https://github.com/erigones/esdc-ce/issues/44>`__
+- Removed DB object caching between GUI<->API internal requests - `#62 <https://github.com/erigones/esdc-ce/issues/62>`__
+- Fixed DNS permission checking for DC-bound domains - `#63 <https://github.com/erigones/esdc-ce/issues/63>`__
 
 
 2.3.2 (released on 2016-12-17)
