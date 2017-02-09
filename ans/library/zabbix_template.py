@@ -84,7 +84,7 @@ EXAMPLES = '''
       - Example group1
       - Example group2
 
-# Limit the Zabbix group creations to one host since Zabbix can return an error when doing concurent updates
+# Limit the Zabbix group creations to one host since Zabbix can return an error when doing concurrent updates
 - name: Create host groups
   local_action:
     module: zabbix_group
@@ -327,7 +327,6 @@ def main():
             template_id = get_template_id(module, zbx, template_name)
             export_template(module, zbx, template_id, target, fmt)
             changed = True
-
 
     module.exit_json(changed=changed)
 

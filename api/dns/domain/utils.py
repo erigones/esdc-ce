@@ -7,7 +7,6 @@ from api.dc.utils import get_dc
 from api.utils.db import get_object
 from pdns.models import Domain
 from vms.models import Dc, DomainDc
-from gui.models.permission import DnsAdminPermission
 
 logger = getLogger(__name__)
 
