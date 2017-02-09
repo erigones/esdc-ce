@@ -54,10 +54,7 @@
             <td>{% trans "Hostname" %}:</td>
             <td>
               <strong>
-                <span><i class="icon-sitemap" style="color: {{ node.color }};"></i> {{ node.hostname }}</span>
-                {% if node.is_head %}&nbsp;
-                  <span title="{% trans "Head node" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-flag"></i></span>
-                {% endif %}
+                <span><i class="icon-sitemap" style="color: {{ node.color }};"></i> {{ node.hostname }}</span>{% if node.is_head %}&nbsp;<span title="{% trans "Head node" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-flag"></i></span>{% endif %}
                 <a href="#" class="button mini no-ajax" id="node_define" title="{% trans "Change node settings" %}" data-toggle="tooltip" data-placement="bottom">
                   <i class="icon-pencil"></i> {% trans "Edit" %}
                 </a>
