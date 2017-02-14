@@ -6,7 +6,6 @@ from api.task.response import mgmt_task_response, FailureTaskResponse, SuccessTa
 from api.vm.utils import get_vm
 from api.mon.messages import LOG_MONDEF_UPDATE
 from api.mon.node.utils import parse_yyyymm
-from api.mon.validators import parse_graph_vm
 from api.mon.vm.graphs import GRAPH_ITEMS
 from api.mon.vm.serializers import VmMonitoringSerializer, MonVmHistorySerializer
 from api.mon.vm.tasks import mon_vm_sla as t_mon_vm_sla, mon_vm_history as t_mon_vm_history
@@ -96,6 +95,37 @@ class VmHistoryView(APIView):
         self.item_id = item_id
         self.data = data
 
+    def _validate_graph_item_id(self, item_id, graph):
+        """Validates item_id and retrieves ID of the item requested in the graph
+
+        :param item_id: ID of the graph item that will be searched in VM data
+        :type string:
+        :param graph: the name of the graph for which item_id is retrieved
+        :type string:
+        """
+        if item_id is None:
+            raise InvalidInput('Missing item_id parameter in URI')
+        try:
+            item_id = int(item_id)
+            item_id -= 1
+
+            if item_id < 0:
+                raise InvalidInput('Invalid input value for item_id')
+
+        except Exception:
+            raise InvalidInput('Invalid input value for item_id')
+
+        try:
+            if graph.startswith(('nic-', 'net-', )):
+                nic_or_disk_id = self.vm.get_real_nic_id(self.vm.json_active_get_nics()[item_id])
+
+            elif graph.startswith(('disk-', 'hdd-', 'fs-', )):
+                nic_or_disk_id = self.vm.get_real_disk_id(self.vm.json_active_get_disks()[item_id])
+        except IndexError:
+            raise InvalidInput('Invalid input value for item_id')
+
+        return nic_or_disk_id
+
     def get(self):
         request, vm, graph, item_id = self.request, self.vm, self.graph_type, self.item_id
 
@@ -106,16 +136,10 @@ class VmHistoryView(APIView):
             raise VmIsNotOperational
 
         # for selected graphs validate item_id, otherwise set it to None
-        if graph.startswith(('net-', 'disk-', 'fs-')):
-            if item_id is None:
-                raise InvalidInput('Missing item_id parameter in URI')
-            try:
-                item_id = int(item_id)
-            except Exception as e:
-                raise InvalidInput('Invalid input value for item_id, must be integer!')
+        if graph.startswith(('nic-', 'net-', 'disk-', 'hdd-', 'fs-')):
+            item_id = self._validate_graph_item_id(item_id, graph)
         else:
             self.item_id = item_id = None
-
 
         try:
             graph_settings = GRAPH_ITEMS.get_options(graph, vm)

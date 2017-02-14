@@ -104,4 +104,26 @@ GRAPH_ITEMS = _GraphItems({
         },
     },
 
+    'storage-throughput': {
+        'desc': _('The amount of read and written data on the zpool.'),
+        'items': ('zpool.iostat[%(zpool)s,nread]', 'zpool.iostat[%(zpool)s,nwritten]'),
+        'update_interval': GRAPH_UPDATE_INTERVAL,
+        'history': 3,
+        'options': {
+            'series': GRAPH_STACK_SERIES,
+            'yaxis': {'mode': 'byteRate', 'min': 0},
+        },
+    },
+
+    'storage-io': {
+        'desc': _('The amount of read and written data on the zpool.'),
+        'items': ('zpool.iostat[%(zpool)s,nread]', 'zpool.iostat[%(zpool)s,nwritten]'),
+        'update_interval': GRAPH_UPDATE_INTERVAL,
+        'history': 3,
+        'options': {
+            'series': GRAPH_STACK_SERIES,
+            'yaxis': {'mode': 'byteRate', 'min': 0},
+        },
+    },
+
 })

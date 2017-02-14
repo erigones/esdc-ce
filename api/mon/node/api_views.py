@@ -3,7 +3,6 @@ from api.api_views import APIView
 from api.exceptions import NodeIsNotOperational, InvalidInput
 from api.mon.node.tasks import mon_node_sla as t_mon_node_sla, mon_node_history as t_mon_node_history
 from api.mon.node.utils import parse_yyyymm
-from api.mon.validators import parse_graph_vm
 from api.mon.node.serializers import MonNodeHistorySerializer
 from api.node.utils import get_node
 from api.task.response import mgmt_task_response, FailureTaskResponse
