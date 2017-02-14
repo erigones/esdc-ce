@@ -23,14 +23,8 @@
  * VM Control *
  **************/
 
-tr.setting td:first-child:after {
-  font-family: FontAwesome;
-  font-weight: normal;
-  font-style: normal;
-  display: inline-block;
-  text-decoration: inherit;
-  float: right;
-  content: "\f013";
+tr.setting td:first-child span.note {
+  color: #444;
 }
 
 table.form {
@@ -879,4 +873,12 @@ textarea.uneditable-input, input[type="text"].uneditable-input, input[type="pass
 .vm_flags {
   white-space: nowrap;
   margin-left: 3px;
+}
+
+div.vm_node_color {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid #999;
 }

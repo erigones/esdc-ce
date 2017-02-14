@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-10-25 14:03+0000\n"
+"POT-Creation-Date: 2017-02-09 13:34+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,27 +21,27 @@ msgstr ""
 msgid "'"
 msgstr ""
 
-#: static/guacamole/scripts/guacamole-erigones.js:151
+#: static/guacamole/scripts/guacamole-erigones.js:183
 msgid "Idle."
 msgstr ""
 
-#: static/guacamole/scripts/guacamole-erigones.js:154
+#: static/guacamole/scripts/guacamole-erigones.js:186
 msgid "Connecting..."
 msgstr ""
 
-#: static/guacamole/scripts/guacamole-erigones.js:157
+#: static/guacamole/scripts/guacamole-erigones.js:189
 msgid "Connected, waiting for first update..."
 msgstr ""
 
-#: static/guacamole/scripts/guacamole-erigones.js:163
+#: static/guacamole/scripts/guacamole-erigones.js:195
 msgid "Disconnecting..."
 msgstr ""
 
-#: static/guacamole/scripts/guacamole-erigones.js:166
+#: static/guacamole/scripts/guacamole-erigones.js:198
 msgid "Disconnected."
 msgstr ""
 
-#: static/guacamole/scripts/guacamole-erigones.js:169
+#: static/guacamole/scripts/guacamole-erigones.js:201
 msgid "Unknown status"
 msgstr ""
 
@@ -67,51 +67,51 @@ msgstr ""
 msgid "changed status to"
 msgstr ""
 
-#: static/gui/js/gsio.js:758
+#: static/gui/js/gsio.js:762
 msgid "Snapshot successfully created"
 msgstr ""
 
-#: static/gui/js/gsio.js:761
+#: static/gui/js/gsio.js:765
 msgid "Snapshot successfully deleted"
 msgstr ""
 
-#: static/gui/js/gsio.js:764
+#: static/gui/js/gsio.js:768
 msgid "Snapshot successfully restored"
 msgstr ""
 
-#: static/gui/js/gsio.js:772
+#: static/gui/js/gsio.js:776
 msgid "Creating new snapshot failed"
 msgstr ""
 
-#: static/gui/js/gsio.js:775
+#: static/gui/js/gsio.js:779
 msgid "Deleting snapshot failed"
 msgstr ""
 
-#: static/gui/js/gsio.js:778
+#: static/gui/js/gsio.js:782
 msgid "Restoring snapshot failed"
 msgstr ""
 
-#: static/gui/js/gsio.js:823
+#: static/gui/js/gsio.js:827
 msgid "Backup successfully created"
 msgstr ""
 
-#: static/gui/js/gsio.js:826
+#: static/gui/js/gsio.js:830
 msgid "Backup successfully deleted"
 msgstr ""
 
-#: static/gui/js/gsio.js:829
+#: static/gui/js/gsio.js:833
 msgid "Backup successfully restored"
 msgstr ""
 
-#: static/gui/js/gsio.js:837
+#: static/gui/js/gsio.js:841
 msgid "Creating new backup failed"
 msgstr ""
 
-#: static/gui/js/gsio.js:840
+#: static/gui/js/gsio.js:844
 msgid "Deleting backup failed"
 msgstr ""
 
-#: static/gui/js/gsio.js:843
+#: static/gui/js/gsio.js:847
 msgid "Restoring backup failed"
 msgstr ""
 

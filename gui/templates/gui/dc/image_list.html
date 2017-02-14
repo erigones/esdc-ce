@@ -25,8 +25,13 @@
     <span class="title_add"><i class="icon-save"></i> {% trans "Import Disk Image" %}</span>
   </div>
   <div class="modal-body separator">
+    {% if image_vm %}
     <div class="text_edit"></div>
     <div class="text_add"></div>
+    {% else %}
+    <div class="text_edit">{% trans "<strong>Note:</strong> Image server support is disabled. All operations are currently performed only at database level." %}</div>
+    <div class="text_add">{% trans "<strong>Note:</strong> Image server support is disabled. All operations are currently performed only at database level." %}</div>
+    {% endif %}
     <form class="form-horizontal" action="#" data-source="{{ url_form_admin }}" method="POST">
       {% include "gui/dc/image_admin_form.html" with form=form_admin %}
     </form>
@@ -117,12 +122,21 @@
           {% for img in images %}
           <tr id="image_{{ img.name }}">
             <td>
-              {% if is_staff or can_edit and img.dc_bound %}{% if all and img.pk in can_add %}
-              <a href="#" class="btn-link btn-icon-link no-ajax obj_edit_or_add_dc italic{% if not img.is_ok %} disabled{% endif %}" title="{% trans "Attach, update or delete disk Image" %}" data-toggle="tooltip" data-placement="bottom" data-form='{{ img.web_data_admin|jsondata }}' data-prefix="adm">{{ img.alias_version }}</a>
+              {% if is_staff or can_edit and img.dc_bound %}
+                {% if all and img.pk in can_add %}
+                  <span class="italic">{{ img.alias_version }} <small>({{ img.name }})</small></span>
+                  <a href="#" class="button mini no-ajax obj_edit_or_add_dc {% if not img.is_ok %} disabled{% endif %}" title="{% trans "Attach, update or delete disk Image" %}" data-toggle="tooltip" data-placement="bottom" data-form='{{ img.web_data_admin|jsondata }}' data-prefix="adm">
+                    <i class="icon-link"></i> {% trans "Edit" %}
+                  </a>
+                {% else %}
+                  {{ img.alias_version }} <small>({{ img.name }})</small>
+                  <a href="#" class="button mini no-ajax obj_edit{% if not img.is_ok %} disabled{% endif %}" title=" {% if is_staff %}{% trans "Detach, update or delete disk Image" %}{% else %}{% trans "Update or delete disk Image" %}{% endif %}" data-toggle="tooltip" data-placement="bottom" data-form='{{ img.web_data_admin|jsondata }}' data-prefix="adm">
+                    <i class="icon-pencil"></i> {% trans "Edit" %}
+                  </a>
+                {% endif %}
               {% else %}
-              <a href="#" class="btn-link btn-icon-edit no-ajax obj_edit{% if not img.is_ok %} disabled{% endif %}" title="{% if is_staff %}{% trans "Detach, update or delete disk Image" %}{% else %}{% trans "Update or delete disk Image" %}{% endif %}" data-toggle="tooltip" data-placement="bottom" data-form='{{ img.web_data_admin|jsondata }}' data-prefix="adm">{{ img.alias_version }}</a>
+                {{ img.alias_version }} <small>({{ img.name }})</small>
               {% endif %}
-              {% else %}{{ img.alias_version }}{% endif %} <small>({{ img.name }})</small>
             </td>
             <td>{{ img.get_access_display }}</td>
             <td class="nowrap"><span class="vm_hostname" title="{{ img.owner }}"><i class="icon-user"></i> {{ img.owner|truncatechars:16 }}</span></td>

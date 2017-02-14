@@ -101,27 +101,44 @@
         </thead>
 
         <tbody>
-          {% for domain in domains %}
+        {% for domain in domains %}
           <tr>
             <td>
-              {% if is_staff  %}{% if all and domain.pk in can_add %}
-              <a href="#" class="btn-link btn-icon-link no-ajax obj_edit_or_add_dc italic" title="{% trans "Attach, update or delete DNS Domain" %}" data-toggle="tooltip" data-placement="bottom" data-form='{{ domain.web_data|jsondata }}' data-prefix="adm">{{ domain.alias }}</a>
+              {% if is_staff %}
+                {% if all and domain.pk in can_add %}
+                  <span class="italic">{{ domain.alias }}</span>
+                  <a href="#" class="button mini no-ajax obj_edit_or_add_dc" title="{% trans "Attach, update or delete DNS Domain" %}" data-toggle="tooltip" data-placement="bottom" data-form='{{ domain.web_data|jsondata }}' data-prefix="adm"><i class="icon-link"></i> {% trans "Edit" %}</a>
+                {% else %}
+                  {{ domain.name }}
+                  <a href="#" class="button mini no-ajax obj_edit" title="{% trans "Detach, update or delete DNS Domain" %}" data-toggle="tooltip" data-placement="bottom" data-form='{{ domain.web_data|jsondata }}' data-prefix="adm"><i class="icon-pencil"></i> {% trans "Edit" %}</a>
+                {% endif %}
               {% else %}
-              <a href="#" class="btn-link btn-icon-edit no-ajax obj_edit" title="{% trans "Detach, update or delete DNS Domain" %}" data-toggle="tooltip" data-placement="bottom" data-form='{{ domain.web_data|jsondata }}' data-prefix="adm">{{ domain.name }}</a>
+                {{ domain.alias }}
               {% endif %}
-              {% else %}{{ domain.alias }}{% endif %}
             </td>
             <td>{{ domain.get_access_display }}</td>
-            <td class="nowrap"><span class="vm_hostname" title="{{ domain.owner }}"><i class="icon-user"></i> {{ domain.owner|truncatechars:16 }}</span></td>
+            <td class="nowrap">
+              <span class="vm_hostname" title="{{ domain.owner }}"><i class="icon-user"></i> {{ domain.owner|truncatechars:16 }}</span>
+            </td>
             <td class="hidden-phone"><i class="icon-{{ domain.dc_bound_bool|yesno:"ok,remove" }}"></i></td>
-            <td class="nowrap">{% if is_staff or can_edit and domain.dc_bound  %}<a href="{% url 'dc_domain_record_list' %}?{{ qs }}&amp;flt-domain={{ domain.name }}" class="btn-link btn-icon-edit" title="{% trans "Show/edit domain DNS records" %}" data-toggle="tooltip" data-placement="bottom">{% blocktrans count counter=domain.records %}{{ counter }} record{% plural %}{{ counter }} records{% endblocktrans %}</a>{% else %}{% trans "N/A" %}{% endif %}</td>
+            <td class="nowrap">
+              {% if is_staff or can_edit and domain.dc_bound %}
+                <a href="{% url 'dc_domain_record_list' %}?{{ qs }}&amp;flt-domain={{ domain.name }}" class="btn-link" title="{% trans "Show/edit domain DNS records" %}" data-toggle="tooltip" data-placement="bottom">{% blocktrans count counter=domain.records %}{{ counter }} record {% plural %}{{ counter }} records{% endblocktrans %}</a>
+              {% else %}
+                {% trans "N/A" %}
+              {% endif %}
+            </td>
             {% if all %}
-            <td class="hidden-phone"><small class="vm_hostname">{{ domain.dc|dcify }}</small></td>
+              <td class="hidden-phone">
+                <small class="vm_hostname">{{ domain.dc|dcify }}</small>
+              </td>
             {% else %}
-            <td class="hidden-phone"><small class="vm_snapshot_note">{{ domain.desc|wordwrap:44 }}</small></td>
+              <td class="hidden-phone">
+                <small class="vm_snapshot_note">{{ domain.desc|wordwrap:44 }}</small>
+              </td>
             {% endif %}
           </tr>
-          {% endfor %}
+        {% endfor %}
         </tbody>
 
         <tfoot>

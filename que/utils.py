@@ -18,7 +18,6 @@ from que.lock import TaskLock
 from que.user_tasks import UserTasks
 from que.exceptions import PingFailed, NodeError
 
-
 # Defaults
 LOGTASK = cq.conf.ERIGONES_LOGTASK
 TASK_USER = cq.conf.ERIGONES_TASK_USER
@@ -210,7 +209,7 @@ def follow_callback(ar):
     return ar
 
 
-def has_callback(task_id):
+def get_callback(task_id):
     """
     Check if task has a callback.
     """
@@ -300,10 +299,10 @@ def cancel_task(task_id, terminate=False, signal=None, force=False):
     Revoke task.
     """
     # Callbacks must run; they should never expire (unless you are using force)
-    if not force and (has_callback(task_id) or is_callback(task_id)):
+    if not force and (get_callback(task_id) or is_callback(task_id)):
         # Parent task has finished
         return False
-
+    # Don't forget that this triggers also signal
     return cq.control.revoke(task_id, terminate=terminate, signal=signal)
 
 
@@ -368,58 +367,21 @@ def log_task_callback(task_id, task_status=states.REVOKED, cleanup=True, detail=
     return t
 
 
-def delete_task(task_id, force=False, mega_force=False):
+def delete_task(task_id, force=False):
     """
     Delete task from UserTasks. Only for tasks which started, but failed to finish and are stuck in DB.
     """
-    # You have to use the parent task ID instead of the callback task ID
-    if is_callback(task_id):
-        return None, 'Task is a callback'
 
-    if mega_force:
-        logger.warning('Trying to delete task %s, by using mega force!', task_id)
-        force = True
+    if force:
+        logger.warning('Trying to delete task %s by using force.', task_id)
+        logger.warning('Forcing task deletion results in undefined behavior.')
+    else:
+        return None, "Safe task deletion is not implemented."
 
-    ar = _get_ar(task_id)
-    tasks = [ar]
     # The task has a callback, which probably means that it has already finished on compute node.
-    # It is the worst thing that can ever happen :(
-    if has_callback(task_id):
-        if not force:
-            return None, 'Task has a callback'
-
-        ar = _get_ar(task_id)
-
-        while True:
-            # noinspection PyBroadException
-            try:
-                ar = _get_ar(get_result(ar)['meta']['callback'])
-            except:
-                break
-            else:
-                tasks.append(ar)
-
-    if not mega_force:  # You should never use the mega_force (only used manually by support operators)
-        # Only proceed if any of the tasks is in PENDING or STARTED state.
-        # When all tasks are FINISHED there is nothing to delete
-        if all(t.ready() for t in tasks):
-            return None, 'Bad task status'
-
-        # "Proper" task inspection
-        i = cq.control.inspect()
-        task_ids_active = frozenset(t['id'] for tasks in i.active().values() for t in tasks)
-        task_ids_reserved = frozenset(t['id'] for tasks in i.reserved().values() for t in tasks)
-
-        for t in tasks:
-            if t.task_id in task_ids_active:
-                return None, 'Task is running'
-
-            if t.task_id in task_ids_reserved:
-                return None, 'Task is going to run'
-
-        # Just to be sure
-        if all(t.ready() for t in tasks):
-            return None, 'Bad task status'
+    callback = get_callback(task_id)
+    if callback:
+        logger.warning('Task has a callback: %s', callback)
 
     logger.warning('Going to delete task %s!', task_id)
     # Revoke before proceeding (should not do anything, but won't harm)
@@ -528,7 +490,7 @@ def read_file(fp, limit=DEFAULT_FILE_READ_SIZE):
     total = fp.tell()
 
     if total > limit:
-        fp.seek(total-limit)
+        fp.seek(total - limit)
     else:
         fp.seek(0)
 

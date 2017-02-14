@@ -54,7 +54,10 @@
             <td>{% trans "Hostname" %}:</td>
             <td>
               <strong>
-                <a href="#" class="btn-link btn-icon-edit no-ajax" id="node_define" title="{% trans "Change node settings" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-sitemap" style="color: {{ node.color }};"></i> {{ node.hostname }}</a>{% if node.is_head %}&nbsp;<span title="{% trans "Head node" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-flag"></i></span>{% endif %}
+                <span><i class="icon-sitemap" style="color: {{ node.color }};"></i> {{ node.hostname }}</span>{% if node.is_head %}&nbsp;<span title="{% trans "Head node" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-flag"></i></span>{% endif %}
+                <a href="#" class="button mini no-ajax" id="node_define" title="{% trans "Change node settings" %}" data-toggle="tooltip" data-placement="bottom">
+                  <i class="icon-pencil"></i> {% trans "Edit" %}
+                </a>
               </strong>
             </td>
           </tr>
@@ -141,7 +144,7 @@
               </span>
             </td>
             <td>
-              <span class="sla_value" title="{% trans "Actual monthly SLA for this compute node" %}" class="loading-gif" data-toggle="tooltip" data-placement="right">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+              <span class="sla_value loading-gif" title="{% trans "Actual monthly SLA for this compute node" %}" data-toggle="tooltip" data-placement="right">&nbsp;&nbsp;&nbsp;&nbsp;</span>
             </td>
           </tr>
           {% endif %}

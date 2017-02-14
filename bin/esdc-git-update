@@ -8,7 +8,7 @@
 #
 # author:       Miroslav Bagljas
 # email:        miroslav.bagljas@erigones.com
-# copyright:    Copyright 2016, Erigones, s. r. o.
+# copyright:    Copyright 2016-2017, Erigones, s. r. o.
 
 set -o pipefail
 
@@ -21,6 +21,7 @@ NO_MATCH=3
 UP_TO_DATE=4
 FAILED_CHECKOUT=5
 POST_DEPLOY_FAILED=6
+UPGRADE_FAILED=6
 
 # #####################
 # Positional arguments
@@ -36,6 +37,7 @@ MAINDIR="$(cd "$(dirname "$0")/.." ; pwd -P)"
 ERIGONES_HOME=${ERIGONES_HOME:-"${MAINDIR}"}
 CTLSH="${ERIGONES_HOME}/bin/ctl.sh"
 DEPLOY_CMD="${CTLSH} deploy --update"
+APPLIANCE_UPDATE_CMD="${ERIGONES_HOME}/bin/esdc-appliance-update"
 
 # ##########
 # Functions
@@ -53,73 +55,92 @@ function die() {
 # Change working directory to ERIGONES_HOME
 cd "${ERIGONES_HOME}"
 
-# Retrieve current Git settings 
-if ! git --version >/dev/null; then
-	die $GIT_NOT_FOUND "Git was not found on system!"
-fi
-
-if [[ -z "${VERSION}" ]]; then
-	die $PARAM_MISSING "Version number must be provided as first parameter of this script."
-fi
-
-# Git environmental variables for cloning over HTTPS
-if [[ ! -z "${KEY_PATH}" ]]; then
-	export GIT_SSL_KEY=${KEY_PATH}
-fi
-
-if [[ ! -z "${CERT_PATH}" ]]; then
-	export GIT_SSL_CERT=${CERT_PATH}
-fi
-
-export GIT_SSL_NO_VERIFY="false"
-
-# Gather information about current status of esdc git repository
-CURRENT_VERSION=$(git rev-parse HEAD)
-UPDATE_URL=$(git config --list | grep "remote.origin.url" | awk -F '=' '{print $2}')
-# get most recent tag reachable from current commit
-GIT_DESCRIBE=$(git describe)
-MOST_RECENT_TAG=$(echo "${GIT_DESCRIBE}" | awk -F '-' '{print $1}')
-COMMITS_AHEAD_TAG=$(echo "${GIT_DESCRIBE}" | awk -F '-' '{print $2}')
-
-echo "#######################################"
-echo "Remote git repository URL: ${UPDATE_URL}"
-echo "Current HEAD points to commit: ${CURRENT_VERSION}"
-echo "Most recent tag reachable: ${MOST_RECENT_TAG}"
-echo "Number of commits ahead of recent tag: ${COMMITS_AHEAD_TAG}"
-echo "SSL key file: ${KEY_PATH}"
-echo "SSL certificate file: ${CERT_PATH}"
-echo "#######################################"
-
-# fetch most recent changes first
-# MERGE will be done only if requested VERSION is among fetched objects
-git fetch origin
-
-AVAILABLE_TAGS=$(git show-ref --tags)
-# When VERSION matches one of the tags name in the list of reference-tags
-# assign the commit reference to VERSION_REF variable
-# else assume that VERSION holds value of the commit reference
-if echo "${AVAILABLE_TAGS}" | awk '{print $NF}' | grep "refs/tags/${VERSION}$" >/dev/null; then
-	VERSION_REF=$(git rev-parse "${VERSION}")
-else
-	if git rev-list --all | grep "^${VERSION}$" >/dev/null; then
-		VERSION_REF="${VERSION}"
-	else
-		ERR_MSG="Coudln't match '${VERSION}' you requested with any of the commits. Aborting upgrade."
-		die $NO_MATCH "${ERR_MSG}"
+if [[ -z "${ESDC_GIT_UPDATE_2ND_RUN}" ]]; then
+	# Retrieve current Git settings
+	if ! git --version >/dev/null; then
+		die $GIT_NOT_FOUND "Git was not found on system!"
 	fi
-fi
 
-# if we are already at the requested revision exit
-if [[ "${VERSION_REF}" == "$(git rev-parse HEAD)" ]]; then
-	ERR_MSG="Already at requested revision: ${VERSION} with hash: ${VERSION_REF}"
-	die $UP_TO_DATE "${ERR_MSG}"
-fi
+	if [[ -z "${VERSION}" ]]; then
+		die $PARAM_MISSING "Version number must be provided as first parameter of this script."
+	fi
 
-ERR_MSG="Failed to checkout commit: ${VERSION_REF}"
-git checkout "${VERSION_REF}" || die $FAILED_CHECKOUT "${ERR_MSG}"
+	# Git environmental variables for cloning over HTTPS
+	if [[ ! -z "${KEY_PATH}" ]]; then
+		export GIT_SSL_KEY=${KEY_PATH}
+	fi
+
+	if [[ ! -z "${CERT_PATH}" ]]; then
+		export GIT_SSL_CERT=${CERT_PATH}
+	fi
+
+	export GIT_SSL_NO_VERIFY="false"
+
+	# Gather information about current status of esdc git repository
+	CURRENT_VERSION=$(git rev-parse HEAD)
+	UPDATE_URL=$(git config --list | grep "remote.origin.url" | awk -F '=' '{print $2}')
+	# get most recent tag reachable from current commit
+	GIT_DESCRIBE=$(git describe)
+	MOST_RECENT_TAG=$(echo "${GIT_DESCRIBE}" | awk -F '-' '{print $1}')
+	COMMITS_AHEAD_TAG=$(echo "${GIT_DESCRIBE}" | awk -F '-' '{print $2}')
+
+	echo "#######################################"
+	echo "Remote git repository URL: ${UPDATE_URL}"
+	echo "Current HEAD points to commit: ${CURRENT_VERSION}"
+	echo "Most recent tag reachable: ${MOST_RECENT_TAG}"
+	echo "Number of commits ahead of recent tag: ${COMMITS_AHEAD_TAG}"
+	echo "SSL key file: ${KEY_PATH}"
+	echo "SSL certificate file: ${CERT_PATH}"
+	echo "#######################################"
+
+	# fetch most recent changes first
+	# MERGE will be done only if requested VERSION is among fetched objects
+	git fetch origin
+
+	AVAILABLE_TAGS=$(git show-ref --tags)
+	# When VERSION matches one of the tags name in the list of reference-tags
+	# assign the commit reference to VERSION_REF variable
+	# else assume that VERSION holds value of the commit reference
+	if echo "${AVAILABLE_TAGS}" | awk '{print $NF}' | grep "refs/tags/${VERSION}$" >/dev/null; then
+		VERSION_REF=$(git rev-parse "${VERSION}")
+	else
+		if git rev-list --all | grep "^${VERSION}$" >/dev/null; then
+			VERSION_REF="${VERSION}"
+		else
+			ERR_MSG="Coudln't match '${VERSION}' you requested with any of the commits. Aborting upgrade."
+			die $NO_MATCH "${ERR_MSG}"
+		fi
+	fi
+
+	# if we are already at the requested revision exit
+	if [[ "${VERSION_REF}" == "$(git rev-parse HEAD)" ]]; then
+		ERR_MSG="Already at requested revision: ${VERSION} with hash: ${VERSION_REF}"
+		die $UP_TO_DATE "${ERR_MSG}"
+	fi
+
+	ERR_MSG="Failed to checkout commit: ${VERSION_REF}"
+	git checkout "${VERSION_REF}" || die $FAILED_CHECKOUT "${ERR_MSG}"
+
+	# Call our NEW self!
+	ESDC_GIT_UPDATE_2ND_RUN=true "${0}" "${@}"
+	exit $?
+fi
 
 if [[ "$(uname -s)" == "SunOS" ]] && [[ -f /usr/bin/zonename ]] && [[ "$(/usr/bin/zonename)" == "global" ]]; then
 	DEPLOY_CMD="${DEPLOY_CMD} --node"
+else
+	# run appliance upgrade
+	if [[ -x "${APPLIANCE_UPDATE_CMD}" ]]; then
+		echo "Upgrading appliances (please wait) ..."
+		appliance_update_output=$("${APPLIANCE_UPDATE_CMD}" 2>&1)
+
+		if [[ ${?} -eq 0 ]]; then
+			echo "Appliance upgrade was successful"
+		else
+			echo "${appliance_update_output}" >&2
+			die $UPGRADE_FAILED "Appliance upgrade failed"
+		fi
+	fi
 fi
 
 # Running ctl.sh deploy --update

@@ -1,19 +1,14 @@
-from time import time
-
-from gevent import sleep
-
 from vms.models import Image, Snapshot
 from que.tasks import cq, get_task_logger
+from que.mgmt import MgmtCallbackTask
 from que.exceptions import TaskException
-from que.user_tasks import UserTasks
 from api.task.utils import callback
 from api.task.tasks import task_log_cb_success
+from api.image.base.utils import wait_for_delete_node_image_tasks
 
 __all__ = ('image_manage_cb',)
 
 logger = get_task_logger(__name__)
-
-DELETE_NODE_IMAGE_TASKS_CHECK_TIMEOUT = 600
 
 
 # noinspection PyUnusedLocal
@@ -26,6 +21,10 @@ def _image_manage_cb_failed(result, task_id, img, action, snap=None):
             snap.save_status(Image.OK)
 
     elif action == 'PUT':
+        for attr, value in img.backup.items():
+            setattr(img, attr, value)
+
+        img.backup = {}  # Remove backup
         img.status = Image.OK
         img.manifest = img.manifest_active
         img.save()
@@ -34,7 +33,7 @@ def _image_manage_cb_failed(result, task_id, img, action, snap=None):
         img.save_status(Image.OK)
 
 
-@cq.task(name='api.image.base.tasks.image_manage_cb')
+@cq.task(name='api.image.base.tasks.image_manage_cb', base=MgmtCallbackTask, bind=True)
 @callback()
 def image_manage_cb(result, task_id, image_uuid=None, vm_uuid=None, snap_id=None, delete_node_image_tasks=None):
     """
@@ -75,26 +74,7 @@ def image_manage_cb(result, task_id, image_uuid=None, vm_uuid=None, snap_id=None
             img.save()
 
         elif action == 'DELETE':
-            if delete_node_image_tasks:
-                logger.info('Image %s must be deleted from node storage by DELETE node_image tasks: %s',
-                            img, delete_node_image_tasks)
-                delete_node_image_tasks = set(delete_node_image_tasks)
-                start_time = time()
-
-                while delete_node_image_tasks:
-                    for tid in tuple(delete_node_image_tasks):  # copy so we do not iterate over something that changes
-                        if UserTasks.exists(tid):
-                            logger.info('DELETE node_image task ID %s seems to be still running. Check later...', tid)
-                            sleep(1)
-                        else:
-                            logger.info('DELETE node_image task ID %s is not running anymore. OK...', tid)
-                            delete_node_image_tasks.remove(tid)
-
-                    if (time() - start_time) > DELETE_NODE_IMAGE_TASKS_CHECK_TIMEOUT:
-                        logger.error('Timeout while waiting for DELETE node_image (%s) tasks to finish: %s',
-                                     img, delete_node_image_tasks)
-                        break
-
+            wait_for_delete_node_image_tasks(img, delete_node_image_tasks)
             img.delete()
 
     else:

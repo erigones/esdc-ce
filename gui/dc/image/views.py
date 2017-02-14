@@ -14,7 +14,7 @@ from gui.dc.image.forms import ImageForm, AdminImageForm
 from api.response import JSONResponse
 from api.utils.views import call_api_view
 from api.imagestore.views import imagestore_manage
-from vms.models import Image, ImageStore
+from vms.models import Image, ImageVm, ImageStore
 
 
 @login_required
@@ -34,6 +34,7 @@ def dc_image_list(request):
     context['deleted'] = _deleted = can_edit and request.GET.get('deleted', False)
     context['qs'] = qs = get_query_string(request, all=_all, deleted=_deleted).urlencode()
     context['task_id'] = request.GET.get('task_id', '')
+    context['image_vm'] = ImageVm.get_uuid()
 
     if _deleted:
         imgs = imgs.exclude(access=Image.INTERNAL)
@@ -150,6 +151,7 @@ def admin_image_form(request):
 def imagestore_list(request, repo=None):
     user, dc = request.user, request.dc
     context = collect_view_data(request, 'dc_image_list')
+    context['image_vm'] = ImageVm.get_uuid()
     context['is_staff'] = is_staff = user.is_staff
     context['all'] = _all = is_staff and request.GET.get('all', False)
     context['qs'] = qs = get_query_string(request, all=_all).urlencode()
@@ -157,15 +159,31 @@ def imagestore_list(request, repo=None):
     context['form_admin'] = AdminImageForm(request, None, prefix='adm', initial={'owner': user.username,
                                                                                  'access': Image.PRIVATE,
                                                                                  'dc_bound': True})
+    qs_image_filter = request.GET.copy()
+    qs_image_filter.pop('created_since', None)
+    qs_image_filter.pop('last', None)
+    context['qs_image_filter'] = qs_image_filter.urlencode()
+    context['default_limit'] = default_limit = 30
 
     try:
-        created_since_days = int(request.GET.get('created_since', '30'))
+        created_since_days = int(request.GET.get('created_since', 0))
     except (ValueError, TypeError):
-        created_since_days = 30
+        created_since_days = None
+
+    if created_since_days:
+        limit = None
+    else:
+        created_since_days = None
+
+        try:
+            limit = int(request.GET.get('last', default_limit))
+        except (ValueError, TypeError):
+            limit = default_limit
 
     repositories = ImageStore.get_repositories()
     context['imagestores'] = imagestores = ImageStore.all(repositories)
     context['created_since'] = created_since_days
+    context['limit'] = limit
 
     if repositories:
         if repo and repo in repositories:
@@ -176,9 +194,9 @@ def imagestore_list(request, repo=None):
         if created_since_days:
             created_since = make_aware(datetime.now() - timedelta(days=created_since_days))
         else:
-            created_since = ''
+            created_since = None
 
-        context['images'] = imagestore.images_filter(created_since=created_since)
+        context['images'] = imagestore.images_filter(created_since=created_since, limit=limit)
     else:
         context['imagestore'] = None
         context['images'] = []
@@ -214,4 +232,3 @@ def imagestore_update(request, repo):
             status = res.status_code
 
         return JSONResponse(res.data, status=status)
-

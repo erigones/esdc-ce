@@ -215,7 +215,7 @@ def vms(request, hostname, zpool=None):
     context = collect_view_data(request, 'node_list')
     context['node'] = node = get_node(request, hostname)
     context['nodes'] = Node.all()
-    context['node_not_online'] = not node.is_online()
+    context['node_online'] = node.is_online()
     context['can_edit'] = True
     context['storages'] = nss = node.nodestorage_set.select_related('storage').all().order_by('zpool')
     all_vms = node.vm_set.select_related('owner', 'dc', 'slavevm', 'slavevm__master_vm').order_by('hostname')
@@ -293,6 +293,7 @@ def backups(request, hostname):
     context = collect_view_data(request, 'node_list')
     context['node'] = node = get_node(request, hostname)
     context['nodes'] = (node,)
+    context['node_online'] = node.is_online()
     context['submenu_auto'] = ''
     context['lastbkp'] = []
     context['can_edit'] = True

@@ -1,0 +1,5 @@
+{% load i18n gui_utils %}{% if all %}
+<a href="{{ request.path }}?{{ qs|qs_del:'all' }}" class="btn btn-mini active" title="{% trans "Global settings have an impact on the behavior of all virtual data centers and the Danube Cloud system, including objects that cannot be associated with a virtual data center (compute nodes)." %}" data-toggle="tooltip" data-placement="left"><i class="icon-check"></i> {% trans "Show global settings" %}</a>
+{% else %}
+<a href="{{ request.path }}?{{ qs|qs_set:'all' }}" class="btn btn-mini" title="{% trans "Global settings have an impact on the behavior of all virtual data centers and the Danube Cloud system, including objects that cannot be associated with a virtual data center (compute nodes)." %}" data-toggle="tooltip" data-placement="left"><i class="icon-check-empty"></i> {% trans "Show global settings" %}</a>
+{% endif %}

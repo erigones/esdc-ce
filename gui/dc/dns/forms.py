@@ -113,9 +113,9 @@ class DnsRecordFilterForm(forms.Form):
             domain_choices = [(d.name, d.name) for d in domains]
         else:
             dc_domain_ids = list(dc.domaindc_set.values_list('domain_id', flat=True))
-            domains = domains.filter(id__in=dc_domain_ids)
+            domains = domains.filter(Q(id__in=dc_domain_ids) | Q(user=user.id))
             domain_choices = [(d.name, d.name) for d in domains
-                              if (user.is_staff or d.owner == user or d.dc_bound == dc.id)]
+                              if (user.is_staff or d.user == user.id or d.dc_bound == dc.id)]
 
         self.fields['domain'].choices = domain_choices
 

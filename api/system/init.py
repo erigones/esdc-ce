@@ -11,7 +11,7 @@ from api.utils.request import get_dummy_request
 from api.utils.views import call_api_view
 from api.system.utils import get_local_netinfo
 from api.dns.domain.utils import reverse_domain_from_network
-from vms.models import Dc, Image, Vm
+from vms.models import Dc, Image, Vm, DcNode
 
 logger = getLogger(__name__)
 
@@ -37,7 +37,7 @@ def _api_cmd(request, method, view, *args, **kwargs):
             logger.error('%s failed (%s): %s', log, cod, out)
             raise APIViewError(str(out))
 
-    return out
+    return res
 
 
 def _es_api_url(site_link):
@@ -53,43 +53,80 @@ def _es_api_url(site_link):
             es2.write(es1.read().replace("API_URL = 'http://127.0.0.1:8000/api'", api_url))
 
 
-def _init_images(images, default_dc, admin_dc):
-    """Import manifests of initial images"""
-    for manifest in images:
+def _save_image(manifest, default_dc, admin_dc):
+    """Save image from image manifest"""
+    # noinspection PyProtectedMember
+    image_desc_max_length = Image._meta.get_field('desc').max_length
+    # noinspection PyProtectedMember
+    image_name_max_length = Image._meta.get_field('name').max_length
+    name = manifest['name'][:image_name_max_length]
+    i = 0
+    i_str = str(i)
+
+    while Image.objects.filter(name=name).exists() and len(i_str) < image_name_max_length:
+        i += 1
+        i_str = str(i)
+        # Create new name by appending a number to the existing name
+        # (optionally stripping n-number of characters from end of the name)
+        name = name[:(image_name_max_length - len(i_str))] + i_str
+
+    img = Image(uuid=manifest['uuid'])
+    img.owner_id = settings.ADMIN_USER
+    img.name = img.alias = name
+    img.version = manifest['version']
+    img.ostype = Image.os_to_ostype(manifest)
+    img.size = int(manifest.get('image_size', Image.DEFAULT_SIZE))
+    img.desc = manifest.get('description', '')[:image_desc_max_length]
+    img.status = Image.OK
+    img.manifest = img.manifest_active = manifest
+    tags = manifest.pop('tags', {})
+    img.tags = tags.get(Image.TAGS_KEY, [])
+    img.deploy = tags.get('deploy', False)
+    img.resize = tags.get('resize', img.ostype in img.ZONE)
+    internal = tags.get('internal', False)
+
+    if internal:
+        img.dc_bound = admin_dc
+        img.access = Image.INTERNAL
+    else:
+        img.dc_bound = None
+        img.access = Image.PUBLIC
+
+    img.save()
+
+    img.dc.add(admin_dc)
+
+    if not internal:
+        img.dc.add(default_dc)
+
+    return img
+
+
+def _init_images(node, images, default_dc, admin_dc):
+    """Import manifests of initial images - images imported on head node and in the image server"""
+    for image in images:
         try:
-            img = Image(uuid=manifest['uuid'])
-            img.owner_id = settings.ADMIN_USER
-            img.name = img.alias = manifest['name']
-            img.version = manifest['version']
-            img.ostype = Image.os_to_ostype(manifest)
-            img.size = int(manifest.get('image_size', Image.DEFAULT_SIZE))
-            img.desc = manifest.get('description', '')[:128]
-            img.status = Image.OK
-            img.manifest = img.manifest_active = manifest
-            tags = manifest.pop('tags', {})
-            img.tags = tags.get(Image.TAGS_KEY, [])
-            img.deploy = tags.get('deploy', False)
-            img.resize = tags.get('resize', img.ostype in img.ZONE)
-            internal = tags.get('internal', False)
+            manifest = image['manifest']
 
-            if internal:
-                img.dc_bound = admin_dc
-                img.access = Image.INTERNAL
-            else:
-                img.dc_bound = None
-                img.access = Image.PUBLIC
-
-            img.save()
+            try:
+                img = Image.objects.get(uuid=manifest['uuid'])
+            except Image.DoesNotExist:
+                img = _save_image(manifest, default_dc, admin_dc)
         except Exception as ex:
             logger.exception(ex)
-            logger.error('Could not initialize image from manifest: %s', manifest)
+            logger.error('Could not initialize image from object: %s', image)
             continue
         else:
             logger.info('Added initial image %s (%s (%s))', img.uuid, img.name, img.version)
-            img.dc.add(admin_dc)
 
-            if not internal:
-                img.dc.add(default_dc)
+        try:
+            ns = node.nodestorage_set.get(zpool=image['zpool'])
+            ns.images.add(img)
+        except Exception as ex:
+            logger.exception(ex)
+            logger.error('Could not associate image %s with zpool %s on node %s', img, image.get('zpool'), node)
+        else:
+            logger.info('Associated image %s with node storage %s', img, ns)
 
 
 def init_mgmt(head_node, images=None):
@@ -116,7 +153,7 @@ def init_mgmt(head_node, images=None):
     # Initialize images
     if images and isinstance(images, list):
         logger.warn('Initializing %d images', len(images))
-        _init_images(images, default_dc, admin_dc)
+        _init_images(head_node, images, default_dc, admin_dc)
     else:
         logger.error('Could not parse initial images or empty initial images')
 
@@ -164,22 +201,49 @@ def init_mgmt(head_node, images=None):
         logger.exception(e)
 
     # Add head node + all its storages into admin DC
-    api_post(dc_node, head_node.hostname, strategy=1, add_storage=9, dc=admin)
+    api_post(dc_node, head_node.hostname, strategy=DcNode.SHARED, add_storage=9, dc=admin)
 
     logger.warning('Admin datacenter "%s" was successfully initialized', admin_dc)
 
     # Harvest all VMs from head node into admin DC
-    ret = api_post(harvest_vm, head_node.hostname, dc=admin)
+    while True:
+        ret = api_post(harvest_vm, head_node.hostname, dc=admin)
+
+        if status.is_success(ret.status_code):
+            logger.info('POST harvest_vm(%s) has started: %s', head_node.hostname, ret.data)
+            break
+        else:
+            logger.error('POST harvest_vm(%s) has failed; retrying in 3 seconds', head_node.hostname)
+            sleep(3)
+
     # The harvest is performing some other tasks asynchronously during which the node must stay in online state.
     # So let's sleep for some time to give the tasks some breathing space.
     logger.info('Sleeping for 60 seconds after admin datacenter initialization')
     sleep(60)
 
-    # We can change the default resolvers after we've harvested the VMS_VM_DNS01 (#831)
+    # Let's update the default image server after we've harvested the VMS_VM_IMG01
     try:
-        vm_dns01_ip = Vm.objects.get(uuid=settings.VMS_VM_DNS01).ips[0]
-        api_put(dc_settings, main, VMS_VM_RESOLVERS_DEFAULT=[vm_dns01_ip])
-        api_put(dc_settings, admin, VMS_VM_RESOLVERS_DEFAULT=[vm_dns01_ip])
+        if Vm.objects.filter(uuid=settings.VMS_VM_IMG01).exists():
+            vm_img01_uuid = settings.VMS_VM_IMG01
+        else:
+            vm_img01_uuid = None
+
+        if settings.VMS_IMAGE_VM == vm_img01_uuid:
+            logger.info('The current image server (VMS_IMAGE_VM) is already set to %s', vm_img01_uuid)
+        else:
+            api_put(dc_settings, main, VMS_IMAGE_VM=vm_img01_uuid)
+    except Exception as e:
+        logger.exception(e)
+
+    # We can change the default resolvers after we've harvested the VMS_VM_DNS01 (#chili-831)
+    try:
+        try:
+            vm_dns01_ip = Vm.objects.get(uuid=settings.VMS_VM_DNS01).ips[0]
+        except Vm.DoesNotExist:
+            logger.warning('DNS VM (%s) not found - using default DNS servers', settings.VMS_VM_DNS01)
+        else:
+            api_put(dc_settings, main, VMS_VM_RESOLVERS_DEFAULT=[vm_dns01_ip])
+            api_put(dc_settings, admin, VMS_VM_RESOLVERS_DEFAULT=[vm_dns01_ip])
     except Exception as e:
         logger.exception(e)
 

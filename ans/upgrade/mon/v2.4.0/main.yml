@@ -1,0 +1,10 @@
+
+- name: Delete hardcoded hostname from /etc/hosts
+  lineinfile: dest=/etc/hosts line="127.0.0.1   mon01" state=absent
+
+- name: Update postgresql config
+  copy: src="{{ upg_dir }}/{{ upgrading_to }}/files/pg-ansible.conf" dest=/var/lib/pgsql/9.5/data/conf.d/ansible.conf
+  notify: restart postgresql95
+
+- include: "{{ upg_base }}/lib/zabbix_import_templates.yml"
+

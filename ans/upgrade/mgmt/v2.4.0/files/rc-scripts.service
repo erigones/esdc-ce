@@ -1,0 +1,13 @@
+[Unit]
+Description=Custom RC scripts
+ConditionFileIsExecutable=/usr/sbin/rc-scripts.sh
+After=redis.service rabbitmq-server.service tomcat.service guacd.service zabbix-agent.service nginx.service haproxy.service
+
+[Service]
+Type=forking
+ExecStart=/usr/sbin/rc-scripts.sh
+TimeoutSec=0
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

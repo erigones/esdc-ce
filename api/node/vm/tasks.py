@@ -1,4 +1,5 @@
 from que.tasks import cq, get_task_logger
+from que.mgmt import MgmtCallbackTask
 from que.utils import dc_id_from_task_id
 from que.exceptions import TaskException
 from api.utils.request import get_dummy_request
@@ -27,7 +28,7 @@ def _vm_update(vm):
         logger.error('PUT vm_manage(%s) failed: %s (%s): %s', vm, res.status_code, res.status_text, res.data)
 
 
-@cq.task(name='api.node.vm.tasks.harvest_vm_cb')
+@cq.task(name='api.node.vm.tasks.harvest_vm_cb', base=MgmtCallbackTask, bind=True)
 @callback()
 def harvest_vm_cb(result, task_id, node_uuid=None):
     node = Node.objects.get(uuid=node_uuid)
@@ -62,12 +63,13 @@ def harvest_vm_cb(result, task_id, node_uuid=None):
                 logger.warning('Ignoring VM %s found in harvest_vm(%s)', vm_uuid, node)
                 continue
         try:
-            vm = vm_from_json(request, task_id, json, dc, owner=1, template=True, save=True,
+            vm = vm_from_json(request, task_id, json, dc, template=True, save=True,
                               update_ips=True, update_dns=True)
         except Exception as e:
             logger.exception(e)
             logger.error('Could not load VM from json:\n"""%s"""', json)
-            task_log_cb_error({'message': 'Could not load server %s' % vm_uuid}, task_id, obj=node, **result['meta'])
+            err_msg = 'Could not load server %s. Error: %s' % (vm_uuid, e)
+            task_log_cb_error({'message': err_msg}, task_id, obj=node, **result['meta'])
             vms_err.append(vm_uuid)
         else:
             logger.info('Successfully saved new VM %s after harvest_vm(%s)', vm, node)

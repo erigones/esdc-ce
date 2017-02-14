@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Danube Cloud core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-10-25 13:41+0000\n"
+"POT-Creation-Date: 2017-02-09 13:41+0000\n"
 "PO-Revision-Date: 2014-02-26 21:04+0100\n"
 "Last-Translator: Erigones, s. r. o. <erigones@erigones.com>\n"
 "Language-Team: Erigones, s. r. o. <erigones@erigones.com>\n"
@@ -21,4 +21,3 @@ msgstr ""
 #: templates/admin/base_site.html:4 templates/admin/base_site.html.py:8
 msgid "Danube Cloud Admin"
 msgstr ""
-

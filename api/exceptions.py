@@ -34,11 +34,35 @@ from __future__ import unicode_literals
 
 import math
 
-from django.db import DatabaseError
 from django.utils.encoding import force_text
 from django.utils.translation import ungettext, ugettext_lazy as _
+from django.db import (
+    DatabaseError,
+    OperationalError as DatabaseOperationalError,
+    InterfaceError as DatabaseInterfaceError,
+)
+from redis.exceptions import (
+    TimeoutError as RedisTimeoutError,
+    ConnectionError as RedisConnectionError,
+)
+from kombu.exceptions import (
+    TimeoutError as RabbitTimeoutError,
+    ConnectionError as RabbitConnectionError,
+)
 
 from api import status
+
+
+# List of operational errors that affect the application in a serious manner
+# (e.g. callback tasks that fail because of this must be retried)
+OPERATIONAL_ERRORS = (
+    DatabaseOperationalError,
+    DatabaseInterfaceError,
+    RabbitConnectionError,
+    RabbitTimeoutError,
+    RedisTimeoutError,
+    RedisConnectionError,
+)
 
 
 class APIException(Exception):

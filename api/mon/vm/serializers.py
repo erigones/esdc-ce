@@ -12,6 +12,7 @@ class VmMonitoringSerializer(s.InstanceSerializer):
     _update_fields_ = ('ip', 'dns', 'port', 'useip', 'proxy', 'templates', 'hostgroups')
 
     hostname = s.CharField(read_only=True)
+    uuid = s.CharField(read_only=True)
     monitored = s.BooleanField(read_only=True)
     ip = s.IPAddressField(source='monitoring_ip', required=False)
     dns = s.RegexField(r'^[A-Za-z0-9\.-]+$', source='monitoring_dns', required=False, min_length=1, max_length=128)

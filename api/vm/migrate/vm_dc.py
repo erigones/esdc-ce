@@ -15,11 +15,11 @@ class VmDc(APIView):
     """
     api.vm.migrate.views.vm_dc
     """
-    def __init__(self, request, hostname, data):
+    def __init__(self, request, hostname_or_uuid, data):
         super(VmDc, self).__init__(request)
-        self.hostname = hostname
+        self.hostname_or_uuid = hostname_or_uuid
         self.data = data
-        self.vm = get_vm(request, hostname, exists_ok=True, noexists_fail=True)
+        self.vm = get_vm(request, hostname_or_uuid, exists_ok=True, noexists_fail=True)
 
     @atomic
     def put(self):

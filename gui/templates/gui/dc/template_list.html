@@ -78,12 +78,17 @@
           {% for vmt in templates %}
           <tr>
             <td>
-              {% if is_staff %}{% if all and vmt.pk in can_add %}
-              <a href="#" class="btn-link btn-icon-link no-ajax obj_add italic" title="{% trans "Attach server Template" %}" data-toggle="tooltip" data-placement="bottom" data-form='{"name":"{{ vmt.name }}"}'>{{ vmt.alias }}</a>
+              {% if is_staff %}
+                {% if all and vmt.pk in can_add %}
+                  <span class="italic">{{ vmt.alias }} <small>({{ vmt.name }})</small></span>
+                  <a href="#" class="button mini no-ajax obj_add" title="{% trans "Attach server Template" %}" data-toggle="tooltip" data-placement="bottom" data-form='{"name":"{{ vmt.name }}"}'> <i class="icon-link"></i> {% trans "Edit" %}</a>
+                {% else %}
+                  {{ vmt.alias }} <small>({{ vmt.name }})</small>
+                  <a href="#" class="button mini no-ajax obj_edit" title="{% trans "Detach server Template from Datacenter" %}" data-toggle="tooltip" data-placement="bottom" data-form='{"name":"{{ vmt.name }}"}'> <i class="icon-pencil"></i> {% trans "Edit" %}</a>
+                {% endif %}
               {% else %}
-              <a href="#" class="btn-link btn-icon-edit no-ajax obj_edit" title="{% trans "Detach server Template from Datacenter" %}" data-toggle="tooltip" data-placement="bottom" data-form='{"name":"{{ vmt.name }}"}'>{{ vmt.alias }}</a>
+                {{ vmt.alias }} <small>({{ vmt.name }})</small>
               {% endif %}
-              {% else %}{{ vmt.alias }}{% endif %} <small>({{ vmt.name }})</small>
             </td>
             <td>{{ vmt.get_access_display }}</td>
             <td class="nowrap"><span class="vm_hostname" title="{{ vmt.owner }}"><i class="icon-user"></i> {{ vmt.owner|truncatechars:16 }}</span></td>

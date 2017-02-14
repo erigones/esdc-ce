@@ -40,7 +40,9 @@ i {
     padding-left: 1px;
     padding-right: 1px;
   }
-
+  &.yes {
+    color: #3d8bd0;
+  }
   &.no {
     color: #aaa;
   }

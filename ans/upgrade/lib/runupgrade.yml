@@ -1,0 +1,30 @@
+- name: "Running appliance upgrade of hosts {{ runhosts }}"
+  hosts: "{{ runhosts }}"
+  vars:
+    appliance_type: 'mgmt'   # default, overridden by extra-vars
+    erigones_home: "{{ lookup('env','ERIGONES_HOME')|default('/opt/erigones') }}"
+    upg_base: "{{ erigones_home }}/ans/upgrade"
+    # directory with the actual upgrade steps:
+    upg_dir: "{{ upg_base }}/{{ appliance_type }}"
+    versionfile: /etc/esdc.version
+  tasks:
+  - name: extracting current appliance version
+    shell: if [ -f "{{ versionfile }}" ]; then cat "{{ versionfile }}"; else echo 'v1.0.0'; fi
+    register: appliance_version
+  - name: getting list of upgrades
+    local_action:
+        module: shell
+        args: find "{{ upg_dir }}" -maxdepth 1 -type d -name 'v*' | sort --version-sort
+    register: upg_subdirs
+  - include: "{{ upg_base }}/lib/runtasks.yml"
+    with_items: "{{ upg_subdirs.stdout.split('\n') }}"
+    when: ( tasklist | basename | version_compare(appliance_version.stdout, '>'))
+    loop_control:
+      loop_var: tasklist
+  handlers:
+  - name: reload systemd
+    shell: /bin/systemctl daemon-reload
+  - name: restart postgresql95
+    service: name=postgresql-9.5 state=restarted
+  - name: restart erigonesd-beat
+    service: name=erigonesd-beat state=restarted

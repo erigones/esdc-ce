@@ -56,56 +56,60 @@ i.yes, i.no {
   padding-left: 1px;
   padding-right: 1px;
 }
-/* line 44, ../scss/node.scss */
+/* line 43, ../scss/node.scss */
+i.yes {
+  color: #3d8bd0;
+}
+/* line 46, ../scss/node.scss */
 i.no {
   color: #aaa;
 }
 
-/* line 50, ../scss/node.scss */
+/* line 52, ../scss/node.scss */
 .form-horizontal.wider .control-label {
   width: 200px;
 }
-/* line 53, ../scss/node.scss */
+/* line 55, ../scss/node.scss */
 .form-horizontal.wider .controls {
   margin-left: 220px;
 }
 
-/* line 59, ../scss/node.scss */
+/* line 61, ../scss/node.scss */
 #dc_settings_modal .form-horizontal.wider .control-label {
   width: 260px;
 }
-/* line 62, ../scss/node.scss */
+/* line 64, ../scss/node.scss */
 #dc_settings_modal .form-horizontal.wider .controls {
   margin-left: 280px;
 }
 
-/* line 68, ../scss/node.scss */
+/* line 70, ../scss/node.scss */
 .form-horizontal.left .control-label {
   width: auto;
   margin-right: 10px;
 }
-/* line 73, ../scss/node.scss */
+/* line 75, ../scss/node.scss */
 .form-horizontal.left .controls {
   margin-left: 0px;
 }
 
-/* line 78, ../scss/node.scss */
+/* line 80, ../scss/node.scss */
 .license-ok i {
   color: #468847;
 }
 
-/* line 81, ../scss/node.scss */
+/* line 83, ../scss/node.scss */
 .license-expired i {
   color: #b94a48;
 }
 
-/* line 85, ../scss/node.scss */
+/* line 87, ../scss/node.scss */
 .same-width a.btn {
   min-width: 200px;
   text-align: left;
 }
 
-/* line 90, ../scss/node.scss */
+/* line 92, ../scss/node.scss */
 .btn-badge {
   position: absolute;
   right: 0;
@@ -120,12 +124,12 @@ i.no {
   line-height: 24px;
 }
 
-/* line 104, ../scss/node.scss */
+/* line 106, ../scss/node.scss */
 th.row_menu.pad div.btn-group {
   margin-left: 10px;
 }
 
-/* line 108, ../scss/node.scss */
+/* line 110, ../scss/node.scss */
 .node_flags {
   white-space: nowrap;
   margin-left: 3px;

@@ -532,16 +532,30 @@ button.button.mini {
   border-radius: 10px;
 }
 /* line 333, ../scss/form-elements.scss */
+.button.block {
+  width: 100%;
+}
+/* line 337, ../scss/form-elements.scss */
+.button.sharp-edge {
+  -moz-border-radius: 0 0 0 0;
+  -webkit-border-radius: 0;
+  border-radius: 0 0 0 0;
+}
+/* line 341, ../scss/form-elements.scss */
+.button.menu {
+  margin: 0;
+}
+/* line 345, ../scss/form-elements.scss */
 .button.mini {
   padding: 0px 10px;
   line-height: 20px;
 }
-/* line 338, ../scss/form-elements.scss */
+/* line 350, ../scss/form-elements.scss */
 .button.small {
   padding: 0px 10px;
   line-height: 22.5px;
 }
-/* line 343, ../scss/form-elements.scss */
+/* line 355, ../scss/form-elements.scss */
 .button.large {
   border: none;
   padding: 0 18px;
@@ -556,7 +570,7 @@ button.button.mini {
   margin-bottom: 8px;
   min-width: 103px;
 }
-/* line 353, ../scss/form-elements.scss */
+/* line 365, ../scss/form-elements.scss */
 .button.large:active {
   -moz-box-shadow: none;
   -webkit-box-shadow: none;
@@ -565,35 +579,35 @@ button.button.mini {
   top: 1px;
   position: relative;
 }
-/* line 360, ../scss/form-elements.scss */
+/* line 372, ../scss/form-elements.scss */
 .button.large:hover {
   color: #333;
 }
-/* line 364, ../scss/form-elements.scss */
+/* line 376, ../scss/form-elements.scss */
 .button.large span {
   margin-top: 5px;
   font-size: 12px;
   margin-bottom: 10px;
   display: block;
 }
-/* line 371, ../scss/form-elements.scss */
+/* line 383, ../scss/form-elements.scss */
 .button.large i {
   font-weight: normal;
   font-size: 32px;
   line-height: 32px;
   margin-top: 20px;
 }
-/* line 378, ../scss/form-elements.scss */
+/* line 390, ../scss/form-elements.scss */
 .button.large:last-child {
   margin-right: 0;
 }
-/* line 383, ../scss/form-elements.scss */
+/* line 395, ../scss/form-elements.scss */
 .button:active {
   -moz-box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 4px 0px inset, rgba(255, 255, 255, 0.5) 0px 1px 0px 0px;
   -webkit-box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 4px 0px inset, rgba(255, 255, 255, 0.5) 0px 1px 0px 0px;
   box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 4px 0px inset, rgba(255, 255, 255, 0.5) 0px 1px 0px 0px;
 }
-/* line 387, ../scss/form-elements.scss */
+/* line 399, ../scss/form-elements.scss */
 .button.blue {
   background: #147CB9;
   background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4gPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiBncmFkaWVudFVuaXRzPSJvYmplY3RCb3VuZGluZ0JveCIgeDE9IjAuNSIgeTE9IjAuMCIgeDI9IjAuNSIgeTI9IjEuMCI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzJjYTNlOCIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzE0N2NiOSIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JhZCkiIC8+PC9zdmc+IA==');
@@ -647,7 +661,7 @@ button.button.mini {
   -webkit-box-shadow: inset 0px 0px 5px rgba(0, 0, 0, 0.5), 0px 1px 0px transparent;
   box-shadow: inset 0px 0px 5px rgba(0, 0, 0, 0.5), 0px 1px 0px transparent;
 }
-/* line 391, ../scss/form-elements.scss */
+/* line 403, ../scss/form-elements.scss */
 .button.red {
   background: #cc3333;
   background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4gPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiBncmFkaWVudFVuaXRzPSJvYmplY3RCb3VuZGluZ0JveCIgeDE9IjAuNSIgeTE9IjAuMCIgeDI9IjAuNSIgeTI9IjEuMCI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2RhNmM2YyIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2NjMzMzMyIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JhZCkiIC8+PC9zdmc+IA==');
@@ -701,7 +715,7 @@ button.button.mini {
   -webkit-box-shadow: inset 0px 0px 5px rgba(0, 0, 0, 0.5), 0px 1px 0px transparent;
   box-shadow: inset 0px 0px 5px rgba(0, 0, 0, 0.5), 0px 1px 0px transparent;
 }
-/* line 395, ../scss/form-elements.scss */
+/* line 407, ../scss/form-elements.scss */
 .button.green {
   background: #1f7b1f;
   background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4gPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiBncmFkaWVudFVuaXRzPSJvYmplY3RCb3VuZGluZ0JveCIgeDE9IjAuNSIgeTE9IjAuMCIgeDI9IjAuNSIgeTI9IjEuMCI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzJkYjQyZCIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzFmN2IxZiIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JhZCkiIC8+PC9zdmc+IA==');
@@ -755,7 +769,7 @@ button.button.mini {
   -webkit-box-shadow: inset 0px 0px 5px rgba(0, 0, 0, 0.5), 0px 1px 0px transparent;
   box-shadow: inset 0px 0px 5px rgba(0, 0, 0, 0.5), 0px 1px 0px transparent;
 }
-/* line 399, ../scss/form-elements.scss */
+/* line 411, ../scss/form-elements.scss */
 .button.black {
   background: #262626;
   background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4gPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiBncmFkaWVudFVuaXRzPSJvYmplY3RCb3VuZGluZ0JveCIgeDE9IjAuNSIgeTE9IjAuMCIgeDI9IjAuNSIgeTI9IjEuMCI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzRhNGE0YSIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzI2MjYyNiIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JhZCkiIC8+PC9zdmc+IA==');
@@ -809,7 +823,7 @@ button.button.mini {
   -webkit-box-shadow: inset 0px 0px 5px rgba(0, 0, 0, 0.5), 0px 1px 0px transparent;
   box-shadow: inset 0px 0px 5px rgba(0, 0, 0, 0.5), 0px 1px 0px transparent;
 }
-/* line 403, ../scss/form-elements.scss */
+/* line 415, ../scss/form-elements.scss */
 .button.light-gray {
   background: #46464d;
   background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4gPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiBncmFkaWVudFVuaXRzPSJvYmplY3RCb3VuZGluZ0JveCIgeDE9IjAuNSIgeTE9IjAuMCIgeDI9IjAuNSIgeTI9IjEuMCI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzY4Njg3MyIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzQ2NDY0ZCIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JhZCkiIC8+PC9zdmc+IA==');
@@ -863,7 +877,7 @@ button.button.mini {
   -webkit-box-shadow: inset 0px 0px 5px rgba(0, 0, 0, 0.5), 0px 1px 0px transparent;
   box-shadow: inset 0px 0px 5px rgba(0, 0, 0, 0.5), 0px 1px 0px transparent;
 }
-/* line 407, ../scss/form-elements.scss */
+/* line 419, ../scss/form-elements.scss */
 .button.gray {
   background: #3A3A40;
   background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4gPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiBncmFkaWVudFVuaXRzPSJvYmplY3RCb3VuZGluZ0JveCIgeDE9IjAuNSIgeTE9IjAuMCIgeDI9IjAuNSIgeTI9IjEuMCI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzVjNWM2NSIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzNhM2E0MCIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JhZCkiIC8+PC9zdmc+IA==');
@@ -917,12 +931,12 @@ button.button.mini {
   -webkit-box-shadow: inset 0px 0px 5px rgba(0, 0, 0, 0.5), 0px 1px 0px transparent;
   box-shadow: inset 0px 0px 5px rgba(0, 0, 0, 0.5), 0px 1px 0px transparent;
 }
-/* line 410, ../scss/form-elements.scss */
+/* line 422, ../scss/form-elements.scss */
 .button.gray.disabled {
   opacity: 0.70;
   filter: alpha(opacity=70);
 }
-/* line 416, ../scss/form-elements.scss */
+/* line 428, ../scss/form-elements.scss */
 .button.gold {
   background: #d4881c;
   background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4gPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiBncmFkaWVudFVuaXRzPSJvYmplY3RCb3VuZGluZ0JveCIgeDE9IjAuNSIgeTE9IjAuMCIgeDI9IjAuNSIgeTI9IjEuMCI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2U4YTk1MCIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2Q0ODgxYyIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JhZCkiIC8+PC9zdmc+IA==');
@@ -977,7 +991,7 @@ button.button.mini {
   box-shadow: inset 0px 0px 5px rgba(0, 0, 0, 0.5), 0px 1px 0px transparent;
 }
 
-/* line 425, ../scss/form-elements.scss */
+/* line 437, ../scss/form-elements.scss */
 .ui-datepicker {
   width: 210px;
   display: none;
@@ -994,11 +1008,11 @@ button.button.mini {
   -webkit-border-radius: 4px 4px;
   border-radius: 4px / 4px;
 }
-/* line 433, ../scss/form-elements.scss */
+/* line 445, ../scss/form-elements.scss */
 .ui-datepicker .ui-datepicker-header {
   position: relative;
 }
-/* line 435, ../scss/form-elements.scss */
+/* line 447, ../scss/form-elements.scss */
 .ui-datepicker .ui-datepicker-header a.ui-datepicker-next {
   cursor: pointer;
   height: 22px;
@@ -1008,11 +1022,11 @@ button.button.mini {
   margin-right: 5px;
   margin-top: 5px;
 }
-/* line 443, ../scss/form-elements.scss */
+/* line 455, ../scss/form-elements.scss */
 .ui-datepicker .ui-datepicker-header a.ui-datepicker-next span {
   display: none;
 }
-/* line 447, ../scss/form-elements.scss */
+/* line 459, ../scss/form-elements.scss */
 .ui-datepicker .ui-datepicker-header a.ui-datepicker-prev {
   margin-top: 5px;
   cursor: pointer;
@@ -1022,11 +1036,11 @@ button.button.mini {
   background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAHCAYAAAA1WQxeAAAAbklEQVR42n3OsQ2AMAwEQEZhBKQswAhMkBEyAlUGSJUhIjq3KSjc0HkMSkRFZyyQFaEAlq7xvyw3zPxgjBlkJu/9QUSbLjsRrLVrjJElUFc4O+cYAEpQ3GdTSiMi7h+FQhZ9znl5KVTFVgR98tcJpkqi3lNxkrYAAAAASUVORK5CYII=') center center no-repeat;
   margin-left: 5px;
 }
-/* line 455, ../scss/form-elements.scss */
+/* line 467, ../scss/form-elements.scss */
 .ui-datepicker .ui-datepicker-header a.ui-datepicker-prev span {
   display: none;
 }
-/* line 460, ../scss/form-elements.scss */
+/* line 472, ../scss/form-elements.scss */
 .ui-datepicker .ui-datepicker-title {
   padding-top: 8px;
   text-align: center;
@@ -1035,12 +1049,12 @@ button.button.mini {
   font-weight: bold;
   font-size: .8em;
 }
-/* line 472, ../scss/form-elements.scss */
+/* line 484, ../scss/form-elements.scss */
 .ui-datepicker .ui-datepicker-calendar {
   margin-bottom: 5px;
   margin-left: 6px;
 }
-/* line 478, ../scss/form-elements.scss */
+/* line 490, ../scss/form-elements.scss */
 .ui-datepicker .ui-datepicker-calendar thead th span {
   line-height: 1.6em;
   color: #9D9B9B;
@@ -1048,15 +1062,15 @@ button.button.mini {
   font-weight: bold;
   text-shadow: rgba(0, 0, 0, 0.3) 0 -1px 0;
 }
-/* line 489, ../scss/form-elements.scss */
+/* line 501, ../scss/form-elements.scss */
 .ui-datepicker .ui-datepicker-calendar tbody tr:first-child td {
   border-top: 1px solid #303030;
 }
-/* line 490, ../scss/form-elements.scss */
+/* line 502, ../scss/form-elements.scss */
 .ui-datepicker .ui-datepicker-calendar tbody tr:last-child td {
   border-bottom: 1px solid #303030;
 }
-/* line 492, ../scss/form-elements.scss */
+/* line 504, ../scss/form-elements.scss */
 .ui-datepicker .ui-datepicker-calendar tbody td {
   border: 1px solid #232323;
   min-width: 28px;
@@ -1066,15 +1080,15 @@ button.button.mini {
   -webkit-box-shadow: #4a4a4a 0 1px 0 inset;
   box-shadow: #4a4a4a 0 1px 0 inset;
 }
-/* line 493, ../scss/form-elements.scss */
+/* line 505, ../scss/form-elements.scss */
 .ui-datepicker .ui-datepicker-calendar tbody td:last-child {
   border-right: 1px solid #303030;
 }
-/* line 494, ../scss/form-elements.scss */
+/* line 506, ../scss/form-elements.scss */
 .ui-datepicker .ui-datepicker-calendar tbody td:first-child {
   border-left: 1px solid #303030;
 }
-/* line 503, ../scss/form-elements.scss */
+/* line 515, ../scss/form-elements.scss */
 .ui-datepicker .ui-datepicker-calendar tbody td a, .ui-datepicker .ui-datepicker-calendar tbody td span {
   text-align: center;
   display: block;
@@ -1084,7 +1098,7 @@ button.button.mini {
   font-weight: bold;
   font-size: .8em;
 }
-/* line 512, ../scss/form-elements.scss */
+/* line 524, ../scss/form-elements.scss */
 .ui-datepicker .ui-datepicker-calendar tbody td a.ui-state-active, .ui-datepicker .ui-datepicker-calendar tbody td span.ui-state-active {
   text-shadow: #4e5e75 0 -1px 0;
   background: #8F9EB4;
@@ -1092,30 +1106,30 @@ button.button.mini {
   -webkit-box-shadow: #596a84 0 1px 0 inset, #445266 0 2px 3px inset;
   box-shadow: #596a84 0 1px 0 inset, #445266 0 2px 3px inset;
 }
-/* line 518, ../scss/form-elements.scss */
+/* line 530, ../scss/form-elements.scss */
 .ui-datepicker .ui-datepicker-calendar tbody td .ui-state-hover {
   background: #515151;
 }
-/* line 522, ../scss/form-elements.scss */
+/* line 534, ../scss/form-elements.scss */
 .ui-datepicker .ui-datepicker-calendar tbody td.ui-datepicker-other-month {
   background: #333;
   -moz-box-shadow: #414141 0 1px 0 inset;
   -webkit-box-shadow: #414141 0 1px 0 inset;
   box-shadow: #414141 0 1px 0 inset;
 }
-/* line 524, ../scss/form-elements.scss */
+/* line 536, ../scss/form-elements.scss */
 .ui-datepicker .ui-datepicker-calendar tbody td.ui-datepicker-other-month a, .ui-datepicker .ui-datepicker-calendar tbody td.ui-datepicker-other-month span {
   color: #646162;
 }
-/* line 530, ../scss/form-elements.scss */
+/* line 542, ../scss/form-elements.scss */
 .ui-datepicker .ui-datepicker-calendar tbody td.ui-datepicker-unselectable a, .ui-datepicker .ui-datepicker-calendar tbody td.ui-datepicker-unselectable span {
   color: #999999;
 }
-/* line 534, ../scss/form-elements.scss */
+/* line 546, ../scss/form-elements.scss */
 .ui-datepicker .ui-datepicker-calendar tbody td.ui-datepicker-today a.ui-state-active {
   color: #FFF;
 }
-/* line 537, ../scss/form-elements.scss */
+/* line 549, ../scss/form-elements.scss */
 .ui-datepicker .ui-datepicker-calendar tbody td.ui-datepicker-today a, .ui-datepicker .ui-datepicker-calendar tbody td.ui-datepicker-today span {
   color: Salmon;
 }
@@ -1123,14 +1137,14 @@ button.button.mini {
 /**************************
  * Overloaded select2 CSS *
  **************************/
-/* line 550, ../scss/form-elements.scss */
+/* line 562, ../scss/form-elements.scss */
 .modal .input-select2.select2-container .select2-choice, .modal .input-select2 .select2-drop, .modal .input-select2 .select2-results, .modal .input-select2 .select2-search input, .modal .tags-select2.select2-container .select2-choices, .modal .tags-select2 .select2-drop, .modal .tags-select2 .select2-results, .modal .tags-select2 .select2-search input {
   font-size: 12px;
   font-weight: normal;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-/* line 556, ../scss/form-elements.scss */
+/* line 568, ../scss/form-elements.scss */
 .modal .input-select2.select2-container .select2-choice, .modal .tags-select2.select2-container .select2-choices {
   -moz-box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 0.5), 0px 1px 0px rgba(255, 255, 255, 0.3);
   -webkit-box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 0.5), 0px 1px 0px rgba(255, 255, 255, 0.3);
@@ -1143,7 +1157,7 @@ button.button.mini {
   height: 32px;
 }
 
-/* line 566, ../scss/form-elements.scss */
+/* line 578, ../scss/form-elements.scss */
 .modal .input-select2.select2-container.select2-container-disabled .select2-choice, .modal .input-select2.select2-container.select2-container-disabled .select2-choice .select2-arrow, .modal .input-select2.select2-container.select2-container-disabled .select2-choice:hover, .modal .tags-select2.select2-container.select2-container-disabled .select2-choice, .modal .tags-select2.select2-container.select2-container-disabled .select2-choice .select2-arrow, .modal .tags-select2.select2-container.select2-container-disabled .select2-choice:hover {
   background: #ccc;
   color: #444;
@@ -1153,25 +1167,25 @@ button.button.mini {
   box-shadow: none;
 }
 
-/* line 573, ../scss/form-elements.scss */
+/* line 585, ../scss/form-elements.scss */
 .modal .input-select2.select2-container .select2-choice .select2-arrow, .modal .tags-select2.select2-container .select2-choice .select2-arrow {
   background: rgba(32, 32, 32, 0.95);
   border-left: 1px solid transparent;
 }
 
-/* line 602, ../scss/form-elements.scss */
+/* line 614, ../scss/form-elements.scss */
 .modal .tags-select2.select2-container .select2-choices {
   -moz-border-radius: 4px;
   -webkit-border-radius: 4px;
   border-radius: 4px;
   padding: 3px 0;
 }
-/* line 615, ../scss/form-elements.scss */
+/* line 627, ../scss/form-elements.scss */
 .modal .tags-select2 input[type="text"] {
   height: 28px;
 }
 
-/* line 621, ../scss/form-elements.scss */
+/* line 633, ../scss/form-elements.scss */
 html[dir="rtl"] .modal .input-select2.select2-container .select2-choice .select2-arrow,
 html[dir="rtl"] .modal .tags-select2.select2-container .select2-choice .select2-arrow {
   border-right: 1px solid transparent;
@@ -1182,48 +1196,48 @@ html[dir="rtl"] .modal .tags-select2.select2-container .select2-choice .select2-
  *****
  * The select2 classes below work only when dropdownCssClass is set to input-select2 or tags-select2
  */
-/* line 634, ../scss/form-elements.scss */
+/* line 646, ../scss/form-elements.scss */
 .input-select2.select2-drop, .tags-select2.select2-drop {
   background: rgba(32, 32, 32, 0.95);
   border: 1px solid #111;
   color: #ddd;
 }
-/* line 641, ../scss/form-elements.scss */
+/* line 653, ../scss/form-elements.scss */
 .input-select2 .select2-results li, .tags-select2 .select2-results li {
   border: 1px solid transparent;
 }
-/* line 644, ../scss/form-elements.scss */
+/* line 656, ../scss/form-elements.scss */
 .input-select2 .select2-results .select2-highlighted, .tags-select2 .select2-results .select2-highlighted {
   background: rgba(0, 0, 0, 0.25);
   border: 1px solid #3875d7;
   color: #fff;
 }
-/* line 649, ../scss/form-elements.scss */
+/* line 661, ../scss/form-elements.scss */
 .input-select2 .select2-results .select2-disabled, .tags-select2 .select2-results .select2-disabled {
   background: none;
   color: #888;
 }
-/* line 653, ../scss/form-elements.scss */
+/* line 665, ../scss/form-elements.scss */
 .input-select2 .select2-results .select2-no-results, .input-select2 .select2-results .select2-searching, .input-select2 .select2-results .select2-ajax-error, .input-select2 .select2-results .select2-selection-limit, .tags-select2 .select2-results .select2-no-results, .tags-select2 .select2-results .select2-searching, .tags-select2 .select2-results .select2-ajax-error, .tags-select2 .select2-results .select2-selection-limit {
   background: rgba(32, 32, 32, 0.95);
   color: #ddd;
 }
-/* line 659, ../scss/form-elements.scss */
+/* line 671, ../scss/form-elements.scss */
 .input-select2 .select2-choices .select2-search-field input, .tags-select2 .select2-choices .select2-search-field input {
   color: #fff;
 }
-/* line 663, ../scss/form-elements.scss */
+/* line 675, ../scss/form-elements.scss */
 .input-select2 .select2-search input, .tags-select2 .select2-search input {
   background: rgba(32, 32, 32, 0.95) url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAAoCAYAAACiu5n/AAACLElEQVR42u3Zz0sUYRzH8bUISoyF1i5iXSooyYgOEXapZNYNojwU/aAfUAT9A4YhUgdxt1To0KFIBCMIvEcUEXntUtivpYuUhYFIdDBMmD69he/hObgsbSnb13ngdZjZhX3eO8/MDrMpSctKErwsg//HUSgU7uNYsB3hHla4CybqEoRPaMJGFCEMewxuxnsIk5iALPqg1yVdj9eQGUdjiuE1eAs+QOYztrsMJqwFk8EyHguW95klD+ZD08gsYvBFCBPYgHXBOT1UNpg3ncQpnAicRbrCCQ3j8SIf5QvYEWxvxnlb0mWDr0MIvcOaCiayC78gRKmlH+WDbaIjkJnDzgq/+VHIvMWqag3ehBkIAxXGdkAIDVRlsE24H9//4ty9hju4Hej710c5m83WYging32HMYjMnwSvx75UlQ+iOiDEaEMLZiA8dPc7TFQDnkGYxQ8Iz9Hs8k4riqIa4l5ApojVbm8tiduPL5CZRs5lMGFH8DNYxo+C5d3tMfgohJeow0qMQujxuqRb0RBsZ3DA2ZIuP5LgJDgJToKr4ZHOWjTOy+fzNa6DiezCFGReod1lMGF3IYzjMm5B5rirYIJyEJ4iHezfjW+YRr2n4EHE2LrAa1cg5DwFj2DWLlKljn67p+B+CIdKPAaOsddTcBOEKbTZvjp0Qvjo8Sp9DjJFfIVMjBsef4f34AHeYAxX0VfqMbDnfw97IXMTta6DLbobcxBa3Qdb9BPE2LZQ8G98530ecQi/2QAAAABJRU5ErkJggg==') no-repeat 100% -22px;
   color: #eee;
 }
-/* line 667, ../scss/form-elements.scss */
+/* line 679, ../scss/form-elements.scss */
 .input-select2 .select2-search input.select2-active, .tags-select2 .select2-search input.select2-active {
   background: rgba(32, 32, 32, 0.95) url('data:image/gif;base64,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') no-repeat 100%;
   color: #eee;
 }
 
-/* line 674, ../scss/form-elements.scss */
+/* line 686, ../scss/form-elements.scss */
 html[dir="rtl"] .input-select2 .select2-search input,
 html[dir="rtl"] .tags-select2 .select2-search input {
   background: rgba(32, 32, 32, 0.95) url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAAoCAYAAACiu5n/AAACLElEQVR42u3Zz0sUYRzH8bUISoyF1i5iXSooyYgOEXapZNYNojwU/aAfUAT9A4YhUgdxt1To0KFIBCMIvEcUEXntUtivpYuUhYFIdDBMmD69he/hObgsbSnb13ngdZjZhX3eO8/MDrMpSctKErwsg//HUSgU7uNYsB3hHla4CybqEoRPaMJGFCEMewxuxnsIk5iALPqg1yVdj9eQGUdjiuE1eAs+QOYztrsMJqwFk8EyHguW95klD+ZD08gsYvBFCBPYgHXBOT1UNpg3ncQpnAicRbrCCQ3j8SIf5QvYEWxvxnlb0mWDr0MIvcOaCiayC78gRKmlH+WDbaIjkJnDzgq/+VHIvMWqag3ehBkIAxXGdkAIDVRlsE24H9//4ty9hju4Hej710c5m83WYging32HMYjMnwSvx75UlQ+iOiDEaEMLZiA8dPc7TFQDnkGYxQ8Iz9Hs8k4riqIa4l5ApojVbm8tiduPL5CZRs5lMGFH8DNYxo+C5d3tMfgohJeow0qMQujxuqRb0RBsZ3DA2ZIuP5LgJDgJToKr4ZHOWjTOy+fzNa6DiezCFGReod1lMGF3IYzjMm5B5rirYIJyEJ4iHezfjW+YRr2n4EHE2LrAa1cg5DwFj2DWLlKljn67p+B+CIdKPAaOsddTcBOEKbTZvjp0Qvjo8Sp9DjJFfIVMjBsef4f34AHeYAxX0VfqMbDnfw97IXMTta6DLbobcxBa3Qdb9BPE2LZQ8G98530ecQi/2QAAAABJRU5ErkJggg==') no-repeat -37px -22px;
@@ -1231,7 +1245,7 @@ html[dir="rtl"] .tags-select2 .select2-search input {
 }
 
 /* Profile form customization */
-/* line 682, ../scss/form-elements.scss */
+/* line 694, ../scss/form-elements.scss */
 #profile_user_form #id_phone_1, #profile_billing_address_form #id_phone2_1, #profile_billing_address_form #id_fax_1 {
   margin-top: 0;
 }

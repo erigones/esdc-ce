@@ -68,6 +68,7 @@ class SnapshotDefineSerializer(s.InstanceSerializer):
     _default_fields_ = ('hostname', 'name', 'disk_id')
 
     hostname = s.CharField(source='vm.hostname', read_only=True)
+    vm_uuid = s.CharField(source='vm.uuid', read_only=True)
     name = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\._-]*$', max_length=8, min_length=1)
     disk_id = s.IntegerField(source='array_disk_id', max_value=DISK_ID_MAX, min_value=DISK_ID_MIN)
     desc = s.SafeCharField(max_length=128, required=False)
@@ -122,6 +123,7 @@ class SnapshotSerializer(s.InstanceSerializer):
     _default_fields_ = ('hostname', 'name', 'disk_id')
 
     hostname = s.CharField(source='vm.hostname', read_only=True)
+    vm_uuid = s.CharField(source='vm.uuid', read_only=True)
     define = s.CharField(source='define.name', read_only=True)
     name = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\._-]*$', max_length=24, min_length=1)
     disk_id = s.IntegerField(source='array_disk_id', max_value=DISK_ID_MAX, min_value=DISK_ID_MIN)
@@ -130,3 +132,4 @@ class SnapshotSerializer(s.InstanceSerializer):
     created = s.DateTimeField(read_only=True, required=False)
     status = s.IntegerChoiceField(choices=Snapshot.STATUS, read_only=True, required=False)
     size = s.IntegerField(read_only=True)
+    id = s.SafeCharField(read_only=True)

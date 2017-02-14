@@ -29,14 +29,14 @@ class VmStatus(APIView):
     actions = ('start', 'stop', 'reboot')
     statuses = (Vm.RUNNING, Vm.STOPPED, Vm.STOPPING, Vm.FROZEN)
 
-    def __init__(self, request, hostname, action, data):
+    def __init__(self, request, hostname_or_uuid, action, data):
         super(VmStatus, self).__init__(request)
-        self.hostname = hostname
+        self.hostname_or_uuid = hostname_or_uuid
         self.action = action
         self.data = data
 
-        if hostname:
-            self.vm = get_vm(request, hostname, exists_ok=True, noexists_fail=True, sr=('node', 'owner'))
+        if hostname_or_uuid:
+            self.vm = get_vm(request, hostname_or_uuid, exists_ok=True, noexists_fail=True, sr=('node', 'owner'))
         else:
             self.vm = get_vms(request, sr=('node', 'owner'), order_by=self.order_by)
 
@@ -138,7 +138,7 @@ class VmStatus(APIView):
     def get(self, many=False):
         request, vm = self.request, self.vm
 
-        if many or not self.hostname:
+        if many or not self.hostname_or_uuid:
             if vm:
                 res = VmStatusSerializer(vm, many=True).data
             else:

@@ -2,7 +2,6 @@ import json
 import phonenumbers
 
 from django import forms
-from django.core.serializers.json import DjangoJSONEncoder
 from django.forms import widgets
 from django.utils import six
 from django.utils.html import conditional_escape
@@ -11,6 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 from frozendict import frozendict
 from taggit.forms import TagWidget as _TagWidget
 
+from api.utils.encoders import JSONEncoder
 from gui.models import UserProfile
 
 
@@ -188,7 +188,7 @@ class TagWidget(_TagWidget):
 
     def build_attrs(self, *args, **kwargs):
         if self.tag_choices:
-            tags = json.dumps(self.tag_choices, indent=None, cls=DjangoJSONEncoder)
+            tags = json.dumps(self.tag_choices, indent=None, cls=JSONEncoder)
             kwargs['data-tags'] = mark_safe(conditional_escape(tags))
 
         return super(TagWidget, self).build_attrs(*args, **kwargs)

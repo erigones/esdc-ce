@@ -87,19 +87,19 @@ def template_manage(request, name, data=None):
         :type data.dc_bound: boolean
         :arg data.dc: Name of the datacenter the server template will be attached to (**required** if DC-bound)
         :type data.dc: string
-        :arg data.vm_define: :http:get:`Server definition object </vm/(hostname)/define>` (default: {})
+        :arg data.vm_define: :http:get:`Server definition object </vm/(hostname_or_uuid)/define>` (default: {})
         :type data.vm_define: object
         :arg data.vm_define_disk: List of \
-:http:get:`server disk definition objects </vm/(hostname)/define/disk/(disk_id)>` (default: [])
+:http:get:`server disk definition objects </vm/(hostname_or_uuid)/define/disk/(disk_id)>` (default: [])
         :type data.vm_define_disk: array
         :arg data.vm_define_nic: List of \
-:http:get:`server NIC definition objects </vm/(hostname)/define/nic/(nic_id)>` (default: [])
+:http:get:`server NIC definition objects </vm/(hostname_or_uuid)/define/nic/(nic_id)>` (default: [])
         :type data.vm_define_nic: array
         :arg data.vm_define_snapshot: List of \
-:http:get:`server snapshot definition objects </vm/(hostname)/define/snapshot/(snapdef)>` (default: [])
+:http:get:`server snapshot definition objects </vm/(hostname_or_uuid)/define/snapshot/(snapdef)>` (default: [])
         :type data.vm_define_snapshot: array
         :arg data.vm_define_backup: List of \
-:http:get:`server backup definition objects </vm/(hostname)/define/backup/(bkpdef)>` (default: [])
+:http:get:`server backup definition objects </vm/(hostname_or_uuid)/define/backup/(bkpdef)>` (default: [])
         :type data.vm_define_backup: array
         :status 201: SUCCESS
         :status 400: FAILURE
@@ -132,19 +132,19 @@ def template_manage(request, name, data=None):
         :type data.ostype: integer
         :arg data.dc_bound: Whether the server template is bound to a datacenter (requires |SuperAdmin| permission)
         :type data.dc_bound: boolean
-        :arg data.vm_define: :http:get:`Server definition object </vm/(hostname)/define>`
+        :arg data.vm_define: :http:get:`Server definition object </vm/(hostname_or_uuid)/define>`
         :type data.vm_define: object
         :arg data.vm_define_disk: List of \
-:http:get:`server disk definition objects </vm/(hostname)/define/disk/(disk_id)>`
+:http:get:`server disk definition objects </vm/(hostname_or_uuid)/define/disk/(disk_id)>`
         :type data.vm_define_disk: array
         :arg data.vm_define_nic: List of \
-:http:get:`server NIC definition objects </vm/(hostname)/define/nic/(nic_id)>`
+:http:get:`server NIC definition objects </vm/(hostname_or_uuid)/define/nic/(nic_id)>`
         :type data.vm_define_nic: array
         :arg data.vm_define_snapshot: List of \
-:http:get:`server snapshot definition objects </vm/(hostname)/define/snapshot/(snapdef)>`
+:http:get:`server snapshot definition objects </vm/(hostname_or_uuid)/define/snapshot/(snapdef)>`
         :type data.vm_define_snapshot: array
         :arg data.vm_define_backup: List of \
-:http:get:`server backup definition objects </vm/(hostname)/define/backup/(bkpdef)>`
+:http:get:`server backup definition objects </vm/(hostname_or_uuid)/define/backup/(bkpdef)>`
         :type data.vm_define_backup: array
         :status 200: SUCCESS
         :status 400: FAILURE

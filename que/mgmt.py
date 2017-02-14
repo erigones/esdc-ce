@@ -20,9 +20,34 @@ from que.user_tasks import UserTasks
 
 KEY_PREFIX = cq.conf.ERIGONES_CACHE_PREFIX
 EXPIRES = cq.conf.ERIGONES_TASK_DEFAULT_EXPIRES
+MAX_RETRIES = cq.conf.ERIGONES_TASK_MGMT_CB_MAX_RETRIES
+RETRY_DELAY = cq.conf.ERIGONES_TASK_MGMT_CB_DEFAULT_RETRY_DELAY
 
 redis = cq.backend.client
 logger = getLogger(__name__)
+
+
+# noinspection PyAbstractClass
+class MgmtCallbackTask(Task):
+    """
+    Abstract task for callback tasks running in mgmt queue.
+    Every callback function should finish and write its result to the DB. When the DB (or other resource) is not
+    available the task needs to be run again.
+    """
+    abstract = True
+    logger = None  # Task logger
+    max_retries = MAX_RETRIES
+    default_retry_delay = RETRY_DELAY
+
+    def __call__(self, *args, **kwargs):
+        self.logger = get_task_logger('que.mgmt')
+        from api.exceptions import OPERATIONAL_ERRORS
+
+        try:
+            return super(MgmtCallbackTask, self).__call__(*args, **kwargs)  # run()
+        except OPERATIONAL_ERRORS as exc:
+            self.logger.warning('Execution of mgmt callback task failed because of an operational error: %s', exc)
+            self.retry(exc=exc)  # Will raise special exception
 
 
 # noinspection PyAbstractClass

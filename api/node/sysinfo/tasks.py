@@ -11,6 +11,7 @@ from api.dns.record.api_views import RecordView
 from vms.models import Node, DefaultDc
 from vms.signals import node_created, node_json_changed
 from que.tasks import cq, get_task_logger
+from que.mgmt import MgmtCallbackTask
 from que.exceptions import TaskException
 
 __all__ = ('node_sysinfo_cb',)
@@ -18,8 +19,8 @@ __all__ = ('node_sysinfo_cb',)
 logger = get_task_logger(__name__)
 
 
-@cq.task(name='api.node.sysinfo.tasks.node_sysinfo_cb', ignore_result=False)
-@mgmt_lock(wait_for_release=True)
+@cq.task(name='api.node.sysinfo.tasks.node_sysinfo_cb', base=MgmtCallbackTask, bind=True, ignore_result=False)
+@mgmt_lock(wait_for_release=True, bound_task=True)
 @callback(log_exception=True, update_user_tasks=True)
 def node_sysinfo_cb(result, task_id, node_uuid=None):
     """
@@ -126,7 +127,7 @@ def node_sysinfo_cb(result, task_id, node_uuid=None):
             logger.exception(e)
 
     try:
-        run_node_img_sources_sync(node, img_sources)
+        run_node_img_sources_sync(node, node_img_sources=img_sources)
     except Exception as e:
         logger.exception(e)
 

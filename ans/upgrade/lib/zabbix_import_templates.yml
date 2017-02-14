@@ -1,0 +1,41 @@
+# This task searches for directory zabbix_templates in current task dir (e.g. v2.4.0/zabbix_templates)
+# and imports all .json files that are present there.
+# Required variables: upg_dir, upgrading_to
+
+- name: Preparing to update zabbix monitoring templates
+  set_fact:
+      tmpl_dir: '{{ upg_dir }}/{{ upgrading_to }}/files/zabbix_templates'
+
+- name: Get list of new templates
+  local_action:
+    module: shell
+    args: find "{{ tmpl_dir }}" -name \*.json -type f -exec basename {} \;
+  register: tmpl_list
+  
+# output is 3 lines:
+# 1: zabbix api url
+# 2: user
+# 3: pass
+- name: Query Zabbix credentials
+  local_action:
+    module: shell
+    args: python -c 'from vms.models import DefaultDc; print(DefaultDc().settings.MON_ZABBIX_SERVER); print(DefaultDc().settings.MON_ZABBIX_USERNAME); print(DefaultDc().settings.MON_ZABBIX_PASSWORD);'
+  environment:
+    ERIGONES_HOME: "{{ erigones_home }}"
+    PYTHONPATH: "{{ erigones_home }}:$PYTHONPATH"
+    VIRTUAL_ENV: "{{ erigones_home }}/envs"
+    PATH: "{{ erigones_home }}/bin:{{ erigones_home }}/envs/bin:$PATH"
+    DJANGO_SETTINGS_MODULE: "core.settings"
+  register: zabbix_credentials
+
+- name: Import monitoring templates
+  local_action:
+    module: zabbix_template
+                   url="{{ zabbix_credentials.stdout_lines[0] }}"
+                   login_user="{{ zabbix_credentials.stdout_lines[1] }}"
+                   login_password="{{ zabbix_credentials.stdout_lines[2] }}"
+                   state=import
+                   format=json
+                   template="{{ tmpl_dir }}/{{ item }}"
+  with_items: "{{ tmpl_list.stdout.split('\n') }}"
+

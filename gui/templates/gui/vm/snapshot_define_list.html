@@ -18,10 +18,9 @@
     {% for sd in snapdefs %}{% with disk_id=sd.array_disk_id  %}
     <tr>
       <td>
-        {% if can_edit and not snapdefs.definition %}
-        <a href="#" class="btn-link btn-icon-edit no-ajax" title="{% trans "Update or delete snapshot definition" %}" data-toggle="tooltip" data-placement="bottom" data-form='{{ sd.web_data|local_schedule:TZ|jsondata }}'>{{ sd.name }}</a>
-        {% else %}
         {{ sd.name }}
+        {% if can_edit and not snapdefs.definition %}
+          <a href="#" class="button mini no-ajax" title="{% trans "Update or delete snapshot definition" %}" data-toggle="tooltip" data-placement="bottom" data-form='{{ sd.web_data|local_schedule:TZ|jsondata }}'> <i class="icon-pencil"></i> {% trans "Edit" %}</a>
         {% endif %}
       </td>
       <td>{{ disk_id }}{% if not snapdefs.definition %} <small>({{ sd.disk_size|multiply:1048576|filesizeformat }})</small>{% endif %}</td>

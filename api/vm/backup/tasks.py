@@ -2,6 +2,7 @@ from django.utils.six import iteritems
 
 from vms.models import Vm, Snapshot, Backup, BackupDefine
 from que.tasks import cq, get_task_logger
+from que.mgmt import MgmtCallbackTask
 from que.utils import task_id_from_task_id
 from que.exceptions import TaskException
 from api.utils.request import get_dummy_request
@@ -75,7 +76,7 @@ def _vm_backup_update_snapshots(data, src_attr, dst_attr):
             b.save(update_fields=(dst_attr,))
 
 
-@cq.task(name='api.vm.backup.tasks.vm_backup_list_cb')
+@cq.task(name='api.vm.backup.tasks.vm_backup_list_cb', base=MgmtCallbackTask, bind=True)
 @callback()
 def vm_backup_list_cb(result, task_id, vm_uuid=None, node_uuid=None, bkp_ids=None):
     """
@@ -155,7 +156,7 @@ def _vm_backup_cb_alert(result, task_id, bkp_id=None, task_exception=None, **kwa
             bkp.name, vm.hostname, bkp.array_disk_id, action_msg))
 
 
-@cq.task(name='api.vm.backup.tasks.vm_backup_cb')
+@cq.task(name='api.vm.backup.tasks.vm_backup_cb', base=MgmtCallbackTask, bind=True)
 @callback(error_fun=_vm_backup_cb_alert)
 def vm_backup_cb(result, task_id, vm_uuid=None, node_uuid=None, bkp_id=None):
     """

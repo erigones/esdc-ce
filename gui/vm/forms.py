@@ -10,7 +10,7 @@ import re
 from pdns.models import Record
 from vms.models import Vm, Snapshot, Backup, BackupDefine
 from vms.utils import AttrDict
-from gui.forms import SerializerForm as _SerializerForm
+from gui.forms import SerializerForm
 from gui.utils import tags_to_string
 from gui.fields import ArrayField, DictField, TagField
 from gui.widgets import NumberInput, ArrayWidget, DictWidget, TagWidget
@@ -82,23 +82,6 @@ class HostnameForm(forms.Form):
     hostname = forms.CharField(label=_('Hostname'), required=True,
                                widget=forms.TextInput(attrs={'class': 'input-transparent narrow uneditable-input',
                                                              'disabled': 'disabled'}))
-
-
-class SerializerForm(_SerializerForm):
-    """
-    Just override api_call() -> will save one DB call.
-    """
-    @classmethod
-    def api_call(cls, action, obj, request, **kwargs):
-        # Set vm object to request and get_vm in api will skip a DB call
-        request._api_vm = obj
-
-        res = super(SerializerForm, cls).api_call(action, obj, request, **kwargs)
-
-        # Remove vm, because request could be re-used somewhere
-        request._api_vm = None
-
-        return res
 
 
 class ServerSettingsForm(SerializerForm):

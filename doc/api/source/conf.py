@@ -50,7 +50,7 @@ master_doc = 'index'
 # General information about the project.
 project = u'Danube Cloud API'
 # noinspection PyShadowingBuiltins
-copyright = u'2013-2016, Erigones, s. r. o.'
+copyright = u'2013-2017, Erigones, s. r. o.'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

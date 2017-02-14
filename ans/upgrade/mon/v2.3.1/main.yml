@@ -1,0 +1,3 @@
+
+- include: "{{ upg_base }}/lib/zabbix_import_templates.yml"
+
