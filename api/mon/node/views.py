@@ -48,9 +48,10 @@ def mon_node_sla(request, hostname, yyyymm, data=None):
 @setting_required('MON_ZABBIX_NODE_SYNC')
 def mon_node_history(request, hostname, graph, item_id=None, data=None):
     """
-    Get (:http:get:`GET </mon/node/(hostname)/history/(graph)/(item_id)>`) monitoring history
+    Get (:http:get:`GET </mon/node/(hostname)/history/(graph)>`) monitoring history
     for requested node and graph name.
 
+    .. http:get:: /mon/vm/(hostname)/history/(graph)
     .. http:get:: /mon/node/(hostname)/history/(graph)/(item_id)
 
         :DC-bound?:
@@ -69,11 +70,12 @@ def mon_node_history(request, hostname, graph, item_id=None, data=None):
         |  *mem-usage* - Total compute node physical memory consumed by the Node.
         |  *swap-usage* - Total compute node swap space used.
         |  *net-bandwidth* - The amount of received and sent network traffic through \
-the virtual network interface.
-        |  *net-packets* - The amount of received and sent packets through the virtual network interface.
+the virtual network interface. *requires item_id*
+        |  *net-packets* - The amount of received and sent packets through the \
+virtual network interface. *requires item_id*
 
         :type graph: string
-        :arg item_id: **optional** only used with **net-bandwidth** and **net-packets** graphs to specify ID of the \
+        :arg item_id: **optional** it's only used with *net-bandwidth* and *net-packets* graphs to specify ID of the \
 item for which graph should be retrieved.
         :type item_id: integer
         :arg data.since: Return only values that have been received after the given UNIX timestamp
@@ -86,7 +88,8 @@ item for which graph should be retrieved.
         :status 400: FAILURE
         :status 403: Forbidden
         :status 404: Node not found
-        :status 412: Invalid graph / Invalid OS type
+        :status 412: Invalid graph / Invalid OS type / Missing item_id parameter in URI \
+/ Invalid input value for item_id, must be integer
         :status 417: Node monitoring disabled
         :status 423: Node is not operational
 

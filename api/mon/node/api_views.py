@@ -66,7 +66,7 @@ class NodeHistoryView(APIView):
                 raise InvalidInput('Missing item_id parameter in URI')
             try:
                 item_id = int(item_id)
-            except Exception as e:
+            except Exception:
                 raise InvalidInput('Invalid input value for item_id, must be integer!')
         else:
             self.item_id = item_id = None

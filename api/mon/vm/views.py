@@ -121,9 +121,10 @@ def mon_vm_sla(request, hostname, yyyymm, data=None):
 @setting_required('MON_ZABBIX_ENABLED')
 def mon_vm_history(request, hostname, graph, item_id=None, data=None):
     """
-    Get (:http:get:`GET </mon/vm/(hostname)/history/(graph)/(item_id)>`) monitoring history
+    Get (:http:get:`GET </mon/vm/(hostname)/history/(graph)>`) monitoring history
     for requested server and graph name.
 
+    .. http:get:: /mon/vm/(hostname)/history/(graph)
     .. http:get:: /mon/vm/(hostname)/history/(graph)/(item_id)
 
         :DC-bound?:
@@ -142,14 +143,17 @@ def mon_vm_history(request, hostname, graph, item_id=None, data=None):
         |  *mem-usage* - Total compute node physical memory consumed by the VM.
         |  *swap-usage* - Total compute node swap space used by the VM.
         |  *net-bandwidth* - The amount of received and sent network traffic through \
-the virtual network interface.
-        |  *net-packets* - The amount of received and sent packets through the virtual network interface.
-        |  *disk-throughput* (KVM only) - The amount of written and read data on the virtual hard drive.
+the virtual network interface. *requires item_id*
+        |  *net-packets* - The amount of received and sent packets through the virtual \
+network interface. *requires item_id*
+        |  *disk-throughput* (KVM only) - The amount of written and read data on \
+the virtual hard drive. *requires item_id*
         |  *disk-io* (KVM only) - The amount of write and read I/O operations performed on \
-the virtual hard drive.
-        |  *fs-throughput* (SunOS Zone only) - The amount of written and read data on the virtual hard drive.
+the virtual hard drive. *requires item_id*
+        |  *fs-throughput* (SunOS Zone only) - The amount of written and read data \
+on the virtual hard drive. *requires item_id*
         |  *fs-io* (SunOS Zone only) - The amount of write and read I/O operations performed on \
-the virtual hard drive.
+the virtual hard drive. *requires item_id*
         |  *vm-disk-logical-throughput* - Aggregated disk throughput on the logical layer \
 (with acceleration mechanisms included).
         |  *vm-disk-logical-io* - Aggregated amount or read and write I/O operations on the logical layer \
@@ -160,8 +164,8 @@ the virtual hard drive.
 (with acceleration mechanisms included).
 
         :type graph: string
-        :arg item_id: **optional** only used with **net-bandwidth**, **net-packets**, **disk-throughput**, \
-**disk-io**, **fs-throughput**, **fs-io** graphs to specify ID of the item for which graph should be retrieved.
+        :arg item_id: **optional** it's only used with *net-bandwidth*, *net-packets*, *disk-throughput*, \
+*disk-io*, *fs-throughput*, *fs-io* graphs to specify ID of the item for which graph should be retrieved.
         :type item_id: integer
         :arg data.since: Return only values that have been received after the given timestamp (default: now - 1 hour)
         :type data.since: integer
@@ -172,7 +176,8 @@ the virtual hard drive.
         :status 400: FAILURE
         :status 403: Forbidden
         :status 404: VM not found
-        :status 412: Invalid graph / Invalid OS type
+        :status 412: Invalid graph / Invalid OS type / Missing item_id parameter in URI \
+/ Invalid input value for item_id, must be integer
         :status 417: VM monitoring disabled
         :status 423: VM is not operational
 
