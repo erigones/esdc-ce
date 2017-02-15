@@ -19,6 +19,7 @@ GIT_NOT_FOUND=1
 PARAM_MISSING=2
 NO_MATCH=3
 UP_TO_DATE=4
+FAILED_FETCH=5
 FAILED_CHECKOUT=5
 POST_DEPLOY_FAILED=6
 UPGRADE_FAILED=6
@@ -50,6 +51,13 @@ function die() {
 	[[ -n "${msg}" ]] && echo "ERROR: ${msg}" 1>&2
 
 	exit "${exit_code}"
+}
+
+function usage() {
+	echo "USAGE: $0 <version> [private SSL key file] [X509 certificate file]"
+	echo ""
+	echo "Example 1: $0 v2.4.0"
+	echo "Example 2: $0 v3.0.0 /path/to/YourDCHost.key /path/to/YourDCHost.crt"
 }
 
 # Change working directory to ERIGONES_HOME
@@ -95,7 +103,7 @@ if [[ -z "${ESDC_GIT_UPDATE_2ND_RUN}" ]]; then
 
 	# fetch most recent changes first
 	# MERGE will be done only if requested VERSION is among fetched objects
-	git fetch origin
+	git fetch origin || die $FAILED_FETCH "Unable to fetch changes from git remote"
 
 	AVAILABLE_TAGS=$(git show-ref --tags)
 	# When VERSION matches one of the tags name in the list of reference-tags
