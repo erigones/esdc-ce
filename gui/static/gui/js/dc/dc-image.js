@@ -82,7 +82,7 @@ function DcImageList(task_id) {
     if (!img_status.length) {
       return;
     }
-    var img_link = $(jq('image_' + img_name) + ' .edit-button');
+    var img_link = $(jq('image_' + img_name) + ' a.edit-button');
 
     img_status.html(status_display);
 
