@@ -70,6 +70,7 @@ if [[ -z "${ESDC_GIT_UPDATE_2ND_RUN}" ]]; then
 	fi
 
 	if [[ -z "${VERSION}" ]]; then
+		usage
 		die $PARAM_MISSING "Version number must be provided as first parameter of this script."
 	fi
 
