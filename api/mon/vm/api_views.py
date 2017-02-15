@@ -88,7 +88,7 @@ class VmSLAView(APIView):
 
 class VmHistoryView(APIView):
 
-    def __init__(self, request, hostname, graph_type, item_id, data):
+    def __init__(self, request, hostname_or_uuid, graph_type, item_id, data):
         super(VmHistoryView, self).__init__(request)
         self.vm = get_vm(request, hostname_or_uuid, sr=('dc',), exists_ok=True, noexists_fail=True)
         self.graph_type = graph_type

@@ -119,13 +119,13 @@ def mon_vm_sla(request, hostname_or_uuid, yyyymm, data=None):
 @api_view(('GET',))
 @request_data()  # get_vm() = IsVmOwner
 @setting_required('MON_ZABBIX_ENABLED')
-def mon_vm_history(request, hostname, graph, item_id=None, data=None):
+def mon_vm_history(request, hostname_or_uuid, graph, item_id=None, data=None):
     """
     Get (:http:get:`GET </mon/vm/(hostname_or_uuid)/history/(graph)>`) monitoring history
     for requested server and graph name.
 
-    .. http:get:: /mon/vm/(hostname)/history/(graph)
-    .. http:get:: /mon/vm/(hostname)/history/(graph)/(item_id)
+    .. http:get:: /mon/vm/(hostname_or_uuid)/history/(graph)
+    .. http:get:: /mon/vm/(hostname_or_uuid)/history/(graph)/(item_id)
 
         :DC-bound?:
             * |dc-yes|
@@ -182,4 +182,4 @@ the virtual hard drive. *requires item_id*
         :status 423: VM is not operational
 
     """
-    return VmHistoryView(request, hostname, graph, item_id, data).get()
+    return VmHistoryView(request, hostname_or_uuid, graph, item_id, data).get()
