@@ -455,7 +455,7 @@
                 {% endif %}
                 <td colspan="3">
                   {% if ptr %}
-                    {{ ptr.content }} <a href="#" class="button mini no-ajax vm_nic_ptr" data-source="{% url 'vm_ptr_form' vm.hostname nic.nic_id %}" data-ipaddr="{{ ip }}" title="{% trans "Change reverse DNS record for this IP address" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-pencil"></i> {% trans "Edit" %}</a>
+                    <span class="ptr-content">{{ ptr.content }}</span> <a href="#" class="button mini no-ajax vm_nic_ptr" data-source="{% url 'vm_ptr_form' vm.hostname nic.nic_id %}" data-ipaddr="{{ ip }}" title="{% trans "Change reverse DNS record for this IP address" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-pencil"></i> {% trans "Edit" %}</a>
                   {% endif %}
                 </td>
               </tr>

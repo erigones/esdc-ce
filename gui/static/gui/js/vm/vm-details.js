@@ -679,7 +679,7 @@ function vm_ptr_change(hostname, btn) {
   if (btn.hasClass('disabled')) {
     return false;
   }
-
+  var ptr_content = btn.parent().find('.ptr-content');
   var ipaddr = btn.data('ipaddr');
   var mod = $('#vm_ptr_modal');
   var text = mod.find('div.vm_modal_text');
@@ -691,13 +691,13 @@ function vm_ptr_change(hostname, btn) {
   disable_form_submit(form);
 
   text.html(text_default.replace('__ipaddr__', ipaddr));
-  ptr.val(btn.html());
+  ptr.val(ptr_content.html());
 
   var handler = function() {
     ajax('POST', btn.data('source'), ATIMEOUT, function(data, textStatus, jqXHR) {
       if (jqXHR.status == 201) {
         mod.modal('hide');
-        btn.html(form.find('#id_ptr-content').val());
+        ptr_content.html(form.find('#id_ptr-content').val());
       } else if (jqXHR.status == 204) {
         mod.modal('hide');
       } else {
