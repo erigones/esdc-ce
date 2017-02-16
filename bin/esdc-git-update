@@ -69,9 +69,8 @@ if [[ -z "${ESDC_GIT_UPDATE_2ND_RUN}" ]]; then
 		die $GIT_NOT_FOUND "Git was not found on system!"
 	fi
 
-	if [[ -z "${VERSION}" ]]; then
+	if [[ $# -ne 1 ]] && [[ $# -ne 3 ]]; then
 		usage
-		die $PARAM_MISSING "Version number must be provided as first parameter of this script."
 	fi
 
 	# Git environmental variables for cloning over HTTPS

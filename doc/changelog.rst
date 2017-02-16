@@ -25,7 +25,7 @@ Features
 - Updated design of DC switch button - `#64 <https://github.com/erigones/esdc-ce/issues/64>`__
 - Changed image repository view to show last 30 images by default - `#66 <https://github.com/erigones/esdc-ce/issues/66>`__
 - Improved consistency and UX of modal button links - `#39 <https://github.com/erigones/esdc-ce/issues/39>`__
-- Fail when fetch fails and display usage - `#68 <https://github.com/erigones/esdc-ce/issues/68>`__
+- Modified update script bin/esdc-git-update to fail when git fetch fails and display usage for invalid invocation - `#68 <https://github.com/erigones/esdc-ce/issues/68>`__
 
 
 Bugs
