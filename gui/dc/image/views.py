@@ -15,6 +15,7 @@ from api.response import JSONResponse
 from api.utils.views import call_api_view
 from api.imagestore.views import imagestore_manage
 from vms.models import Image, ImageVm, ImageStore
+from vms.models import Vm
 
 
 @login_required
@@ -196,7 +197,8 @@ def imagestore_list(request, repo=None):
         else:
             created_since = None
 
-        context['images'] = imagestore.images_filter(created_since=created_since, limit=limit)
+        context['images'] = imagestore.images_filter(created_since=created_since, limit=limit,
+                                                     excluded_ostypes=(Vm.LINUX_ZONE,))
     else:
         context['imagestore'] = None
         context['images'] = []

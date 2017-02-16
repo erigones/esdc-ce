@@ -116,11 +116,20 @@ class ImageStore(_DummyModel):
     def images(self):
         return cache.get(self._cache_key_images) or []
 
-    def images_filter(self, created_since=None, limit=None):
-        images = self.images
+    def images_filter(self, created_since=None, limit=None, excluded_ostypes=()):
+        def apply_filters(filters):
+            def fun(image):
+                return all(filter_(image) for filter_ in filters)
+            return fun
+        active_filters = []
 
         if created_since:
-            images = [img for img in images if img['created'] > created_since]
+            active_filters.append(lambda img: img['created'] > created_since)
+
+        if excluded_ostypes:
+            active_filters.append(lambda img: img['ostype'] not in excluded_ostypes)
+
+        images = filter(apply_filters(active_filters), self.images)
 
         if limit:
             images = images[:limit]

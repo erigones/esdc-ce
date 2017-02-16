@@ -34,7 +34,7 @@
         <span class="snapshot_name">{{ bkp.name }}</span>
         {% if can_edit and not bkp.locked %}
           <a href="#" class="button mini no-ajax vm_snapshot_name" data-backup="true" title="{% trans "Delete or restore this backup" %}" data-toggle="tooltip" data-placement="bottom">
-            <i class="icon-pencil"></i> {% trans "Delete or restore" %}
+            <i class="icon-edit"></i> {% trans "Manage" %}
           </a>
         {% endif %}
       </td>

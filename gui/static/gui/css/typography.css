@@ -14,7 +14,7 @@ p {
 }
 
 /* line 15, ../scss/typography.scss */
-a.btn-icon:after, a.btn-icon-edit:after, a.btn-icon-link:after {
+a.btn-icon:after, a.btn-icon-edit:after, a.btn-icon-link:after, a.btn-icon-external-link:after {
   font-family: FontAwesome;
   font-weight: normal;
   font-style: normal;
@@ -23,15 +23,15 @@ a.btn-icon:after, a.btn-icon-edit:after, a.btn-icon-link:after {
   color: #000 !important;
 }
 /* line 25, ../scss/typography.scss */
-a.btn-icon.icon-active:after, a.icon-active.btn-icon-edit:after, a.icon-active.btn-icon-link:after {
+a.btn-icon.icon-active:after, a.icon-active.btn-icon-edit:after, a.icon-active.btn-icon-link:after, a.icon-active.btn-icon-external-link:after {
   color: #0088cc !important;
 }
 /* line 28, ../scss/typography.scss */
-a.btn-icon.icon-active:after:hover, a.icon-active.btn-icon-edit:after:hover, a.icon-active.btn-icon-link:after:hover {
+a.btn-icon.icon-active:after:hover, a.icon-active.btn-icon-edit:after:hover, a.icon-active.btn-icon-link:after:hover, a.icon-active.btn-icon-external-link:after:hover {
   color: #005580 !important;
 }
 /* line 33, ../scss/typography.scss */
-a.btn-icon.icon-active.disabled:after, a.icon-active.disabled.btn-icon-edit:after, a.icon-active.disabled.btn-icon-link:after, a.btn-icon.icon-active.disabled:after:hover, a.icon-active.disabled.btn-icon-edit:after:hover, a.icon-active.disabled.btn-icon-link:after:hover {
+a.btn-icon.icon-active.disabled:after, a.icon-active.disabled.btn-icon-edit:after, a.icon-active.disabled.btn-icon-link:after, a.icon-active.disabled.btn-icon-external-link:after, a.btn-icon.icon-active.disabled:after:hover, a.icon-active.disabled.btn-icon-edit:after:hover, a.icon-active.disabled.btn-icon-link:after:hover, a.icon-active.disabled.btn-icon-external-link:after:hover {
   color: #333 !important;
 }
 
@@ -45,12 +45,17 @@ a.btn-icon-link:after {
   content: "\f0c1";
 }
 
-/* line 49, ../scss/typography.scss */
+/* line 48, ../scss/typography.scss */
+a.btn-icon-external-link:after {
+  content: "\f08e";
+}
+
+/* line 53, ../scss/typography.scss */
 a.btn-text {
   color: #333333;
 }
 
-/* line 53, ../scss/typography.scss */
+/* line 57, ../scss/typography.scss */
 [class^="icon-"]:before, [class*=" icon-"]:before {
   cursor: default;
 }

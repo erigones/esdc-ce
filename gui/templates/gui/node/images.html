@@ -101,8 +101,8 @@
           {% with vms_count=vms|length %}
           <tr id="ns_image_{{ img.name }}">
             <td>{{ img.alias_version }} <small>({{ img.name }})</small>
-              <a href="#" class="button mini no-ajax obj_edit{% if ns_status.status != img.READY %} disabled{% endif %}" title="{% trans "Delete disk image from compute node storage" %}" data-toggle="tooltip" data-placement="bottom" data-form='{"name":{{ img.name|jsondata }}, "alias_version": {{ img.alias_version|jsondata }}}' data-vms="{{ vms_count }}">
-                <i class="icon-pencil"></i> {% trans "Edit" %}
+              <a href="#" class="button mini no-ajax ns-image-delete-button obj_edit{% if ns_status.status != img.READY %} disabled{% endif %}" title="{% trans "Delete disk image from compute node storage" %}" data-toggle="tooltip" data-placement="bottom" data-form='{"name":{{ img.name|jsondata }}, "alias_version": {{ img.alias_version|jsondata }}}' data-vms="{{ vms_count }}">
+                <i class="icon-remove"></i> {% trans "Delete" %}
               </a>
             </td>
             <td class="hidden-tablet hidden-phone">{{ img.get_access_display }}</td>
