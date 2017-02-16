@@ -1,2 +1,2 @@
-__version__ = '2.4.0-rc1'
+__version__ = '2.4.0-rc2'
 __edition__ = 'ce'
