@@ -164,9 +164,8 @@ class ServerSettingsForm(SerializerForm):
 
     @property
     def saved_hostname(self):
-        if self._api_response:
-            return self._api_response['result']['hostname']
-        return self.current_hostname
+        assert self._api_response, 'API view must be called first'
+        return self._api_response['result']['hostname']
 
     def _final_data(self, data=None):
         # noinspection PyProtectedMember
