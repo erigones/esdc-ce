@@ -24,6 +24,7 @@ class SerializerForm(forms.Form):
     _serializer = None
     _api_method = frozendict({'create': 'POST', 'update': 'PUT', 'delete': 'DELETE', 'get': 'GET'})
     _api_call = NotImplemented  # Set in descendant class
+    _api_response = None
     _exclude_fields = frozenset()
     _custom_fields = frozendict()
     _custom_field_opts = frozendict()
@@ -296,6 +297,7 @@ class SerializerForm(forms.Form):
 
         # Call API function (also updates tasklog)
         res = self.api_call(action, self._obj, self._request, args=args, data=data)
+        self._api_response = res.data
 
         if res.status_code in (200, 201):
             self._set_api_task_id(res.data)

@@ -436,10 +436,8 @@ def settings_form(request, hostname):
             # noinspection PyUnresolvedReferences
             if form.action == 'delete':
                 return redirect('vm_list')
-            elif form.action == 'create':
-                return redirect('vm_details', hostname=form.new_hostname)
             else:
-                return redirect('vm_details', hostname=vm.hostname)
+                return redirect('vm_details', hostname=form.saved_hostname)
 
     return render(request, 'gui/vm/settings_form.html', {'settingsform': form, 'vm': vm})
 
