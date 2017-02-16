@@ -379,6 +379,9 @@ def add_import_form(request):
             else:
                 redirect_to_vm_list = False
 
+                if html_table[vm]['_vm_defined']:
+                    defined_vms[vm] = html_table[vm]
+
         if redirect_to_vm_list:
             return redirect('vm_list')
 
