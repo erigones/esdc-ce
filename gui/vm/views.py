@@ -357,7 +357,7 @@ def add_import_form(request):
 
     # Get data from xls file
     html_table = None
-    defined_vms = dict()
+    defined_vms = {}
     import_error = None
     filename = form.cleaned_data.get('import_file')
 
@@ -374,10 +374,10 @@ def add_import_form(request):
 
         for vm in html_table:
             status, html_table[vm] = vm_define_all(request, html_table[vm])
-            if status != 201:
-                redirect_to_vm_list = False
-            else:
+            if status == 201:
                 defined_vms[vm] = html_table[vm]
+            else:
+                redirect_to_vm_list = False
 
         if redirect_to_vm_list:
             return redirect('vm_list')
