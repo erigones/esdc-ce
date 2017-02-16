@@ -61,7 +61,7 @@ function ImageStoreList() {
 
       table_rows.each(function(i, e) {
         var tr = $(e);
-        var image_name = tr.find('a.imagestore-image').text();
+        var image_name = tr.find('span.imagestore-image-name').text();
 
         if (pattern.test(image_name)) {
           tr.show();
