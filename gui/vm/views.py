@@ -357,6 +357,7 @@ def add_import_form(request):
 
     # Get data from xls file
     html_table = None
+    defined_vms = dict()
     import_error = None
     filename = form.cleaned_data.get('import_file')
 
@@ -375,13 +376,15 @@ def add_import_form(request):
             status, html_table[vm] = vm_define_all(request, html_table[vm])
             if status != 201:
                 redirect_to_vm_list = False
+            else:
+                defined_vms[vm] = html_table[vm]
 
         if redirect_to_vm_list:
             return redirect('vm_list')
 
         # Some server creation has failed, remove all created server definitions
-        for vm in html_table:
-            status, html_table[vm] = vm_define_all(request, html_table[vm], method='DELETE')
+        for vm in defined_vms:
+            status, defined_vms[vm] = vm_define_all(request, defined_vms[vm], method='DELETE')
 
     ieb = ImportExportBase()
 
