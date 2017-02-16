@@ -38,6 +38,7 @@ Bugs
 - Fixed initial VM harvest problem with temporary unreachable worker - `#61 <https://github.com/erigones/esdc-ce/issues/61>`__
 - Changed reload to restart of application GUI service - commit `#05f9702 <https://github.com/erigones/esdc-ce/commit/05f97027ac542c4f284892fd3aa85e1576a553ed>`__
 - Fixed redirect after VM hostname change - `#70 <https://github.com/erigones/esdc-ce/issues/70>`__
+- Fixed language switching in user profile - `#72 <https://github.com/erigones/esdc-ce/issues/72>`__
 
 
 2.3.3 (released on 2017-02-04)
