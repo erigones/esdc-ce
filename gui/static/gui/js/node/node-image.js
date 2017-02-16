@@ -67,7 +67,7 @@ function NodeImage(hostname, zpool) {
 
   this.update_status = function(img_name, state, status_display) {
     var img_status = $(jq('ns_image_' + img_name) + ' .ns_image_status');
-    var img_link = $(jq('ns_image_' + img_name) + ' a.btn-link');
+    var img_link = $(jq('ns_image_' + img_name) + ' a.ns-image-delete-button');
 
     if (img_status.length) {
       img_status.html(status_display);
