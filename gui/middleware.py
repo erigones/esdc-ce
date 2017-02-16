@@ -34,7 +34,7 @@ class TimezoneMiddleware(object):
     """
     # noinspection PyMethodMayBeStatic
     def process_request(self, request):
-        tz = request.session.get('django_timezone')
+        tz = request.session.get(settings.TIMEZONE_SESSION_KEY)
         if not tz:
             tz = settings.TIME_ZONE
         timezone.activate(tz)
