@@ -71,6 +71,7 @@ if [[ -z "${ESDC_GIT_UPDATE_2ND_RUN}" ]]; then
 
 	if [[ $# -ne 1 ]] && [[ $# -ne 3 ]]; then
 		usage
+		die $PARAM_MISSING
 	fi
 
 	# Git environmental variables for cloning over HTTPS
