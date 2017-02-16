@@ -63,9 +63,9 @@
             </select>
             &nbsp; {% trans "Use once?" %}:
             <span class="controls oneline">
-          <input type="checkbox" id="id_iso-image-once" name="iso-image-once" value="true" {% if not last_cdimage %} checked="checked"{% endif %} class="normal-check"/>
-          <label for="id_iso-image-once"></label>
-        </span>
+              <input type="checkbox" id="id_iso-image-once" name="iso-image-once" value="true" {% if not last_cdimage %} checked="checked"{% endif %} class="normal-check"/>
+              <label for="id_iso-image-once"></label>
+            </span>
           </div>
           <br/>
           <div class="input">{% trans "Attach 2nd ISO image (optional):" %}
@@ -124,7 +124,8 @@
     <div class="modal-footer">
       <div class="inner-well">
         {% if can_edit %}
-          <span class="pull-left"><a class="vm_modal_more btn btn-small btn-inverse no-ajax">{% trans "Show advanced settings" %}</a></span>{% endif %}
+          <span class="pull-left"><a class="vm_modal_more btn btn-small btn-inverse no-ajax">{% trans "Show advanced settings" %}</a></span>
+        {% endif %}
         <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
         <a class="vm_modal_update button green no-ajax" data-enter="true">{% trans "Update" %}</a>
         {% if can_edit %}
@@ -150,7 +151,8 @@
     <div class="modal-footer">
       <div class="inner-well">
         {% if can_edit %}
-          <span class="pull-left"><a class="vm_modal_more btn btn-small btn-inverse no-ajax">{% trans "Show advanced settings" %}</a></span>{% endif %}
+          <span class="pull-left"><a class="vm_modal_more btn btn-small btn-inverse no-ajax">{% trans "Show advanced settings" %}</a></span>
+        {% endif %}
         <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
         <a class="vm_modal_update button green no-ajax" data-enter="true">{% trans "Update" %}</a>
         {% if can_edit %}
@@ -176,7 +178,8 @@
     <div class="modal-footer">
       <div class="inner-well">
         {% if can_edit %}
-          <span class="pull-left"><a class="vm_modal_more btn btn-small btn-inverse no-ajax">{% trans "Show advanced settings" %}</a></span>{% endif %}
+          <span class="pull-left"><a class="vm_modal_more btn btn-small btn-inverse no-ajax">{% trans "Show advanced settings" %}</a></span>
+        {% endif %}
         <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
         <a class="vm_modal_update button green no-ajax" data-enter="true" data-confirm="{% trans "Changing disk size is dangerous! Are you sure you want to change the disk size?" %}">{% trans "Update" %}</a>
         {% if can_edit %}
@@ -201,7 +204,7 @@
               {% trans "Please choose target compute node:" %}
               <select id="id_migrate-node" name="migrate-node" class="input-select2" style="width: 220px">
                 {% for node in settingsform.vm_nodes %}
-                  <option {% if node == vm.node %} selected="selected"{% endif %} value="{{ node.hostname }}">{{ node.hostname }}</option>
+                  <option{% if node == vm.node %} selected="selected"{% endif %} value="{{ node.hostname }}">{{ node.hostname }}</option>
                 {% endfor %}
               </select>
             </div>
@@ -440,13 +443,9 @@
                 {% if is_kvm %}
                   <td class="hidden-phone-small">{{ nic.model }}</td>
                 {% endif %}
-                {% with netmask=nic|keyvalue:"netmask" allowed_ips=nic|keyvalue:"allowed_ips" %}
-                  <td>{% if ip %}{{ ip|cidr:netmask }}{% endif %}{% if allowed_ips %}<br>
-                    <small>({{ allowed_ips|join:", " }})</small>{% endif %}</td>{% endwith %}
+                {% with netmask=nic|keyvalue:"netmask" allowed_ips=nic|keyvalue:"allowed_ips" %}<td>{% if ip %}{{ ip|cidr:netmask }}{% endif %}{% if allowed_ips %}<br><small>({{ allowed_ips|join:", " }})</small>{% endif %}</td>{% endwith %}
                 <td>{{ nic.gateway|default:"" }}</td>
-                <td>{{ nic.net }}{% if not ip %}
-                  <span title="{% trans "IP addresses for this network are managed by an external service" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-info-sign"></i></span>{% endif %}
-                </td>
+                <td>{{ nic.net }}{% if not ip %}<span title="{% trans "IP addresses for this network are managed by an external service" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-info-sign"></i></span>{% endif %}</td>
               </tr>
               <tr class="row2">
                 <td></td>
@@ -466,8 +465,7 @@
               <tfoot>
               <tr>
                 <td colspan="5" class="vm_admin vm_control">
-                  <a href="#" class="button gray no-ajax vm_nic_settings vm_add vm_lock_disable" title="{% trans "Add new NIC into Server definition" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-plus"></i> {% trans "Add NIC" %}
-                  </a>
+                  <a href="#" class="button gray no-ajax vm_nic_settings vm_add vm_lock_disable" title="{% trans "Add new NIC into Server definition" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-plus"></i> {% trans "Add NIC" %}</a>
                 </td>
               </tr>
               </tfoot>
@@ -537,8 +535,7 @@
                 <tfoot>
                 <tr>
                   <td colspan="{% if can_edit %}6{% else %}5{% endif %}" class="vm_admin vm_control">
-                    <a href="#" class="button gray no-ajax vm_disk_settings vm_add vm_lock_disable" title="{% trans "Add new disk into Server definition" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-plus"></i> {% trans "Add Disk" %}
-                    </a>
+                    <a href="#" class="button gray no-ajax vm_disk_settings vm_add vm_lock_disable" title="{% trans "Add new disk into Server definition" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-plus"></i> {% trans "Add Disk" %}</a>
                   </td>
                 </tr>
                 </tfoot>
