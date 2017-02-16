@@ -118,7 +118,7 @@
             <td>{{ img.created|date:"SHORT_DATETIME_FORMAT" }}</td>
             <td class="hidden-phone">
               {% if img.homepage %}
-              <a href="{{ img.homepage }}" target="_blank" class="btn-icon-link btn-text btn-link no-ajax"><small class="vm_snapshot_note">{{ img.desc }}</small></a>
+              <a href="{{ img.homepage }}" target="_blank" class="btn-icon-external-link btn-text btn-link no-ajax"><small class="vm_snapshot_note">{{ img.desc }}</small></a>
               {% else %}
               <small class="vm_snapshot_note">{{ img.desc }}</small>
               {% endif %}

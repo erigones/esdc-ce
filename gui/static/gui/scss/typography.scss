@@ -45,6 +45,10 @@ a.btn-icon-link:after {
   @extend a.btn-icon;
   content: "\f0c1";
 }
+a.btn-icon-external-link:after {
+  @extend a.btn-icon;
+  content: "\f08e";
+}
 
 a.btn-text {
   color: #333333;
