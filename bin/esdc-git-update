@@ -19,6 +19,7 @@ GIT_NOT_FOUND=1
 PARAM_MISSING=2
 NO_MATCH=3
 UP_TO_DATE=4
+FAILED_FETCH=5
 FAILED_CHECKOUT=5
 POST_DEPLOY_FAILED=6
 UPGRADE_FAILED=6
@@ -52,6 +53,13 @@ function die() {
 	exit "${exit_code}"
 }
 
+function usage() {
+	echo "USAGE: $0 <version> [private SSL key file] [X509 certificate file]"
+	echo ""
+	echo "Example 1: $0 v2.4.0"
+	echo "Example 2: $0 v3.0.0 /path/to/YourDCHost.key /path/to/YourDCHost.crt"
+}
+
 # Change working directory to ERIGONES_HOME
 cd "${ERIGONES_HOME}"
 
@@ -61,16 +69,23 @@ if [[ -z "${ESDC_GIT_UPDATE_2ND_RUN}" ]]; then
 		die $GIT_NOT_FOUND "Git was not found on system!"
 	fi
 
-	if [[ -z "${VERSION}" ]]; then
-		die $PARAM_MISSING "Version number must be provided as first parameter of this script."
+	if [[ $# -ne 1 ]] && [[ $# -ne 3 ]]; then
+		usage
+		die $PARAM_MISSING
 	fi
 
 	# Git environmental variables for cloning over HTTPS
 	if [[ ! -z "${KEY_PATH}" ]]; then
+		if [[ ! -f "${KEY_PATH}" ]]; then
+			die $PARAM_MISSING "File does not exist: ${KEY_PATH}"
+		fi
 		export GIT_SSL_KEY=${KEY_PATH}
 	fi
 
 	if [[ ! -z "${CERT_PATH}" ]]; then
+		if [[ ! -f "${CERT_PATH}" ]]; then
+			die $PARAM_MISSING "File does not exist: ${CERT_PATH}"
+		fi
 		export GIT_SSL_CERT=${CERT_PATH}
 	fi
 
@@ -95,7 +110,7 @@ if [[ -z "${ESDC_GIT_UPDATE_2ND_RUN}" ]]; then
 
 	# fetch most recent changes first
 	# MERGE will be done only if requested VERSION is among fetched objects
-	git fetch origin
+	git fetch origin || die $FAILED_FETCH "Unable to fetch changes from git remote"
 
 	AVAILABLE_TAGS=$(git show-ref --tags)
 	# When VERSION matches one of the tags name in the list of reference-tags
