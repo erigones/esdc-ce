@@ -89,7 +89,6 @@ class ServerSettingsForm(SerializerForm):
     Form for changing VM's settings (alias and hostname).
     """
     admin = False
-    new_hostname = None
     _api_call = vm_define_user
 
     alias = forms.RegexField(label=_('Short server name'), required=True,
@@ -163,13 +162,18 @@ class ServerSettingsForm(SerializerForm):
             return self._obj.hostname
         return self._vm_hostname
 
+    @property
+    def saved_hostname(self):
+        assert self._api_response, 'API view must be called first'
+        return self._api_response['result']['hostname']
+
     def _final_data(self, data=None):
         # noinspection PyProtectedMember
         ret = super(ServerSettingsForm, self)._final_data(data=data)
-        self.new_hostname = self._vm_hostname
+        new_hostname = self._vm_hostname
 
-        if self.new_hostname != self.current_hostname or not self._obj:
-            ret['hostname'] = self.new_hostname
+        if not self._obj or new_hostname != self.current_hostname:
+            ret['hostname'] = new_hostname
 
         try:
             del ret['domain']
