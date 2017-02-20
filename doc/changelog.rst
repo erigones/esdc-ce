@@ -41,6 +41,8 @@ Bugs
 - Fixed redirect after VM hostname change - `#70 <https://github.com/erigones/esdc-ce/issues/70>`__
 - Fixed minor issues in Import/Export functionality - `#71 <https://github.com/erigones/esdc-ce/issues/71>`__
 - Fixed language switching in user profile - `#72 <https://github.com/erigones/esdc-ce/issues/72>`__
+- Fixed ``GET /task/log -page <number>`` API view - `#74 <https://github.com/erigones/esdc-ce/pull/74>`__
+- Fixed object_type filter in Task Log (API & GUI) - `#74 <https://github.com/erigones/esdc-ce/pull/74>`__
 
 
 2.3.3 (released on 2017-02-04)
