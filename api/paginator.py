@@ -15,32 +15,32 @@ class Paginator(DjangoPaginator):
 
     def __init__(self, request, object_list, per_page, **kwargs):
         super(Paginator, self).__init__(object_list, per_page, **kwargs)
-        self.page = None
+        self._page = None
         self.request = request
 
     def get_page(self, page):
         try:
-            self.page = self.page(page)
+            self._page = self.page(page)
         except InvalidPage:
             raise NotFound(self.invalid_page_message)
         else:
-            return self.page
+            return self._page
 
     def get_next_link(self):
-        if not self.page.has_next():
+        if not self._page.has_next():
             return None
 
         url = self.request.build_absolute_uri()
-        page_number = self.page.next_page_number()
+        page_number = self._page.next_page_number()
 
         return replace_query_param(url, self.page_query_param, page_number)
 
     def get_previous_link(self):
-        if not self.page.has_previous():
+        if not self._page.has_previous():
             return None
 
         url = self.request.build_absolute_uri()
-        page_number = self.page.previous_page_number()
+        page_number = self._page.previous_page_number()
 
         if page_number == 1:
             return None
@@ -49,7 +49,7 @@ class Paginator(DjangoPaginator):
 
     def get_response_results(self, results):
         return OrderedDict([
-            ('count', self.page.paginator.count),
+            ('count', self._page.paginator.count),
             ('next', self.get_next_link()),
             ('previous', self.get_previous_link()),
             ('results', results),
