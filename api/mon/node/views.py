@@ -2,7 +2,7 @@ from api.decorators import api_view, request_data_defaultdc, setting_required
 from api.permissions import IsSuperAdmin
 from api.mon.node.api_views import NodeSLAView, NodeHistoryView
 
-__all__ = ('mon_node_sla',)
+__all__ = ('mon_node_sla', 'mon_node_history')
 
 
 #: node_status:   GET: Node.STATUS_OPERATIONAL

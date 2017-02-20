@@ -47,7 +47,7 @@ class NodeSLAView(APIView):
 class NodeHistoryView(APIView):
     """ """
     def __init__(self, request, hostname, graph_type, item_id, data):
-        super(VMHistoryView, self).__init__(request)
+        super(NodeHistoryView, self).__init__(request)
         self.request = request
         self.node = get_node(request, hostname)
         self.graph_type = graph_type
@@ -81,10 +81,12 @@ class NodeHistoryView(APIView):
             if required_ostype is not None and node.ostype not in required_ostype:
                 raise InvalidInput('Invalid OS type')
 
-        _apiview_ = {'view': 'mon_node_history',
-                     'method': request.method,
-                     'hostname': node.zabbix_name,
-                     'graph': graph}
+        _api_view_ = {
+            'view': 'mon_node_history',
+            'method': request.method,
+            'hostname': node.zabbix_name,
+            'graph': graph,
+         }
 
         ser = MonNodeHistorySerializer(data=self.data)
 

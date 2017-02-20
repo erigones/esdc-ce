@@ -41,6 +41,7 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
     )
     STATUS = STATUS_DB[:2]
     STATUS_OPERATIONAL = frozenset([ONLINE])
+    STATUS_AVAILABLE_MONITORING = frozenset([ONLINE, OFFLINE, UNREACHABLE])
 
     _pk_key = 'node_uuid'  # _UserTasksModel
     _log_name_attr = 'hostname'  # _UserTasksModel

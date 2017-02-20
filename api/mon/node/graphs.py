@@ -56,7 +56,7 @@ GRAPH_ITEMS = _GraphItems({
         'desc': _('Total compute node CPU consumed by the node.'),
         'items': ('system.cpu.util[,system,]', 'system.cpu.util[,user,]'),
         'update_interval': GRAPH_UPDATE_INTERVAL,
-        'history': 3,
+        'history': 0,
         'options': {
             'series': GRAPH_STACK_SERIES,
             'yaxis': {'mode': None, 'min': 0},
@@ -67,9 +67,9 @@ GRAPH_ITEMS = _GraphItems({
         'desc': _('Total amount of time spent in CPU run queue by the node.'),
         'items': ('system.cpu.switches', 'system.cpu.intr'),
         'update_interval': GRAPH_UPDATE_INTERVAL,
-        'history': 0,
+        'history': 3,
         'options': {
-            'yaxis': {'mode': 'second', 'min': 0},
+            'yaxis': {'mode': None, 'min': 0},
         },
     },
 
