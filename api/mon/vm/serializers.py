@@ -1,5 +1,7 @@
 from api import serializers as s
 from api.vm.define.serializers import VmDefineSerializer
+from api.vm.define.vm_define_nic import NIC_ID_MIN, NIC_ID_MAX
+from api.vm.define.vm_define_disk import DISK_ID_MIN, DISK_ID_MAX
 from vms.models import Vm
 
 
@@ -51,6 +53,8 @@ class MonVmHistorySerializer(s.Serializer):
     since = s.TimeStampField(required=False)
     until = s.TimeStampField(required=False)
     autorefresh = s.BooleanField(default=False)
+    nic_id = s.IntegerField(required=False, min=NIC_ID_MIN+1, max=NIC_ID_MAX+1)
+    disk_id = s.IntegerField(required=False, min=DISK_ID_MIN+1, max=DISK_ID_MAX+1)
 
     def __init__(self, instance=None, data=None, **kwargs):
         # We cannot set a function as a default argument of TimeStampField - bug #chili-478 #note-10
