@@ -81,17 +81,18 @@ class NodeHistoryView(APIView):
             if required_ostype is not None and node.ostype not in required_ostype:
                 raise InvalidInput('Invalid OS type')
 
+        ser = MonNodeHistorySerializer(data=self.data)
+
+        if not ser.is_valid():
+            return FailureTaskResponse(request, ser.errors, obj=node)
+
         _api_view_ = {
             'view': 'mon_node_history',
             'method': request.method,
             'hostname': node.zabbix_name,
             'graph': graph,
+            'graph_params': ser.object.copy(),
          }
-
-        ser = MonNodeHistorySerializer(data=self.data)
-
-        if not ser.is_valid():
-            return FailureTaskResponse(request, ser.errors, obj=node)
 
         result = ser.object.copy()
         result['desc'] = graph_settings.get('desc', '')

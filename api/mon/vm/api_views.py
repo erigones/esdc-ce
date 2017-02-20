@@ -151,12 +151,18 @@ class VmHistoryView(APIView):
             if required_ostype is not None and vm.ostype not in required_ostype:
                 raise InvalidInput('Invalid OS type')
 
-        _apiview_ = {'view': 'mon_vm_history', 'method': request.method, 'hostname': vm.hostname, 'graph': graph}
-
         ser = MonVmHistorySerializer(data=self.data)
 
         if not ser.is_valid():
             return FailureTaskResponse(request, ser.errors, vm=vm)
+
+        _apiview_ = {
+            'view': 'mon_vm_history',
+            'method': request.method,
+            'hostname': vm.hostname,
+            'graph': graph,
+            'graph_params': ser.object.copy(),
+        }
 
         result = ser.object.copy()
         result['desc'] = graph_settings.get('desc', '')
