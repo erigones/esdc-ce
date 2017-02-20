@@ -1,4 +1,5 @@
 from django.db import models, transaction
+from django.utils import timezone
 from django.utils.translation import ugettext_noop, ugettext_lazy as _
 from django.core.cache import cache
 from django.conf import settings
@@ -296,6 +297,10 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
     def save_authorized_keys(self, value):
         self.authorized_keys = value
         self.save(update_resources=False, update_fields=('enc_json', 'changed'))
+
+    @property
+    def lifetime(self):
+        return int(timezone.now().strftime('%s')) - int(self.created.strftime('%s'))
 
     @property  # Return host name used as Zabbix alias
     def zabbix_name(self):

@@ -1,7 +1,7 @@
 {% extends load_base %}
 {% load i18n %}
 
-{% block base_nav %}{% include "gui/vm/navigation.html" with li_monitoring="active" %}{% endblock %}
+{% block base_nav %}{% include "gui/node/navigation.html" with li_monitoring="active" %}{% endblock %}
 
 {% block base_content %}
 <div class="container-fluid">
@@ -9,10 +9,10 @@
     <div class="span8 offset2">
       <div class="box">
         <div class="tab-header tab-header-light">
-          <i class="icon-bullhorn"></i> {% trans "Server monitoring disabled" %}
+          <i class="icon-bullhorn"></i> {% trans "Compute node monitoring disabled" %}
         </div>
         <div class="padded">
-          <p>{% trans "Monitoring information for this server is not available because the monitoring status is set to <i>Disabled</i>." %}</p>
+          <p>{% trans "Monitoring information of compute nodes are not available because synchronization with the monitoring server is <i>disabled</i>." %}</p>
         </div>
       </div>
     </div>

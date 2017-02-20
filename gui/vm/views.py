@@ -32,8 +32,9 @@ from gui.tasklog.utils import get_tasklog
 from gui.models.permission import ImageAdminPermission
 
 from api.decorators import setting_required
-from api.vm.utils import get_iso_images
 from api.response import JSONResponse
+from api.vm.utils import get_iso_images
+from api.mon.utils import MonitoringGraph as Graph
 from api.dns.record.api_views import RecordView
 
 from vms.models import Vm, Node, Image, BackupDefine
@@ -234,14 +235,19 @@ def monitoring(request, hostname, graph_type='cpu'):
     from api.mon.vm.graphs import GRAPH_ITEMS
 
     context['graph_items'] = GRAPH_ITEMS
-    context['vm_lifetime'] = vm.lifetime
-    context['vm_operational'] = vm.status in vm.STATUS_OPERATIONAL
+    context['obj_lifetime'] = vm.lifetime
+    context['obj_operational'] = vm.status in vm.STATUS_OPERATIONAL
 
     if graph_type == 'memory':
-        graphs = ('mem-usage', 'swap-usage')
+        graphs = (
+            Graph('mem-usage'),
+            Graph('swap-usage'),
+        )
     elif graph_type == 'network':
         context['vm_nics'] = nics = range(1, len(vm.json_get_nics()) + 1)
-        graphs = list(chain(*[('net-bandwidth-%s' % i, 'net-packets-%s' % i) for i in nics]))
+        graphs = list(chain(*[
+            (Graph('net-bandwidth', nic_id=i), Graph('net-packets', nic_id=i)) for i in nics
+        ]))
     elif graph_type == 'disk':
         if vm.is_kvm():
             prefix = 'disk'
@@ -252,13 +258,24 @@ def monitoring(request, hostname, graph_type='cpu'):
         context['desc_io'] = GRAPH_ITEMS.get(prefix + '-io').get('desc')
         context['graph_prefix'] = prefix
         context['vm_disks'] = disks = range(1, len(vm.json_get_disks()) + 1)
-        graphs = list(chain(*[('%s-throughput-%s' % (prefix, i), '%s-io-%s' % (prefix, i)) for i in disks]))
+        graphs = list(chain(*[
+            (Graph(prefix + '-throughput', disk_id=i), Graph(prefix + '-io', disk_id=i)) for i in disks
+        ]))
     elif graph_type == 'vm-disk':
-        graphs = ('vm-disk-logical-throughput', 'vm-disk-logical-io', 'vm-disk-physical-throughput',
-                  'vm-disk-physical-io', 'vm-disk-io-operations')
+        graphs = (
+            Graph('vm-disk-logical-throughput'),
+            Graph('vm-disk-logical-io'),
+            Graph('vm-disk-physical-throughput'),
+            Graph('vm-disk-physical-io'),
+            Graph('vm-disk-io-operations'),
+        )
     else:
         graph_type = 'cpu'
-        graphs = ('cpu-usage', 'cpu-waittime', 'cpu-load')
+        graphs = (
+            Graph('cpu-usage'),
+            Graph('cpu-waittime'),
+            Graph('cpu-load'),
+        )
 
     context['graphs'] = graphs
     context['graph_type'] = graph_type

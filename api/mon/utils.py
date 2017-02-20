@@ -1,6 +1,17 @@
 from django.conf import settings
 
 from api.task.internal import InternalTask
+from vms.utils import AttrDict
+
+
+class MonitoringGraph(AttrDict):
+    """
+    Monitoring graph configuration.
+    """
+    def __init__(self, name, **params):
+        dict.__init__(self)
+        self['name'] = name
+        self['params'] = params
 
 
 # noinspection PyAbstractClass
