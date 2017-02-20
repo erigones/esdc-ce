@@ -1,5 +1,5 @@
 from django.db import models, transaction
-from django.utils import timezone
+from django.utils import timezone, six
 from django.utils.translation import ugettext_noop, ugettext_lazy as _
 from django.core.cache import cache
 from django.conf import settings
@@ -176,6 +176,18 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
             'Virtual Network Interfaces': self.virtual_network_interfaces,
             'Link Aggregations': self.network_aggregations
         }
+
+    @property
+    def used_nics(self):
+        """NICs that are being used by node
+
+        This is determined by checking if NIC has IPv4 address associated with it.
+
+        """
+        all_nics = self.network_interfaces.copy()
+        all_nics.update(self.virtual_network_interfaces)
+
+        return {iface: prop for iface, prop in six.iteritems(all_nics) if prop.get('ip4addr')}
 
     @property
     def api_sysinfo(self):
