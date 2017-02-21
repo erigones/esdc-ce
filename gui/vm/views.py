@@ -51,7 +51,7 @@ def my_list(request):
     context['vms'] = vms = get_vms(request)
     context['vms_tags'] = get_vms_tags(vms)
     context['can_edit'] = request.user.is_admin(request)
-    context['vms_node_online'] = Vm.objects.filter(node__isnull=False, node__status=Node.ONLINE).exists()
+    context['vms_node_online'] = not Vm.objects.filter(node__isnull=False).exclude(node__status=Node.ONLINE).exists()
 
     return render(request, 'gui/vm/list.html', context)
 
