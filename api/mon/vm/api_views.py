@@ -7,7 +7,8 @@ from api.vm.utils import get_vm
 from api.mon.messages import LOG_MONDEF_UPDATE
 from api.mon.node.utils import parse_yyyymm
 from api.mon.vm.graphs import GRAPH_ITEMS
-from api.mon.vm.serializers import VmMonitoringSerializer, MonVmHistorySerializer
+from api.mon.serializers import MonHistorySerializer
+from api.mon.vm.serializers import VmMonitoringSerializer, NetworkMonVmHistorySerializer, DiskMonVmHistorySerializer
 from api.mon.vm.tasks import mon_vm_sla as t_mon_vm_sla, mon_vm_history as t_mon_vm_history
 from api.vm.define.utils import VM_STATUS_OPERATIONAL
 
@@ -95,37 +96,6 @@ class VmHistoryView(APIView):
         self.item_id = item_id
         self.data = data
 
-    def _validate_graph_item_id(self, item_id, graph):
-        """Validates item_id and retrieves ID of the item requested in the graph
-
-        :param item_id: ID of the graph item that will be searched in VM data
-        :type string:
-        :param graph: the name of the graph for which item_id is retrieved
-        :type string:
-        """
-        if item_id is None:
-            raise InvalidInput('Missing item_id parameter in URI')
-        try:
-            item_id = int(item_id)
-            item_id -= 1
-
-            if item_id < 0:
-                raise InvalidInput('Invalid input value for item_id')
-
-        except Exception:
-            raise InvalidInput('Invalid input value for item_id')
-
-        try:
-            if graph.startswith(('nic-', 'net-', )):
-                nic_or_disk_id = self.vm.get_real_nic_id(self.vm.json_active_get_nics()[item_id])
-
-            elif graph.startswith(('disk-', 'hdd-', 'fs-', )):
-                nic_or_disk_id = self.vm.get_real_disk_id(self.vm.json_active_get_disks()[item_id])
-        except IndexError:
-            raise InvalidInput('Invalid input value for item_id')
-
-        return nic_or_disk_id
-
     def get(self):
         request, vm, graph, item_id = self.request, self.vm, self.graph_type, self.item_id
 
@@ -134,12 +104,6 @@ class VmHistoryView(APIView):
 
         if vm.status not in vm.STATUS_OPERATIONAL:
             raise VmIsNotOperational
-
-        # for selected graphs validate item_id, otherwise set it to None
-        if graph.startswith(('nic-', 'net-', 'disk-', 'hdd-', 'fs-')):
-            item_id = self._validate_graph_item_id(item_id, graph)
-        else:
-            self.item_id = item_id = None
 
         try:
             graph_settings = GRAPH_ITEMS.get_options(graph, vm)
@@ -151,7 +115,14 @@ class VmHistoryView(APIView):
             if required_ostype is not None and vm.ostype not in required_ostype:
                 raise InvalidInput('Invalid OS type')
 
-        ser = MonVmHistorySerializer(data=self.data)
+        if graph.startswith(('nic-', 'net-')):
+            ser_class = NetworkMonVmHistorySerializer
+        elif graph.startswith(('disk-', 'hdd-', 'fs-')):
+            ser_class = DiskMonVmHistorySerializer
+        else:
+            ser_class = MonHistorySerializer
+
+        ser = ser_class(obj=self.vm, data=self.data)
 
         if not ser.is_valid():
             return FailureTaskResponse(request, ser.errors, vm=vm)
@@ -170,8 +141,11 @@ class VmHistoryView(APIView):
         result['graph'] = graph
         result['options'] = graph_settings.get('options', {})
         result['update_interval'] = graph_settings.get('update_interval', None)
-        tidlock = 'mon_vm_history vm:%s graph:%s since:%d until:%d' % (vm.uuid, graph, round(ser.object['since'], -2),
-                                                                       round(ser.object['until'], -2))
+        tidlock = 'mon_vm_history vm:%s graph:%s item_id:%s since:%d until:%d' % (vm.uuid, graph, ser.item_id,
+                                                                                  round(ser.object['since'], -2),
+                                                                                  round(ser.object['until'], -2))
+
+        item_id = ser.item_id
 
         if item_id is None:
             items = graph_settings['items']

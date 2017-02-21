@@ -1,7 +1,10 @@
+from django.utils.translation import ugettext_lazy as _
+
 from api import serializers as s
+from api.mon.serializers import MonHistorySerializer
 from api.vm.define.serializers import VmDefineSerializer
-from api.vm.define.vm_define_nic import NIC_ID_MIN, NIC_ID_MAX
 from api.vm.define.vm_define_disk import DISK_ID_MIN, DISK_ID_MAX
+from api.vm.define.vm_define_nic import NIC_ID_MIN, NIC_ID_MAX
 from vms.models import Vm
 
 
@@ -46,24 +49,37 @@ class VmMonitoringSerializer(s.InstanceSerializer):
     validate_hostgroups = VmDefineSerializer.validate_monitoring_hostgroups.im_func
 
 
-class MonVmHistorySerializer(s.Serializer):
+class NetworkMonVmHistorySerializer(MonHistorySerializer):
     """
-    Used by mon_vm_history to validate time period input.
+    Used by VmHistoryView to validate nic_id value.
     """
-    since = s.TimeStampField(required=False)
-    until = s.TimeStampField(required=False)
-    autorefresh = s.BooleanField(default=False)
-    nic_id = s.IntegerField(required=False, min=NIC_ID_MIN+1, max=NIC_ID_MAX+1)
-    disk_id = s.IntegerField(required=False, min=DISK_ID_MIN+1, max=DISK_ID_MAX+1)
+    nic_id = s.IntegerField(required=True, min_value=NIC_ID_MIN + 1, max_value=NIC_ID_MAX + 1)
 
-    def __init__(self, instance=None, data=None, **kwargs):
-        # We cannot set a function as a default argument of TimeStampField - bug #chili-478 #note-10
-        if data is None:
-            data = {}
-        else:
-            data = data.copy()
-        if 'since' not in data:
-            data['since'] = s.TimeStampField.one_hour_ago()
-        if 'until' not in data:
-            data['until'] = s.TimeStampField.now()
-        super(MonVmHistorySerializer, self).__init__(instance=instance, data=data, **kwargs)
+    def validate(self, attrs):
+        nic_id = attrs.get('nic_id')
+        assert nic_id
+
+        try:
+            self.item_id = self.obj.get_real_nic_id(self.obj.json_active_get_nics()[nic_id - 1])
+        except IndexError:
+            raise s.ValidationError(_('NIC ID not defined on VM.'))
+
+        return attrs
+
+
+class DiskMonVmHistorySerializer(MonHistorySerializer):
+    """
+    Used by VmHistoryView to validate disk_id value.
+    """
+    disk_id = s.IntegerField(required=True, min_value=DISK_ID_MIN + 1, max_value=DISK_ID_MAX + 1)
+
+    def validate(self, attrs):
+        disk_id = attrs.get('disk_id')
+        assert disk_id
+
+        try:
+            self.item_id = self.obj.get_real_disk_id(self.obj.json_active_get_disks()[disk_id - 1])
+        except IndexError:
+            raise s.ValidationError(_('Disk ID not defined on VM.'))
+
+        return attrs

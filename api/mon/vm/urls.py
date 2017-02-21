@@ -12,6 +12,4 @@ urlpatterns = patterns(
     # /mon/vm/<hostname_or_uuid>/history/(graph) - get
     url(r'^(?P<hostname_or_uuid>[A-Za-z0-9\._-]+)/history/(?P<graph>[A-Za-z0-9\._-]+)/$',
         'mon_vm_history', name='api_mon_vm_history'),
-    url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/history/(?P<graph>[A-Za-z0-9\._-]+)/(?P<item_id>\d)/$',
-        'mon_vm_history', name='api_mon_vm_history'),
 )
