@@ -2,8 +2,8 @@ Changelog
 #########
 
 
-2.4.0 (unreleased)
-==================
+2.4.0 (released on 2017-02-22)
+==============================
 
 Features
 --------
@@ -27,7 +27,6 @@ Features
 - Improved consistency and UX of modal button links - `#39 <https://github.com/erigones/esdc-ce/issues/39>`__
 - Modified update script bin/esdc-git-update to fail when git fetch fails and display usage for invalid invocation - `#68 <https://github.com/erigones/esdc-ce/issues/68>`__
 - Removed Linux Zone images from Import images view as it's not supported for now - `#73 <https://github.com/erigones/esdc-ce/issues/73>`__
-
 
 Bugs
 ----
