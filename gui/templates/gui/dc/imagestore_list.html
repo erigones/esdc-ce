@@ -106,9 +106,9 @@
         <tbody>
           {% for img in images %}
           <tr>
-            <td>{{ img.name }} ({{ img.version }})
+            <td><span class="imagestore-image-name">{{ img.name }} ({{ img.version }})</span>
               <a href="#" class="button mini obj_add imagestore-image" data-prefix="adm" data-form="{{ img.web_data|jsondata }}">
-                <i class="icon-pencil"></i> {% trans "Edit" %}
+                <i class="icon-download"></i> {% trans "Import" %}
               </a>
               <br><small>{{ img.uuid }}</small>
             </td>
@@ -118,7 +118,7 @@
             <td>{{ img.created|date:"SHORT_DATETIME_FORMAT" }}</td>
             <td class="hidden-phone">
               {% if img.homepage %}
-              <a href="{{ img.homepage }}" target="_blank" class="btn-icon-link btn-text btn-link no-ajax"><small class="vm_snapshot_note">{{ img.desc }}</small></a>
+              <a href="{{ img.homepage }}" target="_blank" class="btn-icon-external-link btn-text btn-link no-ajax"><small class="vm_snapshot_note">{{ img.desc }}</small></a>
               {% else %}
               <small class="vm_snapshot_note">{{ img.desc }}</small>
               {% endif %}

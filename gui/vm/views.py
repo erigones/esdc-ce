@@ -52,7 +52,7 @@ def my_list(request):
     context['vms'] = vms = get_vms(request)
     context['vms_tags'] = get_vms_tags(vms)
     context['can_edit'] = request.user.is_admin(request)
-    context['vms_node_online'] = Vm.objects.filter(node__isnull=False, node__status=Node.ONLINE).exists()
+    context['vms_node_online'] = not Vm.objects.filter(node__isnull=False).exclude(node__status=Node.ONLINE).exists()
 
     return render(request, 'gui/vm/list.html', context)
 
@@ -374,6 +374,7 @@ def add_import_form(request):
 
     # Get data from xls file
     html_table = None
+    defined_vms = {}
     import_error = None
     filename = form.cleaned_data.get('import_file')
 
@@ -390,15 +391,20 @@ def add_import_form(request):
 
         for vm in html_table:
             status, html_table[vm] = vm_define_all(request, html_table[vm])
-            if status != 201:
+            if status == 201:
+                defined_vms[vm] = html_table[vm]
+            else:
                 redirect_to_vm_list = False
+
+                if html_table[vm]['_vm_defined']:
+                    defined_vms[vm] = html_table[vm]
 
         if redirect_to_vm_list:
             return redirect('vm_list')
 
         # Some server creation has failed, remove all created server definitions
-        for vm in html_table:
-            status, html_table[vm] = vm_define_all(request, html_table[vm], method='DELETE')
+        for vm in defined_vms:
+            status, defined_vms[vm] = vm_define_all(request, defined_vms[vm], method='DELETE')
 
     ieb = ImportExportBase()
 
@@ -453,10 +459,8 @@ def settings_form(request, hostname):
             # noinspection PyUnresolvedReferences
             if form.action == 'delete':
                 return redirect('vm_list')
-            elif form.action == 'create':
-                return redirect('vm_details', hostname=form.new_hostname)
             else:
-                return redirect('vm_details', hostname=vm.hostname)
+                return redirect('vm_details', hostname=form.saved_hostname)
 
     return render(request, 'gui/vm/settings_form.html', {'settingsform': form, 'vm': vm})
 

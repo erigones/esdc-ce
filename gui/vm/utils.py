@@ -213,6 +213,7 @@ def vm_define_all(request, vm_details, method='POST'):
     logger.debug('Extracted json %s', json.loads(vm_details['json']))
     hostname = vm['hostname']
     success = True
+    vm_details['_vm_defined'] = False
 
     try:  # Set server zpool from first disk pool
         vm['zpool'] = disks[0]['zpool']
@@ -232,6 +233,8 @@ def vm_define_all(request, vm_details, method='POST'):
         success = False
         logger.warning('vm_define: "%s" status_code: "%s" data: %s', hostname, res.status_code, res.data)
         vm_details = process_errors(res.data, vm_details, 0)
+    else:
+        vm_details['_vm_defined'] = True
 
     # Try to create NIC and DISK only if server has been created
     if success:

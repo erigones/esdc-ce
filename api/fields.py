@@ -330,7 +330,7 @@ class WritableField(Field):
 
     # noinspection PyShadowingNames
     def __init__(self, source=None, label=None, help_text=None, read_only=False, write_only=False, required=None,
-                 validators=(), error_messages=None, default=None, allow_empty=None):
+                 validators=(), error_messages=None, default=None, allow_empty=None, **kwargs):
         super(WritableField, self).__init__(source=source, label=label, help_text=help_text)
 
         self.read_only = read_only

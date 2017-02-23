@@ -109,7 +109,7 @@ class TaskLogFilterSerializer(s.Serializer):
         if data.get('show_running'):
             query.append(Q(task__in=pending_tasks))
 
-        object_type = data.get('object_type')
+        object_type = data.get('content_type')
         if object_type:
             if self._content_type:
                 content_type = self._content_type

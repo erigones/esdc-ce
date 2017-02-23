@@ -82,6 +82,7 @@ LANGUAGES = (
 CSRF_COOKIE_NAME = 'es_csrftoken'
 SESSION_COOKIE_NAME = 'es_sessionid'
 LANGUAGE_COOKIE_NAME = 'es_language'
+TIMEZONE_SESSION_KEY = 'django_timezone'
 
 SITE_ID = 1
 

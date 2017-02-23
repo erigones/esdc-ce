@@ -1,4 +1,4 @@
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import LANGUAGE_SESSION_KEY, ugettext_lazy as _
 from django.utils.six import iteritems
 from django.db import models
 from django.conf import settings
@@ -164,5 +164,5 @@ class UserProfile(models.Model):
         Save language and timezone settings from profile into session.
         The settings are read by django middleware.
         """
-        request.session['django_language'] = str(self.language)
-        request.session['django_timezone'] = str(self.timezone)
+        request.session[LANGUAGE_SESSION_KEY] = str(self.language)
+        request.session[settings.TIMEZONE_SESSION_KEY] = str(self.timezone)

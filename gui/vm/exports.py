@@ -54,7 +54,7 @@ class SampleVm(object):
 
     # noinspection PyMethodMayBeStatic
     def get_ostype_display(self):
-        return 'Linux'
+        return 'Linux VM'
 
     def generate_nics(self):
         nics = []

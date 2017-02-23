@@ -32,7 +32,7 @@ class TaskLogView(APIView):
             tasklog_items = get_tasklog(request, q=q, order_by=self.order_by)
             TaskLogEntry.prepare_queryset(tasklog_items)
             pag = get_pager(request, tasklog_items, per_page=100)
-            res = pag.paginator.get_response_results(TaskLogEntrySerializer(pag).data)
+            res = pag.paginator.get_response_results(TaskLogEntrySerializer(pag, many=True).data)
         else:
             res = {'results': get_tasklog_cached(request)}
 
