@@ -28,7 +28,7 @@ var HISTORY_GRAPH_OPTIONS = {
 
 
 function _get_graph_id(obj_type, hostname, graph_name, graph_params) {
-  var valid_graph_params = _.pick(graph_params, 'nic_id', 'disk_id');
+  var valid_graph_params = _.pick(graph_params, 'nic_id', 'disk_id', 'nic', 'zpool');
 
   return obj_type + '__' + hostname + '__' + graph_name + '__' + $.param(valid_graph_params);
 }

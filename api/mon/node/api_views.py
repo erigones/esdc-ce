@@ -1,9 +1,11 @@
-from api.mon.node.graphs import GRAPH_ITEMS
 from api.api_views import APIView
 from api.exceptions import NodeIsNotOperational, InvalidInput
+from api.mon.node.graphs import GRAPH_ITEMS
+from api.mon.node.serializers import NetworkMonNodeHistorySerializer, DiskMonNodeHistorySerializer
 from api.mon.node.tasks import mon_node_sla as t_mon_node_sla, mon_node_history as t_mon_node_history
 from api.mon.node.utils import parse_yyyymm
-from api.mon.node.serializers import MonNodeHistorySerializer
+from api.mon.serializers import MonHistorySerializer
+from api.mon.utils import call_mon_history_task
 from api.node.utils import get_node
 from api.task.response import mgmt_task_response, FailureTaskResponse
 from que import TG_DC_UNBOUND
@@ -46,81 +48,41 @@ class NodeSLAView(APIView):
 
 class NodeHistoryView(APIView):
     """ """
-    def __init__(self, request, hostname, graph_type, item_id, data):
+    def __init__(self, request, hostname, graph_type, data):
         super(NodeHistoryView, self).__init__(request)
-        self.request = request
         self.node = get_node(request, hostname)
         self.graph_type = graph_type
-        self.item_id = item_id
         self.data = data
 
     def get(self):
-        request, node, graph, item_id = self.request, self.node, self.graph_type, self.item_id
+        request, node, graph = self.request, self.node, self.graph_type
 
-        if node.status not in node.STATUS_OPERATIONAL:
+        if node.status not in node.STATUS_AVAILABLE_MONITORING:
             raise NodeIsNotOperational
-
-        # for selected graphs validate item_id, otherwise set it to None
-        if graph.startswith(('net-', 'disk-')):
-            if item_id is None:
-                raise InvalidInput('Missing item_id parameter in URI')
-            try:
-                item_id = int(item_id)
-            except Exception:
-                raise InvalidInput('Invalid input value for item_id, must be integer!')
-        else:
-            self.item_id = item_id = None
 
         try:
             graph_settings = GRAPH_ITEMS.get_options(graph, node)
         except KeyError:
             raise InvalidInput('Invalid graph')
+
+        if graph.startswith(('nic-', 'net-')):
+            ser_class = NetworkMonNodeHistorySerializer
+        elif graph.startswith(('storage-', )):
+            ser_class = DiskMonNodeHistorySerializer
         else:
-            required_ostype = graph_settings.get('required_ostype', None)
+            ser_class = MonHistorySerializer
 
-            if required_ostype is not None and node.ostype not in required_ostype:
-                raise InvalidInput('Invalid OS type')
-
-        ser = MonNodeHistorySerializer(data=self.data)
+        ser = ser_class(obj=self.node, data=self.data)
 
         if not ser.is_valid():
             return FailureTaskResponse(request, ser.errors, obj=node)
 
-        _api_view_ = {
-            'view': 'mon_node_history',
-            'method': request.method,
-            'hostname': node.zabbix_name,
-            'graph': graph,
-            'graph_params': ser.object.copy(),
-         }
-
-        result = ser.object.copy()
-        result['desc'] = graph_settings.get('desc', '')
-        result['hostname'] = node.zabbix_name
-        result['graph'] = graph
-        result['options'] = graph_settings.get('options', {})
-        result['update_interval'] = graph_settings.get('update_interval', None)
-        tidlock = 'mon_node_history node:%s graph:%s since:%d until:%d' % (node.uuid, graph,
-                                                                           round(ser.object['since'], -2),
-                                                                           round(ser.object['until'], -2))
-
-        if item_id is None:
-            items = graph_settings['items']
-        else:
-            item_dict = {'id': item_id}
-            items = [i % item_dict for i in graph_settings['items']]
-
-        if 'items_search_fun' in graph_settings:
-            # noinspection PyCallingNonCallable
-            items_search = graph_settings['items_search_fun'](graph_settings, item_id)
-        else:
-            items_search = None
-
-        history = graph_settings['history']
-        ter = t_mon_node_history.call(request, node.owner.id, (node.uuid, items, history, result, items_search),
-                                      meta={'apiview': _apiview_}, tidlock=tidlock)
-        # NOTE: cache_result=tidlock, cache_timeout=60)
-        # Caching is disable here, because it makes no real sense.
-        # The latest graphs must be fetched from zabbix and the older are requested only seldom.
-
-        return mgmt_task_response(request, *ter, obj=node, api_view=_apiview_, data=self.data)
+        return call_mon_history_task(
+            request, t_mon_node_history,
+            view_fun_name='mon_node_history',
+            obj=self.node,
+            serializer=ser,
+            data=self.data,
+            graph=graph,
+            graph_settings=graph_settings
+        )

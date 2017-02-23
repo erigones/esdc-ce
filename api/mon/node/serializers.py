@@ -1,22 +1,40 @@
+from django.utils.translation import ugettext_lazy as _
+
 from api import serializers as s
+from api.mon.serializers import MonHistorySerializer
 
 
-class MonNodeHistorySerializer(s.Serializer):
+class DiskMonNodeHistorySerializer(MonHistorySerializer):
     """
-    Used by mon_node_history to validate time period input.
+    Used by NodeHistoryView to validate zpools value.
     """
-    since = s.TimeStampField(required=False)
-    until = s.TimeStampField(required=False)
-    autorefresh = s.BooleanField(default=False)
+    zpool = s.CharField(required=True)
 
-    def __init__(self, instance=None, data=None, **kwargs):
-        # We cannot set a function as a default argument of TimeStampField - bug #chili-478 #note-10
-        if data is None:
-            data = {}
+    def validate(self, attrs):
+        zpool = attrs.get('zpool')
+        assert zpool
+
+        if zpool in self.obj.zpools:
+            self.item_id = zpool
         else:
-            data = data.copy()
-        if 'since' not in data:
-            data['since'] = s.TimeStampField.one_hour_ago()
-        if 'until' not in data:
-            data['until'] = s.TimeStampField.now()
-        super(MonNodeHistorySerializer, self).__init__(instance=instance, data=data, **kwargs)
+            raise s.ValidationError(_('Zpool ID not defined on the node.'))
+
+        return attrs
+
+
+class NetworkMonNodeHistorySerializer(MonHistorySerializer):
+    """
+    Used by NodeHistoryView to validate nic_id value.
+    """
+    nic = s.CharField(required=True)
+
+    def validate(self, attrs):
+        nic = attrs.get('nic')
+        assert nic
+
+        if nic in self.obj.used_nics:
+            self.item_id = nic
+        else:
+            raise s.ValidationError(_('NIC ID not defined on the node.'))
+
+        return attrs

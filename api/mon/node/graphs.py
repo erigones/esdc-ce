@@ -106,7 +106,7 @@ GRAPH_ITEMS = _GraphItems({
 
     'storage-throughput': {
         'desc': _('The amount of read and written data on the zpool.'),
-        'items': ('zpool.iostat[%(zpool)s,nread]', 'zpool.iostat[%(zpool)s,nwritten]'),
+        'items': ('zpool.iostat[%(id)s,nread]', 'zpool.iostat[%(id)s,nwritten]'),
         'update_interval': GRAPH_UPDATE_INTERVAL,
         'history': 3,
         'options': {
@@ -116,13 +116,46 @@ GRAPH_ITEMS = _GraphItems({
     },
 
     'storage-io': {
-        'desc': _('The amount of read and written data on the zpool.'),
-        'items': ('zpool.iostat[%(zpool)s,nread]', 'zpool.iostat[%(zpool)s,nwritten]'),
+        'desc': _('The amount of I/O read and write operations performed on the zpool.'),
+        'items': ('zpool.iostat[%(id)s,reads]', 'zpool.iostat[%(id)s,writes]'),
         'update_interval': GRAPH_UPDATE_INTERVAL,
         'history': 3,
         'options': {
             'series': GRAPH_STACK_SERIES,
             'yaxis': {'mode': 'byteRate', 'min': 0},
+        },
+    },
+
+    'storage-space': {
+        'desc': _('ZFS zpool space usage by type.'),
+        'items': ('zfs.usedds[%(id)s]', 'zfs.usedrefreserv[%(id)s]', 'zfs.usedsnap[%(id)s]'),
+        'update_interval': GRAPH_UPDATE_INTERVAL,
+        'history': 3,
+        'options': {
+            'series': GRAPH_STACK_SERIES,
+            'yaxis': {'mode': 'byte', 'min': 0},
+        },
+    },
+
+    'net-bandwidth': {
+        'desc': _('The amount of received and sent network traffic over the network interface.'),
+        'items': ('net.if.in[%(id)s]', 'net.if.out[%(id)s]'),
+        'update_interval': GRAPH_UPDATE_INTERVAL,
+        'history': 3,
+        'options': {
+            'series': GRAPH_STACK_SERIES,
+            'yaxis': {'mode': 'bitRate', 'min': 0},
+        },
+    },
+
+    'net-packets': {
+        'desc': _('The number of received and sent packets through the network interface.'),
+        'items': ('net.if.in[%(id)s,packets]', 'net.if.out[%(id)s,packets]'),
+        'update_interval': GRAPH_UPDATE_INTERVAL,
+        'history': 3,
+        'options': {
+            'series': GRAPH_STACK_SERIES,
+            'yaxis': {'mode': None, 'min': 0},
         },
     },
 

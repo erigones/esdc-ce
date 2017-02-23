@@ -1,3 +1,5 @@
+from itertools import chain
+
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
 from django.views.decorators.http import require_POST
@@ -384,6 +386,18 @@ def monitoring(request, hostname, graph_type='cpu'):
             Graph('mem-usage'),
             Graph('swap-usage')
         )
+    elif graph_type == 'network':
+        context['node_nics'] = node_nics = node.used_nics.keys()
+        graphs = list(chain(*[
+            (Graph('net-bandwidth', nic=i), Graph('net-packets', nic=i)) for i in node_nics
+        ]))
+    elif graph_type == 'storage':
+        context['zpools'] = node_zpools = node.zpools
+        graphs = list(chain(*[
+            (Graph('storage-throughput', zpool=i),
+             Graph('storage-io', zpool=i),
+             Graph('storage-space', zpool=i)) for i in node_zpools
+        ]))
     else:
         graph_type = 'cpu'
         graphs = (

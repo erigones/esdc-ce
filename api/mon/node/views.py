@@ -46,21 +46,20 @@ def mon_node_sla(request, hostname, yyyymm, data=None):
 @request_data_defaultdc(permissions=(IsSuperAdmin,))
 @setting_required('MON_ZABBIX_ENABLED')
 @setting_required('MON_ZABBIX_NODE_SYNC')
-def mon_node_history(request, hostname, graph, item_id=None, data=None):
+def mon_node_history(request, hostname, graph, data=None):
     """
     Get (:http:get:`GET </mon/node/(hostname)/history/(graph)>`) monitoring history
     for requested node and graph name.
 
-    .. http:get:: /mon/vm/(hostname)/history/(graph)
-    .. http:get:: /mon/node/(hostname)/history/(graph)/(item_id)
+    .. http:get:: /mon/node/(hostname)/history/(graph)
 
         :DC-bound?:
             * |dc-no|
         :Permissions:
-            * |IsSuperAdmin|
+            * |SuperAdmin|
         :Asynchronous?:
             * |async-yes|
-        :arg hostname: **required** - Server hostname
+        :arg hostname: **required** - Compute node hostname
         :type hostname: string
         :arg graph: **required** - Graph identificator. One of:
 
@@ -70,28 +69,32 @@ def mon_node_history(request, hostname, graph, item_id=None, data=None):
         |  *mem-usage* - Total compute node physical memory consumed by the Node.
         |  *swap-usage* - Total compute node swap space used.
         |  *net-bandwidth* - The amount of received and sent network traffic through \
-the virtual network interface. *requires item_id*
+the virtual network interface. *requires data.nic*
         |  *net-packets* - The amount of received and sent packets through the \
-virtual network interface. *requires item_id*
-
+virtual network interface. *requires data.nic*
+        |  *storage-throughput* - The amount of read and written data on the zpool.
+        |  *storage-io* - The amount of I/O read and write operations performed on the zpool.
+        |  *storage-space* - ZFS zpool space usage by type.
         :type graph: string
-        :arg item_id: **optional** it's only used with *net-bandwidth* and *net-packets* graphs to specify ID of the \
-item for which graph should be retrieved.
-        :type item_id: integer
-        :arg data.since: Return only values that have been received after the given UNIX timestamp
+        :arg data.since: Return only values that have been received after the given UNIX timestamp \
 (default: now - 1 hour)
         :type data.since: integer
         :arg data.until: Return only values that have been received before the given UNIX timestamp (default: now)
         :type data.until: integer
+        :arg data.nic: **optional** only used with *net-bandwidth* and *net-packets* graphs \
+to specify ID of the NIC for which graph should be retrieved.
+        :type data.nic: string
+        :arg data.zpool: **optional** only used with *storage-throughput*, *storage-io* and *storage-space* graphs \
+to specify ID of the zpool for which graph should be retrieved.
+        :type data.zpool: string
         :status 200: SUCCESS
         :status 201: PENDING
         :status 400: FAILURE
         :status 403: Forbidden
         :status 404: Node not found
-        :status 412: Invalid graph / Invalid OS type / Missing item_id parameter in URI \
-/ Invalid input value for item_id, must be integer
+        :status 412: Invalid graph
         :status 417: Node monitoring disabled
         :status 423: Node is not operational
 
     """
-    return NodeHistoryView(request, hostname, graph, item_id, data).get()
+    return NodeHistoryView(request, hostname, graph, data).get()
