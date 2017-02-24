@@ -509,28 +509,24 @@ _es() {
 			if [ ${COMP_CWORD} -eq 2 ]; then
 				COMPREPLY=( $(compgen -P "${cur%/*}" -W "/ /(yyyymm)" -- "/${cur##*/}" ) )
 			fi
-			[[ "${action}" == "get" ]] || [[ "${action}" == "set" ]]
 		;;
 
 		/mon/vm/*/history/|/mon/node/*/history/)
 			if [ ${COMP_CWORD} -eq 2 ]; then
 				COMPREPLY=( $(compgen -P "${cur%/*}" -W "/ /(graph)" -- "/${cur##*/}" ) )
 			fi
-			[[ "${action}" == "get" ]] || [[ "${action}" == "set" ]]
 		;;
 
 		/mon/vm/*/*|/mon/node/*/*)
 			if [ ${COMP_CWORD} -eq 2 ]; then
 				COMPREPLY=( $(compgen -P "${cur%/*}" -W "/ /monitoring /sla/ /history/" -- "/${cur##*/}" ) )
 			fi
-			[[ "${action}" == "get" ]] || [[ "${action}" == "set" ]]
 		;;
 
 		/mon/vm/*|/mon/node/*)
 			if [ ${COMP_CWORD} -eq 2 ]; then
 				COMPREPLY=( $(compgen -P "${cur%/*}" -W "/ /(hostname)/" -- "/${cur##*/}" ) )
 			fi
-			[[ "${action}" == "get" ]] || [[ "${action}" == "set" ]]
 		;;
 
 		/node/*/storage)

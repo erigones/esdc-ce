@@ -179,10 +179,9 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
 
     @property
     def used_nics(self):
-        """NICs that are being used by node
+        """NICs that are being used by node.
 
         This is determined by checking if NIC has IPv4 address associated with it.
-
         """
         all_nics = self.network_interfaces.copy()
         all_nics.update(self.virtual_network_interfaces)

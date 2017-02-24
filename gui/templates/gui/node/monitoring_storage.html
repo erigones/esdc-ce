@@ -20,19 +20,19 @@
   <div class="row-fluid">
     <div class="span6 small" id="node__{{ node.hostname }}__storage-throughput__zpool={{ zpool }}">
       <div class="tab-header">
-        <i class="icon-bar-chart"></i> {{ node.hostname }} &rsaquo; {% blocktrans %}storage {{ zpool }} &rsaquo; throughput{% endblocktrans %}
+        <i class="icon-bar-chart"></i> {{ node.hostname }} &rsaquo; {% blocktrans %}zpool {{ zpool }} &rsaquo; throughput{% endblocktrans %}
         {% include "gui/node/monitoring_graph.html" with desc=desc_throughput %}
     </div>
     <div class="span6 small" id="node__{{ node.hostname }}__storage-io__zpool={{ zpool }}">
       <div class="tab-header">
-        <i class="icon-bar-chart"></i> {{ node.hostname }} &rsaquo; {% blocktrans %}storage {{ zpool }} &rsaquo; I/O{% endblocktrans %}
+        <i class="icon-bar-chart"></i> {{ node.hostname }} &rsaquo; {% blocktrans %}zpool {{ zpool }} &rsaquo; I/O{% endblocktrans %}
         {% include "gui/node/monitoring_graph.html" with desc=desc_io %}
     </div>
   </div>
   <div class="row-fluid">
     <div class="span12" id="node__{{ node.hostname }}__storage-space__zpool={{ zpool }}">
       <div class="tab-header">
-        <i class="icon-bar-chart"></i> {{ node.hostname }} &rsaquo; {% blocktrans %}storage {{ zpool }} &rsaquo; space{% endblocktrans %}
+        <i class="icon-bar-chart"></i> {{ node.hostname }} &rsaquo; {% blocktrans %}zpool {{ zpool }} &rsaquo; space{% endblocktrans %}
         {% include "gui/node/monitoring_graph.html" with desc=desc_space %}
     </div>
   </div>

@@ -67,7 +67,7 @@ def call_mon_history_task(request, task_function, view_fun_name, obj, serializer
 
     history = graph_settings['history']
     ter = task_function.call(request, obj.owner.id, (obj.uuid, items, history, result, items_search),
-                                  meta={'apiview': _apiview_}, tidlock=tidlock)
+                             meta={'apiview': _apiview_}, tidlock=tidlock)
     # NOTE: cache_result=tidlock, cache_timeout=60)
     # Caching is disable here, because it makes no real sense.
     # The latest graphs must be fetched from zabbix and the older are requested only seldom.

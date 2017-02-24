@@ -49,7 +49,7 @@ class VmMonitoringSerializer(s.InstanceSerializer):
     validate_hostgroups = VmDefineSerializer.validate_monitoring_hostgroups.im_func
 
 
-class NetworkMonVmHistorySerializer(MonHistorySerializer):
+class NetworkVmMonHistorySerializer(MonHistorySerializer):
     """
     Used by VmHistoryView to validate nic_id value.
     """
@@ -67,7 +67,7 @@ class NetworkMonVmHistorySerializer(MonHistorySerializer):
         return attrs
 
 
-class DiskMonVmHistorySerializer(MonHistorySerializer):
+class DiskVmMonHistorySerializer(MonHistorySerializer):
     """
     Used by VmHistoryView to validate disk_id value.
     """

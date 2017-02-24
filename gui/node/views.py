@@ -379,7 +379,7 @@ def monitoring(request, hostname, graph_type='cpu'):
 
     context['graph_items'] = GRAPH_ITEMS
     context['obj_lifetime'] = node.lifetime
-    context['obj_operational'] = node.status != Node.UNLICENSED  # TODO: implement this in GUI
+    context['obj_operational'] = node.status != Node.STATUS_AVAILABLE_MONITORING
 
     if graph_type == 'memory':
         graphs = (
@@ -394,9 +394,8 @@ def monitoring(request, hostname, graph_type='cpu'):
     elif graph_type == 'storage':
         context['zpools'] = node_zpools = node.zpools
         graphs = list(chain(*[
-            (Graph('storage-throughput', zpool=i),
-             Graph('storage-io', zpool=i),
-             Graph('storage-space', zpool=i)) for i in node_zpools
+            (Graph('storage-throughput', zpool=i), Graph('storage-io', zpool=i), Graph('storage-space', zpool=i))
+            for i in node_zpools
         ]))
     else:
         graph_type = 'cpu'

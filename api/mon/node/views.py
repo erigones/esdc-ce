@@ -5,7 +5,7 @@ from api.mon.node.api_views import NodeSLAView, NodeHistoryView
 __all__ = ('mon_node_sla', 'mon_node_history')
 
 
-#: node_status:   GET: Node.STATUS_OPERATIONAL
+#: node_status:   GET: Node.STATUS_AVAILABLE_MONITORING
 @api_view(('GET',))
 @request_data_defaultdc(permissions=(IsSuperAdmin,))
 @setting_required('MON_ZABBIX_ENABLED')
@@ -41,7 +41,7 @@ def mon_node_sla(request, hostname, yyyymm, data=None):
     return NodeSLAView(request, hostname, yyyymm, data).get()
 
 
-#: node_status:   GET: Node.STATUS_OPERATIONAL
+#: node_status:   GET: Node.STATUS_AVAILABLE_MONITORING
 @api_view(('GET',))
 @request_data_defaultdc(permissions=(IsSuperAdmin,))
 @setting_required('MON_ZABBIX_ENABLED')
@@ -61,6 +61,7 @@ def mon_node_history(request, hostname, graph, data=None):
             * |async-yes|
         :arg hostname: **required** - Compute node hostname
         :type hostname: string
+        :type graph: string
         :arg graph: **required** - Graph identificator. One of:
 
         |  *cpu-usage* - Total compute node CPU consumed by the Node.
@@ -75,16 +76,16 @@ virtual network interface. *requires data.nic*
         |  *storage-throughput* - The amount of read and written data on the zpool.
         |  *storage-io* - The amount of I/O read and write operations performed on the zpool.
         |  *storage-space* - ZFS zpool space usage by type.
-        :type graph: string
+
         :arg data.since: Return only values that have been received after the given UNIX timestamp \
 (default: now - 1 hour)
         :type data.since: integer
         :arg data.until: Return only values that have been received before the given UNIX timestamp (default: now)
         :type data.until: integer
-        :arg data.nic: **optional** only used with *net-bandwidth* and *net-packets* graphs \
-to specify ID of the NIC for which graph should be retrieved.
+        :arg data.nic: only used with *net-bandwidth* and *net-packets* graphs \
+to specify name of the NIC for which graph should be retrieved.
         :type data.nic: string
-        :arg data.zpool: **optional** only used with *storage-throughput*, *storage-io* and *storage-space* graphs \
+        :arg data.zpool: only used with *storage-throughput*, *storage-io* and *storage-space* graphs \
 to specify ID of the zpool for which graph should be retrieved.
         :type data.zpool: string
         :status 200: SUCCESS

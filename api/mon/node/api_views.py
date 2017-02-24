@@ -1,7 +1,7 @@
 from api.api_views import APIView
 from api.exceptions import NodeIsNotOperational, InvalidInput
 from api.mon.node.graphs import GRAPH_ITEMS
-from api.mon.node.serializers import NetworkMonNodeHistorySerializer, DiskMonNodeHistorySerializer
+from api.mon.node.serializers import NetworkNodeMonHistorySerializer, StorageNodeMonHistorySerializer
 from api.mon.node.tasks import mon_node_sla as t_mon_node_sla, mon_node_history as t_mon_node_history
 from api.mon.node.utils import parse_yyyymm
 from api.mon.serializers import MonHistorySerializer
@@ -23,7 +23,7 @@ class NodeSLAView(APIView):
     def get(self):
         request, node = self.request, self.node
 
-        if node.status not in node.STATUS_OPERATIONAL:
+        if node.status not in node.STATUS_AVAILABLE_MONITORING:
             raise NodeIsNotOperational
 
         yyyymm, since, until, current_month = parse_yyyymm(self.yyyymm, node.created.replace(tzinfo=None))
@@ -66,9 +66,9 @@ class NodeHistoryView(APIView):
             raise InvalidInput('Invalid graph')
 
         if graph.startswith(('nic-', 'net-')):
-            ser_class = NetworkMonNodeHistorySerializer
+            ser_class = NetworkNodeMonHistorySerializer
         elif graph.startswith(('storage-', )):
-            ser_class = DiskMonNodeHistorySerializer
+            ser_class = StorageNodeMonHistorySerializer
         else:
             ser_class = MonHistorySerializer
 

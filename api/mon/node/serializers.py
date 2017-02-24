@@ -4,7 +4,7 @@ from api import serializers as s
 from api.mon.serializers import MonHistorySerializer
 
 
-class DiskMonNodeHistorySerializer(MonHistorySerializer):
+class StorageNodeMonHistorySerializer(MonHistorySerializer):
     """
     Used by NodeHistoryView to validate zpools value.
     """
@@ -17,12 +17,12 @@ class DiskMonNodeHistorySerializer(MonHistorySerializer):
         if zpool in self.obj.zpools:
             self.item_id = zpool
         else:
-            raise s.ValidationError(_('Zpool ID not defined on the node.'))
+            raise s.ValidationError(_('Zpool not defined on compute node.'))
 
         return attrs
 
 
-class NetworkMonNodeHistorySerializer(MonHistorySerializer):
+class NetworkNodeMonHistorySerializer(MonHistorySerializer):
     """
     Used by NodeHistoryView to validate nic_id value.
     """
@@ -35,6 +35,6 @@ class NetworkMonNodeHistorySerializer(MonHistorySerializer):
         if nic in self.obj.used_nics:
             self.item_id = nic
         else:
-            raise s.ValidationError(_('NIC ID not defined on the node.'))
+            raise s.ValidationError(_('NIC not defined on compute node.'))
 
         return attrs

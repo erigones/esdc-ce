@@ -9,7 +9,7 @@ from api.mon.messages import LOG_MONDEF_UPDATE
 from api.mon.node.utils import parse_yyyymm
 from api.mon.vm.graphs import GRAPH_ITEMS
 from api.mon.serializers import MonHistorySerializer
-from api.mon.vm.serializers import VmMonitoringSerializer, NetworkMonVmHistorySerializer, DiskMonVmHistorySerializer
+from api.mon.vm.serializers import VmMonitoringSerializer, NetworkVmMonHistorySerializer, DiskVmMonHistorySerializer
 from api.mon.vm.tasks import mon_vm_sla as t_mon_vm_sla, mon_vm_history as t_mon_vm_history
 from api.vm.define.utils import VM_STATUS_OPERATIONAL
 
@@ -116,9 +116,9 @@ class VmHistoryView(APIView):
                 raise InvalidInput('Invalid OS type')
 
         if graph.startswith(('nic-', 'net-')):
-            ser_class = NetworkMonVmHistorySerializer
+            ser_class = NetworkVmMonHistorySerializer
         elif graph.startswith(('disk-', 'hdd-', 'fs-')):
-            ser_class = DiskMonVmHistorySerializer
+            ser_class = DiskVmMonHistorySerializer
         else:
             ser_class = MonHistorySerializer
 

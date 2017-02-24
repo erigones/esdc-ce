@@ -8,6 +8,8 @@ class MonHistorySerializer(s.Serializer):
     since = s.TimeStampField(required=False)
     until = s.TimeStampField(required=False)
     autorefresh = s.BooleanField(default=False)
+    # item_id is used in child classes to store value of the zabbix item,
+    # that is subsequently used to fill Zabbix item in GRAPH_ITEMS dict
     item_id = None
 
     def __init__(self, obj=None, instance=None, data=None, **kwargs):

@@ -134,6 +134,7 @@ def mon_vm_history(request, hostname_or_uuid, graph, data=None):
             * |async-yes|
         :arg hostname_or_uuid: **required** - Server hostname or uuid
         :type hostname_or_uuid: string
+        :type graph: string
         :arg graph: **required** - Graph identificator. One of:
 
         |  *cpu-usage* - Total compute node CPU consumed by the VM.
@@ -162,15 +163,14 @@ the virtual hard drive. *requires data.disk_id*
         |  *vm-disk-io-operations* - Aggregated amount of disk I/O operations by latency on the logical layer \
 (with acceleration mechanisms included).
 
-        :type graph: string
         :arg data.since: Return only values that have been received after the given timestamp (default: now - 1 hour)
         :type data.since: integer
         :arg data.until: Return only values that have been received before the given timestamp (default: now)
         :type data.until: integer
-        :arg data.disk_id: **optional** it's used only with *disk-throughput*, \
+        :arg data.disk_id: used only with *disk-throughput*, \
 *disk-io*, *fs-throughput*, *fs-io* graphs to specify ID of the disk for which graph should be retrieved.
         :type data.disk_id: integer
-        :arg data.nic_id: **optional** it's only used with *net-bandwidth*, *net-packets* \
+        :arg data.nic_id: only used with *net-bandwidth*, *net-packets* \
 graphs to specify ID of the NIC for which graph should be retrieved.
         :type data.nic_id: integer
         :status 200: SUCCESS
