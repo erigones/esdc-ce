@@ -72,6 +72,13 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
         _OSType.LINUX_ZONE: settings.VMS_VM_BRAND_LX_ZONE_DEFAULT,
     })
 
+    CPU_TYPE_QEMU = 'qemu64'
+    CPU_TYPE_HOST = 'host'
+    CPU_TYPE = (
+        (CPU_TYPE_QEMU, CPU_TYPE_QEMU),
+        (CPU_TYPE_HOST, CPU_TYPE_HOST),
+    )
+
     DISK_MODEL = (
         ('virtio', 'virtio'),
         ('ide', 'ide'),
@@ -1622,6 +1629,18 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
             return int((int(json.get('cpu_cap', 100)) - 100) / (settings.VMS_VM_CPU_BURST_RATIO * 100))
         except TypeError:
             return 0
+
+    @property
+    def cpu_type(self):
+        if self.is_kvm():
+            return self.json.get('cpu_type', self.CPU_TYPE_QEMU)
+        else:
+            return ''
+
+    @cpu_type.setter
+    def cpu_type(self, value):
+        if self.is_kvm():
+            self.save_item('cpu_type', value, save=False)
 
     @property  # Return CPU count
     def vcpus(self):
