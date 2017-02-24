@@ -1,14 +1,6 @@
 from django.utils.translation import ugettext_noop as _
 
 
-def _zone_fs_items(graph_options, item_id):
-    """Return zabbix search params"""
-    items_search = graph_options['items_search'].copy()
-    items_search['sortorder'] = item_id  # 0 - ASC, 1 - DESC
-
-    return items_search
-
-
 def _threshold_to_grid(val):
     """Return graph threshold configuration"""
     return {
@@ -44,12 +36,19 @@ class _GraphItems(dict):
 
 
 GRAPH_UPDATE_INTERVAL = 30
+GRAPH_UPDATE_INTERVAL_LONG = 130
 GRAPH_STACK_SERIES = {
     'stack': True,
     'lines': {
         'fillColor': {'colors': [{'opacity': 0.6}]},
         'lineWidth': 0.2,
     }
+}
+GRAPH_LINE_SERIES = {
+    'lines': {
+        'lineWidth': 2.0,
+        'fill': False,
+    },
 }
 GRAPH_ITEMS = _GraphItems({
     'cpu-usage': {
@@ -64,11 +63,12 @@ GRAPH_ITEMS = _GraphItems({
     },
 
     'cpu-jumps': {
-        'desc': _('Total amount of time spent in CPU run queue by the node.'),
+        'desc': _('Number of context switches and interrupts on the node.'),
         'items': ('system.cpu.switches', 'system.cpu.intr'),
         'update_interval': GRAPH_UPDATE_INTERVAL,
         'history': 3,
         'options': {
+            'series': GRAPH_LINE_SERIES,
             'yaxis': {'mode': None, 'min': 0},
         },
     },
@@ -110,18 +110,16 @@ GRAPH_ITEMS = _GraphItems({
         'update_interval': GRAPH_UPDATE_INTERVAL,
         'history': 3,
         'options': {
-            'series': GRAPH_STACK_SERIES,
             'yaxis': {'mode': 'byteRate', 'min': 0},
         },
     },
 
     'storage-io': {
-        'desc': _('The amount of I/O read and write operations performed on the zpool.'),
+        'desc': _('The amount of read and write I/O operations performed on the zpool.'),
         'items': ('zpool.iostat[%(id)s,reads]', 'zpool.iostat[%(id)s,writes]'),
         'update_interval': GRAPH_UPDATE_INTERVAL,
         'history': 3,
         'options': {
-            'series': GRAPH_STACK_SERIES,
             'yaxis': {'mode': 'byteRate', 'min': 0},
         },
     },
@@ -129,7 +127,7 @@ GRAPH_ITEMS = _GraphItems({
     'storage-space': {
         'desc': _('ZFS zpool space usage by type.'),
         'items': ('zfs.usedds[%(id)s]', 'zfs.usedrefreserv[%(id)s]', 'zfs.usedsnap[%(id)s]'),
-        'update_interval': GRAPH_UPDATE_INTERVAL,
+        'update_interval': GRAPH_UPDATE_INTERVAL_LONG,
         'history': 3,
         'options': {
             'series': GRAPH_STACK_SERIES,
@@ -143,7 +141,6 @@ GRAPH_ITEMS = _GraphItems({
         'update_interval': GRAPH_UPDATE_INTERVAL,
         'history': 3,
         'options': {
-            'series': GRAPH_STACK_SERIES,
             'yaxis': {'mode': 'bitRate', 'min': 0},
         },
     },
@@ -154,7 +151,6 @@ GRAPH_ITEMS = _GraphItems({
         'update_interval': GRAPH_UPDATE_INTERVAL,
         'history': 3,
         'options': {
-            'series': GRAPH_STACK_SERIES,
             'yaxis': {'mode': None, 'min': 0},
         },
     },

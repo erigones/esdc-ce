@@ -64,6 +64,12 @@ GRAPH_STACK_SERIES = {
         'lineWidth': 0.2,
     }
 }
+GRAPH_LINE_SERIES = {
+    'lines': {
+        'lineWidth': 2.0,
+        'fill': False,
+    },
+}
 GRAPH_ITEMS = _GraphItems({
     'cpu-usage': {
         'desc': _('Total compute node CPU consumed by the VM.'),
@@ -124,7 +130,6 @@ GRAPH_ITEMS = _GraphItems({
         'update_interval': GRAPH_UPDATE_INTERVAL,
         'history': 3,
         'options': {
-            'series': GRAPH_STACK_SERIES,
             'yaxis': {'mode': 'bitRate', 'min': 0},
         },
     },
@@ -135,7 +140,6 @@ GRAPH_ITEMS = _GraphItems({
         'update_interval': GRAPH_UPDATE_INTERVAL,
         'history': 3,
         'options': {
-            'series': GRAPH_STACK_SERIES,
             'yaxis': {'mode': None, 'min': 0},
         },
     },
@@ -147,7 +151,6 @@ GRAPH_ITEMS = _GraphItems({
         'update_interval': GRAPH_UPDATE_INTERVAL,
         'history': 0,
         'options': {
-            'series': GRAPH_STACK_SERIES,
             'yaxis': {'mode': 'byteRate', 'min': 0},
         },
     },
@@ -159,7 +162,6 @@ GRAPH_ITEMS = _GraphItems({
         'update_interval': GRAPH_UPDATE_INTERVAL,
         'history': 0,
         'options': {
-            'series': GRAPH_STACK_SERIES,
             'yaxis': {'mode': None, 'min': 0},
         },
     },
@@ -175,7 +177,6 @@ GRAPH_ITEMS = _GraphItems({
         'update_interval': GRAPH_UPDATE_INTERVAL,
         'history': 0,
         'options': {
-            'series': GRAPH_STACK_SERIES,
             'yaxis': {'mode': 'byteRate', 'min': 0},
         },
     },
@@ -190,7 +191,6 @@ GRAPH_ITEMS = _GraphItems({
         'update_interval': GRAPH_UPDATE_INTERVAL,
         'history': 0,
         'options': {
-            'series': GRAPH_STACK_SERIES,
             'yaxis': {'mode': None, 'min': 0},
         },
     },
@@ -201,7 +201,6 @@ GRAPH_ITEMS = _GraphItems({
         'update_interval': GRAPH_UPDATE_INTERVAL,
         'history': 3,
         'options': {
-            'series': GRAPH_STACK_SERIES,
             'yaxis': {'mode': 'byteRate', 'min': 0},
         },
     },
@@ -213,7 +212,6 @@ GRAPH_ITEMS = _GraphItems({
         'update_interval': GRAPH_UPDATE_INTERVAL,
         'history': 3,
         'options': {
-            'series': GRAPH_STACK_SERIES,
             'yaxis': {'mode': None, 'min': 0},
         },
     },
@@ -224,7 +222,6 @@ GRAPH_ITEMS = _GraphItems({
         'update_interval': GRAPH_UPDATE_INTERVAL,
         'history': 3,
         'options': {
-            'series': GRAPH_STACK_SERIES,
             'yaxis': {'mode': 'byteRate', 'min': 0},
         },
     },
@@ -235,7 +232,6 @@ GRAPH_ITEMS = _GraphItems({
         'update_interval': GRAPH_UPDATE_INTERVAL,
         'history': 3,
         'options': {
-            'series': GRAPH_STACK_SERIES,
             'yaxis': {'mode': None, 'min': 0},
         },
     },
@@ -248,6 +244,7 @@ GRAPH_ITEMS = _GraphItems({
         'update_interval': GRAPH_UPDATE_INTERVAL,
         'history': 3,
         'options': {
+            'series': GRAPH_LINE_SERIES,
             'yaxis': {'mode': None, 'min': 0},
         },
     },
