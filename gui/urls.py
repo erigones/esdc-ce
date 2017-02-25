@@ -19,8 +19,9 @@ urlpatterns = patterns(
     url(r'^accounts/', include('gui.accounts.urls')),
     # Profile pages
     url(r'^accounts/profile/', include('gui.profile.urls')),
-    # Dashboard pages
-    url(r'^dashboard/$', 'dashboard', name='dashboard'),
+    # System pages
+    url(r'^dashboard/$', RedirectView.as_view(url='/system/overview/', permanent=False)),
+    url(r'^system/', include('gui.system.urls')),
     # Datacenter pages
     url(r'^dc/', include('gui.dc.urls')),
     # Node pages
