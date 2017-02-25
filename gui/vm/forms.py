@@ -239,8 +239,12 @@ class AdminServerSettingsForm(ServerSettingsForm):
                                        help_text=_('Comma-separated list of custom monitoring hostgroups.'),
                                        widget=ArrayWidget(attrs={'class': 'input-transparent narrow'}))
     mdata = DictField(label=_('Metadata'), required=False,
-                      widget=DictWidget(attrs={'class': 'input-transparent small', 'rows': 5}),
-                      help_text=_('key=value string pairs.'))
+                      help_text=_('key=value string pairs.'),
+                      widget=DictWidget(attrs={
+                          'class': 'input-transparent small',
+                          'rows': 5,
+                          'data-raw_input_enabled': 'true',
+                      }))
 
     def __init__(self, request, vm, *args, **kwargs):
         super(AdminServerSettingsForm, self).__init__(request, vm, *args, **kwargs)
