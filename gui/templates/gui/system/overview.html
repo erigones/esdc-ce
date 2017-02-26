@@ -41,9 +41,9 @@ function init_stat_graph(graph_name, graph_data, options) {
 }
 
   $(document).ready(function() {
-    init_stat_graph('system_stats_dc', {{ dc|json|safe }});
-    init_stat_graph('system_stats_node', {{ node|json|safe }});
-    init_stat_graph('system_stats_vm', {{ vm|json|safe }});
+    init_stat_graph('system_stats_dc', {{ stats.dcs|json|safe }});
+    init_stat_graph('system_stats_node', {{ stats.nodes|json|safe }});
+    init_stat_graph('system_stats_vm', {{ stats.vms|json|safe }});
   });   
 </script>
 {% endblock %}
@@ -67,7 +67,7 @@ function init_stat_graph(graph_name, graph_data, options) {
             <td class="center-text">
               <div class="graph-container">
                 <div class="graph"></div>
-                <div class="graph-center">{{ dc_total }}</div>
+                <div class="graph-center">{{ stats.dcs_total }}</div>
               </div>
             </td>
           </tr>
@@ -97,7 +97,7 @@ function init_stat_graph(graph_name, graph_data, options) {
             <td class="center-text">
               <div class="graph-container">
                 <div class="graph"></div>
-                <div class="graph-center">{{ node_total }}</div>
+                <div class="graph-center">{{ stats.nodes_total }}</div>
               </div>
             </td>
           </tr>
@@ -127,7 +127,7 @@ function init_stat_graph(graph_name, graph_data, options) {
             <td class="center-text">
               <div class="graph-container">
                 <div class="graph"></div>
-                <div class="graph-center">{{ vm_total }}</div>
+                <div class="graph-center">{{ stats.vms_total }}</div>
               </div>
             </td>
           </tr>
