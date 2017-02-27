@@ -9,9 +9,9 @@
       {% if dc_settings.VMS_VM_BACKUP_ENABLED and node.is_backup %}
       <li class="{{ li_backups }}"><a href="{% url 'node_backups' node.hostname %}" data-toggle="tab" title="{% trans "Show backups stored on this compute node" %}"><i class="icon-paste"></i> {% trans "Backups" %}</a></li>
       {% endif %}
-      {% comment %}{% if dc_settings.MON_ZABBIX_ENABLED %}
+      {% if dc_settings.MON_ZABBIX_ENABLED %}
       <li class="{{ li_monitoring }}"><a href="{% url 'node_monitoring' node.hostname %}" data-toggle="tab" title="{% trans "Show compute node monitoring" %}"><i class="icon-bar-chart"></i> {% trans "Monitoring" %}</a></li>
-      {% endif %}{% endcomment %}
+      {% endif %}
       <li class="{{ li_tasklog }}"><a href="{% url 'node_tasklog' node.hostname %}" data-toggle="tab" title="{% trans "Show compute node related task log" %}"><i class="icon-tasks"></i> {% trans "Task Log" %}</a></li>
     </ul>
   </div>

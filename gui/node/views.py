@@ -1,3 +1,5 @@
+from itertools import chain
+
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
 from django.views.decorators.http import require_POST
@@ -6,17 +8,18 @@ from django.db.models import Count, Q
 from django.http import HttpResponse, Http404, QueryDict
 from django.conf import settings
 
-from vms.models import Node, NodeStorage, Storage, DefaultDc, TaskLogEntry
+from vms.models import Node, NodeStorage, Storage, TaskLogEntry
 from gui.decorators import staff_required, ajax_required
 from gui.utils import collect_view_data, get_pager, reverse
 from gui.signals import view_node_list, view_node_details
-from gui.node.utils import get_nodes_extended, get_node, get_node_backups
+from gui.node.utils import get_dc1_settings, get_nodes_extended, get_node, get_node_backups
 from gui.node.forms import NodeForm, NodeStorageForm, UpdateBackupForm, NodeStorageImageForm, BackupFilterForm
 from gui.vm.forms import RestoreBackupForm
 from gui.vm.utils import get_vms
 from gui.dc.views import dc_switch
 from gui.tasklog.utils import get_tasklog
 from api.decorators import setting_required
+from api.mon.utils import MonitoringGraph as Graph
 
 
 @login_required
@@ -40,12 +43,7 @@ def details(request, hostname):
     """
     Compute node details.
     """
-    dc = request.dc
-
-    if not dc.is_default():
-        dc = DefaultDc()
-
-    dc1_settings = dc.settings
+    dc1_settings = get_dc1_settings(request)
     context = collect_view_data(request, 'node_list')
     context['node'] = node = get_node(request, hostname, sr=('owner',))
     context['nodes'] = Node.all()
@@ -364,15 +362,53 @@ def backup_form(request, hostname):
 
 @login_required
 @staff_required
-def monitoring(request, hostname):
+@setting_required('MON_ZABBIX_ENABLED')
+def monitoring(request, hostname, graph_type='cpu'):
     """
     Compute node related monitoring.
     """
+    dc1_settings = get_dc1_settings(request)
     context = collect_view_data(request, 'node_list')
-    context['node'] = get_node(request, hostname)
+    context['node'] = node = get_node(request, hostname)
     context['nodes'] = Node.all()
 
-    return render(request, 'gui/node/monitoring.html', context)
+    if not dc1_settings.MON_ZABBIX_NODE_SYNC:
+        return render(request, 'gui/node/monitoring_disabled.html', context)
+
+    from api.mon.node.graphs import GRAPH_ITEMS
+
+    context['graph_items'] = GRAPH_ITEMS
+    context['obj_lifetime'] = node.lifetime
+    context['obj_operational'] = node.status != Node.STATUS_AVAILABLE_MONITORING
+
+    if graph_type == 'memory':
+        graphs = (
+            Graph('mem-usage'),
+            Graph('swap-usage')
+        )
+    elif graph_type == 'network':
+        context['node_nics'] = node_nics = node.used_nics.keys()
+        graphs = list(chain(*[
+            (Graph('net-bandwidth', nic=i), Graph('net-packets', nic=i)) for i in node_nics
+        ]))
+    elif graph_type == 'storage':
+        context['zpools'] = node_zpools = node.zpools
+        graphs = list(chain(*[
+            (Graph('storage-throughput', zpool=i), Graph('storage-io', zpool=i), Graph('storage-space', zpool=i))
+            for i in node_zpools
+        ]))
+    else:
+        graph_type = 'cpu'
+        graphs = (
+            Graph('cpu-usage'),
+            Graph('cpu-jumps'),
+            Graph('cpu-load'),
+        )
+
+    context['graphs'] = graphs
+    context['graph_type'] = graph_type
+
+    return render(request, 'gui/node/monitoring_%s.html' % graph_type, context)
 
 
 @login_required

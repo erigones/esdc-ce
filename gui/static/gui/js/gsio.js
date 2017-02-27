@@ -199,15 +199,15 @@ function get_sla(view_name, hostname, yyyymm) {
   return null;
 }
 
-// Get VM monitoring history
-function vm_get_history(hostname, graph, data) {
+// Get Node or VM monitoring history (obj_type = {vm|node})
+function mon_get_history(obj_type, hostname, graph, data) {
   var kwargs = {'data': {}};
   if (typeof(data) !== 'undefined') {
     kwargs['data'] = data;
   }
   // This runs in background, so do not run if not connected
   if (SOCKET.socket.connected) {
-    return esio('get', 'mon_vm_history', [hostname, graph], kwargs);
+    return esio('get', 'mon_'+ obj_type +'_history', [hostname, graph], kwargs);
   }
   return null;
 }
@@ -501,6 +501,7 @@ function message_callback(code, res, view, method, args, kwargs, apiview, apidat
         return; // do not update cached_tasklog
 
       case 'mon_vm_history': // mon_vm_history started
+      case 'mon_node_history': // mon_node_history started
         return; // do not update cached_tasklog
 
       case 'node_image': // node_image started
@@ -537,7 +538,8 @@ function message_callback(code, res, view, method, args, kwargs, apiview, apidat
         return; // do not update cached_tasklog
 
       case 'mon_vm_history': // mon_vm_history failed
-        vm_history_update(args[0], args[1], null, _message_from_result(res));
+      case 'mon_node_history': // mon_node_history failed
+        mon_history_update(view.split('_', 2)[1], args[0], args[1], data, null, _message_from_result(res));
         return; // do not update cached_tasklog
 
       case 'vm_backup': // vm_backup failed
@@ -633,7 +635,8 @@ function message_callback(code, res, view, method, args, kwargs, apiview, apidat
         return; // do not update cached_tasklog
 
       case 'mon_vm_history': // mon_vm_history result from cache
-        vm_history_update(args[0], args[1], res.result);
+      case 'mon_node_history': // mon_node_history result from cache
+        mon_history_update(view.split('_', 2)[1], args[0], args[1], data, res.result);
         return; // do not update cached_tasklog
     }
   }
@@ -935,12 +938,17 @@ function _task_status_callback(res, apiview) {
       return false; // do not update cached_tasklog
 
     case 'mon_vm_history':
+    case 'mon_node_history':
+      var obj_type = apiview.view.split('_', 2)[1];
       var error = null;
+
       if (res.status != 'SUCCESS') {
         result = null;
         error = _message_from_result(res);
       }
-      if (t) {vm_history_update(hostname, apiview.graph, result, error);}
+
+      mon_history_update(obj_type, hostname, apiview.graph, apiview.graph_params, result, error);
+
       return false; // do not update cached_tasklog
 
 

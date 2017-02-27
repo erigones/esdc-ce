@@ -1,0 +1,11 @@
+{% load i18n %}
+<div class="row-fluid">
+  <div class="span12 tabbable black-box submenu">
+    <ul class="nav nav-tabs">
+      <li class="{{ mon_cpu }}"><a href="{% url 'node_monitoring_graphs' node.hostname 'cpu' %}" data-toggle="tab">{% trans "CPU" %}</a></li>
+      <li class="{{ mon_mem }}"><a href="{% url 'node_monitoring_graphs' node.hostname 'memory' %}" data-toggle="tab">{% trans "Memory" %}</a></li>
+      <li class="{{ mon_net }}"><a href="{% url 'node_monitoring_graphs' node.hostname 'network' %}" data-toggle="tab">{% trans "Networks" %}</a></li>
+      <li class="{{ mon_disk }}"><a href="{% url 'node_monitoring_graphs' node.hostname 'storage' %}" data-toggle="tab">{% trans "Storages" %}</a></li>
+    </ul>
+  </div>
+</div>

@@ -808,7 +808,7 @@ class _Zabbix(object):
             raise ZabbixError(e)
 
     def get_history(self, host, items, history, since, until, items_search=None):
-        """Return monitoring history for selected host, items and period"""
+        """Return monitoring history for selected zabbix host, items and period"""
         res = {'history': []}
         now = int(datetime.now().strftime('%s'))
         max_period = self.settings.MON_ZABBIX_GRAPH_MAX_PERIOD
@@ -1521,3 +1521,7 @@ class Zabbix(object):
         zx.reset_cache()
 
         return result
+
+    def node_history(self, node_id, items, zhistory, since, until, items_search=None):
+        """[INTERNAL] Return node history data for selected graph and period"""
+        return self.izx.get_history(node_id, items, zhistory, since, until, items_search=items_search)

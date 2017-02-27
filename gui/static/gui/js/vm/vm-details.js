@@ -55,7 +55,7 @@ function vm_tasks(hostname, res, view, method) {
   var ret = null;
 
   try {
-    if (view == 'vm_define' || view == 'mon_node_sla') {
+    if (view == 'vm_define' || view.substring(0, 3) !== 'vm_' ) {
       return null;
     }
 

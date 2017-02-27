@@ -7,6 +7,7 @@ Changelog
 Features
 --------
 
+- Added compute node monitoring and graphs to GUI and API - `#13 <https://github.com/erigones/esdc-ce/issues/13>`__
 - Added ``cpu_type`` parameter into vm_define API call - `#76 <https://github.com/erigones/esdc-ce/issues/76>`__
 
 Bugs

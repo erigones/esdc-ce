@@ -18,12 +18,12 @@
 <div class="container-fluid">
   {% for nic_id in vm_nics %}
   <div class="row-fluid">
-    <div class="span6 small" id="vm_history_net-bandwidth-{{ nic_id }}_{{ vm.hostname }}">
+    <div class="span6 small" id="vm__{{ vm.hostname }}__net-bandwidth__nic_id={{ nic_id }}">
       <div class="tab-header">
         <i class="icon-bar-chart"></i> {{ vm.alias }} &rsaquo; {% blocktrans %}nic {{ nic_id }} &rsaquo; bandwidth{% endblocktrans %}
         {% include "gui/vm/monitoring_graph.html" with desc=desc_bandwidth %}
     </div>
-    <div class="span6 small" id="vm_history_net-packets-{{ nic_id }}_{{ vm.hostname }}">
+    <div class="span6 small" id="vm__{{ vm.hostname }}__net-packets__nic_id={{ nic_id }}">
       <div class="tab-header">
         <i class="icon-bar-chart"></i> {{ vm.alias }} &rsaquo; {% blocktrans %}nic {{ nic_id }} &rsaquo; packets{% endblocktrans %}
         {% include "gui/vm/monitoring_graph.html" with desc=desc_packets %}

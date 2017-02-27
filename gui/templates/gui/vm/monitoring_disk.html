@@ -17,12 +17,12 @@
 <div class="container-fluid">
   {% for disk_id in vm_disks %}
   <div class="row-fluid">
-    <div class="span6 small" id="vm_history_{{ graph_prefix }}-throughput-{{ disk_id }}_{{ vm.hostname }}">
+    <div class="span6 small" id="vm__{{ vm.hostname }}__{{ graph_prefix }}-throughput__disk_id={{ disk_id }}">
       <div class="tab-header">
         <i class="icon-bar-chart"></i> {{ vm.alias }} &rsaquo; {% blocktrans %}disk {{ disk_id }} &rsaquo; throughput{% endblocktrans %}
         {% include "gui/vm/monitoring_graph.html" with desc=desc_throughput %}
     </div>
-    <div class="span6 small" id="vm_history_{{ graph_prefix }}-io-{{ disk_id }}_{{ vm.hostname }}">
+    <div class="span6 small" id="vm__{{ vm.hostname }}__{{ graph_prefix }}-io__disk_id={{ disk_id }}">
       <div class="tab-header">
         <i class="icon-bar-chart"></i> {{ vm.alias }} &rsaquo; {% blocktrans %}disk {{ disk_id }} &rsaquo; I/O{% endblocktrans %}
         {% include "gui/vm/monitoring_graph.html" with desc=desc_io %}
