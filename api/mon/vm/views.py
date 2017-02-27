@@ -134,6 +134,7 @@ def mon_vm_history(request, hostname_or_uuid, graph, data=None):
             * |async-yes|
         :arg hostname_or_uuid: **required** - Server hostname or uuid
         :type hostname_or_uuid: string
+        :type graph: string
         :arg graph: **required** - Graph identificator. One of:
 
         |  *cpu-usage* - Total compute node CPU consumed by the VM.
@@ -141,15 +142,18 @@ def mon_vm_history(request, hostname_or_uuid, graph, data=None):
         |  *cpu-load* - 1-minute load average.
         |  *mem-usage* - Total compute node physical memory consumed by the VM.
         |  *swap-usage* - Total compute node swap space used by the VM.
-        |  *net-bandwidth-(nic_id)* - The amount of received and sent network traffic through \
-the virtual network interface.
-        |  *net-packets-(nic_id)* - The amount of received and sent packets through the virtual network interface.
-        |  *disk-throughput-(disk_id)* (KVM only) - The amount of written and read data on the virtual hard drive.
-        |  *disk-io-(disk_id)* (KVM only) - The amount of write and read I/O operations performed on \
-the virtual hard drive.
-        |  *fs-throughput-(disk_id)* (SunOS Zone only) - The amount of written and read data on the virtual hard drive.
-        |  *fs-io-(disk_id)* (SunOS Zone only) - The amount of write and read I/O operations performed on \
-the virtual hard drive.
+        |  *net-bandwidth* - The amount of received and sent network traffic through \
+the virtual network interface. *requires data.nic_id*
+        |  *net-packets* - The amount of received and sent packets through the virtual \
+network interface. *requires data.nic_id*
+        |  *disk-throughput* (KVM only) - The amount of written and read data on \
+the virtual hard drive. *requires data.disk_id*
+        |  *disk-io* (KVM only) - The amount of write and read I/O operations performed on \
+the virtual hard drive. *requires data.disk_id*
+        |  *fs-throughput* (SunOS Zone only) - The amount of written and read data \
+on the virtual hard drive. *requires data.disk_id*
+        |  *fs-io* (SunOS Zone only) - The amount of write and read I/O operations performed on \
+the virtual hard drive. *requires data.disk_id*
         |  *vm-disk-logical-throughput* - Aggregated disk throughput on the logical layer \
 (with acceleration mechanisms included).
         |  *vm-disk-logical-io* - Aggregated amount or read and write I/O operations on the logical layer \
@@ -159,11 +163,16 @@ the virtual hard drive.
         |  *vm-disk-io-operations* - Aggregated amount of disk I/O operations by latency on the logical layer \
 (with acceleration mechanisms included).
 
-        :type graph: string
         :arg data.since: Return only values that have been received after the given timestamp (default: now - 1 hour)
         :type data.since: integer
         :arg data.until: Return only values that have been received before the given timestamp (default: now)
         :type data.until: integer
+        :arg data.disk_id: used only with *disk-throughput*, \
+*disk-io*, *fs-throughput*, *fs-io* graphs to specify ID of the disk for which graph should be retrieved.
+        :type data.disk_id: integer
+        :arg data.nic_id: only used with *net-bandwidth*, *net-packets* \
+graphs to specify ID of the NIC for which graph should be retrieved.
+        :type data.nic_id: integer
         :status 200: SUCCESS
         :status 201: PENDING
         :status 400: FAILURE

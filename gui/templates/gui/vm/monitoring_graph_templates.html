@@ -1,0 +1,8 @@
+{% load i18n %}
+<script type="text/html" id="template-graph-tooltip-trend"><small>{% templatetag openvariable %} time {% templatetag closevariable %}</small>
+{% trans "Average" %}: {% templatetag openvariable %} value_avg {% templatetag closevariable %}
+{% trans "Maximum" %}: {% templatetag openvariable %} value_max {% templatetag closevariable %}
+{% trans "Minimum" %}: {% templatetag openvariable %} value_min {% templatetag closevariable %}</script>
+
+<script type="text/html" id="template-graph-tooltip-history"><small>{% templatetag openvariable %} time {% templatetag closevariable %}</small>
+{% trans "Value" %}: {% templatetag openvariable %} value {% templatetag closevariable %}</script>

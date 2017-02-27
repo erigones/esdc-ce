@@ -1,7 +1,7 @@
 from django.http import Http404
 from django.db.models import Count, Sum
 
-from vms.models import Node
+from vms.models import DefaultDc, Node
 from gui.utils import get_order_by, get_pager
 from api.node.utils import get_nodes as api_get_nodes, get_node as api_get_node
 from api.node.base.serializers import ExtendedNodeSerializer
@@ -11,9 +11,23 @@ from api.vm.backup.vm_backup_list import VmBackupList
 get_nodes = api_get_nodes
 
 
+def get_dc1_settings(request):
+    """
+    Return Default (main) DC settings.
+    """
+    dc = request.dc
+
+    if dc.is_default():
+        dc = request.dc
+    else:
+        dc = DefaultDc()
+
+    return dc.settings
+
+
 def get_nodes_extended(request):
     """
-    Return extended nodes query set; used by node_list
+    Return extended nodes query set; used by node_list.
     """
     return api_get_nodes(request, annotate={'vms': Count('vm')}, extra={'select': ExtendedNodeSerializer.extra_select})
 
