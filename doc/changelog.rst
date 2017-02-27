@@ -1,11 +1,13 @@
 Changelog
 #########
 
-2.4.1 (unreleased)
+2.5.0 (unreleased)
 ==================
 
 Features
 --------
+
+- Added ``cpu_type`` parameter into vm_define API call - `#76 <https://github.com/erigones/esdc-ce/issues/76>`__
 
 Bugs
 ----

@@ -74,6 +74,7 @@ class VmDefineSerializer(VmBaseSerializer):
     hostname = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\.-]+[A-Za-z0-9]$', max_length=128, min_length=4)
     alias = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\.-]+[A-Za-z0-9]$', max_length=24, min_length=4, required=False)
     ostype = s.IntegerChoiceField(choices=Vm.OSTYPE, default=settings.VMS_VM_OSTYPE_DEFAULT)
+    cpu_type = s.ChoiceField(choices=Vm.CPU_TYPE, default=settings.VMS_VM_CPU_TYPE_DEFAULT)
     vcpus = s.IntegerField(max_value=64, min_value=1)
     ram = s.IntegerField(max_value=524288, min_value=32)
     owner = s.SlugRelatedField(slug_field='username', queryset=User.objects, read_only=False, required=False)  # vv
@@ -121,6 +122,7 @@ class VmDefineSerializer(VmBaseSerializer):
             del self.fields['maintain_resolvers']
             del self.fields['routes']
         else:
+            del self.fields['cpu_type']
             del self.fields['vga']
 
         if not kwargs.get('many', False):
@@ -497,14 +499,19 @@ class VmDefineSerializer(VmBaseSerializer):
     def validate(self, attrs):
         vm = self.object
 
+        try:
+            ostype = attrs['ostype']
+        except KeyError:
+            ostype = vm.ostype
+
+        # Default cpu_type for a new Windows VM is 'host'
+        if not vm and ostype == Vm.WINDOWS and 'cpu_type' not in self.init_data:
+            attrs['cpu_type'] = Vm.CPU_TYPE_HOST
+
         # Check if template ostype matches vm.ostype
         template = attrs.get('template', None)
 
         if template and template.ostype:
-            try:
-                ostype = attrs['ostype']
-            except KeyError:
-                ostype = vm.ostype
             if template.ostype != ostype:
                 err = _('Server template is only available for servers with "%(ostype)s" OS type.')
                 self._errors['template'] = s.ErrorList([err % {'ostype': template.get_ostype_display()}])
