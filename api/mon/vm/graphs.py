@@ -4,23 +4,6 @@ from api.mon.graphs import GraphItems
 from vms.models import Vm
 
 
-def _zone_fs_items(graph_options, item_id):
-    """Return zabbix search params"""
-    items_search = graph_options['items_search'].copy()
-    items_search['sortorder'] = item_id  # 0 - ASC, 1 - DESC
-
-    return items_search
-
-
-def _threshold_to_grid(val):
-    """Return graph threshold configuration"""
-    return {
-        'markings': [
-            {'color': '#FF0000', 'lineWidth': 1, 'yaxis': {'from': val, 'to': val}},
-        ]
-    }
-
-
 GRAPH_ITEMS = GraphItems({
     'cpu-usage': {
         'desc': _('Total compute node CPU consumed by the VM.'),
@@ -124,7 +107,7 @@ GRAPH_ITEMS = GraphItems({
                   'kstat.get[unix:0:vopstats_disk%(id)d:write_bytes]'),
         'items_search': {'search': {'key_': 'kstat.get[unix:0:vopstats_*_bytes*'}, 'searchWildcardsEnabled': True,
                          'limit': 2, 'sortfield': ['name'], 'sortorder': '???'},
-        'items_search_fun': _zone_fs_items,
+        'items_search_fun': GraphItems.zone_fs_items,
         'update_interval': GraphItems.GRAPH_UPDATE_INTERVAL,
         'history': 0,
         'options': {
@@ -138,7 +121,7 @@ GRAPH_ITEMS = GraphItems({
         'items': ('kstat.get[unix:0:vopstats_disk%(id)d:nread]', 'kstat.get[unix:0:vopstats_disk%(id)d:nwrite]'),
         'items_search': {'search': {'key_': 'kstat.get[unix:0:vopstats_*:n*]'}, 'searchWildcardsEnabled': True,
                          'limit': 2, 'sortfield': ['name'], 'sortorder': '???'},
-        'items_search_fun': _zone_fs_items,
+        'items_search_fun': GraphItems.zone_fs_items,
         'update_interval': GraphItems.GRAPH_UPDATE_INTERVAL,
         'history': 0,
         'options': {

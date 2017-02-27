@@ -57,3 +57,12 @@ class GraphItems(dict):
             graph_options['options']['grid'] = cls._threshold_to_grid(cap * 100)
 
         return graph_options
+
+    @staticmethod
+    def zone_fs_items(graph_options, item_id):
+        """Return zabbix search params"""
+        items_search = graph_options['items_search'].copy()
+        items_search['sortorder'] = item_id  # 0 - ASC, 1 - DESC
+
+        return items_search
+
