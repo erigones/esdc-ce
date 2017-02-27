@@ -123,10 +123,10 @@ def vm_define(request, hostname_or_uuid, data=None):
         :arg data.zfs_io_priority: IO throttle priority relative to other VMs (requires |SuperAdmin| permission) \
 (default: 100)
         :type data.zfs_io_priority: integer
-        :arg data.cpu_type: Type of the virtual CPU exposed to the VM. One of qemu64, host \
-(KVM only, default: qemu64, except for Windows ostype where the default is host)
+        :arg data.cpu_type: **KVM only**; Type of the virtual CPU exposed to the VM. One of qemu64, host \
+(default: qemu64; except for Windows ``ostype`` where the default is host)
         :type data.cpu_type: string
-        :arg data.vga: VGA emulation driver. One of std, cirrus, vmware (KVM only, default: std)
+        :arg data.vga: **KVM only**; VGA emulation driver. One of std, cirrus, vmware (default: std)
         :type data.vga: string
         :arg data.routes: Key-value object that maps destinations to gateways. \
 Items will be set as static routes in the OS (SunOS Zone only, default: {})
@@ -183,9 +183,9 @@ Items will be set as static routes in the OS (SunOS Zone only, default: {})
         :type data.cpu_shares: integer
         :arg data.zfs_io_priority: IO throttle priority relative to other VMs (requires |SuperAdmin| permission)
         :type data.zfs_io_priority: integer
-        :arg data.cpu_type: Type of the virtual CPU exposed to the VM. One of qemu64, host (KVM only)
+        :arg data.cpu_type: **KVM only**; Type of the virtual CPU exposed to the VM. One of qemu64, host
         :type data.cpu_type: string
-        :arg data.vga: VGA emulation driver. One of std, cirrus, vmware (KVM only)
+        :arg data.vga: **KVM only**; VGA emulation driver. One of std, cirrus, vmware
         :type data.vga: string
         :arg data.routes: Key-value object that maps destinations to gateways. \
 Items will be set as static routes in the OS (SunOS Zone only)
