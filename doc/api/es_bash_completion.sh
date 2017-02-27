@@ -141,6 +141,10 @@ _es() {
 			[[ "${action}" == "set" ]] && params="-name -alias -users -permissions -dc_bound -dcs"
 		;;
 
+		/task/log/stats)
+			[[ "${action}" == "get" ]] && params="-last"
+		;;
+
 		/task/log|/task/log/)
 			[ ${COMP_CWORD} -eq 2 ] && COMPREPLY=( "${cur} " )
 			params="-page -status -object_type -object_name -show_running -hide_auto -date_from -date_to"
