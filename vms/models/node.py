@@ -1,4 +1,5 @@
 from django.db import models, transaction
+from django.utils import timezone, six
 from django.utils.translation import ugettext_noop, ugettext_lazy as _
 from django.core.cache import cache
 from django.conf import settings
@@ -40,6 +41,7 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
     )
     STATUS = STATUS_DB[:2]
     STATUS_OPERATIONAL = frozenset([ONLINE])
+    STATUS_AVAILABLE_MONITORING = frozenset([ONLINE, OFFLINE, UNREACHABLE])
 
     _pk_key = 'node_uuid'  # _UserTasksModel
     _log_name_attr = 'hostname'  # _UserTasksModel
@@ -176,6 +178,17 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
         }
 
     @property
+    def used_nics(self):
+        """NICs that are being used by node.
+
+        This is determined by checking if NIC has IPv4 address associated with it.
+        """
+        all_nics = self.network_interfaces.copy()
+        all_nics.update(self.virtual_network_interfaces)
+
+        return {iface: prop for iface, prop in six.iteritems(all_nics) if prop.get('ip4addr')}
+
+    @property
     def api_sysinfo(self):
         """Complete compute node OS info"""
         sysinfo = self.sysinfo
@@ -296,6 +309,10 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
     def save_authorized_keys(self, value):
         self.authorized_keys = value
         self.save(update_resources=False, update_fields=('enc_json', 'changed'))
+
+    @property
+    def lifetime(self):
+        return int(timezone.now().strftime('%s')) - int(self.created.strftime('%s'))
 
     @property  # Return host name used as Zabbix alias
     def zabbix_name(self):

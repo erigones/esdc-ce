@@ -45,14 +45,14 @@ def mon_vm_sla(task_id, vm_hostname, yyyymm, vm_node_history, **kwargs):
 # noinspection PyUnusedLocal
 @cq.task(name='api.mon.vm.tasks.mon_vm_history', base=MgmtTask)
 @mgmt_task()
-def mon_vm_history(task_id, vmuuid, items, zhistory, result, items_search, **kwargs):
+def mon_vm_history(task_id, vm_uuid, items, zhistory, result, items_search, **kwargs):
     """
     Return server history data for selected graph and period.
     """
     dc = Dc.objects.get_by_id(int(dc_id_from_task_id(task_id)))
 
     try:
-        history = getZabbix(dc).vm_history(vmuuid, items, zhistory, result['since'], result['until'],
+        history = getZabbix(dc).vm_history(vm_uuid, items, zhistory, result['since'], result['until'],
                                            items_search=items_search)
     except ZabbixError as exc:
         raise MgmtTaskException(text_type(exc))

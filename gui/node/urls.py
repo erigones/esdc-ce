@@ -19,5 +19,7 @@ urlpatterns = patterns(
     url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/backups/list/(?P<vm_hostname>[A-Za-z0-9\._-]+)/$',
         'backup_list', name='node_vm_backup_list'),
     url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/monitoring/$', 'monitoring', name='node_monitoring'),
+    url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/monitoring/(?P<graph_type>[A-Za-z0-9-]+)/$',
+        'monitoring', name='node_monitoring_graphs'),
     url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/tasklog/$', 'tasklog', name='node_tasklog'),
 )

@@ -27,10 +27,16 @@ var HISTORY_GRAPH_OPTIONS = {
 };
 
 
-/*********** ServerMonitoringGraph class *************/
-function ServerMonitoringGraph(hostname, graph) {
+function _get_graph_id(obj_type, hostname, graph_name, graph_params) {
+  var valid_graph_params = _.pick(graph_params, 'nic_id', 'disk_id', 'nic', 'zpool');
+
+  return obj_type + '__' + hostname + '__' + graph_name + '__' + $.param(valid_graph_params);
+}
+
+/*********** MonitoringGraph class *************/
+function MonitoringGraph(obj_type, hostname, graph_name, graph_params, graph_id) {
   var self = this;
-  var chart = $(jq('vm_history_' + graph + '_' + hostname));
+  var chart = $(jq(graph_id || _get_graph_id(obj_type, hostname, graph_name, graph_params)));
   var plot = null;
   var options = null;
   var history_chooser_timer = null;
@@ -46,7 +52,7 @@ function ServerMonitoringGraph(hostname, graph) {
   var elements = {
     win:        chart,
     header:     chart.find('div.tab-header'),
-    control:    chart.find('div.vm_history_control a:not(.useless)'),
+    control:    chart.find('div.graph_history_control a:not(.useless)'),
     chartable:  chart.find('table.chartable'),
     winctrl:    chart.find('span.window-control'),
     period:     chart.find('span.period'),
@@ -64,6 +70,10 @@ function ServerMonitoringGraph(hostname, graph) {
     return Math.floor(date.getTime() / 1000);
   }
 
+  function _get_graph_data(additional_graph_params) {
+    return $.extend({}, graph_params, additional_graph_params);
+  }
+
   /*
    * Format value by using the yaxis.tickFormatter()
    */
@@ -76,7 +86,7 @@ function ServerMonitoringGraph(hostname, graph) {
   }
 
   /*
-   * Parse mon_vm_history result and return plot data
+   * Parse mon_*_history result and return plot data
    */
   function _parse_history(result) {
     var i, data = {};
@@ -272,7 +282,7 @@ function ServerMonitoringGraph(hostname, graph) {
   }
 
   /*
-   * Create data for vm_get_history()
+   * Create data for mon_get_history()
    */
   function _get_kwargs(period) {
     var now = _now();
@@ -294,7 +304,7 @@ function ServerMonitoringGraph(hostname, graph) {
   }
 
   /*
-   * Create mon_vm_history task
+   * Create mon_vm|node_history task
    */
   function _update(kwargs, timeout) {
     if (typeof(timeout) === 'undefined') {
@@ -310,7 +320,7 @@ function ServerMonitoringGraph(hostname, graph) {
       // Disable the buttons now
       elements.control.addClass('disabled');
       // Emit
-      if (vm_get_history(hostname, graph, kwargs) === null) { // Emit never happened, socketio disconnected
+      if (mon_get_history(obj_type, hostname, graph_name, _get_graph_data(kwargs)) === null) { // Emit never happened, socketio disconnected
         // Enable buttons and red graph
         _graph_enable_problem();
         elements.control.removeClass('disabled');
@@ -352,7 +362,7 @@ function ServerMonitoringGraph(hostname, graph) {
       autorefresh_timer = setTimeout(function() {
         var kwargs = {since: result.until + 1, autorefresh: true};
         // Emit
-        vm_get_history(hostname, graph, kwargs);
+        mon_get_history(obj_type, hostname, graph_name, _get_graph_data(kwargs));
       }, result.update_interval * 1000);
     }
   }
@@ -376,6 +386,9 @@ function ServerMonitoringGraph(hostname, graph) {
     _update(_get_kwargs('1h'), 1000);
   };
 
+  this.is_displayed = function() {
+    return Boolean($(chart.selector).length);
+  };
 
   /*
    * Initialize
@@ -465,27 +478,26 @@ function ServerMonitoringGraph(hostname, graph) {
     return false;
   });
 
-} // ServerMonitoringGraph
+} // MonitoringGraph
 
 
-// Create and save graph instances
-function vm_history_init(hostname, graphs) {
+// Create and save graph instances (obj_type = {vm|node})
+function mon_history_init(obj_type, hostname, graphs) {
   for (i = 0; i < graphs.length; i++) {
-    var key = graphs[i] + '_' + hostname;
+    var graph = graphs[i];
+    var key = _get_graph_id(obj_type, hostname, graph.name, graph.params);
 
-    HISTORY_GRAPH_OBJECTS[key] = new ServerMonitoringGraph(hostname, graphs[i]);
+    HISTORY_GRAPH_OBJECTS[key] = new MonitoringGraph(obj_type, hostname, graph.name, graph.params, key);
     HISTORY_GRAPH_OBJECTS[key].initial_update();
   }
 }
 
-// Get monitoring history and draw new graph
-function vm_history_update(hostname, graph, result, error) {
-  var key = graph + '_' + hostname;
-  var chart = $(jq('vm_history_' + key));
+// Get monitoring history and draw new graph (obj_type = {vm|node})
+function mon_history_update(obj_type, hostname, graph_name, graph_params, result, error) {
+  var key = _get_graph_id(obj_type, hostname, graph_name, graph_params);
+  var mon_graph = HISTORY_GRAPH_OBJECTS[key];
 
-  if (!chart.length) { return; }
-
-  if (HISTORY_GRAPH_OBJECTS[key]) {
-    HISTORY_GRAPH_OBJECTS[key].draw(result, error);
+  if (mon_graph && mon_graph.is_displayed()) {
+    mon_graph.draw(result, error);
   }
 }

@@ -4,11 +4,13 @@ from api.api_views import APIView
 from api.exceptions import InvalidInput, VmIsNotOperational, VmIsLocked, ExpectationFailed
 from api.task.response import mgmt_task_response, FailureTaskResponse, SuccessTaskResponse
 from api.vm.utils import get_vm
+from api.mon.utils import call_mon_history_task
 from api.mon.messages import LOG_MONDEF_UPDATE
 from api.mon.node.utils import parse_yyyymm
-from api.mon.vm.tasks import mon_vm_sla as t_mon_vm_sla, mon_vm_history as t_mon_vm_history
-from api.mon.vm.serializers import VmMonitoringSerializer, MonVmHistorySerializer
 from api.mon.vm.graphs import GRAPH_ITEMS
+from api.mon.serializers import MonHistorySerializer
+from api.mon.vm.serializers import VmMonitoringSerializer, NetworkVmMonHistorySerializer, DiskVmMonHistorySerializer
+from api.mon.vm.tasks import mon_vm_sla as t_mon_vm_sla, mon_vm_history as t_mon_vm_history
 from api.vm.define.utils import VM_STATUS_OPERATIONAL
 
 
@@ -103,13 +105,8 @@ class VmHistoryView(APIView):
         if vm.status not in vm.STATUS_OPERATIONAL:
             raise VmIsNotOperational
 
-        # Validate graph identificator
-        graph_category, item_id = MonVmHistorySerializer.parse_graph(vm, graph)
-
         try:
-            if not graph_category:
-                raise KeyError
-            graph_settings = GRAPH_ITEMS.get_options(graph_category, vm)
+            graph_settings = GRAPH_ITEMS.get_options(graph, vm)
         except KeyError:
             raise InvalidInput('Invalid graph')
         else:
@@ -118,39 +115,24 @@ class VmHistoryView(APIView):
             if required_ostype is not None and vm.ostype not in required_ostype:
                 raise InvalidInput('Invalid OS type')
 
-        _apiview_ = {'view': 'mon_vm_history', 'method': request.method, 'hostname': vm.hostname, 'graph': graph}
+        if graph.startswith(('nic-', 'net-')):
+            ser_class = NetworkVmMonHistorySerializer
+        elif graph.startswith(('disk-', 'hdd-', 'fs-')):
+            ser_class = DiskVmMonHistorySerializer
+        else:
+            ser_class = MonHistorySerializer
 
-        ser = MonVmHistorySerializer(data=self.data)
+        ser = ser_class(obj=self.vm, data=self.data)
 
         if not ser.is_valid():
             return FailureTaskResponse(request, ser.errors, vm=vm)
 
-        result = ser.object.copy()
-        result['desc'] = graph_settings.get('desc', '')
-        result['hostname'] = vm.hostname
-        result['graph'] = graph
-        result['options'] = graph_settings.get('options', {})
-        result['update_interval'] = graph_settings.get('update_interval', None)
-        tidlock = 'mon_vm_history vm:%s graph:%s since:%d until:%d' % (vm.uuid, graph, round(ser.object['since'], -2),
-                                                                       round(ser.object['until'], -2))
-
-        if item_id is None:
-            items = graph_settings['items']
-        else:
-            item_dict = {'id': item_id}
-            items = [i % item_dict for i in graph_settings['items']]
-
-        if 'items_search_fun' in graph_settings:
-            # noinspection PyCallingNonCallable
-            items_search = graph_settings['items_search_fun'](graph_settings, item_id)
-        else:
-            items_search = None
-
-        history = graph_settings['history']
-        ter = t_mon_vm_history.call(request, vm.owner.id, (vm.uuid, items, history, result, items_search),
-                                    kwargs={'vm_uuid': vm.uuid}, meta={'apiview': _apiview_}, tidlock=tidlock)
-        # NOTE: cache_result=tidlock, cache_timeout=60)
-        # Caching is disable here, because it makes no real sense.
-        # The latest graphs must be fetched from zabbix and the older are requested only seldom.
-
-        return mgmt_task_response(request, *ter, vm=vm, api_view=_apiview_, data=self.data)
+        return call_mon_history_task(
+            request, t_mon_vm_history,
+            view_fun_name='mon_vm_history',
+            obj=self.vm,
+            serializer=ser,
+            data=self.data,
+            graph=graph,
+            graph_settings=graph_settings
+        )

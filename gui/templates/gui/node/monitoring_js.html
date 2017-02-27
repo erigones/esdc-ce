@@ -1,0 +1,13 @@
+{% load i18n %}
+{% load gui_utils %}
+<script type="text/javascript">
+  HISTORY_GRAPH_OBJECTS = {}; {# Clear object cache #}
+
+  {% if obj_operational %}
+  $(document).ready(function() {
+    mon_history_init('node', '{{ node.hostname }}', {{ graphs|json|safe }});
+  });
+  {% endif %}
+</script>
+
+{% include "gui/node/monitoring_graph_templates.html" %}

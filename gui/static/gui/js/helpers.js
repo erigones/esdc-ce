@@ -132,7 +132,7 @@ function deepcopy(oldObject) {
 }
 
 function _jq(myid) {
-  return myid.replace(/(:|\.)/g,'\\$1');
+  return myid.replace(/(:|\.|=)/g,'\\$1');
 }
 function jqi(myid) {
   return '#' + _jq(myid);
