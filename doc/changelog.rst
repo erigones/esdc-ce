@@ -13,6 +13,8 @@ Features
 Bugs
 ----
 
+- Fixed bug that assigned old IP address to the VM during the redeploy - `#77 <https://github.com/erigones/esdc-ce/issues/77>`__
+
 
 2.4.0 (released on 2017-02-22)
 ==============================
