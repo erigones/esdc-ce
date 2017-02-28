@@ -14,6 +14,7 @@ Bugs
 ----
 
 - Fixed bug that assigned old IP address to the VM during the redeploy - `#77 <https://github.com/erigones/esdc-ce/issues/77>`__
+- Disabled TOS acceptation checkbox when TOS_LINK is empty - `#78 <https://github.com/erigones/esdc-ce/issues/78>`__
 
 
 2.4.0 (released on 2017-02-22)
