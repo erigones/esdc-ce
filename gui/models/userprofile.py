@@ -145,7 +145,7 @@ class UserProfile(models.Model):
         return (
             self.user.email and self.phone and (
                 not settings.REGISTRATION_ENABLED or
-                self.tos_acceptation and
+                (self.tos_acceptation or not settings.TOS_LINK) and
                 self.email_verified and
                 self.phone_verified and
                 (self.usertype == self.PERSONAL or (self.usertype == self.COMPANY and self.companyid))

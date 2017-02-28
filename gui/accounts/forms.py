@@ -216,7 +216,7 @@ class UserProfileRegisterForm(forms.ModelForm):
     User profile registration form, for extended data collected about user (gui users table)
     """
     include_company = False
-    include_tos = True
+    include_tos = bool(settings.TOS_LINK)
     include_others = True
     phone_help_text = _('You will receive a text message with an auto-generated password which you can change after '
                         'login.')

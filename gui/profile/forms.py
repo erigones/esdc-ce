@@ -250,7 +250,8 @@ class UserProfileForm(SerializerForm):
         super(UserProfileForm, self).__init__(request, profile, *args, **kwargs)
 
         # Display TOS acceptation checkbox if user did not accepted TOS and registration is enabled
-        if profile.user.is_staff or profile.tos_acceptation or not settings.REGISTRATION_ENABLED:
+        if (profile.user.is_staff or profile.tos_acceptation or
+                not settings.REGISTRATION_ENABLED or not settings.TOS_LINK):
             del self.fields['tos_acceptation']
 
         if not profile.user.is_staff and user_profile_company_only_form(profile.user):
