@@ -733,7 +733,7 @@ function mdata_display(input_field) {
     $(this).parent().remove();
   });
 
-  input_group.on('click', 'span.icon-plus', function() {
+  input_group.on('click', 'span.icon-plus.icon-link-enabled', function() {
     $(this).removeClass('icon-plus').addClass('icon-minus');
     input_group.append(row_template({'key': '', 'value': '', 'sign': 'plus icon-link-disabled'}));
   });
@@ -841,7 +841,7 @@ function array_display(input_field) {
     $(this).parent().remove();
   });
 
-  input_group.on('click', 'span.icon-plus', function() {
+  input_group.on('click', 'span.icon-plus.icon-link-enabled', function() {
     $(this).removeClass('icon-plus').addClass('icon-minus');
     input_group.append(row_template({'value': '', 'sign': 'plus icon-link-disabled'}));
   });

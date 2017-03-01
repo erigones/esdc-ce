@@ -209,28 +209,31 @@ div.black-box .help-inline.note.checkbox, div.block-box .help-inline.error.check
   margin-left: 3px;
 }
 
-/* line 163, ../scss/layout.scss */
-.icon-link-enabled {
-  cursor: pointer;
-}
-/* line 165, ../scss/layout.scss */
-.icon-link-enabled :hover {
+/* line 164, ../scss/layout.scss */
+span.icon-link-enabled :hover {
   color: #3875d7;
 }
+/* line 168, ../scss/layout.scss */
+span.icon-link-enabled:before {
+  cursor: pointer;
+}
 
-/* line 170, ../scss/layout.scss */
-.icon-link-disabled {
+/* line 173, ../scss/layout.scss */
+span.icon-link-disabled {
   color: gray;
+}
+/* line 176, ../scss/layout.scss */
+span.icon-link-disabled:before {
   cursor: not-allowed;
 }
 
-/* line 175, ../scss/layout.scss */
+/* line 181, ../scss/layout.scss */
 .clearfix {
   overflow: hidden;
   *zoom: 1;
 }
 
-/* line 179, ../scss/layout.scss */
+/* line 185, ../scss/layout.scss */
 .footer {
   padding: 5px 10px;
   margin: auto;
@@ -254,11 +257,11 @@ div.black-box .help-inline.note.checkbox, div.block-box .help-inline.error.check
   color: white;
   text-shadow: 0 1px rgba(0, 0, 0, 0.8);
 }
-/* line 199, ../scss/layout.scss */
+/* line 205, ../scss/layout.scss */
 .footer a {
   color: #ddd;
 }
-/* line 201, ../scss/layout.scss */
+/* line 207, ../scss/layout.scss */
 .footer a:hover {
   color: #ccc;
 }
