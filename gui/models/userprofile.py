@@ -148,6 +148,7 @@ class UserProfile(models.Model):
                 (self.tos_acceptation or not settings.TOS_LINK) and
                 self.email_verified and
                 self.phone_verified and
+                # A company user account also requires a valid company ID
                 (self.usertype == self.PERSONAL or (self.usertype == self.COMPANY and self.companyid))
             )
         )
