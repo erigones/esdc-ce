@@ -639,6 +639,25 @@ function vm_modal_form_handler(e, handler) {
 
 }
 
+/*
+ * Helper function used by mdata_input and array_input
+ */
+function _load_json_input(input_field, display_error) {
+	var value_raw = input_field.val();
+
+	if (value_raw) {
+		try {
+			return JSON.parse(value_raw);
+		} catch (e) {
+			if (display_error) {
+				alert2(e.message);
+			}
+			return null;
+		}
+	} else {
+		return {};
+	}
+}
 
 /*
  * mdata_input functions
@@ -647,30 +666,50 @@ function vm_modal_form_handler(e, handler) {
 function mdata_display(input_field) {
   if (!input_field.length) { return; }
 
-  var input_group = input_field.parent();
+  var control_group = input_field.parent();
   var row_template = _.template($('#template-mdata-row-inputs').html());
-  var value_raw = input_field.val();
-  var value;
+  var input_group = $('<div class="dynamic-input-group"></div>');
+  var current_value = _load_json_input(input_field, false);
 
-  if (value_raw) {
-    try {
-      value = JSON.parse(value_raw);
-    } catch(e) {
-      console.log(e);
-      return;
-    }
-  } else {
-    value = {};
+  control_group.children('div.dynamic-input-group').remove();
+
+  if (current_value !== null) {
+    // pretty print
+    input_field.val(JSON.stringify(current_value, undefined, 4));
   }
 
-  // pretty print
-  input_field.val(JSON.stringify(value, undefined, 4));
+  function hide_mdata_input() {
+    var btn = $(this);
+    input_field.off('focus', display_mdata_input);
+    mdata_handler(input_field);  // This will show the original input field and update its value
 
-  input_field.click(function() {
-    $(this).hide();
-    input_group.children('span.help-inline').hide();
-    input_group.children('span.mdata-row').remove();
+    if (!btn.is(input_field)) {
+      btn.remove();
+    }
+
+    input_group.detach();
+    control_group.append($('#template-mdata-btn-enable').html());
+    control_group.find('a.mdata-input-enable').click(display_mdata_input);
+  }
+
+  function display_mdata_input() {
+    var btn = $(this);
     var row, input;
+    var value = _load_json_input(input_field, true);
+
+    if (value === null) {
+      input_field.off('focus', display_mdata_input);
+      return;
+    }
+
+    control_group.children('span.help-inline').hide();
+    control_group.append(input_group);
+    input_group.empty();
+    input_field.hide();
+
+    if (!btn.is(input_field)) {  // called from button instead of focus
+      btn.remove();
+    }
 
     $.each(value, function(key, val) {
       row = $(row_template({'key': key, 'value': repr(val), 'sign': 'minus icon-link-enabled'}));
@@ -678,14 +717,23 @@ function mdata_display(input_field) {
       input = row.children().get(1);
       input.scrollLeft = input.scrollWidth;
     });
+
     input_group.append(row_template({'key': '', 'value': '', 'sign': 'plus icon-link-disabled'}));
-  });
+    input_group.find('span.mdata-row:last input:first').focus();
+
+    if (input_field.data('raw_input_enabled')) {
+      control_group.append($('#template-mdata-btn-disable').html());
+      control_group.find('a.mdata-input-disable').click(hide_mdata_input);
+    }
+  }
+
+  input_field.focus(display_mdata_input);
 
   input_group.on('click', 'span.icon-minus', function() {
     $(this).parent().remove();
   });
 
-  input_group.on('click', 'span.icon-plus', function() {
+  input_group.on('click', 'span.icon-plus.icon-link-enabled', function() {
     $(this).removeClass('icon-plus').addClass('icon-minus');
     input_group.append(row_template({'key': '', 'value': '', 'sign': 'plus icon-link-disabled'}));
   });
@@ -703,7 +751,7 @@ function mdata_display(input_field) {
 function mdata_handler(input_field) {
   if (!input_field.length) { return; }
 
-  var input_group = input_field.parent();
+  var input_group = input_field.parent().find('div.dynamic-input-group');
   var rows = input_group.children('span.mdata-row');
 
   // do not bother if there are no mdata-rows around
@@ -720,7 +768,7 @@ function mdata_handler(input_field) {
 
     // Update textarea and clean mdata-rows
     rows.remove();
-    input_field.val(JSON.stringify(result));
+    input_field.val(JSON.stringify(result, undefined, 4));
     input_field.show();
   }
 }
@@ -745,30 +793,36 @@ function mdata_prepare(fields) {
 function array_display(input_field) {
   if (!input_field.length) { return; }
 
-  var input_group = input_field.parent();
+  var control_group = input_field.parent();
   var row_template = _.template($('#template-array-row-inputs').html());
-  var value_raw = input_field.val();
-  var value;
+  var input_group = $('<div class="dynamic-input-group"></div>');
+  var current_value = _load_json_input(input_field, false);
 
-  if (value_raw) {
-    try {
-      value = JSON.parse(value_raw);
-    } catch(e) {
-      console.log(e);
-      return;
-    }
-  } else {
-    value = [];
+  control_group.children('div.dynamic-input-group').remove();
+
+  if (current_value !== null) {
+    // pretty print
+    input_field.val(JSON.stringify(current_value, undefined, 4));
   }
 
-  // pretty print
-  input_field.val(JSON.stringify(value, undefined, 4));
-
-  input_field.click(function() {
-    $(this).hide();
-    input_group.children('span.help-inline').hide();
-    input_group.children('span.array-row').remove();
+  function display_array_input() {
+    var btn = $(this);
     var row, input;
+    var value = _load_json_input(input_field, true);
+
+    if (value === null) {
+      input_field.off('focus', display_array_input);
+      return;
+    }
+
+    control_group.children('span.help-inline').hide();
+    control_group.append(input_group);
+    input_group.empty();
+    input_field.hide();
+
+    if (!btn.is(input_field)) {  // called from button instead of focus
+      btn.remove();
+    }
 
     $.each(value, function(i, val) {
       row = $(row_template({'value': repr(val), 'sign': 'minus icon-link-enabled'}));
@@ -776,14 +830,18 @@ function array_display(input_field) {
       input = row.children().get(0);
       input.scrollLeft = input.scrollWidth;
     });
+
     input_group.append(row_template({'value': '', 'sign': 'plus icon-link-disabled'}));
-  });
+    input_group.find('span.array-row:last input:first').focus();
+  }
+
+  input_field.focus(display_array_input);
 
   input_group.on('click', 'span.icon-minus', function() {
     $(this).parent().remove();
   });
 
-  input_group.on('click', 'span.icon-plus', function() {
+  input_group.on('click', 'span.icon-plus.icon-link-enabled', function() {
     $(this).removeClass('icon-plus').addClass('icon-minus');
     input_group.append(row_template({'value': '', 'sign': 'plus icon-link-disabled'}));
   });
@@ -801,7 +859,7 @@ function array_display(input_field) {
 function array_handler(input_field) {
   if (!input_field.length) { return; }
 
-  var input_group = input_field.parent();
+  var input_group = input_field.parent().find('div.dynamic-input-group');
   var rows = input_group.children('span.array-row');
 
   // do not bother if there are no array-rows around

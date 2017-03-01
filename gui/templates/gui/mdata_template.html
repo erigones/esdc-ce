@@ -1,6 +1,9 @@
+{% load i18n %}
 <script type="text/html" id="template-mdata-row-inputs"><span class="mdata-row">
     <input value="{% templatetag openvariable %}-key-{% templatetag closevariable %}" type="text" class="mdata-key {{ key_class|default:"input-transparent narrower" }}" />:
     <input value="{% templatetag openvariable %}-value-{% templatetag closevariable %}" type="text" class="mdata-val {{ value_class|default:"input-transparent narrow" }}" />
     <span class="icon-{% templatetag openvariable %}sign{% templatetag closevariable %}" ></span>
   </span>
 </script>
+<script type="text/html" id="template-mdata-btn-disable"><a class="help-inline note mdata-input-disable"><i class="icon-ok-sign"></i> {% trans "Switch to raw input mode" %}</a></script>
+<script type="text/html" id="template-mdata-btn-enable"><a class="help-inline note mdata-input-enable"><i class="icon-ok-sign"></i> {% trans "Switch to key-value input mode" %}</a></script>
