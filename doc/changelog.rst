@@ -10,6 +10,7 @@ Features
 - Added compute node monitoring and graphs to GUI and API - `#13 <https://github.com/erigones/esdc-ce/issues/13>`__
 - Added ``cpu_type`` parameter into vm_define API call - `#76 <https://github.com/erigones/esdc-ce/issues/76>`__
 - Updated metadata input fields to accept raw JSON input - `#79 <https://github.com/erigones/esdc-ce/issues/79>`__
+- Added convenience button in the OnScreenKeyboard in the virtual console that emits Ctrl+Alt+Delete - `#80 <https://github.com/erigones/esdc-ce/issues/80>`__
 - Updated version of the packages in requirement files - `#81 <https://github.com/erigones/esdc-ce/issues/81>`__
 
 Bugs
