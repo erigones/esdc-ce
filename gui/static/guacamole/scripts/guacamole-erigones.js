@@ -23,31 +23,34 @@ function GuacamoleErigones(guac, zoom_enabled) {
     'btn_kbd': document.getElementById('btn-kbd'),
     'btn_menu': document.getElementById('btn-menu'),
   };
+  var KEYSYM_CTRL = 65507;
+  var KEYSYM_ALT = 65513;
+  var KEYSYM_DELETE = 65535;
 
   if (typeof(zoom_enabled) === 'undefined') {
     zoom_enabled = false;
   }
 
   // Connect
-  this.connect = function(data) {
+  this.connect = function (data) {
     guac.connect(data);
   };
 
   // Hide message
-  this.hide_message = function() {
+  this.hide_message = function () {
     message.className = 'hide';
     display.className = '';
   };
 
   // Show message
-  this.show_message = function(text) {
+  this.show_message = function (text) {
     message.innerHTML = text;
     display.className = 'disabled';
     message.className = '';
   };
 
   // Touch keyboard
-  this.toggle_touch_keyboard = function(show) {
+  this.toggle_touch_keyboard = function (show) {
     touch_keyboard_enabled = show;
 
     if (touch_keyboard_enabled) {
@@ -59,7 +62,7 @@ function GuacamoleErigones(guac, zoom_enabled) {
     }
   };
 
-  this.resize_touch_keyboard = function() {
+  this.resize_touch_keyboard = function () {
     // Hide native keyboard on every resize
     if (keyboard_status == 3) {
       self.toggle_touch_keyboard(false);
@@ -68,7 +71,7 @@ function GuacamoleErigones(guac, zoom_enabled) {
   };
 
   // OnScreen keyboard
-  this.resize_onscreen_keyboard = function() {
+  this.resize_onscreen_keyboard = function () {
     if (keyboard2 && onscreen_keyboard_enabled) {
 
       if (onscreen_keyboard_enabled == 'full') {
@@ -84,8 +87,8 @@ function GuacamoleErigones(guac, zoom_enabled) {
 
     }
   };
-  
-  init_onscreen_keyboard = function(show_keyboard_handler) {
+
+  init_onscreen_keyboard = function (show_keyboard_handler) {
     if (!onscreen_keyboard_source || onscreen_keyboard_downloading) {
       return false;
     }
@@ -95,7 +98,7 @@ function GuacamoleErigones(guac, zoom_enabled) {
     var xhr = new XMLHttpRequest();
     var layout;
 
-    xhr.onreadystatechange = function() {
+    xhr.onreadystatechange = function () {
       if (xhr.readyState == XMLHttpRequest.DONE) {
         if (xhr.status == 200 || xhr.status == 304) {
           layout = JSON.parse(xhr.responseText);
@@ -109,7 +112,13 @@ function GuacamoleErigones(guac, zoom_enabled) {
             guac.sendKeyEvent(0, keysym);
           };
 
+          var cads = document.getElementsByClassName('guac-keyboard-key-ctrl-alt-del');
+          if (cads.length) {
+            cads[0].onclick = ctrl_alt_delete_keystroke;
+          }
+
           show_keyboard_handler();
+
         }
         onscreen_keyboard_downloading = false;
       }
@@ -136,7 +145,19 @@ function GuacamoleErigones(guac, zoom_enabled) {
     onscreen_keyboard.className = 'hide';
   }
 
-  this.toggle_onscreen_keyboard = function(cls) {
+  function ctrl_alt_delete_keystroke(e) {
+    e.preventDefault();
+    guac.sendKeyEvent(1, KEYSYM_CTRL);
+    guac.sendKeyEvent(1, KEYSYM_ALT);
+    guac.sendKeyEvent(1, KEYSYM_DELETE);
+
+    guac.sendKeyEvent(0, KEYSYM_DELETE);
+    guac.sendKeyEvent(0, KEYSYM_ALT);
+    guac.sendKeyEvent(0, KEYSYM_CTRL);
+    return false;
+  }
+
+  this.toggle_onscreen_keyboard = function (cls) {
     onscreen_keyboard_enabled = cls;
 
     if (onscreen_keyboard_enabled) {
@@ -147,14 +168,14 @@ function GuacamoleErigones(guac, zoom_enabled) {
   };
 
   // Zoom
-  this.zoom = function(yes) {
+  this.zoom = function (yes) {
     if (typeof(yes) !== 'undefined') {
       zoom_enabled = yes;
     }
 
     if (zoom_enabled) {
-      var scale = Math.min( window.innerWidth / guac_display.getWidth(),
-                            window.innerHeight / guac_display.getHeight());
+      var scale = Math.min(window.innerWidth / guac_display.getWidth(),
+        window.innerHeight / guac_display.getHeight());
 
       if (scale != guac_display.getScale()) {
         guac_display.scale(scale);
@@ -177,7 +198,7 @@ function GuacamoleErigones(guac, zoom_enabled) {
   display.appendChild(guac_element);
 
   // State change
-  guac.onstatechange = function(state) {
+  guac.onstatechange = function (state) {
     switch (state) {
       case 0:
         self.show_message(gettext('Idle.'));
@@ -204,23 +225,23 @@ function GuacamoleErigones(guac, zoom_enabled) {
   };
 
   // Name change
-  guac.onname = function(name) {
+  guac.onname = function (name) {
     connection = name;
   };
 
   // Errors
-  guac.onerror = function(error) {
+  guac.onerror = function (error) {
     self.show_message(error);
     guac.disconnect();
   };
 
   // Resize
-  guac.onresize = function(width, height) {
+  guac.onresize = function (width, height) {
     self.zoom();
   };
 
   // Disable default click action
-  guac_element.onclick = function(e) {
+  guac_element.onclick = function (e) {
     e.preventDefault();
     return false;
   };
@@ -230,13 +251,13 @@ function GuacamoleErigones(guac, zoom_enabled) {
   touch = new Guacamole.Mouse.Touchpad(guac_element);
 
   touch.onmousedown = touch.onmouseup = touch.onmousemove =
-  mouse.onmousedown = mouse.onmouseup = mouse.onmousemove = function(ms) {
-    var mss = new Guacamole.Mouse.State(
+    mouse.onmousedown = mouse.onmouseup = mouse.onmousemove = function (ms) {
+      var mss = new Guacamole.Mouse.State(
         ms.x / guac_display.getScale(),
         ms.y / guac_display.getScale(),
         ms.left, ms.middle, ms.right, ms.up, ms.down);
-    guac.sendMouseState(mss);
-  };
+      guac.sendMouseState(mss);
+    };
 
   // Keyboard
   keyboard = new Guacamole.Keyboard(document);
@@ -249,11 +270,11 @@ function GuacamoleErigones(guac, zoom_enabled) {
   };
 
   // Disconnect
-  window.onunload = function() {
+  window.onunload = function () {
     guac.disconnect();
   };
 
-  window.onresize = function() {
+  window.onresize = function () {
     guac.sendSize(window.innerWidth, window.innerHeight);
     self.zoom();
   };
@@ -264,7 +285,7 @@ function GuacamoleErigones(guac, zoom_enabled) {
    *        */
 
   // Focus on display
-  menu.btn_capture.onclick = function(e) {
+  menu.btn_capture.onclick = function (e) {
     guac.sendKeyEvent(1, 'z');
     guac.sendKeyEvent(0, 'z');
     self.resize_touch_keyboard();
@@ -272,7 +293,7 @@ function GuacamoleErigones(guac, zoom_enabled) {
   };
 
   // Switch zoom setting
-  menu.btn_zoom.onclick = function(e) {
+  menu.btn_zoom.onclick = function (e) {
     self.zoom(!zoom_enabled);
 
     if (zoom_enabled) {
@@ -283,7 +304,7 @@ function GuacamoleErigones(guac, zoom_enabled) {
   };
 
   // Show / Hide touchscreen keyboard
-  menu.btn_kbd.onclick = function(e) {
+  menu.btn_kbd.onclick = function (e) {
     switch (keyboard_status) {
       case 0:
         self.toggle_onscreen_keyboard('compact');
@@ -313,7 +334,7 @@ function GuacamoleErigones(guac, zoom_enabled) {
   };
 
   // Change menu position
-  menu.btn_menu.onclick = function(e) {
+  menu.btn_menu.onclick = function (e) {
     switch (menu.menu.className) {
       case 'right':
         menu.menu.className = 'bottom';

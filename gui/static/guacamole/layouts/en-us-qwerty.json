@@ -92,6 +92,10 @@
             "modifier" : "super",
             "keysym"   : 65515
         }],
+        "CtrlAltDel" : [{
+            "title"  : "Ctrl+Alt+Del",
+            "keysym": 65507
+        }],
 
         "`" : [
             { "title" : "`", "requires" : [         ] },
@@ -341,7 +345,9 @@
 
         [ "Esc", 0.7, "F1", "F2",  "F3",  "F4",
                  0.7, "F5", "F6",  "F7",  "F8",
-                 0.7, "F9", "F10", "F11", "F12" ],
+                 0.7, "F9", "F10", "F11", "F12",
+                 1.95, "CtrlAltDel"
+        ],
 
         [ 0.1 ],
 
@@ -392,7 +398,9 @@
         "PgUp" : 1.6,
         "Del"  : 1.6,
         "End"  : 1.6,
-        "PgDn" : 1.6
+        "PgDn" : 1.6,
+
+        "CtrlAltDel": 3.3
 
     }
 
