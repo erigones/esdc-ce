@@ -2,7 +2,7 @@
   hosts: "{{ runhosts }}"
   vars:
     appliance_type: 'mgmt'   # default, overridden by extra-vars
-    erigones_home: "{{ lookup('env','ERIGONES_HOME')|default('/opt/erigones') }}"
+    erigones_home: "{{ lookup('env','ERIGONES_HOME')|default('/opt/erigones', true) }}"
     upg_base: "{{ erigones_home }}/ans/upgrade"
     # directory with the actual upgrade steps:
     upg_dir: "{{ upg_base }}/{{ appliance_type }}"
@@ -28,3 +28,5 @@
     service: name=postgresql-9.5 state=restarted
   - name: restart erigonesd-beat
     service: name=erigonesd-beat state=restarted
+  - name: reload haproxy
+    service: name=haproxy state=reloaded
