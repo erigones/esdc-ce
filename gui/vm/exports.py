@@ -212,7 +212,7 @@ class Export(ImportExportBase, Excel):
 
     @staticmethod
     def _convert_to_gb(num):
-        return round(num / 1024, 4)
+        return round(num / 1024, 1)
 
     #
     # Functions required for Data sheet generation
