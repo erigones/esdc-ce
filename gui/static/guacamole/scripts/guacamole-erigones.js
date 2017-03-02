@@ -23,9 +23,9 @@ function GuacamoleErigones(guac, zoom_enabled) {
     'btn_kbd': document.getElementById('btn-kbd'),
     'btn_menu': document.getElementById('btn-menu'),
   };
-  var KEYSYM_CTRL = 65507;
-  var KEYSYM_ALT = 65513;
-  var KEYSYM_DELETE = 65535;
+  var KEYSYM_CTRL = 65507; // This number comes from en-us-querty.json
+  var KEYSYM_ALT = 65513; // This number comes from en-us-querty.json
+  var KEYSYM_DELETE = 65535; // This number comes from en-us-querty.json
 
   if (typeof(zoom_enabled) === 'undefined') {
     zoom_enabled = false;
