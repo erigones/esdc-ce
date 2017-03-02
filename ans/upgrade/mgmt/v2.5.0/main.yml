@@ -1,0 +1,5 @@
+# https://github.com/erigones/esdc-factory/commit/398ce29b33e0e4f98794f021342dea44b4eba03b
+- name: Add rate-limit to main frontend in /etc/haproxy/haproxy.cfg
+  lineinfile: dest=/etc/haproxy/haproxy.cfg line="\trate-limit sessions 30" state=present insertafter="redirect scheme https" 
+  notify: 
+    - reload haproxy

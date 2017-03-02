@@ -126,7 +126,7 @@
                 <a href="{{ pathto('http-routingtable') }}" rel="nofollow">API routing table</a>
               </li>
             </ul>
-            {% set toctree = toctree(maxdepth=theme_navigation_depth, collapse=theme_collapse_navigation, includehidden=True) %}
+            {% set toctree = toctree(maxdepth=theme_navigation_depth|int, collapse=theme_collapse_navigation, includehidden=True) %}
             {% if toctree %}
                 {{ toctree }}
             {% else %}
@@ -155,6 +155,9 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             {% block body %}{% endblock %}
+           </div>
+           <div class="articleComments">
+            {% block comments %}{% endblock %}
            </div>
           </div>
           {% include "footer.html" %}
@@ -187,7 +190,8 @@
             VERSION:'{{ release|e }}',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'{{ '' if no_search_suffix else file_suffix }}',
-            HAS_SOURCE:  {{ has_source|lower }}
+            HAS_SOURCE:  {{ has_source|lower }},
+            SOURCELINK_SUFFIX: '{{ sourcelink_suffix }}'
         };
     </script>
     {%- for scriptfile in script_files %}
