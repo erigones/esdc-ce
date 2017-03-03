@@ -1,7 +1,7 @@
 --find-links https://download.erigones.org/pypi/
 ### project
 pip
-setuptools==34.3.0
+setuptools==33.1.1
 Django==1.8.17
 Sphinx==1.5.3
 Jinja2==2.9.5

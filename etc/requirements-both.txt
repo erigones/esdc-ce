@@ -1,5 +1,5 @@
 ### que
-setuptools==34.3.0
+setuptools==33.1.1
 six==1.10.0
 psutil==5.1.3
 celery==3.1.25
