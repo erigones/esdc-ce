@@ -19,6 +19,7 @@ Bugs
 - Fixed bug that assigned old IP address to the VM during the redeploy - `#77 <https://github.com/erigones/esdc-ce/issues/77>`__
 - Disabled TOS acceptation checkbox when TOS_LINK is empty - `#78 <https://github.com/erigones/esdc-ce/issues/78>`__
 - Fixed RAM/HDD size rounding in sample export spreadsheet - `#83 <https://github.com/erigones/esdc-ce/issues/83>`__
+- Fixed race conditions that could happen during VM status changes - `#85 <https://github.com/erigones/esdc-ce/issues/85>`__
 
 
 2.4.0 (released on 2017-02-22)
