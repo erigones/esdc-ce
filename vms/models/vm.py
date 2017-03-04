@@ -1431,10 +1431,10 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
 
         return uptime
 
-    def save_zoneid(self, zoneid):
+    def save_zoneid(self, zoneid, change_time=None):
         """Save new zoneid"""
         cache.set(self.zoneid_key(self.uuid), zoneid)
-        cache.set(self.zoneid_change_key(self.uuid), timezone.now())
+        cache.set(self.zoneid_change_key(self.uuid), change_time or timezone.now())
 
     @staticmethod
     def zoneid_key(uuid):
