@@ -53,6 +53,18 @@ def _get_task_time(result, key='finish_time'):
         return None
 
 
+def _parse_timestamp(exit_or_boot_timestamp):
+    """
+    Parse boot_timestamp or exit_timestamp and return datetime object or None.
+    """
+    timestamp = exit_or_boot_timestamp.strip(':')
+
+    if timestamp:
+        return datetime_parse(timestamp).replace(tzinfo=utc)
+    else:
+        return None
+
+
 # noinspection PyUnusedLocal
 def vm_status_all(task_id, node, **kwargs):
     """
@@ -65,7 +77,7 @@ def vm_status_all(task_id, node, **kwargs):
         return
 
     logger.info('Running vm_status_all on compute node %s by %s', node, task_id)
-    tid, err = execute(ERIGONES_TASK_USER, None, 'vmadm list -p -H -o uuid,state,zoneid',
+    tid, err = execute(ERIGONES_TASK_USER, None, 'vmadm list -p -H -o uuid,state,zoneid,exit_timestamp,boot_timestamp',
                        callback=('api.vm.status.tasks.vm_status_all_cb', {'node_uuid': node.uuid}),
                        queue=node.fast_queue, nolog=True, ping_worker=False, check_user_tasks=False)
 
@@ -87,7 +99,8 @@ def vm_status_one(task_id, vm):
     """
     logger.info('Running vm_status_one for VM %s by %s', vm, task_id)
     node = vm.node
-    tid, err = execute(ERIGONES_TASK_USER, None, 'vmadm list -p -H -o uuid,state,zoneid uuid=' + vm.uuid,
+    tid, err = execute(ERIGONES_TASK_USER, None,
+                       'vmadm list -p -H -o uuid,state,zoneid,exit_timestamp,boot_timestamp uuid=' + vm.uuid,
                        callback=('api.vm.status.tasks.vm_status_all_cb', {'node_uuid': node.uuid}),
                        queue=node.fast_queue, nolog=True, ping_worker=False, check_user_tasks=False)
 
@@ -184,7 +197,7 @@ def _vm_zoneid_check(task_id, uuid, zoneid, zoneid_cache=None, change_time=None)
                 return
 
         cache.set(Vm.zoneid_key(uuid), zoneid)
-        cache.set(Vm.zoneid_change_key(uuid), timezone.now())
+        cache.set(Vm.zoneid_change_key(uuid), change_time or timezone.now())
         vm_zoneid_changed.send(task_id, vm_uuid=uuid, zoneid=zoneid, old_zoneid=zoneid_cache)  # Signal!
 
 
@@ -282,18 +295,18 @@ def _vm_status_check(task_id, node_uuid, uuid, zoneid, state, state_cache=None, 
     if deploy:  # deploy process started (VM is running)
         if vm.is_deploy_needed():
             vm.status = Vm.DEPLOYING_START
-            vm.save_status()
+            vm.save_status(status_change_time=change_time)
             return  # The deploy will be over after VM is stopped by itself from inside
         elif vm.is_blank():  # Empty VM is running -> stop VM via vm_deploy()
             vm.status = Vm.DEPLOYING_DUMMY
-            vm.save_status()
+            vm.save_status(status_change_time=change_time)
             deploy_dummy = True  # The deploy will be over after VM is stopped by vm_deploy()
         else:  # Deploy is not needed, but VM has an image. We are done here -> VM is running
             deploy_over = True
 
     if deploy_finish:  # finish deploy process -> the deploy will be over when VM is started by vm_deploy()
         vm.status = Vm.DEPLOYING_FINISH
-        vm.save_status()
+        vm.save_status(status_change_time=change_time)
 
     if deploy_finish or deploy_dummy:
         _tid, _err = vm_deploy(vm, force_stop=deploy_dummy)
@@ -305,9 +318,8 @@ def _vm_status_check(task_id, node_uuid, uuid, zoneid, state, state_cache=None, 
 
         return
 
-    if vm.is_changing_status():  # nothing to do, need to wait
-        logger.warn('Detected running vm_status task (pending state) for vm %s. Doing nothing.', uuid)
-        return
+    if vm.is_changing_status():
+        logger.warn('Detected running vm_status task (pending state) for vm %s', uuid)
 
     _save_vm_status(task_id, vm, state, old_state=state_cache, deploy_over=deploy_over, change_time=change_time,
                     **kwargs)
@@ -332,10 +344,11 @@ def vm_status_all_cb(result, task_id, node_uuid=None):
 
     for line in result['stdout'].splitlines():
         try:
-            i = line.strip().split(':')
+            i = line.strip().split(':', 3)
             uuid = i[0]
             state = Vm.STATUS_DICT[i[1]]  # int
             zoneid = int(i[2] or Vm.STOPPED_ZONEID)  # int; "-1" means that the VM not running
+            exit_or_boot_timestamp = i[3]
         except:
             try:
                 # noinspection PyUnboundLocalVariable
@@ -350,7 +363,7 @@ def vm_status_all_cb(result, task_id, node_uuid=None):
                          line, 'vm_status_all', node_uuid)
             continue
 
-        vms.append((uuid, state, zoneid))
+        vms.append((uuid, state, zoneid, exit_or_boot_timestamp))
         r_states.get(KEY_PREFIX + Vm.status_key(uuid))
         r_zoneids.get(KEY_PREFIX + Vm.zoneid_key(uuid))
 
@@ -362,12 +375,12 @@ def vm_status_all_cb(result, task_id, node_uuid=None):
 
     for i, line in enumerate(vms):
         vm = None
-        uuid, state, zoneid = line
+        uuid, state, zoneid, exit_or_boot_timestamp = line
         state_cache = vm_states[i]  # None or string
         zoneid_cache = vm_zoneids[i]  # None or string
         # Check and eventually save VM's status
         _vm_status_check(tid, node_uuid, uuid, zoneid, state, state_cache=state_cache, zoneid_cache=zoneid_cache,
-                         change_time=_get_task_time(result, 'exec_time'))
+                         change_time=_parse_timestamp(exit_or_boot_timestamp))
 
 
 @cq.task(name='api.vm.status.tasks.vm_status_event_cb', base=InternalTask, ignore_result=True)
@@ -450,11 +463,11 @@ def vm_status_cb(result, task_id, vm_uuid=None):
     """
     vm = Vm.objects.get(uuid=vm_uuid)
     msg = result.get('message', '')
+    json = result.pop('json', None)
 
     if result['returncode'] == 0 and msg and msg.find('Successfully') == 0:
         # json was updated
         if result['meta']['apiview']['update'] and msg.find('Successfully updated') == 0:
-            json = result.pop('json', None)
             try:  # save json from smartos
                 json_active = vm.json.load(json)
                 vm_delete_snapshots_of_removed_disks(vm)  # Do this before updating json and json_active
@@ -463,17 +476,22 @@ def vm_status_cb(result, task_id, vm_uuid=None):
             except Exception as e:
                 logger.exception(e)
                 logger.error('Could not parse json output from vm_status(%s). Error: %s', vm_uuid, e)
+                change_time = _get_task_time(result, 'exec_time')
             else:
                 vm.save(update_node_resources=True, update_storage_resources=True,
                         update_fields=('enc_json', 'enc_json_active', 'changed'))
                 vm_update_ipaddress_usage(vm)
                 vm_json_active_changed.send(task_id, vm=vm)  # Signal!
+                change_time = _parse_timestamp(json.get('boot_timestamp') or json.get('exit_timestamp'))
+        else:
+            change_time = _get_task_time(result, 'exec_time')
 
         if msg.find('Successfully started') >= 0:
             new_status = Vm.RUNNING
         elif msg.find('Successfully completed stop') >= 0:
             if result['meta']['apiview']['freeze']:
                 new_status = Vm.FROZEN
+                change_time = _get_task_time(result, 'finish_time')  # Force status save
             else:
                 new_status = Vm.STOPPED
         elif msg.find('Successfully completed reboot') >= 0:
@@ -495,7 +513,7 @@ def vm_status_cb(result, task_id, vm_uuid=None):
 
         raise TaskException(result, 'Got bad return code (%s). Error: %s' % (result['returncode'], msg))
 
-    _save_vm_status(task_id, vm, new_status, change_time=_get_task_time(result, 'finish_time'))
+    _save_vm_status(task_id, vm, new_status, change_time=change_time)
     task_log_cb_success(result, task_id, vm=vm, **result['meta'])
 
     return result
