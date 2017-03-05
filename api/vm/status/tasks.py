@@ -476,15 +476,13 @@ def vm_status_cb(result, task_id, vm_uuid=None):
             except Exception as e:
                 logger.exception(e)
                 logger.error('Could not parse json output from vm_status(%s). Error: %s', vm_uuid, e)
-                change_time = _get_task_time(result, 'exec_time')
             else:
                 vm.save(update_node_resources=True, update_storage_resources=True,
                         update_fields=('enc_json', 'enc_json_active', 'changed'))
                 vm_update_ipaddress_usage(vm)
                 vm_json_active_changed.send(task_id, vm=vm)  # Signal!
-                change_time = _parse_timestamp(json.get('boot_timestamp') or json.get('exit_timestamp'))
-        else:
-            change_time = _get_task_time(result, 'exec_time')
+
+        change_time = _get_task_time(result, 'exec_time')
 
         if msg.find('Successfully started') >= 0:
             new_status = Vm.RUNNING
