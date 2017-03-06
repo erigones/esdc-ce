@@ -11,6 +11,7 @@ Features
 Bugs
 ----
 
+- Fixed scrolling to first input field with an error in modal form - `#88 <https://github.com/erigones/esdc-ce/issues/88>`__
 
 
 2.5.0 (released on 2017-03-03)
