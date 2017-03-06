@@ -81,6 +81,7 @@ class NodeHistoryView(APIView):
             request, t_mon_node_history,
             view_fun_name='mon_node_history',
             obj=self.node,
+            dc_bound=False,
             serializer=ser,
             data=self.data,
             graph=graph,

@@ -11,6 +11,7 @@ Features
 Bugs
 ----
 
+- Fixed bug that caused node monitoring graphs not to show, when not in main DC -  `#100 <https://github.com/erigones/esdc-ce/issues/100>`__
 
 
 2.5.0 (released on 2017-03-03)
