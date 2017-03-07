@@ -169,11 +169,9 @@ function scroll_to_form_error(form_wrapper) {  /* Issue #35 */
 
 function scroll_to_modal_error(mod) {  /* Issue #12 */
   var first_error = mod.find('div.input.error:first');
-  var offset;
 
   if (first_error.length) {
-    offset = first_error.offset().top - mod.offset().top + 220;
-    mod.find('div.modal-body').animate({scrollTop: offset}, 500);
+    first_error.get(0).scrollIntoView();
   }
 }
 
