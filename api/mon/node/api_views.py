@@ -48,6 +48,8 @@ class NodeSLAView(APIView):
 
 class NodeHistoryView(APIView):
     """ """
+    dc_bound = False
+
     def __init__(self, request, hostname, graph_type, data):
         super(NodeHistoryView, self).__init__(request)
         self.node = get_node(request, hostname)

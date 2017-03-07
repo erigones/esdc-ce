@@ -3,7 +3,7 @@ from django.conf import settings
 from api.task.internal import InternalTask
 from api.task.response import mgmt_task_response
 from vms.utils import AttrDict
-from que import TG_DC_UNBOUND
+from que import TG_DC_UNBOUND, TG_DC_BOUND
 
 
 class MonitoringGraph(AttrDict):
@@ -70,11 +70,12 @@ def call_mon_history_task(request, task_function, view_fun_name, obj, dc_bound,
     history = graph_settings['history']
     # for VM the task_function is called without task group value because it's DC bound
     if dc_bound:
-        ter = task_function.call(request, obj.owner.id, (obj.uuid, items, history, result, items_search),
-                                 meta={'apiview': _apiview_}, tidlock=tidlock)
+        tg = TG_DC_BOUND
     else:
-        ter = task_function.call(request, obj.owner.id, (obj.uuid, items, history, result, items_search),
-                                 tg=TG_DC_UNBOUND, meta={'apiview': _apiview_}, tidlock=tidlock)
+        tg = TG_DC_UNBOUND
+
+    ter = task_function.call(request, obj.owner.id, (obj.uuid, items, history, result, items_search),
+                                 tg=tg, meta={'apiview': _apiview_}, tidlock=tidlock)
     # NOTE: cache_result=tidlock, cache_timeout=60)
     # Caching is disable here, because it makes no real sense.
     # The latest graphs must be fetched from zabbix and the older are requested only seldom.
