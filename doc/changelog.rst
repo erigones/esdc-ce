@@ -11,6 +11,8 @@ Features
 Bugs
 ----
 
+
+- Fixed bug that caused node monitoring graphs not to show, when not in main DC -  `#100 <https://github.com/erigones/esdc-ce/issues/100>`__
 - Fixed scrolling to first input field with an error in modal form - `#88 <https://github.com/erigones/esdc-ce/issues/88>`__
 
 
