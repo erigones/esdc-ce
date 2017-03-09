@@ -26,7 +26,7 @@ class AdminUserForm(SerializerForm):
     dc_bound = forms.BooleanField(label=_('DC-bound?'), required=False,
                                   widget=forms.CheckboxInput(attrs={'class': 'normal-check'}))
     username = forms.CharField(label=_('Username'), max_length=80, required=True,
-                               widget=forms.TextInput(attrs={'class': 'uneditable-input', 'disabled': '',
+                               widget=forms.TextInput(attrs={'class': 'uneditable-input', 'disabled': 'disabled',
                                                              'required': 'required', 'pattern': '[A-Za-z0-9@\.+_-]+'}))
     groups = forms.MultipleChoiceField(label=_('User groups'), required=False,
                                        widget=forms.SelectMultiple(attrs={'class': 'narrow input-select2 '
