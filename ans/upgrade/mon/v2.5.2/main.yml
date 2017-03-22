@@ -4,6 +4,32 @@
 - name: Update fixed templates (esdc-factory#30)
   include: "{{ upg_base }}/lib/zabbix_import_templates.yml"
 
+- name: Locate old rabbitmq process check item from t_svc-mq
+  local_action:
+    module: zabbix
+    args:
+      url: "{{ zabbix_url }}"
+      login_user: "{{ zabbix_login_user }}"
+      login_password: "{{ zabbix_login_password }}"
+      api_method: item.get
+      api_params_dict:
+        filter:
+          key_: "proc.num[beam,,,rabbitmq_server]"
+        templated: True
+        inherited: False
+  register: old_rabbitmq_item
+
+- name: Delete old rabbitmq process check item from t_svc-mq
+  local_action:
+    module: zabbix
+    args:
+      url: "{{ zabbix_url }}"
+      login_user: "{{ zabbix_login_user }}"
+      login_password: "{{ zabbix_login_password }}"
+      api_method: item.delete
+      api_params_list: "{{ old_rabbitmq_item.result|map(attribute='itemid')|list }}"
+  when: old_rabbitmq_item.result
+
 - name: Fix regular expressions for FS discovery (esdc-factory#30)
   shell: |
     psql -U postgres -d zabbix <<" EOF"
