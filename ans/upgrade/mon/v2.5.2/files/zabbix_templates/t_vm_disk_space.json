@@ -1,0 +1,321 @@
+{
+    "zabbix_export": {
+        "date": "2015-12-03T21:45:44Z",
+        "templates": [
+            {
+                "templates": [],
+                "name": "t_vm_disk_space",
+                "macros": [],
+                "items": [
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "300",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "B",
+                        "value_type": "3",
+                        "key": "vm.space[{HOST.HOST},usedchild]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Disk space consumed by children",
+                        "applications": [
+                            {
+                                "name": "Disk space consumed by VM"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "14"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "300",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "B",
+                        "value_type": "3",
+                        "key": "vm.space[{HOST.HOST},usedds]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Disk space consumed by datasets",
+                        "applications": [
+                            {
+                                "name": "Disk space consumed by VM"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "14"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "300",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "B",
+                        "value_type": "3",
+                        "key": "vm.space[{HOST.HOST},usedrefreserv]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Disk space consumed by refreservation",
+                        "applications": [
+                            {
+                                "name": "Disk space consumed by VM"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "14"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "300",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "B",
+                        "value_type": "3",
+                        "key": "vm.space[{HOST.HOST},usedsnap]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Disk space consumed by snapshots",
+                        "applications": [
+                            {
+                                "name": "Disk space consumed by VM"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "14"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "300",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "B",
+                        "value_type": "3",
+                        "key": "vm.space[{HOST.HOST},used]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Total disk space consumed",
+                        "applications": [
+                            {
+                                "name": "Disk space consumed by VM"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "14"
+                    }
+                ],
+                "screens": [],
+                "applications": [
+                    {
+                        "name": "Disk space consumed by VM"
+                    }
+                ],
+                "discovery_rules": [],
+                "groups": [
+                    {
+                        "name": "Templates"
+                    }
+                ],
+                "template": "t_vm_disk_space"
+            }
+        ],
+        "version": "2.0",
+        "groups": [
+            {
+                "name": "Templates"
+            }
+        ],
+        "graphs": [
+            {
+                "show_3d": "0",
+                "graph_items": [
+                    {
+                        "calc_fnc": "2",
+                        "color": "C80000",
+                        "item": {
+                            "host": "t_vm_disk_space",
+                            "key": "vm.space[{HOST.HOST},usedchild]"
+                        },
+                        "sortorder": "0",
+                        "drawtype": "0",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "C800C8",
+                        "item": {
+                            "host": "t_vm_disk_space",
+                            "key": "vm.space[{HOST.HOST},usedsnap]"
+                        },
+                        "sortorder": "3",
+                        "drawtype": "0",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "0000C8",
+                        "item": {
+                            "host": "t_vm_disk_space",
+                            "key": "vm.space[{HOST.HOST},usedrefreserv]"
+                        },
+                        "sortorder": "2",
+                        "drawtype": "0",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "00C800",
+                        "item": {
+                            "host": "t_vm_disk_space",
+                            "key": "vm.space[{HOST.HOST},usedds]"
+                        },
+                        "sortorder": "1",
+                        "drawtype": "0",
+                        "type": "0",
+                        "yaxisside": "0"
+                    }
+                ],
+                "ymin_type_1": "1",
+                "name": "Disk space consumed by type",
+                "percent_left": "0.0000",
+                "type": "1",
+                "ymax_type_1": "2",
+                "height": "400",
+                "yaxismax": "100.0000",
+                "width": "900",
+                "show_legend": "1",
+                "show_work_period": "1",
+                "ymax_item_1": {
+                    "host": "t_vm_disk_space",
+                    "key": "vm.space[{HOST.HOST},used]"
+                },
+                "ymin_item_1": "0",
+                "show_triggers": "1",
+                "yaxismin": "0.0000",
+                "percent_right": "0.0000"
+            }
+        ]
+    }
+}
