@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
-# (c) 2012-2016, Erigones, s. r. o
+# (c) 2012-2017, Erigones, s. r. o
 try:
     from zabbix_api import ZabbixAPI, ZabbixAPIException
 except ImportError:
@@ -11,6 +11,7 @@ from ansible.module_utils.basic import AnsibleModule
 
 
 def main():
+    # noinspection PyShadowingBuiltins
     module = AnsibleModule(
         argument_spec=dict(
             server_url=dict(required=True, default=None, aliases=['url']),
@@ -53,7 +54,7 @@ def main():
         module.fail_json(msg="Zabbix API error: %s" % e)
         raise AssertionError
     except Exception as e:
-        module.fail_json(msg="Other failure: %s" % e)
+        module.fail_json(msg="Unknown failure: %s" % e)
         raise AssertionError
     else:
         if api_method.endswith(('.get', '.isreadable', '.iswritable')):
