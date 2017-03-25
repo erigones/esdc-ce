@@ -1148,10 +1148,14 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
         """Return nics map from json_active."""
         return self.get_nics_map(self.json_active_get_nics())
 
-    def get_cpu_ram(self, ram_overhead=False):
-        """Return tuple (vCPUS, RAM) used in resource accounting"""
+    def get_cpu_ram(self, ram_overhead=False, ignore_cpu_ram=None):
+        """Return tuple (vCPUS, RAM) used in resource accounting. Function may return zeros when the VM is a slave VM
+        without reserved resources; if you want the CPU, RAM count for these kind of VMs, use `ignore_cpu_ram=False`"""
         json = self.json
         json_active = self.json_active
+
+        if ignore_cpu_ram is not False and self.is_slave_vm() and not self.slavevm.reserve_resources:
+            return 0, 0
 
         if self.is_kvm():
             cpu = json.get('vcpus', 0)
@@ -1226,10 +1230,17 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
 
         return dsk_size
 
-    def get_cpu_ram_disk(self, zpool=None, ram_overhead=False):
+    def get_cpu_ram_disk(self, zpool=None, ram_overhead=False, ignore_cpu_ram=None, ignore_disk=False):
         """Return tuple (vCPUS, RAM, sum(disk_size_on_zpool)) used in resource accounting"""
-        cpu, ram = self.get_cpu_ram(ram_overhead=ram_overhead)
-        dsk = self.get_disk_size(zpool=zpool)
+        if ignore_cpu_ram:
+            cpu, ram = 0, 0
+        else:
+            cpu, ram = self.get_cpu_ram(ram_overhead=ram_overhead, ignore_cpu_ram=ignore_cpu_ram)
+
+        if ignore_disk:
+            dsk = 0
+        else:
+            dsk = self.get_disk_size(zpool=zpool)
 
         return cpu, ram, dsk
 
@@ -1918,7 +1929,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
         return {nic['network_uuid'] for nic in vm_nics}
 
     def is_slave_vm(self):
-        """Return if this a VM object associated with SlaveVM"""
+        """Return True if this a VM object associated with SlaveVM"""
         return hasattr(self, 'slavevm')
 
     def add_slave_vm(self, vm):

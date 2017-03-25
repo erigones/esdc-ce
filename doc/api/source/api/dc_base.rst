@@ -190,6 +190,7 @@
                     "VMS_VM_MONITORED_DEFAULT": true, 
                     "VMS_VM_OSTYPE_DEFAULT": 1, 
                     "VMS_VM_REPLICATION_ENABLED": true,
+                    "VMS_VM_REPLICA_RESERVATION_DEFAULT": true,
                     "VMS_VM_RESOLVERS_DEFAULT": [
                         "192.168.155.25"
                     ], 

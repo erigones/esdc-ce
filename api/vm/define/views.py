@@ -36,7 +36,7 @@ def vm_define_list(request, data=None):
         :status 200: SUCCESS
         :status 403: Forbidden
     """
-    vms = get_vms(request, sr=('node', 'owner', 'template'), order_by=VmDefineView.get_order_by(data))
+    vms = get_vms(request, sr=('node', 'owner', 'template', 'slavevm'), order_by=VmDefineView.get_order_by(data))
 
     return VmDefineView(request).get(vms.prefetch_related('tags'), None, many=True)
 
@@ -218,7 +218,7 @@ Items will be set as static routes in the OS (SunOS Zone only)
         :status 404: VM not found
         :status 423: VM is not operational / VM is not notcreated / VM is locked or has slave VMs
     """
-    vm = get_vm(request, hostname_or_uuid, sr=('owner', 'node', 'template'), check_node_status=None,
+    vm = get_vm(request, hostname_or_uuid, sr=('owner', 'node', 'template', 'slavevm'), check_node_status=None,
                 noexists_fail=False, exists_ok=False)
 
     return VmDefineView(request).response(vm, data, hostname_or_uuid=hostname_or_uuid)
@@ -231,7 +231,7 @@ def vm_define_user(request, hostname_or_uuid, data=None):
     vm_define alternative used only for updating hostname and alias.
     Used by non-admin VM owners from GUI.
     """
-    vm = get_vm(request, hostname_or_uuid, sr=('owner', 'node', 'template'), check_node_status=None,
+    vm = get_vm(request, hostname_or_uuid, sr=('owner', 'node', 'template', 'slavevm'), check_node_status=None,
                 exists_ok=True, noexists_fail=True)
     allowed = {'hostname', 'alias', 'installed'}
 
@@ -397,8 +397,8 @@ def vm_define_disk(request, hostname_or_uuid, disk_id=None, data=None):
         :status 423: VM is not operational / VM is locked or has slave VMs
 
     """
-    vm = get_vm(request, hostname_or_uuid, exists_ok=True, noexists_fail=True, sr=('node', 'owner', 'template'),
-                check_node_status=None)
+    vm = get_vm(request, hostname_or_uuid, exists_ok=True, noexists_fail=True,
+                sr=('node', 'owner', 'template', 'slavevm'), check_node_status=None)
 
     try:
         disk_id = int(disk_id) - 1
@@ -603,8 +603,8 @@ other VMs. Useful for floating/shared IPs
         :status 423: VM is not operational / VM is locked or has slave VMs
 
     """
-    vm = get_vm(request, hostname_or_uuid, exists_ok=True, noexists_fail=True, sr=('node', 'owner', 'template'),
-                check_node_status=None)
+    vm = get_vm(request, hostname_or_uuid, exists_ok=True, noexists_fail=True,
+                sr=('node', 'owner', 'template', 'slavevm'), check_node_status=None)
 
     try:
         nic_id = int(nic_id) - 1
@@ -641,7 +641,7 @@ def vm_define_revert(request, hostname_or_uuid, data=None):
         :status 417: VM definition unchanged
         :status 423: VM is not operational / VM is not created / VM is locked or has slave VMs
     """
-    vm = get_vm(request, hostname_or_uuid, exists_ok=True, noexists_fail=True, sr=('node', 'owner', 'template'),
-                check_node_status=None)
+    vm = get_vm(request, hostname_or_uuid, exists_ok=True, noexists_fail=True,
+                sr=('node', 'owner', 'template', 'slavevm'), check_node_status=None)
 
     return VmDefineRevertView(request).put(vm, data)

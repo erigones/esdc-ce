@@ -30,8 +30,8 @@ def _get_vm_from_db(request, attrs, where, sr, api, **kwargs):
     return vm
 
 
-def get_vm(request, hostname_or_uuid, attrs=None, where=None, exists_ok=False, noexists_fail=False, sr=('node',),
-           api=True, extra=None, check_node_status=('POST', 'PUT', 'DELETE'), dc_bound=True):
+def get_vm(request, hostname_or_uuid, attrs=None, where=None, exists_ok=False, noexists_fail=False,
+           sr=('node', 'slavevm'), api=True, extra=None, check_node_status=('POST', 'PUT', 'DELETE'), dc_bound=True):
     """
     Call get_object for Vm model identified by hostname or uuid. If attributes are not
     specified then set them to check owner and node status.
@@ -71,7 +71,7 @@ def get_vm(request, hostname_or_uuid, attrs=None, where=None, exists_ok=False, n
     return vm
 
 
-def get_vms(request, where=None, sr=('node',), order_by=('hostname',), dc_bound=True):
+def get_vms(request, where=None, sr=('node', 'slavevm'), order_by=('hostname',), dc_bound=True):
     """
     Return queryset of VMs for current user or all if admin.
     Also acts as IsVmOwner permission.

@@ -210,7 +210,7 @@ def _vm_status_check(task_id, node_uuid, uuid, zoneid, state, state_cache=None, 
     """
     if state_cache is None:
         try:  # vm state not in cache, loading from DB...
-            vm = Vm.objects.get(uuid=uuid)
+            vm = Vm.objects.select_related('slavevm').get(uuid=uuid)
         except Vm.DoesNotExist:
             logger.warn('Got status of undefined vm (%s) - ignoring', uuid)
             return
@@ -421,7 +421,7 @@ def vm_status_current_cb(result, task_id, vm_uuid=None):
 
     line = stdout.strip().split(':')
     result['status'] = line[0]
-    vm = Vm.objects.select_related('node').get(uuid=vm_uuid)
+    vm = Vm.objects.select_related('node', 'slavevm').get(uuid=vm_uuid)
 
     try:
         state = Vm.STATUS_DICT[result['status']]
@@ -461,7 +461,7 @@ def vm_status_cb(result, task_id, vm_uuid=None):
     A callback function for PUT api.vm.status.views.vm_status.
     Always updates the VM's status in DB.
     """
-    vm = Vm.objects.get(uuid=vm_uuid)
+    vm = Vm.objects.select_related('slavevm').get(uuid=vm_uuid)
     msg = result.get('message', '')
     json = result.pop('json', None)
 

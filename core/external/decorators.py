@@ -37,14 +37,15 @@ def _collect_template_data(serializer, dc_settings, settings_templates):
 def _update_serializer_settings(third_party_app, dc_settings, serializer, default_dc=False):
     logger.info('Updating app %s settings (default_dc: %s).', third_party_app, default_dc)
     icon = getattr(dc_settings, 'SETTINGS_ICON', 'icon-cogs')
+    name = getattr(dc_settings, 'SETTINGS_NAME', third_party_app)
 
     if default_dc:
         template_collector = _collect_template_data(serializer, dc_settings.DEFAULT_DC_SETTINGS,
                                                     dc_settings.SETTINGS_TEMPLATES)
-        serializer.default_dc_third_party_settings.append((third_party_app, template_collector, icon))
+        serializer.default_dc_third_party_settings.append((third_party_app, template_collector, name, icon))
     else:
         template_collector = _collect_template_data(serializer, dc_settings.DC_SETTINGS, dc_settings.SETTINGS_TEMPLATES)
-        serializer.third_party_settings.append((third_party_app, template_collector, icon))
+        serializer.third_party_settings.append((third_party_app, template_collector, name, icon))
 
 
 def third_party_apps_dc_modules_and_settings(klass):

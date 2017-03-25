@@ -388,9 +388,9 @@ _es() {
 				COMPREPLY=( $(compgen -P "${cur%/*}" -W "/ /(repname)" -- "/${cur##*/}" ) )
 			fi
 			if [[ "${action}" == "create" ]]; then
-				params="-node -root_zpool -disk_zpools -sleep_time -enabled -bwlimit -cb_url -cb_method"
+				params="-node -root_zpool -disk_zpools -sleep_time -enabled -bwlimit -reserve_resources -cb_url -cb_method"
 			elif [[ "${action}" == "set" ]]; then
-				params="-sleep_time -enabled -bwlimit -cb_url -cb_method"
+				params="-sleep_time -enabled -bwlimit -reserve_resources -cb_url -cb_method"
 			elif [[ "${action}" == "delete" ]]; then
 				params="-cb_url -cb_method"
 			else
