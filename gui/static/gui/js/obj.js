@@ -1,5 +1,21 @@
 /* jshint -W030 */
 
+function default_table_obj_postfun() {
+  $(this).removeClass('info error');
+}
+
+function table_obj_added(tr, postfun) {
+  tr.addClass('info').fadeTo(300, 0.3).fadeTo(2000, 1.0, postfun || default_table_obj_postfun);
+}
+
+function table_obj_removed(tr, postfun) {
+  tr.addClass('error').fadeTo(300, 0.3).fadeTo(300, 1.0).fadeTo(1800, 0.1, postfun || default_table_obj_postfun);
+}
+
+function table_obj_updated(tr, postfun) {
+  tr.addClass('info').fadeTo(300, 0.3).fadeTo(300, 1.0).fadeTo(300, 0.3).fadeTo(300, 1.0, postfun || default_table_obj_postfun);
+}
+
 function update_form_fields(form, form_data, prefix) {
   if (form_data) {
 
@@ -497,4 +513,5 @@ function ObjList(init, nosort, custsort, links, handler) {
     obj_list_sort_js(this.elements.table, nosort, custsort);
   }
 
+  table_obj_added(this.elements.table.find('tbody tr.info'));
 } // ObjList
