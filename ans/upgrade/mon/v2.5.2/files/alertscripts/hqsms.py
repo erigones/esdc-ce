@@ -4,7 +4,7 @@ import sys
 import requests
 
 __USERNAME__ = '@USERNAME@'
-__PASSWORD__ = '@PASSWORD@' # md5 hash
+__PASSWORD__ = '@PASSWORD@'  # md5 hash
 __FROM__ = '@FROM@'
 
 
@@ -17,6 +17,7 @@ def login_data():
         'password': __PASSWORD__,
         'from': __FROM__,
     }
+
 
 def sms_send(phone, message):
     """
