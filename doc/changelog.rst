@@ -12,6 +12,8 @@ Features
 Bugs
 ----
 
+- Fixed list of images to be deleted in *Delete unused images* modal - `#117 <https://github.com/erigones/esdc-ce/issues/117>`__
+
 
 2.5.1 (released on 2017-03-07)
 ==============================
