@@ -1,8 +1,9 @@
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_POST
+from django.core.exceptions import PermissionDenied
 from django.db.models import Count
+from django.http import HttpResponse
 from django.shortcuts import render, Http404
-from django.http import HttpResponse, HttpResponseForbidden
+from django.views.decorators.http import require_POST
 
 from gui.decorators import staff_required, ajax_required, admin_required, profile_required, permission_required
 from gui.utils import collect_view_data, reverse, redirect, get_query_string, get_order_by, get_pager
@@ -159,7 +160,7 @@ def dc_domain_record_list(request):
     qs['flt-all'] = '1' if _all else ''
 
     if not name:
-        return HttpResponseForbidden()
+        raise PermissionDenied
 
     context['domain'] = domain = get_domain(request, name)
     context['filters'] = filter_form = DnsRecordFilterForm(request, qs, _all=_all, prefix='flt')

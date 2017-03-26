@@ -1,6 +1,7 @@
 from socketio import socketio_manage
-from django.http import HttpResponse, HttpResponseForbidden
+from django.http import HttpResponse
 from django.db import close_old_connections
+from django.core.exceptions import PermissionDenied
 
 from sio.namespaces import APINamespace
 
@@ -19,4 +20,4 @@ def socketio(request):
         else:
             return HttpResponse(None, status=204)
     else:
-        return HttpResponseForbidden()
+        raise PermissionDenied
