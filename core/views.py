@@ -1,5 +1,15 @@
 from django.views import defaults
-from django.http import HttpResponseNotFound, HttpResponseServerError
+from django.http import HttpResponseNotFound, HttpResponseServerError, HttpResponseForbidden
+
+
+def forbidden(request):
+    """
+    Custom 403 handler.
+    """
+    if request.path.startswith('/api/'):
+        return HttpResponseForbidden('You do not have permission to access this resource',
+                                     content_type='application/json')
+    return defaults.permission_denied(request)
 
 
 def page_not_found(request):

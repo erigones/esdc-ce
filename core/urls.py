@@ -2,6 +2,7 @@ from django.conf.urls import url, include, patterns
 from django.contrib import admin
 from django.conf import settings
 
+handler403 = 'core.views.forbidden'
 handler404 = 'core.views.page_not_found'
 handler500 = 'core.views.server_error'
 
