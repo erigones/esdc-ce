@@ -12,6 +12,8 @@ Features
 Bugs
 ----
 
+- Added template for HTTP 403 status code - `#96 <https://github.com/erigones/esdc-ce/issues/96>`__
+
 
 2.5.1 (released on 2017-03-07)
 ==============================
