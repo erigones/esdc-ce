@@ -86,7 +86,6 @@ class SnapshotDefineView(APIView):
     def create_from_template(cls, request, vm, vm_define_snapshot, log=logger):
         """Create snapshot definitions from vm.template.vm_define_snapshot list"""
         if vm_define_snapshot and isinstance(vm_define_snapshot, list):
-            old_method = request.method
             request = set_request_method(request, 'POST')
 
             for i, data in enumerate(vm_define_snapshot):
@@ -108,5 +107,3 @@ class SnapshotDefineView(APIView):
                 except Exception as ex:
                     log.warn('Failed to create snapshot definition [%d] for vm=%s defined by template %s with '
                              'data="%s". Error: %s', i, vm, vm.template, data, ex)
-
-            set_request_method(request, old_method)

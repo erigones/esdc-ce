@@ -52,13 +52,8 @@ class VmDefineDiskView(VmDefineBaseView):
     def _set_vm_tags(self, vm, tags, task_id=None):
         from api.vm.define.vm_define import VmDefineView
 
-        old_method = self.request.method
         request = set_request_method(self.request, 'PUT')
-
-        try:
-            VmDefineView(request).put(vm, {'tags': list(tags)}, task_id=task_id)
-        finally:
-            set_request_method(request, old_method)
+        VmDefineView(request).put(vm, {'tags': list(tags)}, task_id=task_id)
 
     def _update_vm_tags(self, vm, img, img_old, data, task_id=None):
         if self._image_tags_inherit(data) and (img or img_old) and (img != img_old):

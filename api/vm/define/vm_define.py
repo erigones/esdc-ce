@@ -76,40 +76,36 @@ class VmDefineView(VmDefineBaseView):
     def _create_disks_and_nics(self, vm):
         """Try to create disks and nics defined by template"""
         # WARNING: This will temporary change the request.method to POST
-        old_method = self.request.method
         request = set_request_method(self.request, 'POST')
 
-        try:
-            if not vm.json_get_disks():
-                vm_define_disk = VmDefineDiskView(request)
-                for i, data in enumerate(vm.template.vm_define_disk):
-                    if data:
-                        if i == 0 and not vm.is_kvm():  # Non-global zone's 1st disk can be only modified
-                            logger.info('Updating disk_id=%d for vm %s defined by template %s', i, vm, vm.template)
-                            res = vm_define_disk.put(vm, i, data)
-                            if res.status_code != scode.HTTP_200_OK:
-                                logger.warn('Failed (%s) to modify disk_id=%s in vm %s defined by template %s. '
-                                            'Error: %s', res.status_code, i, vm, vm.template, res.data)
-                        else:
-                            logger.info('Creating disk_id=%d for vm %s defined by template %s', i, vm, vm.template)
-                            res = vm_define_disk.post(vm, i, data)
-                            if res.status_code != scode.HTTP_201_CREATED:
-                                logger.warn('Failed (%s) to add disk_id=%s into vm %s defined by template %s. '
-                                            'Error: %s', res.status_code, i, vm, vm.template, res.data)
-                                break
-
-            if not vm.json_get_nics():
-                vm_define_nic = VmDefineNicView(request)
-                for i, data in enumerate(vm.template.vm_define_nic):
-                    if data:
-                        logger.info('Creating nic_id=%d for vm %s defined by template %s', i, vm, vm.template)
-                        res = vm_define_nic.post(vm, i, data)
+        if not vm.json_get_disks():
+            vm_define_disk = VmDefineDiskView(request)
+            for i, data in enumerate(vm.template.vm_define_disk):
+                if data:
+                    if i == 0 and not vm.is_kvm():  # Non-global zone's 1st disk can be only modified
+                        logger.info('Updating disk_id=%d for vm %s defined by template %s', i, vm, vm.template)
+                        res = vm_define_disk.put(vm, i, data)
+                        if res.status_code != scode.HTTP_200_OK:
+                            logger.warn('Failed (%s) to modify disk_id=%s in vm %s defined by template %s. '
+                                        'Error: %s', res.status_code, i, vm, vm.template, res.data)
+                    else:
+                        logger.info('Creating disk_id=%d for vm %s defined by template %s', i, vm, vm.template)
+                        res = vm_define_disk.post(vm, i, data)
                         if res.status_code != scode.HTTP_201_CREATED:
-                            logger.warn('Failed (%s) to add nic_id=%s into vm %s defined by template %s. '
+                            logger.warn('Failed (%s) to add disk_id=%s into vm %s defined by template %s. '
                                         'Error: %s', res.status_code, i, vm, vm.template, res.data)
                             break
-        finally:
-            set_request_method(request, old_method)
+
+        if not vm.json_get_nics():
+            vm_define_nic = VmDefineNicView(request)
+            for i, data in enumerate(vm.template.vm_define_nic):
+                if data:
+                    logger.info('Creating nic_id=%d for vm %s defined by template %s', i, vm, vm.template)
+                    res = vm_define_nic.post(vm, i, data)
+                    if res.status_code != scode.HTTP_201_CREATED:
+                        logger.warn('Failed (%s) to add nic_id=%s into vm %s defined by template %s. '
+                                    'Error: %s', res.status_code, i, vm, vm.template, res.data)
+                        break
 
     # noinspection PyUnusedLocal
     def get(self, vm, data, many=False, **kwargs):
@@ -228,10 +224,13 @@ class VmDefineView(VmDefineBaseView):
         if not new_node:
             raise ExpectationFailed(err)
 
-        old_method = self.request.method
-        request = set_request_method(self.request, 'PUT')
-        res = self.put(vm, {'node': new_node.hostname})
-        set_request_method(request, old_method)
+        old_request = self.request
+        self.request = set_request_method(old_request, 'PUT')
+
+        try:
+            res = self.put(vm, {'node': new_node.hostname})
+        finally:
+            self.request = old_request
 
         if res.status_code != scode.HTTP_200_OK:
             try:

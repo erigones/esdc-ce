@@ -15,6 +15,7 @@ Bugs
 
 - Added template for HTTP 403 status code - `#96 <https://github.com/erigones/esdc-ce/issues/96>`__
 - Fixed 500 error during xls bulk import when ostype does not exist - `#121 <https://github.com/erigones/esdc-ce/issues/121>`__
+- Fixed race conditions when using `set_request_method()` and `call_api_view()` functions - `#123 <https://github.com/erigones/esdc-ce/issues/123>`__
 
 
 2.5.1 (released on 2017-03-07)
