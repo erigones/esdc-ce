@@ -2,6 +2,7 @@ from django.http import Http404
 from django.utils.translation import ugettext_lazy as _
 from django.utils.six import iteritems
 
+from frozendict import frozendict
 from logging import getLogger
 import json
 
@@ -17,6 +18,8 @@ from api.vm.backup.vm_backup_list import VmBackupList
 from api.utils.views import call_api_view
 
 logger = getLogger(__name__)
+
+REVERSE_OSTYPES = frozendict([(ostype, key) for key, ostype in Vm.OSTYPE])
 
 
 def get_vm(request, hostname, exists_ok=True, noexists_fail=True, auto_dc_switch=True, sr=('dc', 'owner')):
@@ -437,12 +440,7 @@ class ImportExportBase(object):
         for field in fields:
             if field in vm and vm[field] is not None:
                 if field == 'os type':
-                    for ostype in Vm.OSTYPE:
-                        if vm['os type'] in ostype:
-                            bucket[self.convert_file_header_to_header('os type')] = ostype[0]
-                            break
-                        else:
-                            bucket[self.convert_file_header_to_header('os type')] = None
+                    bucket[self.convert_file_header_to_header('os type')] = REVERSE_OSTYPES.get(vm['os type'], None)
                 else:
                     bucket[self.convert_file_header_to_header(field)] = vm[field]
 
