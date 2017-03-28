@@ -19,7 +19,7 @@ from api.utils.views import call_api_view
 
 logger = getLogger(__name__)
 
-REVERSE_OSTYPES = frozendict([(ostype, key) for key, ostype in Vm.OSTYPE])
+REVERSE_OSTYPES = frozendict((ostype, key) for key, ostype in Vm.OSTYPE)
 
 
 def get_vm(request, hostname, exists_ok=True, noexists_fail=True, auto_dc_switch=True, sr=('dc', 'owner')):
