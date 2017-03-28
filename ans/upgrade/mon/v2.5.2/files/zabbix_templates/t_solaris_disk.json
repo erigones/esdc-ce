@@ -5,7 +5,12 @@
             {
                 "templates": [],
                 "name": "t_solaris_disk",
-                "macros": [],
+                "macros": [
+                    {
+                        "macro": "{$DISK_ERRORS_THRESHOLD}",
+                        "value": "5"
+                    }
+                ],
                 "items": [],
                 "screens": [],
                 "applications": [
@@ -92,7 +97,17 @@
                                 "percent_right": "0.0000"
                             }
                         ],
-                        "trigger_prototypes": [],
+                        "trigger_prototypes": [
+                           {
+                                "status": "0",
+                                "description": "",
+                                "url": "",
+                                "type": "0",
+                                "priority": "3",
+                                "expression": "{t_solaris_disk:sd.errors[{#SD}].last(0)}>{$DISK_ERRORS_THRESHOLD}",
+                                "name": "Too many SCSI errors on disk {#DISK} ({#ZPOOL})"
+                            }
+                        ],
                         "item_prototypes": [
                             {
                                 "username": "",
