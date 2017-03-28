@@ -333,6 +333,8 @@ def vm_define_disk(request, hostname_or_uuid, disk_id=None, data=None):
         :type data.zpool: string
         :arg data.boot: Whether this disk should be bootable (default: true for first disk, otherwise false)
         :type data.boot: boolean
+        :arg data.refreservation: Minimum amount of space in MB reserved for this disk (KVM only, default: ``size``)
+        :type data.refreservation: integer
         :arg data.image_tags_inherit: Whether to update VM tags from image tags (default: true)
         :type data.image_tags_inherit: boolean
         :status 201: SUCCESS
@@ -366,6 +368,8 @@ def vm_define_disk(request, hostname_or_uuid, disk_id=None, data=None):
         :type data.zpool: string
         :arg data.boot: Whether this disk should be bootable
         :type data.boot: boolean
+        :arg data.refreservation: Minimum amount of space in MB reserved for this disk (KVM only)
+        :type data.refreservation: integer
         :arg data.image_tags_inherit: Whether to update VM tags from image tags (default: true)
         :type data.image_tags_inherit: boolean
         :status 200: SUCCESS
