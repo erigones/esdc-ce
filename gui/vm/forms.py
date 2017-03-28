@@ -206,7 +206,8 @@ class AdminServerSettingsForm(ServerSettingsForm):
                                widget=NumberInput(attrs={'class': 'input-transparent narrow', 'required': 'required'}))
     # noinspection SpellCheckingInspection
     ram = forms.IntegerField(label=_('RAM'), max_value=524288, min_value=32, required=True,
-                             widget=forms.TextInput(attrs={'class': 'input-transparent narrow', 'required': 'required',
+                             widget=forms.TextInput(attrs={'class': 'input-transparent narrow input-mbytes',
+                                                           'required': 'required',
                                                            'pattern': '[0-9\.]+[BKMGTPEbkmgtpe]?'}))
     monitored = forms.BooleanField(label=_('Monitored?'), required=False,
                                    widget=forms.CheckboxInput(attrs={'class': 'normal-check'}))
@@ -331,7 +332,8 @@ class AdminServerDiskSettingsForm(ServerDiskSettingsForm):
     size = forms.IntegerField(label=_('Size'), max_value=268435456, min_value=0, required=True,
                               help_text=_('Changing disk size of created server is a dangerous operation and '
                                           'can cause data loss!'),
-                              widget=forms.TextInput(attrs={'class': 'input-transparent narrow', 'required': 'required',
+                              widget=forms.TextInput(attrs={'class': 'input-transparent narrow input-mbytes',
+                                                            'required': 'required',
                                                             'pattern': '[0-9\.]+[BKMGTPEbkmgtpe]?'}))
     boot = forms.BooleanField(label=_('Bootable'), required=False,
                               widget=forms.CheckboxInput(attrs={'class': 'normal-check'}))

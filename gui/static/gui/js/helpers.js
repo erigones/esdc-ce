@@ -892,6 +892,24 @@ function array_prepare(fields) {
 }
 
 
+/*
+ * Megabyte input helper
+ */
+function mbytes_handler(input_field) {
+  input_field.on('keyup', function() {
+    var f = $(this);
+
+    f.val(parse_bytes(f.val(), 'M'));
+  });
+}
+
+function mbytes_enable(fields) {
+  $.each(fields, function() {
+    mbytes_handler($(this));
+  });
+}
+
+
 
 /*
  * Browser hacks and usability improvements

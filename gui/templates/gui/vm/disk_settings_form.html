@@ -9,10 +9,10 @@
 {% if disk_settingsform.admin %}
 {% if vm.is_kvm %}{% include "gui/form_field.html" with field=disk_settingsform.model %}{% endif %}
 {% include "gui/form_field.html" with field=disk_settingsform.image %}
-{% include "gui/form_field.html" with field=disk_settingsform.size addon=" MB" %}
+{% include "gui/form_field.html" with field=disk_settingsform.size addon=mb_addon %}
 <div class="advanced hide">
 {% comment %}refreservation disabledd
-{% if vm.is_kvm %}{% include "gui/form_field.html" with field=disk_settingsform.refreservation addon=" MB" %}{% endif %}
+{% if vm.is_kvm %}{% include "gui/form_field.html" with field=disk_settingsform.refreservation addon=mb_addon %}{% endif %}
 {% endcomment %}
 {% if vm.is_kvm %}{% include "gui/form_field_checkbox.html" with field=disk_settingsform.boot %}{% endif %}
 {% include "gui/form_field.html" with field=disk_settingsform.compression %}
