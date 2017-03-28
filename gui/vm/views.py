@@ -1,15 +1,16 @@
 from logging import getLogger
-from django.conf import settings
-from django.shortcuts import render, redirect
-from django.http import Http404, HttpResponseForbidden, HttpResponse
+from itertools import chain
 
-from django.utils.translation import ugettext_lazy as _
-from django.db.models import Q
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import PermissionDenied
+from django.db.models import Q
+from django.http import Http404, HttpResponse
+from django.shortcuts import render, redirect
+from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.http import require_POST
-from itertools import chain
 
 from gui.vm.guacamole import GuacamoleAuth
 from gui.vm.imports import handle_uploaded_file, ImportException
@@ -322,7 +323,7 @@ def set_installed(request, hostname):
         else:
             return JSONResponse(res.data, status=res.status_code)
 
-    return HttpResponseForbidden()
+    raise PermissionDenied
 
 
 @login_required
@@ -426,7 +427,7 @@ def add_settings_form(request):
     if request.user.is_admin(request):  # must check can_edit permission
         return settings_form(request, None)
 
-    return HttpResponseForbidden()
+    raise PermissionDenied
 
 
 @login_required
@@ -545,7 +546,7 @@ def multi_settings_form(request):
     Ajax page for changing settings of multiple servers.
     """
     if not request.user.is_admin(request):  # can_edit permission
-        return HttpResponseForbidden()
+        raise PermissionDenied
 
     if request.POST['action'] == 'delete':  # delete only for now
         for hostname in request.POST.getlist('hostname'):

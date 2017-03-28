@@ -8,10 +8,13 @@ Features
 --------
 
 - Decreased MON_ZABBIX_TIMEOUT to 15 seconds - `#120 <https://github.com/erigones/esdc-ce/issues/120>`__
+- Renamed "offline" compute node status to "maintenance" - `#87 <https://github.com/erigones/esdc-ce/issues/87>`__
 
 Bugs
 ----
 
+- Added template for HTTP 403 status code - `#96 <https://github.com/erigones/esdc-ce/issues/96>`__
+- Fixed 500 error during xls bulk import when ostype does not exist - `#121 <https://github.com/erigones/esdc-ce/issues/121>`__
 - Fixed race conditions when using `set_request_method()` and `call_api_view()` functions - `#123 <https://github.com/erigones/esdc-ce/issues/123>`__
 
 
