@@ -189,7 +189,7 @@ class Migration(migrations.Migration):
                 ('uuid', models.CharField(max_length=36, serialize=False, verbose_name='UUID', primary_key=True)),
                 ('hostname', models.CharField(unique=True, max_length=128, verbose_name='Hostname')),
                 ('address', models.CharField(max_length=64, verbose_name='Address')),
-                ('status', models.SmallIntegerField(default=1, db_index=True, verbose_name='Status', choices=[(2, b'online'), (1, b'offline'), (3, b'unreachable'), (9, b'unlicensed')])),
+                ('status', models.SmallIntegerField(default=1, db_index=True, verbose_name='Status', choices=[(2, b'online'), (1, b'maintenance'), (3, b'unreachable'), (9, b'unlicensed')])),
                 ('config', models.TextField(verbose_name='Config', blank=True)),
                 ('cpu', models.PositiveIntegerField(help_text='Total number of CPUs (cores).', verbose_name='CPUs')),
                 ('ram', models.PositiveIntegerField(help_text='Total RAM size in MB.', verbose_name='RAM (MB)')),
