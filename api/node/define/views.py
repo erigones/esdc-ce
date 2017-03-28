@@ -65,7 +65,7 @@ def node_define(request, hostname, data=None):
             * |async-no|
         :arg hostname: **required** - Node hostname
         :type hostname: string
-        :arg data.status: Compute node status (DB only) (1 - offline, 2 - online)
+        :arg data.status: Compute node status (DB only) (1 - maintenance, 2 - online)
         :type data.status: integer
         :arg data.is_compute: Compute capability
         :type data.is_compute: boolean
