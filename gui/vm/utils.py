@@ -440,6 +440,9 @@ class ImportExportBase(object):
                     for ostype in Vm.OSTYPE:
                         if vm['os type'] in ostype:
                             bucket[self.convert_file_header_to_header('os type')] = ostype[0]
+                            break
+                        else:
+                            bucket[self.convert_file_header_to_header('os type')] = None
                 else:
                     bucket[self.convert_file_header_to_header(field)] = vm[field]
 
