@@ -91,11 +91,11 @@ def vm_define(request, hostname_or_uuid, data=None):
         :arg data.template: VM template name (default: null)
         :type data.template: string
         :arg data.ostype: Operating system type (1 - Linux VM, 2 - SunOS VM, 3 - BSD VM, 4 - Windows VM, \
-5 - SunOS Zone, 6 - Linux Zone) (default: 1 [if not specified in template])
+5 - SunOS Zone, 6 - Linux Zone) (default: 1)
         :type data.ostype: integer
-        :arg data.vcpus: **required** (if not specified in template) - Number of virtual CPUs inside VM (1 - 64)
+        :arg data.vcpus: **required** - Number of virtual CPUs inside VM (1 - 64)
         :type data.vcpus: integer
-        :arg data.ram: **required** (if not specified in template) - Size of RAM inside VM (32 - 524288 MB)
+        :arg data.ram: **required** - Size of RAM inside VM (32 - 524288 MB)
         :type data.ram: integer
         :arg data.owner: User that owns the VM (default: logged in user)
         :type data.owner: string
@@ -111,9 +111,9 @@ def vm_define(request, hostname_or_uuid, data=None):
         :type data.monitored: boolean
         :arg data.installed: Mark the server as installed (default: false)
         :type data.installed: boolean
-        :arg data.snapshot_limit_manual: Maximum number of manual snapshots for this VM (default: specified in template)
+        :arg data.snapshot_limit_manual: Maximum number of manual snapshots for this VM (default: null [unlimited])
         :type data.snapshot_limit_manual: integer
-        :arg data.snapshot_size_limit: Maximum size of all snapshots for this VM (default: specified in template)
+        :arg data.snapshot_size_limit: Maximum size of all snapshots for this VM (default: null [unlimited])
         :type data.snapshot_size_limit: integer
         :arg data.zpool: The zpool used for the VM zone (default: zones)
         :type data.zpool: string
@@ -491,7 +491,7 @@ def vm_define_nic(request, hostname_or_uuid, nic_id=None, data=None):
         :type data.ip: string
         :arg data.model: Virtual NIC Model. One of virtio, e1000, rtl8139 (default: virtio)
         :type data.model: string
-        :arg data.dns: Create DNS A record for VM's FQDN? (default: true for first NIC, otherwise false)
+        :arg data.dns: Create a DNS A record for VM's FQDN? (default: true for first NIC, otherwise false)
         :type data.dns: boolean
         :arg data.use_net_dns: Inherit DNS resolvers from network's resolvers setting (default: false)
         :type data.use_net_dns: boolean
@@ -517,7 +517,8 @@ than specified in ``ip`` (requires |SuperAdmin| permission) (default: false)
         :arg data.allowed_ips: List of additional IP addresses that can be used by this VM's NIC and also by \
 other VMs. Useful for floating/shared IPs (default: [])
         :type data.allowed_ips: array
-        :arg data.monitoring: Use this NIC for external monitoring (default: true for first NIC, otherwise false)
+        :arg data.monitoring: Use this NIC's IP address for external monitoring \
+(default: true for first NIC, otherwise false)
         :type data.monitoring: boolean
         :arg data.set_gateway: Whether to set gateway from network (``data.net``) settings (default: true)
         :type data.set_gateway: boolean
@@ -546,7 +547,7 @@ other VMs. Useful for floating/shared IPs (default: [])
         :type data.ip: string
         :arg data.model: Virtual NIC Model. One of virtio, e1000, rtl8139
         :type data.model: string
-        :arg data.dns: Create DNS A record for VM's FQDN?
+        :arg data.dns: Create a DNS A record for VM's FQDN?
         :type data.dns: boolean
         :arg data.use_net_dns: Inherit DNS resolvers from network's resolvers setting
         :type data.use_net_dns: boolean
@@ -572,7 +573,7 @@ than specified in ``ip`` (requires |SuperAdmin| permission)
         :arg data.allowed_ips: List of additional IP addresses that can be used by this VM's NIC and also by \
 other VMs. Useful for floating/shared IPs
         :type data.allowed_ips: array
-        :arg data.monitoring: Use this NIC for external monitoring
+        :arg data.monitoring: Use this NIC's IP address for external monitoring
         :type data.monitoring: boolean
         :arg data.set_gateway: Whether to set gateway from network (``data.net``) settings
         :type data.set_gateway: boolean
