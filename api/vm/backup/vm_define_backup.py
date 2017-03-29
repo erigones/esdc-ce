@@ -84,7 +84,6 @@ class BackupDefineView(APIView):
     def create_from_template(cls, request, vm, vm_define_backup, log=logger):
         """Create backup definitions from vm.template.vm_define_backup list"""
         if vm_define_backup and isinstance(vm_define_backup, list):
-            old_method = request.method
             request = set_request_method(request, 'POST')
 
             for i, data in enumerate(vm_define_backup):
@@ -105,5 +104,3 @@ class BackupDefineView(APIView):
                 except Exception as ex:
                     log.warn('Failed to create backup definition [%d] for vm=%s defined by template %s with '
                              'data="%s". Error: %s', i, vm, vm.template, data, ex)
-
-            set_request_method(request, old_method)
