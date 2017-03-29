@@ -9,8 +9,8 @@
 {% include "gui/form_field.html" with field=form.strategy %}
 {% include "gui/form_field.html" with field=form.priority %}
 {% include "gui/form_field.html" with field=form.cpu %}
-{% include "gui/form_field.html" with field=form.ram addon=" MB" %}
-{% include "gui/form_field.html" with field=form.disk addon=" MB" %}
+{% include "gui/form_field.html" with field=form.ram addon=mb_addon %}
+{% include "gui/form_field.html" with field=form.disk addon=mb_addon %}
 {% include "gui/form_field.html" with field=form.add_storage %}
 
 <div class="advanced hide"></div>

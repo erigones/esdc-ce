@@ -73,6 +73,7 @@ function obj_form_modal(btn, mod_selector, init, handler) {
   var fileinput = mod.find('input:file');
   var mdata_input = mod.find('textarea.input-mdata');
   var array_input = mod.find('textarea.input-array');
+  var mbytes_input = mod.find('.input-mbytes');
 
   this.mod = mod;
   this.btn = btn;
@@ -132,6 +133,7 @@ function obj_form_modal(btn, mod_selector, init, handler) {
           fileinput = $(fileinput.selector);
           mdata_input = $(mdata_input.selector);
           array_input = $(array_input.selector);
+          mbytes_input = $(mbytes_input.selector);
           vm_forms_toggle(add, mod);
           init(self, false);
           select.select2({dropdownCssClass: select.attr('class')});
@@ -140,6 +142,7 @@ function obj_form_modal(btn, mod_selector, init, handler) {
           fileinput.fileupload(FILEINPUT_OPTIONS);
           mdata_enable(mdata_input);
           array_enable(array_input);
+          mbytes_enable(mbytes_input);
 
           if (mod.find('div.advanced div.input.error').length || btn_more.hasClass('active')) {
             morehandler(true);
@@ -243,6 +246,7 @@ function obj_form_modal(btn, mod_selector, init, handler) {
   fileinput.fileupload(FILEINPUT_OPTIONS);
   mdata_enable(mdata_input);
   array_enable(array_input);
+  mbytes_enable(mbytes_input);
   activate_modal_ux(mod, form);
   mod.modal('show');
 } // dc_form_modal
