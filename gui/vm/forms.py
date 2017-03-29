@@ -437,20 +437,30 @@ class AdminServerNicSettingsForm(ServerNicSettingsForm):
                                      widget=forms.TextInput(attrs={'class': 'input-transparent narrow',
                                                                    'placeholder': _('Automatic allocation')}))
     dns = forms.BooleanField(label=_('Create DNS?'), required=False,
+                             help_text=_("Create a DNS A record for VM's FQDN?"),
                              widget=forms.CheckboxInput(attrs={'class': 'normal-check'}))
     monitoring = forms.BooleanField(label=_('Use for monitoring?'), required=False,
+                                    help_text=_("Use this NIC's IP address for external monitoring."),
                                     widget=forms.CheckboxInput(attrs={'class': 'normal-check'}))
     mac = forms.CharField(label=_('MAC Address'), required=False, max_length=20,
+                          help_text=_('If left empty, a MAC address will be generated automatically.'),
                           widget=forms.TextInput(attrs={'class': 'input-transparent narrow'}))
     primary = forms.BooleanField(label=_('Primary NIC?'), required=False,
+                                 help_text=_("Use this NIC's gateway as VM's default gateway."),
                                  widget=forms.CheckboxInput(attrs={'class': 'normal-check'}))
     allow_dhcp_spoofing = forms.BooleanField(label=_('Allow DHCP Spoofing?'), required=False,
+                                             help_text=_('Allow packets required for DHCP server.'),
                                              widget=forms.CheckboxInput(attrs={'class': 'normal-check'}))
     allow_ip_spoofing = forms.BooleanField(label=_('Allow IP Spoofing?'), required=False,
+                                           help_text=_("Allow sending and receiving packets for IP addresses other "
+                                                       "than specified in NIC's IP address field."),
                                            widget=forms.CheckboxInput(attrs={'class': 'normal-check'}))
     allow_mac_spoofing = forms.BooleanField(label=_('Allow MAC Spoofing?'), required=False,
+                                            help_text=_("Allow sending packets with MAC addresses other than specified "
+                                                        "in NIC's MAC address field."),
                                             widget=forms.CheckboxInput(attrs={'class': 'normal-check'}))
     allow_restricted_traffic = forms.BooleanField(label=_('Allow Restricted Traffic?'), required=False,
+                                                  help_text=_('Allow sending packets that are not IPv4, IPv6, or ARP.'),
                                                   widget=forms.CheckboxInput(attrs={'class': 'normal-check'}))
 
     def __init__(self, request, vm, *args, **kwargs):
