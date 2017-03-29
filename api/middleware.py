@@ -23,6 +23,7 @@ def task_status_loop(request, response, task_id, stream=None):
     logger.debug('Starting APISyncMiddleware loop (%s)', request.path)
     logger.info('Waiting for pending task %s status in "%s" streaming loop', task_id, stream)
     elapsed = 0
+    task_status_request = set_request_method(request, 'GET')
 
     # Task check loop
     while elapsed < settings.API_SYNC_TIMEOUT:
@@ -46,8 +47,7 @@ def task_status_loop(request, response, task_id, stream=None):
         if status != HTTP_201_CREATED:
             logger.debug('APISyncMiddleware loop finished (%s) in %d seconds', request.path, elapsed)
             logger.info('Task %s finished', task_id)
-            request = set_request_method(request, 'GET')
-            res = task_status(request, task_id=task_id)
+            res = task_status(task_status_request, task_id=task_id)
 
             if stream == ES_STREAM_CLIENT:
                 yield '%d\n' % res.status_code  # new status code (es knows how to interpret this)
