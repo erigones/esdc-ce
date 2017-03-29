@@ -762,7 +762,7 @@ def _generic_add_context(request):
 
     Partial add VM view, was separated to smaller functions due to code reuse in Enterprise Edition apps (payments).
     """
-    context = collect_view_data(request, 'vm_add')
+    context = collect_view_data(request, 'vm_add', mb_addon=SIZE_FIELD_MB_ADDON)
     context['vms'] = vms = get_vms(request)
     context['vms_tags'] = get_vms_tags(vms)
 
