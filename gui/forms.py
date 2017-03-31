@@ -6,7 +6,7 @@ from django.utils.translation import ugettext
 from django.utils.six import iteritems, text_type
 from frozendict import frozendict
 
-from gui.widgets import NumberInput, ArrayWidget, DictWidget
+from gui.widgets import NumberInput, ByteSizeInput, ArrayWidget, DictWidget
 from gui.fields import ArrayField, IntegerArrayField, DictField
 from api import fields
 from api.relations import RelatedField
@@ -126,6 +126,11 @@ class SerializerForm(forms.Form):
             if isinstance(field, fields.IntegerField):
                 field_class = forms.IntegerField
                 widget_class = NumberInput
+
+                if field.help_text and '(MB)' in field.help_text:
+                    widget_class = ByteSizeInput
+                    widget_attrs['class'] += ' ' + 'input-mbytes'
+
             elif isinstance(field, fields.BaseArrayField):
                 if isinstance(field, fields.IntegerArrayField):
                     field_class = IntegerArrayField

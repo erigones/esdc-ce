@@ -25,7 +25,7 @@ __all__ = (
     'DictWidget',
 )
 
-HTML5_ATTRS = {'autocorrect': 'off', 'autocapitalize': 'off', 'spellcheck': 'false'}
+HTML5_ATTRS = frozendict({'autocorrect': 'off', 'autocapitalize': 'off', 'spellcheck': 'false'})
 
 
 def edit_string_for_items(array):
@@ -94,7 +94,7 @@ class NumberInput(_DefaultAttrsWidget, widgets.Input):
     HTML5 input type for numbers.
     """
     input_type = 'number'
-    default_attrs = frozendict(HTML5_ATTRS)
+    default_attrs = HTML5_ATTRS
 
 
 class EmailInput(_DefaultAttrsWidget, widgets.Input):
@@ -102,7 +102,7 @@ class EmailInput(_DefaultAttrsWidget, widgets.Input):
     HTML5 input type for email address.
     """
     input_type = 'email'
-    default_attrs = frozendict(HTML5_ATTRS)
+    default_attrs = HTML5_ATTRS
 
 
 class URLInput(_DefaultAttrsWidget, widgets.URLInput):
@@ -110,7 +110,7 @@ class URLInput(_DefaultAttrsWidget, widgets.URLInput):
     HTML5 input type for URL address.
     """
     input_type = 'url'
-    default_attrs = frozendict(HTML5_ATTRS)
+    default_attrs = HTML5_ATTRS
 
 
 class TelInput(_DefaultAttrsWidget, widgets.Input):
@@ -118,7 +118,14 @@ class TelInput(_DefaultAttrsWidget, widgets.Input):
     HTML5 input type for url address
     """
     input_type = 'tel'
-    default_attrs = frozendict(HTML5_ATTRS)
+    default_attrs = HTML5_ATTRS
+
+
+class ByteSizeInput(_DefaultAttrsWidget, widgets.TextInput):
+    """
+    HTML5 input type for url address
+    """
+    default_attrs = frozendict({'pattern': '[0-9\.]+[BKMGTPEbkmgtpe]?'})
 
 
 # noinspection PyAbstractClass
