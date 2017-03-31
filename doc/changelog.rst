@@ -12,6 +12,8 @@ Features
 Bugs
 ----
 
+- Fixed errors in graph descriptions - `#112 <https://github.com/erigones/esdc-ce/issues/112>`__
+
 
 2.5.1 (released on 2017-03-07)
 ==============================
