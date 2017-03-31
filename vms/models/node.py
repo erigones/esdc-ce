@@ -35,7 +35,7 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
     UNLICENSED = 9
     STATUS_DB = (  # Do not change the order here
         (ONLINE, ugettext_noop('online')),
-        (OFFLINE, ugettext_noop('offline')),
+        (OFFLINE, ugettext_noop('maintenance')),
         (UNREACHABLE, ugettext_noop('unreachable')),
         (UNLICENSED, ugettext_noop('unlicensed')),
     )

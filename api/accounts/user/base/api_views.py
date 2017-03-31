@@ -25,7 +25,7 @@ class UserView(APIView):
         self.username = username
         self.data = data
         self.many = many
-        sr = ('dc_bound',)
+        sr = ('dc_bound', 'default_dc')
         pr = ()
 
         if not settings.ACL_ENABLED and self.data:

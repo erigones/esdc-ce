@@ -7,12 +7,21 @@ Changelog
 Features
 --------
 
+- Added more help texts about input fields accepting byte conversion units - `#86 <https://github.com/erigones/esdc-ce/issues/86>`__
+- Renamed "offline" compute node status to "maintenance" - `#87 <https://github.com/erigones/esdc-ce/issues/87>`__
+- Documented refreservation parameter in vm_define_disk API function - `#106 <https://github.com/erigones/esdc-ce/issues/106>`__
 - Decreased MON_ZABBIX_TIMEOUT to 15 seconds - `#120 <https://github.com/erigones/esdc-ce/issues/120>`__
+- Allow to update disk size of a running VM - requiring only one reboot to take effect - `#127 <https://github.com/erigones/esdc-ce/issues/127>`__
+- Added current_dc (read_only) attribute to output of user_list, user_manage and dc_user(_list) views - `#131 <https://github.com/erigones/esdc-ce/issues/131>`__
 
 Bugs
 ----
 
+- Added template for HTTP 403 status code - `#96 <https://github.com/erigones/esdc-ce/issues/96>`__
 - Fixed errors in graph descriptions - `#112 <https://github.com/erigones/esdc-ce/issues/112>`__
+- Fixed list of images to be deleted in *Delete unused images* modal - `#117 <https://github.com/erigones/esdc-ce/issues/117>`__
+- Fixed 500 error during xls bulk import when ostype does not exist - `#121 <https://github.com/erigones/esdc-ce/issues/121>`__
+- Fixed race conditions when using `set_request_method()` and `call_api_view()` functions - `#123 <https://github.com/erigones/esdc-ce/issues/123>`__
 
 
 2.5.1 (released on 2017-03-07)

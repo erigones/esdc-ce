@@ -5,12 +5,17 @@ from django import forms
 from django.utils import six
 from django.utils.translation import ugettext as _
 from django.utils.encoding import force_text
+from django.utils.safestring import mark_safe
 
 from taggit.utils import split_strip
 from taggit.forms import TagField as _TagField
 
 from gui.utils import tags_to_string
 from gui.widgets import ArrayWidget, ArrayAreaWidget, DictWidget
+
+
+SIZE_FIELD_MB_ADDON = mark_safe(' MB <small class="hidden-phone">&nbsp;&nbsp;&nbsp;<b>' + _('Hint') + ':</b> ' +
+                                _('Press "1g" for 1024 MB') + '</b></small>')
 
 
 def parse_items(itemstring):
