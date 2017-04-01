@@ -15,6 +15,9 @@ def imagestore_list(request, data=None):
     .. note :: Disk image repositories can be configured by modifying the \
 :http:put:`VMS_IMAGE_REPOSITORIES </dc/(dc)/settings>` global setting.
 
+    .. note :: If a global image server (:http:put:`VMS_IMAGE_VM </dc/(dc)/settings>`) is configured in the system, \
+the list will automatically include a local repository named after the image server.
+
     .. http:get:: /imagestore
 
         :DC-bound?:
@@ -36,8 +39,6 @@ def imagestore_list(request, data=None):
             * |ImageImportAdmin|
         :Asynchronous?:
             * |async-no|
-        :arg data.full: Return list of objects with all image repository details (default: false)
-        :type data.full: boolean
         :status 200: SUCCESS
         :status 400: FAILURE
         :status 403: Forbidden

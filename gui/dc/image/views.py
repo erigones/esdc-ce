@@ -165,6 +165,7 @@ def imagestore_list(request, repo=None):
     qs_image_filter.pop('last', None)
     context['qs_image_filter'] = qs_image_filter.urlencode()
     context['default_limit'] = default_limit = 30
+    context['image_uuids'] = set(Image.objects.all().values_list('uuid', flat=True))
 
     try:
         created_since_days = int(request.GET.get('created_since', 0))

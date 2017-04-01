@@ -274,8 +274,14 @@ class ImageView(TaskAPIView):
             img.status = Image.PENDING
             img.save()
 
-            return self._run_execute(LOG_IMAGE_IMPORT, 'esimg import -f %s' % ser_import.img_file_url,
-                                     stdin=img.manifest.dump(), delete_on_error=True, detail_dict=dd)
+            if ser_import.img_file_url.startswith(self.img_server.repo_url):
+                logger.info('Importing image from local image server - assuming that image exists on server')
+                cmd = 'esimg update -c'
+            else:
+                cmd = 'esimg import -f %s' % ser_import.img_file_url
+
+            return self._run_execute(LOG_IMAGE_IMPORT, cmd, stdin=img.manifest.dump(), delete_on_error=True,
+                                     detail_dict=dd)
         else:
             img.status = Image.OK
             img.manifest_active = img.manifest
