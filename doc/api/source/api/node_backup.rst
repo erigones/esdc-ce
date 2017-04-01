@@ -1,6 +1,12 @@
 :mod:`api.node.backup`
 ======================
 
+/node/*(hostname)*/define/backup
+--------------------------------
+
+.. autofunction:: api.node.backup.views.node_vm_define_backup_list
+
+
 /node/*(hostname)*/backup
 -------------------------
 

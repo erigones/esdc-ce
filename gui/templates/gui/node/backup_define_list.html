@@ -1,0 +1,46 @@
+{% load i18n tz %}
+{% load gui_utils %}
+{% get_current_timezone as TZ %}
+<table class="table box table-striped table-hover table-responsive" id="etable">
+  <thead>
+    {% if bkpdefs %}
+    <tr class="datatable_head" data-order_by_default="[[1,&quot;asc&quot;]]">
+      <th>{% trans "Name" %}</th>
+      <th>{% trans "Hostname" %}</th>
+      <th>{% trans "Disk&nbsp;ID" %}</th>
+      <th>{% trans "Type" %}</th>
+      <th class="hidden-phone">{% trans "Schedule" %}</th>
+      <th>{% trans "Active" %}</th>
+      <th class="hidden-phone">{% trans "Retention" %}</th>
+      <th class="hidden-phone">{% trans "Backups" %}</th>
+      <th class="hidden-phone">{% trans "Description" %}</th>
+    </tr>
+    {% endif %}
+  </thead>
+  <tbody>
+    {% for bd in bkpdefs %}{% with vm=bd.vm disk_id=bd.array_disk_id  %}
+    <tr>
+      <td>
+        <a href="{% url 'dc_vm_backup' vm.dc vm.hostname %}" class="btn-link" title="{% trans "Edit backup definitions for this server" %}" data-toggle="tooltip" data-placement="bottom">{{ bd.name }}</a>
+      </td>
+      <td><span class="vm_hostname">{{ vm.hostname }}<br><i class="icon-cloud"></i>&nbsp;{{ vm.dc.alias }}</span></td>
+      <td>{{ disk_id }} <small>({{ bd.disk_size|multiply:1048576|filesizeformat }})</small></td>
+      <td>{{ bd.get_type_display }}</td>
+      <td class="hidden-phone">{{ bd.schedule|local_schedule:TZ }}</td>
+      <td><i class="icon-{{ bd.active|yesno:"ok,remove" }}"></i></td>
+      <td class="hidden-phone">{{ bd.retention }}</td>
+      <td class="hidden-phone">{{ bd.backups }}</td>
+      <td class="hidden-phone"><small class="vm_snapshot_note">{{ bd.desc|wordwrap:44 }}</small></td>
+    </tr>
+    {% endwith %}{% endfor %}
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="9">
+        <span class="pull-right">
+          {% trans "Total" %}: {{ bkpdefs|length }}&nbsp;
+        </span>
+      </td>
+    </tr>
+  </tfoot>
+</table>
