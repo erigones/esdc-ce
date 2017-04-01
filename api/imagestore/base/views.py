@@ -12,10 +12,10 @@ def imagestore_list(request, data=None):
     List (:http:get:`GET </imagestore>`) or
     refresh (:http:put:`PUT </imagestore>`) information about disk image repositories.
 
-    .. note :: Disk image repositories can be configured by modifying the \
+    .. note:: Disk image repositories can be configured by modifying the \
 :http:put:`VMS_IMAGE_REPOSITORIES </dc/(dc)/settings>` global setting.
 
-    .. note :: If a global image server (:http:put:`VMS_IMAGE_VM </dc/(dc)/settings>`) is configured in the system, \
+    .. note:: If a global image server (:http:put:`VMS_IMAGE_VM </dc/(dc)/settings>`) is configured in the system, \
 the list will automatically include a local repository named after the image server.
 
     .. http:get:: /imagestore
@@ -54,7 +54,7 @@ def imagestore_manage(request, name, data=None):
     Show (:http:get:`GET </imagestore/(name)>`) or
     refresh (:http:put:`PUT </imagestore/(name)>`) information about a disk image repository.
 
-    .. note :: Disk image repositories can be configured by modifying the \
+    .. note:: Disk image repositories can be configured by modifying the \
 :http:put:`VMS_IMAGE_REPOSITORIES </dc/(dc)/settings>` global setting.
 
     .. http:get:: /imagestore/(name)
