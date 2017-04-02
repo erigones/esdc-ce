@@ -4,6 +4,17 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import get_user_model
 
 
+class EmptyDomainOwner(object):
+    """
+    Dummy model used as the owner attribute in case the domain.id is NULL.
+    """
+    def __getattr__(self, item):
+        return None
+
+    def __str__(self):
+        return ''
+
+
 class Domain(models.Model):
     """
     This table contains all the domain names that your pdns-server is handling
@@ -30,6 +41,7 @@ class Domain(models.Model):
     + created field (null=True)
     + changed field (null=True)
     """
+    NoOwner = EmptyDomainOwner
     QServerExclude = Q(name__iendswith='in-addr.arpa')
     _user_model = None  # Cache the User model
     _owner = models.Empty  # Owner (user) object cache
@@ -136,9 +148,9 @@ class Domain(models.Model):
                 try:
                     self._owner = user_model.objects.get(pk=self.user)
                 except user_model.DoesNotExist:
-                    self._owner = None
+                    self._owner = self.NoOwner()
             else:
-                self._owner = None
+                self._owner = self.NoOwner()
         return self._owner
 
     @owner.setter
