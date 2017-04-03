@@ -34,7 +34,7 @@ function vm_snapshot_list_links(hostname, snaplist) {
     return false;
   });
   // remove info class
-  table_obj_added(snaplist.find('tr.info'))
+  table_obj_added(snaplist.find('tr.info'));
 }
 
 // Update list of snapshots/backups with html from server and add links
