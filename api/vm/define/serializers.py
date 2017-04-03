@@ -943,7 +943,7 @@ class VmDefineNicSerializer(s.Serializer):
     allow_mac_spoofing = s.BooleanField(default=False)
     allow_restricted_traffic = s.BooleanField(default=False)
     allow_unfiltered_promisc = s.BooleanField(default=False)
-    allowed_ips = s.IPAddressArrayField(default=[], max_items=NIC_ALLOWED_IPS_MAX)
+    allowed_ips = s.IPAddressArrayField(default=set(), max_items=NIC_ALLOWED_IPS_MAX)
     monitoring = s.BooleanField(default=False)
     set_gateway = s.BooleanField(default=True)
 
@@ -1051,6 +1051,7 @@ class VmDefineNicSerializer(s.Serializer):
 
         if allowed_ips is not None:
             self._ips = IPAddress.objects.filter(ip__in=allowed_ips, subnet=self._net)
+            data['allowed_ips'] = set(allowed_ips)
 
         # dns is True if a valid DNS A record exists and points this NICs IP
         data['dns'] = False
@@ -1114,7 +1115,7 @@ class VmDefineNicSerializer(s.Serializer):
             ret['ip'] = self.object.get('ip', None)
             ret['netmask'] = self.object.get('netmask', None)
             ret['gateway'] = self.object.get('gateway', None)
-            ret['allowed_ips'] = self.object.get('allowed_ips', [])
+            ret['allowed_ips'] = self.object.get('allowed_ips', set())
 
         return ret
 
@@ -1277,7 +1278,7 @@ class VmDefineNicSerializer(s.Serializer):
                 self._ip_old = self._ip
                 self._ip = None
 
-        allowed_ips = attrs.get('allowed_ips', [])
+        allowed_ips = attrs.get('allowed_ips', set())
 
         if allowed_ips:
             allowed_ips = set(allowed_ips)
@@ -1313,12 +1314,12 @@ class VmDefineNicSerializer(s.Serializer):
 
                 self._ips = _ips
                 self._changing_allowed_ips = True
-                attrs['allowed_ips'] = list(ip_list)
+                attrs['allowed_ips'] = set(ip_list)
         else:
             # changing net + allowed_ips not specified, but already set on nic (with old net)
             # or settings empty allowed_ips (=> user wants to remove allowed_ips)
             if self._ips and (self._net_old or 'allowed_ips' in attrs):
-                attrs['allowed_ips'] = []
+                attrs['allowed_ips'] = set()
                 self._ips_old = self._ips
                 self._ips = ()
                 self._changing_allowed_ips = True
