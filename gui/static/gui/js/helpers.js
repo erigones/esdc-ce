@@ -110,6 +110,10 @@ function toArray(str, sep, fun) {
   }
 }
 
+/*
+ * Add or update query string parameter
+ * Thanks to @niyazpk and @amorgner: https://gist.github.com/niyazpk/f8ac616f181f6042d1e0#gistcomment-1743025
+ */
 function update_query_string(uri, key, value) {
   // remove the hash part before operating on the uri
   var i = uri.indexOf('#');
