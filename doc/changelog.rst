@@ -19,6 +19,7 @@ Bugs
 
 - Added template for HTTP 403 status code - `#96 <https://github.com/erigones/esdc-ce/issues/96>`__
 - Fixed errors in graph descriptions - `#112 <https://github.com/erigones/esdc-ce/issues/112>`__
+- Fixed 500 AttributeError: 'unicode' object has no attribute 'iteritems' when doing VM undo - `#115 <https://github.com/erigones/esdc-ce/issues/115>`__
 - Fixed 500 error when DNS domain owner is NULL in DB - `#116 <https://github.com/erigones/esdc-ce/issues/116>`__
 - Fixed list of images to be deleted in *Delete unused images* modal - `#117 <https://github.com/erigones/esdc-ce/issues/117>`__
 - Fixed 500 error during xls bulk import when ostype does not exist - `#121 <https://github.com/erigones/esdc-ce/issues/121>`__
