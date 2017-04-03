@@ -1115,7 +1115,7 @@ class VmDefineNicSerializer(s.Serializer):
             ret['ip'] = self.object.get('ip', None)
             ret['netmask'] = self.object.get('netmask', None)
             ret['gateway'] = self.object.get('gateway', None)
-            ret['allowed_ips'] = self.object.get('allowed_ips', set())
+            ret['allowed_ips'] = self.object.get('allowed_ips', [])
 
         return ret
 
@@ -1278,10 +1278,9 @@ class VmDefineNicSerializer(s.Serializer):
                 self._ip_old = self._ip
                 self._ip = None
 
-        allowed_ips = attrs.get('allowed_ips', set())
+        allowed_ips = set(attrs.get('allowed_ips', ()))
 
         if allowed_ips:
-            allowed_ips = set(allowed_ips)
             _ips = IPAddress.objects.filter(ip__in=allowed_ips, subnet=net)
 
             if self.object and not self._net_old and self._ips and self._ips == _ips:
