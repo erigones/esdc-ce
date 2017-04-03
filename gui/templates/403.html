@@ -1,7 +1,7 @@
 {% load i18n %}<!DOCTYPE html>
 <html>
 <head>
-  <title>{% trans "The page you were looking for does not exist" %} (404)</title>
+  <title>{% trans "You are not permitted to view this page" %} (403)</title>
   <style type="text/css">
       body {
         background-color: #fff;
@@ -58,8 +58,8 @@
 
   <a href="/">
     <span class="wrapper">
-      <h2>404</h2>
-      <div class="desc">{% trans "Your ship has run ashore!" %}<br>
+      <h2>403</h2>
+      <div class="desc">{% trans "You do not have permission to dock your ship here!" %}<br>
       {% trans "Click here to return to mighty Danube Cloud current" %}.</div>
     </span>
   </a>

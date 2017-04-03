@@ -3,7 +3,7 @@
 [Unit]
 Description=Ludolph - Monitoring Jabber Bot
 Documentation=https://github.com/erigones/Ludolph
-After=network.target zabbix-server.service
+After=postgresql-9.5.service pgbouncer.service httpd.service
 
 [Service]
 Type=simple

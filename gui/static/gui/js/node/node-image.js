@@ -4,7 +4,6 @@ function NodeImage(hostname, zpool) {
   var self = this;
   var multi_modal = $('#node_image_multi_modal');
   var multi_delete = $('#node_image_multi_delete');
-  var multi_images = $('#id_imf_images');
 
   this.list = new ObjList(
     function(mod, start) {
@@ -96,12 +95,13 @@ function NodeImage(hostname, zpool) {
     var images = $('#etable tbody a.obj_edit:not(".disabled")[data-vms="0"]').map(function() { return $(this).data('form'); }).get();
     var image_aliases = _.pluck(images, 'alias_version');
     var multi_modal_yes = multi_modal.find('a.vm_modal_yes');
+    var multi_images = multi_modal.find('#id_imf_images');  // Always re-fetch this object before displaying modal (#117)
 
     if (image_aliases.length) {
       multi_images.html(image_aliases.join(', '));
       multi_modal_yes.removeClass('disabled');
     } else {
-      multi_images.html();
+      multi_images.html('');
       multi_modal_yes.addClass('disabled');
     }
 

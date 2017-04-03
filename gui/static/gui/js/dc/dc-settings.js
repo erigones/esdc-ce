@@ -7,6 +7,7 @@ function DcSettings(input_tooltip_disabled_msg) {
   var select = null;
   var mdata_input = null;
   var array_input = null;
+  var mbytes_input = null;
 
   function init_table() {
     select = table.find('select.input-select2');
@@ -15,6 +16,8 @@ function DcSettings(input_tooltip_disabled_msg) {
     mdata_enable(mdata_input);
     array_input = table.find('textarea.input-array');
     array_enable(array_input);
+    mbytes_input = table.find('.input-mbytes');
+    mbytes_enable(mbytes_input);
   }
 
   function click_update() {
