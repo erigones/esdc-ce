@@ -14,6 +14,10 @@ class EmptyDomainOwner(object):
     def __str__(self):
         return ''
 
+    def __nonzero__(self):
+        return False
+    __bool__ = __nonzero__
+
 
 class Domain(models.Model):
     """
