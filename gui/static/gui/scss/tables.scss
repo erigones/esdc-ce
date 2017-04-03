@@ -96,6 +96,14 @@ table.box {
   &.table-striped tbody tr:nth-child(odd) td, &.table-striped tbody tr:nth-child(odd) th {
     background: #FDFDFD;
   }
+  &.table-striped tbody {
+	tr.info td {
+	  background-color: #d9edf7;
+	}
+	tr.error td {
+	  background-color: #f2dede;
+	}
+  }
 
   .button {
     i {
