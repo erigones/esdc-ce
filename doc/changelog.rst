@@ -11,6 +11,7 @@ Features
 - Renamed "offline" compute node status to "maintenance" - `#87 <https://github.com/erigones/esdc-ce/issues/87>`__
 - Documented refreservation parameter in vm_define_disk API function - `#106 <https://github.com/erigones/esdc-ce/issues/106>`__
 - Decreased MON_ZABBIX_TIMEOUT to 15 seconds - `#120 <https://github.com/erigones/esdc-ce/issues/120>`__
+- Added visual flash for objects (table rows) added, updated or removed to/from a table - - `#125 <https://github.com/erigones/esdc-ce/issues/125>`__
 - Allow to update disk size of a running VM - requiring only one reboot to take effect - `#127 <https://github.com/erigones/esdc-ce/issues/127>`__
 - Added current_dc (read_only) attribute to output of user_list, user_manage and dc_user(_list) views - `#131 <https://github.com/erigones/esdc-ce/issues/131>`__
 
