@@ -82,7 +82,7 @@ class VmManage(APIView):
     @staticmethod
     def _check_disk_update(disk_update):
         for disk in disk_update:
-            if 'size' in disk or 'refreservation' in disk or 'model' in disk:
+            if 'model' in disk:
                 return True
         return False
 

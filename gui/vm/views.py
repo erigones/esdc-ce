@@ -26,6 +26,7 @@ from gui.vm.utils import (
     get_vm_backups, get_vm_bkpdefs, vm_define_all, ImportExportBase
 )
 from gui.decorators import ajax_required, profile_required, admin_required, permission_required
+from gui.fields import SIZE_FIELD_MB_ADDON
 from gui.utils import collect_view_data, get_pager
 from gui.signals import (view_vm_details, view_vm_snapshot, view_vm_backup, view_vm_console, view_vm_monitoring,
                          view_vm_tasklog)
@@ -65,7 +66,7 @@ def details(request, hostname):
     Page with details of server.
     """
     dc_settings = request.dc.settings
-    context = collect_view_data(request, 'vm_list')
+    context = collect_view_data(request, 'vm_list', mb_addon=SIZE_FIELD_MB_ADDON)
     context['vm'] = vm = get_vm(request, hostname, sr=('dc', 'owner', 'template'))
     context['vms'] = vms = get_vms(request)
     context['vms_tags'] = get_vms_tags(vms)
@@ -463,7 +464,11 @@ def settings_form(request, hostname):
             else:
                 return redirect('vm_details', hostname=form.saved_hostname)
 
-    return render(request, 'gui/vm/settings_form.html', {'settingsform': form, 'vm': vm})
+    return render(request, 'gui/vm/settings_form.html', {
+        'settingsform': form,
+        'vm': vm,
+        'mb_addon': SIZE_FIELD_MB_ADDON,
+    })
 
 
 @login_required
@@ -491,7 +496,11 @@ def disk_settings_form(request, hostname):
         elif status in (200, 201):
             return redirect('vm_details', hostname=vm.hostname)
 
-    return render(request, 'gui/vm/disk_settings_form.html', {'disk_settingsform': form, 'vm': vm})
+    return render(request, 'gui/vm/disk_settings_form.html', {
+        'disk_settingsform': form,
+        'vm': vm,
+        'mb_addon': SIZE_FIELD_MB_ADDON,
+    })
 
 
 @login_required
@@ -753,7 +762,7 @@ def _generic_add_context(request):
 
     Partial add VM view, was separated to smaller functions due to code reuse in Enterprise Edition apps (payments).
     """
-    context = collect_view_data(request, 'vm_add')
+    context = collect_view_data(request, 'vm_add', mb_addon=SIZE_FIELD_MB_ADDON)
     context['vms'] = vms = get_vms(request)
     context['vms_tags'] = get_vms_tags(vms)
 

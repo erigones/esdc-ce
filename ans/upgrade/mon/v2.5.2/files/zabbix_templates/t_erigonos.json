@@ -1661,7 +1661,7 @@
                                 "password": "",
                                 "snmpv3_privpassphrase": "",
                                 "snmpv3_privprotocol": "0",
-                                "name": "Incoming errors on $1",
+                                "name": "Incoming errors on {#IFNAME}",
                                 "applications": [
                                     {
                                         "name": "Network interfaces"
@@ -1704,7 +1704,7 @@
                                 "password": "",
                                 "snmpv3_privpassphrase": "",
                                 "snmpv3_privprotocol": "0",
-                                "name": "Incoming network traffic on $1",
+                                "name": "Incoming network traffic on {#IFNAME}",
                                 "applications": [
                                     {
                                         "name": "Network interfaces"
@@ -1747,7 +1747,7 @@
                                 "password": "",
                                 "snmpv3_privpassphrase": "",
                                 "snmpv3_privprotocol": "0",
-                                "name": "Incoming packets on $1",
+                                "name": "Incoming packets on {#IFNAME}",
                                 "applications": [
                                     {
                                         "name": "Network interfaces"
@@ -1790,7 +1790,7 @@
                                 "password": "",
                                 "snmpv3_privpassphrase": "",
                                 "snmpv3_privprotocol": "0",
-                                "name": "Outgoing errors on $1",
+                                "name": "Outgoing errors on {#IFNAME}",
                                 "applications": [
                                     {
                                         "name": "Network interfaces"
@@ -1833,7 +1833,7 @@
                                 "password": "",
                                 "snmpv3_privpassphrase": "",
                                 "snmpv3_privprotocol": "0",
-                                "name": "Outgoing network traffic on $1",
+                                "name": "Outgoing network traffic on {#IFNAME}",
                                 "applications": [
                                     {
                                         "name": "Network interfaces"
@@ -1876,7 +1876,7 @@
                                 "password": "",
                                 "snmpv3_privpassphrase": "",
                                 "snmpv3_privprotocol": "0",
-                                "name": "Outgoing packets on $1",
+                                "name": "Outgoing packets on {#IFNAME}",
                                 "applications": [
                                     {
                                         "name": "Network interfaces"

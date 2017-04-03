@@ -24,13 +24,13 @@ class DcUserView(APIView):
 
         if username:
             self.user = get_object(request, User, {'username': username}, where=restrict_users,
-                                   sr=('dc_bound',), exists_ok=True, noexists_fail=True)
+                                   sr=('dc_bound', 'default_dc'), exists_ok=True, noexists_fail=True)
         else:
             self.user = User.objects.distinct().filter(restrict_users)\
                                                .filter(is_active=self.active).order_by(*self.order_by)
 
             if self.full or self.extended:
-                self.user = self.user.select_related('dc_bound').prefetch_related('roles')
+                self.user = self.user.select_related('dc_bound', 'default_dc').prefetch_related('roles')
 
     def get(self, many=False):
         return self._get(self.user, many=many, field_name='username')

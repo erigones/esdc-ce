@@ -5,7 +5,7 @@ from api.mon.graphs import GraphItems
 
 GRAPH_ITEMS = GraphItems({
     'cpu-usage': {
-        'desc': _('Total compute node CPU consumed by the node.'),
+        'desc': _('Total CPU utilisation on the compute node.'),
         'items': ('system.cpu.util[,system,]', 'system.cpu.util[,user,]'),
         'update_interval': GraphItems.GRAPH_UPDATE_INTERVAL,
         'history': 0,
@@ -16,7 +16,7 @@ GRAPH_ITEMS = GraphItems({
     },
 
     'cpu-jumps': {
-        'desc': _('Number of context switches and interrupts on the node.'),
+        'desc': _('Number of context switches and interrupts on the compute node.'),
         'items': ('system.cpu.switches', 'system.cpu.intr'),
         'update_interval': GraphItems.GRAPH_UPDATE_INTERVAL,
         'history': 3,
@@ -37,7 +37,7 @@ GRAPH_ITEMS = GraphItems({
     },
 
     'mem-usage': {
-        'desc': _('Total compute node physical memory consumed by the node.'),
+        'desc': _('Total physical memory consumed by the compute node.'),
         'items': ('vm.memory.size[used]',),
         'update_interval': GraphItems.GRAPH_UPDATE_INTERVAL,
         'history': 3,
@@ -48,7 +48,7 @@ GRAPH_ITEMS = GraphItems({
     },
 
     'swap-usage': {
-        'desc': _('Total compute node swap space used by the node.'),
+        'desc': _('Total swap space used by the compute node.'),
         'items': ('system.swap.size[,used]',),
         'update_interval': GraphItems.GRAPH_UPDATE_INTERVAL,
         'history': 3,
@@ -73,7 +73,7 @@ GRAPH_ITEMS = GraphItems({
         'update_interval': GraphItems.GRAPH_UPDATE_INTERVAL,
         'history': 3,
         'options': {
-            'yaxis': {'mode': 'byteRate', 'min': 0},
+            'yaxis': {'mode': None, 'min': 0},
         },
     },
 

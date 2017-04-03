@@ -18,7 +18,7 @@ class DomainSerializer(s.InstanceSerializer):
     name_changed = None
 
     name = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\._/-]*$', max_length=253, min_length=3)
-    owner = s.SlugRelatedField(slug_field='username', queryset=User.objects, required=False)
+    owner = s.SlugRelatedField(slug_field='username', queryset=User.objects)
     access = s.IntegerChoiceField(choices=Domain.ACCESS, default=Domain.PRIVATE)
     desc = s.SafeCharField(max_length=128, required=False)
     created = s.DateTimeField(read_only=True, required=False)
