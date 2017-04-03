@@ -14,6 +14,7 @@ Bugs
 ----
 
 - Added template for HTTP 403 status code - `#96 <https://github.com/erigones/esdc-ce/issues/96>`__
+- Fixed 500 AttributeError: 'unicode' object has no attribute 'iteritems' when doing VM undo - `#115 <https://github.com/erigones/esdc-ce/issues/115>`__
 - Fixed 500 error during xls bulk import when ostype does not exist - `#121 <https://github.com/erigones/esdc-ce/issues/121>`__
 
 
