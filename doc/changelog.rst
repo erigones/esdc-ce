@@ -15,6 +15,7 @@ Features
 - Allow to update disk size of a running VM - requiring only one reboot to take effect - `#127 <https://github.com/erigones/esdc-ce/issues/127>`__
 - Added current_dc (read_only) attribute to output of user_list, user_manage and dc_user(_list) views - `#131 <https://github.com/erigones/esdc-ce/issues/131>`__
 - Moved Create DNS checkbox to non advanced section when creating (editing) NIC in VM - `#145 <https://github.com/erigones/esdc-ce/issues/145>`__
+- Added new variables storing path to update key/cert files in core.settings - `#104 <https://github.com/erigones/esdc-ce/issues/104>`__
 
 Bugs
 ----

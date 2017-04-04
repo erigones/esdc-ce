@@ -657,3 +657,7 @@ if THIRD_PARTY_APPS_ENABLED:
     MODULES += THIRD_PARTY_MODULES
 
 MODULES = frozenset(MODULES)
+
+# location of key/cert files needed to authenticate against update server
+UPDATE_KEY_FILE = os.path.join(LIBDIR, 'update.key')
+UPDATE_CERT_FILE = os.path.join(LIBDIR, 'update.crt')
