@@ -112,36 +112,31 @@ def update_command(version, key=None, cert=None, sudo=False):
     if sudo:
         cmd.insert(0, 'sudo')
 
-    if os.path.isfile(ssl_key_file) or key:
+    if key:
 
-        if key:
+        try:
+            with open(ssl_key_file, 'w+') as f:
+                f.write(key)
+        except IOError as err:
+            logger.error('Error writing private key to file %s (%s)', ssl_key_file, err)
 
-            try:
-                with open(ssl_key_file, 'w+') as f:
-                    f.write(key)
-            except IOError as err:
-                logger.error('Error writing private key to file %s (%s)', ssl_key_file, err)
+    # this serves double purpose to check if file was properly written
+    # and to check if UPDATE_KEY_FILE exists if cert param was None
+    if os.path.isfile(ssl_key_file):
+        cmd.append(ssl_key_file)
 
-        # these server double purpose to check if file was properly written
-        # and to check if os.path.isfile(ssl_key_file) was True in the above block
-        if os.path.isfile(ssl_key_file):
-            cmd.append(ssl_key_file)
+    if cert:
 
-    if os.path.isfile(ssl_cert_file) or cert:
+        try:
+            with open(ssl_cert_file, 'w+') as f:
+                f.write(cert)
+        except IOError as err:
+            logger.error('Error writing private cert to file %s (%s)', ssl_cert_file, err)
 
-        if cert:
-
-            try:
-                with open(ssl_cert_file, 'w+') as f:
-                    f.write(cert)
-            except IOError as err:
-                logger.error('Error writing private cert to file %s (%s)', ssl_cert_file, err)
-
-        # these server double purpose to check if file was properly written
-        # and to check if os.path.isfile(ssl_cert_file) was True in the above block
-        if os.path.isfile(ssl_cert_file):
-            cmd.append(ssl_cert_file)
-
+    # this serves double purpose to check if file was properly written
+    # and to check if UPDATE_CERT_FILE exists if cert param was None
+    if os.path.isfile(ssl_cert_file):
+        cmd.append(ssl_cert_file)
 
     return _execute(cmd)
 
