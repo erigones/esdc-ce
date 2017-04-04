@@ -1,7 +1,15 @@
 # https://github.com/erigones/esdc-ce/issues/103
+
+- name: check free space
+  shell: if [[ $(df -m / | tail -1 | awk '{print $4}') -lt 1600 ]]; then echo LOW_SPACE; fi
+  register: free_space
+  failed_when: "'LOW_SPACE' in free_space.stdout"
+
 - name: Create swapfile
-  command: "dd if=/dev/zero of=/swapfile2 bs=1M count=1534 creates=/swapfile2"
+  command: "fallocate -l 1536 /swapfile2"
   register: write_swapfile
+  args:
+    creates: /swapfile2
 
 - name: Set swapfile permissions
   file: path="/swapfile2" mode=600
