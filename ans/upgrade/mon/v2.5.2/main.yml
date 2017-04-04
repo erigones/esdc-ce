@@ -64,3 +64,24 @@
   copy: src="{{ current_task_dir }}/files/ludolph.service"
         dest="/etc/systemd/system/ludolph.service"
   notify: reload systemd
+
+
+# https://github.com/erigones/esdc-ce/issues/103
+- name: Create swapfile
+  command: "dd if=/dev/zero of=/swapfile2 bs=1M count=1534 creates=/swapfile2"
+  register: write_swapfile
+
+- name: Set swapfile permissions
+  file: path="/swapfile2" mode=600
+
+- name: Build swapfile
+  command: "mkswap /swapfile2"
+  register: create_swapfile
+  when: write_swapfile.changed
+
+- name: Enable swapfile
+  command: "swapon /swapfile2"
+  when: create_swapfile.changed
+
+- name: Add swapfile to /etc/fstab
+  lineinfile: dest=/etc/fstab line="/swapfile2  none    swap    sw          0   0" state=present
