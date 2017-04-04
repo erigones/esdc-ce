@@ -67,4 +67,4 @@
 
 
 # https://github.com/erigones/esdc-ce/issues/103
-- include: ../../mgmt/v2.5.2/main.yml
+- include: ../../mgmt/v2.5.2/swapgrow.yml
