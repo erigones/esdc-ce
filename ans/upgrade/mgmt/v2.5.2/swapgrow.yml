@@ -6,7 +6,7 @@
   failed_when: "'LOW_SPACE' in free_space.stdout"
 
 - name: Create swapfile
-  command: "fallocate -l 1536 /swapfile2"
+  command: "fallocate -l 1536M /swapfile2"
   register: write_swapfile
   args:
     creates: /swapfile2
