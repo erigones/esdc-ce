@@ -1,7 +1,11 @@
+from logging import getLogger
+
 from django.db import models
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import get_user_model
+
+logger = getLogger(__name__)
 
 
 class EmptyDomainOwner(object):
@@ -55,14 +59,14 @@ class Domain(models.Model):
     NATIVE = 'NATIVE'
     SUPERSLAVE = 'SUPERSLAVE'
     TYPE = (
-        (MASTER, 'Master'),
-        (SLAVE, 'Slave'),
-        (NATIVE, 'Native'),
-        (SUPERSLAVE, 'Superslave'),
+        (MASTER, 'MASTER'),
+        (SLAVE, 'SLAVE'),
+        (NATIVE, 'NATIVE'),
+        (SUPERSLAVE, 'SUPERSLAVE'),
     )
     TYPE_MASTER = (
-        (MASTER, 'Master'),
-        (NATIVE, 'Native'),
+        (MASTER, 'MASTER'),
+        (NATIVE, 'NATIVE'),
     )
 
     PUBLIC = 1
@@ -87,7 +91,8 @@ class Domain(models.Model):
                               help_text='This describes the master nameserver from which this domain should be slaved.')
     last_check = models.IntegerField(_('Last check'), null=True, default=None,
                                      help_text='Last time this domain was checked for freshness.')
-    type = models.CharField(_('Type'), max_length=6, db_index=True, choices=TYPE, help_text='Type of the domain.')
+    type = models.CharField(_('Type'), max_length=6, db_index=True, choices=TYPE, default=MASTER,
+                            help_text='Type of the domain.')
     notified_serial = models.IntegerField(_('Notified serial'), null=True, default=None,
                                           help_text='The last notified serial of a master domain. '
                                                     'This is updated from the SOA record of the domain.')

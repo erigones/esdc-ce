@@ -55,9 +55,10 @@ class DomainView(APIView):
 
     def post(self):
         request = self.request
+        dc1_settings = DefaultDc().settings
         domain = self.domain
         domain.owner = request.user  # just a default
-        domain.type = Domain.NATIVE  # just a default
+        domain.type = dc1_settings.DNS_DOMAIN_TYPE_DEFAULT
 
         if not request.user.is_staff:
             self.data.pop('dc_bound', None)  # default DC binding cannot be changed when creating object
@@ -74,8 +75,6 @@ class DomainView(APIView):
         # Create SOA and NS records for new MASTER/NATIVE domain
         from api.dns.record.views import dns_record
         try:
-            dc1_settings = DefaultDc().settings
-
             if dc1_settings.DNS_SOA_DEFAULT and dc1_settings.DNS_NAMESERVERS:
                 soa_attrs = {'hostmaster': dc1_settings.DNS_HOSTMASTER.replace('@', '.'),
                              'nameserver': dc1_settings.DNS_NAMESERVERS[0]}
