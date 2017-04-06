@@ -220,3 +220,29 @@ div.dataTables_paginate .ui-state-disabled, div.dataTables_paginate .ui-state-di
 .inner-well .table th, .inner-well .table td {
   border: none;
 }
+
+/* line 172, ../scss/tables.scss */
+#debug {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  background-color: #fff;
+  opacity: 0.9;
+  width: 100%;
+  padding: 0 5px;
+}
+
+/* line 182, ../scss/tables.scss */
+table#debug-query-table tr td {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+/* line 187, ../scss/tables.scss */
+table#debug-query-table code {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  font-size: 9px;
+  line-height: 8px;
+}
