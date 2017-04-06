@@ -279,6 +279,7 @@ class Record(models.Model):
         else:
             return self.content
 
+    # noinspection PyPep8Naming
     @classmethod
     def increment_SOA_serial(cls, instance):
         """Method called in post_save and post_delete to increment SOA after record updates"""
@@ -304,13 +305,14 @@ class Record(models.Model):
         soa_rec.content = ' '.join(soa_rec_content)
         soa_rec.save(update_fields=('content', 'change_date'))
 
+    # noinspection PyUnusedLocal
     @classmethod
     def post_save_record(cls, sender, instance, **kwargs):
         """Called via signal after record has been saved to database"""
         cls.increment_SOA_serial(instance)
 
+    # noinspection PyUnusedLocal
     @classmethod
     def post_delete_record(cls, sender, instance, **kwargs):
-        """ """
         """Called via signal after record has been deleted from database"""
         cls.increment_SOA_serial(instance)
