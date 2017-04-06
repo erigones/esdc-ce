@@ -12,7 +12,7 @@ from api.dns.domain.serializers import DomainSerializer, ExtendedDomainSerialize
 from api.dns.messages import LOG_DOMAIN_CREATE, LOG_DOMAIN_UPDATE, LOG_DOMAIN_DELETE
 from api.dc.utils import attach_dc_virt_object
 from api.dc.messages import LOG_DOMAIN_ATTACH
-from pdns.models import Domain, Record
+from pdns.models import Record
 from vms.models import Dc, DefaultDc
 
 logger = getLogger(__name__)

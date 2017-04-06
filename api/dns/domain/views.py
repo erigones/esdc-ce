@@ -73,9 +73,10 @@ def dns_domain(request, name, data=None):
         :type data.access: integer
         :arg data.owner: User that owns the domain (default: logged in user)
         :type data.owner: string
-        :arg data.type: PowerDNS domain type which determines how records are replicated. MASTER will use DNS \
-protocol messages to communicate changes with slaves. NATIVE will use database replication between master DNS \
-server and slave DNS server. (MASTER, NATIVE) (default: MASTER)
+        :arg data.type: PowerDNS domain type which determines how records are replicated. One of MASTER, NATIVE. \
+When set to MASTER, PowerDNS will use DNS protocol messages to communicate changes with slaves. \
+When set to NATIVE, PowerDNS will use database replication between master DNS \
+server and slave DNS servers. (default: MASTER)
         :type data.type: string
         :arg data.desc: Domain description
         :type data.desc: string
@@ -102,10 +103,10 @@ server and slave DNS server. (MASTER, NATIVE) (default: MASTER)
         :type name: string
         :arg data.access: Access type (1 - Public, 3 - Private)
         :type data.access: integer
-        :arg data.type: PowerDNS domain type which determines how records are replicated. When set to MASTER, \
-PowerDNS will use DNS protocol messages to communicate changes with slaves. \
+        :arg data.type: PowerDNS domain type which determines how records are replicated. One of MASTER, NATIVE. \
+When set to MASTER, PowerDNS will use DNS protocol messages to communicate changes with slaves. \
 When set to NATIVE, PowerDNS will use database replication between master DNS \
-server and slave DNS servers. (MASTER, NATIVE) (default: MASTER)
+server and slave DNS servers.
         :type data.type: string
         :arg data.owner: User that owns the domain
         :type data.owner: string

@@ -238,11 +238,6 @@ class Record(models.Model):
         return cls.objects.select_related('domain').filter(type=cls.A, name=name.lower(),
                                                            domain_id=Domain.get_domain_id(domain))
 
-    # noinspection PyPep8Naming
-    @classmethod
-    def get_record_SOA(cls, domain):
-        return cls.objects.get(type=cls.SOA, domain_id=Domain.get_domain_id(domain))
-
     @property
     def web_data(self):
         """Return dict used in web templates"""
@@ -291,7 +286,7 @@ class Record(models.Model):
             return
 
         try:
-            soa_rec = cls.get_record_SOA(instance.domain.name)
+            soa_rec = cls.objects.get(type=cls.SOA, domain_id=instance.domain.id)
         except cls.DoesNotExist:
             logger.warning('SOA record does not exist!')
             return

@@ -13,7 +13,7 @@ from api.vm.utils import get_vm, get_owners
 from api.sms.utils import get_services
 from api.mon.zabbix import VM_KWARGS, VM_KWARGS_NIC, VM_KWARGS_DISK
 from gui.models import User, UserProfile, Role
-from vms.models import Dc, DefaultDc, Vm, BackupDefine, Subnet, Domain
+from vms.models import Dc, DefaultDc, Vm, BackupDefine, Subnet
 from vms.utils import DefAttrDict
 from pdns.models import Domain
 
@@ -609,7 +609,7 @@ class DefaultDcSettingsSerializer(DcSettingsSerializer):
                                                         'repositories available in every virtual datacenter.'))
 
     DNS_DOMAIN_TYPE_DEFAULT = s.ChoiceField(label='DNS_DOMAIN_TYPE_DEFAULT', choices=Domain.TYPE_MASTER,
-                                            help_text='Default PowerDNS replication type of the newly created domain.')
+                                            help_text='Default PowerDNS replication type of newly created domain.')
     DNS_HOSTMASTER = s.EmailField(label='DNS_HOSTMASTER', max_length=255,
                                   help_text=_('Default hostmaster email address used for SOA records '
                                               'of newly created domains.'))
