@@ -55,6 +55,12 @@ class AdminDomainForm(SerializerForm):
                               widget=forms.Select(attrs=SELECT_ATTRS))
     access = forms.TypedChoiceField(label=_('Access'), required=False, coerce=int, choices=Domain.ACCESS,
                                     widget=forms.Select(attrs=SELECT_ATTRS))
+    type = forms.ChoiceField(label=_('Type'), required=False, choices=Domain.TYPE_MASTER,
+                             widget=forms.Select(attrs=SELECT_ATTRS),
+                             help_text=_('PowerDNS domain type. '
+                                         'MASTER - use DNS protocol messages to communicate changes '
+                                         'with slaves. NATIVE - use database replication '
+                                         'between master DNS server and slave DNS servers.'))
     desc = forms.CharField(label=_('Description'), max_length=128, required=False,
                            widget=forms.TextInput(attrs={'class': 'input-transparent wide', 'required': ''}))
 

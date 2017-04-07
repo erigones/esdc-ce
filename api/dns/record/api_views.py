@@ -54,7 +54,7 @@ class RecordView(APIView):
 
         if record_id is None:  # Get many
             records = self.data.get('records', None)
-            qs = self.domain.record_set.order_by(*self.order_by)
+            qs = self.domain.record_set.select_related('domain').order_by(*self.order_by)
 
             if records is None:
                 self.record = qs
@@ -66,7 +66,8 @@ class RecordView(APIView):
             if record_id == 0:  # New record
                 self.record = Record(domain=self.domain)
             else:  # Existing record
-                self.record = get_object(request, Record, {'domain': self.domain, 'id': record_id}, noexists_fail=True)
+                self.record = get_object(request, Record, {'domain': self.domain, 'id': record_id}, sr=('domain',),
+                                         noexists_fail=True)
 
     def _fix_detail_dict(self, dd):
         related_obj = self.related_obj

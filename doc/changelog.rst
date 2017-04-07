@@ -11,6 +11,7 @@ Features
 - Renamed "offline" compute node status to "maintenance" - `#87 <https://github.com/erigones/esdc-ce/issues/87>`__
 - Added new variables storing path to update key/cert files in core.settings - `#104 <https://github.com/erigones/esdc-ce/issues/104>`__
 - Documented refreservation parameter in vm_define_disk API function - `#106 <https://github.com/erigones/esdc-ce/issues/106>`__
+- Implemented SOA serial number incrementation when DNS record is updated - `#118 <https://github.com/erigones/esdc-ce/issues/118>`__
 - Decreased MON_ZABBIX_TIMEOUT to 15 seconds - `#120 <https://github.com/erigones/esdc-ce/issues/120>`__
 - Added visual flash for objects (table rows) added, updated or removed to/from a table - - `#125 <https://github.com/erigones/esdc-ce/issues/125>`__
 - Allow to update disk size of a running VM - requiring only one reboot to take effect - `#127 <https://github.com/erigones/esdc-ce/issues/127>`__
@@ -23,13 +24,13 @@ Bugs
 
 - Added template for HTTP 403 status code - `#96 <https://github.com/erigones/esdc-ce/issues/96>`__
 - Fixed errors in graph descriptions - `#112 <https://github.com/erigones/esdc-ce/issues/112>`__
+- Fixed default image import list, where last 30 results were not selected by the published date - `#113 <https://github.com/erigones/esdc-ce/issues/113>`__
 - Fixed 500 AttributeError: 'unicode' object has no attribute 'iteritems' when doing VM undo - `#115 <https://github.com/erigones/esdc-ce/issues/115>`__
 - Fixed 500 error when DNS domain owner is NULL in DB - `#116 <https://github.com/erigones/esdc-ce/issues/116>`__
 - Fixed list of images to be deleted in *Delete unused images* modal - `#117 <https://github.com/erigones/esdc-ce/issues/117>`__
 - Fixed 500 error during xls bulk import when ostype does not exist - `#121 <https://github.com/erigones/esdc-ce/issues/121>`__
 - Fixed race conditions when using `set_request_method()` and `call_api_view()` functions - `#123 <https://github.com/erigones/esdc-ce/issues/123>`__
 - Fixed `get_owners` convenience function that sometimes returned duplicate users, which resulted in occasional errors - `#136 <https://github.com/erigones/esdc-ce/issues/136>`__
-- Fixed default image import list, where last 30 results were not selected by the published date - `#113 <https://github.com/erigones/esdc-ce/issues/113>`__
 
 
 2.5.1 (released on 2017-03-07)

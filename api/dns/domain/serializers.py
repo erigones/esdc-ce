@@ -12,12 +12,13 @@ class DomainSerializer(s.InstanceSerializer):
     pdns.models.Domain
     """
     _model_ = Domain
-    _update_fields_ = ('owner', 'access', 'desc', 'dc_bound')
-    _default_fields_ = ('name', 'owner')
+    _update_fields_ = ('owner', 'access', 'desc', 'dc_bound', 'type')
+    _default_fields_ = ('name', 'owner', 'type')
     _blank_fields_ = frozenset({'desc'})
     name_changed = None
 
     name = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\._/-]*$', max_length=253, min_length=3)
+    type = s.ChoiceField(choices=Domain.TYPE_MASTER, default=Domain.MASTER)
     owner = s.SlugRelatedField(slug_field='username', queryset=User.objects)
     access = s.IntegerChoiceField(choices=Domain.ACCESS, default=Domain.PRIVATE)
     desc = s.SafeCharField(max_length=128, required=False)

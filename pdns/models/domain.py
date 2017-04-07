@@ -55,14 +55,14 @@ class Domain(models.Model):
     NATIVE = 'NATIVE'
     SUPERSLAVE = 'SUPERSLAVE'
     TYPE = (
-        (MASTER, 'Master'),
-        (SLAVE, 'Slave'),
-        (NATIVE, 'Native'),
-        (SUPERSLAVE, 'Superslave'),
+        (MASTER, 'MASTER'),
+        (SLAVE, 'SLAVE'),
+        (NATIVE, 'NATIVE'),
+        (SUPERSLAVE, 'SUPERSLAVE'),
     )
     TYPE_MASTER = (
-        (MASTER, 'Master'),
-        (NATIVE, 'Native'),
+        (MASTER, 'MASTER'),
+        (NATIVE, 'NATIVE'),
     )
 
     PUBLIC = 1

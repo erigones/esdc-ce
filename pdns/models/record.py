@@ -43,6 +43,9 @@ class Record(models.Model):
     CREATE INDEX recordorder ON records (domain_id, ordername text_pattern_ops); -- (custom SQL)
     """
 
+    # MAX value for SOA serial
+    MAX_UINT32 = 4294967295  # 2**38 - 1
+
     # Defaults
     PRIO = 0
     TTL = 300
@@ -275,3 +278,41 @@ class Record(models.Model):
             return '%s %s' % (self.prio, self.content)
         else:
             return self.content
+
+    # noinspection PyPep8Naming
+    @classmethod
+    def increment_SOA_serial(cls, instance):
+        """Method called in post_save and post_delete to increment SOA after record updates"""
+        if instance.type == cls.SOA:
+            return
+
+        try:
+            soa_rec = cls.objects.get(type=cls.SOA, domain_id=instance.domain.id)
+        except cls.DoesNotExist:
+            logger.warning('SOA record does not exist!')
+            return
+
+        soa_rec_content = soa_rec.content.split()
+        soa_serial = int(soa_rec_content[2])  # get serial from SOA record
+
+        if 0 < soa_serial < cls.MAX_UINT32:
+            soa_serial += 1
+        elif soa_serial >= cls.MAX_UINT32:
+            # start from 1 as we reached end of range for 32 uint
+            soa_serial = 1
+
+        soa_rec_content[2] = str(soa_serial)
+        soa_rec.content = ' '.join(soa_rec_content)
+        soa_rec.save(update_fields=('content', 'change_date'))
+
+    # noinspection PyUnusedLocal
+    @classmethod
+    def post_save_record(cls, sender, instance, **kwargs):
+        """Called via signal after record has been saved to database"""
+        cls.increment_SOA_serial(instance)
+
+    # noinspection PyUnusedLocal
+    @classmethod
+    def post_delete_record(cls, sender, instance, **kwargs):
+        """Called via signal after record has been deleted from database"""
+        cls.increment_SOA_serial(instance)
