@@ -13,7 +13,7 @@ Features
 - Documented refreservation parameter in vm_define_disk API function - `#106 <https://github.com/erigones/esdc-ce/issues/106>`__
 - Implemented SOA serial number incrementation when DNS record is updated - `#118 <https://github.com/erigones/esdc-ce/issues/118>`__
 - Decreased MON_ZABBIX_TIMEOUT to 15 seconds - `#120 <https://github.com/erigones/esdc-ce/issues/120>`__
-- Added visual flash for objects (table rows) added, updated or removed to/from a table - - `#125 <https://github.com/erigones/esdc-ce/issues/125>`__
+- Added visual flash for objects (table rows) added, updated or removed to/from a table - `#125 <https://github.com/erigones/esdc-ce/issues/125>`__
 - Allow to update disk size of a running VM - requiring only one reboot to take effect - `#127 <https://github.com/erigones/esdc-ce/issues/127>`__
 - Added current_dc (read_only) attribute to output of user_list, user_manage and dc_user(_list) views - `#131 <https://github.com/erigones/esdc-ce/issues/131>`__
 - Moved Create DNS checkbox to non advanced section when creating (editing) NIC in VM - `#145 <https://github.com/erigones/esdc-ce/issues/145>`__
@@ -31,6 +31,7 @@ Bugs
 - Fixed 500 error during xls bulk import when ostype does not exist - `#121 <https://github.com/erigones/esdc-ce/issues/121>`__
 - Fixed race conditions when using `set_request_method()` and `call_api_view()` functions - `#123 <https://github.com/erigones/esdc-ce/issues/123>`__
 - Fixed `get_owners` convenience function that sometimes returned duplicate users, which resulted in occasional errors - `#136 <https://github.com/erigones/esdc-ce/issues/136>`__
+- Changed erigonesd mgmt worker systemd manifest - `#150 <https://github.com/erigones/esdc-ce/issues/150>`__
 
 
 2.5.1 (released on 2017-03-07)
@@ -42,7 +43,7 @@ Features
 Bugs
 ----
 
-- Fixed bug that caused node monitoring graphs not to show, when not in main DC -  `#100 <https://github.com/erigones/esdc-ce/issues/100>`__
+- Fixed bug that caused node monitoring graphs not to show, when not in main DC - `#100 <https://github.com/erigones/esdc-ce/issues/100>`__
 - Fixed scrolling to first input field with an error in modal form - `#88 <https://github.com/erigones/esdc-ce/issues/88>`__
 
 
