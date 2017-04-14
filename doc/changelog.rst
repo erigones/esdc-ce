@@ -1,6 +1,19 @@
 Changelog
 #########
 
+2.6.0 (unreleased)
+==================
+
+Features
+--------
+
+- Create required `domainmetadata` for every newly created domain - `#151 <https://github.com/erigones/esdc-ce/issues/151>`__
+
+Bugs
+----
+
+
+
 2.5.2 (released on 2017-04-11)
 ==============================
 
