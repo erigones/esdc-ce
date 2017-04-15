@@ -747,12 +747,7 @@ function vm_settings_modal(hostname, btn, mod_selector) {
       tags_select.select2({tags: ServerListTags.tags(), dropdownCssClass: tags_select.attr('class'), tokenSeparators: [',', ' ']});
 
       mdata_display($('#id_opt-mdata'));
-
-      mod.on('keyup', '#id_opt-ram', function() {
-        var ram = $(this);
-
-        ram.val(parse_bytes(ram.val(), 'M'));
-      });
+      mbytes_handler($('#id_opt-ram'));
 
       if (init && add) {  // switching template affects VM form fields only when adding new VM
         mod.on('change', '#id_opt-template', function() {
@@ -853,11 +848,7 @@ function vm_settings_modal(hostname, btn, mod_selector) {
         }
       }
 
-      mod.on('keyup', '#id_opt-disk-size', function() {
-        var size = $(this);
-
-        size.val(parse_bytes(size.val(), 'M'));
-      });
+      mbytes_handler($('#id_opt-disk-size'));
 
       mod.on('change', '#id_opt-disk-size', function() {
         var size = $(this);

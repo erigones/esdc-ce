@@ -8,10 +8,10 @@
     upg_dir: "{{ upg_base }}/{{ appliance_type }}"
     versionfile: /etc/esdc.version
   tasks:
-  - name: extracting current appliance version
+  - name: Extracting current appliance version
     shell: if [ -f "{{ versionfile }}" ]; then cat "{{ versionfile }}"; else echo 'v1.0.0'; fi
     register: appliance_version
-  - name: getting list of upgrades
+  - name: Getting list of upgrades
     local_action:
         module: shell
         args: find "{{ upg_dir }}" -maxdepth 1 -type d -name 'v*' | sort --version-sort
@@ -30,3 +30,5 @@
     service: name=erigonesd-beat state=restarted
   - name: reload haproxy
     service: name=haproxy state=reloaded
+  - name: restart zabbix-server
+    service: name=zabbix-server state=restarted

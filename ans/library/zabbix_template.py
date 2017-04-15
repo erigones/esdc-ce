@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
-# (c) 2012-2016, Erigones, s. r. o
+# (c) 2012-2017, Erigones, s. r. o
 # noinspection PyPep8Naming
 import xml.etree.ElementTree as ET
 import os
@@ -119,6 +119,7 @@ def indent(elem, level=0):
             elem.tail = i
 
 
+# noinspection PyShadowingBuiltins
 def get_template_name(module, filename):
     try:
         with open(filename, 'r') as f:
@@ -132,6 +133,7 @@ def get_template_name(module, filename):
     return data['zabbix_export']['templates'][0]['name']
 
 
+# noinspection PyShadowingBuiltins
 def get_template_id(module, zbx, name):
     try:
         result = zbx.template.get({
@@ -150,6 +152,7 @@ def get_template_id(module, zbx, name):
         raise ValueError("Template \"%s\" not found" % name)
 
 
+# noinspection PyShadowingBuiltins
 def check_template(module, zbx, name):
     try:
         return bool(get_template_id(module, zbx, name))
@@ -159,6 +162,7 @@ def check_template(module, zbx, name):
         module.fail_json(msg="Zabbix API problem: %s" % e)
 
 
+# noinspection PyShadowingBuiltins
 def import_template(module, zbx, filename, fmt):
     if not os.path.exists(filename):
         module.fail_json(msg="template file %s not found" % filename)
@@ -210,6 +214,7 @@ def import_template(module, zbx, filename, fmt):
         raise AssertionError
 
 
+# noinspection PyShadowingBuiltins
 def export_template(module, zbx, template_id, target, fmt):
     try:
         result = zbx.configuration.export({
@@ -240,6 +245,7 @@ def export_template(module, zbx, template_id, target, fmt):
         raise AssertionError
 
 
+# noinspection PyShadowingBuiltins
 def remove_template(module, zbx, template_id):
     try:
         return zbx.template.delete([template_id])
@@ -249,6 +255,7 @@ def remove_template(module, zbx, template_id):
 
 
 def main():
+    # noinspection PyShadowingBuiltins
     module = AnsibleModule(
         argument_spec=dict(
             server_url=dict(required=True, default=None, aliases=['url']),

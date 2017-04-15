@@ -70,26 +70,33 @@ function DcImageList(task_id) {
     var total;
 
     if (img_row.length) {
-      self.list.elements.table.fnDeleteRow(img_row.get(0));
-      img_row.remove();
-      total = $('#total');
-      total.html(total.html() - 1);
+      table_obj_removed(img_row, function() {
+        self.list.elements.table.fnDeleteRow(img_row.get(0));
+        img_row.remove();
+        total = $('#total');
+        total.html(total.html() - 1);
+      });
     }
   };
 
   this.update_status = function(img_name, state, status_display) {
-    var img_status = $(jq('image_' + img_name) + ' .image_status');
-    if (!img_status.length) {
+    var img_row = $(jq('image_' + img_name));
+
+    if (!img_row.length) {
       return;
     }
-    var img_link = $(jq('image_' + img_name) + ' a.edit-button');
+
+    var img_status = img_row.find('span.image_status');
+    var img_link = img_row.find('a.edit-button');
 
     img_status.html(status_display);
 
     if (state == 2) {
       img_link.addClass('disabled');
+      img_row.addClass('info');
     } else {
       img_link.removeClass('disabled');
+      table_obj_updated(img_row);
     }
   };
 } // DcImageList

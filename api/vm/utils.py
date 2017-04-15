@@ -172,7 +172,7 @@ def get_owners(request, dc=None, all=False, order_by=('username',)):
     Return QuerySet of all active users. WARNING: Use with care!
     """
     dc = dc or request.dc
-    qs = User.objects.exclude(id=settings.SYSTEM_USER).filter(is_active=True).order_by(*order_by)
+    qs = User.objects.exclude(id=settings.SYSTEM_USER).filter(is_active=True).order_by(*order_by).distinct()
 
     if all or dc.access == dc.PUBLIC:
         # Public DC is available for all active users

@@ -1,0 +1,17 @@
+# Ludolph systemd service file
+#
+[Unit]
+Description=Ludolph - Monitoring Jabber Bot
+Documentation=https://github.com/erigones/Ludolph
+After=postgresql-9.5.service pgbouncer.service httpd.service
+
+[Service]
+Type=simple
+User=ludolph
+ExecStart=/usr/bin/ludolph
+Restart=on-failure
+RestartPreventExitStatus=2
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target

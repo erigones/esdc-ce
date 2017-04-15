@@ -343,18 +343,20 @@ class DcSettingsSerializer(s.InstanceSerializer):
                                                           help_text=_('Predefined manual snapshot limit '
                                                                       'for new servers.'))
     VMS_VM_SNAPSHOT_SIZE_LIMIT = s.IntegerField(label='VMS_VM_SNAPSHOT_SIZE_LIMIT', required=False,
-                                                help_text=_('Maximum size of all snapshots per server.'))
+                                                help_text=_('Maximum size (MB) of all snapshots per server.'))
     VMS_VM_SNAPSHOT_SIZE_LIMIT_DEFAULT = s.IntegerField(label='VMS_VM_SNAPSHOT_SIZE_LIMIT_DEFAULT', required=False,
-                                                        help_text=_('Predefined snapshot size limit for new servers.'))
+                                                        help_text=_('Predefined snapshot size limit (MB) for new '
+                                                                    'servers.'))
     VMS_VM_SNAPSHOT_DC_SIZE_LIMIT = s.IntegerField(label='VMS_VM_SNAPSHOT_DC_SIZE_LIMIT', required=False,
-                                                   help_text=_('Maximum size of all snapshots in this '
+                                                   help_text=_('Maximum size (MB) of all snapshots in this '
                                                                'virtual datacenter.'))
     VMS_VM_BACKUP_DEFINE_LIMIT = s.IntegerField(label='VMS_VM_BACKUP_DEFINE_LIMIT', required=False,
                                                 help_text=_('Maximum number of backup definitions per server.'))
     VMS_VM_BACKUP_LIMIT = s.IntegerField(label='VMS_VM_BACKUP_LIMIT', required=False,
                                          help_text=_('Upper retention limit used for new backup definitions.'))
     VMS_VM_BACKUP_DC_SIZE_LIMIT = s.IntegerField(label='VMS_VM_BACKUP_DC_SIZE_LIMIT', required=False,
-                                                 help_text=_('Maximum size of all backups in this virtual datacenter.'))
+                                                 help_text=_('Maximum size (MB) of all backups in this '
+                                                             'virtual datacenter.'))
     VMS_VM_BACKUP_COMPRESSION_DEFAULT = s.ChoiceField(label='VMS_VM_BACKUP_COMPRESSION_DEFAULT',
                                                       choices=BackupDefine.COMPRESSION,
                                                       help_text=_('Predefined compression algorithm for '
@@ -606,6 +608,8 @@ class DefaultDcSettingsSerializer(DcSettingsSerializer):
                                             help_text=_('Object (key=name, value=URL) with remote disk image '
                                                         'repositories available in every virtual datacenter.'))
 
+    DNS_DOMAIN_TYPE_DEFAULT = s.ChoiceField(label='DNS_DOMAIN_TYPE_DEFAULT', choices=Domain.TYPE_MASTER,
+                                            help_text='Default PowerDNS replication type of newly created domain.')
     DNS_HOSTMASTER = s.EmailField(label='DNS_HOSTMASTER', max_length=255,
                                   help_text=_('Default hostmaster email address used for SOA records '
                                               'of newly created domains.'))

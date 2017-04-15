@@ -1,10 +1,11 @@
-- name: upgrading to {{ tasklist|basename }}
+- name: Upgrading to {{ tasklist|basename }}
   set_fact:
-      upgrading_to: "{{ tasklist|basename }}"
+    upgrading_to: "{{ tasklist|basename }}"
+    current_task_dir: "{{ upg_dir }}/{{ tasklist|basename }}"
 
-- include: "{{ upg_dir }}/{{ upgrading_to }}/main.yml"
+- include: "{{ current_task_dir }}/main.yml"
 
 - meta: flush_handlers
 
-- name: bumping appliance version
+- name: Bumping appliance version
   shell: echo "{{ upgrading_to }}" > "{{ versionfile }}"

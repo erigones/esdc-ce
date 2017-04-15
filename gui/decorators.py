@@ -1,7 +1,8 @@
 from django.conf import settings
-from django.http import HttpResponseBadRequest, HttpResponseForbidden
+from django.http import HttpResponseBadRequest
 from django.shortcuts import redirect
 from django.core.urlresolvers import reverse
+from django.core.exceptions import PermissionDenied
 
 
 def staff_required(fun):
@@ -11,7 +12,7 @@ def staff_required(fun):
     def wrap(request, *args, **kwargs):
         if request.user.is_staff:
             return fun(request, *args, **kwargs)
-        return HttpResponseForbidden()
+        raise PermissionDenied
     return wrap
 
 
@@ -22,7 +23,7 @@ def admin_required(fun):
     def wrap(request, *args, **kwargs):
         if request.user.is_admin(request):
             return fun(request, *args, **kwargs)
-        return HttpResponseForbidden()
+        raise PermissionDenied
     return wrap
 
 
@@ -79,6 +80,6 @@ def permission_required(permission):
         def wrap(request, *args, **kwargs):
             if request.user.is_staff or permission.name in request.dc_user_permissions:
                 return fun(request, *args, **kwargs)
-            return HttpResponseForbidden()
+            raise PermissionDenied
         return wrap
     return permission_required_decorator

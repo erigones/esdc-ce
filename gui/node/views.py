@@ -200,6 +200,7 @@ def images_zpool(request, hostname, zpool):
 
     context['image_vms'] = image_vms
     context['form'] = NodeStorageImageForm(ns, initial={'node': hostname, 'zpool': zpool})
+    context['last_img'] = request.GET.get('last_img', None)
 
     return render(request, 'gui/node/images.html', context)
 

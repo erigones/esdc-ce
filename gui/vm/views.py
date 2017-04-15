@@ -1,15 +1,16 @@
 from logging import getLogger
-from django.conf import settings
-from django.shortcuts import render, redirect
-from django.http import Http404, HttpResponseForbidden, HttpResponse
+from itertools import chain
 
-from django.utils.translation import ugettext_lazy as _
-from django.db.models import Q
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import PermissionDenied
+from django.db.models import Q
+from django.http import Http404, HttpResponse
+from django.shortcuts import render, redirect
+from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.http import require_POST
-from itertools import chain
 
 from gui.vm.guacamole import GuacamoleAuth
 from gui.vm.imports import handle_uploaded_file, ImportException
@@ -25,6 +26,7 @@ from gui.vm.utils import (
     get_vm_backups, get_vm_bkpdefs, vm_define_all, ImportExportBase
 )
 from gui.decorators import ajax_required, profile_required, admin_required, permission_required
+from gui.fields import SIZE_FIELD_MB_ADDON
 from gui.utils import collect_view_data, get_pager
 from gui.signals import (view_vm_details, view_vm_snapshot, view_vm_backup, view_vm_console, view_vm_monitoring,
                          view_vm_tasklog)
@@ -64,7 +66,7 @@ def details(request, hostname):
     Page with details of server.
     """
     dc_settings = request.dc.settings
-    context = collect_view_data(request, 'vm_list')
+    context = collect_view_data(request, 'vm_list', mb_addon=SIZE_FIELD_MB_ADDON)
     context['vm'] = vm = get_vm(request, hostname, sr=('dc', 'owner', 'template', 'slavevm'))
     context['vms'] = vms = get_vms(request)
     context['vms_tags'] = get_vms_tags(vms)
@@ -322,7 +324,7 @@ def set_installed(request, hostname):
         else:
             return JSONResponse(res.data, status=res.status_code)
 
-    return HttpResponseForbidden()
+    raise PermissionDenied
 
 
 @login_required
@@ -426,7 +428,7 @@ def add_settings_form(request):
     if request.user.is_admin(request):  # must check can_edit permission
         return settings_form(request, None)
 
-    return HttpResponseForbidden()
+    raise PermissionDenied
 
 
 @login_required
@@ -462,7 +464,11 @@ def settings_form(request, hostname):
             else:
                 return redirect('vm_details', hostname=form.saved_hostname)
 
-    return render(request, 'gui/vm/settings_form.html', {'settingsform': form, 'vm': vm})
+    return render(request, 'gui/vm/settings_form.html', {
+        'settingsform': form,
+        'vm': vm,
+        'mb_addon': SIZE_FIELD_MB_ADDON,
+    })
 
 
 @login_required
@@ -490,7 +496,11 @@ def disk_settings_form(request, hostname):
         elif status in (200, 201):
             return redirect('vm_details', hostname=vm.hostname)
 
-    return render(request, 'gui/vm/disk_settings_form.html', {'disk_settingsform': form, 'vm': vm})
+    return render(request, 'gui/vm/disk_settings_form.html', {
+        'disk_settingsform': form,
+        'vm': vm,
+        'mb_addon': SIZE_FIELD_MB_ADDON,
+    })
 
 
 @login_required
@@ -545,7 +555,7 @@ def multi_settings_form(request):
     Ajax page for changing settings of multiple servers.
     """
     if not request.user.is_admin(request):  # can_edit permission
-        return HttpResponseForbidden()
+        raise PermissionDenied
 
     if request.POST['action'] == 'delete':  # delete only for now
         for hostname in request.POST.getlist('hostname'):
@@ -752,7 +762,7 @@ def _generic_add_context(request):
 
     Partial add VM view, was separated to smaller functions due to code reuse in Enterprise Edition apps (payments).
     """
-    context = collect_view_data(request, 'vm_add')
+    context = collect_view_data(request, 'vm_add', mb_addon=SIZE_FIELD_MB_ADDON)
     context['vms'] = vms = get_vms(request)
     context['vms_tags'] = get_vms_tags(vms)
 

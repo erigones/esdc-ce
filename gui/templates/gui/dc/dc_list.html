@@ -101,7 +101,7 @@
             </td>
             <td class="nowrap"><span class="vm_hostname">{{ dc.site }}</span></td>
             <td>{{ dc.get_access_display }}</td>
-            <td class="nowrap"><span class="vm_hostname" title="{{ dc.owner }}"><i class="icon-user"></i> {{ dc.owner|truncatechars:16 }}</span></td>
+            <td class="nowrap"><span class="vm_hostname" title="{{ dc.owner }}"><i class="icon-user"></i>&nbsp;{{ dc.owner|truncatechars:16 }}</span></td>
             {% if can_edit %}<td class="hidden-phone"><span class="vm_hostname">{{ dc.roles.all|groupify }}</span></td>{% endif %}
             {% is_admin request.user dc=dc as user_is_this_dc_admin %}  {# TODO FIXME: this hits the database hard for not staff users and many DCs #}
             {% if user_is_this_dc_admin %}

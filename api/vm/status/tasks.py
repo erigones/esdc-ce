@@ -451,7 +451,8 @@ def _vm_status_cb_failed(result, task_id, vm):
         # VM status to stopping in PUT vm_status() and there is nothing which would change the status back.
         # So lets restore the last known status and double-check via vm_status_one()
         vm.save_status(result['meta']['last_status'])
-        vm_status_one(task_id, vm)
+
+    vm_status_one(task_id, vm)
 
 
 @cq.task(name='api.vm.status.tasks.vm_status_cb', base=MgmtCallbackTask, bind=True)

@@ -1,4 +1,5 @@
 from logging import getLogger
+from copy import copy
 
 from api.views import exception_handler
 from api.utils.request import set_request_method
@@ -10,8 +11,11 @@ def call_api_view(request, method, fun, *args, **kwargs):
     """
     A handy wrapper for calling api view functions or classes.
     """
+    # We need a shallow copy of the request object because the original request object is still used by our caller
+    request = copy(request)
+
     if method:
-        request = set_request_method(request, method)
+        request = set_request_method(request, method, copy_request=False)
 
     request.disable_throttling = kwargs.pop('disable_throttling', True)
     log_response = kwargs.pop('log_response', False)

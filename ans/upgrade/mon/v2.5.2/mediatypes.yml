@@ -1,0 +1,54 @@
+- name: Fetch custom media types
+  local_action:
+    module: zabbix
+    args:
+      url: "{{ zabbix_url }}"
+      login_user: "{{ zabbix_login_user }}"
+      login_password: "{{ zabbix_login_password }}"
+      api_method: mediatype.get
+      api_params_dict:
+        output:
+          - "mediatypeid"
+          - "description"
+        filter:
+          description:
+            - "SMS"
+            - "Ludolph"
+            - "NMA"
+            - "Prowl"
+  register: zabbix_custom_media_types
+
+- name: Fix exec_params on custom media types
+  local_action:
+    module: zabbix
+    args:
+      url: "{{ zabbix_url }}"
+      login_user: "{{ zabbix_login_user }}"
+      login_password: "{{ zabbix_login_password }}"
+      api_method: mediatype.update
+      api_params_dict:
+        exec_params: "{ALERT.SENDTO}\n{ALERT.SUBJECT}\n{ALERT.MESSAGE}\n"
+        mediatypeid: "{{ item }}"
+  with_items: "{{ zabbix_custom_media_types.result|map(attribute='mediatypeid')|list }}"
+
+- name: Fix exec_path on SMS custom media type
+  local_action:
+    module: zabbix
+    args:
+      url: "{{ zabbix_url }}"
+      login_user: "{{ zabbix_login_user }}"
+      login_password: "{{ zabbix_login_password }}"
+      api_method: mediatype.update
+      api_params_dict:
+        exec_path: "sms.sh"
+        mediatypeid: "{{ item.mediatypeid }}"
+  with_items: "{{ zabbix_custom_media_types.result|list }}"
+  when: "item.description is defined and item.description == 'SMS'"
+
+- name: Copy sample alertscripts
+  copy: src="{{ current_task_dir }}/files/alertscripts/"
+        dest="/etc/zabbix/alertscripts/"
+        mode=0750
+        owner=root
+        group=zabbix
+        force=no

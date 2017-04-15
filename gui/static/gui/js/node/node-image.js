@@ -4,7 +4,6 @@ function NodeImage(hostname, zpool) {
   var self = this;
   var multi_modal = $('#node_image_multi_modal');
   var multi_delete = $('#node_image_multi_delete');
-  var multi_images = $('#id_imf_images');
 
   this.list = new ObjList(
     function(mod, start) {
@@ -37,8 +36,8 @@ function NodeImage(hostname, zpool) {
     return Boolean($(jq('node_images_' + check_hostname + '_' + check_zpool)).length);
   };
 
-  this.reload = function() {
-    update_content(CURRENT_URL, false);
+  this.reload = function(img_name) {
+    update_content(update_query_string(CURRENT_URL, 'last_img', img_name), false);
   };
 
   this.update_menu_total = function(hostname, zpool, add) {
@@ -58,24 +57,35 @@ function NodeImage(hostname, zpool) {
     var total = $('#total');
 
     if (img_row.length) {
-      self.list.elements.table.fnDeleteRow(img_row.get(0));
-      img_row.remove();
-      total.html(total.html() - 1);
-      self.update_menu_total(hostname, zpool, false);
+      table_obj_removed(img_row, function() {
+        self.list.elements.table.fnDeleteRow(img_row.get(0));
+        img_row.remove();
+        total.html(total.html() - 1);
+        self.update_menu_total(hostname, zpool, false);
+      });
     }
   };
 
   this.update_status = function(img_name, state, status_display) {
-    var img_status = $(jq('ns_image_' + img_name) + ' .ns_image_status');
-    var img_link = $(jq('ns_image_' + img_name) + ' a.ns-image-delete-button');
+    var img_row = $(jq('ns_image_' + img_name));
 
-    if (img_status.length) {
+    if (img_row.length) {
+      var img_status = img_row.find('span.ns_image_status');
+      var img_link = img_row.find('a.ns-image-delete-button');
+
       img_status.html(status_display);
 
       if (state == 1) { // ready
         img_link.removeClass('disabled');
-      } else { // deleting
+        table_obj_added(img_row);
+      } else { // deleting or importing
         img_link.addClass('disabled');
+
+        if (state == 2) {       // importing
+          img_row.addClass('info');
+        } else {                // deleting
+          img_row.addClass('error');
+        }
       }
     }
   };
@@ -85,12 +95,13 @@ function NodeImage(hostname, zpool) {
     var images = $('#etable tbody a.obj_edit:not(".disabled")[data-vms="0"]').map(function() { return $(this).data('form'); }).get();
     var image_aliases = _.pluck(images, 'alias_version');
     var multi_modal_yes = multi_modal.find('a.vm_modal_yes');
+    var multi_images = multi_modal.find('#id_imf_images');  // Always re-fetch this object before displaying modal (#117)
 
     if (image_aliases.length) {
       multi_images.html(image_aliases.join(', '));
       multi_modal_yes.removeClass('disabled');
     } else {
-      multi_images.html();
+      multi_images.html('');
       multi_modal_yes.addClass('disabled');
     }
 
@@ -108,7 +119,7 @@ function node_image_update(hostname, zpool, img_name, done, state, status_displa
     if (NODE_IMAGE.is_displayed(hostname, zpool)) {
       if (done) {
         if (state) {
-          NODE_IMAGE.reload();
+          NODE_IMAGE.reload(img_name);
         } else {
           NODE_IMAGE.remove_row(img_name);
         }

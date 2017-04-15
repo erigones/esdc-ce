@@ -807,7 +807,7 @@
                         ],
                         "privatekey": "",
                         "allowed_hosts": "",
-                        "history": "14"
+                        "history": "7"
                     },
                     {
                         "username": "",
@@ -960,6 +960,9 @@
                         "name": "Memory"
                     },
                     {
+                        "name": "Network interfaces"
+                    },
+                    {
                         "name": "Processes"
                     },
                     {
@@ -974,7 +977,7 @@
                         "snmp_oid": "",
                         "snmpv3_securitylevel": "0",
                         "port": "",
-                        "lifetime": "30",
+                        "lifetime": "1",
                         "graph_prototypes": [],
                         "trigger_prototypes": [
                             {
@@ -1208,6 +1211,282 @@
                         "name": "Mounted ZFS filesystem discovery",
                         "privatekey": "",
                         "filter": "{#FSTYPE}:^zfs$",
+                        "allowed_hosts": ""
+                    },
+
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "lifetime": "1",
+                        "graph_prototypes": [
+                            {
+                                "show_3d": "0",
+                                "graph_items": [
+                                    {
+                                        "calc_fnc": "2",
+                                        "color": "87B457",
+                                        "item": {
+                                            "host": "t_erigones-zone",
+                                            "key": "net.if.in[{#IFNAME}]"
+                                        },
+                                        "sortorder": "0",
+                                        "drawtype": "5",
+                                        "type": "0",
+                                        "yaxisside": "1"
+                                    },
+                                    {
+                                        "calc_fnc": "2",
+                                        "color": "BDDA83",
+                                        "item": {
+                                            "host": "t_erigones-zone",
+                                            "key": "net.if.in[{#IFNAME},packets]"
+                                        },
+                                        "sortorder": "2",
+                                        "drawtype": "0",
+                                        "type": "0",
+                                        "yaxisside": "0"
+                                    },
+                                    {
+                                        "calc_fnc": "2",
+                                        "color": "98D6E7",
+                                        "item": {
+                                            "host": "t_erigones-zone",
+                                            "key": "net.if.out[{#IFNAME},packets]"
+                                        },
+                                        "sortorder": "3",
+                                        "drawtype": "0",
+                                        "type": "0",
+                                        "yaxisside": "0"
+                                    },
+                                    {
+                                        "calc_fnc": "2",
+                                        "color": "5299AD",
+                                        "item": {
+                                            "host": "t_erigones-zone",
+                                            "key": "net.if.out[{#IFNAME}]"
+                                        },
+                                        "sortorder": "1",
+                                        "drawtype": "5",
+                                        "type": "0",
+                                        "yaxisside": "1"
+                                    }
+                                ],
+                                "ymin_type_1": "1",
+                                "name": "Network traffic on {#IFNAME}",
+                                "percent_left": "0.0000",
+                                "type": "0",
+                                "ymax_type_1": "0",
+                                "height": "200",
+                                "yaxismax": "100.0000",
+                                "width": "900",
+                                "show_legend": "1",
+                                "show_work_period": "1",
+                                "ymax_item_1": "0",
+                                "ymin_item_1": "0",
+                                "show_triggers": "1",
+                                "yaxismin": "0.0000",
+                                "percent_right": "95.0000"
+                            }
+                        ],
+                        "trigger_prototypes": [],
+                        "item_prototypes": [
+                            {
+                                "username": "",
+                                "snmpv3_contextname": "",
+                                "inventory_link": "0",
+                                "multiplier": "1",
+                                "trends": "365",
+                                "snmpv3_authpassphrase": "",
+                                "snmp_oid": "",
+                                "snmpv3_securitylevel": "0",
+                                "port": "",
+                                "logtimefmt": "",
+                                "delay": "30",
+                                "publickey": "",
+                                "params": "",
+                                "snmpv3_securityname": "",
+                                "formula": "8",
+                                "type": "0",
+                                "snmpv3_authprotocol": "0",
+                                "valuemap": [],
+                                "ipmi_sensor": "",
+                                "status": "0",
+                                "authtype": "0",
+                                "snmp_community": "",
+                                "description": "",
+                                "data_type": "0",
+                                "delay_flex": "50/1-7,00:00-24:00",
+                                "units": "bps",
+                                "value_type": "3",
+                                "key": "net.if.in[{#IFNAME}]",
+                                "delta": "1",
+                                "password": "",
+                                "snmpv3_privpassphrase": "",
+                                "snmpv3_privprotocol": "0",
+                                "name": "Incoming network traffic on $1",
+                                "applications": [
+                                    {
+                                        "name": "Network interfaces"
+                                    }
+                                ],
+                                "privatekey": "",
+                                "allowed_hosts": "",
+                                "history": "7"
+                            },
+                            {
+                                "username": "",
+                                "snmpv3_contextname": "",
+                                "inventory_link": "0",
+                                "multiplier": "1",
+                                "trends": "365",
+                                "snmpv3_authpassphrase": "",
+                                "snmp_oid": "",
+                                "snmpv3_securitylevel": "0",
+                                "port": "",
+                                "logtimefmt": "",
+                                "delay": "30",
+                                "publickey": "",
+                                "params": "",
+                                "snmpv3_securityname": "",
+                                "formula": "8",
+                                "type": "0",
+                                "snmpv3_authprotocol": "0",
+                                "valuemap": [],
+                                "ipmi_sensor": "",
+                                "status": "0",
+                                "authtype": "0",
+                                "snmp_community": "",
+                                "description": "",
+                                "data_type": "0",
+                                "delay_flex": "50/1-7,00:00-24:00",
+                                "units": "pps",
+                                "value_type": "3",
+                                "key": "net.if.in[{#IFNAME},packets]",
+                                "delta": "1",
+                                "password": "",
+                                "snmpv3_privpassphrase": "",
+                                "snmpv3_privprotocol": "0",
+                                "name": "Incoming packets on $1",
+                                "applications": [
+                                    {
+                                        "name": "Network interfaces"
+                                    }
+                                ],
+                                "privatekey": "",
+                                "allowed_hosts": "",
+                                "history": "7"
+                            },
+                            {
+                                "username": "",
+                                "snmpv3_contextname": "",
+                                "inventory_link": "0",
+                                "multiplier": "1",
+                                "trends": "365",
+                                "snmpv3_authpassphrase": "",
+                                "snmp_oid": "",
+                                "snmpv3_securitylevel": "0",
+                                "port": "",
+                                "logtimefmt": "",
+                                "delay": "30",
+                                "publickey": "",
+                                "params": "",
+                                "snmpv3_securityname": "",
+                                "formula": "8",
+                                "type": "0",
+                                "snmpv3_authprotocol": "0",
+                                "valuemap": [],
+                                "ipmi_sensor": "",
+                                "status": "0",
+                                "authtype": "0",
+                                "snmp_community": "",
+                                "description": "",
+                                "data_type": "0",
+                                "delay_flex": "",
+                                "units": "bps",
+                                "value_type": "3",
+                                "key": "net.if.out[{#IFNAME}]",
+                                "delta": "1",
+                                "password": "",
+                                "snmpv3_privpassphrase": "",
+                                "snmpv3_privprotocol": "0",
+                                "name": "Outgoing network traffic on $1",
+                                "applications": [
+                                    {
+                                        "name": "Network interfaces"
+                                    }
+                                ],
+                                "privatekey": "",
+                                "allowed_hosts": "",
+                                "history": "7"
+                            },
+                            {
+                                "username": "",
+                                "snmpv3_contextname": "",
+                                "inventory_link": "0",
+                                "multiplier": "1",
+                                "trends": "365",
+                                "snmpv3_authpassphrase": "",
+                                "snmp_oid": "",
+                                "snmpv3_securitylevel": "0",
+                                "port": "",
+                                "logtimefmt": "",
+                                "delay": "30",
+                                "publickey": "",
+                                "params": "",
+                                "snmpv3_securityname": "",
+                                "formula": "8",
+                                "type": "0",
+                                "snmpv3_authprotocol": "0",
+                                "valuemap": [],
+                                "ipmi_sensor": "",
+                                "status": "0",
+                                "authtype": "0",
+                                "snmp_community": "",
+                                "description": "",
+                                "data_type": "0",
+                                "delay_flex": "50/1-7,00:00-24:00",
+                                "units": "pps",
+                                "value_type": "3",
+                                "key": "net.if.out[{#IFNAME},packets]",
+                                "delta": "1",
+                                "password": "",
+                                "snmpv3_privpassphrase": "",
+                                "snmpv3_privprotocol": "0",
+                                "name": "Outgoing packets on $1",
+                                "applications": [
+                                    {
+                                        "name": "Network interfaces"
+                                    }
+                                ],
+                                "privatekey": "",
+                                "allowed_hosts": "",
+                                "history": "7"
+                            }
+                        ],
+                        "delay": "3600",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "Discovery of network interfaces as defined in global regular expression \"Network interfaces for discovery\".",
+                        "host_prototypes": [],
+                        "delay_flex": "",
+                        "key": "net.if.discovery",
+                        "ipmi_sensor": "",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Network interface discovery",
+                        "privatekey": "",
+                        "filter": "{#IFNAME}:@Network interfaces for discovery (SmartOS)",
                         "allowed_hosts": ""
                     }
                 ],
