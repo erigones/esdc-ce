@@ -99,10 +99,18 @@ table.box.table-striped tbody tr:nth-child(odd) td, table.box.table-striped tbod
   background: #FDFDFD;
 }
 /* line 100, ../scss/tables.scss */
+table.box.table-striped tbody tr.info td {
+  background-color: #d9edf7;
+}
+/* line 103, ../scss/tables.scss */
+table.box.table-striped tbody tr.error td {
+  background-color: #f2dede;
+}
+/* line 108, ../scss/tables.scss */
 table.box .button {
   line-height: normal;
 }
-/* line 101, ../scss/tables.scss */
+/* line 109, ../scss/tables.scss */
 table.box .button i {
   font-size: 14px;
 }
@@ -110,32 +118,32 @@ table.box .button i {
 /*
  *  Responsive tables
  */
-/* line 113, ../scss/tables.scss */
+/* line 121, ../scss/tables.scss */
 table.table-responsive th, table.table-responsive td {
   word-wrap: break-word;
   max-width: 200px;
 }
 
-/* line 118, ../scss/tables.scss */
+/* line 126, ../scss/tables.scss */
 .tab-header {
   height: auto;
   word-wrap: break-word;
   overflow: hidden;
 }
 
-/* line 124, ../scss/tables.scss */
+/* line 132, ../scss/tables.scss */
 p.table_desc {
   margin: 0;
   color: #454545;
 }
 
-/* line 129, ../scss/tables.scss */
+/* line 137, ../scss/tables.scss */
 div.dataTables_paginate {
   float: none;
   margin-bottom: 20px;
   padding-right: 10px;
 }
-/* line 135, ../scss/tables.scss */
+/* line 143, ../scss/tables.scss */
 div.dataTables_paginate a {
   background: #ededed;
   background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4gPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiBncmFkaWVudFVuaXRzPSJvYmplY3RCb3VuZGluZ0JveCIgeDE9IjAuNSIgeTE9IjAuMCIgeDI9IjAuNSIgeTI9IjEuMCI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2VkZWRlZCIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JhZCkiIC8+PC9zdmc+IA==');
@@ -189,26 +197,52 @@ div.dataTables_paginate a:active {
   background-image: -webkit-linear-gradient(top, #d6d6d6, #e8e8e8);
   background-image: linear-gradient(to bottom, #d6d6d6, #e8e8e8);
 }
-/* line 143, ../scss/tables.scss */
+/* line 151, ../scss/tables.scss */
 div.dataTables_paginate .first {
   -moz-border-radius: 4px 0 0 4px;
   -webkit-border-radius: 4px;
   border-radius: 4px 0 0 4px;
 }
-/* line 147, ../scss/tables.scss */
+/* line 155, ../scss/tables.scss */
 div.dataTables_paginate .last {
   -moz-border-radius: 0 4px 4px 0;
   -webkit-border-radius: 0;
   border-radius: 0 4px 4px 0;
 }
-/* line 151, ../scss/tables.scss */
+/* line 159, ../scss/tables.scss */
 div.dataTables_paginate .ui-state-disabled, div.dataTables_paginate .ui-state-disabled:hover {
   background: #ddd;
   cursor: default;
   text-shadow: none;
 }
 
-/* line 159, ../scss/tables.scss */
+/* line 167, ../scss/tables.scss */
 .inner-well .table th, .inner-well .table td {
   border: none;
+}
+
+/* line 172, ../scss/tables.scss */
+#debug {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  background-color: #fff;
+  opacity: 0.9;
+  width: 100%;
+  padding: 0 5px;
+}
+
+/* line 182, ../scss/tables.scss */
+table#debug-query-table tr td {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+/* line 187, ../scss/tables.scss */
+table#debug-query-table code {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  font-size: 9px;
+  line-height: 8px;
 }

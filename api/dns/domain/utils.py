@@ -69,7 +69,7 @@ def prefetch_domain_owner(domain_qs):
     users = {user.id: user for user in Domain.get_user_model().objects.filter(id__in=user_ids)}
 
     for domain in domain_qs:
-        domain._owner = users.get(domain.user, None)
+        domain._owner = users.get(domain.user, Domain.NoOwner())
 
     return domain_qs
 

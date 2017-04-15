@@ -22,4 +22,5 @@
                    state=import
                    format=json
                    template="{{ tmpl_dir }}/{{ item }}"
+                   timeout=45
   with_items: "{{ tmpl_list.stdout.split('\n') }}"

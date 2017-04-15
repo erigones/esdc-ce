@@ -429,6 +429,7 @@ DNS_HOSTMASTER = 'hostmaster@example.com'  # This will be used as a placeholder 
 DNS_NAMESERVERS = ['ns1.' + DNS_MGMT_DOMAIN]  # Items will be used as a placeholder for generating SOA and NS records
 DNS_SOA_DEFAULT = '{nameserver} {hostmaster} 2013010100 28800 7200 604800 86400'  # For auto-generated SOA records
 DNS_PTR_DEFAULT = 'ptr-{ipaddr}.example.com'  # Content for the per VM PTR records.
+DNS_DOMAIN_TYPE_DEFAULT = 'MASTER'
 
 ESLIC_ENABLED = False  # Module. Enterprise Edition.
 
@@ -657,3 +658,7 @@ if THIRD_PARTY_APPS_ENABLED:
     MODULES += THIRD_PARTY_MODULES
 
 MODULES = frozenset(MODULES)
+
+# location of key/cert files needed to authenticate against update server
+UPDATE_KEY_FILE = path.join(LIBDIR, 'update.key')
+UPDATE_CERT_FILE = path.join(LIBDIR, 'update.crt')
