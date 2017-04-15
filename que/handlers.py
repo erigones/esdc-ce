@@ -104,7 +104,8 @@ def update_command(version, key=None, cert=None, sudo=False):
     """Call update script"""
     from core import settings
 
-    lib_path = settings.LIBDIR
+    ssl_key_file = settings.UPDATE_KEY_FILE
+    ssl_cert_file = settings.UPDATE_CERT_FILE
     update_script = os.path.join(settings.PROJECT_DIR, ERIGONES_UPDATE_SCRIPT)
     cmd = [update_script, version]
 
@@ -112,9 +113,6 @@ def update_command(version, key=None, cert=None, sudo=False):
         cmd.insert(0, 'sudo')
 
     if key:
-        ssl_key_name = 'update.key'
-        ssl_key_file = os.path.join(lib_path, ssl_key_name)
-        cmd.append(ssl_key_file)
 
         try:
             with open(ssl_key_file, 'w+') as f:
@@ -122,16 +120,23 @@ def update_command(version, key=None, cert=None, sudo=False):
         except IOError as err:
             logger.error('Error writing private key to file %s (%s)', ssl_key_file, err)
 
+    # this serves double purpose to check if file was properly written
+    # and to check if UPDATE_KEY_FILE exists if cert param was None
+    if os.path.isfile(ssl_key_file):
+        cmd.append(ssl_key_file)
+
     if cert:
-        ssl_cert_name = 'update.crt'
-        ssl_cert_file = os.path.join(lib_path, ssl_cert_name)
-        cmd.append(ssl_cert_file)
 
         try:
             with open(ssl_cert_file, 'w+') as f:
                 f.write(cert)
         except IOError as err:
             logger.error('Error writing private cert to file %s (%s)', ssl_cert_file, err)
+
+    # this serves double purpose to check if file was properly written
+    # and to check if UPDATE_CERT_FILE exists if cert param was None
+    if os.path.isfile(ssl_cert_file):
+        cmd.append(ssl_cert_file)
 
     return _execute(cmd)
 

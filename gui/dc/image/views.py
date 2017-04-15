@@ -129,8 +129,8 @@ def admin_image_form(request):
     form = AdminImageForm(request, img, request.POST, prefix='adm')
 
     if form.is_valid():
-        args = (form.cleaned_data['name'],)
-        status = form.save(args=args)
+        img_name = form.cleaned_data['name']
+        status = form.save(args=(img_name,))
 
         if status == 204:
             return HttpResponse(None, status=status)
@@ -139,6 +139,9 @@ def admin_image_form(request):
 
             if form.action == 'create' and not form.cleaned_data.get('dc_bound'):
                 qs['all'] = 1  # Show all items if adding new item and not attaching
+
+            if status == 201:
+                qs['last_img'] = img_name
 
             return redirect('dc_image_list', query_string=qs)
 

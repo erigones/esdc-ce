@@ -297,6 +297,12 @@ function _message_from_result(res) {
     }
   }
 
+  if (typeof(msg) == 'object') {
+    // The string version for this msg is "[object Object]" and we don't want to show that to user
+    console.log('Unknown error - maybe the task was deleted?');
+    msg = 'Unknown error';
+  }
+
   return String(msg);
 }
 

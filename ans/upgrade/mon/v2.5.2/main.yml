@@ -64,3 +64,7 @@
   copy: src="{{ current_task_dir }}/files/ludolph.service"
         dest="/etc/systemd/system/ludolph.service"
   notify: reload systemd
+
+
+# https://github.com/erigones/esdc-ce/issues/103
+- include: ../../mgmt/v2.5.2/swapgrow.yml

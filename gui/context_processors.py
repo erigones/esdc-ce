@@ -5,8 +5,8 @@ from core.external.utils import get_third_party_js, get_third_party_css
 
 def _get_sql_queries():
     if settings.SQL_DEBUG:
-        from django.db import connection
-        sql_queries = connection.queries
+        from django.db import connections
+        sql_queries = connections['default'].queries + connections['pdns'].queries
     else:
         sql_queries = []
 

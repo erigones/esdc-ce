@@ -90,7 +90,7 @@ def _task_cleanup(result, task_id, task_status, obj, **kwargs):
         _node_image_cb_failed(result, task_id, obj, img)
 
     else:
-        task_cleanup_signal.send(sender=view, apiview=apiview, result=result, task_id=task_id, task_status=task_status,
+        task_cleanup_signal.send(sender=view, apiview=apiview, result=result, task_id=task_id, status=task_status,
                                  obj=obj)
 
 

@@ -105,6 +105,7 @@
 {% include "gui/table_form_field.html" with field=form.VMS_VM_RESOLVERS_DEFAULT %}
 {% include "gui/table_form_field.html" with field=form.DNS_PTR_DEFAULT %}
 {% if all %}
+{% include "gui/table_form_field.html" with field=form.DNS_DOMAIN_TYPE_DEFAULT trclass="setting" %}
 {% include "gui/table_form_field.html" with field=form.DNS_NAMESERVERS trclass="setting" %}
 {% include "gui/table_form_field.html" with field=form.DNS_HOSTMASTER trclass="setting" %}
 {% include "gui/table_form_field.html" with field=form.DNS_SOA_DEFAULT trclass="setting" %}

@@ -121,7 +121,7 @@
         <tbody>
           {% for img in images %}
           <tr id="image_{{ img.name }}">
-            <td>
+            <td{% if img.name == last_img %} class="info"{% endif %}>
               {% if is_staff or can_edit and img.dc_bound %}
                 {% if all and img.pk in can_add %}
                   <span class="italic">{{ img.alias_version }} <small>({{ img.name }})</small></span>
