@@ -263,7 +263,6 @@ class _Zabbix(object):
         try:
             return result[0][key]
         except (KeyError, IndexError) as e:
-            logger.exception(e)
             raise ZabbixError(e)
 
     def _send_data(self, host, key, value):
