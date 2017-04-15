@@ -20,7 +20,8 @@
   <tbody id="vm_snaplist_">
     {% for bkp in backups %}{% with disk_id=bkp.array_disk_id bkp_id=bkp.bkpid disk_size=bkp.disk_size %}
     <tr data-disk_id="{{ disk_id }}" data-disk_size="{{ disk_size }}" data-snapname="{{ bkp.name }}" data-status="{{ bkp.status }}" data-hostname="{{ bkp.vm_hostname }}" data-type="{{ bkp.type }}">
-      <td class="top chbox hidden-phone-small"><td>
+      <td class="top chbox hidden-phone-small"></td>
+      <td>
         <a href="{{ node_vm_backup_url }}&hostname={% if bkp.vm %}{{ bkp.vm.hostname }}{% else %}novm{% endif %}&last_bkpid={{ bkp.bkpid }}" class="btn-link" data-backup="true" title="{% trans "Edit backups for this server" %}" data-toggle="tooltip" data-placement="bottom">{{ bkp.name }}</a>
       </td>
       <td><span class="vm_hostname">{{ bkp.vm_hostname }}<br><i class="icon-cloud"></i> {{ bkp.dc.alias }}</span></td>

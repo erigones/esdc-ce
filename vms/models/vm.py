@@ -844,6 +844,12 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
             # Remove primary attribute if False
             if 'primary' in nic and not nic['primary']:
                 del nics[i]['primary']
+            # Remove ips key from nic dictionary before saving changes
+            if 'ips' in nic:
+                del nics[i]['ips']
+            # Remove gateways key from nic dictionary before saving changes
+            if 'gateways' in nic:
+                del nics[i]['gateways']
             # Remove model if OS zone
             if not kvm and 'model' in nic:
                 del nics[i]['model']
@@ -1425,10 +1431,10 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
 
         return uptime
 
-    def save_zoneid(self, zoneid):
+    def save_zoneid(self, zoneid, change_time=None):
         """Save new zoneid"""
         cache.set(self.zoneid_key(self.uuid), zoneid)
-        cache.set(self.zoneid_change_key(self.uuid), timezone.now())
+        cache.set(self.zoneid_change_key(self.uuid), change_time or timezone.now())
 
     @staticmethod
     def zoneid_key(uuid):

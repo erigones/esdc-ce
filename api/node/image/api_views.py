@@ -51,18 +51,15 @@ class NodeImageView(APIView):
                         img, node, ns.zpool, block_key)
             return block_key
 
-        old_method = request.method
+        req = set_request_method(request, 'POST')
 
         try:
-            request = set_request_method(request, 'POST')
-            res = cls(request, ns, img, None).post()
+            res = cls(req, ns, img, None).post()
         except Exception as ex:
-            res = exception_handler(ex, request)
+            res = exception_handler(ex, req)
             if res is None:
                 raise ex
             res.exception = True
-        finally:
-            set_request_method(request, old_method)
 
         if res.status_code in (200, 201):
             logger.warn('POST node_image(%s, %s, %s) was successful: %s; task will be blocked by block_key=%s',

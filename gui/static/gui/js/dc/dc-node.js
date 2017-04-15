@@ -4,14 +4,6 @@ function DcNodeList() {
     var strategy = $('#id_strategy');
     var fields = $('#id_cpu, #id_ram, #id_disk');
 
-    $('#id_ram').off('keyup').keyup(function() {
-      $(this).val(parse_bytes($(this).val(), 'M'));
-    });
-
-    $('#id_disk').off('keyup').keyup(function() {
-      $(this).val(parse_bytes($(this).val(), 'M'));
-    });
-
     function strategy_change() {
       if (strategy.val() == 1) {
         fields.prop('disabled', true).addClass('uneditable-input').removeClass('input-transparent');

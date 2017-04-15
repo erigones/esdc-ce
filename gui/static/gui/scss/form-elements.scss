@@ -57,6 +57,15 @@ form.fill-up {
   }
 }
 
+a.help-inline.note {
+  font-style: normal;
+  font-weight: bold;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 .box {
   .note {
     font-size: 10px;

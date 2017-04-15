@@ -92,6 +92,7 @@ class DcSettingsForm(SerializerForm):
         'VMS_NET_DEFAULT': select_widget,
         'VMS_STORAGE_DEFAULT': select_widget,
         'SITE_SIGNATURE': {'rows': 2},
+        'VMS_VM_MDATA_DEFAULT': {'data-raw_input_enabled': 'true'}
     })
 
     not_advanced = frozenset(set(DcSettingsSerializer.modules) - {'VMS_ZONE_ENABLED'} | {'dc'})

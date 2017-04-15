@@ -1,17 +1,71 @@
 Changelog
 #########
 
-2.5.0 (unreleased)
-==================
+2.5.2 (released on 2017-04-11)
+==============================
+
+Features
+--------
+
+- Added more help texts about input fields accepting byte conversion units - `#86 <https://github.com/erigones/esdc-ce/issues/86>`__
+- Renamed "offline" compute node status to "maintenance" - `#87 <https://github.com/erigones/esdc-ce/issues/87>`__
+- Added new variables storing path to update key/cert files in core.settings - `#104 <https://github.com/erigones/esdc-ce/issues/104>`__
+- Documented refreservation parameter in vm_define_disk API function - `#106 <https://github.com/erigones/esdc-ce/issues/106>`__
+- Implemented SOA serial number incrementation when DNS record is updated - `#118 <https://github.com/erigones/esdc-ce/issues/118>`__
+- Decreased MON_ZABBIX_TIMEOUT to 15 seconds - `#120 <https://github.com/erigones/esdc-ce/issues/120>`__
+- Added visual flash for objects (table rows) added, updated or removed to/from a table - `#125 <https://github.com/erigones/esdc-ce/issues/125>`__
+- Allow to update disk size of a running VM - requiring only one reboot to take effect - `#127 <https://github.com/erigones/esdc-ce/issues/127>`__
+- Added current_dc (read_only) attribute to output of user_list, user_manage and dc_user(_list) views - `#131 <https://github.com/erigones/esdc-ce/issues/131>`__
+- Moved Create DNS checkbox to non advanced section when creating (editing) NIC in VM - `#145 <https://github.com/erigones/esdc-ce/issues/145>`__
+- Force VM status check after a failed status change - commit `ea2bfd2 <https://github.com/erigones/esdc-ce/commit/ea2bfd2203ed6559f17f095a6e619c0129d40786>`__
+
+Bugs
+----
+
+- Added template for HTTP 403 status code - `#96 <https://github.com/erigones/esdc-ce/issues/96>`__
+- Fixed errors in graph descriptions - `#112 <https://github.com/erigones/esdc-ce/issues/112>`__
+- Fixed default image import list, where last 30 results were not selected by the published date - `#113 <https://github.com/erigones/esdc-ce/issues/113>`__
+- Fixed 500 AttributeError: 'unicode' object has no attribute 'iteritems' when doing VM undo - `#115 <https://github.com/erigones/esdc-ce/issues/115>`__
+- Fixed 500 error when DNS domain owner is NULL in DB - `#116 <https://github.com/erigones/esdc-ce/issues/116>`__
+- Fixed list of images to be deleted in *Delete unused images* modal - `#117 <https://github.com/erigones/esdc-ce/issues/117>`__
+- Fixed 500 error during xls bulk import when ostype does not exist - `#121 <https://github.com/erigones/esdc-ce/issues/121>`__
+- Fixed race conditions when using `set_request_method()` and `call_api_view()` functions - `#123 <https://github.com/erigones/esdc-ce/issues/123>`__
+- Fixed `get_owners` convenience function that sometimes returned duplicate users, which resulted in occasional errors - `#136 <https://github.com/erigones/esdc-ce/issues/136>`__
+- Changed erigonesd mgmt worker systemd manifest - `#150 <https://github.com/erigones/esdc-ce/issues/150>`__
+
+
+2.5.1 (released on 2017-03-07)
+==============================
+
+Features
+--------
+
+Bugs
+----
+
+- Fixed bug that caused node monitoring graphs not to show, when not in main DC - `#100 <https://github.com/erigones/esdc-ce/issues/100>`__
+- Fixed scrolling to first input field with an error in modal form - `#88 <https://github.com/erigones/esdc-ce/issues/88>`__
+
+
+2.5.0 (released on 2017-03-03)
+==============================
 
 Features
 --------
 
 - Added compute node monitoring and graphs to GUI and API - `#13 <https://github.com/erigones/esdc-ce/issues/13>`__
 - Added ``cpu_type`` parameter into vm_define API call - `#76 <https://github.com/erigones/esdc-ce/issues/76>`__
+- Updated metadata input fields to accept raw JSON input - `#79 <https://github.com/erigones/esdc-ce/issues/79>`__
+- Added convenience button in the OnScreenKeyboard in the virtual console that emits Ctrl+Alt+Delete - `#80 <https://github.com/erigones/esdc-ce/issues/80>`__
+- Updated version of the packages in requirement files - `#81 <https://github.com/erigones/esdc-ce/issues/81>`__
 
 Bugs
 ----
+
+- Fixed bug that assigned old IP address to the VM during the redeploy - `#77 <https://github.com/erigones/esdc-ce/issues/77>`__
+- Disabled TOS acceptation checkbox when TOS_LINK is empty - `#78 <https://github.com/erigones/esdc-ce/issues/78>`__
+- Fixed RAM/HDD size rounding in sample export spreadsheet - `#83 <https://github.com/erigones/esdc-ce/issues/83>`__
+- Fixed race conditions that could happen during VM status changes - `#85 <https://github.com/erigones/esdc-ce/issues/85>`__
 
 
 2.4.0 (released on 2017-02-22)

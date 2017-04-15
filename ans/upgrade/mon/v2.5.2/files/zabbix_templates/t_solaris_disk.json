@@ -1,0 +1,452 @@
+{
+    "zabbix_export": {
+        "date": "2015-12-03T21:45:22Z",
+        "templates": [
+            {
+                "templates": [],
+                "name": "t_solaris_disk",
+                "macros": [
+                    {
+                        "macro": "{$DISK_ERRORS_THRESHOLD}",
+                        "value": "5"
+                    }
+                ],
+                "items": [],
+                "screens": [],
+                "applications": [
+                    {
+                        "name": "Disks"
+                    }
+                ],
+                "discovery_rules": [
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "lifetime": "1",
+                        "graph_prototypes": [
+                            {
+                                "show_3d": "0",
+                                "graph_items": [
+                                    {
+                                        "calc_fnc": "2",
+                                        "color": "98D6E7",
+                                        "item": {
+                                            "host": "t_solaris_disk",
+                                            "key": "vfs.dev.read[{#SD},operations]"
+                                        },
+                                        "sortorder": "2",
+                                        "drawtype": "2",
+                                        "type": "0",
+                                        "yaxisside": "0"
+                                    },
+                                    {
+                                        "calc_fnc": "2",
+                                        "color": "87B457",
+                                        "item": {
+                                            "host": "t_solaris_disk",
+                                            "key": "vfs.dev.write[{#SD},bytes]"
+                                        },
+                                        "sortorder": "1",
+                                        "drawtype": "5",
+                                        "type": "0",
+                                        "yaxisside": "1"
+                                    },
+                                    {
+                                        "calc_fnc": "2",
+                                        "color": "BDDA83",
+                                        "item": {
+                                            "host": "t_solaris_disk",
+                                            "key": "vfs.dev.write[{#SD},operations]"
+                                        },
+                                        "sortorder": "3",
+                                        "drawtype": "2",
+                                        "type": "0",
+                                        "yaxisside": "0"
+                                    },
+                                    {
+                                        "calc_fnc": "2",
+                                        "color": "335098",
+                                        "item": {
+                                            "host": "t_solaris_disk",
+                                            "key": "vfs.dev.read[{#SD},bytes]"
+                                        },
+                                        "sortorder": "0",
+                                        "drawtype": "5",
+                                        "type": "0",
+                                        "yaxisside": "1"
+                                    }
+                                ],
+                                "ymin_type_1": "0",
+                                "name": "Disk {#DISK} I/O",
+                                "percent_left": "0.0000",
+                                "type": "0",
+                                "ymax_type_1": "0",
+                                "height": "300",
+                                "yaxismax": "100.0000",
+                                "width": "900",
+                                "show_legend": "1",
+                                "show_work_period": "1",
+                                "ymax_item_1": "0",
+                                "ymin_item_1": "0",
+                                "show_triggers": "1",
+                                "yaxismin": "0.0000",
+                                "percent_right": "0.0000"
+                            }
+                        ],
+                        "trigger_prototypes": [
+                           {
+                                "status": "0",
+                                "description": "",
+                                "url": "",
+                                "type": "0",
+                                "priority": "3",
+                                "expression": "{t_solaris_disk:sd.errors[{#SD}].last(0)}>{$DISK_ERRORS_THRESHOLD}",
+                                "name": "Too many SCSI errors on disk {#DISK} ({#ZPOOL})"
+                            }
+                        ],
+                        "item_prototypes": [
+                            {
+                                "username": "",
+                                "snmpv3_contextname": "",
+                                "inventory_link": "0",
+                                "multiplier": "0",
+                                "trends": "365",
+                                "snmpv3_authpassphrase": "",
+                                "snmp_oid": "",
+                                "snmpv3_securitylevel": "0",
+                                "port": "",
+                                "logtimefmt": "",
+                                "delay": "300",
+                                "publickey": "",
+                                "params": "",
+                                "snmpv3_securityname": "",
+                                "formula": "1",
+                                "type": "0",
+                                "snmpv3_authprotocol": "0",
+                                "valuemap": [],
+                                "ipmi_sensor": "",
+                                "status": "0",
+                                "authtype": "0",
+                                "snmp_community": "",
+                                "description": "",
+                                "data_type": "0",
+                                "delay_flex": "",
+                                "units": "",
+                                "value_type": "3",
+                                "key": "sd.errors[{#SD}]",
+                                "delta": "0",
+                                "password": "",
+                                "snmpv3_privpassphrase": "",
+                                "snmpv3_privprotocol": "0",
+                                "name": "Cumulative sum of SCSI errors on disk {#DISK} ({#ZPOOL})",
+                                "applications": [
+                                    {
+                                        "name": "Disks"
+                                    }
+                                ],
+                                "privatekey": "",
+                                "allowed_hosts": "",
+                                "history": "1"
+                            },
+                            {
+                                "username": "",
+                                "snmpv3_contextname": "",
+                                "inventory_link": "0",
+                                "multiplier": "0",
+                                "trends": "365",
+                                "snmpv3_authpassphrase": "",
+                                "snmp_oid": "",
+                                "snmpv3_securitylevel": "0",
+                                "port": "",
+                                "logtimefmt": "",
+                                "delay": "60",
+                                "publickey": "",
+                                "params": "(last(\"sd.rtime[{#SD}]\") - last(\"sd.rtime[{#SD}]\",#1)) / 60",
+                                "snmpv3_securityname": "",
+                                "formula": "1",
+                                "type": "15",
+                                "snmpv3_authprotocol": "0",
+                                "valuemap": [],
+                                "ipmi_sensor": "",
+                                "status": "0",
+                                "authtype": "0",
+                                "snmp_community": "",
+                                "description": "",
+                                "data_type": "0",
+                                "delay_flex": "",
+                                "units": "%",
+                                "value_type": "3",
+                                "key": "sd.util[{#SD}]",
+                                "delta": "0",
+                                "password": "",
+                                "snmpv3_privpassphrase": "",
+                                "snmpv3_privprotocol": "0",
+                                "name": "Disk {#DISK} ({#ZPOOL}) utilization",
+                                "applications": [
+                                    {
+                                        "name": "Disks"
+                                    }
+                                ],
+                                "privatekey": "",
+                                "allowed_hosts": "",
+                                "history": "7"
+                            },
+                            {
+                                "username": "",
+                                "snmpv3_contextname": "",
+                                "inventory_link": "0",
+                                "multiplier": "0",
+                                "trends": "365",
+                                "snmpv3_authpassphrase": "",
+                                "snmp_oid": "",
+                                "snmpv3_securitylevel": "0",
+                                "port": "",
+                                "logtimefmt": "",
+                                "delay": "60",
+                                "publickey": "",
+                                "params": "",
+                                "snmpv3_securityname": "",
+                                "formula": "1",
+                                "type": "0",
+                                "snmpv3_authprotocol": "0",
+                                "valuemap": [],
+                                "ipmi_sensor": "",
+                                "status": "0",
+                                "authtype": "0",
+                                "snmp_community": "",
+                                "description": "",
+                                "data_type": "0",
+                                "delay_flex": "",
+                                "units": "Bps",
+                                "value_type": "3",
+                                "key": "vfs.dev.read[{#SD},bytes]",
+                                "delta": "1",
+                                "password": "",
+                                "snmpv3_privpassphrase": "",
+                                "snmpv3_privprotocol": "0",
+                                "name": "Disk {#DISK} read bytes",
+                                "applications": [
+                                    {
+                                        "name": "Disks"
+                                    }
+                                ],
+                                "privatekey": "",
+                                "allowed_hosts": "",
+                                "history": "1"
+                            },
+                            {
+                                "username": "",
+                                "snmpv3_contextname": "",
+                                "inventory_link": "0",
+                                "multiplier": "0",
+                                "trends": "365",
+                                "snmpv3_authpassphrase": "",
+                                "snmp_oid": "",
+                                "snmpv3_securitylevel": "0",
+                                "port": "",
+                                "logtimefmt": "",
+                                "delay": "60",
+                                "publickey": "",
+                                "params": "",
+                                "snmpv3_securityname": "",
+                                "formula": "1",
+                                "type": "0",
+                                "snmpv3_authprotocol": "0",
+                                "valuemap": [],
+                                "ipmi_sensor": "",
+                                "status": "0",
+                                "authtype": "0",
+                                "snmp_community": "",
+                                "description": "",
+                                "data_type": "0",
+                                "delay_flex": "",
+                                "units": "iops",
+                                "value_type": "3",
+                                "key": "vfs.dev.read[{#SD},operations]",
+                                "delta": "1",
+                                "password": "",
+                                "snmpv3_privpassphrase": "",
+                                "snmpv3_privprotocol": "0",
+                                "name": "Disk {#DISK} read operations",
+                                "applications": [
+                                    {
+                                        "name": "Disks"
+                                    }
+                                ],
+                                "privatekey": "",
+                                "allowed_hosts": "",
+                                "history": "1"
+                            },
+                            {
+                                "username": "",
+                                "snmpv3_contextname": "",
+                                "inventory_link": "0",
+                                "multiplier": "0",
+                                "trends": "0",
+                                "snmpv3_authpassphrase": "",
+                                "snmp_oid": "",
+                                "snmpv3_securitylevel": "0",
+                                "port": "",
+                                "logtimefmt": "",
+                                "delay": "60",
+                                "publickey": "",
+                                "params": "",
+                                "snmpv3_securityname": "",
+                                "formula": "1",
+                                "type": "0",
+                                "snmpv3_authprotocol": "0",
+                                "valuemap": [],
+                                "ipmi_sensor": "",
+                                "status": "0",
+                                "authtype": "0",
+                                "snmp_community": "",
+                                "description": "",
+                                "data_type": "0",
+                                "delay_flex": "",
+                                "units": "",
+                                "value_type": "0",
+                                "key": "sd.rtime[{#SD}]",
+                                "delta": "0",
+                                "password": "",
+                                "snmpv3_privpassphrase": "",
+                                "snmpv3_privprotocol": "0",
+                                "name": "Disk {#DISK} rtime",
+                                "applications": [
+                                    {
+                                        "name": "Disks"
+                                    }
+                                ],
+                                "privatekey": "",
+                                "allowed_hosts": "",
+                                "history": "1"
+                            },
+                            {
+                                "username": "",
+                                "snmpv3_contextname": "",
+                                "inventory_link": "0",
+                                "multiplier": "0",
+                                "trends": "365",
+                                "snmpv3_authpassphrase": "",
+                                "snmp_oid": "",
+                                "snmpv3_securitylevel": "0",
+                                "port": "",
+                                "logtimefmt": "",
+                                "delay": "60",
+                                "publickey": "",
+                                "params": "",
+                                "snmpv3_securityname": "",
+                                "formula": "1",
+                                "type": "0",
+                                "snmpv3_authprotocol": "0",
+                                "valuemap": [],
+                                "ipmi_sensor": "",
+                                "status": "0",
+                                "authtype": "0",
+                                "snmp_community": "",
+                                "description": "",
+                                "data_type": "0",
+                                "delay_flex": "",
+                                "units": "iops",
+                                "value_type": "3",
+                                "key": "vfs.dev.write[{#SD},operations]",
+                                "delta": "1",
+                                "password": "",
+                                "snmpv3_privpassphrase": "",
+                                "snmpv3_privprotocol": "0",
+                                "name": "Disk {#DISK} write operations",
+                                "applications": [
+                                    {
+                                        "name": "Disks"
+                                    }
+                                ],
+                                "privatekey": "",
+                                "allowed_hosts": "",
+                                "history": "1"
+                            },
+                            {
+                                "username": "",
+                                "snmpv3_contextname": "",
+                                "inventory_link": "0",
+                                "multiplier": "0",
+                                "trends": "365",
+                                "snmpv3_authpassphrase": "",
+                                "snmp_oid": "",
+                                "snmpv3_securitylevel": "0",
+                                "port": "",
+                                "logtimefmt": "",
+                                "delay": "60",
+                                "publickey": "",
+                                "params": "",
+                                "snmpv3_securityname": "",
+                                "formula": "1",
+                                "type": "0",
+                                "snmpv3_authprotocol": "0",
+                                "valuemap": [],
+                                "ipmi_sensor": "",
+                                "status": "0",
+                                "authtype": "0",
+                                "snmp_community": "",
+                                "description": "",
+                                "data_type": "0",
+                                "delay_flex": "",
+                                "units": "Bps",
+                                "value_type": "3",
+                                "key": "vfs.dev.write[{#SD},bytes]",
+                                "delta": "1",
+                                "password": "",
+                                "snmpv3_privpassphrase": "",
+                                "snmpv3_privprotocol": "0",
+                                "name": "Disk {#DISK} written bytes",
+                                "applications": [
+                                    {
+                                        "name": "Disks"
+                                    }
+                                ],
+                                "privatekey": "",
+                                "allowed_hosts": "",
+                                "history": "1"
+                            }
+                        ],
+                        "delay": "14440",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "Custom low-level discovery to discover disks on Solaris-based operating systems",
+                        "host_prototypes": [],
+                        "delay_flex": "",
+                        "key": "sd.discovery",
+                        "ipmi_sensor": "",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Disk discovery",
+                        "privatekey": "",
+                        "filter": ":",
+                        "allowed_hosts": ""
+                    }
+                ],
+                "groups": [
+                    {
+                        "name": "Templates"
+                    }
+                ],
+                "template": "t_solaris_disk"
+            }
+        ],
+        "version": "2.0",
+        "groups": [
+            {
+                "name": "Templates"
+            }
+        ]
+    }
+}

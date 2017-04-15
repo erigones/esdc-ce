@@ -1,0 +1,6 @@
+- include: swapgrow.yml
+
+- name: Copy fixed erigonesd systemd service manifest
+  copy: src="{{ current_task_dir }}/files/erigonesd.service"
+        dest="/etc/systemd/system/erigonesd.service"
+  notify: reload systemd

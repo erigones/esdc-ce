@@ -122,7 +122,7 @@ if [[ -z "${ESDC_GIT_UPDATE_2ND_RUN}" ]]; then
 		if git rev-list --all | grep "^${VERSION}$" >/dev/null; then
 			VERSION_REF="${VERSION}"
 		else
-			ERR_MSG="Coudln't match '${VERSION}' you requested with any of the commits. Aborting upgrade."
+			ERR_MSG="Could not match '${VERSION}' you requested with any of the commits. Aborting upgrade."
 			die $NO_MATCH "${ERR_MSG}"
 		fi
 	fi

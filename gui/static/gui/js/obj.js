@@ -1,5 +1,21 @@
 /* jshint -W030 */
 
+function default_table_obj_postfun() {
+  $(this).removeClass('info error');
+}
+
+function table_obj_added(tr, postfun) {
+  tr.addClass('info').fadeTo(300, 0.3).fadeTo(2000, 1.0, postfun || default_table_obj_postfun);
+}
+
+function table_obj_removed(tr, postfun) {
+  tr.addClass('error').fadeTo(300, 0.3).fadeTo(300, 1.0).fadeTo(1800, 0.1, postfun || default_table_obj_postfun);
+}
+
+function table_obj_updated(tr, postfun) {
+  tr.addClass('info').fadeTo(300, 0.3).fadeTo(300, 1.0).fadeTo(300, 0.3).fadeTo(300, 1.0, postfun || default_table_obj_postfun);
+}
+
 function update_form_fields(form, form_data, prefix) {
   if (form_data) {
 
@@ -73,6 +89,7 @@ function obj_form_modal(btn, mod_selector, init, handler) {
   var fileinput = mod.find('input:file');
   var mdata_input = mod.find('textarea.input-mdata');
   var array_input = mod.find('textarea.input-array');
+  var mbytes_input = mod.find('.input-mbytes');
 
   this.mod = mod;
   this.btn = btn;
@@ -132,6 +149,7 @@ function obj_form_modal(btn, mod_selector, init, handler) {
           fileinput = $(fileinput.selector);
           mdata_input = $(mdata_input.selector);
           array_input = $(array_input.selector);
+          mbytes_input = $(mbytes_input.selector);
           vm_forms_toggle(add, mod);
           init(self, false);
           select.select2({dropdownCssClass: select.attr('class')});
@@ -140,6 +158,7 @@ function obj_form_modal(btn, mod_selector, init, handler) {
           fileinput.fileupload(FILEINPUT_OPTIONS);
           mdata_enable(mdata_input);
           array_enable(array_input);
+          mbytes_enable(mbytes_input);
 
           if (mod.find('div.advanced div.input.error').length || btn_more.hasClass('active')) {
             morehandler(true);
@@ -243,6 +262,7 @@ function obj_form_modal(btn, mod_selector, init, handler) {
   fileinput.fileupload(FILEINPUT_OPTIONS);
   mdata_enable(mdata_input);
   array_enable(array_input);
+  mbytes_enable(mbytes_input);
   activate_modal_ux(mod, form);
   mod.modal('show');
 } // dc_form_modal
@@ -497,4 +517,5 @@ function ObjList(init, nosort, custsort, links, handler) {
     obj_list_sort_js(this.elements.table, nosort, custsort);
   }
 
+  table_obj_added(this.elements.table.find('tbody tr.info'));
 } // ObjList

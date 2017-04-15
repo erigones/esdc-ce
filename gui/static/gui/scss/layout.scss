@@ -160,16 +160,22 @@ div.black-box .help-inline.note.checkbox, div.block-box .help-inline.error.check
   margin-left: 3px;
 }
 
-.icon-link-enabled {
-  cursor: pointer;
+span.icon-link-enabled {
   :hover {
     color: #3875d7;
   }
+
+  &:before {
+    cursor: pointer;
+  }
 }
 
-.icon-link-disabled {
+span.icon-link-disabled {
   color: gray;
-  cursor: not-allowed;
+
+  &:before {
+	cursor: not-allowed;
+  }
 }
 
 .clearfix {

@@ -131,6 +131,7 @@ class VmHistoryView(APIView):
             request, t_mon_vm_history,
             view_fun_name='mon_vm_history',
             obj=self.vm,
+            dc_bound=True,
             serializer=ser,
             data=self.data,
             graph=graph,

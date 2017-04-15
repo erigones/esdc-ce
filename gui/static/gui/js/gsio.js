@@ -297,6 +297,12 @@ function _message_from_result(res) {
     }
   }
 
+  if (typeof(msg) == 'object') {
+    // The string version for this msg is "[object Object]" and we don't want to show that to user
+    console.log('Unknown error - maybe the task was deleted?');
+    msg = 'Unknown error';
+  }
+
   return String(msg);
 }
 
@@ -715,11 +721,6 @@ function _task_status_callback(res, apiview) {
     case 'vm_status':
       if (res.status == 'SUCCESS') {
         var result_msg = result.message || '';
-        // everything fine, we will wait for the vm_status_changed action, except when doing a reboot
-        // A fast reboot will not trigger a vm_status_changed action unless we hit the stopping state
-        if (result_msg.indexOf('Successfully completed reboot') === 0 && apiview.status_display != 'stopping') {
-          _update_vm_visuals(hostname, apiview.status_display, apiview);
-        }
         // Sometimes the vm configuration gets updated during vm_status.
         // If this happens we should refresh server details page (see vm_manage below)
         if (result_msg.indexOf('Successfully updated') === 0 && t) {

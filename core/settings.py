@@ -429,6 +429,7 @@ DNS_HOSTMASTER = 'hostmaster@example.com'  # This will be used as a placeholder 
 DNS_NAMESERVERS = ['ns1.' + DNS_MGMT_DOMAIN]  # Items will be used as a placeholder for generating SOA and NS records
 DNS_SOA_DEFAULT = '{nameserver} {hostmaster} 2013010100 28800 7200 604800 86400'  # For auto-generated SOA records
 DNS_PTR_DEFAULT = 'ptr-{ipaddr}.example.com'  # Content for the per VM PTR records.
+DNS_DOMAIN_TYPE_DEFAULT = 'MASTER'
 
 ESLIC_ENABLED = False  # Module. Enterprise Edition.
 
@@ -463,7 +464,7 @@ MON_ZABBIX_NODE_SLA = True  # global, internal
 MON_ZABBIX_SENDER = '/usr/bin/zabbix_sender'  # hidden
 MON_ZABBIX_SERVER = 'https://example.com/zabbix'  # local, internal+external
 MON_ZABBIX_SERVER_SSL_VERIFY = True  # local, internal+external
-MON_ZABBIX_TIMEOUT = 60  # local, internal+external
+MON_ZABBIX_TIMEOUT = 15  # local, internal+external
 MON_ZABBIX_USERNAME = 'Admin'  # local, internal+external
 MON_ZABBIX_PASSWORD = 'zabbix'  # local, internal+external
 MON_ZABBIX_HTTP_USERNAME = ''  # local, internal+external
@@ -580,7 +581,7 @@ VMS_IMAGE_IMGADM_CONF = {
 VMS_IMAGE_SOURCES = []
 VMS_IMAGE_LIMIT = None
 VMS_IMAGE_REPOSITORIES = {
-    'danubecloud': 'https://images.erigones.org',
+    'danubecloud': 'https://images.danubecloud.org',
     'images.joyent.com': 'https://images.joyent.com',
 }
 VMS_ISO_DIR = '/iso'
@@ -657,3 +658,7 @@ if THIRD_PARTY_APPS_ENABLED:
     MODULES += THIRD_PARTY_MODULES
 
 MODULES = frozenset(MODULES)
+
+# location of key/cert files needed to authenticate against update server
+UPDATE_KEY_FILE = path.join(LIBDIR, 'update.key')
+UPDATE_CERT_FILE = path.join(LIBDIR, 'update.crt')

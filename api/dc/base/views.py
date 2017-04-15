@@ -64,7 +64,9 @@ def dc_manage(request, dc, data=None):
             * |async-no|
         :arg dc: **required** - Datacenter name
         :type dc: string
-        :arg data.site: **required** - Datacenter web site hostname
+        :arg data.site: **required** - Hostname part of the browsing URL that determines the current working \
+datacenter for an anonymous user; You will need a working DNS record with the same hostname pointing to your \
+Danube Cloud management portal
         :type data.site: string
         :arg data.alias: Short datacenter name (default: ``name``)
         :type data.alias: string
@@ -91,7 +93,9 @@ def dc_manage(request, dc, data=None):
             * |async-no|
         :arg dc: **required** - Datacenter name
         :type dc: string
-        :arg data.site: Datacenter web site hostname
+        :arg data.site: Hostname part of the browsing URL that determines the current working \
+datacenter for an anonymous user; You will need a working DNS record with the same hostname pointing to your \
+Danube Cloud management portal
         :type data.site: string
         :arg data.alias: Short datacenter name
         :type data.alias: string

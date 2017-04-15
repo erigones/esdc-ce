@@ -54,3 +54,4 @@ celerybeat-schedule*
 
 # Ansible
 ans/hosts.cfg
+ans/ha/cfg/local_vars.yml

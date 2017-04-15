@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, Http404
 
 from vms.models import Node, DcNode
+from gui.fields import SIZE_FIELD_MB_ADDON
 from gui.decorators import staff_required, ajax_required, admin_required, profile_required
 from gui.utils import collect_view_data, redirect, get_query_string
 from gui.dc.node.forms import DcNodeForm
@@ -17,7 +18,7 @@ def dc_node_list(request):
     """
     Compute node <-> Datacenter associations.
     """
-    context = collect_view_data(request, 'dc_node_list')
+    context = collect_view_data(request, 'dc_node_list', mb_addon=SIZE_FIELD_MB_ADDON)
     context['can_edit'] = can_edit = request.user.is_staff  # DC owners have read-only rights
     context['all'] = _all = can_edit and request.GET.get('all', False)
     context['qs'] = get_query_string(request, all=_all).urlencode()
@@ -59,4 +60,4 @@ def dc_node_form(request):
         elif status in (200, 201):
             return redirect('dc_node_list', query_string=request.GET)
 
-    return render(request, 'gui/dc/node_form.html', {'form': form})
+    return render(request, 'gui/dc/node_form.html', {'form': form, 'mb_addon': SIZE_FIELD_MB_ADDON})

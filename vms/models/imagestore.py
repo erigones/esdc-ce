@@ -1,4 +1,5 @@
 from hashlib import md5
+from operator import itemgetter
 from frozendict import frozendict
 from django.utils.translation import ugettext_lazy as _
 from django.utils.text import Truncator
@@ -136,10 +137,17 @@ class ImageStore(_DummyModel):
 
         return images
 
-    def save_images(self, images):
+    @staticmethod
+    def _ordering_newest_first(images):
+        return sorted(images, key=itemgetter('created'), reverse=True)
+
+    def save_images(self, images, order_fun=None):
+        if not order_fun:
+            order_fun = self._ordering_newest_first
+
         cache.set(
             self._cache_key_images,
-            [ImageStoreObject(img, self.get_image_manifest_url(img['uuid'])) for img in images]
+            order_fun(ImageStoreObject(img, self.get_image_manifest_url(img['uuid'])) for img in images)
         )
 
     def delete_images(self):

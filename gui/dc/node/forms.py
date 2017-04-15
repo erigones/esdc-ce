@@ -25,18 +25,18 @@ class DcNodeForm(SerializerForm):
                                   widget=NumberInput(attrs={'class': 'input-transparent narrow',
                                                             'required': 'required'}))
     cpu = forms.IntegerField(label=_('CPUs'), required=False,
-                             help_text=_('Total number of CPUs (cores).'),
+                             help_text=_('Total number of vCPUs for VMs.'),
                              widget=NumberInput(attrs={'class': 'input-transparent narrow', 'required': 'required'}))
     # noinspection SpellCheckingInspection
     ram = forms.IntegerField(label=_('RAM'), required=False,
-                             help_text=_('Total RAM size in MB.'),
-                             widget=forms.TextInput(attrs={'class': 'input-transparent narrow',
+                             help_text=_('Total RAM size in MB for VMs.'),
+                             widget=forms.TextInput(attrs={'class': 'input-transparent narrow input-mbytes',
                                                            'required': 'required',
                                                            'pattern': '[0-9\.]+[BKMGTPEbkmgtpe]?'}))
     # noinspection SpellCheckingInspection
     disk = forms.IntegerField(label=_('Disk pool size'), required=False,
-                              help_text=_('Size of the local disk pool.'),
-                              widget=forms.TextInput(attrs={'class': 'input-transparent narrow',
+                              help_text=_('Size of the local disk pool for VMs.'),
+                              widget=forms.TextInput(attrs={'class': 'input-transparent narrow input-mbytes',
                                                             'required': 'required',
                                                             'pattern': '[0-9\.]+[BKMGTPEbkmgtpe]?'}))
     add_storage = forms.TypedChoiceField(label=_('Attach node Storages'), required=False, coerce=int, empty_value=0,

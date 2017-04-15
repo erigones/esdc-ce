@@ -28,7 +28,7 @@ __vm_hostname_is_valid() {
 _es() {
 	local cur prev actions prefix action params
 	local es_output="--json --csv --tabulate --tabulate-plain --tabulate-simple --tabulate-grid"
-	local vm_define="-hostname -alias -template -ostype -vcpus -owner -node -tags -monitored -installed -snapshot_limit_manual -zpool -cpu_shares -zfs_io_priority -mdata -full -routes"
+	local vm_define="-hostname -alias -template -ostype -vcpus -ram -owner -node -tags -monitored -installed -snapshot_limit_manual -zpool -cpu_shares -zfs_io_priority -mdata -full -routes"
 	local vm_snapshot="-disk_id -note -force"
 	local vm_backup="-disk_id -note"
 

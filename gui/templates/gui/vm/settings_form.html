@@ -29,13 +29,13 @@
 {% include "gui/form_field.html" with field=settingsform.template %}
 {% include "gui/form_field.html" with field=settingsform.ostype %}
 {% include "gui/form_field.html" with field=settingsform.vcpus %}
-{% include "gui/form_field.html" with field=settingsform.ram addon=" MB" %}
+{% include "gui/form_field.html" with field=settingsform.ram addon=mb_addon %}
 
 <div class="advanced hide">
 {% include "gui/form_field_checkbox.html" with field=settingsform.monitored %}
 {% include "gui/form_field_checkbox.html" with field=settingsform.installed %}
 {% include "gui/form_field.html" with field=settingsform.snapshot_limit_manual %}
-{% include "gui/form_field.html" with field=settingsform.snapshot_size_limit addon=" MB" %}
+{% include "gui/form_field.html" with field=settingsform.snapshot_size_limit addon=mb_addon %}
 {% include "gui/form_field.html" with field=settingsform.cpu_shares %}
 {% include "gui/form_field.html" with field=settingsform.zfs_io_priority %}
 {% include "gui/form_field.html" with field=settingsform.zpool %}
