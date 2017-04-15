@@ -1,6 +1,19 @@
 Changelog
 #########
 
+2.6.0 (unreleased)
+==================
+
+Features
+--------
+
+- Added node_vm_define_backup_list API and GUI views -  `#139 <https://github.com/erigones/esdc-ce/issues/139>`__
+
+Bugs
+----
+
+
+
 2.5.2 (released on 2017-04-11)
 ==============================
 
