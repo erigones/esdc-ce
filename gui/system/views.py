@@ -8,7 +8,7 @@ from api.system.stats.api_views import SystemStatsView
 
 
 NODE_STATS_COLORS = {
-    'offline': '#b94a48',
+    'maintenance': '#684688',
     'online': '#468847',
     'unreachable': '#f89406',
     'unlicensed': '#999999',
