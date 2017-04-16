@@ -1,6 +1,18 @@
 Changelog
 #########
 
+2.6.0 (unreleased)
+==================
+
+Features
+--------
+
+Bugs
+----
+
+- Do not display *pending* status when desired VM status was already reached - `#152 <https://github.com/erigones/esdc-ce/issues/152>`__
+
+
 2.5.2 (released on 2017-04-11)
 ==============================
 
