@@ -185,6 +185,12 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
         (NOTCREATED, NOTREADY_NOTCREATED),
     )
 
+    STATUS_TRANSITION_DICT = frozendict({  # PUT vm_status actions
+        'start': RUNNING,
+        'stop': STOPPED,
+        'reboot': RUNNING,
+    })
+
     DISK_BLOCK_SIZE = frozendict({
         _OSType.LINUX: 4096,
         _OSType.SUNOS: 131072,
@@ -1268,6 +1274,21 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
         """Return appropriate task if VM status is changing"""
         return self.get_tasks(match_dict={'view': 'vm_status', 'method': 'PUT'})
 
+    def is_changing_status_to(self, vm_status_tasks=None):
+        """Return VM status the VM is transitioning to (only if a vm_status task is running)"""
+        if vm_status_tasks is None:
+            vm_status_tasks = self.is_changing_status()
+
+        actions = set(task.get('action') for _, task in iteritems(vm_status_tasks))
+
+        if actions:
+            if len(actions) == 1:
+                return self.STATUS_TRANSITION_DICT.get(actions.pop(), self.UNKNOWN)
+            else:
+                return self.UNKNOWN  # Two or more different vm_status actions
+
+        return None  # Not changing status
+
     def is_deploying(self):
         """Return True if VM has deploying status"""
         return self.status in (self.CREATING, self.DEPLOYING_DUMMY, self.DEPLOYING_START, self.DEPLOYING_FINISH)
@@ -1310,13 +1331,14 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
             return self.STATUS_UNKNOWN
         if not pending:
             return self.get_status_display()
+
         vm_status_tasks = self.is_changing_status()
-        if vm_status_tasks:
+
+        # Although a vm_status task is still running the VM may have already changed its status
+        if vm_status_tasks and self.is_changing_status_to(vm_status_tasks) != self.status:
             if self.status == self.STOPPING:
-                for tid, task in iteritems(vm_status_tasks):
-                    if task.get('force', False):
-                        self._status_display = self.STATUS_PENDING
-                        break
+                if any(task.get('force', False) for _, task in iteritems(vm_status_tasks)):
+                    self._status_display = self.STATUS_PENDING
                 else:
                     self._status_display = self.get_status_display()
             else:
