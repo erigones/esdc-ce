@@ -104,6 +104,8 @@ class FakeDetailLog(object):
     """
     def add(self, *args):
         pass
+
+
 LOG = FakeDetailLog()
 
 
@@ -364,6 +366,18 @@ class _Zabbix(object):
 
         try:
             return res[serviceid]['sla'][0]['sla']
+        except (KeyError, IndexError) as e:
+            logger.exception(e)
+            raise ZabbixError(e)
+
+    def _zabbix_get_template_list(self):
+        """Query Zabbix API for templates"""
+        res = self.zapi.template.get({
+            'output': ['name', 'host', 'id', 'description']
+        })
+
+        try:
+            return res
         except (KeyError, IndexError) as e:
             logger.exception(e)
             raise ZabbixError(e)
@@ -1524,3 +1538,7 @@ class Zabbix(object):
     def node_history(self, node_id, items, zhistory, since, until, items_search=None):
         """[INTERNAL] Return node history data for selected graph and period"""
         return self.izx.get_history(node_id, items, zhistory, since, until, items_search=items_search)
+
+    def template_list(self):
+        """[EXTERNAL] Return list of available templates"""
+        return self.ezx._zabbix_get_template_list()
