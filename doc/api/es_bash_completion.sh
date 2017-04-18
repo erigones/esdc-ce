@@ -58,7 +58,7 @@ _es() {
 
 			"get"|"create"|"set"|"delete"|"options")
 				if [ ${COMP_CWORD} -lt 3 ]; then
-					COMPREPLY=( $( compgen -W "/vm/define /vm/define/snapshot /vm/define/backup /vm/status /vm/ /vm/(hostname) /mon/ /mon/vm/ /mon/node/ /node/ /node/(hostname) /dc/ /dc/(dc) /network/ /network/ip/ /network/(name) /image/ /image/(name) /imagestore/ /imagestore/(name) /template/ /template/(name) /iso/ /iso/(name) /dns/domain/ /dns/domain/(name) /task/log /task/ /task/(task_id) /system/ /accounts/login /accounts/logout /accounts/user /accounts/permission /accounts/group" -- "${cur}" ) )
+					COMPREPLY=( $( compgen -W "/vm/define /vm/define/snapshot /vm/define/backup /vm/status /vm/ /vm/(hostname) /mon/ /mon/vm/ /mon/node/ /mon/template/ /node/ /node/(hostname) /dc/ /dc/(dc) /network/ /network/ip/ /network/(name) /image/ /image/(name) /imagestore/ /imagestore/(name) /template/ /template/(name) /iso/ /iso/(name) /dns/domain/ /dns/domain/(name) /task/log /task/ /task/(task_id) /system/ /accounts/login /accounts/logout /accounts/user /accounts/permission /accounts/group" -- "${cur}" ) )
 				fi
 			;;
 			*)
