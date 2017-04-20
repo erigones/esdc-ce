@@ -1,0 +1,94 @@
+#!/bin/bash
+
+# Copyright 2013, Joyent. Inc. All rights reserved.
+
+PATH=/opt/local/bin:/opt/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin
+export PATH
+
+set -o errexit
+set -o xtrace
+
+. /lib/svc/share/smf_include.sh
+smf_is_globalzone && exit ${SMF_EXIT_OK}
+
+# Set basedir and default config file
+ZONEINIT_INCLUDES=/var/zoneinit/includes
+ZONECONFIG=/root/zoneconfig
+
+# This script should only continue if
+#
+#  1) executed as a SMF start method; and
+#  2) /var/svc/provisioning exist.
+#
+# Otherwise, pretend success but do nothing
+# except updating authorized_keys of root user
+#
+
+AUTHORIZED_KEYS="$(mdata-get root_authorized_keys || echo '')"
+mkdir -pm 700 /root/.ssh
+while read -r AUTHKEY; do
+    [ -z "$AUTHKEY" ] && continue
+    if ! grep -q "^$AUTHKEY$" /root/.ssh/authorized_keys 2> /dev/null; then
+        echo "$AUTHKEY" >> /root/.ssh/authorized_keys
+    fi
+done <<< "$AUTHORIZED_KEYS"
+chmod 600 /root/.ssh/authorized_keys
+
+
+# Pre-create /var/svc/provisioning if /root/zoneconfig exists
+# to stay backwards compatible.
+
+[ -e ${ZONECONFIG} ] && touch /var/svc/provisioning
+
+# Do nothing if not under SMF, not provisioning, or already done.
+
+if [[ ! "${SMF_METHOD}" == "start" ]] || \
+   [[ ! -e /var/svc/provisioning ]] || \
+   [[ $(svcprop -p application/done zoneinit) =~ true ]]; then
+  exit ${SMF_EXIT_OK}
+fi
+
+function log {
+  local WHERE=$(basename ${INC-zoneinit})
+  echo "${WHERE}: $1"
+}
+
+function exit_handler {
+  local WHERE=$(basename ${INC-zoneinit})
+  local EXITCODE=${2:-95}
+
+  if [ ${EXITCODE} -gt 0 ]; then
+    echo "${WHERE}: $1 ${EXITCODE}"
+
+    # Renaming 'provisioning' to 'provision_failure' tells the provisioner
+    # that we failed and the machine is no good
+
+    [ -e /var/svc/provisioning ] && mv /var/svc/provision{ing,_failure}
+
+    # Status 95 tells the SMF restarter to fail fatally (not try again)
+    exit ${SMF_EXIT_ERR_FATAL}
+  fi
+}
+
+trap 'exit_handler "received exit status" $?' EXIT
+
+START_TIME=$(date +%s)
+log "(start)"
+
+# Pull in and execute all operations from the 'includes' directory
+for INC in ${ZONEINIT_INCLUDES}/*.sh
+do
+  log "(start)"
+  source ${INC}
+done
+unset INC
+
+END_TIME=$(date +%s)
+RUN_TIME=$((END_TIME-START_TIME))
+if [ ${RUN_TIME} -gt 0 ]; then
+  log "total runtime ${RUN_TIME} seconds"
+fi
+
+# provisioner takes over
+log "(finish)"
+exit ${SMF_EXIT_OK}
