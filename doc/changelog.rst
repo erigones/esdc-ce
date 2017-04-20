@@ -1,6 +1,19 @@
 Changelog
 #########
 
+2.5.3 (unreleased)
+==================
+
+Features
+--------
+
+- Removed head node flag in GUI - `esdc-docs#13 <https://github.com/erigones/esdc-docs/issues/13>`__
+
+Bugs
+----
+
+
+
 2.5.2 (released on 2017-04-11)
 ==============================
 
