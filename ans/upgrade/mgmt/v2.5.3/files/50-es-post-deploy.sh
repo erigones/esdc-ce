@@ -44,8 +44,6 @@ fi
 
 log "Starting post-deploy configuration"
 
-sleep 3
-
 if [[ ! -f "/root/.ssh/id_rsa" ]]; then
 	log "Generating SSH key pair for this server"
 	ssh-keygen -t rsa -b 2048 -f /root/.ssh/id_rsa -q -P ""

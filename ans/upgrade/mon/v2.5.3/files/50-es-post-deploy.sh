@@ -44,8 +44,6 @@ fi
 
 log "Starting post-deploy configuration"
 
-sleep 3
-
 log "Generating SSL certificate"
 openssl req -new -nodes -x509 \
 -subj "/C=SK/ST=Slovakia/L=Bratislava/O=IT/CN=*.*" \
