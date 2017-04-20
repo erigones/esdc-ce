@@ -8,6 +8,7 @@ Features
 --------
 
 - Removed head node flag in GUI - `esdc-docs#13 <https://github.com/erigones/esdc-docs/issues/13>`__
+- Add support for appending additional SSH authorized_keys into the service VMs - `esdc-factory#43 <https://github.com/erigones/esdc-factory/issues/43>`__
 
 Bugs
 ----
