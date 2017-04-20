@@ -12,6 +12,7 @@ Features
 Bugs
 ----
 
+- Fixed VM hostname fetching in `message_callback` (GUI/JS) - `#159 <https://github.com/erigones/esdc-ce/issues/159>`__
 
 
 2.5.2 (released on 2017-04-11)
