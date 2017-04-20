@@ -1,6 +1,8 @@
-from que.tasks import execute
-from vms.models import SnapshotDefine, Snapshot, BackupDefine, Backup, IPAddress
 from core.celery.config import ERIGONES_TASK_USER
+from que.tasks import execute, get_task_logger
+from vms.models import SnapshotDefine, Snapshot, BackupDefine, Backup, IPAddress
+
+logger = get_task_logger(__name__)
 
 
 def is_vm_missing(vm, msg):
@@ -103,3 +105,19 @@ def vm_reset(vm):
     cmd = 'vmadm stop %s -F; vmadm start %s' % (vm.uuid, vm.uuid)
     return execute(ERIGONES_TASK_USER, None, cmd, callback=False, queue=vm.node.fast_queue, nolog=True,
                    check_user_tasks=False)
+
+def vm_update(vm):
+    """
+    Internal API used for updating VM if there were changes in jason detected.
+    """
+    logger.info('Running PUT vm_manage(%s), because something (vnc port?) has changed changed', vm)
+    from api.vm.base.views import vm_manage
+    from api.utils.request import get_dummy_request
+    from api.utils.views import call_api_view
+    request = get_dummy_request(vm.dc, method='PUT', system_user=True)
+    res = call_api_view(request, 'PUT', vm_manage, vm.hostname)
+
+    if res.status_code == 201:
+        logger.warn('PUT vm_manage(%s) was successful: %s', vm, res.data)
+    else:
+        logger.error('PUT vm_manage(%s) failed: %s (%s): %s', vm, res.status_code, res.status_text, res.data)

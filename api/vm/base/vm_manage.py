@@ -6,12 +6,13 @@ from que.tasks import execute
 from vms.models import Image, ImageVm
 from api.api_views import APIView
 from api.exceptions import (PermissionDenied, VmIsNotOperational, VmIsLocked, VmHasPendingTasks, PreconditionRequired,
-                            ExpectationFailed)
+                            ExpectationFailed, NodeIsNotOperational, InvalidInput)
 from api.serializers import ForceSerializer
 from api.task.utils import TaskID
 from api.task.response import SuccessTaskResponse, FailureTaskResponse, TaskResponse
 from api.signals import vm_updated
 from api.vm.utils import get_vms, get_vm
+from api.node.utils import get_node
 from api.vm.messages import LOG_VM_CREATE, LOG_VM_RECREATE, LOG_VM_UPDATE, LOG_VM_DELETE
 from api.vm.base.serializers import VmCreateSerializer, VmSerializer, ExtendedVmSerializer
 from api.vm.define.vm_define import VmDefineView
@@ -292,15 +293,36 @@ class VmManage(APIView):
 
         apiview = self.apiview
         apiview['force'] = bool(ForceSerializer(data=self.data, default=False))
+        queue = vm.node.fast_queue
+        new_node_uuid = None
+        detail_dict = {}
 
         if vm.status not in (vm.RUNNING, vm.STOPPED):
             raise VmIsNotOperational('VM is not stopped or running')
 
         if apiview['force']:
+            detail_dict['force'] = True
             # final cmd and empty stdin
             cmd = 'vmadm get %s 2>/dev/null' % vm.uuid
             stdin = None
             block_key = None
+            node_param = self.data.get('node')
+
+            if node_param:
+                if not request.user.is_staff:
+                    raise PermissionDenied
+
+                node = get_node(request, node_param, dc=request.dc, exists_ok=True, noexists_fail=True)
+
+                if node.hostname == vm.node.hostname:
+                    raise InvalidInput('VM already has the requested node set in DB')
+
+                if node.status != node.ONLINE:
+                    raise NodeIsNotOperational
+
+                apiview['node'] = detail_dict['node'] = node.hostname
+                queue = node.fast_queue
+                new_node_uuid = node.uuid
 
         elif vm.json_changed():
             if vm.locked:
@@ -338,7 +360,7 @@ class VmManage(APIView):
             'output': {'returncode': 'returncode', 'stderr': 'message', 'stdout': 'json'},
             'replace_stderr': ((vm.uuid, vm.hostname),), 'msg': msg, 'vm_uuid': vm.uuid, 'apiview': apiview
         }
-        callback = ('api.vm.base.tasks.vm_update_cb', {'vm_uuid': vm.uuid})
+        callback = ('api.vm.base.tasks.vm_update_cb', {'vm_uuid': vm.uuid, 'new_node_uuid': new_node_uuid})
 
         logger.debug('Updating VM %s with json: """%s"""', vm, stdin)
 
@@ -347,12 +369,13 @@ class VmManage(APIView):
 
         try:
             tid, err = execute(request, vm.owner.id, cmd, stdin=stdin, meta=meta, lock=self.lock, callback=callback,
-                               queue=vm.node.fast_queue, block_key=block_key)
+                               queue=queue, block_key=block_key)
 
             if err:
                 return FailureTaskResponse(request, err, vm=vm)
             else:
-                return TaskResponse(request, tid, msg=msg, vm=vm, api_view=apiview, data=self.data)
+                return TaskResponse(request, tid, msg=msg, vm=vm, api_view=apiview, data=self.data,
+                                    detail_dict=detail_dict)
         finally:
             if err:
                 vm.revert_notready()

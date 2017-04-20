@@ -103,12 +103,18 @@ VM owner has no SSH keys available
             * |async-yes|
         :arg hostname_or_uuid: **required** - Server hostname or uuid
         :type hostname_or_uuid: string
+        :arg data.force: If true, update VM definition according to current VM configuration on compute node
+        :type data.force: boolean
+        :arg data.node: (EXPERIMENTAL feature) Name of the compute node on which VM is located - \
+must be used used with `force` (requires |SuperAdmin| permission)
+        :type data.node: string
         :status 200: SUCCESS
         :status 201: PENDING
         :status 400: FAILURE
         :status 403: Forbidden
         :status 404: VM not found
         :status 409: VM has pending tasks
+        :status 412: VM already has the requested node set in DB
         :status 417: VM has snapshots (disk size update)
         :status 423: Node is not operational / VM is not stopped or running / VM is locked or has slave VMs
         :status 424: Cannot import required image

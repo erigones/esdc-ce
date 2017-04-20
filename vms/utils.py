@@ -56,7 +56,7 @@ class DefAttrDict(AttrDict):
             return default
 
 
-class PickleDict(AttrDict):
+class PickleDict(dict):
     """
     Used for vm.json or vm.json_active property.
     """
