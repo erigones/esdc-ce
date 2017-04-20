@@ -1,6 +1,7 @@
 from hashlib import sha1
 from collections import defaultdict, namedtuple
 import os
+import json
 
 from . import ESLIB
 from .cmd import CmdError, cmd_output, get_timestamp
@@ -28,6 +29,7 @@ class Backup(ZFSCmd):
     update_snapshots = ()  # List of dicts with name and new_name attributes, which were renamed during archivation
     last_snapshot = None  # Last snapshot created on original dataset
     deleted_last_snapshot_names = ()  # List of snapshots on original dataset, which were deleted by the backup process
+    metadata_file = None  # Metadata file created for last backup (used in both dataset and file)
 
     # delete cleanup attributes
     affected_datasets = ()
@@ -79,6 +81,13 @@ class Backup(ZFSCmd):
         return os.remove(filename)
 
     @classmethod
+    def _delete_file_silent(cls, filename):
+        try:  # Cleanup
+            return cls._delete_file(filename)
+        except OSError:
+            pass
+
+    @classmethod
     def _create_backup_dir(cls, directory):
         if not os.path.exists(directory):
             return os.makedirs(directory, cls.BKPDIR_MODE)
@@ -86,7 +95,7 @@ class Backup(ZFSCmd):
     @classmethod
     def _check_file(cls, filename):
         if not os.path.isfile(filename):
-            raise CmdError(cls.ERR_FILE_CHECK, 'Backup file is not available')
+            raise CmdError(cls.ERR_FILE_CHECK, 'File "%s" is not available' % filename)
 
     @classmethod
     def _check_dir(cls, directory):
@@ -231,6 +240,20 @@ class Backup(ZFSCmd):
 
         return res
 
+    def _remove_json_metadata_file(self, jsonfile):
+        """Delete JSON file with metadata silently: if this fails backup is removed anyway."""
+        self._delete_file_silent(jsonfile)
+        self.metadata_file = jsonfile
+
+    def _store_json_metadata_to_file(self, jsonfile, data):
+        """Store JSON into file and create directories if they do not exists"""
+        self._create_backup_dir(os.path.dirname(jsonfile))
+
+        with open(jsonfile, 'w+') as outfile:
+            json.dump(data, outfile)
+
+        self.metadata_file = jsonfile
+
     def cleanup(self, action, response):
         """Emergency rollback - run action_cleanup() method"""
         fun = getattr(self, '%s_cleanup' % action, None)
@@ -247,6 +270,10 @@ class Backup(ZFSCmd):
         response['update_snapshots'] = self.update_snapshots
         response['deleted_last_snapshot_names'] = self.deleted_last_snapshot_names
 
+        if self.metadata_file:
+            self._remove_json_metadata_file(self.metadata_file)
+            response['metadata_file'] = self.metadata_file
+
         if self.last_snapshot:
             try:
                 self._destroy_dataset(self.last_snapshot, remote=True)
@@ -254,7 +281,7 @@ class Backup(ZFSCmd):
                 response['last_snapshot_name'] = get_snap_name(self.last_snapshot)
 
     @cmd_output
-    def ds_create(self, snapshot, destination, name, fsfreeze=None):
+    def ds_create(self, snapshot, destination, name, metadata=None, json=None, fsfreeze=None):
         """Create snapshot on remote host and send it here"""
         ds = destination.split('/')
 
@@ -267,6 +294,10 @@ class Backup(ZFSCmd):
         self._check_host()  # Check SSH if needed
         self.deleted_last_snapshot_names = []
         remote_snapshots = [get_snap_name(s) for s in self._list_dataset_snapshots(remote_ds, remote=True)]
+
+        if metadata and json:
+            # Create metadata file first, if it fails we dont need to create backup, clean up would remove it anyways.
+            self._store_json_metadata_to_file(metadata, json)
 
         if self._dataset_exists(destination):
             local_snapshots = list(self._list_dataset_snapshots(destination))
@@ -319,20 +350,26 @@ class Backup(ZFSCmd):
             'update_snapshots': self.update_snapshots,
             'last_snapshot_name': get_snap_name(self.last_snapshot),
             'deleted_last_snapshot_names': self.deleted_last_snapshot_names,
+            'metadata_file': self.metadata_file,
         }
 
     def ds_delete_cleanup(self, response):
         response['deleted_snapshots'] = self.deleted_snapshots
         response['update_snapshots'] = self._list_dataset_snapshot_size()
         response['deleted_last_snapshot_names'] = self.deleted_last_snapshot_names
+        response['deleted_metadata_file'] = self.metadata_file
 
     @cmd_output
-    def ds_delete(self, snapshots, last_snapshots=()):
+    def ds_delete(self, snapshots, metadata=None, last_snapshots=()):
         """Delete list of snapshots. This will also delete the whole dataset if deleting last snapshot on it!"""
         dataset_snapshots = defaultdict(list)
         current_snapshots = {}
         self.deleted_snapshots = deleted_snapshots = []
         self.affected_datasets = affected_datasets = []
+
+        if metadata:
+            # check if metadata file exists, otherwise do not delete snapshot
+            self._check_file(metadata)
 
         for snap in snapshots:  # Prepare {dataset: [snapshots]} map
             dataset_snapshots[get_snap_dataset(snap)].append(snap)
@@ -361,6 +398,10 @@ class Backup(ZFSCmd):
                 if keep_dataset:
                     affected_datasets.append(ds)
 
+        if metadata:
+            # remove metadata file only at successful snapshot removal
+            self._remove_json_metadata_file(metadata)
+
         if last_snapshots:
             deleted_last_snapshot_names = [get_snap_name(snap) for snap in last_snapshots]
             remote_snapshots = build_snapshot(get_snap_dataset(last_snapshots[0]),
@@ -377,6 +418,7 @@ class Backup(ZFSCmd):
             'deleted_snapshots': deleted_snapshots,
             'update_snapshots': self._list_dataset_snapshot_size(),
             'deleted_last_snapshot_names': self.deleted_last_snapshot_names,
+            'deleted_metadata_file': self.metadata_file
         }
 
     @cmd_output
@@ -411,43 +453,55 @@ class Backup(ZFSCmd):
         return {}
 
     @cmd_output
-    def file_create(self, source, filename, fsfreeze=None):
+    def file_create(self, source, filename, metadata=None, json=None, fsfreeze=None):
         backup_dir = os.path.abspath(os.path.join(os.path.dirname(filename), '..', '..'))
         self._check_dir(backup_dir)  # Check parent/backup directory (zones/backups/file)
         self._check_host()
         filename = os.path.abspath(filename)
         self._create_backup_dir(os.path.dirname(filename))
 
+        if metadata and json:
+            # Create metadata file first, if it fails we dont need to create backup.
+            self._store_json_metadata_to_file(metadata, json)
+
         try:
             self._backup_to_file(source, filename, fsfreeze=fsfreeze)
             size = self._get_file_size(filename)
             checksum = self._get_file_checksum(filename)
         except Exception:
-            try:  # Cleanup
-                self._delete_file(filename)
-            except OSError:
-                pass
+            self._delete_file_silent(filename)
             raise  # Re-raise error
 
         return {
             'file': filename,
             'size': size,
             'checksum': checksum,
+            'metadata_file': self.metadata_file,
         }
 
     def cleanup_file_delete(self, response):
         response['deleted_files'] = self.deleted_files
 
+        if self.metadata_file:
+            self._remove_json_metadata_file(self.metadata_file)
+            response['deleted_metadata_file'] = self.metadata_file
+
     @cmd_output
-    def file_delete(self, filenames):
+    def file_delete(self, filenames, metadata=None):
         self.deleted_files = deleted_files = []
+
+        if metadata:
+            self._remove_json_metadata_file(metadata)
 
         for f in filenames:
             f = os.path.abspath(f)
             self._delete_file(f)
             deleted_files.append(f)
 
-        return {'deleted_files': deleted_files}
+        return {
+            'deleted_files': deleted_files,
+            'deleted_metadata_file': self.metadata_file
+        }
 
     @cmd_output
     def file_restore(self, destination, filename, checksum):
