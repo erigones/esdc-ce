@@ -381,7 +381,7 @@ function update_sio_status() {
 
 // callback: "message"
 function message_callback(code, res, view, method, args, kwargs, apiview, apidata) {
-  var hostname = kwargs.hostname || args[0] || null;
+  var hostname = apiview.hostname || kwargs.hostname || kwargs.hostname_or_uuid || args[0] || null;
   var target_hostname = hostname;  // get target_hostname (real VM)
   var data = kwargs;
   var task_id = res.task_id || null;
@@ -394,8 +394,13 @@ function message_callback(code, res, view, method, args, kwargs, apiview, apidat
   if ('data' in kwargs) {
     data = kwargs.data;
   }
-  if ('target_hostname' in data) {
+
+  if ('target_hostname' in apiview) {
+    target_hostname = apiview.target_hostname;
+  } else if ('target_hostname' in data) {
     target_hostname = data.target_hostname;
+  } else if ('target_hostname_or_uuid' in data) {
+    target_hostname = data.target_hostname_or_uuid;
   }
 
   // always update task list if it exists
