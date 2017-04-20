@@ -64,7 +64,7 @@
             </td>
 
             <td class="nowrap">
-              <a href="{% url 'node_details' node.hostname %}" class="btn-link"><i class="icon-sitemap" style="color: {{ node.color }};"></i> <span class="node_hostname">{{ node.hostname }}</span></a>{% if node.is_head %}<span title="{% trans "Head node" %}" data-toggle="tooltip" data-placement="bottom" class="node_flags"><i class="icon-flag"></i></span>{% endif %}
+              <a href="{% url 'node_details' node.hostname %}" class="btn-link"><i class="icon-sitemap" style="color: {{ node.color }};"></i> <span class="node_hostname">{{ node.hostname }}</span></a>
             </td>
 
             <td class="hidden-phone nowrap">
