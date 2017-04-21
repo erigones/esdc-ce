@@ -108,6 +108,9 @@ VM owner has no SSH keys available
         :arg data.node: (EXPERIMENTAL feature) Name of the compute node on which VM is located - \
 must be used used with `force` (requires |SuperAdmin| permission)
         :type data.node: string
+        .. warning:: The `node` parameter should only be used in special cases, i.e. disaster recovery from \
+backups, when the VM was restored manually on a different compute node. This action does not perform any resource \
+checking on the target node in DB.
         :status 200: SUCCESS
         :status 201: PENDING
         :status 400: FAILURE

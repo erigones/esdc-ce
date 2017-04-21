@@ -106,6 +106,7 @@ def vm_reset(vm):
     return execute(ERIGONES_TASK_USER, None, cmd, callback=False, queue=vm.node.fast_queue, nolog=True,
                    check_user_tasks=False)
 
+
 def vm_update(vm):
     """
     Internal API used for updating VM if there were changes in jason detected.

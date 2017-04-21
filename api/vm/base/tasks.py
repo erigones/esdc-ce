@@ -11,8 +11,7 @@ from api.email import sendmail
 from api.utils.request import get_dummy_request
 from api.task.tasks import task_log_cb_success, task_log_cb_error
 from api.task.utils import callback
-from api.vm.base.utils import ( is_vm_missing, vm_update_ipaddress_usage,
-                                vm_delete_snapshots_of_removed_disks,
+from api.vm.base.utils import (is_vm_missing, vm_update_ipaddress_usage, vm_delete_snapshots_of_removed_disks,
                                 vm_reset, vm_update)
 from api.vm.status.tasks import vm_status_changed, vm_status_one
 from api.vm.snapshot.vm_define_snapshot import SnapshotDefineView
