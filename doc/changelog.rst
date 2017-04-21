@@ -7,12 +7,15 @@ Changelog
 Features
 --------
 
+- Added requests and esdc-api into requirements on mgmt and CN - commit `d7be2ca <https://github.com/erigones/esdc-ce/commit/d7be2ca1065103459a1708b5d1c5d6be7bcfac3f>`__
 - Removed head node flag in GUI - `esdc-docs#13 <https://github.com/erigones/esdc-docs/issues/13>`__
 - Add support for appending additional SSH authorized_keys into the service VMs - `esdc-factory#43 <https://github.com/erigones/esdc-factory/issues/43>`__
+- Updated API call `PUT vm_manage` to support forced change of the node on the VM - `#154 <https://github.com/erigones/esdc-ce/issues/154>`__
 
 Bugs
 ----
 
+- Fixed VM hostname fetching in `message_callback` (GUI/JS) - `#159 <https://github.com/erigones/esdc-ce/issues/159>`__
 
 
 2.5.2 (released on 2017-04-11)
