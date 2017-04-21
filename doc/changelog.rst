@@ -8,6 +8,7 @@ Features
 --------
 
 - Removed head node flag in GUI - `esdc-docs#13 <https://github.com/erigones/esdc-docs/issues/13>`__
+- Updated backup functionality to store metadata on backup node - `esdc-ce#155 <https://github.com/erigones/esdc-ce/issues/155>`__
 
 Bugs
 ----
