@@ -1,7 +1,7 @@
 Changelog
 #########
 
-2.6.0 (unreleased)
+2.5.3 (unreleased)
 ==================
 
 Features
@@ -11,7 +11,6 @@ Features
 
 Bugs
 ----
-
 
 
 2.5.2 (released on 2017-04-11)
