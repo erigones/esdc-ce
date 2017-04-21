@@ -8,5 +8,6 @@ from django.db.models.signals import post_delete, post_save
 from pdns.models.record import Record
 from pdns.models.record import Domain
 
+post_save.connect(Domain.post_save_domain, sender=Domain, dispatch_uid='post_save_domain')
 post_save.connect(Record.post_save_record, sender=Record, dispatch_uid='post_save_record')
 post_delete.connect(Record.post_delete_record, sender=Record, dispatch_uid='post_delete_record')
