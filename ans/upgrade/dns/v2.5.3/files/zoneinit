@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Copyright 2013, Joyent. Inc. All rights reserved.
+# Copyright (c) 2016, Erigones, s. r. o.
 
 PATH=/opt/local/bin:/opt/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin
 export PATH
@@ -24,6 +25,8 @@ ZONECONFIG=/root/zoneconfig
 # except updating authorized_keys of root user
 #
 
+# allow updating authorized_keys from mdata on every reboot
+# https://github.com/erigones/esdc-factory/issues/43
 AUTHORIZED_KEYS="$(mdata-get root_authorized_keys || echo '')"
 mkdir -pm 700 /root/.ssh
 while read -r AUTHKEY; do
