@@ -224,7 +224,7 @@ def vm_backup_cb(result, task_id, vm_uuid=None, node_uuid=None, bkp_id=None):
                                                  'failed.' % (bkp.name, bkp.vm.hostname, bkp.array_disk_id),
                                          priority=Zabbix.zbx.WARNING)
 
-            bkp.mainifest_path = data.get('metadata_file', '')
+            bkp.manifest_path = data.get('metadata_file', '')
             bkp.time = data.get('time_elapsed', None)
             bkp.status = bkp.OK
             bkp.save()
