@@ -253,9 +253,9 @@ class Backup(_VmDiskModel, _StatusModel, _JsonPickleModel):
 
     def create_dataset_manifest_path(self):
         """Return backup dataset minifest path"""
-        # zones/backups/manifests/ds/<uuid>-disk0.json
+        # zones/backups/manifests/ds/<uuid>-disk0/<snap_name>.json
         return path.join('/', self.zpool.zpool, self.dc.settings.VMS_VM_BACKUP_MANIFESTS_DS_DIR,
-                         '%s-disk%s.json' % (self.vm_uuid, self.disk_id))
+                         '%s-disk%s' % (self.vm_uuid, self.disk_id), '%s.json' % self.snap_name)
 
     @classmethod
     def get_total_dc_size(cls, dc):
