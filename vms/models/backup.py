@@ -243,20 +243,18 @@ class Backup(_VmDiskModel, _StatusModel, _JsonPickleModel):
     @property
     def manifest_name(self):
         """Return manifest file name"""
-        assert self.name
-        define = self.define
-        return '%s-full.%s.json' % (self.name, define.FILE_SUFFIX[define.compression])
+        return '%s.json' % self.file_name
 
     def create_file_manifest_path(self):
         """Return backup file manifest path"""
         # /zones/backups/manifests/file/<uuid>/disk0/<file_name>.zfs.json
         return path.join('/', self.zpool.zpool, self.dc.settings.VMS_VM_BACKUP_MANIFESTS_FILE_DIR, self.vm_uuid,
-                         'disk%s' % self.disk_id, self.file_name)
+                         'disk%s' % self.disk_id, self.manifest_name)
 
     def create_dataset_manifest_path(self):
         """Return backup dataset minifest path"""
         # zones/backups/manifests/ds/<uuid>-disk0.json
-        return path.join(self.zpool.zpool, self.dc.settings.VMS_VM_BACKUP_MANIFESTS_DS_DIR,
+        return path.join('/', self.zpool.zpool, self.dc.settings.VMS_VM_BACKUP_MANIFESTS_DS_DIR,
                          '%s-disk%s.json' % (self.vm_uuid, self.disk_id))
 
     @classmethod
