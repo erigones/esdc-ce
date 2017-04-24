@@ -1,7 +1,7 @@
 #!/bin/sh
 
 ZKCLI=/usbkey/scripts/zookeepercli
-QUERY_STRING="$*"
+QUERY_STRING="$@"
 
 if [ -z "${QUERY_STRING}" ]; then
 		echo "Usage:   $0 <query>" 1>&2
