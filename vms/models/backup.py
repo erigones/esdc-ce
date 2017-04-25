@@ -247,7 +247,7 @@ class Backup(_VmDiskModel, _StatusModel, _JsonPickleModel):
                          'disk%s' % self.disk_id, '%s.json' % self.file_name)
 
     def create_dataset_manifest_path(self):
-        """Return backup dataset minifest path"""
+        """Return backup dataset manifest path"""
         # zones/backups/manifests/ds/<uuid>-disk0/<snap_name>.json
         return path.join('/', self.zpool.zpool, self.dc.settings.VMS_VM_BACKUP_MANIFESTS_DS_DIR,
                          '%s-disk%s' % (self.vm_uuid, self.disk_id), '%s.json' % self.snap_name)
