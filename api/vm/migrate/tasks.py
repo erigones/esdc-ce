@@ -1,8 +1,9 @@
-from que.tasks import cq, get_task_logger
-from que.mgmt import MgmtCallbackTask
-from que.exceptions import TaskException
-from api.task.utils import callback
 from api.task.tasks import task_log_cb_success
+from api.task.utils import callback
+from api.vm.base.utils import vm_update
+from que.exceptions import TaskException
+from que.mgmt import MgmtCallbackTask
+from que.tasks import cq, get_task_logger
 from vms.models import Vm, SlaveVm
 from vms.signals import vm_node_changed
 
@@ -66,16 +67,6 @@ def vm_migrate_cb(result, task_id, vm_uuid=None, slave_vm_uuid=None):
     task_log_cb_success(result, task_id, vm=vm, **result['meta'])
 
     if vm.json_changed():
-        logger.info('Running PUT vm_manage(%s), because something (vnc port?) has changed changed', vm)
-        from api.vm.base.views import vm_manage
-        from api.utils.request import get_dummy_request
-        from api.utils.views import call_api_view
-        request = get_dummy_request(vm.dc, method='PUT', system_user=True)
-        res = call_api_view(request, 'PUT', vm_manage, vm.hostname)
-
-        if res.status_code == 201:
-            logger.warn('PUT vm_manage(%s) was successful: %s', vm, res.data)
-        else:
-            logger.error('PUT vm_manage(%s) failed: %s (%s): %s', vm, res.status_code, res.status_text, res.data)
+        vm_update(vm)
 
     return result
