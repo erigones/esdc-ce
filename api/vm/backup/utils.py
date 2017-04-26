@@ -63,13 +63,15 @@ def get_backup_cmd(action, bkp, bkps=None, define=None, zfs_filesystem=None, fsf
 
     if action == 'create':
         if file_backup:
-            cmd_args.append('-f "%s" -s %s' % (bkp.create_file_path(), zfs_filesystem))
+            cmd_args.append('-f "%s" -s %s -m "%s" -j -' % (bkp.create_file_path(), zfs_filesystem,
+                                                            bkp.create_file_manifest_path()))
 
             if define.compression:
                 cmd_args.append('-c %s' % define.get_compression_display())
         else:
-            cmd_args.append('-d %s -s %s@%s -n "%s"' % (bkp.create_dataset_path(), zfs_filesystem, bkp.snap_name,
-                                                        bkp.name))
+            cmd_args.append('-d %s -s %s@%s -n "%s" -m "%s" -j -' % (bkp.create_dataset_path(), zfs_filesystem,
+                                                                     bkp.snap_name, bkp.name,
+                                                                     bkp.create_dataset_manifest_path()))
 
         if define.bwlimit:
             cmd_args.append('-l %d' % define.bwlimit)
@@ -98,6 +100,9 @@ def get_backup_cmd(action, bkp, bkps=None, define=None, zfs_filesystem=None, fsf
 
                 if last:
                     cmd_args.append('-r %s' % last)
+
+        if bkp.manifest_path:
+            cmd_args.append('-m "%s"' % bkp.manifest_path)
 
     elif action == 'restore':
         if file_backup:

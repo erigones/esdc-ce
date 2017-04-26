@@ -1,5 +1,0 @@
-- name: Load Zabbix credentials
-  include: "{{ upg_base }}/lib/zabbix_credentials.yml"
-
-- name: Update fixed templates
-  include: "{{ upg_base }}/lib/zabbix_import_templates.yml"
