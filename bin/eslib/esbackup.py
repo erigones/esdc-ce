@@ -243,7 +243,7 @@ class Backup(ZFSCmd):
     def _remove_json_metadata_file(self, jsonfile):
         """Delete JSON file with metadata silently: if this fails backup is removed anyway."""
         self._delete_file_silent(jsonfile)
-        self.metadata_file = jsonfile
+        self.metadata_file = None
 
     def _store_json_metadata_to_file(self, jsonfile, data):
         """Store JSON into file and create directories if they do not exists"""
@@ -271,8 +271,9 @@ class Backup(ZFSCmd):
         response['deleted_last_snapshot_names'] = self.deleted_last_snapshot_names
 
         if self.metadata_file:
-            self._remove_json_metadata_file(self.metadata_file)
-            response['metadata_file'] = self.metadata_file
+            self._remove_json_metadata_file(self.metadata_file)  # Silent operation
+
+        response['metadata_file'] = self.metadata_file
 
         if self.last_snapshot:
             try:
@@ -367,10 +368,6 @@ class Backup(ZFSCmd):
         self.deleted_snapshots = deleted_snapshots = []
         self.affected_datasets = affected_datasets = []
 
-        if metadata:
-            # check if metadata file exists, otherwise do not delete snapshot
-            self._check_file(metadata)
-
         for snap in snapshots:  # Prepare {dataset: [snapshots]} map
             dataset_snapshots[get_snap_dataset(snap)].append(snap)
 
@@ -400,7 +397,7 @@ class Backup(ZFSCmd):
 
         if metadata:
             # remove metadata file only at successful snapshot removal
-            self._remove_json_metadata_file(metadata)
+            self._remove_json_metadata_file(metadata)  # Silent operation
 
         if last_snapshots:
             deleted_last_snapshot_names = [get_snap_name(snap) for snap in last_snapshots]
@@ -470,6 +467,8 @@ class Backup(ZFSCmd):
             checksum = self._get_file_checksum(filename)
         except Exception:
             self._delete_file_silent(filename)
+            if self.metadata_file:
+                self._remove_json_metadata_file(metadata)  # Silent operation
             raise  # Re-raise error
 
         return {
@@ -479,24 +478,21 @@ class Backup(ZFSCmd):
             'metadata_file': self.metadata_file,
         }
 
-    def cleanup_file_delete(self, response):
+    def file_delete_cleanup(self, response):
         response['deleted_files'] = self.deleted_files
-
-        if self.metadata_file:
-            self._remove_json_metadata_file(self.metadata_file)
-            response['deleted_metadata_file'] = self.metadata_file
+        response['deleted_metadata_file'] = self.metadata_file
 
     @cmd_output
     def file_delete(self, filenames, metadata=None):
         self.deleted_files = deleted_files = []
 
-        if metadata:
-            self._remove_json_metadata_file(metadata)
-
         for f in filenames:
             f = os.path.abspath(f)
             self._delete_file(f)
             deleted_files.append(f)
+
+        if metadata:
+            self._remove_json_metadata_file(metadata)  # Silent operation
 
         return {
             'deleted_files': deleted_files,
