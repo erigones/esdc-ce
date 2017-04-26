@@ -33,7 +33,6 @@ dictdiffer==0.6.1
 zabbix-api-erigones==1.2.3
 psycopg2==2.6.2
 psycogreen==1.0
-requests==2.13.0
 django-redis-cache==1.7.1
 hiredis==0.2.0
 wsgiref==0.1.2
