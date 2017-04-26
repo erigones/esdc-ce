@@ -9,15 +9,14 @@ if [ -z "${QUERY_STRING}" ]; then
 		exit 10
 fi
 
-if [ ! -f /usbkey/config ]; then
-		echo "Error: Cannot access /usbkey/config" 1>&2
-		exit 20
-fi
 if [ ! -x "${ZKCLI}" ]; then
 		echo "Error: Cannot find binary ${ZKCLI}" 1>&2
 		exit 20
 fi
 
-. /usbkey/config
-"${ZKCLI}" -servers "${cfgdb_admin_ip}" -auth_usr "esdc" -auth_pwd "${esdc_install_password}" -c ${QUERY_STRING}
+# find and load config file (usually /usbkey/config
+. /lib/sdc/config.sh
+load_sdc_config
+
+"${ZKCLI}" -servers "${CONFIG_cfgdb_admin_ip}" -auth_usr "esdc" -auth_pwd "${CONFIG_esdc_install_password}" -c ${QUERY_STRING}
 exit $?
