@@ -1,4 +1,10 @@
+
 # esdc-factory#43
 - name: Update post-deploy script
   copy: src="{{ current_task_dir }}/files/50-es-post-deploy.sh" dest=/var/lib/rc-scripts/50-es-post-deploy.sh mode=0750 owner=root group=root
 
+- name: Load Zabbix credentials
+  include: "{{ upg_base }}/lib/zabbix_credentials.yml"
+
+- name: Update fixed templates
+  include: "{{ upg_base }}/lib/zabbix_import_templates.yml"
