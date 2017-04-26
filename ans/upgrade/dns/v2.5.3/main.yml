@@ -1,0 +1,7 @@
+# esdc-factory#43
+- name: Update zoneinit script to append authorized_keys from mdata
+  copy: src="{{ current_task_dir }}/files/zoneinit" dest=/opt/local/lib/svc/method/zoneinit mode=0755 owner=root group=root
+
+- name: Delete previous zoneinit script for authorized_keys
+  file: dest=/var/zoneinit/includes/93-authorized-keys.sh state=absent
+
