@@ -5,3 +5,27 @@
 - name: Delete previous zoneinit script for authorized_keys
   file: dest=/var/zoneinit/includes/93-authorized-keys.sh state=absent
 
+# esdc-factory#41
+- name: "alter pdns conf setting: allow-axfr-ips"
+  lineinfile:
+    state=present
+    dest=/opt/local/etc/pdns.conf
+    regexp="^allow-axfr-ips *=.*$"
+    line="allow-axfr-ips="
+  notify: restart pdns
+
+- name: "alter pdns conf setting: disable-axfr=no"
+  lineinfile:
+    state=present
+    dest=/opt/local/etc/pdns.conf
+    regexp="^disable-axfr *=.*$"
+    line="disable-axfr=no"
+  notify: restart pdns
+
+- name: "alter pdns conf setting: master=yes"
+  lineinfile:
+    state=present
+    dest=/opt/local/etc/pdns.conf
+    regexp="^master *=.*$"
+    line="master=yes"
+  notify: restart pdns
