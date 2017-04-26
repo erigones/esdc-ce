@@ -7,10 +7,13 @@ Changelog
 Features
 --------
 
+- Removed head node flag in GUI - `esdc-docs#13 <https://github.com/erigones/esdc-docs/issues/13>`__
 - Create required `domainmetadata` for every newly created domain - `#151 <https://github.com/erigones/esdc-ce/issues/151>`__
+- Updated backup functionality to store metadata on backup node - `esdc-ce#155 <https://github.com/erigones/esdc-ce/issues/155>`__
 
 Bugs
 ----
+
 
 
 2.5.2 (released on 2017-04-11)

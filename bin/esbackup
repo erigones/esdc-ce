@@ -3,22 +3,7 @@
 from argparse import ArgumentParser, ArgumentTypeError
 
 from eslib.esbackup import Backup
-from eslib.cmd_args import t_int, t_ascii
-
-
-def t_dataset(value):
-    """Dataset validator"""
-    ds = value.split('/')
-
-    if len(ds) > 1:
-        try:
-            map(t_ascii, ds)
-        except ArgumentTypeError:
-            pass
-        else:
-            return value
-
-    raise ArgumentTypeError('Invalid dataset: "%s"' % value)
+from eslib.cmd_args import t_dataset, t_file, t_int, t_ascii, JSONFileType
 
 
 def t_snapshot(value):
@@ -40,17 +25,6 @@ def t_snapshot(value):
     raise ArgumentTypeError('Invalid snapshot: "%s"' % value)
 
 
-def t_file(value):
-    fp = value.split('/')
-
-    try:
-        map(t_ascii, fp)
-    except ArgumentTypeError:
-        pass
-
-    return value
-
-
 def main():
     """Parse input and create Backup instance"""
     parser = ArgumentParser()
@@ -67,6 +41,8 @@ def main():
     ds_create.add_argument('-n', '--name', required=True, metavar='NAME', type=t_ascii, help='Backup name')
     ds_create.add_argument('-H', '--host', help='Source host', metavar='HOST', type=t_ascii)
     ds_create.add_argument('-l', '--limit', metavar='BW_LIMIT', type=t_int, help='Bandwidth limit')
+    ds_create.add_argument('-m', '--metadata', help='VM metadata file storage path', type=t_file)
+    ds_create.add_argument('-j', '--json', help='VM metadata input json', metavar='JSON', type=JSONFileType())
     ds_create.add_argument('-F', '--fsfreeze', metavar='QA_SOCKET', type=t_file,
                            help='Send fsfreeze command to qemu agent socket')
 
@@ -76,6 +52,7 @@ def main():
     ds_delete.add_argument('-r', '--remote-snapshot', nargs='*', metavar='DATASET@NAME', type=t_snapshot,
                            help='Remote snapshot name(s) to destroy, including dataset')
     ds_delete.add_argument('-H', '--host', metavar='HOST', type=t_ascii, help='Destination host')
+    ds_delete.add_argument('-m', '--metadata', help='VM metadata file storage path', type=t_file)
 
     ds_restore = subparsers.add_parser('ds-restore', help='Restore dataset backup', parents=(verbose,))
     ds_restore.add_argument('-d', '--destination', required=True, metavar='DATASET', type=t_dataset,
@@ -89,6 +66,8 @@ def main():
     file_create.add_argument('-f', '--file', required=True, metavar='FILE', type=t_file, help='Destination file')
     file_create.add_argument('-H', '--host', help='Source host', metavar='HOST', type=t_ascii)
     file_create.add_argument('-l', '--limit', metavar='BW_LIMIT', type=t_int, help='Bandwidth limit')
+    file_create.add_argument('-m', '--metadata', help='VM metadata file storage path', type=t_file)
+    file_create.add_argument('-j', '--json', help='VM metadata input json', metavar='JSON', type=JSONFileType())
     file_create.add_argument('-c', '--compression', metavar='COMPRESSION', choices=('gzip', 'bzip2'),
                              help='Compression algorithm')
     file_create.add_argument('-F', '--fsfreeze', metavar='QA_SOCKET', type=t_file,
@@ -97,6 +76,7 @@ def main():
     file_delete = subparsers.add_parser('file-delete', help='Delete file backup', parents=(verbose,))
     file_delete.add_argument('-f', '--file', nargs='+', required=True, metavar='FILE', type=t_file,
                              help='Backup file(s)')
+    file_delete.add_argument('-m', '--metadata', help='VM metadata file storage path', type=t_file)
 
     file_restore = subparsers.add_parser('file-restore', help='Restore file backup', parents=(verbose,))
     file_restore.add_argument('-f', '--file', required=True, metavar='FILE', type=t_file, help='Source file')
@@ -111,15 +91,17 @@ def main():
     cmd = args.action
 
     if cmd == 'ds-create':
-        res = bkp.ds_create(args.snapshot, args.destination, args.name, fsfreeze=args.fsfreeze)
+        res = bkp.ds_create(args.snapshot, args.destination, args.name, metadata=args.metadata, json=args.json,
+                            fsfreeze=args.fsfreeze)
     elif cmd == 'ds-delete':
-        res = bkp.ds_delete(args.snapshot, last_snapshots=args.remote_snapshot)
+        res = bkp.ds_delete(args.snapshot, last_snapshots=args.remote_snapshot, metadata=args.metadata)
     elif cmd == 'ds-restore':
         res = bkp.ds_restore(args.snapshot, args.destination)
     elif cmd == 'file-create':
-        res = bkp.file_create(args.source, args.file, fsfreeze=args.fsfreeze)
+        res = bkp.file_create(args.source, args.file, metadata=args.metadata, json=args.json,
+                              fsfreeze=args.fsfreeze)
     elif cmd == 'file-delete':
-        res = bkp.file_delete(args.file)
+        res = bkp.file_delete(args.file, metadata=args.metadata)
     elif cmd == 'file-restore':
         res = bkp.file_restore(args.destination, args.file, args.checksum)
     else:
