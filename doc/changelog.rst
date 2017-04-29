@@ -1,7 +1,6 @@
 Changelog
 #########
 
-2.6.0 (unreleased)
 2.5.3 (unreleased)
 ==================
 
@@ -11,12 +10,8 @@ Features
 Bugs
 ----
 
-- Do not display *pending* status when desired VM status was already reached - `#152 <https://github.com/erigones/esdc-ce/issues/152>`__
-
 - Create required `domainmetadata` for every newly created domain - `#151 <https://github.com/erigones/esdc-ce/issues/151>`__
-
-Bugs
-----
+- Do not display *pending* status when desired VM status was already reached - `#152 <https://github.com/erigones/esdc-ce/issues/152>`__
 
 
 2.5.2 (released on 2017-04-11)
