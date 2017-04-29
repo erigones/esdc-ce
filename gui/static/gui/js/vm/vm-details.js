@@ -748,6 +748,8 @@ function vm_settings_modal(hostname, btn, mod_selector) {
 
       mdata_display($('#id_opt-mdata'));
       mbytes_handler($('#id_opt-ram'));
+      mon_templates_enable($('#id_opt-monitoring_templates'));
+      mon_hostgroups_enable($('#id_opt-monitoring_hostgroups'));
 
       if (init && add) {  // switching template affects VM form fields only when adding new VM
         mod.on('change', '#id_opt-template', function() {

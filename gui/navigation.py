@@ -113,7 +113,7 @@ SERVERS = {
 MONITORING = {
     'title': _('Monitoring'),
     'icon': 'bar-chart',
-    'url': 'monitoring',
+    'url': 'monitoring_server_redirect',
     'active_views': {'monitoring'},
     'a_class': 'no-ajax',
     'a_target': '_blank',

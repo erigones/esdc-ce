@@ -60,6 +60,27 @@ function update_form_fields(form, form_data, prefix) {
   return false;
 }
 
+function select_tags_enable(elements, options) {
+  options = options || {};
+
+  elements.each(function() {
+    var input = $(this);
+    var tags_type = input.data('tags-type');
+
+    switch (tags_type) {
+      case 'mon_templates':
+        mon_templates_enable(input, options);
+        break;
+      case 'mon_hostgroups':
+        mon_hostgroups_enable(input, options);
+        break;
+      default:
+        input.select2($.extend({tags: input.data('tags-choices') || [], dropdownCssClass: input.attr('class'), tokenSeparators: [',', ' ']}, options));
+        break;
+    }
+  });
+}
+
 /****************
  * obj_form_modal
  */
@@ -153,7 +174,7 @@ function obj_form_modal(btn, mod_selector, init, handler) {
           vm_forms_toggle(add, mod);
           init(self, false);
           select.select2({dropdownCssClass: select.attr('class')});
-          select_tags.each(function() { $(this).select2({tags: $(this).data('tags') || [], dropdownCssClass: $(this).attr('class'), tokenSeparators: [',', ' ']}); });
+          select_tags_enable(select_tags);
           dateinput.datepicker(DATEINPUT_OPTIONS);
           fileinput.fileupload(FILEINPUT_OPTIONS);
           mdata_enable(mdata_input);
@@ -257,7 +278,7 @@ function obj_form_modal(btn, mod_selector, init, handler) {
   }
 
   select.select2({dropdownCssClass: select.attr('class')});
-  select_tags.each(function() { $(this).select2({tags: $(this).data('tags') || [], dropdownCssClass: $(this).attr('class'), tokenSeparators: [',', ' ']}); });
+  select_tags_enable(select_tags);
   dateinput.datepicker(DATEINPUT_OPTIONS);
   fileinput.fileupload(FILEINPUT_OPTIONS);
   mdata_enable(mdata_input);

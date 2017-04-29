@@ -18,7 +18,7 @@ SIZE_FIELD_MB_ADDON = mark_safe(' MB <small class="hidden-phone">&nbsp;&nbsp;&nb
                                 _('Press "1g" for 1024 MB') + '</b></small>')
 
 
-def parse_items(itemstring):
+def parse_items(itemstring, sort=False):
     """Like taggit.utils.parse_tags, but without sorting"""
     if not itemstring:
         return []
@@ -79,17 +79,25 @@ def parse_items(itemstring):
         for chunk in to_be_split:
             words.extend(split_strip(chunk, delimiter))
 
+    if sort:
+        words = list(set(words))
+        words.sort()
+
     return words
 
 
 class ArrayField(forms.CharField):
     widget = ArrayWidget
 
+    def __init__(self, *args, **kwargs):
+        self.tags = kwargs.pop('tags', False)
+        super(ArrayField, self).__init__(*args, **kwargs)
+
     def clean(self, value):
         value = super(ArrayField, self).clean(value)
 
         try:
-            return parse_items(value)
+            return parse_items(value, sort=self.tags)
         except ValueError:
             raise forms.ValidationError(_('Please provide a comma-separated list of items.'))
 
