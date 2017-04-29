@@ -7,9 +7,9 @@ from que.erigonesd import cq
 from que.exceptions import MgmtTaskException
 from que.internal import InternalTask
 from que.mgmt import MgmtTask
-from vms.models import Dc, DefaultDc
+from vms.models import Dc
 
-__all__ = ('mon_clear_zabbix_cache',)
+__all__ = ('mon_clear_zabbix_cache', 'mon_template_list', 'mon_hostgroup_list')
 
 logger = get_task_logger(__name__)
 
@@ -36,7 +36,7 @@ def mon_clear_zabbix_cache(task_id, dc_id, full=True):
 
 
 # noinspection PyUnusedLocal
-@cq.task(name='api.mon.node.tasks.mon_template_list', base=MgmtTask)
+@cq.task(name='api.mon.base.tasks.mon_template_list', base=MgmtTask)
 @mgmt_task()
 def mon_template_list(task_id, dc_id, **kwargs):
     """
@@ -49,8 +49,22 @@ def mon_template_list(task_id, dc_id, **kwargs):
     except ZabbixError as exc:
         raise MgmtTaskException(text_type(exc))
 
-    return {'templates': [{'name': templ['host'],
-             'visible_name': templ['name'],
-             'desc': templ['description'],
-             'id': templ['templateid']} for templ in zabbix_templates]
-           }
+    return [{'name': t['host'], 'visible_name': t['name'], 'desc': t['description'], 'id': t['templateid']}
+            for t in zabbix_templates]
+
+
+# noinspection PyUnusedLocal
+@cq.task(name='api.mon.base.tasks.mon_hostgroup_list', base=MgmtTask)
+@mgmt_task()
+def mon_hostgroup_list(task_id, dc_id, **kwargs):
+    """
+    Return list of hostgroups available in Zabbix.
+    """
+    dc = Dc.objects.get_by_id(int(dc_id))
+
+    try:
+        zabbix_hostgroups = getZabbix(dc).hostgroup_list()
+    except ZabbixError as exc:
+        raise MgmtTaskException(text_type(exc))
+
+    return [{'name': t['name'], 'id': t['groupid']} for t in zabbix_hostgroups]
