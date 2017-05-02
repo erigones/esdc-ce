@@ -22,9 +22,6 @@ class VmMigrate(APIView):
     def put(self):
         request, vm = self.request, self.vm
 
-        if vm.uuid in settings.VMS_INTERNAL:
-            raise PreconditionRequired('Internal VM can\'t be migrated')
-
         if vm.locked:
             raise VmIsLocked
 
