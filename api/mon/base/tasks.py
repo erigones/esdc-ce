@@ -49,8 +49,15 @@ def mon_template_list(task_id, dc_id, **kwargs):
     except ZabbixError as exc:
         raise MgmtTaskException(text_type(exc))
 
-    return [{'name': t['host'], 'visible_name': t['name'], 'desc': t['description'], 'id': t['templateid']}
-            for t in zabbix_templates]
+    return [
+        {
+            'name': t['host'],
+            'visible_name': t['name'],
+            'desc': t['description'],
+            'id': t['templateid'],
+        }
+        for t in zabbix_templates
+    ]
 
 
 # noinspection PyUnusedLocal
@@ -67,4 +74,10 @@ def mon_hostgroup_list(task_id, dc_id, **kwargs):
     except ZabbixError as exc:
         raise MgmtTaskException(text_type(exc))
 
-    return [{'name': t['name'], 'id': t['groupid']} for t in zabbix_hostgroups]
+    return [
+        {
+            'name': t['name'],
+            'id': t['groupid'],
+        }
+        for t in zabbix_hostgroups
+    ]
