@@ -1270,14 +1270,18 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
             'locked': self.locked,
         }
 
-    def is_changing_status(self):
+    def get_status_changing_tasks(self):
         """Return appropriate task if VM status is changing"""
         return self.get_tasks(match_dict={'view': 'vm_status', 'method': 'PUT'})
 
-    def is_changing_status_to(self, vm_status_tasks=None):
+    def is_changing_status(self):
+        """Return True if VM status is changing"""
+        return bool(self.get_status_changing_tasks())
+
+    def get_target_status(self, vm_status_tasks=None):
         """Return VM status the VM is transitioning to (only if a vm_status task is running)"""
         if vm_status_tasks is None:
-            vm_status_tasks = self.is_changing_status()
+            vm_status_tasks = self.get_status_changing_tasks()
 
         actions = set(task.get('action') for _, task in iteritems(vm_status_tasks))
 
@@ -1332,10 +1336,10 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
         if not pending:
             return self.get_status_display()
 
-        vm_status_tasks = self.is_changing_status()
+        vm_status_tasks = self.get_status_changing_tasks()
 
         # Although a vm_status task is still running the VM may have already changed its status
-        if vm_status_tasks and self.is_changing_status_to(vm_status_tasks) != self.status:
+        if vm_status_tasks and self.get_target_status(vm_status_tasks) != self.status:
             if self.status == self.STOPPING:
                 if any(task.get('force', False) for _, task in iteritems(vm_status_tasks)):
                     self._status_display = self.STATUS_PENDING
