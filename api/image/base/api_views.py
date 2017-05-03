@@ -175,9 +175,6 @@ class ImageView(TaskAPIView):
 
         assert request.dc == vm.dc
 
-        if vm.uuid in settings.VMS_INTERNAL:  # Bug #chili-792
-            raise PreconditionRequired('Internal VM can\'t be used for creating images')
-
         data.pop('dc_bound', None)  # Default DC binding cannot be changed when creating Image for the first time
         img.dc_bound = vm.dc        # Default DC binding set to VM DC (cannot be changed, ^^^)
         img.ostype = vm.ostype      # Default ostype inherited from VM (cannot be changed)

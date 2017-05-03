@@ -86,7 +86,7 @@ virtual network interface. *requires data.nic*
 to specify name of the NIC for which graph should be retrieved.
         :type data.nic: string
         :arg data.zpool: only used with *storage-throughput*, *storage-io* and *storage-space* graphs \
-to specify ID of the zpool for which graph should be retrieved.
+to specify name of the zpool for which graph should be retrieved.
         :type data.zpool: string
         :status 200: SUCCESS
         :status 201: PENDING
