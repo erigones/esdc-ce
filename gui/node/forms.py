@@ -50,12 +50,18 @@ class NodeForm(SerializerForm):
                                   widget=forms.TextInput(attrs={'class': 'input-transparent narrow',
                                                                 'required': 'required'}))
 
-    monitoring_templates = ArrayField(label=_('Monitoring templates'), required=False,
+    monitoring_templates = ArrayField(label=_('Monitoring templates'), required=False, tags=True,
                                       help_text=_('Comma-separated list of custom monitoring templates.'),
-                                      widget=ArrayWidget(attrs={'class': 'input-transparent narrow'}))
-    monitoring_hostgroups = ArrayField(label=_('Monitoring hostgroups'), required=False,
+                                      widget=ArrayWidget(tags=True, escape_space=False,
+                                                         attrs={'class': 'tags-select2 narrow',
+                                                                'data-tags-type': 'mon_templates',
+                                                                'data-tags-api-call': 'mon_node_template_list'}))
+    monitoring_hostgroups = ArrayField(label=_('Monitoring hostgroups'), required=False, tags=True,
                                        help_text=_('Comma-separated list of custom monitoring hostgroups.'),
-                                       widget=ArrayWidget(attrs={'class': 'input-transparent narrow'}))
+                                       widget=ArrayWidget(tags=True, escape_space=False,
+                                                          attrs={'class': 'tags-select2 narrow',
+                                                                 'data-tags-type': 'mon_hostgroups',
+                                                                 'data-tags-api-call': 'mon_node_hostgroup_list'}))
 
     def __init__(self, request, node, *args, **kwargs):
         super(NodeForm, self).__init__(request, node, *args, **kwargs)

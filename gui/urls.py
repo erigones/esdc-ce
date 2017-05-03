@@ -30,7 +30,7 @@ urlpatterns = patterns(
     # Server pages
     url(r'^servers/', include('gui.vm.urls')),
     # Monitoring pages
-    url(r'^monitoring/$', 'monitoring', name='monitoring'),
+    url(r'^monitoring/', include('gui.mon.urls')),
     # Task log
     url(r'^tasklog/', include('gui.tasklog.urls')),
 )

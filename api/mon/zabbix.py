@@ -104,6 +104,8 @@ class FakeDetailLog(object):
     """
     def add(self, *args):
         pass
+
+
 LOG = FakeDetailLog()
 
 
@@ -857,6 +859,30 @@ class _Zabbix(object):
         else:
             return res
 
+    def get_template_list(self):
+        """Query Zabbix API for templates"""
+        res = self.zapi.template.get({
+            'output': ['name', 'host', 'templateid', 'description']
+        })
+
+        try:
+            return res
+        except (KeyError, IndexError) as e:
+            logger.exception(e)
+            raise ZabbixError(e)
+
+    def get_hostgroup_list(self):
+        """Query Zabbix API for hostgroups"""
+        res = self.zapi.hostgroup.get({
+            'output': ['name', 'groupid']
+        })
+
+        try:
+            return res
+        except (KeyError, IndexError) as e:
+            logger.exception(e)
+            raise ZabbixError(e)
+
 
 class InternalZabbix(_Zabbix):
     """
@@ -1524,3 +1550,11 @@ class Zabbix(object):
     def node_history(self, node_id, items, zhistory, since, until, items_search=None):
         """[INTERNAL] Return node history data for selected graph and period"""
         return self.izx.get_history(node_id, items, zhistory, since, until, items_search=items_search)
+
+    def template_list(self):
+        """[EXTERNAL] Return list of available templates"""
+        return self.ezx.get_template_list()
+
+    def hostgroup_list(self):
+        """[EXTERNAL] Return list of available hostgroups"""
+        return self.ezx.get_hostgroup_list()

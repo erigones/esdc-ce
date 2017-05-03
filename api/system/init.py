@@ -170,6 +170,7 @@ def init_mgmt(head_node, images=None):
     # Setup miscellaneous stuff depending on admin network info
     try:
         mgmt_ifconfig = get_local_netinfo()
+        mgmt_ifconfig['vlan_id'] = head_node.vlan_id
         mgmt_ip = mgmt_ifconfig['addr']
 
         try:
