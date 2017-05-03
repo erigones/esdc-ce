@@ -8,6 +8,7 @@ Features
 --------
 
 - Create required `domainmetadata` for every newly created domain - `#151 <https://github.com/erigones/esdc-ce/issues/151>`__
+- Added support for updating VLAN ID on admin network during mgmt initialization - `#166 <https://github.com/erigones/esdc-ce/issues/166>`__
 
 Bugs
 ----
