@@ -428,7 +428,7 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
             for iface, iface_info in sysinfo['Network Interfaces'].items():
                 if 'admin' in iface_info.get('NIC Names', ()):
                     admin_iface = iface_info
-                    ip = iface_info.get('ip4addr', None)
+                    ip = admin_iface.get('ip4addr', None)
                     break
 
             if not ip:
