@@ -62,6 +62,8 @@ function update_form_fields(form, form_data, prefix) {
 
 function select_tags_enable(elements, options) {
   options = options || {};
+  mon_templates_reset();
+  mon_hostgroups_reset();
 
   elements.each(function() {
     var input = $(this);
