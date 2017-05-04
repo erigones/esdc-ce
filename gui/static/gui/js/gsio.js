@@ -391,6 +391,10 @@ function message_callback(code, res, view, method, args, kwargs, apiview, apidat
     return false;
   }
 
+  if ('view' in apiview) {
+    view = apiview.view;
+  }
+
   if ('data' in kwargs) {
     data = kwargs.data;
   }
@@ -515,6 +519,12 @@ function message_callback(code, res, view, method, args, kwargs, apiview, apidat
       case 'mon_node_history': // mon_node_history started
         return; // do not update cached_tasklog
 
+      case 'mon_template_list': // mon_template_list started
+      case 'mon_node_template_list':
+      case 'mon_hostgroup_list': // mon_hostgroup_list started
+      case 'mon_node_hostgroup_list':
+        return; // do not update cached_tasklog
+
       case 'node_image': // node_image started
         if (method == 'DELETE') { // POST node_image() will not affect DB, so not update is needed (except tasklog)
           node_image_update(args[0], args[1] || kwargs.zpool, args[2] || kwargs.name, false, 3, 'deleting');
@@ -551,6 +561,12 @@ function message_callback(code, res, view, method, args, kwargs, apiview, apidat
       case 'mon_vm_history': // mon_vm_history failed
       case 'mon_node_history': // mon_node_history failed
         mon_history_update(view.split('_', 2)[1], args[0], args[1], data, null, _message_from_result(res));
+        return; // do not update cached_tasklog
+
+      case 'mon_template_list': // mon_template_list failed
+      case 'mon_node_template_list':
+      case 'mon_hostgroup_list': // mon_hostgroup_list failed
+      case 'mon_node_hostgroup_list':
         return; // do not update cached_tasklog
 
       case 'vm_backup': // vm_backup failed
@@ -648,6 +664,15 @@ function message_callback(code, res, view, method, args, kwargs, apiview, apidat
       case 'mon_vm_history': // mon_vm_history result from cache
       case 'mon_node_history': // mon_node_history result from cache
         mon_history_update(view.split('_', 2)[1], args[0], args[1], data, res.result);
+        return; // do not update cached_tasklog
+
+      case 'mon_template_list': // mon_template_list result from cache
+      case 'mon_node_template_list':
+        mon_templates_update(res.result);
+        return; // do not update cached_tasklog
+      case 'mon_hostgroup_list': // mon_hostgroup_list result from cache
+      case 'mon_node_hostgroup_list':
+        mon_hostgroups_update(res.result);
         return; // do not update cached_tasklog
     }
   }
@@ -955,6 +980,19 @@ function _task_status_callback(res, apiview) {
 
       mon_history_update(obj_type, hostname, apiview.graph, apiview.graph_params, result, error);
 
+      return false; // do not update cached_tasklog
+
+    case 'mon_template_list':
+    case 'mon_node_template_list':
+      if (res.status == 'SUCCESS') {
+        mon_templates_update(result);
+      }
+      return false; // do not update cached_tasklog
+    case 'mon_hostgroup_list':
+    case 'mon_node_hostgroup_list':
+      if (res.status == 'SUCCESS') {
+        mon_hostgroups_update(result);
+      }
       return false; // do not update cached_tasklog
 
 

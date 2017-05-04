@@ -13,12 +13,19 @@ Features
 - Updated API call `PUT vm_manage` to support forced change of the node on the VM - `#154 <https://github.com/erigones/esdc-ce/issues/154>`__
 - Create required `domainmetadata` for every newly created domain - `#151 <https://github.com/erigones/esdc-ce/issues/151>`__
 - Updated backup functionality to store metadata on backup node - `#155 <https://github.com/erigones/esdc-ce/issues/155>`__
+- Added GET mon_template_list and GET mon_hostgroup_list API views for listing monitoring templates and hostgroups - `#90 <https://github.com/erigones/esdc-ce/issues/90>`__
+- Added dropdown menus (with tags support) to form fields for selecting monitoring templates and hostgroups - `#90 <https://github.com/erigones/esdc-ce/issues/90>`__
+- Create required `domainmetadata` for every newly created domain - `#151 <https://github.com/erigones/esdc-ce/issues/151>`__
+- Added support for updating VLAN ID on admin network during mgmt initialization - `#166 <https://github.com/erigones/esdc-ce/issues/166>`__
+- Allowed migration of Danube Cloud internal (service) VMs - `#167 <https://github.com/erigones/esdc-ce/issues/167>`__
 
 Bugs
 ----
 
 - Fixed VM hostname fetching in `message_callback` (GUI/JS) - `#159 <https://github.com/erigones/esdc-ce/issues/159>`__
 
+- Create required `domainmetadata` for every newly created domain - `#151 <https://github.com/erigones/esdc-ce/issues/151>`__
+- Do not display *pending* status when desired VM status was already reached - `#152 <https://github.com/erigones/esdc-ce/issues/152>`__
 
 
 2.5.2 (released on 2017-04-11)

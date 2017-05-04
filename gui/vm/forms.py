@@ -233,12 +233,14 @@ class AdminServerSettingsForm(ServerSettingsForm):
     owner = forms.ChoiceField(label=_('Owner'), required=False,
                               widget=forms.Select(attrs={'class': 'narrow input-select2'}))
 
-    monitoring_templates = ArrayField(label=_('Monitoring templates'), required=False,
+    monitoring_templates = ArrayField(label=_('Monitoring templates'), required=False, tags=True,
                                       help_text=_('Comma-separated list of custom monitoring templates.'),
-                                      widget=ArrayWidget(attrs={'class': 'input-transparent narrow'}))
-    monitoring_hostgroups = ArrayField(label=_('Monitoring hostgroups'), required=False,
+                                      widget=ArrayWidget(tags=True, escape_space=False,
+                                                         attrs={'class': 'tags-select2 narrow'}))
+    monitoring_hostgroups = ArrayField(label=_('Monitoring hostgroups'), required=False, tags=True,
                                        help_text=_('Comma-separated list of custom monitoring hostgroups.'),
-                                       widget=ArrayWidget(attrs={'class': 'input-transparent narrow'}))
+                                       widget=ArrayWidget(tags=True, escape_space=False,
+                                                          attrs={'class': 'tags-select2 narrow'}))
     mdata = DictField(label=_('Metadata'), required=False,
                       help_text=_('key=value string pairs.'),
                       widget=DictWidget(attrs={
@@ -249,6 +251,7 @@ class AdminServerSettingsForm(ServerSettingsForm):
 
     def __init__(self, request, vm, *args, **kwargs):
         super(AdminServerSettingsForm, self).__init__(request, vm, *args, **kwargs)
+        dc_settings = request.dc.settings
         self.is_kvm = is_kvm(vm, self.data, prefix='opt-')
         # Set choices
         self.vm_nodes = get_nodes(request, is_compute=True)
@@ -263,6 +266,12 @@ class AdminServerSettingsForm(ServerSettingsForm):
             self.fields['zfs_io_priority'].widget.attrs['disabled'] = 'disabled'
             self.fields['zfs_io_priority'].widget.attrs['class'] += ' uneditable-input'
 
+        if dc_settings.MON_ZABBIX_TEMPLATES_VM_RESTRICT:
+            self.fields['monitoring_templates'].widget.tag_choices = dc_settings.MON_ZABBIX_TEMPLATES_VM_ALLOWED
+
+        if dc_settings.MON_ZABBIX_HOSTGROUPS_VM_RESTRICT:
+            self.fields['monitoring_hostgroups'].widget.tag_choices = dc_settings.MON_ZABBIX_HOSTGROUPS_VM_ALLOWED
+
         if vm:
             empty_template_data = {}
             self.fields['ostype'].widget.attrs['disabled'] = 'disabled'
@@ -275,7 +284,7 @@ class AdminServerSettingsForm(ServerSettingsForm):
             ostype = [i for i in Vm.OSTYPE if i[0] != Vm.LINUX_ZONE]
 
             # Disable zone support _only_ when adding new VM (zone must be available in edit mode) - Issue #chili-461
-            if not request.dc.settings.VMS_ZONE_ENABLED:
+            if not dc_settings.VMS_ZONE_ENABLED:
                 # Remove SunOS Zone support
                 ostype = [i for i in ostype if i[0] != Vm.SUNOS_ZONE]
 

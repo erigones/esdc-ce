@@ -28,16 +28,22 @@ __all__ = (
 HTML5_ATTRS = frozendict({'autocorrect': 'off', 'autocapitalize': 'off', 'spellcheck': 'false'})
 
 
-def edit_string_for_items(array):
+def edit_string_for_items(array, escape_space=True, escape_comma=True, sort=False):
     """Like taggit.utils.edit_string_for_tags, but with list/tuple as input and without sorting"""
     items = []
     for i in array:
         if not isinstance(i, six.string_types):
             i = str(i)
-        if ',' in i or ' ' in i:
+        if escape_space and ' ' in i:
+            items.append('"%s"' % i)
+        if escape_comma and ',' in i:
             items.append('"%s"' % i)
         else:
             items.append(i)
+
+    if sort:
+        items.sort()
+
     return ','.join(items)
 
 
@@ -63,9 +69,25 @@ class _DefaultAttrsWidget(widgets.Widget):
 
 
 class ArrayWidget(_DefaultAttrsWidget, widgets.TextInput):
+    tag_choices = None
+
+    def __init__(self, *args, **kwargs):
+        self.tags = kwargs.pop('tags', False)
+        self.escape_space = kwargs.pop('escape_space', True)
+        self.escape_comma = kwargs.pop('escape_comma', True)
+        super(ArrayWidget, self).__init__(*args, **kwargs)
+
+    def build_attrs(self, *args, **kwargs):
+        if self.tag_choices:
+            tags = json.dumps(self.tag_choices, indent=None, cls=JSONEncoder)
+            kwargs['data-tags-choices'] = mark_safe(conditional_escape(tags))
+
+        return super(ArrayWidget, self).build_attrs(*args, **kwargs)
+
     def render(self, name, value, attrs=None):
         if value is not None and not isinstance(value, six.string_types):
-            value = edit_string_for_items(value)
+            value = edit_string_for_items(value, escape_space=self.escape_space, escape_comma=self.escape_comma,
+                                          sort=self.tags)
         return super(ArrayWidget, self).render(name, value, attrs=attrs)
 
 
@@ -196,6 +218,6 @@ class TagWidget(_TagWidget):
     def build_attrs(self, *args, **kwargs):
         if self.tag_choices:
             tags = json.dumps(self.tag_choices, indent=None, cls=JSONEncoder)
-            kwargs['data-tags'] = mark_safe(conditional_escape(tags))
+            kwargs['data-tags-choices'] = mark_safe(conditional_escape(tags))
 
         return super(TagWidget, self).build_attrs(*args, **kwargs)

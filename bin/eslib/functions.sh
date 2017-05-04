@@ -465,6 +465,12 @@ _vm_delete() {
 	${VMADM} delete "${uuid}"
 }
 
+_vm_remove_indestructible_property() {
+	local uuid="$1"
+
+	echo '{"indestructible_zoneroot": false, "indestructible_delegated": false}' | vmadm update "${uuid}"
+}
+
 _vm_property() {
 	local json="$1"
 	local property="$2"
