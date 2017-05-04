@@ -223,6 +223,7 @@ def vm_update_cb(result, task_id, vm_uuid=None, new_node_uuid=None):
         ignored_changed_vm_attrs = (
             'set_customer_metadata',
             'remove_customer_metadata',
+            'create_timestamp',
             'boot_timestamp',
             'autoboot',
             'vnc_port',
