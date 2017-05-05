@@ -36,6 +36,38 @@ def _reset_allowed_ip_usage(vm, ip):
         ip.save()
 
 
+def _is_ip_ok(ip_queryset, vm_ip, vm_network_uuid):
+    """Helper function used below. Return True if vm_ip (string) is found in the IPAddress queryset and has the
+    expected usage flag and subnet uuid."""
+    return any(ip.ip == vm_ip and ip.subnet.uuid == vm_network_uuid and ip.usage == IPAddress.VM_REAL
+               for ip in ip_queryset)
+
+
+def _save_ip_vm_association(vm, nic_id, ip, network_uuid, allowed_ips=False):
+    """Helper function used below for unassociated IP addresses. Check if an IP address can be associated with a VM
+    and update the VM<->IPAddress association if possible."""
+    try:
+        wanted_ip = IPAddress.objects.select_related('vm').get(subnet__uuid=network_uuid, ip=ip)
+    except IPAddress.DoesNotExist:
+        logger.error('IP address %s (subnet %s) for VM %s NIC ID %s (allowed_ips=%s) does not exist',
+                     ip, network_uuid, vm, nic_id, allowed_ips)
+    else:
+        if not wanted_ip.vm and wanted_ip.usage in (IPAddress.VM, IPAddress.VM_REAL):
+            logger.warning('Saving IP address %s (subnet %s) association with VM %s NIC ID %s (allowed_ips=%s)',
+                           ip, network_uuid, vm, nic_id, allowed_ips)
+            wanted_ip.usage = IPAddress.VM_REAL
+
+            if allowed_ips:
+                wanted_ip.vms.add(vm)
+            else:
+                wanted_ip.vm = vm
+
+            wanted_ip.save()
+        else:
+            logger.critical('IP address %s (subnet %s) for VM %s NIC ID %s (allowed_ips=%s) is already used by %s %s',
+                            ip, network_uuid, vm, nic_id, allowed_ips, wanted_ip.get_usage_display(), wanted_ip.vm)
+
+
 def vm_update_ipaddress_usage(vm):
     """
     This helper function is responsible for updating IPAddress.usage and IPAddress.vm of server IPs (#chili-615,1029),
@@ -65,10 +97,38 @@ def vm_update_ipaddress_usage(vm):
         for ip in vm.allowed_ips.filter(usage=IPAddress.VM_REAL):
             _reset_allowed_ip_usage(vm, ip)
 
-    else:
-        # Server was updated or created
-        vm.ipaddress_set.filter(usage=IPAddress.VM).update(usage=IPAddress.VM_REAL)
-        vm.allowed_ips.filter(usage=IPAddress.VM).update(usage=IPAddress.VM_REAL)
+        return
+
+    # Server was updated or created
+    vm.ipaddress_set.filter(usage=IPAddress.VM).update(usage=IPAddress.VM_REAL)
+    vm.allowed_ips.filter(usage=IPAddress.VM).update(usage=IPAddress.VM_REAL)
+
+    # The VM configuration may be changed directly on the hypervisor, thus the VM could have
+    # new NICs and IP addresses which configuration bypassed our API - issue #168.
+    vm_ips = vm.ipaddress_set.select_related('subnet').filter(usage=IPAddress.VM_REAL)
+    vm_allowed_ips = vm.allowed_ips.select_related('subnet').filter(usage=IPAddress.VM_REAL)
+    # For issue #168 we have to check the VM<->IPAddress association in a loop for each NIC, because we need to
+    # match the NIC.network_uuid with a Subnet.
+    for nic_id, nic in enumerate(vm.json_active_get_nics(), 1):
+        network_uuid = nic.get('network_uuid', None)
+
+        if network_uuid:
+            ip = nic.get('ip', '')
+            allowed_ips = nic.get('allowed_ips', ())
+
+            if ip:
+                if _is_ip_ok(vm_ips, ip, network_uuid):
+                    logger.debug('VM %s NIC ID %s IP address %s is OK', vm, nic_id, ip)
+                else:
+                    _save_ip_vm_association(vm, nic_id, ip, network_uuid, allowed_ips=False)
+
+            for ip in allowed_ips:
+                if _is_ip_ok(vm_allowed_ips, ip, network_uuid):
+                    logger.debug('VM %s NIC ID %s allowed IP address %s is OK', vm, nic_id, ip)
+                else:
+                    _save_ip_vm_association(vm, nic_id, ip, network_uuid, allowed_ips=True)
+        else:
+            logger.error('VM %s NIC ID %s does not have a network uuid!', vm, nic_id)
 
 
 def vm_deploy(vm, force_stop=False):
