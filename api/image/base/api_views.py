@@ -1,6 +1,5 @@
 from logging import getLogger
 
-from django.conf import settings
 from django.utils.translation import ugettext_noop as _
 from django.core.exceptions import ObjectDoesNotExist
 
