@@ -19,7 +19,7 @@ class ImageStoreImageView(APIView):
         self.data = data
         self.name = name
         self.uuid = uuid
-        repositories = ImageStore.get_repositories()
+        repositories = ImageStore.get_repositories(include_image_vm=request.user.is_staff)
 
         try:
             self.repo = ImageStore(name, url=repositories[name])

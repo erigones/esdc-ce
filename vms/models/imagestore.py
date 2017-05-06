@@ -100,13 +100,13 @@ class ImageStore(_DummyModel):
         return '<%s: %s>' % (self.__class__.__name__, self.name)
 
     @staticmethod
-    def get_repositories():
+    def get_repositories(include_image_vm=False):
         from vms.models.image import ImageVm  # circular imports
 
         repos = OrderedDict(sorted(iteritems(DefaultDc().settings.VMS_IMAGE_REPOSITORIES)))
         image_vm = ImageVm()
 
-        if image_vm:
+        if include_image_vm and image_vm:
             repos[image_vm.repo_name] = image_vm.repo_url
 
         return repos

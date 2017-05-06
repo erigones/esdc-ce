@@ -185,7 +185,7 @@ def imagestore_list(request, repo=None):
         except (ValueError, TypeError):
             limit = default_limit
 
-    repositories = ImageStore.get_repositories()
+    repositories = ImageStore.get_repositories(include_image_vm=request.user.is_staff)
     context['imagestores'] = imagestores = ImageStore.all(repositories)
     context['created_since'] = created_since_days
     context['limit'] = limit
@@ -220,7 +220,7 @@ def imagestore_update(request, repo):
     """
     Ajax page for refreshing imagestore repositories.
     """
-    if repo not in ImageStore.get_repositories():
+    if repo not in ImageStore.get_repositories(include_image_vm=request.user.is_staff):
         raise Http404
 
     res = call_api_view(request, 'PUT', imagestore_manage, repo, log_response=True)

@@ -16,7 +16,7 @@ def imagestore_list(request, data=None):
 :http:put:`VMS_IMAGE_REPOSITORIES </dc/(dc)/settings>` global setting.
 
     .. note:: If a global image server (:http:put:`VMS_IMAGE_VM </dc/(dc)/settings>`) is configured in the system, \
-the list will automatically include a local repository named after the image server.
+the list will automatically include a local repository named after the image server (requires |SuperAdmin| permission).
 
     .. http:get:: /imagestore
 
