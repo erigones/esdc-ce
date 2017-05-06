@@ -2,13 +2,23 @@ Changelog
 #########
 
 2.6.0 (unreleased)
-2.5.3 (unreleased)
 ==================
 
 Features
 --------
 
 - Added ability to import images from local image server - `#140 <https://github.com/erigones/esdc-ce/issues/140>`__
+
+Bugs
+----
+
+
+2.5.3 (unreleased)
+==================
+
+Features
+--------
+
 - Added requests and esdc-api into requirements on mgmt and CN - commit `d7be2ca <https://github.com/erigones/esdc-ce/commit/d7be2ca1065103459a1708b5d1c5d6be7bcfac3f>`__
 - Removed head node flag in GUI - `esdc-docs#13 <https://github.com/erigones/esdc-docs/issues/13>`__
 - Add support for appending additional SSH authorized_keys into the service VMs - `esdc-factory#43 <https://github.com/erigones/esdc-factory/issues/43>`__
