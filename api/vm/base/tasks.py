@@ -5,13 +5,14 @@ from que.mgmt import MgmtCallbackTask
 from que.utils import user_id_from_task_id
 from que.exceptions import TaskException
 from gui.models import User
-from vms.models import Vm, Snapshot, SnapshotDefine, BackupDefine
-from vms.signals import vm_created, vm_deployed, vm_notcreated, vm_json_active_changed
+from vms.models import Vm, Snapshot, SnapshotDefine, BackupDefine, Node
+from vms.signals import vm_created, vm_deployed, vm_notcreated, vm_json_active_changed, vm_node_changed
 from api.email import sendmail
 from api.utils.request import get_dummy_request
 from api.task.tasks import task_log_cb_success, task_log_cb_error
 from api.task.utils import callback
-from api.vm.base.utils import is_vm_missing, vm_update_ipaddress_usage, vm_delete_snapshots_of_removed_disks, vm_reset
+from api.vm.base.utils import (is_vm_missing, vm_update_ipaddress_usage, vm_delete_snapshots_of_removed_disks,
+                               vm_reset, vm_update)
 from api.vm.status.tasks import vm_status_changed, vm_status_one
 from api.vm.snapshot.vm_define_snapshot import SnapshotDefineView
 from api.vm.backup.vm_define_backup import BackupDefineView
@@ -197,7 +198,7 @@ def vm_create_cb(result, task_id, vm_uuid=None):
 
 @cq.task(name='api.vm.base.tasks.vm_update_cb', base=MgmtCallbackTask, bind=True)
 @callback()
-def vm_update_cb(result, task_id, vm_uuid=None):
+def vm_update_cb(result, task_id, vm_uuid=None, new_node_uuid=None):
     """
     A callback function for api.vm.base.views.vm_manage.
     """
@@ -208,20 +209,52 @@ def vm_update_cb(result, task_id, vm_uuid=None):
 
     if result['returncode'] == 0 and (force or msg.find('Successfully updated') >= 0):
         json = result.pop('json', None)
+
         try:  # save json from smartos
             json_active = vm.json.load(json)
-            vm_delete_snapshots_of_removed_disks(vm)  # Do this before updating json and json_active
-            vm.json_active = json_active
-            vm.json = json_active
         except Exception as e:
             logger.exception(e)
             logger.error('Could not parse json output from PUT vm_manage(%s). Error: %s', vm_uuid, e)
             raise TaskException(result, 'Could not parse json output')
-        else:
-            vm.save(update_node_resources=True, update_storage_resources=True,
-                    update_fields=('enc_json', 'enc_json_active', 'changed'))
-            vm_update_ipaddress_usage(vm)
-            vm_json_active_changed.send(task_id, vm=vm)  # Signal!
+
+        vm_delete_snapshots_of_removed_disks(vm)  # Do this before updating json and json_active
+        vm.json = json_active
+        update_fields = ['enc_json', 'enc_json_active', 'changed']
+        ignored_changed_vm_attrs = (
+            'set_customer_metadata',
+            'remove_customer_metadata',
+            'create_timestamp',
+            'boot_timestamp',
+            'autoboot',
+            'vnc_port',
+        )
+
+        if new_node_uuid:
+            update_dict = vm.json_update()
+
+            for i in ignored_changed_vm_attrs:
+                update_dict.pop(i, None)
+
+            if update_dict:
+                raise TaskException(result, 'VM definition on compute node differs from definition in DB in '
+                                    'following attributes: %s' % ','.join(update_dict.keys()))
+            update_fields.append('node_id')
+
+        vm.json_active = json_active
+
+        if new_node_uuid:
+            node = Node.objects.get(uuid=new_node_uuid)
+            vm.set_node(node)
+
+        vm.save(update_node_resources=True, update_storage_resources=True, update_fields=update_fields)
+        vm_update_ipaddress_usage(vm)
+        vm_json_active_changed.send(task_id, vm=vm)  # Signal!
+
+        if new_node_uuid:
+            vm_node_changed.send(task_id, vm=vm, force_update=True)  # Signal!
+            result['message'] = 'Node association successfully changed on VM %s' % vm.hostname
+            if vm.json_changed():
+                vm_update(vm)
 
     else:
         logger.error('Found nonzero returncode in result from PUT vm_manage(%s). Error: %s', vm_uuid, msg)

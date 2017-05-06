@@ -24,6 +24,8 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
     Node (host) object.
     """
     _esysinfo = ('sysinfo', 'diskinfo', 'zpools')
+    _vlan_id = None
+
     ZPOOL = 'zones'
     # Used in NodeStorage.size_vms
     VMS_SIZE_TOTAL_KEY = 'vms-size-total:%s'  # %s = zpool.id (NodeStorage)
@@ -279,6 +281,11 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
         self.address = address
 
     @property
+    def vlan_id(self):
+        assert self._vlan_id is not None, 'vlan_id is available only during node initialization'
+        return self._vlan_id
+
+    @property
     def esysinfo(self):  # esysinfo is a dictionary consisting of 3 items: sysinfo, diskinfo, zpools
         _json = self.json
         return {i: _json.get(i, {}) for i in self._esysinfo}
@@ -416,13 +423,21 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
 
         if update_ip:
             ip = None  # get ip address from sysinfo
-            for iface, i in sysinfo['Network Interfaces'].items():
-                ip = i['ip4addr']
-                if ip and 'admin' in i['NIC Names']:
+            admin_iface = None
+
+            for iface, iface_info in sysinfo['Network Interfaces'].items():
+                if 'admin' in iface_info.get('NIC Names', ()):
+                    admin_iface = iface_info
+                    ip = admin_iface.get('ip4addr', None)
                     break
+
+            if not ip:
+                admin_iface = sysinfo.get('Virtual Network Interfaces', {}).get('admin0', {})
+                ip = admin_iface.get('ip4addr', None)
 
             assert ip, 'Node IP Address not found in sysinfo output'
 
+            self._vlan_id = admin_iface.get('VLAN', 0)  # Used by api.system.init.init_mgmt()
             self.ip_address = ip
 
     def sysinfo_changed(self, esysinfo):

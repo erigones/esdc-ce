@@ -220,6 +220,7 @@ class APINamespace(BaseNamespace):
             return
         elif tt == TT_MGMT:
             self.log('Ignoring mgmt task %s, because we never called it', task_id, level=DEBUG)
+            return
 
         self.last_tasks.append(task_id)
         r = self._api_task_status(task_id)

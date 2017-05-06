@@ -1,6 +1,5 @@
 from logging import getLogger
 
-from django.conf import settings
 from django.utils.translation import ugettext_noop as _
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -174,9 +173,6 @@ class ImageView(TaskAPIView):
         img, data, request = self.img, self.data, self.request
 
         assert request.dc == vm.dc
-
-        if vm.uuid in settings.VMS_INTERNAL:  # Bug #chili-792
-            raise PreconditionRequired('Internal VM can\'t be used for creating images')
 
         data.pop('dc_bound', None)  # Default DC binding cannot be changed when creating Image for the first time
         img.dc_bound = vm.dc        # Default DC binding set to VM DC (cannot be changed, ^^^)

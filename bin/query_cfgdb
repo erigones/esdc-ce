@@ -1,0 +1,22 @@
+#!/bin/sh
+
+ZKCLI=/usbkey/scripts/zookeepercli
+QUERY_STRING="$@"
+
+if [ -z "${QUERY_STRING}" ]; then
+		echo "Usage:   $0 <query>" 1>&2
+		echo "Example: $0 ls /esdc/nodes" 1>&2
+		exit 10
+fi
+
+if [ ! -x "${ZKCLI}" ]; then
+		echo "Error: Cannot find binary ${ZKCLI}" 1>&2
+		exit 20
+fi
+
+# find and load config file (usually /usbkey/config
+. /lib/sdc/config.sh
+load_sdc_config
+
+"${ZKCLI}" -servers "${CONFIG_cfgdb_admin_ip}" -auth_usr "esdc" -auth_pwd "${CONFIG_esdc_install_password}" -c ${QUERY_STRING}
+exit $?

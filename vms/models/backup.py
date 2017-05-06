@@ -128,6 +128,7 @@ class Backup(_VmDiskModel, _StatusModel, _JsonPickleModel):
     name = models.CharField(_('Name'), max_length=32)  # define name + timestamp
     status = models.SmallIntegerField(_('Status'), choices=STATUS)
     file_path = models.CharField(_('File path'), max_length=255, blank=True)
+    manifest_path = models.CharField(_('Manifest path'), max_length=255, blank=True)
     checksum = models.CharField(_('Checksum'), max_length=40, blank=True)
     node = models.ForeignKey(Node, verbose_name=_('Node'))
     zpool = models.ForeignKey(NodeStorage, verbose_name=_('Zpool'))
@@ -238,6 +239,18 @@ class Backup(_VmDiskModel, _StatusModel, _JsonPickleModel):
         # zones/backups/ds/<uuid>-disk0
         return path.join(self.zpool.zpool, self.dc.settings.VMS_VM_BACKUP_DS_DIR,
                          '%s-disk%s' % (self.vm_uuid, self.disk_id))
+
+    def create_file_manifest_path(self):
+        """Return backup file manifest path"""
+        # /zones/backups/manifests/file/<uuid>/disk0/<file_name>.zfs.json
+        return path.join('/', self.zpool.zpool, self.dc.settings.VMS_VM_BACKUP_MANIFESTS_FILE_DIR, self.vm_uuid,
+                         'disk%s' % self.disk_id, '%s.json' % self.file_name)
+
+    def create_dataset_manifest_path(self):
+        """Return backup dataset manifest path"""
+        # zones/backups/manifests/ds/<uuid>-disk0/<snap_name>.json
+        return path.join('/', self.zpool.zpool, self.dc.settings.VMS_VM_BACKUP_MANIFESTS_DS_DIR,
+                         '%s-disk%s' % (self.vm_uuid, self.disk_id), '%s.json' % self.snap_name)
 
     @classmethod
     def get_total_dc_size(cls, dc):

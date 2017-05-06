@@ -1,6 +1,31 @@
 Changelog
 #########
 
+2.5.3 (unreleased)
+==================
+
+Features
+--------
+
+- Added requests and esdc-api into requirements on mgmt and CN - commit `d7be2ca <https://github.com/erigones/esdc-ce/commit/d7be2ca1065103459a1708b5d1c5d6be7bcfac3f>`__
+- Removed head node flag in GUI - `esdc-docs#13 <https://github.com/erigones/esdc-docs/issues/13>`__
+- Add support for appending additional SSH authorized_keys into the service VMs - `esdc-factory#43 <https://github.com/erigones/esdc-factory/issues/43>`__
+- Added GET mon_template_list and GET mon_hostgroup_list API views for listing monitoring templates and hostgroups - `#90 <https://github.com/erigones/esdc-ce/issues/90>`__
+- Added dropdown menus (with tags support) to form fields for selecting monitoring templates and hostgroups - `#90 <https://github.com/erigones/esdc-ce/issues/90>`__
+- Create required `domainmetadata` for every newly created domain - `#151 <https://github.com/erigones/esdc-ce/issues/151>`__
+- Updated API call `PUT vm_manage` to support forced change of the node on the VM - `#154 <https://github.com/erigones/esdc-ce/issues/154>`__
+- Updated backup functionality to store metadata on backup node - `#155 <https://github.com/erigones/esdc-ce/issues/155>`__
+- Added support for updating VLAN ID on admin network during mgmt initialization - `#166 <https://github.com/erigones/esdc-ce/issues/166>`__
+- Allowed migration of Danube Cloud internal (service) VMs - `#167 <https://github.com/erigones/esdc-ce/issues/167>`__
+
+Bugs
+----
+
+- Create required `domainmetadata` for every newly created domain - `#151 <https://github.com/erigones/esdc-ce/issues/151>`__
+- Do not display *pending* status when desired VM status was already reached - `#152 <https://github.com/erigones/esdc-ce/issues/152>`__
+- Fixed VM hostname fetching in `message_callback` (GUI/JS) - `#159 <https://github.com/erigones/esdc-ce/issues/159>`__
+
+
 2.5.2 (released on 2017-04-11)
 ==============================
 

@@ -50,6 +50,8 @@ class DcForm(SerializerForm):
 
 
 select_widget = {'class': 'narrow input-select2'}
+mon_templates_widget = {'class': 'table-tags-select2', 'data-tags-type': 'mon_templates'}
+mon_hostgroups_widget = {'class': 'table-tags-select2', 'data-tags-type': 'mon_hostgroups'}
 
 
 class DcSettingsForm(SerializerForm):
@@ -92,13 +94,24 @@ class DcSettingsForm(SerializerForm):
         'VMS_NET_DEFAULT': select_widget,
         'VMS_STORAGE_DEFAULT': select_widget,
         'SITE_SIGNATURE': {'rows': 2},
-        'VMS_VM_MDATA_DEFAULT': {'data-raw_input_enabled': 'true'}
+        'VMS_VM_MDATA_DEFAULT': {'data-raw_input_enabled': 'true'},
     })
 
     not_advanced = frozenset(set(DcSettingsSerializer.modules) - {'VMS_ZONE_ENABLED'} | {'dc'})
     third_party_modules = frozenset(DcSettingsSerializer.third_party_modules)
     third_party_settings = DcSettingsSerializer.third_party_settings
-
+    mon_hostgroup_list_fields = (
+        'MON_ZABBIX_HOSTGROUPS_VM',
+        'MON_ZABBIX_HOSTGROUPS_VM_ALLOWED',
+        'MON_ZABBIX_HOSTGROUPS_NODE',
+    )
+    mon_template_list_fields = (
+        'MON_ZABBIX_TEMPLATES_VM',
+        'MON_ZABBIX_TEMPLATES_VM_ALLOWED',
+        'MON_ZABBIX_TEMPLATES_VM_NIC',
+        'MON_ZABBIX_TEMPLATES_VM_DISK',
+        'MON_ZABBIX_TEMPLATES_NODE',
+    )
     globals = frozenset()
 
     def __init__(self, request, obj, *args, **kwargs):
@@ -137,6 +150,18 @@ class DcSettingsForm(SerializerForm):
         if self._disable_globals and source in self.globals:
             form_field_options['widget'].attrs['disabled'] = 'disabled'
             form_field_options['required'] = False
+
+        if self.table:
+            if source in self.mon_hostgroup_list_fields:
+                form_field_options['tags'] = True
+                form_field_options['widget'].tags = True
+                form_field_options['widget'].escape_space = False
+                form_field_options['widget'].attrs = mon_hostgroups_widget
+            elif source in self.mon_template_list_fields:
+                form_field_options['tags'] = True
+                form_field_options['widget'].tags = True
+                form_field_options['widget'].escape_space = False
+                form_field_options['widget'].attrs = mon_templates_widget
 
         return super(DcSettingsForm, self)._build_field(name, serializer_field, form_field_class, **form_field_options)
 

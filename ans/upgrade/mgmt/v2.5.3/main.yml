@@ -1,0 +1,21 @@
+
+# esdc-factory#43
+- name: Update post-deploy script
+  copy: src="{{ current_task_dir }}/files/50-es-post-deploy.sh" dest=/var/lib/rc-scripts/50-es-post-deploy.sh mode=0750 owner=root group=root
+
+# Related to:
+#  - https://github.com/erigones/esdc-ce/issues/118
+#  - https://github.com/erigones/esdc-factory/issues/41
+#  - https://github.com/erigones/esdc-ce/issues/151
+- name: Create default domainmetadata for existing DNS domains
+  local_action:
+    module: shell
+    args: python "{{ current_task_dir }}/files/pdns_sync_domainmetadata.py"
+  environment:
+    ERIGONES_HOME: "{{ erigones_home }}"
+    PYTHONPATH: "{{ erigones_home }}:$PYTHONPATH"
+    VIRTUAL_ENV: "{{ erigones_home }}/envs"
+    PATH: "{{ erigones_home }}/bin:{{ erigones_home }}/envs/bin:$PATH"
+    DJANGO_SETTINGS_MODULE: "core.settings"
+  register: pdns_sync_domainmetadata_result
+  changed_when: "'Inserted domainmetadata' in pdns_sync_domainmetadata_result.stdout"

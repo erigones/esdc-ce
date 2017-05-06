@@ -38,6 +38,32 @@ def t_uuid(value):
     raise ArgumentTypeError('Invalid uuid: "%s"' % value)
 
 
+def t_file(value):
+    fp = filter(None, value.split('/'))
+
+    try:
+        map(t_ascii, fp)
+    except ArgumentTypeError:
+        pass
+
+    return value
+
+
+def t_dataset(value):
+    """Dataset validator"""
+    ds = value.split('/')
+
+    if len(ds) > 1:
+        try:
+            map(t_ascii, ds)
+        except ArgumentTypeError:
+            pass
+        else:
+            return value
+
+    raise ArgumentTypeError('Invalid dataset: "%s"' % value)
+
+
 def t_python_fun(string):
     """Return imported python function"""
     try:

@@ -7,6 +7,7 @@ function DcSettings(input_tooltip_disabled_msg) {
   var select = null;
   var mdata_input = null;
   var array_input = null;
+  var select_tags = null;
   var mbytes_input = null;
 
   function init_table() {
@@ -16,6 +17,8 @@ function DcSettings(input_tooltip_disabled_msg) {
     mdata_enable(mdata_input);
     array_input = table.find('textarea.input-array');
     array_enable(array_input);
+    select_tags = table.find('input.table-tags-select2');
+    select_tags_enable(select_tags, {width: '100%'});
     mbytes_input = table.find('.input-mbytes');
     mbytes_enable(mbytes_input);
   }
