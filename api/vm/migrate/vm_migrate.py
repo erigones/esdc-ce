@@ -1,5 +1,3 @@
-from django.conf import settings
-
 from que.tasks import execute
 from api.api_views import APIView
 from api.exceptions import VmIsNotOperational, VmHasPendingTasks, VmIsLocked, PreconditionRequired
