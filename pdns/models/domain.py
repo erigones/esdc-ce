@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, connections
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import get_user_model
@@ -201,3 +201,12 @@ class Domain(models.Model):
     def get_log_name_lookup_kwargs(log_name_value):
         """Return lookup_key=value DB pairs which can be used for retrieving objects by log_name value"""
         return {'name': log_name_value}
+
+    # noinspection PyUnusedLocal
+    @staticmethod
+    def post_save_domain(sender, instance, created, **kwargs):
+        """Called via signal after domain has been saved to database"""
+        if created:
+            with connections['pdns'].cursor() as cursor:
+                cursor.execute("INSERT INTO domainmetadata (domain_id, kind, content) VALUES "
+                               "(%s, 'ALLOW-AXFR-FROM', 'AUTO-NS')", [instance.id])

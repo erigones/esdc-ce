@@ -808,6 +808,10 @@ destroy_snapshots_dst() {
 _delete_vm() {
 	local uuid="$1"
 
+	if _vm_property "${JSON_SRC}" "indestructible_zoneroot" &> /dev/null; then
+		_vm_remove_indestructible_property &>/dev/null
+	fi
+
 	_vm_destroy "${uuid}" > /dev/null
 
 	if [[ $? -eq 0 ]]; then

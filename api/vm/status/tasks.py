@@ -129,8 +129,17 @@ def vm_status_changed(tid, vm, state, old_state=None, save_state=True, deploy_ov
     # save to DB and also update cache
     if save_state:
         vm.status = state
+
+        if state != Vm.STOPPING:  # Update VM uptime when VM status changes to stopped or running
+            # update VM uptime
+            uptime_msg = vm.update_uptime()  # not running save() -> saved below
+
+            if uptime_msg:
+                logger.info('Uptime message: %s', uptime_msg)
+
         if old_state is not None:  # if cached status != vm.status (don't remember why we need this)
             vm._orig_status = old_state
+
         vm.save(update_fields=('status', 'status_change', 'uptime', 'uptime_changed'), status_change_time=change_time)
 
     if deploy_over:  # deploy process ended
@@ -168,13 +177,6 @@ def _save_vm_status(task_id, vm, new_state, old_state=None, **kwargs):
     if old_state is None:  # Called from vm_status_cb() -> we need to force state change no matter what
         logger.warn('Detected status change %s->%s from vm_status(%s)', vm.status, new_state, vm.uuid)
         old_state = vm.status
-
-    if new_state != Vm.STOPPING:
-        # update VM uptime
-        uptime_msg = vm.update_uptime(new_state)  # not running save() -> saved by vm_status_changed
-
-        if uptime_msg:
-            logger.info('Uptime message: %s', uptime_msg)
 
     # Hurrah!
     vm_status_changed(task_id, vm, new_state, old_state=old_state, **kwargs)  # calls save()

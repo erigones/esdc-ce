@@ -120,9 +120,6 @@ def get_task_result(task, task_id):
             del result['json']
         except KeyError:
             pass
-    else:
-        if result is not None:
-            result = str(result)
 
     tr = {
         'task_id': task_id,
