@@ -46,4 +46,6 @@ APPLIANCE_NUMBER="${MYHOSTNAME:(-2)}"	# e.g: "01"
 cd "${ANS_BASE}"
 /usr/bin/ansible-playbook "${UPG_BASE}/lib/runupgrade.yml" --extra-vars="runhosts='mgmt${APPLIANCE_NUMBER}' appliance_type=mgmt"
 /usr/bin/ansible-playbook "${UPG_BASE}/lib/runupgrade.yml" --extra-vars="runhosts='mon${APPLIANCE_NUMBER}' appliance_type=mon"
-
+/usr/bin/ansible-playbook "${UPG_BASE}/lib/runupgrade.yml" --extra-vars="runhosts='dns${APPLIANCE_NUMBER}' appliance_type=dns"
+/usr/bin/ansible-playbook "${UPG_BASE}/lib/runupgrade.yml" --extra-vars="runhosts='cfgdb${APPLIANCE_NUMBER}' appliance_type=cfgdb"
+/usr/bin/ansible-playbook "${UPG_BASE}/lib/runupgrade.yml" --extra-vars="runhosts='img${APPLIANCE_NUMBER}' appliance_type=img"
