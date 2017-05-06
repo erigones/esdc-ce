@@ -174,7 +174,7 @@ class VmBackup(TaskAPIView):
 
         if self.execute(get_backup_cmd('create', bkp, define=define, zfs_filesystem=self.zfs_filesystem,
                                        fsfreeze=qga_socket),
-                        lock=self.LOCK % (vm.uuid, bkp.disk_id)):
+                        lock=self.LOCK % (vm.uuid, bkp.disk_id), stdin=bkp.json.dump()):
             return self.task_response
 
         bkp.delete()

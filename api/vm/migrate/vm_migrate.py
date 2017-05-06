@@ -1,5 +1,3 @@
-from django.conf import settings
-
 from que.tasks import execute
 from api.api_views import APIView
 from api.exceptions import VmIsNotOperational, VmHasPendingTasks, VmIsLocked, PreconditionRequired
@@ -21,9 +19,6 @@ class VmMigrate(APIView):
 
     def put(self):
         request, vm = self.request, self.vm
-
-        if vm.uuid in settings.VMS_INTERNAL:
-            raise PreconditionRequired('Internal VM can\'t be migrated')
 
         if vm.locked:
             raise VmIsLocked
