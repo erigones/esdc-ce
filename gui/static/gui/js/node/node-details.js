@@ -51,6 +51,9 @@ function node_label_update(hostname, state, status_display) {
     $(this).removeClass().addClass('label status_node' + state).text(status_display).fadeIn();
   });
 
+  if (NODE_LIST) {
+    NODE_LIST.update();
+  }
 }
 
 // Callback for node status change event

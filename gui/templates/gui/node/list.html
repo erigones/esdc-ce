@@ -76,7 +76,9 @@
             </td>
 
             <td>
-              <span class="label status_node{{ node.status }}" id="node_label_{{ node.hostname }}">{{ node.get_status_display }}</span>
+              {% with status_display=node.get_status_display %}
+              <span class="label status_node{{ node.status }}" id="node_label_{{ node.hostname }}" data-status_display="{{ status_display }}">{{ status_display }}</span>
+              {% endwith %}
             </td>
 
             <td class="hidden-phone nowrap">
