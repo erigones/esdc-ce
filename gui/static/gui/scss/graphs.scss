@@ -19,6 +19,14 @@
     }
   }
 
+  .legend.rows2 table {
+	height: 54px;
+  }
+
+  .legend.rows3 table {
+	height: 81px;
+  }
+
   .graph_history_control {
     padding: 0;
     margin-top: 2px;
@@ -61,6 +69,11 @@
   }
 }
 
+.graph-container {
+  position: relative;
+  height: 260px;
+}
+
 .graph {
   width: 100%;
   height: 260px;
@@ -68,4 +81,20 @@
   &.tall {
     height: 500px;
   }
+}
+
+.graph-center {
+  position: absolute;
+  top: 125px;
+  left: 0;
+  width: 100%;
+  font-size: 48px;
+}
+
+.graph-item-label {
+  font-size: 14px;
+  line-height: 18px;
+  text-align: center;
+  padding: 2px;
+  color: #fff;
 }

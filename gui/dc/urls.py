@@ -31,4 +31,9 @@ urlpatterns = patterns(
     # dc redirect to VM details
     url(r'^switch/(?P<dc>[A-Za-z0-9\._-]+)/server/(?P<hostname>[A-Za-z0-9\._-]+)/$', 'dc_vm_details',
         name='dc_vm_details'),
+    # dc redirect do DC settings
+    url(r'^switch/(?P<dc>[A-Za-z0-9\._-]+)/settings/$', 'dc_dc_settings',
+        name='dc_dc_settings'),
+    url(r'^switch/dc-settings/$', 'dc_dc_settings',
+        name='dc_default_settings'),
 )

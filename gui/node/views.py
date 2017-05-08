@@ -13,7 +13,8 @@ from gui.decorators import staff_required, ajax_required
 from gui.utils import collect_view_data, get_pager, reverse
 from gui.signals import view_node_list, view_node_details
 from gui.node.utils import get_dc1_settings, get_nodes_extended, get_node, get_node_backups
-from gui.node.forms import NodeForm, NodeStorageForm, UpdateBackupForm, NodeStorageImageForm, BackupFilterForm
+from gui.node.forms import (NodeStatusForm, NodeForm, NodeStorageForm, UpdateBackupForm, NodeStorageImageForm,
+                            BackupFilterForm)
 from gui.vm.forms import RestoreBackupForm
 from gui.vm.utils import get_vms
 from gui.dc.views import dc_switch
@@ -31,10 +32,30 @@ def node_list(request):
     context = collect_view_data(request, 'node_list')
     context['nodes'] = Node.all()
     context['node_list'] = get_nodes_extended(request)
+    context['status_form'] = NodeStatusForm(request, None)
 
     view_node_list.send(sender='gui.node.views.list', request=request, context=context)
 
     return render(request, 'gui/node/list.html', context)
+
+
+@login_required
+@staff_required
+@ajax_required
+@require_POST
+def status_form(request):
+    """
+    Ajax page for changing status of compute nodes.
+    """
+    form = NodeStatusForm(request, None, request.POST)
+
+    if form.is_valid():
+        res = [form.call_node_define(hostname) == 200 for hostname in form.cleaned_data['hostnames']]
+
+        if all(res):
+            return redirect('node_list')
+
+    return render(request, 'gui/node/status_form.html', {'form': form})
 
 
 @login_required

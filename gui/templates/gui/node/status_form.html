@@ -1,0 +1,17 @@
+{% load i18n %}
+{% csrf_token %}
+{% for error in form.non_field_errors %}
+<div class="alert alert-error"><i class="icon-warning-sign"></i> {{ error }}</div>
+{% endfor %}
+
+{% include "gui/form_field.html" with field=form.status %}
+
+<div class="input">
+  <div class="control-group thinner">
+    <label class="control-label" for="id_hostnames">{% trans "Hostnames" %}:</label>
+    <div class="controls">
+			{{ form.hostnames }}
+      <div class="input-fake" id="id_hostnames_text">{{ form.hostnames.value }}</div>
+    </div>
+  </div>
+</div>
