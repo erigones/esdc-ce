@@ -1017,7 +1017,7 @@ function _task_status_callback(res, apiview) {
         }
       } else {
         notify('error', _message_from_result(res));
-			}
+      }
       break; // update cached tasklog
 
     case 'image_snapshot':

@@ -54,16 +54,16 @@ function mon_templates_enable(elements, options) {
 }
 
 function mon_templates_update(result) {
-	if ($.isArray(MONITORING_TEMPLATES) && MONITORING_TEMPLATES.length === 0 && $.isArray(result)) {
-		// MONITORING_TEMPLATES.extend()
-		MONITORING_TEMPLATES.push.apply(MONITORING_TEMPLATES, _.pluck(result, 'name'));
+  if ($.isArray(MONITORING_TEMPLATES) && MONITORING_TEMPLATES.length === 0 && $.isArray(result)) {
+    // MONITORING_TEMPLATES.extend()
+    MONITORING_TEMPLATES.push.apply(MONITORING_TEMPLATES, _.pluck(result, 'name'));
 
     if (MONITORING_TEMPLATES_ELEMENTS) {
       $.each(MONITORING_TEMPLATES_ELEMENTS, function() {
         $(this).select2('updateResults');
       });
     }
-	}
+  }
 }
 
 
@@ -91,14 +91,14 @@ function mon_hostgroups_enable(elements, options) {
 }
 
 function mon_hostgroups_update(result) {
-	if ($.isArray(MONITORING_HOSTGROUPS) && MONITORING_HOSTGROUPS.length === 0 && $.isArray(result)) {
-		// MONITORING_HOSTGROUPS.extend()
-		MONITORING_HOSTGROUPS.push.apply(MONITORING_HOSTGROUPS, _.pluck(result, 'name'));
+  if ($.isArray(MONITORING_HOSTGROUPS) && MONITORING_HOSTGROUPS.length === 0 && $.isArray(result)) {
+    // MONITORING_HOSTGROUPS.extend()
+    MONITORING_HOSTGROUPS.push.apply(MONITORING_HOSTGROUPS, _.pluck(result, 'name'));
 
     if (MONITORING_HOSTGROUPS_ELEMENTS) {
       $.each(MONITORING_HOSTGROUPS_ELEMENTS, function() {
         $(this).select2('updateResults');
       });
     }
-	}
+  }
 }
