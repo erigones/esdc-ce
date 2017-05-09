@@ -232,7 +232,7 @@ class SerializerForm(forms.Form):
     def _set_custom_api_errors(self, errors):
         pass
 
-    def __add_error(self, field_name, error):
+    def _add_error(self, field_name, error):
         if field_name not in self._errors:
             self._errors[field_name] = self.error_class()
 
@@ -252,23 +252,23 @@ class SerializerForm(forms.Form):
             # Pair API errors to Django form errors
             for field in self.fields:
                 if field in errors:
-                    self.__add_error(field, errors[field])  # should be lazy
+                    self._add_error(field, errors[field])  # should be lazy
                     try:
                         del self.cleaned_data[field]
                     except KeyError:
                         pass
 
             if 'non_field_errors' in errors:
-                self.__add_error(NON_FIELD_ERRORS, errors['non_field_errors'])  # should be lazy
+                self._add_error(NON_FIELD_ERRORS, errors['non_field_errors'])  # should be lazy
             elif 'detail' in errors:
-                self.__add_error(NON_FIELD_ERRORS, ugettext(errors['detail']))  # should be noop
+                self._add_error(NON_FIELD_ERRORS, ugettext(errors['detail']))  # should be noop
 
         else:  # More serious api error
             if isinstance(errors, list):  # Maybe we have errors from multiple serializers
                 for err in errors:
                     self._set_api_errors(err)
             elif errors:
-                self.__add_error(NON_FIELD_ERRORS, errors)
+                self._add_error(NON_FIELD_ERRORS, errors)
 
         self._set_custom_api_errors(errors)
 
@@ -316,4 +316,4 @@ class SerializerForm(forms.Form):
         if self._errors is None:
             self._errors = {}
 
-        self.__add_error(key, value)
+        self._add_error(key, value)
