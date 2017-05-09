@@ -1,7 +1,7 @@
 var NODE_LIST = null;
 function NodeList() {
+  var self = this;
   var et = new eTable('#node_list');
-  var check_list = new CheckList();
   var node_search = $('#node_search');
   var controls = {};
   this.controls = controls;
@@ -22,6 +22,10 @@ function NodeList() {
 
   this.get_hostnames = function() {
     return _.keys(et.selected);
+  };
+
+  this.update = function() {
+    et.toggle_controls();
   };
 
   // Empty selection
