@@ -673,20 +673,20 @@ function vm_modal_form_handler(e, handler) {
  * Helper function used by mdata_input and array_input
  */
 function _load_json_input(input_field, display_error) {
-	var value_raw = input_field.val();
+  var value_raw = input_field.val();
 
-	if (value_raw) {
-		try {
-			return JSON.parse(value_raw);
-		} catch (e) {
-			if (display_error) {
-				alert2(e.message);
-			}
-			return null;
-		}
-	} else {
-		return {};
-	}
+  if (value_raw) {
+    try {
+      return JSON.parse(value_raw);
+    } catch (e) {
+      if (display_error) {
+        alert2(e.message);
+      }
+      return null;
+    }
+  } else {
+    return {};
+  }
 }
 
 /*
