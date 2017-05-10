@@ -185,6 +185,14 @@ class APINamespace(BaseNamespace):
     def on_user_vms_tags(self, user_vms_tags):
         self.request.user.vms_tags = user_vms_tags
 
+    def on_check_system_lock(self):
+        from api.system.update.api_views import UpdateView
+        # Emit task event if a system update lock exists
+        lock = UpdateView.get_task_lock()
+
+        if lock.acquired():
+            self._task_event('no-task-id', {'_event_': 'system_update_running', 'result': {}})
+
     def on_dc_switch(self):
         # Reload user object in request
         self.request.user = self.request.user.__class__.objects.get(pk=self.request.user.pk)

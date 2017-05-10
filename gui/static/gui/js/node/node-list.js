@@ -1,13 +1,18 @@
 var NODE_LIST = null;
-function NodeList() {
+function NodeList(custsort) {
   var self = this;
   var et = new eTable('#node_list');
   var node_search = $('#node_search');
   var controls = {
     'node_status': $('#node_status'),
+    'node_system_update': $('#node_system_update'),  // only in system maintenance view
   };
   this.modal = null;
   this.controls = controls;
+
+  if (typeof(custsort) === 'undefined') {
+    custsort = {'formatted-num': [5, 6, 7, 8, 9]};
+  }
 
   // Check if button is disabled. If not disable it for 0.5 second
   function check_btn(btn) {
@@ -33,6 +38,14 @@ function NodeList() {
     } else {
       controls.node_status.removeClass('disabled');
     }
+
+    if (controls.node_system_update.length) {
+      if (selected_node_statuses.length === 1 && selected_node_statuses[0] === 'maintenance') {
+        controls.node_system_update.removeClass('disabled');
+      } else {
+        controls.node_system_update.addClass('disabled');
+      }
+    }
   }
 
   this.get_hostnames = function() {
@@ -57,7 +70,7 @@ function NodeList() {
   SIGNALS.view_node_list.dispatch(this);
 
   // **** Table init ****
-  obj_list_sort_js(et.elements.table, [0], {'formatted-num': [5, 6, 7, 8, 9]});
+  obj_list_sort_js(et.elements.table, [0], custsort);
   et.toggle_controls();
 
   // **** Node search ****
@@ -96,6 +109,8 @@ function NodeList() {
         $('#id_hostnames').val(hostnames);
       }
     });
+
+    return false;
   });
 
 } // NodeList

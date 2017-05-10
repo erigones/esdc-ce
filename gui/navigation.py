@@ -8,7 +8,7 @@ SYSTEM = {
     'title': _('System'),
     'icon': 'dashboard',
     'url': 'system_overview',
-    'active_views': {'system_overview', 'system_settings', 'system_maintenance'},
+    'active_views': {'system_overview', 'system_settings'},
     'children': [
         {
             'title': _('Overview'),
@@ -20,12 +20,13 @@ SYSTEM = {
             'icon': 'cogs',
             'url': 'system_settings'
         },
-        {
-            'title': _('Maintenance'),
-            'icon': 'wrench',
-            'url': 'system_maintenance'
-        },
     ]
+}
+
+SYSTEM_MAINTENANCE = {
+    'title': _('System maintenance'),
+    'icon': 'wrench',
+    'url': 'system_maintenance'
 }
 
 DATACENTER = {
@@ -34,7 +35,7 @@ DATACENTER = {
     'url': 'dc_node_list',
     'active_views': {'dc_list', 'dc_node_list', 'dc_storage_list', 'dc_network_list', 'dc_image_list',
                      'dc_template_list', 'dc_iso_list', 'dc_domain_list', 'dc_settings', 'dc_user_list',
-                     'dc_group_list', 'dc_user_profile'}
+                     'dc_group_list', 'dc_user_profile', 'system_maintenance'},
     # 'children': []  # Built on runtime
 }
 
@@ -206,8 +207,8 @@ class Navi(object):
 
             if is_staff:
                 if not dc_dns_only:
-                    DATACENTER['children'] += [DATACENTER_SETTINGS]
-                nav = [SYSTEM, DATACENTER, NODES, SERVERS]  # SuperAdmin
+                    DATACENTER['children'] += [DATACENTER_SETTINGS, SYSTEM_MAINTENANCE]
+                nav = [DATACENTER, NODES, SERVERS]  # SuperAdmin
             else:
                 nav = [DATACENTER, SERVERS]  # DCAdmin
 

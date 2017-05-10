@@ -36,7 +36,6 @@ class NodeStatusForm(SerializerForm):
                                     widget=forms.Select(attrs={'class': 'narrow input-select2'}))
 
     def _add_error(self, field_name, error):
-        print('|'*40)
         if self._node_hostname:
             if isinstance(error, (list, tuple)):
                 error = ['%s: %s' % (self._node_hostname, err) for err in error]

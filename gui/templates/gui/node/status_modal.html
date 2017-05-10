@@ -8,7 +8,7 @@
   <div class="modal-body separator">
     <div class="text_edit"></div>
     <div class="text_add"></div>
-    <form class="form-horizontal" action="#" data-source="{% url 'node_status_form' %}" method="POST">
+    <form class="form-horizontal" action="#" data-source="{% url 'node_status_form' %}?current_view={{ current_view }}" method="POST">
       {% include "gui/node/status_form.html" with form=status_form %}
     </form>
   </div>

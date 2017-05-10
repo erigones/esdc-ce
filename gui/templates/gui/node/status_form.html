@@ -4,8 +4,6 @@
 <div class="alert alert-error"><i class="icon-warning-sign"></i> {{ error }}</div>
 {% endfor %}
 
-{% include "gui/form_field.html" with field=form.status %}
-
 <div class="input">
   <div class="control-group thinner">
     <label class="control-label" for="id_hostnames">{% trans "Hostnames" %}:</label>
@@ -15,3 +13,5 @@
     </div>
   </div>
 </div>
+
+{% include "gui/form_field.html" with field=form.status %}

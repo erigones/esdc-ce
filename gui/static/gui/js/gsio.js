@@ -715,6 +715,21 @@ function _task_event_callback(result) {
       alert2(result.message);
       break;
 
+    case 'system_update_running':
+    case 'system_update_started':
+    case 'node_update_started':
+      if (SYSTEM_UPDATE && SYSTEM_UPDATE.is_displayed()) {
+        SYSTEM_UPDATE.started(result);
+      }
+      break;
+
+    case 'system_update_finished':
+    case 'node_update_finished':
+      if (SYSTEM_UPDATE && SYSTEM_UPDATE.is_displayed()) {
+        SYSTEM_UPDATE.finished(result);
+      }
+      break;
+
     default: // send notification
       if (typeof(result.message) !== 'undefined') {
         notify('info', result.message);

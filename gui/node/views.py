@@ -53,7 +53,12 @@ def status_form(request):
         res = [form.call_node_define(hostname) == 200 for hostname in form.cleaned_data['hostnames']]
 
         if all(res):
-            return redirect('node_list')
+            if request.GET.get('current_view', None) == 'maintenance':
+                redirect_view = 'system_maintenance'
+            else:
+                redirect_view = 'node_list'
+
+            return redirect(redirect_view)
 
     return render(request, 'gui/node/status_form.html', {'form': form})
 
