@@ -29,6 +29,6 @@ urlpatterns = patterns(
     # dc switch
     url(r'^switch/$', 'dc_switch_form', name='dc_switch_form'),
     # dc redirect to VM details
-    url(r'^(?P<dc>[A-Za-z0-9\._-]+)/server/(?P<hostname>[A-Za-z0-9\._-]+)/$', 'dc_vm_details',
+    url(r'^switch/(?P<dc>[A-Za-z0-9\._-]+)/server/(?P<hostname>[A-Za-z0-9\._-]+)/$', 'dc_vm_details',
         name='dc_vm_details'),
 )
