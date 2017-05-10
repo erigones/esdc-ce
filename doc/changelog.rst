@@ -1,6 +1,18 @@
 Changelog
 #########
 
+2.6.0 (unreleased)
+==================
+
+Features
+--------
+
+- Added maintenance view with system update functionality into GUI - `#172 <https://github.com/erigones/esdc-ce/issues/172>`__
+
+Bugs
+----
+
+
 2.5.3 (unreleased)
 ==================
 
