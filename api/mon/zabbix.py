@@ -907,29 +907,29 @@ class _UserGroupAwareZabbix(_Zabbix):
 
         user.zabbix_id = None
 
-    def remove_user_from_usergroup(self, user, zabbix_user_group, delete_user_if_last=False):
+    def remove_user_from_user_group(self, user, user_group, delete_user_if_last=False):
         """
         Naive approach. 
         We expect that its up to date and group is in user groups. We should consider some kind of atomicity here
         :param user: 
-        :param zabbix_user_group: 
+        :param user_group: 
         :param delete_user_if_last: 
         :return: 
         """
         user.refresh()
 
-        assert zabbix_user_group in user.groups, "user is not in the group: %s %s" % (zabbix_user_group, user.groups)
-        if not user.groups - {zabbix_user_group} and not delete_user_if_last:
+        assert user_group in user.groups, "user is not in the group: %s %s" % (user_group, user.groups)
+        if not user.groups - {user_group} and not delete_user_if_last:
             raise ObjectManipulationError('cannot remove the last group without deleting the user itself')
 
-        user.groups.remove(zabbix_user_group)
+        user.groups.remove(user_group)
 
         if user.groups:
             user.to_zabbix(groups_info=True)
         else:
             self.delete_user(user)
 
-    def delete_usergroup(self, zabbix_id=None, group_name=None, group=None):
+    def delete_user_group(self, zabbix_id=None, group_name=None, group=None):
         assert zabbix_id or group_name or (group and group.zabbix_id)
         if zabbix_id:
             group = ZabbixUserGroupContainer.from_zabbix_id(self.zapi, zabbix_id)
@@ -940,7 +940,7 @@ class _UserGroupAwareZabbix(_Zabbix):
         else:
             raise ValueError
 
-        self._remove_users_from_usergroup(group, group.users, delete_users_if_last=True)  # remove all users
+        self._remove_users_from_user_group(group, group.users, delete_users_if_last=True)  # remove all users
         self.zapi.usergroup.delete([group.zabbix_id])
 
     def _synchronize_user_media(self, user):
@@ -989,37 +989,37 @@ class _UserGroupAwareZabbix(_Zabbix):
 
         return user_group
 
-    def _sync_usergroup_hostgroups(self, zabbix_user_group, user_group):
+    def __sync_user_group_hostgroups(self, zabbix_user_group, user_group):
         raise NotImplementedError
 
-    def _sync_usergroup_base(self, zabbix_user_group, user_group):
+    def _sync_user_group_base(self, zabbix_user_group, user_group):
         raise NotImplementedError  # what should be here?
 
     def _synchronize_user_group(self, zabbix_user_group, user_group):
         # todo this way or all in one call prepared?
-        self._synchronize_users_for_usergroup(zabbix_user_group, user_group)
+        self._synchronize_users_in_user_group(zabbix_user_group, user_group)
         print "todo hostgroups and base update"
         return
-        self._sync_usergroup_hostgroups(zabbix_user_group, user_group)  # todo
-        self._sync_usergroup_base(zabbix_user_group, user_group)  # this should be easy? # todo
+        self.__sync_user_group_hostgroups(zabbix_user_group, user_group)  # todo
+        self._sync_user_group_base(zabbix_user_group, user_group)  # this should be easy? # todo
 
-    def _synchronize_users_for_usergroup(self, zabbix_usergroup, user_group):
-        print "zabbix_usergroup.users", zabbix_usergroup.users
-        print "user_group.users", user_group.users
-        redundant_users = zabbix_usergroup.users - user_group.users
+    def _synchronize_users_in_user_group(self, remote_user_group, source_user_group):
+        print "remote_user_group.users", remote_user_group.users
+        print "source_user_group.users", source_user_group.users
+        redundant_users = remote_user_group.users - source_user_group.users
         print "redundant_users: {}".format(redundant_users)
-        missing_users = user_group.users - zabbix_usergroup.users
+        missing_users = source_user_group.users - remote_user_group.users
         print "missing users: {}".format(missing_users)
-        self._remove_users_from_usergroup(zabbix_usergroup, redundant_users, delete_users_if_last=True)
-        zabbix_usergroup.add_users(missing_users)
+        self._remove_users_from_user_group(remote_user_group, redundant_users, delete_users_if_last=True)
+        remote_user_group.add_users(missing_users)
 
-    def _remove_users_from_usergroup(self, zabbix_user_group, redundant_users, delete_users_if_last):
+    def _remove_users_from_user_group(self, zabbix_user_group, redundant_users, delete_users_if_last):
         zabbix_user_group.users = zabbix_user_group.users - redundant_users
 
         # Some zabbix users has to be deleted as this is their last group. We have to go the slower way.
         for user in redundant_users:
             print "user deletion:{}".format(user)
-            self.remove_user_from_usergroup(user, zabbix_user_group, delete_user_if_last=delete_users_if_last)
+            self.remove_user_from_user_group(user, zabbix_user_group, delete_user_if_last=delete_users_if_last)
         #TODO create also a faster way of removal for users that has also different groups
 
 
@@ -1239,7 +1239,7 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
         self._zapi = zapi
         self.users = set()
         self.host_groups = set()
-        self.superusergroup = False
+        self.superuser_group = False
         self._api_response = None
 
     @classmethod
@@ -1259,7 +1259,7 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
         container.users = {ZabbixUserContainer.from_mgmt_data(zapi, user) for user in users}
         container.host_groups = {ZabbixHostGroupContainer.from_mgmt_data(zapi, hostgroup)
                                  for hostgroup in accessible_hostgroups}  # self._get_groups
-        container.superusergroup = superusers
+        container.superuser_group = superusers
 
         return container
 
@@ -1278,7 +1278,7 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
     def from_zabbix_data(cls, zapi, zabbix_object):
         container = cls(zapi=zapi, name=zabbix_object['name'])
         container.zabbix_id = zabbix_object['usrgrpid']
-        container.superusergroup = zabbix_object['gui_access'] != 2  # FIXME resolve the identification
+        container.superuser_group = zabbix_object['gui_access'] != 2  # FIXME resolve the identification
         container.users = {ZabbixUserContainer.from_zabbix_data(zapi, userdata) for userdata in
                            zabbix_object.get('users', [])}
         return container
@@ -1298,46 +1298,46 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
         assert self.zabbix_id or basic_info or hostgroups_info or users_info, \
             "It's impossible to create an object without any information about it"
 
-        usergroup_object = {}
+        user_group_object = {}
         if self.zabbix_id:  # todo check whether structure is the same in both create/ update cases
-            usergroup_object['usrgrpid'] = self.zabbix_id
+            user_group_object['usrgrpid'] = self.zabbix_id
         else:
             # if group is not created, we force all information to be put into the object
             basic_info = users_info = hostgroups_info = True
 
         if basic_info:
-            usergroup_object['name'] = self.name
-            usergroup_object['users_status'] = self.USERS_STATUS_ENABLED
-            if self.superusergroup:
-                usergroup_object['gui_access'] = self.FRONTEND_ACCESS_ENABLED_WITH_DEFAULT_AUTH
+            user_group_object['name'] = self.name
+            user_group_object['users_status'] = self.USERS_STATUS_ENABLED
+            if self.superuser_group:
+                user_group_object['gui_access'] = self.FRONTEND_ACCESS_ENABLED_WITH_DEFAULT_AUTH
             else:
-                usergroup_object['gui_access'] = self.FRONTEND_ACCESS_DISABLED
+                user_group_object['gui_access'] = self.FRONTEND_ACCESS_DISABLED
 
         if hostgroups_info:
-            usergroup_object['rights'] = []
-            hostgroups_access_permission = self.PERMISSION_READ_WRITE if self.superusergroup else self.PERMISSION_READ_ONLY
+            user_group_object['rights'] = []
+            hostgroups_access_permission = self.PERMISSION_READ_WRITE if self.superuser_group else self.PERMISSION_READ_ONLY
             for host_group in self.host_groups:
                 if not host_group.zabbix_id:
                     raise ObjectManipulationError(
                         'host group {} doesn\'t exist in zabbix yet, it has to be created first'.format(
                             host_group.name))
                 else:
-                    usergroup_object['rights'].append(
+                    user_group_object['rights'].append(
                         {'permission': hostgroups_access_permission, 'id': host_group.zabbix_id})
 
         if self.zabbix_id:
-            print "updating usergroup: %s" % usergroup_object
-            self._api_response = self._zapi.usergroup.update(usergroup_object)
+            print "updating usergroup: %s" % user_group_object
+            self._api_response = self._zapi.usergroup.update(user_group_object)
             if users_info:
                 raise NotImplementedError("removing users is not implemented")
 
         else:
-            print "cr usergroup: %s" % usergroup_object
-            self._api_response = self._zapi.usergroup.create(usergroup_object)
+            print "cr usergroup: %s" % user_group_object
+            self._api_response = self._zapi.usergroup.create(user_group_object)
             self.zabbix_id = self._api_response['usrgrpids'][0]
 
             if users_info:
-                usergroup_object['userids'] = []
+                user_group_object['userids'] = []
 
                 for user in self.users:
                     if not user.zabbix_id:
@@ -1377,7 +1377,7 @@ def hostgroup_name_factory(dc_name, node_name='', vm_uuid='', tag=''):
     return name
 
 
-def usergroup_name_factory(dc_name, mgmt_group_name):
+def user_group_name_factory(dc_name, mgmt_group_name):
     """
     We just append the dc name here to prevent name clashing among datacenter groups
     :param dc_name: 

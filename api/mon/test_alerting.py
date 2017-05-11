@@ -1,4 +1,4 @@
-from api.mon.zabbix import getZabbix, ZabbixUserGroupContainer, usergroup_name_factory, ZabbixUserContainer
+from api.mon.zabbix import getZabbix, ZabbixUserGroupContainer, user_group_name_factory, ZabbixUserContainer
 from vms.models import Dc
 from gui.models import User
 from unittest import TestCase
@@ -12,52 +12,52 @@ class TestUsergroupManipulation(TestCase):
 
     def test_user_manipulation(self):
         # create users and group
-        # test_create_users_and_usergroup(5,'pirati')
+        # test_create_users_and_user_group(5,'pirati')
         # raw_input('group pirati should exist and should have 5 members')
         # delete users
         group_name = 'tgroup1'
         member_count = 3
-        ug = self._create_users_and_usergroup(member_count, group_name)
+        ug = self._create_users_and_user_group(member_count, group_name)
         # create second group
         second_group_name = 'ufonci'
         second_group_member_count = 2
-        self._create_users_and_usergroup(second_group_member_count, second_group_name)
+        self._create_users_and_user_group(second_group_member_count, second_group_name)
 
-        assert self._get_usergroup_user_count(second_group_name) == second_group_member_count
-        assert self._get_usergroup_user_count(group_name) == member_count
+        assert self._get_user_group_user_count(second_group_name) == second_group_member_count
+        assert self._get_user_group_user_count(group_name) == member_count
 
         increased_second_group_member_count = 4
-        self._create_users_and_usergroup(increased_second_group_member_count, second_group_name)
+        self._create_users_and_user_group(increased_second_group_member_count, second_group_name)
 
-        assert self._get_usergroup_user_count(second_group_name) == increased_second_group_member_count
-        assert self._get_usergroup_user_count(group_name) == member_count
+        assert self._get_user_group_user_count(second_group_name) == increased_second_group_member_count
+        assert self._get_user_group_user_count(group_name) == member_count
 
         decreased_second_group_member_count = 1
-        self._create_users_and_usergroup(decreased_second_group_member_count, second_group_name)
+        self._create_users_and_user_group(decreased_second_group_member_count, second_group_name)
 
-        assert self._get_usergroup_user_count(second_group_name) == decreased_second_group_member_count
-        assert self._get_usergroup_user_count(group_name) == member_count
+        assert self._get_user_group_user_count(second_group_name) == decreased_second_group_member_count
+        assert self._get_user_group_user_count(group_name) == member_count
 
-        self.zabbix.delete_usergroup(group_name=second_group_name)
-        assert self._get_usergroup_user_count(group_name) == member_count
+        self.zabbix.delete_user_group(group_name=second_group_name)
+        assert self._get_user_group_user_count(group_name) == member_count
 
         increased_second_group_member_count = 4
-        self._create_users_and_usergroup(increased_second_group_member_count, second_group_name)
-        assert self._get_usergroup_user_count(second_group_name) == increased_second_group_member_count
-        assert self._get_usergroup_user_count(group_name) == member_count
+        self._create_users_and_user_group(increased_second_group_member_count, second_group_name)
+        assert self._get_user_group_user_count(second_group_name) == increased_second_group_member_count
+        assert self._get_user_group_user_count(group_name) == member_count
 
-        self.zabbix.delete_usergroup(group_name=group_name)
-        assert self._get_usergroup_user_count(second_group_name) == increased_second_group_member_count
+        self.zabbix.delete_user_group(group_name=group_name)
+        assert self._get_user_group_user_count(second_group_name) == increased_second_group_member_count
 
-        self.zabbix.delete_usergroup(group_name=second_group_name)
+        self.zabbix.delete_user_group(group_name=second_group_name)
 
-    def _get_usergroup_user_count(self, group_name):
+    def _get_user_group_user_count(self, group_name):
         first_group = self.zabbix.zapi.usergroup.get({'search': {'name': group_name},
                                                       'selectUsers': ['alias'],
                                                       'limit': 1})[0]
         return len(first_group.get('users', []))
 
-    def _create_users_and_usergroup(self, user_count=5, name='pirati'):
+    def _create_users_and_user_group(self, user_count=5, name='pirati'):
         users = User.objects.all()[:user_count]
         ug = self.zabbix.synchronize_user_group(name, users, [])
         return ug
@@ -67,15 +67,15 @@ class TestUsergroupManipulation(TestCase):
         ugc.to_zabbix(True, True, True)
         return ugc
 
-    def test_create_delete_empty_user_group(self, dc_name='dc', usergroup_name='abc'):
-        zabbix_usergroup_name = usergroup_name_factory(dc_name, usergroup_name)
-        self._create_user_group(zabbix_usergroup_name)
-        response = self.zabbix.zapi.usergroup.get({'search': {'name': zabbix_usergroup_name}})
+    def test_create_delete_empty_user_group(self, dc_name='dc', user_group_name='abc'):
+        zabbix_user_group_name = user_group_name_factory(dc_name, user_group_name)
+        self._create_user_group(zabbix_user_group_name)
+        response = self.zabbix.zapi.usergroup.get({'search': {'name': zabbix_user_group_name}})
         assert response and len(
-            response) == 1, 'there should be one and only one usergroup %s created' % zabbix_usergroup_name
+            response) == 1, 'there should be one and only one user_group %s created' % zabbix_user_group_name
         zugc = ZabbixUserGroupContainer.from_zabbix_data(self.zabbix.zapi, response[0])
-        self.zabbix.delete_usergroup(zabbix_id=zugc.zabbix_id)
-        response = self.zabbix.zapi.usergroup.get({'search': {'name': zabbix_usergroup_name}})
+        self.zabbix.delete_user_group(zabbix_id=zugc.zabbix_id)
+        response = self.zabbix.zapi.usergroup.get({'search': {'name': zabbix_user_group_name}})
         assert not response, "group should have been deleted"
 
     def test_create_delete_user(self):
@@ -97,12 +97,12 @@ class TestUsergroupManipulation(TestCase):
         self.assertRaises(Exception, ZabbixUserContainer.from_zabbix_id, self.zabbix.zapi, users_id)
 
         # and cleanup
-        self.zabbix.delete_usergroup(zabbix_id=g.zabbix_id)
+        self.zabbix.delete_user_group(zabbix_id=g.zabbix_id)
 
     def test_create_update_delete_group_with_users(self):
         group_name = 'tgroup1'
         member_count = 3
-        ug = self._create_users_and_usergroup(member_count, group_name)
+        ug = self._create_users_and_user_group(member_count, group_name)
         response = self.zabbix.zapi.usergroup.get({'search': {'name': group_name},
                                                    'selectUsers': ['alias'],
                                                    'limit': 1})
@@ -114,7 +114,7 @@ class TestUsergroupManipulation(TestCase):
 
         # update group
         increased_member_count = 4
-        self._create_users_and_usergroup(increased_member_count, group_name)
+        self._create_users_and_user_group(increased_member_count, group_name)
         response = self.zabbix.zapi.usergroup.get({'search': {'name': group_name},
                                                    'selectUsers': ['alias'],
                                                    'limit': 1})
@@ -123,6 +123,6 @@ class TestUsergroupManipulation(TestCase):
             zabbix_group.get('users',
                              [])) == increased_member_count, 'the group should have exactly %d members' % increased_member_count
         zugc = ZabbixUserGroupContainer.from_zabbix_data(self.zabbix.zapi, zabbix_group)
-        self.zabbix.delete_usergroup(group=zugc)
+        self.zabbix.delete_user_group(group=zugc)
         response = self.zabbix.zapi.usergroup.get({'search': {'name': group_name}})
         assert not response
