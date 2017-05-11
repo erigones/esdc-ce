@@ -32,7 +32,9 @@
 {% include "gui/form_field.html" with field=settingsform.ram addon=mb_addon %}
 
 <div class="advanced hide">
+{% if dc_settings.MON_ZABBIX_ENABLED %}
 {% include "gui/form_field_checkbox.html" with field=settingsform.monitored %}
+{% endif %}
 {% include "gui/form_field_checkbox.html" with field=settingsform.installed %}
 {% include "gui/form_field.html" with field=settingsform.snapshot_limit_manual %}
 {% include "gui/form_field.html" with field=settingsform.snapshot_size_limit addon=mb_addon %}
@@ -40,8 +42,10 @@
 {% include "gui/form_field.html" with field=settingsform.zfs_io_priority %}
 {% include "gui/form_field.html" with field=settingsform.zpool %}
 {% include "gui/form_field.html" with field=settingsform.owner %}
+{% if dc_settings.MON_ZABBIX_ENABLED %}
 {% include "gui/form_field.html" with field=settingsform.monitoring_templates %}
 {% include "gui/form_field.html" with field=settingsform.monitoring_hostgroups class="thin" %}
+{% endif %}
 {% include "gui/form_field.html" with field=settingsform.mdata %}
 </div>
 
