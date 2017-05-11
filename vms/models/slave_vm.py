@@ -256,8 +256,8 @@ class SlaveVm(_JsonPickleModel):
             # Hostname is unique so temporary rename old_vm to something non-existent
             old_vm_hostname = old_vm.hostname
             old_vm.hostname = '_' + old_vm_hostname
-            old_vm.save(update_node_resources=not self.reserve_resources)
-            new_vm.save(update_node_resources=not self.reserve_resources)
+            old_vm.save()
+            new_vm.save()
             old_vm.hostname = old_vm_hostname
             old_vm.save(update_fields=('hostname',))
             self.save()
@@ -272,6 +272,11 @@ class SlaveVm(_JsonPickleModel):
 
             # Update task log entries
             TaskLogEntry.objects.filter(object_pk=old_vm.pk).update(object_pk=new_vm.pk)
+
+        # Recalculate node resources after failover
+        if not self.reserve_resources:
+            old_vm.save(update_node_resource=True)
+            new_vm.save(update_node_resource=True)
 
         return new_vm
 
