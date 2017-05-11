@@ -643,13 +643,8 @@ SECURITY_OWASP_AT_002 = False  # Testing for Account Enumeration and Guessable U
 
 ACL_ENABLED = True  # Module
 
-# Allow any settings to be defined in local_settings.py which is ignored in our
-# version control system allowing for settings to be defined (overwritten) per
-# machine, and also for security reasons not to store passwords in the VCS.
-try:
-    from local_settings import *
-except ImportError:
-    pass
+# Usernames that clashes with zabbix system usernames etc.
+INVALID_USERNAMES = frozenset(['profile','Admin','provisioner'])
 
 # ESDC :: Third Party Apps Settings
 THIRD_PARTY_APPS, THIRD_PARTY_MODULES = collect_third_party_apps_and_settings(locals())
@@ -664,3 +659,15 @@ MODULES = frozenset(MODULES)
 # location of key/cert files needed to authenticate against update server
 UPDATE_KEY_FILE = path.join(LIBDIR, 'update.key')
 UPDATE_CERT_FILE = path.join(LIBDIR, 'update.crt')
+
+#VVVVVVV        THIS BLOCK SHOULD BE ALWAYS AT THE BOTTOM      VVVVVVVVVVVVVVVV
+
+# Allow any settings to be defined in local_settings.py which is ignored in our
+# version control system allowing for settings to be defined (overwritten) per
+# machine, and also for security reasons not to store passwords in the VCS.
+try:
+    from local_settings import *
+except ImportError:
+    pass
+
+#^^^^^^^        THIS BLOCK SHOULD BE ALWAYS AT THE BOTTOM      ^^^^^^^^^^^^^^^^

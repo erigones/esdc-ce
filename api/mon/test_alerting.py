@@ -1,4 +1,4 @@
-from api.mon.zabbix import getZabbix, ZabbixUserGroupContainer, user_group_name_factory, ZabbixUserContainer
+from api.mon.zabbix import getZabbix, ZabbixUserGroupContainer, ZabbixUserContainer
 from vms.models import Dc
 from gui.models import User
 from unittest import TestCase
@@ -68,7 +68,7 @@ class TestUsergroupManipulation(TestCase):
         return ugc
 
     def test_create_delete_empty_user_group(self, dc_name='dc', user_group_name='abc'):
-        zabbix_user_group_name = user_group_name_factory(dc_name, user_group_name)
+        zabbix_user_group_name = ZabbixUserGroupContainer.user_group_name_factory(dc_name, user_group_name)
         self._create_user_group(zabbix_user_group_name)
         response = self.zabbix.zapi.usergroup.get({'search': {'name': zabbix_user_group_name}})
         assert response and len(

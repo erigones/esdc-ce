@@ -1095,7 +1095,6 @@ class ZabbixUserContainer(ZabbixNamedContainer):
         assert api_response_object
         container = cls(zapi=zapi, name=api_response_object['alias'])
 
-        # Todo mozno parsovanie zabbix responsu hodit do izolovanej metody ( lebo cache)
         container._api_response = api_response_object
         container.zabbix_id = api_response_object['userid']
         container._refresh_groups(api_response_object)
@@ -1224,6 +1223,17 @@ class ZabbixHostGroupContainer(object):
         container.zabbix_id = container._zabbix_response['groupid']
         return container
 
+    @staticmethod
+    def hostgroup_name_factory(dc_name, node_name='', vm_uuid='', tag=''):
+        """    
+        :param dc_name: 
+        :param node_name: 
+        :param vm_uuid:  
+        :param tag: 
+        :return: 
+        """
+        name = ':{}:{}:{}:{}:'.format(dc_name, node_name, vm_uuid, tag)
+        return name
 
 class ZabbixUserGroupContainer(ZabbixNamedContainer):
     FRONTEND_ACCESS_ENABLED_WITH_DEFAULT_AUTH = 0
@@ -1359,37 +1369,19 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
         self.users = {ZabbixUserContainer.from_zabbix_data(self._zapi, userdata) for userdata in
                       api_response.get('users', [])}
 
+    @staticmethod
+    def user_group_name_factory(dc_name, local_group_name):
+        """
+        We just append the dc name here to prevent name clashing among datacenter groups
+        :param dc_name: 
+        :param local_group_name: 
+        :return: 
+        """
+        name = ':{}:{}:'.format(dc_name, local_group_name)
+        return name
 
 class ObjectManipulationError(ZabbixError):
     pass
-
-
-def hostgroup_name_factory(dc_name, node_name='', vm_uuid='', tag=''):
-    """
-    
-    :param dc_name: 
-    :param node_name: 
-    :param vm_uuid:  
-    :param tag: 
-    :return: 
-    """
-    name = ':{}:{}:{}:{}:'.format(dc_name, node_name, vm_uuid, tag)
-    return name
-
-
-def user_group_name_factory(dc_name, mgmt_group_name):
-    """
-    We just append the dc name here to prevent name clashing among datacenter groups
-    :param dc_name: 
-    :param mgmt_group_name: 
-    :return: 
-    """
-    name = ':{}:{}:'.format(dc_name, mgmt_group_name)
-    return name
-
-
-# TODO exempt usernames do settings: provisioner, guest, Admin ako zo zabbixu
-# todo solve inconsistency in names - usergroup user_group etc
 
 
 class InternalZabbix(_UserGroupAwareZabbix):
