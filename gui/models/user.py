@@ -337,3 +337,30 @@ class User(AbstractBaseUser, PermissionsMixin, _AclMixin, _DcBoundMixin):
                 rels.setdefault(obj_model_name, []).append(str(obj))
 
         return rels
+
+    @property
+    def get_alerting_email(self):
+        # todo add more logic
+        from api.mon.zabbix import ZabbixMediaContainer  # todo  lift
+        if self.email:
+            return ZabbixMediaContainer(ZabbixMediaContainer.MEDIAS['email'], sendto=self.email,
+                                        severities=ZabbixMediaContainer.SEVERITIES,
+                                        period=ZabbixMediaContainer.PERIOD_DEFAULT)
+
+    @property
+    def get_alerting_phone(self):
+        # todo add more logic - 1/0, verified/not etc
+        from api.mon.zabbix import ZabbixMediaContainer  # todo  lift
+        if self.userprofile.phone:
+            return ZabbixMediaContainer(ZabbixMediaContainer.MEDIAS['phone'], sendto=self.userprofile.phone,
+                                        severities=ZabbixMediaContainer.SEVERITIES,
+                                        period=ZabbixMediaContainer.PERIOD_DEFAULT_WORKING_HOURS)
+
+    @property
+    def get_alerting_xmpp(self):
+        # todo add more logic - 1/0, verified/not etc
+        from api.mon.zabbix import ZabbixMediaContainer  # todo  lift
+        if self.userprofile.jabber:
+            return ZabbixMediaContainer(ZabbixMediaContainer.MEDIAS['xmpp'], sendto=self.userprofile.jabber,
+                                        severities=ZabbixMediaContainer.SEVERITIES,
+                                        period=ZabbixMediaContainer.PERIOD_DEFAULT)

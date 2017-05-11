@@ -8,7 +8,8 @@ from api.vm.status.tasks import vm_status_all
 from api.mon.vm.tasks import mon_vm_sync, mon_vm_delete
 from api.mon.node.tasks import mon_node_status_sync, mon_node_delete
 from api.imagestore.base.handlers import imagestore_settings_changed_handler
-
+from api.mon.base.tasks import mon_user_group_changed, mon_user_changed
+from blinker import signal
 
 # noinspection PyUnusedLocal
 def noop(*args, **kwargs):
@@ -29,5 +30,14 @@ node_unreachable.connect(noop)
 node_deleted.connect(mon_node_delete.call)
 dc_settings_changed.connect(dc_node_settings_changed_handler)
 dc_settings_changed.connect(imagestore_settings_changed_handler)
+
+# todo presunut niekam kde to ma byt, api.accounts alebo gui.models
+dc_access_changed = signal('dc_access_changed', doc='Datacenter access group changed.')
+group_changed = signal('group_changed', doc='Access group changed.')
+user_changed = signal('user_changed', doc='User details changed.')
+
+dc_access_changed.connect(mon_user_group_changed.call) #FIXME
+group_changed.connect(mon_user_group_changed.call) #FIXME
+user_changed.connect(mon_user_changed.call) #FIXME
 
 # Note: Other signals are connected in api.mon.vm.tasks and api.mon.node.tasks

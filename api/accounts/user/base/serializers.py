@@ -11,7 +11,7 @@ from api.dc.utils import get_dc
 from gui.models import User, Role
 from vms.models import Dc
 
-INVALID_USERNAMES = frozenset(['profile'])
+INVALID_USERNAMES = frozenset(['profile','Admin','provisioner'])  # TODO presunut do conf settings
 
 
 class ApiKeysSerializer(s.InstanceSerializer):

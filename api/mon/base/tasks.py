@@ -81,3 +81,17 @@ def mon_hostgroup_list(task_id, dc_id, **kwargs):
         }
         for t in zabbix_hostgroups
     ]
+
+@cq.task(name='api.mon.base.tasks.mon_user_group_changed', base=InternalTask) # .call zo signalov je v InternalTask
+def mon_user_group_changed():
+    pass #TODO move after merge
+
+
+@cq.task(name='api.mon.base.tasks.mon_user_changed', base=InternalTask)
+def mon_user_changed():
+    pass #TODO move after merge
+
+
+@cq.task(name='api.mon.base.tasks.mon_user_media_changed', base=InternalTask)
+def mon_user_media_changed():
+    pass #TODO move after merge

@@ -61,6 +61,7 @@ class UserView(APIView):
             return True
 
     def user_modify(self, update=False, serializer=None):
+        # TODO here and on 2x2 more places put signal for alerting synchronization, prepare for refactoring perhaps
         if not serializer:
             serializer = self.serializer
 
