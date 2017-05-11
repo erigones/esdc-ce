@@ -275,8 +275,8 @@ class SlaveVm(_JsonPickleModel):
 
         # Recalculate node resources after failover
         if not self.reserve_resources:
-            old_vm.save(update_node_resource=True)
-            new_vm.save(update_node_resource=True)
+            old_vm.save(update_node_resources=True)
+            new_vm.save(update_node_resources=True)
 
         return new_vm
 
