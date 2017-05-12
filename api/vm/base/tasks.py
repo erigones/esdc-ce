@@ -227,6 +227,7 @@ def vm_update_cb(result, task_id, vm_uuid=None, new_node_uuid=None):
             'boot_timestamp',
             'autoboot',
             'vnc_port',
+            'update_disks',
         )
 
         if new_node_uuid:

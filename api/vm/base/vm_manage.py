@@ -38,7 +38,8 @@ class VmManage(APIView):
         if request.method == 'GET':  # get() uses different methods for getting vm(s) object(s)
             self.vm = None
         else:
-            self.vm = get_vm(request, hostname_or_uuid, exists_ok=True, noexists_fail=True)
+            self.vm = get_vm(request, hostname_or_uuid, exists_ok=True, noexists_fail=True,
+                             check_node_status=('POST', 'DELETE'))
 
     @staticmethod
     def fix_create(vm):
@@ -291,6 +292,7 @@ class VmManage(APIView):
         if not (request.user and request.user.is_admin(request)):
             raise PermissionDenied
 
+        node = vm.node
         apiview = self.apiview
         apiview['force'] = bool(ForceSerializer(data=self.data, default=False))
         queue = vm.node.fast_queue
@@ -316,9 +318,6 @@ class VmManage(APIView):
 
                 if node.hostname == vm.node.hostname:
                     raise InvalidInput('VM already has the requested node set in DB')
-
-                if node.status != node.ONLINE:
-                    raise NodeIsNotOperational
 
                 apiview['node'] = detail_dict['node'] = node.hostname
                 queue = node.fast_queue
@@ -354,6 +353,11 @@ class VmManage(APIView):
             vm_updated.send(TaskID(res.data.get('task_id'), request=request), vm=vm)  # Signal!
 
             return res
+
+        # Check compute node status after we know which compute node the task is going to be run on
+        # The internal vm.node.status checking is disabled in get_vm() in __init__
+        if node.status != node.ONLINE:
+            raise NodeIsNotOperational
 
         msg = LOG_VM_UPDATE
         meta = {
