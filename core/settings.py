@@ -646,16 +646,6 @@ ACL_ENABLED = True  # Module
 # Usernames that clashes with zabbix system usernames etc.
 INVALID_USERNAMES = frozenset(['profile','Admin','provisioner'])
 
-# ESDC :: Third Party Apps Settings
-THIRD_PARTY_APPS, THIRD_PARTY_MODULES = collect_third_party_apps_and_settings(locals())
-
-# Updated INSTALLED_APPS with THIRD_PARTY_APPS, make sure nobody fiddle with it.
-if THIRD_PARTY_APPS_ENABLED:
-    INSTALLED_APPS = tuple(list(INSTALLED_APPS) + THIRD_PARTY_APPS)
-    MODULES += THIRD_PARTY_MODULES
-
-MODULES = frozenset(MODULES)
-
 # location of key/cert files needed to authenticate against update server
 UPDATE_KEY_FILE = path.join(LIBDIR, 'update.key')
 UPDATE_CERT_FILE = path.join(LIBDIR, 'update.crt')
@@ -669,5 +659,16 @@ try:
     from local_settings import *
 except ImportError:
     pass
+
+
+# ESDC :: Third Party Apps Settings
+THIRD_PARTY_APPS, THIRD_PARTY_MODULES = collect_third_party_apps_and_settings(locals())
+
+# Updated INSTALLED_APPS with THIRD_PARTY_APPS, make sure nobody fiddle with it.
+if THIRD_PARTY_APPS_ENABLED:
+    INSTALLED_APPS = tuple(list(INSTALLED_APPS) + THIRD_PARTY_APPS)
+    MODULES += THIRD_PARTY_MODULES
+
+MODULES = frozenset(MODULES)
 
 #^^^^^^^        THIS BLOCK SHOULD BE ALWAYS AT THE BOTTOM      ^^^^^^^^^^^^^^^^
