@@ -9,6 +9,7 @@ class TestUsergroupManipulation(TestCase):
 
     def setUp(self):
         self.zabbix = getZabbix(Dc.objects.all()[0]).izx
+        assert User.objects.count()>5,"you have to have at least 5 users in the database to run tests"
 
     def test_user_manipulation(self):
         # create users and group

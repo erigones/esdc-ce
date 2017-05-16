@@ -4,7 +4,7 @@ from api.accounts.user.profile.serializers import UserProfileSerializer
 from api.accounts.user.utils import get_user, get_user_profiles
 from api.accounts.messages import LOG_PROFILE_UPDATE
 from api.task.response import SuccessTaskResponse, FailureTaskResponse
-
+from api.mon.alerting.tasks import mon_user_changed
 
 class UserProfileView(APIView):
     serializer = UserProfileSerializer
@@ -41,6 +41,7 @@ class UserProfileView(APIView):
             return FailureTaskResponse(self.request, ser.errors, obj=profile, dc_bound=False)
 
         ser.save()
+        mon_user_changed.call(self.request,user_name=ser.object.user.username)
 
         return SuccessTaskResponse(self.request, ser.data, obj=self.user, detail_dict=ser.detail_dict(),
                                    owner=ser.object.user, msg=LOG_PROFILE_UPDATE, dc_bound=False)

@@ -10,6 +10,7 @@ from api.dc.utils import attach_dc_virt_object
 from api.dc.messages import LOG_GROUP_ATTACH
 from gui.models import User, Role
 from vms.models import DefaultDc
+from api.mon.alerting.tasks import mon_user_group_changed
 
 
 class GroupView(APIView):
@@ -65,7 +66,7 @@ class GroupView(APIView):
             return FailureTaskResponse(request, ser.errors, obj=group, dc_bound=False)
 
         ser.save()
-
+        mon_user_group_changed.call(request,group_name=ser.object.name)
         if update:
             msg = LOG_GROUP_UPDATE
             status = HTTP_200_OK
@@ -140,5 +141,5 @@ class GroupView(APIView):
         group = self.group
         dd = {'permissions': list(group.permissions.all().values_list('name', flat=True))}
         group.delete()
-
+        mon_user_group_changed.call(self.request,group_name=group.name)
         return SuccessTaskResponse(self.request, None, obj=group, msg=LOG_GROUP_DELETE, detail_dict=dd, dc_bound=False)

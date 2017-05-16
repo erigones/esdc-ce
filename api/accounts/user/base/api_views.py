@@ -12,6 +12,7 @@ from api.accounts.messages import LOG_USER_CREATE, LOG_USER_UPDATE, LOG_USER_DEL
 from api.task.response import SuccessTaskResponse, FailureTaskResponse
 from gui.models import User, AdminPermission
 from vms.models import Dc, DefaultDc
+from api.mon.alerting.tasks import mon_user_changed
 
 
 class UserView(APIView):
@@ -61,7 +62,6 @@ class UserView(APIView):
             return True
 
     def user_modify(self, update=False, serializer=None):
-        # TODO here and on 2x2 more places put signal for alerting synchronization, prepare for refactoring perhaps
         if not serializer:
             serializer = self.serializer
 
@@ -72,7 +72,7 @@ class UserView(APIView):
             return FailureTaskResponse(self.request, ser.errors, obj=user, dc_bound=False)
 
         ser.save()
-
+        mon_user_changed.call(self.request,username=ser.object.username)
         if update:
             msg = LOG_USER_UPDATE
             status = HTTP_200_OK
@@ -138,7 +138,7 @@ class UserView(APIView):
         old_roles = list(user.roles.all())
         ser = self.serializer(self.request, user)
         ser.object.delete()
-
+        mon_user_changed.call(self.request, username=ser.object.username)
         res = SuccessTaskResponse(self.request, None, obj=user, msg=LOG_USER_DELETE, detail_dict=dd, dc_bound=False)
 
         # User was removed, which may affect the cached list of DC admins for DCs which are attached to user's groups
