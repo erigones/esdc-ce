@@ -67,6 +67,7 @@ def cache_result(f):
     """
     Decorator for caching simple function output.
     """
+
     def wrap(obj, *args, **kwargs):
         if kwargs.pop('bypass_cache', False):
             return f(obj, *args, **kwargs)
@@ -88,6 +89,7 @@ def cache_result(f):
                 obj.__cache__[key] = (res, expiry)
 
         return res
+
     return wrap
 
 
@@ -102,6 +104,7 @@ class FakeDetailLog(object):
     """
     Dummy list-like object used for collecting log lines.
     """
+
     def add(self, *args):
         pass
 
@@ -702,8 +705,8 @@ class _Zabbix(object):
                     hi = iface
 
                     if (iface['dns'] != interface['dns'] or iface['ip'] != interface['ip'] or
-                            str(iface['port']) != str(interface['port']) or
-                            str(iface['useip']) != str(interface['useip'])):
+                                str(iface['port']) != str(interface['port']) or
+                                str(iface['useip']) != str(interface['useip'])):
                         # Host ip or dns changed -> update host interface
                         interface['interfaceid'] = iface['interfaceid']
                         interfaces[i] = interface
@@ -1020,7 +1023,7 @@ class _UserGroupAwareZabbix(_Zabbix):
         for user in redundant_users:
             print "user deletion:{}".format(user)
             self.remove_user_from_user_group(user, zabbix_user_group, delete_user_if_last=delete_users_if_last)
-        #TODO create also a faster way of removal for users that has also different groups
+            # TODO create also a faster way of removal for users that has also different groups
 
 
 class ZabbixNamedContainer(object):
@@ -1040,7 +1043,6 @@ class ZabbixNamedContainer(object):
 
     def __ne__(self, other):
         return not self.__eq__(other)
-
 
     def __hash__(self):
         return self.name.__hash__()
@@ -1239,6 +1241,7 @@ class ZabbixHostGroupContainer(object):
         name = ':{}:{}:{}:{}:'.format(dc_name, node_name, vm_uuid, tag)
         return name
 
+
 class ZabbixUserGroupContainer(ZabbixNamedContainer):
     FRONTEND_ACCESS_ENABLED_WITH_DEFAULT_AUTH = 0
     FRONTEND_ACCESS_DISABLED = 2
@@ -1383,6 +1386,7 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
         """
         name = ':{}:{}:'.format(dc_name, local_group_name)
         return name
+
 
 class ObjectManipulationError(ZabbixError):
     pass
@@ -2063,4 +2067,4 @@ class Zabbix(object):
         """[EXTERNAL] Return list of available hostgroups"""
         return self.ezx.get_hostgroup_list()
 
-    # todo the logic regarding separation of internal and external funcionality will be here
+        # todo the logic regarding separation of internal and external funcionality will be here

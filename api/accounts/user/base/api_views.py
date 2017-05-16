@@ -72,7 +72,7 @@ class UserView(APIView):
             return FailureTaskResponse(self.request, ser.errors, obj=user, dc_bound=False)
 
         ser.save()
-        mon_user_changed.call(self.request,username=ser.object.username)
+        mon_user_changed.call(self.request, username=ser.object.username)
         if update:
             msg = LOG_USER_UPDATE
             status = HTTP_200_OK

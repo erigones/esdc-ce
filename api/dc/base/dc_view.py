@@ -143,13 +143,14 @@ class DcView(APIView):
         if ser.groups_changed:
             # The groups that are removed or added should not be DC-bound anymore
             for group in ser.groups_changed:
-                mon_user_group_changed.call(request, group_name=group.name) #TODO maybe it's duplicite so we don't have to do this
+                mon_user_group_changed.call(request,
+                                            group_name=group.name)  # TODO maybe it's duplicite so we don't have to do this
                 if group.dc_bound:
                     remove_dc_binding_virt_object(task_id, LOG_GROUP_UPDATE, group, user=request.user)
 
         # After changing the DC owner or changing DC groups we have to invalidate the list of admins for this DC
         if ser.owner_changed or ser.groups_changed:
-            mon_user_group_changed.call(request,dc_name=dc.name)
+            mon_user_group_changed.call(request, dc_name=dc.name)
             User.clear_dc_admin_ids(dc)
             # Remove user.dc_bound flag for new DC owner
             # Remove user.dc_bound flag for users in new dc.groups, which are DC-bound, but not to this datacenter
@@ -187,7 +188,7 @@ class DcView(APIView):
 
         # After deleting a DC the current_dc is automatically set to DefaultDc by the on_delete db field parameter
         ser.object.delete()
-        mon_user_group_changed.call(request,dc_name=ser.object.name)
+        mon_user_group_changed.call(request, dc_name=ser.object.name)
 
         # Remove cached tasklog for this DC (DB tasklog entries will be remove automatically)
         delete_tasklog_cached(dc_id)
