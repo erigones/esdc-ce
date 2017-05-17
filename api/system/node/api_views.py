@@ -121,7 +121,7 @@ class NodeUpdateView(APIView):
             raise PreconditionRequired('Node is already up-to-date')
 
         if node.status != node.OFFLINE:
-            raise NodeIsNotOperational('Unable to perform update on node that is not in OFFLINE state!')
+            raise NodeIsNotOperational('Unable to perform update on node that is not in maintenance state!')
 
         lock = TaskLock(self._lock_key, desc='System task')
 

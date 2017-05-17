@@ -142,7 +142,8 @@ If not present, cached cert file "update.crt" will be used.
         :status 403: Forbidden
         :status 404: Node not found
         :status 417: Node update file is not available
-        :status 423: Node is not offline / Node version information could not be retrieved / Task is already running
+        :status 423: Node is not in maintenance state / Node version information could not be retrieved / \
+Task is already running
         :status 428: Node is already up-to-date
         :status 504: Node worker is not responding
     """
