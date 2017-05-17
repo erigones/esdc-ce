@@ -6,6 +6,7 @@ from django.conf import settings as django_settings
 from django.core.cache import cache
 from django.utils.six import iteritems
 from frozendict import frozendict
+from gui.models.permission import AdminPermission
 
 from zabbix_api import ZabbixAPI, ZabbixAPIException
 from api.decorators import catch_exception
@@ -890,25 +891,39 @@ class _Zabbix(object):
 class _UserGroupAwareZabbix(_Zabbix):
     # you can access zapi directly, no need to create something to access zapi
 
-    def synchronize_user(self, user):
+    def update_user(self, user):
         """        
         :param user: 
         :return: 
         """
-        raise NotImplementedError
+        zuc = ZabbixUserContainer.from_mgmt_data(self.zapi, user)
+        zuc.to_zabbix(basic_info=True, media_info=True, groups_info=True)
 
-    def delete_user(self, user):
-        assert user.zabbix_id or user.name, "Who should I delete?"
+    def delete_user(self, user=None, user_name=None):
+        assert (user and user.zabbix_id or user.name) or user_name, "Who should I delete?"
 
-        if user.zabbix_id:
-            print 'deleting user {}'.format(user.zabbix_id)
-            self.zapi.user.delete([user.zabbix_id])
+        if user_name:
+            try:
+                user = self._get_zabbix_user(user_name)
+            except RemoteObjectDoesNotExist:
+                return
+
+        elif user.zabbix_id:
+            try:
+                user = self._get_zabbix_user(user.zabbix_id)
+            except RemoteObjectDoesNotExist:
+                return
+
+        elif user.name:
+            try:
+                user = self._get_zabbix_user(user.name)
+            except RemoteObjectDoesNotExist:
+                return
         else:
-            user = self._get_zabbix_user(user.name)
-            print 'deleting user {}'.format(user.zabbix_id)
-            self.zapi.user.delete([user.zabbix_id])
+            raise AssertionError()
 
-        user.zabbix_id = None
+        self.zapi.user.delete([user.zabbix_id])
+        user.zabbix_id = None  # unnecessary perhaps?
 
     def remove_user_from_user_group(self, user, user_group, delete_user_if_last=False):
         """
@@ -934,16 +949,27 @@ class _UserGroupAwareZabbix(_Zabbix):
 
     def delete_user_group(self, zabbix_id=None, group_name=None, group=None):
         assert zabbix_id or group_name or (group and group.zabbix_id)
+        # z.zapi.usergroup.get({'search': {'name': ":dc_name:*"}, 'searchWildcardsEnabled': True})
+
         if zabbix_id:
-            group = ZabbixUserGroupContainer.from_zabbix_id(self.zapi, zabbix_id)
+            try:
+                group = ZabbixUserGroupContainer.from_zabbix_id(self.zapi, zabbix_id)
+            except RemoteObjectDoesNotExist:
+                return
         elif group_name:
-            group = ZabbixUserGroupContainer.from_name(self.zapi, group_name)
+            try:
+                group = ZabbixUserGroupContainer.from_name(self.zapi, group_name)
+            except RemoteObjectDoesNotExist:
+                return
+
         elif group:
             group.refresh()
         else:
             raise ValueError
-
+        print "going to delete group %s" % group.name
+        print "group users before: %s" % (group.users)
         self._remove_users_from_user_group(group, group.users, delete_users_if_last=True)  # remove all users
+        print "group users after: %s" % (group.users)
         self.zapi.usergroup.delete([group.zabbix_id])
 
     def _synchronize_user_media(self, user):
@@ -986,8 +1012,10 @@ class _UserGroupAwareZabbix(_Zabbix):
 
         zabbix_user_group = self._get_zabbix_user_group(group_name)
         if zabbix_user_group:
+            # if exists, we synchronize it
             self._synchronize_user_group(zabbix_user_group, user_group)
         else:
+            # otherwise we create it
             user_group.to_zabbix(True, True, True)
 
         return user_group
@@ -996,6 +1024,7 @@ class _UserGroupAwareZabbix(_Zabbix):
         raise NotImplementedError
 
     def _sync_user_group_base(self, zabbix_user_group, user_group):
+        #  superuser group status
         raise NotImplementedError  # what should be here?
 
     def _synchronize_user_group(self, zabbix_user_group, user_group):
@@ -1004,7 +1033,7 @@ class _UserGroupAwareZabbix(_Zabbix):
         print "todo hostgroups and base update"
         return
         self.__sync_user_group_hostgroups(zabbix_user_group, user_group)  # todo
-        self._sync_user_group_base(zabbix_user_group, user_group)  # this should be easy? # todo
+        self._sync_user_group_base(zabbix_user_group, user_group)  # todo
 
     def _synchronize_users_in_user_group(self, remote_user_group, source_user_group):
         print "remote_user_group.users", remote_user_group.users
@@ -1021,7 +1050,6 @@ class _UserGroupAwareZabbix(_Zabbix):
 
         # Some zabbix users has to be deleted as this is their last group. We have to go the slower way.
         for user in redundant_users:
-            print "user deletion:{}".format(user)
             self.remove_user_from_user_group(user, zabbix_user_group, delete_user_if_last=delete_users_if_last)
             # TODO create also a faster way of removal for users that has also different groups
 
@@ -1063,6 +1091,7 @@ class ZabbixUserContainer(ZabbixNamedContainer):
     MEDIA_ENABLED = 0  # SIC in zabbix docs: 0 - enabled, 1 - disabled.
     USER_QUERY_BASE = {'selectUsrgrps': ['usrgrpid', 'name', 'gui_access'],
                        'selectMedias': ['mediatypeid', 'sendto']}  # FIXME mutable
+    _user = None
 
     def __init__(self, name, zapi=None):
         super(ZabbixUserContainer, self).__init__(name)
@@ -1074,8 +1103,9 @@ class ZabbixUserContainer(ZabbixNamedContainer):
     def from_mgmt_data(cls, zapi, user):
         try:
             container = cls.from_zabbix_alias(zapi, user.username)
-        except Exception:
+        except RemoteObjectDoesNotExist:
             container = cls(zapi=zapi, name=user.username)
+            # fill groups that should be added for the user. or not?
         container._user = user
         return container
 
@@ -1087,14 +1117,17 @@ class ZabbixUserContainer(ZabbixNamedContainer):
             assert len(response) == 1, 'user mapping should be injective'
             return cls.from_zabbix_data(zapi, response[0])
         else:
-            # todo is this consistent? should we fail silently, return clean object or raise exception?
-            raise Exception("object doesn't exist in zabbix")  # todo narrow exception and it's catchers
+            raise RemoteObjectDoesNotExist()
 
     @classmethod
     def from_zabbix_id(cls, zapi, zabbix_id):
         response = zapi.user.get(dict(userids=zabbix_id, **cls.USER_QUERY_BASE))
-        assert len(response) == 1, 'user mapping should be injective'
-        return cls.from_zabbix_data(zapi, response[0])
+
+        if response:
+            assert len(response) == 1, 'user mapping should be injective'
+            return cls.from_zabbix_data(zapi, response[0])
+        else:
+            raise RemoteObjectDoesNotExist()
 
     @classmethod
     def from_zabbix_data(cls, zapi, api_response_object):
@@ -1132,6 +1165,7 @@ class ZabbixUserContainer(ZabbixNamedContainer):
             basic_info = media_info = groups_info = True
 
         if groups_info:
+            # FIXME we cannot create user without group
             assert self.groups and all(group.zabbix_id for group in self.groups), self.groups
 
             user_object['usrgrps'] = [group.zabbix_id for group in self.groups]  # this cannot be set because of json
@@ -1165,7 +1199,7 @@ class ZabbixUserContainer(ZabbixNamedContainer):
             print "updating user: %s" % user_object
             self._api_response = self._zapi.user.update(user_object)
         else:
-            user_object['passwd'] = 'TODO'  # TODO
+            user_object['passwd'] = self._user.__class__.objects.make_random_password(20)
             print "creating user: %s" % user_object
             self._api_response = self._zapi.user.create(user_object)
             self.zabbix_id = self._api_response['userids'][0]
@@ -1262,12 +1296,18 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
     @classmethod
     def from_zabbix_id(cls, zapi, zabbix_id):
         response = zapi.usergroup.get(dict(usrgrpids=[zabbix_id], **cls.QUERY_BASE))
-        return cls.from_zabbix_data(zapi, response[0])
+        if response:
+            return cls.from_zabbix_data(zapi, response[0])
+        else:
+            raise RemoteObjectDoesNotExist()
 
     @classmethod
     def from_name(cls, zapi, name):
         response = zapi.usergroup.get(dict(search={'name': name}, **cls.QUERY_BASE))
-        return cls.from_zabbix_data(zapi, response[0])
+        if response:
+            return cls.from_zabbix_data(zapi, response[0])
+        else:
+            raise RemoteObjectDoesNotExist()
 
     @classmethod
     def from_mgmt_data(cls, zapi, group_name, users, accessible_hostgroups=(), superusers=False):
@@ -1389,6 +1429,10 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
 
 
 class ObjectManipulationError(ZabbixError):
+    pass
+
+
+class RemoteObjectDoesNotExist(ZabbixError):
     pass
 
 
@@ -1592,7 +1636,7 @@ class InternalZabbix(_UserGroupAwareZabbix):
             raise ZabbixError(e)
 
 
-class ExternalZabbix(_Zabbix):
+class ExternalZabbix(_UserGroupAwareZabbix):
     """
     Application zabbix per DC (monitoring from inside/VM agent).
     """
@@ -2067,4 +2111,54 @@ class Zabbix(object):
         """[EXTERNAL] Return list of available hostgroups"""
         return self.ezx.get_hostgroup_list()
 
-        # todo the logic regarding separation of internal and external funcionality will be here
+    def update_user_group(self, group=None, dc_as_group=None):
+        kwargs = {}
+        if dc_as_group:
+            # special case when DC itself acts as a group
+
+            kwargs['superusers'] = True
+            kwargs['group_name'] = '#owner'
+            kwargs['users'] = [
+                self.dc.owner]  # TODO add all superadmins perhaps or create a separate group for them in every DC
+            kwargs['accessible_hostgroups'] = ()  # TODO
+        else:
+
+            kwargs['group_name'] = ZabbixUserGroupContainer.user_group_name_factory(dc_name=self.dc.name,
+                                                                                    local_group_name=group.name)
+            kwargs['users'] = group.user_set.all()
+            kwargs['accessible_hostgroups'] = ()  # TODO
+            kwargs['superusers'] = group.permissions.filter(name=AdminPermission.name).exists()
+
+        if self.internal_and_external_zabbix_share_backend:
+            self.ezx.synchronize_user_group(**kwargs)
+        else:
+            self.izx.synchronize_user_group(**kwargs)
+            self.ezx.synchronize_user_group(**kwargs)
+
+    def delete_user_group(self, name):
+        group_name = ZabbixUserGroupContainer.user_group_name_factory(
+            local_group_name=name,
+            dc_name=self.dc.name)
+        if self.internal_and_external_zabbix_share_backend:
+            self.ezx.delete_user_group(group_name=group_name)
+        else:
+            self.izx.delete_user_group(group_name=group_name)
+            self.ezx.delete_user_group(group_name=group_name)
+
+    def update_user(self, user):
+        if self.internal_and_external_zabbix_share_backend:
+            self.ezx.update_user(user)
+        else:
+            self.izx.update_user(user)
+            self.ezx.update_user(user)
+
+    def delete_user(self, name):
+        if self.internal_and_external_zabbix_share_backend:
+            self.ezx.delete_user(name)
+        else:
+            self.izx.delete_user(name)
+            self.ezx.delete_user(name)
+
+    @property
+    def internal_and_external_zabbix_share_backend(self):
+        return self.izx.zapi == self.ezx.zapi
