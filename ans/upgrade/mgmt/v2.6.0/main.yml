@@ -1,0 +1,10 @@
+
+# Related to:
+#  - https://github.com/erigones/esdc-factory/commit/3e3ed30abcd485d58c548625a39802234fbb57dc
+- name: Updating master IPs in cfgdb
+  local_action:
+    module: shell
+    args: "bash -e {{ current_task_dir }}/files/update_master_ips_in_cfgdb.sh"
+  environment:
+    ERIGONES_HOME: "{{ erigones_home }}"
+    PATH: "{{ erigones_home }}/bin:{{ erigones_home }}/envs/bin:$PATH"
