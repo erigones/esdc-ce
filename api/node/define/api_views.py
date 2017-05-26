@@ -161,9 +161,6 @@ class NodeDefineView(APIView):
                     'external_zabbix_sync': vm.is_external_zabbix_sync_active()}
                    for vm in node.vm_set.select_related('dc').all()]
         else:
-            if node.is_head:
-                raise PreconditionRequired('Head node cannot be deleted')
-
             vms = ()
             # Simulate turning compute and backup flags off
             ser = NodeDefineSerializer(self.request, node, data={'is_backup': False, 'is_compute': False}, partial=True)
