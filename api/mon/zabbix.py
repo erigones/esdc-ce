@@ -891,7 +891,7 @@ class _Zabbix(object):
 class _UserGroupAwareZabbix(_Zabbix):
     # you can access zapi directly, no need to create something to access zapi
 
-    def update_user(self, user):
+    def synchronize_user(self, user):
         """
         We check whether the user object exists in zabbix, if not, we create it. If it does, we update it.
         :param user: 
@@ -1026,7 +1026,7 @@ class _UserGroupAwareZabbix(_Zabbix):
         zabbix_user_group = self._get_zabbix_user_group(group_name)
         if zabbix_user_group:
             # if exists, we synchronize it
-            self._synchronize_user_group(zabbix_user_group, user_group)
+            self._update_user_group(zabbix_user_group, user_group)
         else:
             # otherwise we create it
             user_group.to_zabbix(True, True, True)
@@ -1040,7 +1040,7 @@ class _UserGroupAwareZabbix(_Zabbix):
         #  superuser group status
         raise NotImplementedError  # what should be here?
 
-    def _synchronize_user_group(self, zabbix_user_group, user_group):
+    def _update_user_group(self, zabbix_user_group, user_group):
         # todo this way or all in one call prepared?
         self._synchronize_users_in_user_group(zabbix_user_group, user_group)
         logger.debug('todo hostgroups and base update')
@@ -2160,10 +2160,10 @@ class Zabbix(object):
 
     def synchronize_user(self, user):
         if self.internal_and_external_zabbix_share_backend:
-            self.ezx.update_user(user)
+            self.ezx.synchronize_user(user)
         else:
-            self.izx.update_user(user)
-            self.ezx.update_user(user)
+            self.izx.synchronize_user(user)
+            self.ezx.synchronize_user(user)
 
     def delete_user(self, name):
         if self.internal_and_external_zabbix_share_backend:
