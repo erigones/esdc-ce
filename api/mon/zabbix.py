@@ -892,12 +892,18 @@ class _UserGroupAwareZabbix(_Zabbix):
     # you can access zapi directly, no need to create something to access zapi
 
     def update_user(self, user):
-        """        
+        """
+        We check whether the user object exists in zabbix, if not, we create it. If it does, we update it.
         :param user: 
         :return: 
         """
-        zuc = ZabbixUserContainer.from_mgmt_data(self.zapi, user)
-        zuc.to_zabbix(basic_info=True, media_info=True, groups_info=True)
+        existing_zabbix_user = self._get_zabbix_user(zabbix_alias =user.username)
+        zabbix_user_to_be = ZabbixUserContainer.from_mgmt_data(self.zapi, user)
+
+        if existing_zabbix_user:
+            self._update_user(existing_zabbix_user, zabbix_user_to_be)
+        else:
+            zabbix_user_to_be.to_zabbix(basic_info=True, media_info=True, groups_info=True)
 
     def delete_user(self, user=None, user_name=None):
         logger.debug('trying to delete user %s', user or user_name)
@@ -1000,10 +1006,13 @@ class _UserGroupAwareZabbix(_Zabbix):
     def _get_zabbix_host_group_details(self, host_group_name):
         raise NotImplementedError
 
+    def _update_user(self,existing_user, new_user):
+        raise NotImplementedError() #TODO
+
     def synchronize_user_group(self, group_name, users, accessible_hostgroups, superusers=False):
         """
         Make sure that in the end, there will be a user group with specified users in zabbix.
-         ((((which zabbix? - not a question for this function, it should be solved on a upper layer (Zabbix)))))
+        The question to which Zabbix is not solved on this layer.
         User has to be removed in case she is being removed from the last group
         TODO superuser synchronization should be in the DC settings - not everybody might want to sync some strangers in it's zabbix 
         :param superusers: permissions will be r-w and frontend access will be enabled
@@ -2114,7 +2123,7 @@ class Zabbix(object):
         """[EXTERNAL] Return list of available hostgroups"""
         return self.ezx.get_hostgroup_list()
 
-    def update_user_group(self, group=None, dc_as_group=None):
+    def synchronize_user_group(self, group=None, dc_as_group=None):
         kwargs = {}
         if dc_as_group:
             # special case when DC itself acts as a group
@@ -2149,7 +2158,7 @@ class Zabbix(object):
             self.izx.delete_user_group(group_name=group_name)
             self.ezx.delete_user_group(group_name=group_name)
 
-    def update_user(self, user):
+    def synchronize_user(self, user):
         if self.internal_and_external_zabbix_share_backend:
             self.ezx.update_user(user)
         else:

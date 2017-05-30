@@ -20,7 +20,7 @@ def mon_user_group_changed(task_id, sender, group_name=None, dc_name=None, *args
         if q.exists():
             group = q.get()
             logger.debug( 'going to update %s from %s', (group.name, dc.name))
-            zabbix.update_user_group(group=group)
+            zabbix.synchronize_user_group(group=group)
         else:
             logger.debug( 'going to delete %s from %s', (group_name, dc.name))
             zabbix.delete_user_group(name=group_name)
@@ -33,7 +33,7 @@ def mon_user_group_changed(task_id, sender, group_name=None, dc_name=None, *args
                 "TODO")  # When DC is deleted, we lose the access to the zabbix and therefore we don't know what to do
         else:
             zabbix = getZabbix(dc)
-            zabbix.update_user_group(dc_as_group=True)  # DC name is implied by the zabbix instance
+            zabbix.synchronize_user_group(dc_as_group=True)  # DC name is implied by the zabbix instance
 
     elif group_name:
         # group under all dcs changed
@@ -45,7 +45,7 @@ def mon_user_group_changed(task_id, sender, group_name=None, dc_name=None, *args
             for dc in group.dc_set.all():
                 logger.debug( 'going to update %s from %s', (group.name, dc.name))
                 zabbix = getZabbix(dc)
-                zabbix.update_user_group(group=group)
+                zabbix.synchronize_user_group(group=group)
             # and delete where it shouldn't be
             for dc in Dc.objects.exclude(roles=group):  # TODO this is quite expensive and I would like to avoid this
                 logger.debug( 'going to delete %s from %s', (group.name, dc.name))
@@ -73,11 +73,11 @@ def mon_user_changed(task_id, sender, user_name, dc_name=None, *args, **kwargs):
         if dc_name:
             dc = Dc.objects.get_by_name(dc_name)
             zabbix = getZabbix(dc)
-            zabbix.update_user(user=user)
+            zabbix.synchronize_user(user=user)
         else:
             for dc in Dc.objects.all():
                 zabbix = getZabbix(dc)
-                zabbix.update_user(user=user)
+                zabbix.synchronize_user(user=user)
     else:
         if dc_name:
             dc = Dc.objects.get_by_name(dc_name)
