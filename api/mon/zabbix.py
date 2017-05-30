@@ -900,23 +900,24 @@ class _UserGroupAwareZabbix(_Zabbix):
         zuc.to_zabbix(basic_info=True, media_info=True, groups_info=True)
 
     def delete_user(self, user=None, user_name=None):
+        logger.debug('trying to delete user %s', user or user_name)
         assert (user and user.zabbix_id or user.name) or user_name, "Who should I delete?"
 
         if user_name:
             try:
-                user = self._get_zabbix_user(user_name)
+                user = self._get_zabbix_user(zabbix_alias=user_name)
             except RemoteObjectDoesNotExist:
                 return
 
         elif user.zabbix_id:
             try:
-                user = self._get_zabbix_user(user.zabbix_id)
+                user = self._get_zabbix_user(zabbix_id=user.zabbix_id)
             except RemoteObjectDoesNotExist:
                 return
 
         elif user.name:
             try:
-                user = self._get_zabbix_user(user.name)
+                user = self._get_zabbix_user(zabbix_alias=user.name)
             except RemoteObjectDoesNotExist:
                 return
         else:
@@ -966,10 +967,10 @@ class _UserGroupAwareZabbix(_Zabbix):
             group.refresh()
         else:
             raise ValueError
-        print "going to delete group %s" % group.name
-        print "group users before: %s" % (group.users)
+        logger.debug('going to delete group %s', group.name)
+        logger.debug('group users before: %s', group.users)
         self._remove_users_from_user_group(group, group.users, delete_users_if_last=True)  # remove all users
-        print "group users after: %s" % (group.users)
+        logger.debug('group users after: %s', group.users)
         self.zapi.usergroup.delete([group.zabbix_id])
 
     def _synchronize_user_media(self, user):
@@ -987,8 +988,11 @@ class _UserGroupAwareZabbix(_Zabbix):
         else:
             return None
 
-    def _get_zabbix_user(self, alias):
-        return ZabbixUserContainer.from_zabbix_alias(self.zapi, alias)
+    def _get_zabbix_user(self, zabbix_alias=None, zabbix_id=None):
+        if zabbix_alias:
+            return ZabbixUserContainer.from_zabbix_alias(self.zapi, zabbix_alias)
+        else:
+            return ZabbixUserContainer.from_zabbix_id(self.zapi, zabbix_id)
 
     def _get_zabbix_host_groups(self, host_group_names):
         raise NotImplementedError  # this is a duplicate of_get_groups
@@ -1030,24 +1034,23 @@ class _UserGroupAwareZabbix(_Zabbix):
     def _synchronize_user_group(self, zabbix_user_group, user_group):
         # todo this way or all in one call prepared?
         self._synchronize_users_in_user_group(zabbix_user_group, user_group)
-        print "todo hostgroups and base update"
+        logger.debug('todo hostgroups and base update')
         return
         self.__sync_user_group_hostgroups(zabbix_user_group, user_group)  # todo
         self._sync_user_group_base(zabbix_user_group, user_group)  # todo
 
     def _synchronize_users_in_user_group(self, remote_user_group, source_user_group):
-        print "remote_user_group.users", remote_user_group.users
-        print "source_user_group.users", source_user_group.users
+        logger.debug('remote_user_group.users %s', remote_user_group.users)
+        logger.debug('source_user_group.users %s', source_user_group.users)
         redundant_users = remote_user_group.users - source_user_group.users
-        print "redundant_users: {}".format(redundant_users)
+        logger.debug('redundant_users: %s', redundant_users)
         missing_users = source_user_group.users - remote_user_group.users
-        print "missing users: {}".format(missing_users)
+        logger.debug('missing users: %s', missing_users)
         self._remove_users_from_user_group(remote_user_group, redundant_users, delete_users_if_last=True)
         remote_user_group.add_users(missing_users)
 
     def _remove_users_from_user_group(self, zabbix_user_group, redundant_users, delete_users_if_last):
         zabbix_user_group.users = zabbix_user_group.users - redundant_users
-
         # Some zabbix users has to be deleted as this is their last group. We have to go the slower way.
         for user in redundant_users:
             self.remove_user_from_user_group(user, zabbix_user_group, delete_user_if_last=delete_users_if_last)
@@ -1083,8 +1086,8 @@ class ZabbixNamedContainer(object):
         return self._name
 
     @name.setter
-    def set_name(self, value):
-        raise NotImplementedError("name is immutable")
+    def name(self, value):
+        raise NotImplementedError('name is immutable')
 
 
 class ZabbixUserContainer(ZabbixNamedContainer):
@@ -1196,11 +1199,11 @@ class ZabbixUserContainer(ZabbixNamedContainer):
             # user_object['type']= TODO self._user.is_superadmin but we miss request
 
         if self.zabbix_id:
-            print "updating user: %s" % user_object
+            logger.debug('updating user: %s', user_object)
             self._api_response = self._zapi.user.update(user_object)
         else:
             user_object['passwd'] = self._user.__class__.objects.make_random_password(20)
-            print "creating user: %s" % user_object
+            logger.debug('creating user: %s', user_object)
             self._api_response = self._zapi.user.create(user_object)
             self.zabbix_id = self._api_response['userids'][0]
             # todo refresh the whole object so that there are real data
@@ -1239,7 +1242,7 @@ class ZabbixMediaContainer(object):
         """
     
         :param active_severities: (SEVERITY_WARNING, SEVERITY_HIGH) 
-        :return: 20 (use as input for media.severity)
+        :return: number to be used as input for media.severity
         """
         result = 0
         for severity in active_severities:
@@ -1383,13 +1386,13 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
                         {'permission': hostgroups_access_permission, 'id': host_group.zabbix_id})
 
         if self.zabbix_id:
-            print "updating usergroup: %s" % user_group_object
+            logger.debug('updating usergroup: %s', user_group_object)
             self._api_response = self._zapi.usergroup.update(user_group_object)
             if users_info:
                 raise NotImplementedError("removing users is not implemented")
 
         else:
-            print "cr usergroup: %s" % user_group_object
+            logger.debug('cr usergroup: %s', user_group_object)
             self._api_response = self._zapi.usergroup.create(user_group_object)
             self.zabbix_id = self._api_response['usrgrpids'][0]
 
@@ -2117,7 +2120,8 @@ class Zabbix(object):
             # special case when DC itself acts as a group
 
             kwargs['superusers'] = True
-            kwargs['group_name'] = '#owner'
+            kwargs['group_name'] = ZabbixUserGroupContainer.user_group_name_factory(dc_name=self.dc.name,
+                                                                                    local_group_name='#owner')
             kwargs['users'] = [
                 self.dc.owner]  # TODO add all superadmins perhaps or create a separate group for them in every DC
             kwargs['accessible_hostgroups'] = ()  # TODO

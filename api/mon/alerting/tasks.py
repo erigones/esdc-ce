@@ -19,10 +19,10 @@ def mon_user_group_changed(task_id, sender, group_name=None, dc_name=None, *args
         q = Role.objects.filter(name=group_name)
         if q.exists():
             group = q.get()
-            print 'going to update %s from %s' % (group.name, dc.name)
+            logger.debug( 'going to update %s from %s', (group.name, dc.name))
             zabbix.update_user_group(group=group)
         else:
-            print 'going to delete %s from %s' % (group_name, dc.name)
+            logger.debug( 'going to delete %s from %s', (group_name, dc.name))
             zabbix.delete_user_group(name=group_name)
     elif dc_name:
         # dc changed
@@ -43,18 +43,18 @@ def mon_user_group_changed(task_id, sender, group_name=None, dc_name=None, *args
             group = q.get()
             # group exists, we have to update where it should be
             for dc in group.dc_set.all():
-                print 'going to update %s from %s' % (group.name, dc.name)
+                logger.debug( 'going to update %s from %s', (group.name, dc.name))
                 zabbix = getZabbix(dc)
                 zabbix.update_user_group(group=group)
             # and delete where it shouldn't be
             for dc in Dc.objects.exclude(roles=group):  # TODO this is quite expensive and I would like to avoid this
-                print 'going to delete %s from %s' % (group.name, dc.name)
+                logger.debug( 'going to delete %s from %s', (group.name, dc.name))
                 zabbix = getZabbix(dc)
                 zabbix.delete_user_group(name=group_name)
         else:
             # group does not exist-> remove from all dcs as we don't know where it was
             for dc in Dc.objects.all():
-                print 'going to delete %s from %s' % (group_name, dc.name)
+                logger.debug( 'going to delete %s from %s', (group_name, dc.name))
                 zabbix = getZabbix(dc)
                 zabbix.delete_user_group(name=group_name)
 
