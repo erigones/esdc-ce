@@ -88,7 +88,7 @@ class TestUsergroupManipulation(TestCase):
         user = ZabbixUserContainer.from_mgmt_data(self.zabbix.zapi, db_user)
         assert not user.zabbix_id
         user.groups.add(g)
-        user.to_zabbix(True, True, True)
+        user.to_zabbix()
         assert user.zabbix_id
         users_id = user.zabbix_id
         same_user = ZabbixUserContainer.from_zabbix_alias(self.zabbix.zapi, db_user.username)

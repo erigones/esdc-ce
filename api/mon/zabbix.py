@@ -903,7 +903,7 @@ class _UserGroupAwareZabbix(_Zabbix):
         if existing_zabbix_user:
             self._update_user(existing_zabbix_user, zabbix_user_to_be)
         else:
-            zabbix_user_to_be.to_zabbix(basic_info=True, media_info=True, groups_info=True)
+            zabbix_user_to_be.to_zabbix()
 
     def delete_user(self, user=None, user_name=None):
         logger.debug('trying to delete user %s', user or user_name)
@@ -950,7 +950,7 @@ class _UserGroupAwareZabbix(_Zabbix):
         user.groups.remove(user_group)
 
         if user.groups:
-            user.to_zabbix(groups_info=True)
+            user.update_group_membership()
         else:
             self.delete_user(user)
 
@@ -1164,6 +1164,13 @@ class ZabbixUserContainer(ZabbixNamedContainer):
             self._refresh_groups(self._api_response)
             # TODO refresh media etc
 
+    def update_group_membership(self):
+        assert self.zabbix_id,"update cannot be done on nonexistent object, create should be done first"
+        user_object={'userid':self.zabbix_id}
+        logger.debug('updating user: %s', user_object)
+        self.attach_group_membership(user_object)
+        self._api_response = self._zapi.user.update(user_object)
+
     def attach_group_membership(self, api_request_object):
         # FIXME we cannot create user without group
         assert self.groups and all(group.zabbix_id for group in self.groups), self.groups
@@ -1187,40 +1194,22 @@ class ZabbixUserContainer(ZabbixNamedContainer):
         # user_object['type']= TODO self._user.is_superadmin but we miss request
 
     def to_zabbix(self, basic_info=False, media_info=False, groups_info=False):
-        assert self.zabbix_id or basic_info or media_info or groups_info, \
-            "It's impossible to create an object without any information about it"
+        assert not self.zabbix_id, "use the relevant update method"
         user_object = {}
 
-        # FIXME The create and update paths are so different that we should make two separate methods for it
-        if self.zabbix_id:
-            user_object['userid'] = self.zabbix_id
-        else:
-            # if user is not created, we force all info to be put into the object
-            basic_info = media_info = groups_info = True
+        self.attach_group_membership(user_object)
 
-        if groups_info:
-            self.attach_group_membership(user_object)
+        self.attach_media(user_object)
 
-        if media_info:
-            if not self.zabbix_id:
-                self.attach_media(user_object)
-            else:
-                raise NotImplementedError(
-                    "Update is done through updatemedia call and not through update, so it has to be done separately")
+        self.attach_basic_info(user_object)
 
-        if basic_info:
-            self.attach_basic_info(user_object)
+        user_object['passwd'] = self._user.__class__.objects.make_random_password(20)
 
-        if self.zabbix_id:
-            logger.debug('updating user: %s', user_object)
-            self._api_response = self._zapi.user.update(user_object)
-        else:
-            user_object['passwd'] = self._user.__class__.objects.make_random_password(20)
-            logger.debug('creating user: %s', user_object)
-            self._api_response = self._zapi.user.create(user_object)
-            self.zabbix_id = self._api_response['userids'][0]
-            # todo refresh the whole object so that there are real data
+        logger.debug('creating user: %s', user_object)
+        self._api_response = self._zapi.user.create(user_object)
+        self.zabbix_id = self._api_response['userids'][0]
 
+        # todo refresh the whole object so that there are real data
         return self
 
 
@@ -1342,9 +1331,9 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
             if not user.zabbix_id:
                 # create user separately
                 # shouldn't this be solved differently to handle addition of the user to the group in one step?
-                user.to_zabbix(True, True, True)
+                user.to_zabbix()
             else:
-                user.to_zabbix(groups_info=True)
+                user.update_group_membership()
         self.users.update(missing_users)
 
     @classmethod
@@ -1362,10 +1351,6 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
         The usrgrpid property must be defined for each user group, all other properties are optional. \
         Only the passed properties will be updated, all others will remain unchanged.
 
-
-        :param basic_info: 
-        :param users_info: 
-        :param hostgroups_info: 
         :return: Object prepared to be sent to the zabbix api (for update if zabbix_id is present, for create if not)
         """
         assert self.zabbix_id or basic_info or hostgroups_info or users_info, \
@@ -1415,10 +1400,10 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
                 for user in self.users:
                     if not user.zabbix_id:
                         user.groups.add(self)
-                        user.to_zabbix(True, True, True)
+                        user.to_zabbix()
                     else:
                         user.groups.add(self)
-                        user.to_zabbix(groups_info=True)
+                        user.update_group_membership()
 
     def refresh(self):
         response = self._zapi.usergroup.get(dict(usrgrpids=self.zabbix_id, **self.QUERY_BASE))
