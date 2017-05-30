@@ -1164,6 +1164,28 @@ class ZabbixUserContainer(ZabbixNamedContainer):
             self._refresh_groups(self._api_response)
             # TODO refresh media etc
 
+    def attach_group_membership(self, api_request_object):
+        # FIXME we cannot create user without group
+        assert self.groups and all(group.zabbix_id for group in self.groups), self.groups
+        # this cannot be a set because it's serialized to json, which is not supported for sets:
+        api_request_object['usrgrps'] = [group.zabbix_id for group in self.groups]
+
+    def attach_media(self, api_request_object):
+        api_request_object['user_medias'] = []
+        for media_type in ZabbixMediaContainer.MEDIAS:
+            user_media = getattr(self._user, 'get_alerting_{}'.format(media_type), None)
+            if user_media:
+                media = {'mediatypeid': user_media.media_type, 'sendto': user_media.sendto, 'period': user_media.period,
+                         'severity': user_media.severity, 'active': self.MEDIA_ENABLED}
+                api_request_object['user_medias'].append(media)
+
+
+    def attach_basic_info(self, api_request_object):
+        api_request_object['alias'] = self._user.username
+        api_request_object['name'] = self._user.first_name
+        api_request_object['surname'] = self._user.last_name
+        # user_object['type']= TODO self._user.is_superadmin but we miss request
+
     def to_zabbix(self, basic_info=False, media_info=False, groups_info=False):
         assert self.zabbix_id or basic_info or media_info or groups_info, \
             "It's impossible to create an object without any information about it"
@@ -1177,35 +1199,17 @@ class ZabbixUserContainer(ZabbixNamedContainer):
             basic_info = media_info = groups_info = True
 
         if groups_info:
-            # FIXME we cannot create user without group
-            assert self.groups and all(group.zabbix_id for group in self.groups), self.groups
-
-            user_object['usrgrps'] = [group.zabbix_id for group in self.groups]  # this cannot be set because of json
+            self.attach_group_membership(user_object)
 
         if media_info:
             if not self.zabbix_id:
-                user_object['user_medias'] = []
-                for media_type in ZabbixMediaContainer.MEDIAS:
-                    user_media = getattr(self._user, 'get_alerting_{}'.format(media_type), None)
-                    if user_media:
-                        media = {}
-                        media['mediatypeid'] = user_media.media_type
-                        media['sendto'] = user_media.sendto
-                        media['period'] = user_media.period
-                        media['severity'] = user_media.severity
-                        media['active'] = self.MEDIA_ENABLED
-                        user_object['user_medias'].append(media)
+                self.attach_media(user_object)
             else:
-                update_object = {'medias': [], 'users': []}
                 raise NotImplementedError(
                     "Update is done through updatemedia call and not through update, so it has to be done separately")
 
         if basic_info:
-            # todo put into separate method and build ad hoc
-            user_object['alias'] = self._user.username
-            user_object['name'] = self._user.first_name
-            user_object['surname'] = self._user.last_name
-            # user_object['type']= TODO self._user.is_superadmin but we miss request
+            self.attach_basic_info(user_object)
 
         if self.zabbix_id:
             logger.debug('updating user: %s', user_object)
