@@ -8,11 +8,15 @@
 {% include "gui/form_field.html" with field=form.owner %}
 {% include "gui/form_field.html" with field=form.status %}
 {% include "gui/form_field_checkbox.html" with field=form.is_compute %}
+{% if settings.VMS_VM_BACKUP_ENABLED %}
 {% include "gui/form_field_checkbox.html" with field=form.is_backup %}
+{% endif %}
 
 <div class="advanced hide">
 {% include "gui/form_field.html" with field=form.cpu_coef %}
 {% include "gui/form_field.html" with field=form.ram_coef %}
+{% if settings.MON_ZABBIX_ENABLED %}
 {% include "gui/form_field.html" with field=form.monitoring_templates %}
 {% include "gui/form_field.html" with field=form.monitoring_hostgroups %}
+{% endif %}
 </div>
