@@ -6,7 +6,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from vms.models import Node, Vm
 from api.api_views import APIView
-from api.exceptions import PreconditionRequired, NodeHasPendingTasks
+from api.exceptions import NodeHasPendingTasks
 from api.serializers import ForceSerializer
 from api.signals import node_status_changed, node_online, node_offline, node_deleted, vm_undefined
 from api.task.utils import TaskID
