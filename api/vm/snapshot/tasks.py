@@ -248,7 +248,7 @@ def is_snapshot_task_running(vm):
     snap_tasks = vm.get_tasks(match_dict={'view': 'vm_snapshot'})
     snap_tasks.update(vm.get_tasks(match_dict={'view': 'vm_snapshot_list'}))
 
-    return any(t.get('method', '').upper() in ('POST', 'PUT', 'DELETE') for t in snap_tasks)
+    return any(t.get('method', '').upper() in ('POST', 'PUT', 'DELETE') for t in snap_tasks.values())
 
 
 def sync_snapshots(db_snaps, node_snaps):

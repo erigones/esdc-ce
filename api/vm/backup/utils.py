@@ -131,7 +131,7 @@ def is_backup_task_running(obj):
     bkp_tasks = obj.get_tasks(match_dict={'view': 'vm_backup'})
     bkp_tasks.update(obj.get_tasks(match_dict={'view': 'vm_backup_list'}))
 
-    return any(t.get('method', '').upper() in ('POST', 'PUT', 'DELETE') for t in bkp_tasks)
+    return any(t.get('method', '').upper() in ('POST', 'PUT', 'DELETE') for t in bkp_tasks.values())
 
 
 def sync_backups(db_backups, node_snaps):
