@@ -245,8 +245,8 @@ def parse_node_snaps(data):
 
 def is_snapshot_task_running(vm):
     """Return True if a PUT/POST/DELETE snapshot task is running for a VM"""
-    snap_tasks = (vm.get_tasks(match_dict={'view': 'vm_snapshot'}) +
-                  vm.get_tasks(match_dict={'view': 'vm_snapshot_list'}))
+    snap_tasks = vm.get_tasks(match_dict={'view': 'vm_snapshot'})
+    snap_tasks.update(vm.get_tasks(match_dict={'view': 'vm_snapshot_list'}))
 
     return any(t.get('method', '').upper() in ('POST', 'PUT', 'DELETE') for t in snap_tasks)
 

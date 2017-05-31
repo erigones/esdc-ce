@@ -128,8 +128,8 @@ def get_backup_cmd(action, bkp, bkps=None, define=None, zfs_filesystem=None, fsf
 
 def is_backup_task_running(obj):
     """Return True if a PUT/POST/DELETE backup task is running for a VM"""
-    bkp_tasks = (obj.get_tasks(match_dict={'view': 'vm_backup'}) +
-                 obj.get_tasks(match_dict={'view': 'vm_backup_list'}))
+    bkp_tasks = obj.get_tasks(match_dict={'view': 'vm_backup'})
+    bkp_tasks.update(obj.get_tasks(match_dict={'view': 'vm_backup_list'}))
 
     return any(t.get('method', '').upper() in ('POST', 'PUT', 'DELETE') for t in bkp_tasks)
 
