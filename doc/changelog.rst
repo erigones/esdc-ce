@@ -1,6 +1,18 @@
 Changelog
 #########
 
+2.6.0 (unreleased)
+==================
+
+Features
+--------
+
+- Added ability to sync/fix wrong status of snapshots and dataset backups after a disaster recovery - `#174 <https://github.com/erigones/esdc-ce/issues/174>`__
+
+Bugs
+----
+
+
 2.5.3 (released on 2017-05-16)
 ==============================
 
