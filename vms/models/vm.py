@@ -119,8 +119,6 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
         ('vmware', 'vmware'),
     )
 
-    STOPPED_ZONEID = -1
-
     PENDING = 0  # no real, used only for status changes, not saved in DB
     STOPPED = 1
     RUNNING = 2
@@ -723,9 +721,6 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
     @staticmethod
     def post_delete(sender, instance, **kwargs):
         """Remove cache items and cleanup node and storage resources"""
-        cache.delete(instance.zoneid_change_key(instance.uuid))
-        cache.delete(instance.zoneid_key(instance.uuid))
-
         if instance.node:
             instance.node.update_resources(save=True)
             zpools = instance.get_disks().keys()
@@ -1456,27 +1451,6 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
             uptime += int(timezone.now().strftime('%s')) - self.uptime_changed
 
         return uptime
-
-    def save_zoneid(self, zoneid, change_time=None):
-        """Save new zoneid"""
-        cache.set(self.zoneid_key(self.uuid), zoneid)
-        cache.set(self.zoneid_change_key(self.uuid), change_time or timezone.now())
-
-    @staticmethod
-    def zoneid_key(uuid):
-        return str(uuid) + ':zoneid'
-
-    @staticmethod
-    def zoneid_change_key(uuid):
-        return str(uuid) + ':zoneid-change'
-
-    @property
-    def zoneid(self):  # Return zone ID from cache
-        return int(cache.get(self.zoneid_key(self.uuid)) or self.STOPPED_ZONEID)
-
-    @property
-    def zoneid_change(self):  # Return zone change datetime from cache
-        return cache.get(self.zoneid_change_key(self.uuid))
 
     @property
     def ostype_text(self):  # Used by monitoring

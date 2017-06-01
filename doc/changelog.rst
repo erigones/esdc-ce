@@ -1,6 +1,19 @@
 Changelog
 #########
 
+2.6.0 (unreleased)
+==================
+
+Features
+--------
+
+- Removed VM zoneid fetching and updated monitoring templates - `#129 <https://github.com/erigones/esdc-ce/issues/129>`__
+
+Bugs
+----
+
+
+
 2.5.3 (released on 2017-05-16)
 ==============================
 

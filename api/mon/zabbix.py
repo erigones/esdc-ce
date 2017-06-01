@@ -939,7 +939,7 @@ class InternalZabbix(_Zabbix):
         return {
             '{$VCPUS}': str(vm.vcpus_active),
             '{$RAM}': str(vm.ram_active),
-            '{$ZONEID}': str(vm.zoneid),
+            '{$ZONEID}': '-',  # Issue #129
         }
 
     # noinspection PyMethodMayBeStatic

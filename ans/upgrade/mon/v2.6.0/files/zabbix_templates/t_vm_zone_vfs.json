@@ -1,0 +1,295 @@
+{
+    "zabbix_export": {
+        "date": "2015-12-03T21:46:05Z",
+        "templates": [
+            {
+                "templates": [],
+                "name": "t_vm_zone_vfs",
+                "macros": [],
+                "items": [
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "B",
+                        "value_type": "3",
+                        "key": "kstat.get[zone_vfs::{HOST.NAME}:nread]",
+                        "delta": "1",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "VFS bytes read",
+                        "applications": [
+                            {
+                                "name": "Logical disk I/O"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "B",
+                        "value_type": "3",
+                        "key": "kstat.get[zone_vfs::{HOST.NAME}:nwritten]",
+                        "delta": "1",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "VFS bytes written",
+                        "applications": [
+                            {
+                                "name": "Logical disk I/O"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "iops",
+                        "value_type": "3",
+                        "key": "kstat.get[zone_vfs::{HOST.NAME}:reads]",
+                        "delta": "1",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "VFS read I/O  count",
+                        "applications": [
+                            {
+                                "name": "Logical disk I/O"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "iops",
+                        "value_type": "3",
+                        "key": "kstat.get[zone_vfs::{HOST.NAME}:writes]",
+                        "delta": "1",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "VFS write I/O  count",
+                        "applications": [
+                            {
+                                "name": "Logical disk I/O"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    }
+                ],
+                "screens": [],
+                "applications": [
+                    {
+                        "name": "Logical disk I/O"
+                    }
+                ],
+                "discovery_rules": [],
+                "groups": [
+                    {
+                        "name": "Templates"
+                    }
+                ],
+                "template": "t_vm_zone_vfs"
+            }
+        ],
+        "version": "2.0",
+        "groups": [
+            {
+                "name": "Templates"
+            }
+        ],
+        "graphs": [
+            {
+                "show_3d": "0",
+                "graph_items": [
+                    {
+                        "calc_fnc": "2",
+                        "color": "5D549A",
+                        "item": {
+                            "host": "t_vm_zone_vfs",
+                            "key": "kstat.get[zone_vfs::{HOST.NAME}:nwritten]"
+                        },
+                        "sortorder": "1",
+                        "drawtype": "0",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "5299AD",
+                        "item": {
+                            "host": "t_vm_zone_vfs",
+                            "key": "kstat.get[zone_vfs::{HOST.NAME}:nread]"
+                        },
+                        "sortorder": "0",
+                        "drawtype": "0",
+                        "type": "0",
+                        "yaxisside": "0"
+                    }
+                ],
+                "ymin_type_1": "0",
+                "name": "Logical I/O bytes per second",
+                "percent_left": "0.0000",
+                "type": "0",
+                "ymax_type_1": "0",
+                "height": "200",
+                "yaxismax": "100.0000",
+                "width": "900",
+                "show_legend": "1",
+                "show_work_period": "1",
+                "ymax_item_1": "0",
+                "ymin_item_1": "0",
+                "show_triggers": "1",
+                "yaxismin": "0.0000",
+                "percent_right": "0.0000"
+            },
+            {
+                "show_3d": "0",
+                "graph_items": [
+                    {
+                        "calc_fnc": "2",
+                        "color": "5299AD",
+                        "item": {
+                            "host": "t_vm_zone_vfs",
+                            "key": "kstat.get[zone_vfs::{HOST.NAME}:reads]"
+                        },
+                        "sortorder": "0",
+                        "drawtype": "0",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "5D549A",
+                        "item": {
+                            "host": "t_vm_zone_vfs",
+                            "key": "kstat.get[zone_vfs::{HOST.NAME}:writes]"
+                        },
+                        "sortorder": "1",
+                        "drawtype": "0",
+                        "type": "0",
+                        "yaxisside": "0"
+                    }
+                ],
+                "ymin_type_1": "0",
+                "name": "Logical I/O operations per second",
+                "percent_left": "0.0000",
+                "type": "0",
+                "ymax_type_1": "0",
+                "height": "200",
+                "yaxismax": "100.0000",
+                "width": "900",
+                "show_legend": "1",
+                "show_work_period": "1",
+                "ymax_item_1": "0",
+                "ymin_item_1": "0",
+                "show_triggers": "1",
+                "yaxismin": "0.0000",
+                "percent_right": "0.0000"
+            }
+        ]
+    }
+}
