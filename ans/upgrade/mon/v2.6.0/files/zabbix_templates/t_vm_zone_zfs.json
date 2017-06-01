@@ -1,10 +1,10 @@
 {
     "zabbix_export": {
-        "date": "2015-12-03T21:46:09Z",
+        "date": "2015-12-03T21:46:07Z",
         "templates": [
             {
                 "templates": [],
-                "name": "t_vm_memory",
+                "name": "t_vm_zone_zfs",
                 "macros": [],
                 "items": [
                     {
@@ -18,59 +18,16 @@
                         "snmpv3_securitylevel": "0",
                         "port": "",
                         "logtimefmt": "",
-                        "delay": "0",
+                        "delay": "60",
                         "publickey": "",
                         "params": "",
                         "snmpv3_securityname": "",
                         "formula": "1",
-                        "type": "2",
+                        "type": "0",
                         "snmpv3_authprotocol": "0",
                         "valuemap": [],
                         "ipmi_sensor": "",
-                        "status": "1",
-                        "authtype": "0",
-                        "snmp_community": "",
-                        "description": "",
-                        "data_type": "0",
-                        "delay_flex": "",
-                        "units": "",
-                        "value_type": "3",
-                        "key": "vm.memory.anon_alloc_fail",
-                        "delta": "0",
-                        "password": "",
-                        "snmpv3_privpassphrase": "",
-                        "snmpv3_privprotocol": "0",
-                        "name": "Memory allocation errors",
-                        "applications": [
-                            {
-                                "name": "Memory usage"
-                            }
-                        ],
-                        "privatekey": "",
-                        "allowed_hosts": "",
-                        "history": "7"
-                    },
-                    {
-                        "username": "",
-                        "snmpv3_contextname": "",
-                        "inventory_link": "0",
-                        "multiplier": "0",
-                        "trends": "365",
-                        "snmpv3_authpassphrase": "",
-                        "snmp_oid": "",
-                        "snmpv3_securitylevel": "0",
-                        "port": "",
-                        "logtimefmt": "",
-                        "delay": "0",
-                        "publickey": "",
-                        "params": "",
-                        "snmpv3_securityname": "",
-                        "formula": "1",
-                        "type": "2",
-                        "snmpv3_authprotocol": "0",
-                        "valuemap": [],
-                        "ipmi_sensor": "",
-                        "status": "1",
+                        "status": "0",
                         "authtype": "0",
                         "snmp_community": "",
                         "description": "",
@@ -78,15 +35,15 @@
                         "delay_flex": "",
                         "units": "B",
                         "value_type": "3",
-                        "key": "vm.memory.physcap",
-                        "delta": "0",
+                        "key": "kstat.get[zone_zfs::{$HOST.NAME}:nread]",
+                        "delta": "1",
                         "password": "",
                         "snmpv3_privpassphrase": "",
                         "snmpv3_privprotocol": "0",
-                        "name": "Physical memory cap",
+                        "name": "ZFS bytes read",
                         "applications": [
                             {
-                                "name": "Memory usage"
+                                "name": "Physical disk I/O"
                             }
                         ],
                         "privatekey": "",
@@ -121,58 +78,15 @@
                         "delay_flex": "",
                         "units": "B",
                         "value_type": "3",
-                        "key": "kstat.get[memory_cap::{$HOST.NAME}:rss]",
-                        "delta": "0",
+                        "key": "kstat.get[zone_zfs::{$HOST.NAME}:nwritten]",
+                        "delta": "1",
                         "password": "",
                         "snmpv3_privpassphrase": "",
                         "snmpv3_privprotocol": "0",
-                        "name": "Physical memory usage",
+                        "name": "ZFS bytes written",
                         "applications": [
                             {
-                                "name": "Memory usage"
-                            }
-                        ],
-                        "privatekey": "",
-                        "allowed_hosts": "",
-                        "history": "1"
-                    },
-                    {
-                        "username": "",
-                        "snmpv3_contextname": "",
-                        "inventory_link": "0",
-                        "multiplier": "0",
-                        "trends": "365",
-                        "snmpv3_authpassphrase": "",
-                        "snmp_oid": "",
-                        "snmpv3_securitylevel": "0",
-                        "port": "",
-                        "logtimefmt": "",
-                        "delay": "0",
-                        "publickey": "",
-                        "params": "",
-                        "snmpv3_securityname": "",
-                        "formula": "1",
-                        "type": "2",
-                        "snmpv3_authprotocol": "0",
-                        "valuemap": [],
-                        "ipmi_sensor": "",
-                        "status": "1",
-                        "authtype": "0",
-                        "snmp_community": "",
-                        "description": "",
-                        "data_type": "0",
-                        "delay_flex": "",
-                        "units": "B",
-                        "value_type": "3",
-                        "key": "vm.memory.swapcap",
-                        "delta": "0",
-                        "password": "",
-                        "snmpv3_privpassphrase": "",
-                        "snmpv3_privprotocol": "0",
-                        "name": "Swap cap",
-                        "applications": [
-                            {
-                                "name": "Memory usage"
+                                "name": "Physical disk I/O"
                             }
                         ],
                         "privatekey": "",
@@ -205,17 +119,60 @@
                         "description": "",
                         "data_type": "0",
                         "delay_flex": "",
-                        "units": "B",
+                        "units": "iops",
                         "value_type": "3",
-                        "key": "kstat.get[memory_cap::{$HOST.NAME}:swap]",
-                        "delta": "0",
+                        "key": "kstat.get[zone_zfs::{$HOST.NAME}:reads]",
+                        "delta": "1",
                         "password": "",
                         "snmpv3_privpassphrase": "",
                         "snmpv3_privprotocol": "0",
-                        "name": "Swap usage",
+                        "name": "ZFS read I/O  count",
                         "applications": [
                             {
-                                "name": "Memory usage"
+                                "name": "Physical disk I/O"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "iops",
+                        "value_type": "3",
+                        "key": "kstat.get[zone_zfs::{$HOST.NAME}:writes]",
+                        "delta": "1",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "ZFS write I/O  count",
+                        "applications": [
+                            {
+                                "name": "Physical disk I/O"
                             }
                         ],
                         "privatekey": "",
@@ -226,7 +183,7 @@
                 "screens": [],
                 "applications": [
                     {
-                        "name": "Memory usage"
+                        "name": "Physical disk I/O"
                     }
                 ],
                 "discovery_rules": [],
@@ -235,7 +192,7 @@
                         "name": "Templates"
                     }
                 ],
-                "template": "t_vm_memory"
+                "template": "t_vm_zone_zfs"
             }
         ],
         "version": "2.0",
@@ -250,10 +207,22 @@
                 "graph_items": [
                     {
                         "calc_fnc": "2",
-                        "color": "C80000",
+                        "color": "5D549A",
                         "item": {
-                            "host": "t_vm_memory",
-                            "key": "kstat.get[memory_cap::{$HOST.NAME}:rss]"
+                            "host": "t_vm_zone_zfs",
+                            "key": "kstat.get[zone_zfs::{$HOST.NAME}:nwritten]"
+                        },
+                        "sortorder": "1",
+                        "drawtype": "0",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "5299AD",
+                        "item": {
+                            "host": "t_vm_zone_zfs",
+                            "key": "kstat.get[zone_zfs::{$HOST.NAME}:nread]"
                         },
                         "sortorder": "0",
                         "drawtype": "0",
@@ -261,8 +230,8 @@
                         "yaxisside": "0"
                     }
                 ],
-                "ymin_type_1": "1",
-                "name": "Memory usage",
+                "ymin_type_1": "0",
+                "name": "Physical I/O bytes per second",
                 "percent_left": "0.0000",
                 "type": "0",
                 "ymax_type_1": "0",
@@ -282,19 +251,31 @@
                 "graph_items": [
                     {
                         "calc_fnc": "2",
-                        "color": "C80000",
+                        "color": "87B457",
                         "item": {
-                            "host": "t_vm_memory",
-                            "key": "kstat.get[memory_cap::{$HOST.NAME}:swap]"
+                            "host": "t_vm_zone_zfs",
+                            "key": "kstat.get[zone_zfs::{$HOST.NAME}:reads]"
                         },
                         "sortorder": "0",
                         "drawtype": "0",
                         "type": "0",
-                        "yaxisside": "0"
+                        "yaxisside": "1"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "CF545E",
+                        "item": {
+                            "host": "t_vm_zone_zfs",
+                            "key": "kstat.get[zone_zfs::{$HOST.NAME}:writes]"
+                        },
+                        "sortorder": "1",
+                        "drawtype": "0",
+                        "type": "0",
+                        "yaxisside": "1"
                     }
                 ],
-                "ymin_type_1": "1",
-                "name": "Swap usage",
+                "ymin_type_1": "0",
+                "name": "Physical I/O per second",
                 "percent_left": "0.0000",
                 "type": "0",
                 "ymax_type_1": "0",

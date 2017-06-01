@@ -35,7 +35,7 @@
                         "delay_flex": "",
                         "units": "",
                         "value_type": "3",
-                        "key": "kstat.get[zone_vfs::{HOST.NAME}:1s_ops]",
+                        "key": "kstat.get[zone_vfs::{$HOST.NAME}:1s_ops]",
                         "delta": "1",
                         "password": "",
                         "snmpv3_privpassphrase": "",
@@ -78,7 +78,7 @@
                         "delay_flex": "",
                         "units": "",
                         "value_type": "3",
-                        "key": "kstat.get[zone_vfs::{HOST.NAME}:10ms_ops]",
+                        "key": "kstat.get[zone_vfs::{$HOST.NAME}:10ms_ops]",
                         "delta": "1",
                         "password": "",
                         "snmpv3_privpassphrase": "",
@@ -121,7 +121,7 @@
                         "delay_flex": "",
                         "units": "",
                         "value_type": "3",
-                        "key": "kstat.get[zone_vfs::{HOST.NAME}:10s_ops]",
+                        "key": "kstat.get[zone_vfs::{$HOST.NAME}:10s_ops]",
                         "delta": "1",
                         "password": "",
                         "snmpv3_privpassphrase": "",
@@ -164,7 +164,7 @@
                         "delay_flex": "",
                         "units": "",
                         "value_type": "3",
-                        "key": "kstat.get[zone_vfs::{HOST.NAME}:100ms_ops]",
+                        "key": "kstat.get[zone_vfs::{$HOST.NAME}:100ms_ops]",
                         "delta": "1",
                         "password": "",
                         "snmpv3_privpassphrase": "",
@@ -210,7 +210,7 @@
                         "color": "CF545E",
                         "item": {
                             "host": "t_vm_disk_latency",
-                            "key": "kstat.get[zone_vfs::{HOST.NAME}:10ms_ops]"
+                            "key": "kstat.get[zone_vfs::{$HOST.NAME}:10ms_ops]"
                         },
                         "sortorder": "1",
                         "drawtype": "0",
@@ -222,7 +222,7 @@
                         "color": "87B457",
                         "item": {
                             "host": "t_vm_disk_latency",
-                            "key": "kstat.get[zone_vfs::{HOST.NAME}:10s_ops]"
+                            "key": "kstat.get[zone_vfs::{$HOST.NAME}:10s_ops]"
                         },
                         "sortorder": "2",
                         "drawtype": "0",
@@ -234,7 +234,7 @@
                         "color": "5D549A",
                         "item": {
                             "host": "t_vm_disk_latency",
-                            "key": "kstat.get[zone_vfs::{HOST.NAME}:100ms_ops]"
+                            "key": "kstat.get[zone_vfs::{$HOST.NAME}:100ms_ops]"
                         },
                         "sortorder": "3",
                         "drawtype": "0",
@@ -246,7 +246,7 @@
                         "color": "5299AD",
                         "item": {
                             "host": "t_vm_disk_latency",
-                            "key": "kstat.get[zone_vfs::{HOST.NAME}:1s_ops]"
+                            "key": "kstat.get[zone_vfs::{$HOST.NAME}:1s_ops]"
                         },
                         "sortorder": "0",
                         "drawtype": "0",
