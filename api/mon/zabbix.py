@@ -940,6 +940,7 @@ class InternalZabbix(_Zabbix):
             '{$VCPUS}': str(vm.vcpus_active),
             '{$RAM}': str(vm.ram_active),
             '{$ZONEID}': '-',  # Issue #129
+            '{$UUID_SHORT}': vm.uuid[:30],
         }
 
     # noinspection PyMethodMayBeStatic

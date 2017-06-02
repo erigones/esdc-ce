@@ -29,7 +29,7 @@ GRAPH_ITEMS = GraphItems({
 
     'cpu-load': {
         'desc': _('1-minute load average.'),
-        'items': ('kstat.get[zones::{$HOST.NAME}:avenrun_1min]',),
+        'items': ('kstat.get[zones::{$UUID_SHORT}:avenrun_1min]',),
         'update_interval': GraphItems.GRAPH_UPDATE_INTERVAL,
         'history': 0,
         'options': {
@@ -39,7 +39,7 @@ GRAPH_ITEMS = GraphItems({
 
     'mem-usage': {
         'desc': _('Total compute node physical memory consumed by the VM.'),
-        'items': ('kstat.get[memory_cap::{$HOST.NAME}:rss]',),
+        'items': ('kstat.get[memory_cap::{$UUID_SHORT}:rss]',),
         'update_interval': GraphItems.GRAPH_UPDATE_INTERVAL,
         'history': 3,
         'options': {
@@ -50,7 +50,7 @@ GRAPH_ITEMS = GraphItems({
 
     'swap-usage': {
         'desc': _('Total compute node swap space used by the VM.'),
-        'items': ('kstat.get[memory_cap::{$HOST.NAME}:swap]',),
+        'items': ('kstat.get[memory_cap::{$UUID_SHORT}:swap]',),
         'update_interval': GraphItems.GRAPH_UPDATE_INTERVAL,
         'history': 3,
         'options': {
@@ -131,7 +131,7 @@ GRAPH_ITEMS = GraphItems({
 
     'vm-disk-logical-throughput': {
         'desc': _('Aggregated disk throughput on the logical layer (with acceleration mechanisms included).'),
-        'items': ('kstat.get[zone_vfs::{$HOST.NAME}:nread]', 'kstat.get[zone_vfs::{$HOST.NAME}:nwritten]'),
+        'items': ('kstat.get[zone_vfs::{$UUID_SHORT}:nread]', 'kstat.get[zone_vfs::{$UUID_SHORT}:nwritten]'),
         'update_interval': GraphItems.GRAPH_UPDATE_INTERVAL,
         'history': 3,
         'options': {
@@ -142,7 +142,7 @@ GRAPH_ITEMS = GraphItems({
     'vm-disk-logical-io': {
         'desc': _('Aggregated amount or read and write I/O operations on the logical layer '
                   '(with acceleration mechanisms included).'),
-        'items': ('kstat.get[zone_vfs::{$HOST.NAME}:reads]', 'kstat.get[zone_vfs::{$HOST.NAME}:writes]'),
+        'items': ('kstat.get[zone_vfs::{$UUID_SHORT}:reads]', 'kstat.get[zone_vfs::{$UUID_SHORT}:writes]'),
         'update_interval': GraphItems.GRAPH_UPDATE_INTERVAL,
         'history': 3,
         'options': {
@@ -152,7 +152,7 @@ GRAPH_ITEMS = GraphItems({
 
     'vm-disk-physical-throughput': {
         'desc': _('Aggregated disk throughput on the physical (disk) layer.'),
-        'items': ('kstat.get[zone_zfs::{$HOST.NAME}:nread]', 'kstat.get[zone_zfs::{$HOST.NAME}:nwritten]'),
+        'items': ('kstat.get[zone_zfs::{$UUID_SHORT}:nread]', 'kstat.get[zone_zfs::{$UUID_SHORT}:nwritten]'),
         'update_interval': GraphItems.GRAPH_UPDATE_INTERVAL,
         'history': 3,
         'options': {
@@ -162,7 +162,7 @@ GRAPH_ITEMS = GraphItems({
 
     'vm-disk-physical-io': {
         'desc': _('Aggregated amount of read and write I/O operations on the physical (disk) layer.'),
-        'items': ('kstat.get[zone_zfs::{$HOST.NAME}:reads]', 'kstat.get[zone_zfs::{$HOST.NAME}:writes]'),
+        'items': ('kstat.get[zone_zfs::{$UUID_SHORT}:reads]', 'kstat.get[zone_zfs::{$UUID_SHORT}:writes]'),
         'update_interval': GraphItems.GRAPH_UPDATE_INTERVAL,
         'history': 3,
         'options': {
@@ -173,8 +173,8 @@ GRAPH_ITEMS = GraphItems({
     'vm-disk-io-operations': {
         'desc': _('Aggregated amount of disk I/O operations by latency on the logical layer '
                   '(with acceleration mechanisms included).'),
-        'items': ('kstat.get[zone_vfs::{$HOST.NAME}:1s_ops]', 'kstat.get[zone_vfs::{$HOST.NAME}:10s_ops]',
-                  'kstat.get[zone_vfs::{$HOST.NAME}:10ms_ops]', 'kstat.get[zone_vfs::{$HOST.NAME}:100ms_ops]'),
+        'items': ('kstat.get[zone_vfs::{$UUID_SHORT}:1s_ops]', 'kstat.get[zone_vfs::{$UUID_SHORT}:10s_ops]',
+                  'kstat.get[zone_vfs::{$UUID_SHORT}:10ms_ops]', 'kstat.get[zone_vfs::{$UUID_SHORT}:100ms_ops]'),
         'update_interval': GraphItems.GRAPH_UPDATE_INTERVAL,
         'history': 3,
         'options': {

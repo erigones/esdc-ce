@@ -121,7 +121,7 @@
                         "delay_flex": "",
                         "units": "B",
                         "value_type": "3",
-                        "key": "kstat.get[memory_cap::{$HOST.NAME}:rss]",
+                        "key": "kstat.get[memory_cap::{$UUID_SHORT}:rss]",
                         "delta": "0",
                         "password": "",
                         "snmpv3_privpassphrase": "",
@@ -207,7 +207,7 @@
                         "delay_flex": "",
                         "units": "B",
                         "value_type": "3",
-                        "key": "kstat.get[memory_cap::{$HOST.NAME}:swap]",
+                        "key": "kstat.get[memory_cap::{$UUID_SHORT}:swap]",
                         "delta": "0",
                         "password": "",
                         "snmpv3_privpassphrase": "",
@@ -253,7 +253,7 @@
                         "color": "C80000",
                         "item": {
                             "host": "t_vm_memory",
-                            "key": "kstat.get[memory_cap::{$HOST.NAME}:rss]"
+                            "key": "kstat.get[memory_cap::{$UUID_SHORT}:rss]"
                         },
                         "sortorder": "0",
                         "drawtype": "0",
@@ -285,7 +285,7 @@
                         "color": "C80000",
                         "item": {
                             "host": "t_vm_memory",
-                            "key": "kstat.get[memory_cap::{$HOST.NAME}:swap]"
+                            "key": "kstat.get[memory_cap::{$UUID_SHORT}:swap]"
                         },
                         "sortorder": "0",
                         "drawtype": "0",

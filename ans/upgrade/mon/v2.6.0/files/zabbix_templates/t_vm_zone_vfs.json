@@ -35,7 +35,7 @@
                         "delay_flex": "",
                         "units": "B",
                         "value_type": "3",
-                        "key": "kstat.get[zone_vfs::{$HOST.NAME}:nread]",
+                        "key": "kstat.get[zone_vfs::{$UUID_SHORT}:nread]",
                         "delta": "1",
                         "password": "",
                         "snmpv3_privpassphrase": "",
@@ -78,7 +78,7 @@
                         "delay_flex": "",
                         "units": "B",
                         "value_type": "3",
-                        "key": "kstat.get[zone_vfs::{$HOST.NAME}:nwritten]",
+                        "key": "kstat.get[zone_vfs::{$UUID_SHORT}:nwritten]",
                         "delta": "1",
                         "password": "",
                         "snmpv3_privpassphrase": "",
@@ -121,7 +121,7 @@
                         "delay_flex": "",
                         "units": "iops",
                         "value_type": "3",
-                        "key": "kstat.get[zone_vfs::{$HOST.NAME}:reads]",
+                        "key": "kstat.get[zone_vfs::{$UUID_SHORT}:reads]",
                         "delta": "1",
                         "password": "",
                         "snmpv3_privpassphrase": "",
@@ -164,7 +164,7 @@
                         "delay_flex": "",
                         "units": "iops",
                         "value_type": "3",
-                        "key": "kstat.get[zone_vfs::{$HOST.NAME}:writes]",
+                        "key": "kstat.get[zone_vfs::{$UUID_SHORT}:writes]",
                         "delta": "1",
                         "password": "",
                         "snmpv3_privpassphrase": "",
@@ -210,7 +210,7 @@
                         "color": "5D549A",
                         "item": {
                             "host": "t_vm_zone_vfs",
-                            "key": "kstat.get[zone_vfs::{$HOST.NAME}:nwritten]"
+                            "key": "kstat.get[zone_vfs::{$UUID_SHORT}:nwritten]"
                         },
                         "sortorder": "1",
                         "drawtype": "0",
@@ -222,7 +222,7 @@
                         "color": "5299AD",
                         "item": {
                             "host": "t_vm_zone_vfs",
-                            "key": "kstat.get[zone_vfs::{$HOST.NAME}:nread]"
+                            "key": "kstat.get[zone_vfs::{$UUID_SHORT}:nread]"
                         },
                         "sortorder": "0",
                         "drawtype": "0",
@@ -254,7 +254,7 @@
                         "color": "5299AD",
                         "item": {
                             "host": "t_vm_zone_vfs",
-                            "key": "kstat.get[zone_vfs::{$HOST.NAME}:reads]"
+                            "key": "kstat.get[zone_vfs::{$UUID_SHORT}:reads]"
                         },
                         "sortorder": "0",
                         "drawtype": "0",
@@ -266,7 +266,7 @@
                         "color": "5D549A",
                         "item": {
                             "host": "t_vm_zone_vfs",
-                            "key": "kstat.get[zone_vfs::{$HOST.NAME}:writes]"
+                            "key": "kstat.get[zone_vfs::{$UUID_SHORT}:writes]"
                         },
                         "sortorder": "1",
                         "drawtype": "0",
