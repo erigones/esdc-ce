@@ -62,6 +62,8 @@ class UserView(APIView):
             return True
 
     def user_modify(self, update=False, serializer=None):
+        affected_groups = ()
+
         if not serializer:
             serializer = self.serializer
 
@@ -72,7 +74,6 @@ class UserView(APIView):
             return FailureTaskResponse(self.request, ser.errors, obj=user, dc_bound=False)
 
         ser.save()
-        mon_user_changed.call(self.request, user_name=ser.object.username)
         if update:
             msg = LOG_USER_UPDATE
             status = HTTP_200_OK
@@ -105,6 +106,8 @@ class UserView(APIView):
             if ser.old_roles:
                 user.current_dc = DefaultDc()
 
+        mon_user_changed.call(self.request, user_name=ser.object.username,
+                              affected_groups=tuple(group.id for group in affected_groups))
         return res
 
     def get(self):
@@ -138,7 +141,6 @@ class UserView(APIView):
         old_roles = list(user.roles.all())
         ser = self.serializer(self.request, user)
         ser.object.delete()
-        mon_user_changed.call(self.request, user_name=ser.object.username)
         res = SuccessTaskResponse(self.request, None, obj=user, msg=LOG_USER_DELETE, detail_dict=dd, dc_bound=False)
 
         # User was removed, which may affect the cached list of DC admins for DCs which are attached to user's groups
@@ -150,6 +152,8 @@ class UserView(APIView):
         if was_staff:
             User.clear_super_admin_ids()
 
+        mon_user_changed.call(self.request, user_name=ser.object.username,
+                              affected_groups=tuple(group.id for group in old_roles))
         return res
 
     def api_key(self):
