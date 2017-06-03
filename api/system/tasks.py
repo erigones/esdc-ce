@@ -14,13 +14,12 @@ VM_ZABBIX_SYNC_REQUIRED_FILE = os.path.join(settings.RUNDIR, 'vm_zabbix_sync_req
 
 def vm_zabbix_sync(sender):
     """Sync all VMs with internal zabbix"""
-    from vms.models import Vm
+    from api.mon.utils import get_mon_vms
     from api.mon.vm.tasks import mon_vm_sync
 
-    for vm in Vm.objects.select_related('dc').exclude(status=Vm.NOTCREATED).filter(slavevm__isnull=True):
-        if vm.dc.settings.MON_ZABBIX_ENABLED and vm.is_zabbix_sync_active():
-            logger.debug('Creating zabbix sync task for VM %s', vm)
-            mon_vm_sync.call(sender, vm=vm)
+    for vm in get_mon_vms():
+        logger.debug('Creating zabbix sync task for VM %s', vm)
+        mon_vm_sync.call(sender, vm=vm)
 
 
 # noinspection PyUnusedLocal
