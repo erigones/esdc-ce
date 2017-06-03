@@ -1,0 +1,26 @@
+{% extends load_base %}
+{% load i18n %}
+{% load gui_utils %}
+
+{% block javascript %}
+{% include "gui/node/monitoring_js.html" with graphs=graphs %}
+{% endblock %}
+
+{% block base_nav %}
+{% include "gui/node/navigation.html" with li_monitoring="active" %}
+{% include "gui/node/monitoring_navigation.html" with mon_vm_cpu="active" %}
+{% endblock %}
+
+{% block base_content %}
+<div id="graph_tooltip" class="tooltip right"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>
+
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span12" id="node__{{ node.hostname }}__vm-cpu-usage__">
+      <div class="tab-header">
+        <i class="icon-bar-chart"></i> {{ node.hostname }} &rsaquo; {% trans "VM CPU usage" %}
+        {% include "gui/node/monitoring_graph.html" with desc=graph_items|keyvalue:'vm-cpu-usage'|keyvalue:'desc' %}
+    </div>
+  </div>
+</div> <!-- end container-fluid -->
+{% endblock %}

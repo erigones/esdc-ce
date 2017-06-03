@@ -340,6 +340,7 @@ class _Zabbix(object):
             search_params = {'filter': {'host': host, 'key_': keys}, 'sortfield': ['itemid'], 'sortorder': 0}
 
         search_params['output'] = ['itemid', 'name', 'status', 'units', 'description']
+        search_params['selectHosts'] = ['hostid', 'host', 'name']
 
         return self.zapi.item.get(search_params)
 
@@ -808,9 +809,9 @@ class _Zabbix(object):
             logger.exception(e)
             raise ZabbixError(e)
 
-    def get_history(self, host, items, history, since, until, items_search=None):
+    def get_history(self, hosts, items, history, since, until, items_search=None):
         """Return monitoring history for selected zabbix host, items and period"""
-        res = {'history': []}
+        res = {'history': [], 'items': []}
         now = int(datetime.now().strftime('%s'))
         max_period = self.settings.MON_ZABBIX_GRAPH_MAX_PERIOD
         max_history = now - self.settings.MON_ZABBIX_GRAPH_MAX_HISTORY
@@ -819,6 +820,7 @@ class _Zabbix(object):
         until_history = None
         since_trend = None
         until_trend = None
+        itemids = set()
 
         if until < max_history or period > max_period:  # trends only
             until_trend = until
@@ -828,14 +830,18 @@ class _Zabbix(object):
             since_history = since
 
         try:
-            res['items'] = self._zabbix_get_items(host, items, search_params=items_search)
+            for host in hosts:
+                host_items = self._zabbix_get_items(host, items, search_params=items_search)
 
-            if not res['items']:
-                raise ZabbixAPIException('Cannot find items for selected host in Zabbix')
+                if host_items:
+                    itemids.update(i['itemid'] for i in host_items)
+                    res['items'].extend(host_items)
+                else:
+                    raise ZabbixAPIException('Cannot find items for host "%s" in Zabbix' % host)
 
             # noinspection PyTypeChecker
             params = {
-                'itemids': [i['itemid'] for i in res['items']],
+                'itemids': list(itemids),
                 'history': history,
                 'sortfield': 'clock',
                 'sortorder': 'ASC',
@@ -853,7 +859,7 @@ class _Zabbix(object):
                 res['history'] += self.zapi.history.get(params)
 
         except ZabbixAPIException as exc:
-            self.log(ERROR, 'Zabbix API Error in get_history(%s, %s): %s', host, items, exc)
+            self.log(ERROR, 'Zabbix API Error in get_history(%s, %s): %s', hosts, items, exc)
             raise ZabbixError('Zabbix API Error while retrieving history (%s)' % exc)
 
         else:
@@ -1245,7 +1251,11 @@ class Zabbix(object):
 
     def vm_history(self, vm_host_id, items, zhistory, since, until, items_search=None):
         """[INTERNAL] Return VM history data for selected graph and period"""
-        return self.izx.get_history(vm_host_id, items, zhistory, since, until, items_search=items_search)
+        return self.izx.get_history((vm_host_id,), items, zhistory, since, until, items_search=items_search)
+
+    def vms_history(self, vm_host_ids, items, zhistory, since, until, items_search=None):
+        """[INTERNAL] Return VM history data for selected VMs, graph and period"""
+        return self.izx.get_history(vm_host_ids, items, zhistory, since, until, items_search=items_search)
 
     @staticmethod
     def _vm_disable_sync(zx, vm, log=None):
@@ -1550,7 +1560,7 @@ class Zabbix(object):
 
     def node_history(self, node_id, items, zhistory, since, until, items_search=None):
         """[INTERNAL] Return node history data for selected graph and period"""
-        return self.izx.get_history(node_id, items, zhistory, since, until, items_search=items_search)
+        return self.izx.get_history((node_id,), items, zhistory, since, until, items_search=items_search)
 
     def template_list(self):
         """[EXTERNAL] Return list of available templates"""
