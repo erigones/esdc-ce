@@ -17,8 +17,8 @@ def vm_zabbix_sync(sender):
     from vms.models import Vm
     from api.mon.vm.tasks import mon_vm_sync
 
-    for vm in Vm.objects.select_related('owner', 'dc', 'slavevm').exclude(status=Vm.NOTCREATED):
-        if vm.dc.settings.MON_ZABBIX_ENABLED and vm.is_zabbix_sync_active() and not vm.is_slave_vm():
+    for vm in Vm.objects.select_related('dc').exclude(status=Vm.NOTCREATED).filter(slavevm__isnull=True):
+        if vm.dc.settings.MON_ZABBIX_ENABLED and vm.is_zabbix_sync_active():
             logger.debug('Creating zabbix sync task for VM %s', vm)
             mon_vm_sync.call(sender, vm=vm)
 
