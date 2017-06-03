@@ -35,4 +35,5 @@ def mgmt_worker_startup(task_id, **kwargs):
     if settings.MON_ZABBIX_ENABLED and os.path.exists(VM_ZABBIX_SYNC_REQUIRED_FILE):
         logger.warning('Found %s => running zabbix sync for all VMs', VM_ZABBIX_SYNC_REQUIRED_FILE)
         vm_zabbix_sync(task_id)
+        logger.info('Removed %s', VM_ZABBIX_SYNC_REQUIRED_FILE)
         os.remove(VM_ZABBIX_SYNC_REQUIRED_FILE)
