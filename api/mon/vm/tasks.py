@@ -72,7 +72,7 @@ def mon_vm_sync(task_id, sender, vm_uuid=None, log=LOG, **kwargs):
     """
     assert vm_uuid
     vm = log.obj = Vm.objects.select_related('dc', 'slavevm').get(uuid=vm_uuid)
-    log.dc_id = vm.dc.id  # The "vm_zoneid_changed" case comes from api.vm.status.tasks callbacks
+    log.dc_id = vm.dc.id
 
     if vm.is_slave_vm():
         logger.info('Ignoring VM %s zabbix sync, because it is a slave VM', vm)
