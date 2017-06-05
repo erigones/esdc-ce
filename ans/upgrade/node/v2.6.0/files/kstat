@@ -1,0 +1,20 @@
+#!/bin/bash
+
+STATISTIC="${1}"
+
+#
+# Non-numeric values will change Zabbix items to an unsupported state =>
+# We need to make sure that a numeric value (0) is returned even if the VM is stopped.
+#
+
+if [[ "${STATISTIC}" == *":-1::"* ]]; then
+	echo "0"
+else
+	VALUE=$(/usr/bin/kstat -p "${STATISTIC}" | cut -s -f2)
+
+	if [[ ${?} -eq 1 ]]; then
+		echo "0"
+	else
+		echo "${VALUE}"
+	fi
+fi
