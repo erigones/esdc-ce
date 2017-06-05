@@ -1063,15 +1063,25 @@ class _UserGroupAwareZabbix(_Zabbix):
         missing_users = source_user_group.users - remote_user_group.users
         logger.debug('missing users: %s', missing_users)
         self._remove_users_from_user_group(remote_user_group, redundant_users, delete_users_if_last=True)
-        remote_user_group.add_users(missing_users)
+        self._add_users_to_user_group(remote_user_group, missing_users)
 
     def _remove_users_from_user_group(self, zabbix_user_group, redundant_users, delete_users_if_last):
-        zabbix_user_group.users = zabbix_user_group.users - redundant_users
+        zabbix_user_group.users -= redundant_users
         # Some zabbix users has to be deleted as this is their last group. We have to go the slower way.
         for user in redundant_users:
+
             self.remove_user_from_user_group(user, zabbix_user_group, delete_user_if_last=delete_users_if_last)
             # TODO create also a faster way of removal for users that has also different groups
 
+    def _add_users_to_user_group(self, zabbix_user_group, missing_users):
+        for user in missing_users:
+            user.refresh_id()
+            user.groups.add(zabbix_user_group)
+            if not user.zabbix_id:
+                user.to_zabbix()
+            else:
+                user.update_group_membership()
+        zabbix_user_group.users.update(missing_users)
 
 class ZabbixNamedContainer(object):
     zabbix_id = None
@@ -1367,17 +1377,6 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
         container.superuser_group = superusers
 
         return container
-
-    def add_users(self, missing_users):
-        for user in missing_users:
-            user.groups.add(self)
-            if not user.zabbix_id:
-                # create user separately
-                # shouldn't this be solved differently to handle addition of the user to the group in one step?
-                user.to_zabbix()
-            else:
-                user.update_group_membership()
-        self.users.update(missing_users)
 
     @classmethod
     def from_zabbix_data(cls, zapi, zabbix_object):
