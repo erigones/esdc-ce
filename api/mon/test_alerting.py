@@ -12,20 +12,22 @@ class TestUsergroupManipulation(TestCase):
         assert User.objects.count() > 5, "you have to have at least 5 users in the database to run tests"
 
     def test_user_manipulation(self):
+        raise NotImplementedError("FIXME Wrong abstraction")
         # create users and group
         # test_create_users_and_user_group(5,'pirati')
         # raw_input('group pirati should exist and should have 5 members')
         # delete users
-        group_name = 'tgroup1'
+        group_name = 'testgroup1'
         member_count = 3
         ug = self._create_users_and_user_group(member_count, group_name)
         # create second group
-        second_group_name = 'ufonci'
+        second_group_name = 'testgroup2'
         second_group_member_count = 2
         self._create_users_and_user_group(second_group_member_count, second_group_name)
 
         assert self._get_user_group_user_count(second_group_name) == second_group_member_count
-        assert self._get_user_group_user_count(group_name) == member_count
+        user_group_user_count = self._get_user_group_user_count(group_name)
+        self.assertEqual(user_group_user_count, member_count)
 
         increased_second_group_member_count = 4
         self._create_users_and_user_group(increased_second_group_member_count, second_group_name)
@@ -39,7 +41,7 @@ class TestUsergroupManipulation(TestCase):
         assert self._get_user_group_user_count(second_group_name) == decreased_second_group_member_count
         assert self._get_user_group_user_count(group_name) == member_count
 
-        self.zabbix.delete_user_group(group_name=second_group_name)
+        self.zabbix.delete_user_group(zabbix_group_name=second_group_name)
         assert self._get_user_group_user_count(group_name) == member_count
 
         increased_second_group_member_count = 4
@@ -47,10 +49,10 @@ class TestUsergroupManipulation(TestCase):
         assert self._get_user_group_user_count(second_group_name) == increased_second_group_member_count
         assert self._get_user_group_user_count(group_name) == member_count
 
-        self.zabbix.delete_user_group(group_name=group_name)
+        self.zabbix.delete_user_group(zabbix_group_name=group_name)
         assert self._get_user_group_user_count(second_group_name) == increased_second_group_member_count
 
-        self.zabbix.delete_user_group(group_name=second_group_name)
+        self.zabbix.delete_user_group(zabbix_group_name=second_group_name)
 
     def _get_user_group_user_count(self, group_name):
         first_group = self.zabbix.zapi.usergroup.get({'search': {'name': group_name},
@@ -58,7 +60,7 @@ class TestUsergroupManipulation(TestCase):
                                                       'limit': 1})[0]
         return len(first_group.get('users', []))
 
-    def _create_users_and_user_group(self, user_count=5, name='pirati'):
+    def _create_users_and_user_group(self, user_count=5, name='testgroupname'):
         users = User.objects.all()[:user_count]
         ug = self.zabbix.synchronize_user_group(name, users, [])
         return ug
@@ -127,3 +129,12 @@ class TestUsergroupManipulation(TestCase):
         self.zabbix.delete_user_group(group=zugc)
         response = self.zabbix.zapi.usergroup.get({'search': {'name': group_name}})
         assert not response
+
+    def test_user_update(self):
+        # user added to a group
+        # user removed from a group
+        # user media changed
+        # user media deleted
+        # user admin status changed for a dc
+        # dc ownership changed
+        raise NotImplementedError()

@@ -341,7 +341,8 @@ class User(AbstractBaseUser, PermissionsMixin, _AclMixin, _DcBoundMixin):
     @property
     def get_alerting_email(self):
         # todo add more logic
-        from api.mon.zabbix import ZabbixMediaContainer  # todo  lift
+        # todo put to ZMC and call it 'extract_email_from_user'
+        from api.mon.zabbix import ZabbixMediaContainer
         if self.email:
             return ZabbixMediaContainer(ZabbixMediaContainer.MEDIAS['email'], sendto=self.email,
                                         severities=ZabbixMediaContainer.SEVERITIES,
@@ -350,7 +351,8 @@ class User(AbstractBaseUser, PermissionsMixin, _AclMixin, _DcBoundMixin):
     @property
     def get_alerting_phone(self):
         # todo add more logic - 1/0, verified/not etc
-        from api.mon.zabbix import ZabbixMediaContainer  # todo  lift
+        # todo put to ZMC and call it 'extract_phone_from_user'
+        from api.mon.zabbix import ZabbixMediaContainer
         if self.userprofile.phone:
             return ZabbixMediaContainer(ZabbixMediaContainer.MEDIAS['phone'], sendto=self.userprofile.phone,
                                         severities=ZabbixMediaContainer.SEVERITIES,
@@ -359,8 +361,16 @@ class User(AbstractBaseUser, PermissionsMixin, _AclMixin, _DcBoundMixin):
     @property
     def get_alerting_xmpp(self):
         # todo add more logic - 1/0, verified/not etc
-        from api.mon.zabbix import ZabbixMediaContainer  # todo  lift
+        # todo put to ZMC and call it 'extract_xmpp_from_user'
+        from api.mon.zabbix import ZabbixMediaContainer
         if self.userprofile.jabber:
             return ZabbixMediaContainer(ZabbixMediaContainer.MEDIAS['xmpp'], sendto=self.userprofile.jabber,
                                         severities=ZabbixMediaContainer.SEVERITIES,
                                         period=ZabbixMediaContainer.PERIOD_DEFAULT)
+
+    def yield_all_dc_accesses(self):
+        # TODO yield also dc #owner access
+        # todo optimize query
+        for group in self.roles.all():
+            for dc in group.dc_set.all():
+                yield dc, group

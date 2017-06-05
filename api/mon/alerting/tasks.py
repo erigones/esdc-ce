@@ -7,6 +7,7 @@ from api.mon.zabbix import getZabbix
 
 logger = get_task_logger(__name__)
 
+
 # noinspection PyUnusedLocal
 @cq.task(name='api.mon.base.tasks.mon_user_group_changed', base=MonInternalTask)  # logging will be done separately
 def mon_user_group_changed(task_id, sender, group_name=None, dc_name=None, *args, **kwargs):
@@ -61,13 +62,14 @@ def mon_user_group_changed(task_id, sender, group_name=None, dc_name=None, *args
     else:
         raise AssertionError("either group name or dc name has to be defined")
 
+
 # noinspection PyUnusedLocal
 @cq.task(name='api.mon.base.tasks.mon_user_changed', base=MonInternalTask)  # logging will be done separately
 def mon_user_changed(task_id, sender, user_name, dc_name=None, affected_groups=(), *args, **kwargs):
     """
-    When  removing user from a group, we don't know frmo which one we removed it.
+    When a user is removed from a group, this task doesn't know from which group the user was removed.
     We have to get all groups to which the user belongs to, get their respective zabbix apis
-    and remove the complement(difference) of the sets of all mgmt groups and the zabbix user groups
+    and remove the complement(difference) of the sets of all relevant mgmt groups and the zabbix user groups
 
     """
     from vms.models import Dc

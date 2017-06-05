@@ -964,8 +964,8 @@ class _UserGroupAwareZabbix(_Zabbix):
         else:
             self.delete_user(user)
 
-    def delete_user_group(self, zabbix_id=None, group_name=None, group=None):
-        assert zabbix_id or group_name or (group and group.zabbix_id)
+    def delete_user_group(self, zabbix_id=None, zabbix_group_name=None, group=None):
+        assert zabbix_id or zabbix_group_name or (group and group.zabbix_id)
         # for optimalization: z.zapi.usergroup.get({'search': {'name': ":dc_name:*"}, 'searchWildcardsEnabled': True})
 
         if zabbix_id:
@@ -973,9 +973,9 @@ class _UserGroupAwareZabbix(_Zabbix):
                 group = ZabbixUserGroupContainer.from_zabbix_id(self.zapi, zabbix_id)
             except RemoteObjectDoesNotExist:
                 return
-        elif group_name:
+        elif zabbix_group_name:
             try:
-                group = ZabbixUserGroupContainer.from_name(self.zapi, group_name)
+                group = ZabbixUserGroupContainer.from_zabbix_name(self.zapi, zabbix_group_name)
             except RemoteObjectDoesNotExist:
                 return
 
@@ -1122,7 +1122,7 @@ class ZabbixUserContainer(ZabbixNamedContainer):
     def from_mgmt_data(cls, zapi, user):
         container = cls(zapi=zapi, name=user.username)
         container._user = user
-        container.groups = cls.prepare_groups_for_user(zapi, user)
+        container.prepare_groups()
         return container
 
     @classmethod
@@ -1155,14 +1155,32 @@ class ZabbixUserContainer(ZabbixNamedContainer):
         container._refresh_groups(api_response_object)
         return container
 
-    @staticmethod
-    def prepare_groups_for_user(zapi, user):
-        return {ZabbixUserGroupContainer.from_name(zapi=zapi, name=group.name, resolve_users=False) for group in
-                user.roles.all()}
+    def _prepare_groups(self):
+        for dc, group in self._user.yield_all_dc_accesses():
+            try:
+                yield ZabbixUserGroupContainer.from_zabbix_name(
+                    zapi=self._zapi,
+                    name=ZabbixUserGroupContainer.user_group_name_factory(dc_name=dc.name,
+                                                                          local_group_name=group.name),
+                    resolve_users=False)
+            except RemoteObjectDoesNotExist:
+                pass  # We don't create/delete user groups when users are created.
+
+    def prepare_groups(self):
+        self.groups = set(self._prepare_groups())
 
     def _refresh_groups(self, api_response):
         self.groups = set(ZabbixUserGroupContainer.from_zabbix_data(self._zapi, group) for group in
                           api_response.get('usrgrps', []))
+
+    def refresh_id(self):
+        response = self._zapi.user.get(
+            dict(filter={'alias': self._user.username}))
+        if response:
+            self.zabbix_id = response[0]['userid']
+            return True
+        else:
+            return False
 
     def refresh(self):
         response = self._zapi.user.get(dict(userids=self.zabbix_id, **self.USER_QUERY_BASE))
@@ -1327,7 +1345,7 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
             raise RemoteObjectDoesNotExist()
 
     @classmethod
-    def from_name(cls, zapi, name, resolve_users=True):
+    def from_zabbix_name(cls, zapi, name, resolve_users=True):
         if resolve_users:
             query = cls.QUERY_BASE
         else:
@@ -1423,6 +1441,7 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
                 user_group_object['userids'] = []
 
                 for user in self.users:
+                    user.refresh_id()
                     if not user.zabbix_id:
                         user.groups.add(self)
                         user.to_zabbix()
@@ -2167,10 +2186,12 @@ class Zabbix(object):
             local_group_name=name,
             dc_name=self.dc.name)
         if self.internal_and_external_zabbix_share_backend:
-            self.ezx.delete_user_group(group_name=group_name)
+            self.ezx.delete_user_group(zabbix_group_name=group_name)
         else:
-            self.izx.delete_user_group(group_name=group_name)
-            self.ezx.delete_user_group(group_name=group_name)
+            self.izx.delete_user_group(zabbix_group_name=group_name)
+            self.ezx.delete_user_group(zabbix_group_name=group_name)
+
+            # todo how is delete #owner group resolved?
 
     def synchronize_user(self, user):
         if self.internal_and_external_zabbix_share_backend:
