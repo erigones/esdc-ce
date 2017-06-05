@@ -367,10 +367,3 @@ class User(AbstractBaseUser, PermissionsMixin, _AclMixin, _DcBoundMixin):
             return ZabbixMediaContainer(ZabbixMediaContainer.MEDIAS['xmpp'], sendto=self.userprofile.jabber,
                                         severities=ZabbixMediaContainer.SEVERITIES,
                                         period=ZabbixMediaContainer.PERIOD_DEFAULT)
-
-    def yield_all_dc_accesses(self):
-        # TODO yield also dc #owner access
-        # todo optimize query
-        for group in self.roles.all():
-            for dc in group.dc_set.all():
-                yield dc, group

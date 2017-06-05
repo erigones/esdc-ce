@@ -1065,15 +1065,14 @@ class _UserGroupAwareZabbix(_Zabbix):
         self._remove_users_from_user_group(remote_user_group, redundant_users, delete_users_if_last=True)
         self._add_users_to_user_group(remote_user_group, missing_users)
 
-    def _remove_users_from_user_group(self, zabbix_user_group, redundant_users, delete_users_if_last):
+    def _remove_users_from_user_group(self, zabbix_user_group, redundant_users, delete_users_if_last):  # TODO move
         zabbix_user_group.users -= redundant_users
         # Some zabbix users has to be deleted as this is their last group. We have to go the slower way.
         for user in redundant_users:
-
             self.remove_user_from_user_group(user, zabbix_user_group, delete_user_if_last=delete_users_if_last)
             # TODO create also a faster way of removal for users that has also different groups
 
-    def _add_users_to_user_group(self, zabbix_user_group, missing_users):
+    def _add_users_to_user_group(self, zabbix_user_group, missing_users):  # TODO move
         for user in missing_users:
             user.refresh_id()
             user.groups.add(zabbix_user_group)
@@ -1082,6 +1081,7 @@ class _UserGroupAwareZabbix(_Zabbix):
             else:
                 user.update_group_membership()
         zabbix_user_group.users.update(missing_users)
+
 
 class ZabbixNamedContainer(object):
     zabbix_id = None
@@ -1166,12 +1166,25 @@ class ZabbixUserContainer(ZabbixNamedContainer):
         return container
 
     def _prepare_groups(self):
-        for dc, group in self._user.yield_all_dc_accesses():
+        from vms.models import Dc
+        from django.db.models import Q
+        yielded_owned_dcs = set()
+        for dc_name, group_name, user_id in Dc.objects.filter(
+                        Q(owner=self._user) | Q(roles__user=self._user)).values_list('name', 'roles__name',
+                                                                                     'roles__user'):
+            if user_id == self._user.id:
+                local_group_name = group_name
+            elif dc_name not in yielded_owned_dcs:
+                local_group_name = '#owners'
+                yielded_owned_dcs.add(dc_name)
+            else:
+                continue
+
             try:
                 yield ZabbixUserGroupContainer.from_zabbix_name(
                     zapi=self._zapi,
-                    name=ZabbixUserGroupContainer.user_group_name_factory(dc_name=dc.name,
-                                                                          local_group_name=group.name),
+                    name=ZabbixUserGroupContainer.user_group_name_factory(dc_name=dc_name,
+                                                                          local_group_name=local_group_name),
                     resolve_users=False)
             except RemoteObjectDoesNotExist:
                 pass  # We don't create/delete user groups when users are created.
