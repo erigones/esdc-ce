@@ -304,7 +304,7 @@ def _vm_status_check(task_id, node_uuid, uuid, state, state_cache=None, vm=None,
                     **kwargs)
 
 
-# noinspection PyBroadException,PyUnusedLocal
+# noinspection PyUnusedLocal
 @cq.task(name='api.vm.status.tasks.vm_status_all_cb', ignore_result=True)
 def vm_status_all_cb(result, task_id, node_uuid=None):
     """
@@ -320,26 +320,30 @@ def vm_status_all_cb(result, task_id, node_uuid=None):
     vms = []
     r_states = redis.pipeline()
 
+    # The result['stdout'] contains output from `vmadm list -o uuid,state,exit_timestamp,boot_timestamp`
+    # Only one property of exit_timestamp and boot_timestamp will be in the command output
     for line in result['stdout'].splitlines():
-        try:
-            i = line.strip().split(':', 3)
-            uuid = i[0]
-            state = Vm.STATUS_DICT[i[1]]  # int
-            exit_or_boot_timestamp = i[2]
-        except:
-            try:
-                # noinspection PyUnboundLocalVariable
-                if i[1] in Vm.STATUS_UNUSED:  # 255
-                    logger.info('Ignoring unusable status ("%s") from output of task %s(%s)',
-                                line, 'vm_status_all', node_uuid)
-                    continue
-            except:
-                pass
+        i = line.strip().split(':', 2)  # uuid:state:exit_timestamp,boot_timestamp
 
+        if len(i) != 3:
             logger.error('Could not parse line ("%s") from output of task %s(%s)',
                          line, 'vm_status_all', node_uuid)
             continue
 
+        if i[1] in Vm.STATUS_UNUSED:  # 255
+            logger.info('Ignoring unusable status ("%s") from output of task %s(%s)',
+                        line, 'vm_status_all', node_uuid)
+            continue
+
+        if i[1] not in Vm.STATUS_DICT:
+            logger.error('Unknown status in vmadm list output ("%s") from output of task %s(%s)',
+                         line, 'vm_status_all', node_uuid)
+            continue
+
+        uuid = i[0]
+        state = Vm.STATUS_DICT[i[1]]  # returns int
+        exit_or_boot_timestamp = i[2]
+        # Save vm status line into vms list for later status check because we need to pair it to the redis result list
         vms.append((uuid, state, exit_or_boot_timestamp))
         r_states.get(KEY_PREFIX + Vm.status_key(uuid))
 
@@ -349,7 +353,6 @@ def vm_status_all_cb(result, task_id, node_uuid=None):
     vm_states = r_states.execute()
 
     for i, line in enumerate(vms):
-        vm = None
         uuid, state, exit_or_boot_timestamp = line
         state_cache = vm_states[i]  # None or string
         # Check and eventually save VM's status
