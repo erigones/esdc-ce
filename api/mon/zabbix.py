@@ -985,7 +985,8 @@ class _UserGroupAwareZabbix(_Zabbix):
             raise ValueError
         logger.debug('going to delete group %s', group.name)
         logger.debug('group users before: %s', group.users)
-        self._remove_users_from_user_group(group, group.users, delete_users_if_last=True)  # remove all users
+        users_to_remove = group.users.copy()
+        self._remove_users_from_user_group(group, users_to_remove, delete_users_if_last=True)  # remove all users
         logger.debug('group users after: %s', group.users)
         self.zapi.usergroup.delete([group.zabbix_id])
 
