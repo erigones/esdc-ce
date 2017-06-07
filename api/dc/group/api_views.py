@@ -33,7 +33,7 @@ class DcGroupView(APIView):
             roles = self.dc.roles.all().order_by(*self.order_by)
 
             if self.full or self.extended:
-                roles = roles.select_related('dc_bound',).prefetch_related('permissions', 'user_set')
+                roles = roles.select_related('dc_bound', ).prefetch_related('permissions', 'user_set')
 
         self.role = roles
 
@@ -60,10 +60,10 @@ class DcGroupView(APIView):
 
         ser = self.serializer(self.request, group)
         group.dc_set.add(dc)
-        mon_user_group_changed.call(self.request,group_name=group.name, dc_name=dc.name)
 
         res = SuccessTaskResponse(self.request, ser.data, obj=group, status=status.HTTP_201_CREATED,
                                   detail_dict=ser.detail_dict(), msg=LOG_GROUP_ATTACH)
+        mon_user_group_changed.call(self.request, group_name=group.name, dc_name=dc.name)
         self._remove_dc_binding(res)
         self._remove_user_dc_binding(res)
 
@@ -77,8 +77,8 @@ class DcGroupView(APIView):
 
         ser = self.serializer(self.request, group)
         group.dc_set.remove(self.request.dc)
-        mon_user_group_changed.call(self.request,group_name=group.name, dc_name=dc.name)
         res = SuccessTaskResponse(self.request, None, obj=group, detail_dict=ser.detail_dict(), msg=LOG_GROUP_DETACH)
+        mon_user_group_changed.call(self.request, group_name=group.name, dc_name=dc.name)
         self._remove_dc_binding(res)
 
         return res

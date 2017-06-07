@@ -42,10 +42,10 @@ class UserProfileView(APIView):
             return FailureTaskResponse(self.request, ser.errors, obj=profile, dc_bound=False)
 
         ser.save()
+        response = SuccessTaskResponse(self.request, ser.data, obj=self.user, detail_dict=ser.detail_dict(),
+                                       owner=ser.object.user, msg=LOG_PROFILE_UPDATE, dc_bound=False)
         mon_user_changed.call(self.request, user_name=ser.object.user.username)
-
-        return SuccessTaskResponse(self.request, ser.data, obj=self.user, detail_dict=ser.detail_dict(),
-                                   owner=ser.object.user, msg=LOG_PROFILE_UPDATE, dc_bound=False)
+        return response
 
     # noinspection PyMethodMayBeStatic
     def delete(self):

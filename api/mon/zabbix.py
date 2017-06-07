@@ -804,7 +804,6 @@ class _Zabbix(object):
     def _update_service(self, serviceid, **params):
         """Update Zabbix IT Service"""
         params['serviceid'] = serviceid
-
         try:
             res = self.zapi.service.update(params)
             return res['serviceids'][0]
@@ -815,6 +814,7 @@ class _Zabbix(object):
     def get_history(self, host, items, history, since, until, items_search=None):
         """Return monitoring history for selected zabbix host, items and period"""
         res = {'history': []}
+
         now = int(datetime.now().strftime('%s'))
         max_period = self.settings.MON_ZABBIX_GRAPH_MAX_PERIOD
         max_history = now - self.settings.MON_ZABBIX_GRAPH_MAX_HISTORY
@@ -1176,7 +1176,7 @@ class ZabbixUserContainer(ZabbixNamedContainer):
             if user_id == self._user.id:
                 local_group_name = group_name
             elif dc_name not in yielded_owned_dcs:
-                local_group_name = '#owners'
+                local_group_name = ZabbixUserGroupContainer.OWNERS_GROUP
                 yielded_owned_dcs.add(dc_name)
             else:
                 continue
@@ -1351,6 +1351,7 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
     PERMISSION_READ_WRITE = 3
     QUERY_BASE = {'selectUsers': ['alias'], 'limit': 1}
     QUERY_WITHOUT_USERS = {'limit': 1}
+    OWNERS_GROUP = '#owner'
 
     def __init__(self, name, zapi=None):
         super(ZabbixUserGroupContainer, self).__init__(name)
@@ -2175,8 +2176,9 @@ class Zabbix(object):
             # special case when DC itself acts as a group
 
             kwargs['superusers'] = True
-            kwargs['group_name'] = ZabbixUserGroupContainer.user_group_name_factory(dc_name=self.dc.name,
-                                                                                    local_group_name='#owner')
+            kwargs['group_name'] = ZabbixUserGroupContainer.user_group_name_factory(
+                dc_name=self.dc.name, local_group_name=ZabbixUserGroupContainer.OWNERS_GROUP
+            )
             kwargs['users'] = [
                 self.dc.owner]  # TODO add all superadmins perhaps or create a separate group for them in every DC
             kwargs['accessible_hostgroups'] = ()  # TODO

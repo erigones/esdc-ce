@@ -17,9 +17,8 @@ def mon_user_group_changed(task_id, sender, group_name=None, dc_name=None, *args
         dc = Dc.objects.get_by_name(dc_name)
         zabbix = getZabbix(dc)
         # particular group under dc changed
-        q = Role.objects.filter(name=group_name)
-        if q.exists():
-            group = q.get()
+        group = Role.objects.filter(dc=dc, name=group_name).first()
+        if group:
             logger.debug('going to update %s from %s', (group.name, dc.name))
             zabbix.synchronize_user_group(group=group)
         else:
@@ -39,16 +38,18 @@ def mon_user_group_changed(task_id, sender, group_name=None, dc_name=None, *args
     elif group_name:
         # group under all dcs changed
         # This is an expensive operation, but it's related only to a few superadmin related cases
-        q = Role.objects.filter(name=group_name)
-        if q.exists():
-            group = q.get()
-            # group exists, we have to update where it should be
-            for dc in group.dc_set.all():
+        group = Role.objects.filter(name=group_name).first()
+
+        if group:
+            related_dcs=Dc.objects.filter(roles=group)
+            unrelated_dcs=Dc.objects.exclude(id__in=related_dcs)
+
+            for dc in related_dcs:
                 logger.debug('going to update %s from %s', (group.name, dc.name))
                 zabbix = getZabbix(dc)
                 zabbix.synchronize_user_group(group=group)
-            # and delete where it shouldn't be
-            for dc in Dc.objects.exclude(roles=group):  # TODO this is quite expensive and I would like to avoid this
+
+            for dc in unrelated_dcs:  # TODO this is quite expensive and I would like to avoid this somehow
                 logger.debug('going to delete %s from %s', (group.name, dc.name))
                 zabbix = getZabbix(dc)
                 zabbix.delete_user_group(name=group_name)

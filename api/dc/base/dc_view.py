@@ -122,7 +122,7 @@ class DcView(APIView):
         if dcs.VMS_ISO_RESCUECD:
             from api.dc.iso.views import dc_iso
             call_api_view(request, None, dc_iso, dcs.VMS_ISO_RESCUECD, data={'dc': dc}, log_response=True)
-
+        mon_user_group_changed.call(request, dc_name=dc.name)
         return res
 
     def put(self):
@@ -135,8 +135,8 @@ class DcView(APIView):
             return FailureTaskResponse(request, ser.errors, obj=dc)
 
         ser.save()
-        mon_user_group_changed.call(request, dc_name=ser.object.name)
         res = SuccessTaskResponse(request, ser.data, obj=dc, detail_dict=ser.detail_dict(), msg=LOG_DC_UPDATE)
+        mon_user_group_changed.call(request, dc_name=ser.object.name)
         task_id = res.data.get('task_id')
 
         # Changing DC groups affects the group.dc_bound flag
@@ -189,12 +189,13 @@ class DcView(APIView):
 
         # After deleting a DC the current_dc is automatically set to DefaultDc by the on_delete db field parameter
         ser.object.delete()
-        mon_user_group_changed.call(request, dc_name=ser.object.name)
 
         # Remove cached tasklog for this DC (DB tasklog entries will be remove automatically)
         delete_tasklog_cached(dc_id)
 
         res = SuccessTaskResponse(request, None)  # no msg => won't be logged
+
+        mon_user_group_changed.call(request, dc_name=ser.object.name)
 
         # Every DC-bound object looses their DC => becomes DC-unbound
         task_id = res.data.get('task_id')

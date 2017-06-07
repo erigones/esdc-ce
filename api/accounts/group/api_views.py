@@ -66,7 +66,6 @@ class GroupView(APIView):
             return FailureTaskResponse(request, ser.errors, obj=group, dc_bound=False)
 
         ser.save()
-        mon_user_group_changed.call(request, group_name=ser.object.name)
         if update:
             msg = LOG_GROUP_UPDATE
             status = HTTP_200_OK
@@ -76,6 +75,9 @@ class GroupView(APIView):
 
         res = SuccessTaskResponse(request, ser.data, status=status, obj=group, msg=msg,
                                   detail_dict=ser.detail_dict(), dc_bound=False)
+
+        # call has to be after success response because db commit is done there
+        mon_user_group_changed.call(request, group_name=ser.object.name)
 
         # let's get the task_id so we use the same one for each log message
         task_id = res.data.get('task_id')
@@ -141,5 +143,7 @@ class GroupView(APIView):
         group = self.group
         dd = {'permissions': list(group.permissions.all().values_list('name', flat=True))}
         group.delete()
+        response = SuccessTaskResponse(self.request, None, obj=group, msg=LOG_GROUP_DELETE, detail_dict=dd,
+                                       dc_bound=False)
         mon_user_group_changed.call(self.request, group_name=group.name)
-        return SuccessTaskResponse(self.request, None, obj=group, msg=LOG_GROUP_DELETE, detail_dict=dd, dc_bound=False)
+        return response
