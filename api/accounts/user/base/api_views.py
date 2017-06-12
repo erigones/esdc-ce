@@ -1,6 +1,7 @@
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.db.models import Q
+from django.db import connection
 
 from api.api_views import APIView
 from api.fields import get_boolean_value
@@ -106,8 +107,9 @@ class UserView(APIView):
             if ser.old_roles:
                 user.current_dc = DefaultDc()
 
-        mon_user_changed.call(self.request, user_name=ser.object.username,
-                              affected_groups=tuple(group.id for group in affected_groups))
+        connection.on_commit(lambda: mon_user_changed.call(self.request, user_name=ser.object.username,
+                                                           affected_groups=tuple(
+                                                               group.id for group in affected_groups)))
         return res
 
     def get(self):
@@ -141,6 +143,8 @@ class UserView(APIView):
         old_roles = list(user.roles.all())
         ser = self.serializer(self.request, user)
         ser.object.delete()
+        connection.on_commit(lambda: mon_user_changed.call(self.request, user_name=ser.object.username,
+                                                           affected_groups=tuple(group.id for group in old_roles)))
         res = SuccessTaskResponse(self.request, None, obj=user, msg=LOG_USER_DELETE, detail_dict=dd, dc_bound=False)
 
         # User was removed, which may affect the cached list of DC admins for DCs which are attached to user's groups
@@ -152,8 +156,6 @@ class UserView(APIView):
         if was_staff:
             User.clear_super_admin_ids()
 
-        mon_user_changed.call(self.request, user_name=ser.object.username,
-                              affected_groups=tuple(group.id for group in old_roles))
         return res
 
     def api_key(self):

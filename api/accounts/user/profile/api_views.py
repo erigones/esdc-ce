@@ -1,3 +1,5 @@
+from django.db import connection
+
 from api.api_views import APIView
 from api.exceptions import OperationNotSupported
 from api.accounts.user.profile.serializers import UserProfileSerializer
@@ -42,10 +44,9 @@ class UserProfileView(APIView):
             return FailureTaskResponse(self.request, ser.errors, obj=profile, dc_bound=False)
 
         ser.save()
-        response = SuccessTaskResponse(self.request, ser.data, obj=self.user, detail_dict=ser.detail_dict(),
-                                       owner=ser.object.user, msg=LOG_PROFILE_UPDATE, dc_bound=False)
-        mon_user_changed.call(self.request, user_name=ser.object.user.username)
-        return response
+        connection.on_commit(lambda: mon_user_changed.call(self.request, user_name=ser.object.user.username))
+        return SuccessTaskResponse(self.request, ser.data, obj=self.user, detail_dict=ser.detail_dict(),
+                                   owner=ser.object.user, msg=LOG_PROFILE_UPDATE, dc_bound=False)
 
     # noinspection PyMethodMayBeStatic
     def delete(self):

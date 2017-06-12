@@ -1,3 +1,5 @@
+from django.db import connection
+
 from api import status
 from api.api_views import APIView
 from api.exceptions import ObjectAlreadyExists, ObjectNotFound
@@ -61,9 +63,9 @@ class DcGroupView(APIView):
         ser = self.serializer(self.request, group)
         group.dc_set.add(dc)
 
+        connection.on_commit(lambda: mon_user_group_changed.call(self.request, group_name=group.name, dc_name=dc.name))
         res = SuccessTaskResponse(self.request, ser.data, obj=group, status=status.HTTP_201_CREATED,
                                   detail_dict=ser.detail_dict(), msg=LOG_GROUP_ATTACH)
-        mon_user_group_changed.call(self.request, group_name=group.name, dc_name=dc.name)
         self._remove_dc_binding(res)
         self._remove_user_dc_binding(res)
 
@@ -77,8 +79,8 @@ class DcGroupView(APIView):
 
         ser = self.serializer(self.request, group)
         group.dc_set.remove(self.request.dc)
+        connection.on_commit(lambda: mon_user_group_changed.call(self.request, group_name=group.name, dc_name=dc.name))
         res = SuccessTaskResponse(self.request, None, obj=group, detail_dict=ser.detail_dict(), msg=LOG_GROUP_DETACH)
-        mon_user_group_changed.call(self.request, group_name=group.name, dc_name=dc.name)
         self._remove_dc_binding(res)
 
         return res

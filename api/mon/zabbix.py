@@ -8,7 +8,7 @@ from django.utils.six import iteritems
 from frozendict import frozendict
 from gui.models.permission import AdminPermission
 
-from zabbix_api import ZabbixAPI, ZabbixAPIException
+from zabbix_api import ZabbixAPI, ZabbixAPIException, ZabbixAPIError
 from api.decorators import catch_exception
 from vms.models import DefaultDc
 
@@ -938,26 +938,23 @@ class _UserGroupAwareZabbix(_Zabbix):
                 return
         else:
             raise AssertionError()
-
-        self.zapi.user.delete([user.zabbix_id])
+        try:
+            self.zapi.user.delete([user.zabbix_id])
+        except ZabbixAPIError:
+            # TODO perhaps we should ignore race condition errors, or repeat the task?
+            # Example:
+            # ZabbixAPIError: Application error. No permissions to referred object or it does not exist! [-32500]
+            raise
         user.zabbix_id = None  # unnecessary perhaps?
 
     def remove_user_from_user_group(self, user, user_group, delete_user_if_last=False):
-        """
-        Naive approach. 
-        We expect that its up to date and group is in user groups. We should consider some kind of atomicity here
-        :param user: 
-        :param user_group: 
-        :param delete_user_if_last: 
-        :return: 
-        """
         user.refresh()
-
-        assert user_group in user.groups, 'user is not in the group: %s %s' % (user_group, user.groups)
+        if user_group not in user.groups:
+            logger.warn('user is not in the group: %s %s (possible race condition)', (user_group, user.groups))
         if not user.groups - {user_group} and not delete_user_if_last:
             raise ObjectManipulationError('cannot remove the last group without deleting the user itself')
 
-        user.groups.remove(user_group)
+        user.groups -= {user_group}
 
         if user.groups:
             user.update_group_membership()
@@ -1057,6 +1054,7 @@ class _UserGroupAwareZabbix(_Zabbix):
         self._sync_user_group_base(zabbix_user_group, user_group)  # todo
 
     def _synchronize_users_in_user_group(self, remote_user_group, source_user_group):
+        logger.debug('synchronizing %s', remote_user_group)
         logger.debug('remote_user_group.users %s', remote_user_group.users)
         logger.debug('source_user_group.users %s', source_user_group.users)
         redundant_users = remote_user_group.users - source_user_group.users
@@ -1267,7 +1265,13 @@ class ZabbixUserContainer(ZabbixNamedContainer):
         user_object['passwd'] = self._user.__class__.objects.make_random_password(20)
 
         logger.debug('creating user: %s', user_object)
-        self._api_response = self._zapi.user.create(user_object)
+        try:
+            self._api_response = self._zapi.user.create(user_object)
+        except ZabbixAPIError:
+            # TODO perhaps we should ignore race condition errors, or repeat the task?
+            # example: ZabbixAPIError: Application error....
+            raise
+
         self.zabbix_id = self._api_response['userids'][0]
 
         # todo refresh the whole object so that there are real data

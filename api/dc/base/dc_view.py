@@ -1,3 +1,4 @@
+from django.db import connection
 from django.utils.translation import ugettext_noop as _
 
 from api import status
@@ -98,6 +99,8 @@ class DcView(APIView):
         # Copy custom settings from default DC and save new DC
         ser.object.custom_settings = default_custom_settings
         ser.save()
+        connection.on_commit(lambda: mon_user_group_changed.call(request, dc_name=dc.name))
+
         res = SuccessTaskResponse(request, ser.data, status=status.HTTP_201_CREATED, obj=dc,
                                   detail_dict=ser.detail_dict(), msg=LOG_DC_CREATE)
         dcs = dc.settings
@@ -122,7 +125,6 @@ class DcView(APIView):
         if dcs.VMS_ISO_RESCUECD:
             from api.dc.iso.views import dc_iso
             call_api_view(request, None, dc_iso, dcs.VMS_ISO_RESCUECD, data={'dc': dc}, log_response=True)
-        mon_user_group_changed.call(request, dc_name=dc.name)
         return res
 
     def put(self):
@@ -136,22 +138,19 @@ class DcView(APIView):
 
         ser.save()
         res = SuccessTaskResponse(request, ser.data, obj=dc, detail_dict=ser.detail_dict(), msg=LOG_DC_UPDATE)
-        mon_user_group_changed.call(request, dc_name=ser.object.name)
         task_id = res.data.get('task_id')
-
         # Changing DC groups affects the group.dc_bound flag
         if ser.groups_changed:
             # The groups that are removed or added should not be DC-bound anymore
             for group in ser.groups_changed:
-                mon_user_group_changed.call(request,
-                                            group_name=group.name)
                 # TODO maybe it's duplicate so we don't have to do this
+                connection.on_commit(lambda: mon_user_group_changed.call(request, group_name=group.name))
                 if group.dc_bound:
                     remove_dc_binding_virt_object(task_id, LOG_GROUP_UPDATE, group, user=request.user)
 
         # After changing the DC owner or changing DC groups we have to invalidate the list of admins for this DC
         if ser.owner_changed or ser.groups_changed:
-            mon_user_group_changed.call(request, dc_name=dc.name)
+            connection.on_commit(lambda: mon_user_group_changed.call(request, dc_name=dc.name))
             User.clear_dc_admin_ids(dc)
             # Remove user.dc_bound flag for new DC owner
             # Remove user.dc_bound flag for users in new dc.groups, which are DC-bound, but not to this datacenter
@@ -193,9 +192,8 @@ class DcView(APIView):
         # Remove cached tasklog for this DC (DB tasklog entries will be remove automatically)
         delete_tasklog_cached(dc_id)
 
+        connection.on_commit(lambda: mon_user_group_changed.call(request, dc_name=ser.object.name))
         res = SuccessTaskResponse(request, None)  # no msg => won't be logged
-
-        mon_user_group_changed.call(request, dc_name=ser.object.name)
 
         # Every DC-bound object looses their DC => becomes DC-unbound
         task_id = res.data.get('task_id')

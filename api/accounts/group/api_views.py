@@ -1,3 +1,5 @@
+from django.db import connection
+
 from api.status import HTTP_201_CREATED, HTTP_200_OK
 from api.api_views import APIView
 from api.utils.db import get_virt_object
@@ -73,11 +75,9 @@ class GroupView(APIView):
             msg = LOG_GROUP_CREATE
             status = HTTP_201_CREATED
 
+        connection.on_commit(lambda: mon_user_group_changed.call(request, group_name=ser.object.name))
         res = SuccessTaskResponse(request, ser.data, status=status, obj=group, msg=msg,
                                   detail_dict=ser.detail_dict(), dc_bound=False)
-
-        # call has to be after success response because db commit is done there
-        mon_user_group_changed.call(request, group_name=ser.object.name)
 
         # let's get the task_id so we use the same one for each log message
         task_id = res.data.get('task_id')
@@ -143,7 +143,7 @@ class GroupView(APIView):
         group = self.group
         dd = {'permissions': list(group.permissions.all().values_list('name', flat=True))}
         group.delete()
+        connection.on_commit(lambda: mon_user_group_changed.call(self.request, group_name=group.name))
         response = SuccessTaskResponse(self.request, None, obj=group, msg=LOG_GROUP_DELETE, detail_dict=dd,
                                        dc_bound=False)
-        mon_user_group_changed.call(self.request, group_name=group.name)
         return response

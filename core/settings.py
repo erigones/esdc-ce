@@ -21,7 +21,7 @@ MANAGERS = ADMINS
 # Default test DB
 DATABASES = {
     'esdc': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'transaction_hooks.backends.postgresql_psycopg2',
         'NAME': 'esdc',
         'USER': 'esdc',
         'PASSWORD': 'S3cr3tP4ssw0rd',
@@ -29,7 +29,7 @@ DATABASES = {
         'PORT': '6432',
     },
     'pdns': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'transaction_hooks.backends.postgresql_psycopg2',
         'NAME': 'pdns',
         'USER': 'esdc',
         'PASSWORD': 'S3cr3tP4ssw0rd',
