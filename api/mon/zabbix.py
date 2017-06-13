@@ -1284,7 +1284,7 @@ class ZabbixMediaContainer(object):
         SEVERITY_DISASTER
     )
     PERIOD_DEFAULT_WORKING_HOURS = '1-5,09:00-18:00'  # TODO I'm not sure whether it's utc or not
-    PERIOD_DEFAULT = '01-07,00:00-24:00'
+    PERIOD_DEFAULT = '1-7,00:00-24:00'
 
     def __init__(self, media_type, sendto, severities, period):
         self.media_type = media_type
