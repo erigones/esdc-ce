@@ -253,6 +253,11 @@ EMAIL_ADMINS = False
 TMPDIR = path.join(PROJECT_DIR, 'var', 'tmp')
 LIBDIR = path.join(PROJECT_DIR, 'var', 'lib')
 LOGDIR = path.join(PROJECT_DIR, 'var', 'log')
+
+# Location of key/cert files needed to authenticate against update server
+UPDATE_KEY_FILE = path.join(LIBDIR, 'update.key')
+UPDATE_CERT_FILE = path.join(LIBDIR, 'update.crt')
+
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
 # the site admins on every HTTP 500 error when DEBUG=False.
@@ -646,11 +651,8 @@ ACL_ENABLED = True  # Module
 # Usernames that clashes with zabbix system usernames etc.
 INVALID_USERNAMES = frozenset(['profile','Admin','provisioner'])
 
-# location of key/cert files needed to authenticate against update server
-UPDATE_KEY_FILE = path.join(LIBDIR, 'update.key')
-UPDATE_CERT_FILE = path.join(LIBDIR, 'update.crt')
 
-#VVVVVVV        THIS BLOCK SHOULD BE ALWAYS AT THE BOTTOM      VVVVVVVVVVVVVVVV
+# VVVVVVV        THIS BLOCK SHOULD BE ALWAYS AT THE BOTTOM      VVVVVVVVVVVVVVVV
 
 # Allow any settings to be defined in local_settings.py which is ignored in our
 # version control system allowing for settings to be defined (overwritten) per
@@ -659,7 +661,6 @@ try:
     from local_settings import *
 except ImportError:
     pass
-
 
 # ESDC :: Third Party Apps Settings
 THIRD_PARTY_APPS, THIRD_PARTY_MODULES = collect_third_party_apps_and_settings(locals())
@@ -671,4 +672,4 @@ if THIRD_PARTY_APPS_ENABLED:
 
 MODULES = frozenset(MODULES)
 
-#^^^^^^^        THIS BLOCK SHOULD BE ALWAYS AT THE BOTTOM      ^^^^^^^^^^^^^^^^
+# ^^^^^^^        THIS BLOCK SHOULD BE ALWAYS AT THE BOTTOM      ^^^^^^^^^^^^^^^^

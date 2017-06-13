@@ -3,7 +3,7 @@
 
 - name: Update postgresql config
   copy: src="{{ current_task_dir }}/files/pg-ansible.conf" dest=/var/lib/pgsql/9.5/data/conf.d/ansible.conf
-  notify: restart postgresql95
+  # Restart of PostgreSQL service is not required for correct functioning
 
 - name: Load Zabbix credentials
   include: "{{ upg_base }}/lib/zabbix_credentials.yml"

@@ -22,10 +22,13 @@
     loop_control:
       loop_var: tasklist
   handlers:
+  - name: sleep 15
+    pause: seconds=15
   - name: reload systemd
     shell: /bin/systemctl daemon-reload
   - name: restart postgresql95
     service: name=postgresql-9.5 state=restarted
+    notify: sleep 15
   - name: restart erigonesd-beat
     service: name=erigonesd-beat state=restarted
   - name: reload haproxy
