@@ -11,6 +11,7 @@ from gui.models.permission import AdminPermission
 from zabbix_api import ZabbixAPI, ZabbixAPIException, ZabbixAPIError
 from api.decorators import catch_exception
 from vms.models import DefaultDc
+from gui.models import User
 
 logger = getLogger(__name__)
 
@@ -2188,8 +2189,7 @@ class Zabbix(object):
             kwargs['group_name'] = ZabbixUserGroupContainer.user_group_name_factory(
                 dc_name=self.dc.name, local_group_name=ZabbixUserGroupContainer.OWNERS_GROUP
             )
-            kwargs['users'] = [
-                self.dc.owner]
+            kwargs['users'] = [User.objects.filter(dc=self.dc).first()]  # cannot use self.dc.owner due to cache !!!
             kwargs['accessible_hostgroups'] = ()  # TODO
         else:
 
