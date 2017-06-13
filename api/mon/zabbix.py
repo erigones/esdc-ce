@@ -988,9 +988,6 @@ class _UserGroupAwareZabbix(_Zabbix):
         logger.debug('group users after: %s', group.users)
         self.zapi.usergroup.delete([group.zabbix_id])
 
-    def _synchronize_user_media(self, user):
-        raise NotImplementedError
-
     def _get_zabbix_user_group(self, group_name):
         existing_zabbix_group = self.zapi.usergroup.get({'search': {'name': group_name},
                                                          'selectUsers': ['alias'],
@@ -1008,22 +1005,16 @@ class _UserGroupAwareZabbix(_Zabbix):
         else:
             return ZabbixUserContainer.from_zabbix_id(self.zapi, zabbix_id)
 
-    def _get_zabbix_host_groups(self, host_group_names):
-        raise NotImplementedError  # this is a duplicate of_get_groups
-
-    def _get_zabbix_host_group_details(self, host_group_name):
-        raise NotImplementedError
-
     def synchronize_user_group(self, group_name, users, accessible_hostgroups, superusers=False):
         """
         Make sure that in the end, there will be a user group with specified users in zabbix.
         The question to which Zabbix is not solved on this layer.
         User has to be removed in case she is being removed from the last group
-        TODO superuser synchronization should be in the DC settings - not everybody might want to sync some strangers in it's zabbix
         :param superusers: permissions will be r-w and frontend access will be enabled
         :param group_name: should be the qualified group name (<DC>:<group name>:)
         :return: 
         """
+        # TODO synchronization of superadmins should be in the DC settings
         # todo will hosts be added in the next step?
         user_group = ZabbixUserGroupContainer.from_mgmt_data(self.zapi, group_name, users, accessible_hostgroups,
                                                              superusers)
@@ -1038,20 +1029,18 @@ class _UserGroupAwareZabbix(_Zabbix):
 
         return user_group
 
-    def __sync_user_group_hostgroups(self, zabbix_user_group, user_group):
-        raise NotImplementedError
-
-    def _sync_user_group_base(self, zabbix_user_group, user_group):
-        #  superuser group status
-        raise NotImplementedError  # what should be here?
+    def _synchronize_basic_information_in_user_group(self, zabbix_user_group, user_group):
+        if zabbix_user_group.superuser_group != user_group.superuser_group:
+            zabbix_user_group.superuser_group = user_group.superuser_group
+            zabbix_user_group.update_superuser_status()
 
     def _update_user_group(self, zabbix_user_group, user_group):
         # todo this way or all in one call prepared?
         self._synchronize_users_in_user_group(zabbix_user_group, user_group)
-        logger.debug('todo hostgroups and base update')
+        self._synchronize_basic_information_in_user_group(zabbix_user_group, user_group)
+        logger.debug('todo hostgroups')
+        # self._synchronize_host_groups_in_user_group(zabbix_user_group, user_group)  # todo
         return
-        self.__sync_user_group_hostgroups(zabbix_user_group, user_group)  # todo
-        self._sync_user_group_base(zabbix_user_group, user_group)  # todo
 
     def _synchronize_users_in_user_group(self, remote_user_group, source_user_group):
         logger.debug('synchronizing %s', remote_user_group)
@@ -1112,7 +1101,7 @@ class ZabbixNamedContainer(object):
 
     @name.setter
     def name(self, value):
-        raise NotImplementedError('name is immutable')
+        raise ValueError('name is immutable')
 
 
 class ZabbixUserContainer(ZabbixNamedContainer):
@@ -1346,8 +1335,8 @@ class ZabbixHostGroupContainer(object):
 
 
 class ZabbixUserGroupContainer(ZabbixNamedContainer):
-    FRONTEND_ACCESS_ENABLED_WITH_DEFAULT_AUTH = 0
-    FRONTEND_ACCESS_DISABLED = 2
+    FRONTEND_ACCESS_ENABLED_WITH_DEFAULT_AUTH = '0'
+    FRONTEND_ACCESS_DISABLED = '2'
     USERS_STATUS_ENABLED = 0
     PERMISSION_DENY = 0
     PERMISSION_READ_ONLY = 2
@@ -1433,7 +1422,8 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
 
         if hostgroups_info:
             user_group_object['rights'] = []
-            hostgroups_access_permission = self.PERMISSION_READ_WRITE if self.superuser_group else self.PERMISSION_READ_ONLY
+            hostgroups_access_permission = \
+                self.PERMISSION_READ_WRITE if self.superuser_group else self.PERMISSION_READ_ONLY
             for host_group in self.host_groups:
                 if not host_group.zabbix_id:
                     raise ObjectManipulationError(
@@ -1477,6 +1467,21 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
     def _refresh_users(self, api_response):
         self.users = {ZabbixUserContainer.from_zabbix_data(self._zapi, userdata) for userdata in
                       api_response.get('users', [])}
+
+    def update_superuser_status(self):
+        user_group_object = {'usrgrpid': self.zabbix_id}
+        if self.superuser_group:
+            user_group_object['gui_access'] = self.FRONTEND_ACCESS_ENABLED_WITH_DEFAULT_AUTH
+        else:
+            user_group_object['gui_access'] = self.FRONTEND_ACCESS_DISABLED
+        logger.debug("updating user group with %s", user_group_object)
+        self._api_response = self._zapi.usergroup.update(user_group_object)
+        logger.debug("received %s from zabbix", self._api_response)
+        self.update_hostgroup_info()  # There is some hostgroup information depending on the superuser status
+
+    def update_hostgroup_info(self):
+        logger.debug('TODO host group update %s', self.name)
+        # TODO
 
     @staticmethod
     def user_group_name_factory(dc_name, local_group_name):
