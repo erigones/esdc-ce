@@ -945,7 +945,8 @@ class _UserGroupAwareZabbix(_Zabbix):
             # Example:
             # ZabbixAPIError: Application error. No permissions to referred object or it does not exist! [-32500]
             raise
-        user.zabbix_id = None  # unnecessary perhaps?
+        else:
+            user.zabbix_id = None  # unnecessary perhaps?
 
     def remove_user_from_user_group(self, user, user_group, delete_user_if_last=False):
         user.refresh()
@@ -991,7 +992,6 @@ class _UserGroupAwareZabbix(_Zabbix):
         raise NotImplementedError
 
     def _get_zabbix_user_group(self, group_name):
-        # todo maybe we can cache the group id (also user ids somewhere else)
         existing_zabbix_group = self.zapi.usergroup.get({'search': {'name': group_name},
                                                          'selectUsers': ['alias'],
                                                          'limit': 1})
@@ -1019,7 +1019,7 @@ class _UserGroupAwareZabbix(_Zabbix):
         Make sure that in the end, there will be a user group with specified users in zabbix.
         The question to which Zabbix is not solved on this layer.
         User has to be removed in case she is being removed from the last group
-        TODO superuser synchronization should be in the DC settings - not everybody might want to sync some strangers in it's zabbix 
+        TODO superuser synchronization should be in the DC settings - not everybody might want to sync some strangers in it's zabbix
         :param superusers: permissions will be r-w and frontend access will be enabled
         :param group_name: should be the qualified group name (<DC>:<group name>:)
         :return: 
@@ -1118,7 +1118,7 @@ class ZabbixNamedContainer(object):
 class ZabbixUserContainer(ZabbixNamedContainer):
     MEDIA_ENABLED = 0  # SIC in zabbix docs: 0 - enabled, 1 - disabled.
     USER_QUERY_BASE = {'selectUsrgrps': ['usrgrpid', 'name', 'gui_access'],
-                       'selectMedias': ['mediatypeid', 'sendto']}  # FIXME mutable
+                       'selectMedias': ['mediatypeid', 'sendto']}
     _user = None
 
     def __init__(self, name, zapi=None):
@@ -1137,7 +1137,7 @@ class ZabbixUserContainer(ZabbixNamedContainer):
     @classmethod
     def from_zabbix_alias(cls, zapi, alias):
         response = zapi.user.get(
-            dict(filter={'alias': alias}, **cls.USER_QUERY_BASE))  # todo perhaps limit 1 to improve performance?
+            dict(filter={'alias': alias}, **cls.USER_QUERY_BASE))
         if response:
             assert len(response) == 1, 'user mapping should be injective'
             return cls.from_zabbix_data(zapi, response[0])
@@ -1238,7 +1238,7 @@ class ZabbixUserContainer(ZabbixNamedContainer):
     def _attach_basic_info(self, api_request_object):
         api_request_object['name'] = self._user.first_name
         api_request_object['surname'] = self._user.last_name
-        # user_object['type']= TODO self._user.is_superadmin but we miss request
+        # user_object['type']= FIXME self._user.is_superadmin but we miss request
 
     def _get_api_request_object_stub(self):
         return {'userid': self.zabbix_id}
@@ -1271,10 +1271,9 @@ class ZabbixUserContainer(ZabbixNamedContainer):
             # TODO perhaps we should ignore race condition errors, or repeat the task?
             # example: ZabbixAPIError: Application error....
             raise
+        else:
+            self.zabbix_id = self._api_response['userids'][0]
 
-        self.zabbix_id = self._api_response['userids'][0]
-
-        # todo refresh the whole object so that there are real data
         return self
 
 
@@ -1401,7 +1400,7 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
     def from_zabbix_data(cls, zapi, zabbix_object):
         container = cls(zapi=zapi, name=zabbix_object['name'])
         container.zabbix_id = zabbix_object['usrgrpid']
-        container.superuser_group = zabbix_object['gui_access'] != 2  # FIXME resolve the identification
+        container.superuser_group = zabbix_object['gui_access'] != cls.FRONTEND_ACCESS_DISABLED
         container.users = {ZabbixUserContainer.from_zabbix_data(zapi, userdata) for userdata in
                            zabbix_object.get('users', [])}
         return container
@@ -1418,7 +1417,7 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
             'It\'s impossible to create an object without any information about it'
 
         user_group_object = {}
-        if self.zabbix_id:  # todo check whether structure is the same in both create/ update cases
+        if self.zabbix_id:
             user_group_object['usrgrpid'] = self.zabbix_id
         else:
             # if group is not created, we force all information to be put into the object
@@ -2176,15 +2175,16 @@ class Zabbix(object):
 
     def synchronize_user_group(self, group=None, dc_as_group=None):
         kwargs = {}
+        # TODO create also a separate superadmin group for superadmins in every DC
+
         if dc_as_group:
             # special case when DC itself acts as a group
-
             kwargs['superusers'] = True
             kwargs['group_name'] = ZabbixUserGroupContainer.user_group_name_factory(
                 dc_name=self.dc.name, local_group_name=ZabbixUserGroupContainer.OWNERS_GROUP
             )
             kwargs['users'] = [
-                self.dc.owner]  # TODO add all superadmins perhaps or create a separate group for them in every DC
+                self.dc.owner]
             kwargs['accessible_hostgroups'] = ()  # TODO
         else:
 
@@ -2209,8 +2209,6 @@ class Zabbix(object):
         else:
             self.izx.delete_user_group(zabbix_group_name=group_name)
             self.ezx.delete_user_group(zabbix_group_name=group_name)
-
-            # todo how is delete #owner group resolved?
 
     def synchronize_user(self, user):
         if self.internal_and_external_zabbix_share_backend:

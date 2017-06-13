@@ -30,7 +30,10 @@ def mon_user_group_changed(task_id, sender, group_name=None, dc_name=None, *args
             dc = Dc.objects.get_by_name(dc_name)
         except Exception:
             raise NotImplementedError(
-                "TODO")  # When DC is deleted, we lose the access to the zabbix and therefore we don't know what to do
+                "TODO")
+            # When DC is deleted, we lose the access to the zabbix and therefore we don't know what to do
+            # We have to provide information about zabbix connection so that we can delete related information in zabbix
+
         else:
             zabbix = getZabbix(dc)
             zabbix.synchronize_user_group(dc_as_group=True)  # DC name is implied by the zabbix instance
