@@ -1,140 +1,125 @@
+from zabbix_api import ZabbixAPIError
+
 from api.mon.zabbix import getZabbix, ZabbixUserGroupContainer, ZabbixUserContainer
 from vms.models import Dc
-from gui.models import User
+from gui.models import User, Role
 from unittest import TestCase
+from django.utils.crypto import get_random_string
 
 
-class TestUsergroupManipulation(TestCase):
+class AlertingAPIAdapterTests(TestCase):
+    dc = None
     zabbix = None
+    db_users = None
+    db_groups = None
 
     def setUp(self):
-        self.zabbix = getZabbix(Dc.objects.all()[0]).izx
-        assert User.objects.count() > 5, "you have to have at least 5 users in the database to run tests"
+        self.dc = Dc.objects.all()[0]
+        self.zabbix = getZabbix(self.dc)
 
-    def test_user_manipulation(self):
-        raise NotImplementedError("FIXME Wrong abstraction")
-        # create users and group
-        # test_create_users_and_user_group(5,'pirati')
-        # raw_input('group pirati should exist and should have 5 members')
-        # delete users
-        group_name = 'testgroup1'
-        member_count = 3
-        ug = self._create_users_and_user_group(member_count, group_name)
-        # create second group
-        second_group_name = 'testgroup2'
-        second_group_member_count = 2
-        self._create_users_and_user_group(second_group_member_count, second_group_name)
+        self.db_users = []
+        self.db_groups = []
+        for x in range(5):
+            self.db_users.append(self._create_db_user())
+        for x in range(5):
+            self.db_groups.append(self._create_db_group())
 
-        assert self._get_user_group_user_count(second_group_name) == second_group_member_count
-        user_group_user_count = self._get_user_group_user_count(group_name)
-        self.assertEqual(user_group_user_count, member_count)
+    def tearDown(self):
+        for user in self.db_users:
+            try:
+                self.zabbix.delete_user(name=user.username)
+            except ZabbixAPIError:
+                pass
+            user.delete()
+        for group in self.db_groups:
+            try:
+                self.zabbix.delete_user_group(name=group.name)
+            except ZabbixAPIError:
+                pass
+            group.delete()
 
-        increased_second_group_member_count = 4
-        self._create_users_and_user_group(increased_second_group_member_count, second_group_name)
+    def _create_db_user(self):
+        user = User()
+        user.first_name = get_random_string(10)
+        user.last_name = get_random_string(10)
+        user.api_access = True
+        user.is_active = True
+        user.is_super_admin = False
+        user.callback_key = '***'
+        user.password = get_random_string(10)
+        user.email = get_random_string(10) + '@' + get_random_string(10) + '.com'
+        user.api_key = get_random_string(30)
+        user.username = 'Test' + get_random_string(10)
+        user.password = get_random_string(10)
+        user.save()
+        return user
 
-        assert self._get_user_group_user_count(second_group_name) == increased_second_group_member_count
-        assert self._get_user_group_user_count(group_name) == member_count
-
-        decreased_second_group_member_count = 1
-        self._create_users_and_user_group(decreased_second_group_member_count, second_group_name)
-
-        assert self._get_user_group_user_count(second_group_name) == decreased_second_group_member_count
-        assert self._get_user_group_user_count(group_name) == member_count
-
-        self.zabbix.delete_user_group(zabbix_group_name=second_group_name)
-        assert self._get_user_group_user_count(group_name) == member_count
-
-        increased_second_group_member_count = 4
-        self._create_users_and_user_group(increased_second_group_member_count, second_group_name)
-        assert self._get_user_group_user_count(second_group_name) == increased_second_group_member_count
-        assert self._get_user_group_user_count(group_name) == member_count
-
-        self.zabbix.delete_user_group(zabbix_group_name=group_name)
-        assert self._get_user_group_user_count(second_group_name) == increased_second_group_member_count
-
-        self.zabbix.delete_user_group(zabbix_group_name=second_group_name)
+    def _create_db_group(self):
+        group = Role()
+        group.name = 'TestN' + get_random_string(10)
+        group.alias = 'TestA' + get_random_string(10)
+        group.save()
+        group.dc_set.add(self.dc)
+        assert self.dc in Role.objects.filter(name=group.name).first().dc_set.all()
+        return group
 
     def _get_user_group_user_count(self, group_name):
-        first_group = self.zabbix.zapi.usergroup.get({'search': {'name': group_name},
-                                                      'selectUsers': ['alias'],
-                                                      'limit': 1})[0]
+        first_group = self.zabbix.izx.zapi.usergroup.get({'search': {'name': group_name}, 'selectUsers': ['alias']})[0]
         return len(first_group.get('users', []))
 
-    def _create_users_and_user_group(self, user_count=5, name='testgroupname'):
-        users = User.objects.all()[:user_count]
-        ug = self.zabbix.synchronize_user_group(name, users, [])
-        return ug
+    def _create_zabbix_user_group(self, group):
+        self.assertListEqual(self.zabbix.izx.zapi.usergroup.get(
+            {'search': {'name': ZabbixUserGroupContainer.user_group_name_factory(self.dc.name, group.name)}
+             }), [], 'the group should not exist')
+        self.zabbix.synchronize_user_group(group=group)
+        self.assertEqual(len(self.zabbix.izx.zapi.usergroup.get(
+            {'search': {'name': ZabbixUserGroupContainer.user_group_name_factory(self.dc.name, group.name)}
+             })), 1, 'the group should be in zabbix by now')
 
-    def _create_user_group(self, group_name, users=()):
-        ugc = ZabbixUserGroupContainer.from_mgmt_data(self.zabbix.zapi, group_name, users)
-        ugc.to_zabbix(True, True, True)
-        return ugc
+    def _create_zabbix_user(self, db_user):
+        self.assertListEqual(self.zabbix.izx.zapi.user.get(dict(filter={'alias': db_user.username})), [],
+                             'user shouldn\'t be in zabbix before creation')
+        self.zabbix.synchronize_user(db_user)
+        self.assertEqual(len(self.zabbix.izx.zapi.user.get(dict(filter={'alias': db_user.username}))), 1,
+                         'user should be in zabbix by now')
 
-    def test_create_delete_empty_user_group(self, dc_name='dc', user_group_name='abc'):
-        zabbix_user_group_name = ZabbixUserGroupContainer.user_group_name_factory(dc_name, user_group_name)
-        self._create_user_group(zabbix_user_group_name)
-        response = self.zabbix.zapi.usergroup.get({'search': {'name': zabbix_user_group_name}})
-        assert response and len(
-            response) == 1, 'there should be one and only one user_group %s created' % zabbix_user_group_name
-        zugc = ZabbixUserGroupContainer.from_zabbix_data(self.zabbix.zapi, response[0])
-        self.zabbix.delete_user_group(zabbix_id=zugc.zabbix_id)
-        response = self.zabbix.zapi.usergroup.get({'search': {'name': zabbix_user_group_name}})
-        assert not response, "group should have been deleted"
+    def test_create_delete_empty_user_group(self):
+        db_group = self.db_groups[0]
+        self._create_zabbix_user_group(db_group)
+
+        self.zabbix.delete_user_group(db_group.name)
+
+        self.assertListEqual(self.zabbix.izx.zapi.usergroup.get({'search': {'name': db_group.name}, 'limit': 1}), [],
+                             'the group shouldn\'t exist anymore')
 
     def test_create_delete_user(self):
         # we have to create user group first
-        group_name = 'abcd'
-        g = self._create_user_group(group_name)
+        db_group = self.db_groups[0]
 
-        db_user = User.objects.all()[0]
-        user = ZabbixUserContainer.from_mgmt_data(self.zabbix.zapi, db_user)
-        assert not user.zabbix_id
-        user.groups.add(g)
-        user.to_zabbix()
-        assert user.zabbix_id
-        users_id = user.zabbix_id
-        same_user = ZabbixUserContainer.from_zabbix_alias(self.zabbix.zapi, db_user.username)
-        assert same_user == user
-        self.zabbix.delete_user(user)
-        self.assertRaises(Exception, ZabbixUserContainer.from_zabbix_alias, self.zabbix.zapi, db_user.username)
-        self.assertRaises(Exception, ZabbixUserContainer.from_zabbix_id, self.zabbix.zapi, users_id)
+        self._create_zabbix_user_group(db_group)
 
-        # and cleanup
-        self.zabbix.delete_user_group(zabbix_id=g.zabbix_id)
+        db_user = self.db_users[0]
+        self.assertRaises(Exception, self.zabbix.synchronize_user, (db_user,),
+                          'it should not be permitted to create user without group')
 
-    def test_create_update_delete_group_with_users(self):
-        group_name = 'tgroup1'
-        member_count = 3
-        ug = self._create_users_and_user_group(member_count, group_name)
-        response = self.zabbix.zapi.usergroup.get({'search': {'name': group_name},
-                                                   'selectUsers': ['alias'],
-                                                   'limit': 1})
-        assert response, 'group should have been created in zabbix'
-        zabbix_group = response[0]
-        assert zabbix_group.get('name', '') == group_name, ' zabbix group should have the same name as we defined'
-        assert len(
-            zabbix_group.get('users', [])) == member_count, 'the group should have exactly %d members' % member_count
+        db_user.roles.add(db_group)
+        self._create_zabbix_user(db_user)
 
-        # update group
-        increased_member_count = 4
-        self._create_users_and_user_group(increased_member_count, group_name)
-        response = self.zabbix.zapi.usergroup.get({'search': {'name': group_name},
-                                                   'selectUsers': ['alias'],
-                                                   'limit': 1})
-        zabbix_group = response[0]
-        assert len(
-            zabbix_group.get('users',
-                             [])) == increased_member_count, 'the group should have exactly %d members' % increased_member_count
-        zugc = ZabbixUserGroupContainer.from_zabbix_data(self.zabbix.zapi, zabbix_group)
-        self.zabbix.delete_user_group(group=zugc)
-        response = self.zabbix.zapi.usergroup.get({'search': {'name': group_name}})
-        assert not response
+        self.zabbix.delete_user(db_user.username)
 
-    def test_user_update(self):
+        self.assertListEqual(self.zabbix.izx.zapi.user.get(dict(filter={'alias': db_user.username})), [],
+                             'user shouldn\'t be in zabbix anymore')
+
+        self.zabbix.delete_user_group(db_group.name)
+
+    def _test_user_group_manipulation(self):
+        raise NotImplementedError()  # TODO
+
+    def _test_user_manipulation(self):
         # user added to a group
         # user removed from a group
         # user media changed
         # user media deleted
         # user admin status changed for a dc
         # dc ownership changed
-        raise NotImplementedError()
+        raise NotImplementedError()  # TODO

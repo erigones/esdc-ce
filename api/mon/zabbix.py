@@ -904,7 +904,7 @@ class _UserGroupAwareZabbix(_Zabbix):
         user_to_sync = ZabbixUserContainer.from_mgmt_data(self.zapi, user)
 
         if not user_to_sync.groups and existing_zabbix_user:
-            self.delete_user(user=user_to_sync)
+            self.delete_user(zabbix_user=user_to_sync)
         elif not user_to_sync.groups and not existing_zabbix_user:
             pass
         elif user_to_sync.groups and existing_zabbix_user:
@@ -915,38 +915,38 @@ class _UserGroupAwareZabbix(_Zabbix):
         else:
             raise AssertionError('this should never happen')
 
-    def delete_user(self, user=None, user_name=None):
-        logger.debug('trying to delete user %s', user or user_name)
-        assert (user and user.zabbix_id or user.name) or user_name, 'Who should I delete?'
+    def delete_user(self, zabbix_user=None, user_name=None):
+        logger.debug('trying to delete user %s', zabbix_user or user_name)
+        assert (zabbix_user and (zabbix_user.zabbix_id or zabbix_user.name)) or user_name, 'Who should I delete?'
 
         if user_name:
             try:
-                user = self._get_zabbix_user(zabbix_alias=user_name)
+                zabbix_user = self._get_zabbix_user(zabbix_alias=user_name)
             except RemoteObjectDoesNotExist:
                 return
 
-        elif user.zabbix_id:
+        elif zabbix_user.zabbix_id:
             try:
-                user = self._get_zabbix_user(zabbix_id=user.zabbix_id)
+                zabbix_user = self._get_zabbix_user(zabbix_id=zabbix_user.zabbix_id)
             except RemoteObjectDoesNotExist:
                 return
 
-        elif user.name:
+        elif zabbix_user.name:
             try:
-                user = self._get_zabbix_user(zabbix_alias=user.name)
+                zabbix_user = self._get_zabbix_user(zabbix_alias=zabbix_user.name)
             except RemoteObjectDoesNotExist:
                 return
         else:
             raise AssertionError()
         try:
-            self.zapi.user.delete([user.zabbix_id])
+            self.zapi.user.delete([zabbix_user.zabbix_id])
         except ZabbixAPIError:
             # TODO perhaps we should ignore race condition errors, or repeat the task?
             # Example:
             # ZabbixAPIError: Application error. No permissions to referred object or it does not exist! [-32500]
             raise
         else:
-            user.zabbix_id = None  # unnecessary perhaps?
+            zabbix_user.zabbix_id = None  # unnecessary perhaps?
 
     def remove_user_from_user_group(self, user, user_group, delete_user_if_last=False):
         user.refresh()
@@ -2219,10 +2219,10 @@ class Zabbix(object):
 
     def delete_user(self, name):
         if self.internal_and_external_zabbix_share_backend:
-            self.ezx.delete_user(name)
+            self.ezx.delete_user(user_name=name)
         else:
-            self.izx.delete_user(name)
-            self.ezx.delete_user(name)
+            self.izx.delete_user(user_name=name)
+            self.ezx.delete_user(user_name=name)
 
     @property
     def internal_and_external_zabbix_share_backend(self):
