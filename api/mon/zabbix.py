@@ -1382,7 +1382,7 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
         container.users = {ZabbixUserContainer.from_mgmt_data(zapi, user) for user in users}
         container.host_groups = {ZabbixHostGroupContainer.from_mgmt_data(zapi, hostgroup)
                                  for hostgroup in accessible_hostgroups}  # self._get_groups
-        container.superuser_group = superusers
+        container.superuser_group = superusers  # FIXME this information is not used anywhere by now
 
         return container
 
@@ -1390,7 +1390,7 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
     def from_zabbix_data(cls, zapi, zabbix_object):
         container = cls(zapi=zapi, name=zabbix_object['name'])
         container.zabbix_id = zabbix_object['usrgrpid']
-        container.superuser_group = zabbix_object['gui_access'] != cls.FRONTEND_ACCESS_DISABLED
+        #  container.superuser_group = FIXME cannot determine from this data
         container.users = {ZabbixUserContainer.from_zabbix_data(zapi, userdata) for userdata in
                            zabbix_object.get('users', [])}
         return container
@@ -1416,10 +1416,7 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
         if basic_info:
             user_group_object['name'] = self.name
             user_group_object['users_status'] = self.USERS_STATUS_ENABLED
-            if self.superuser_group:
-                user_group_object['gui_access'] = self.FRONTEND_ACCESS_ENABLED_WITH_DEFAULT_AUTH
-            else:
-                user_group_object['gui_access'] = self.FRONTEND_ACCESS_DISABLED
+            user_group_object['gui_access'] = self.FRONTEND_ACCESS_DISABLED
 
         if hostgroups_info:
             user_group_object['rights'] = []
@@ -1470,14 +1467,6 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
                       api_response.get('users', [])}
 
     def update_superuser_status(self):
-        user_group_object = {'usrgrpid': self.zabbix_id}
-        if self.superuser_group:
-            user_group_object['gui_access'] = self.FRONTEND_ACCESS_ENABLED_WITH_DEFAULT_AUTH
-        else:
-            user_group_object['gui_access'] = self.FRONTEND_ACCESS_DISABLED
-        logger.debug("updating user group with %s", user_group_object)
-        self._api_response = self._zapi.usergroup.update(user_group_object)
-        logger.debug("received %s from zabbix", self._api_response)
         self.update_hostgroup_info()  # There is some hostgroup information depending on the superuser status
 
     def update_hostgroup_info(self):
