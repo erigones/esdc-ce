@@ -1,6 +1,18 @@
 Changelog
 #########
 
+2.6.0 (unreleased)
+==================
+
+Features
+--------
+
+- Added ability to import images from local image server - `#140 <https://github.com/erigones/esdc-ce/issues/140>`__
+
+Bugs
+----
+
+
 2.5.3 (released on 2017-05-16)
 ==============================
 

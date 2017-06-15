@@ -1455,7 +1455,7 @@ class MetadataField(BaseDictField):
 
 
 class URLDictField(BaseDictField):
-    _key_field = RegexField(r'^[a-z0-9\.\-_]+$', max_length=32)
+    _key_field = RegexField(r'^[a-z0-9][a-z0-9\.\-_]*$', max_length=32)
     _val_field = URLField()
 
 
