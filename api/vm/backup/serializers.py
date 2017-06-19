@@ -18,6 +18,7 @@ class BackupDefineSerializer(_HideNodeSerializer):
 
     hostname = s.CharField(source='vm.hostname', read_only=True)
     vm_uuid = s.CharField(source='vm.uuid', read_only=True)
+    dc = s.CharField(source='vm.dc', read_only=True)
     name = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\._-]*$', max_length=8, min_length=1)
     disk_id = s.IntegerField(source='array_disk_id', max_value=DISK_ID_MAX, min_value=DISK_ID_MIN)
     type = s.IntegerChoiceField(choices=BackupDefine.TYPE, default=BackupDefine.DATASET)

@@ -473,12 +473,23 @@ class ImageVm(object):
         return settings.VMS_IMAGE_VM_DATASETS_DIR.format(zfs_filesystem=self.vm.json_active['zfs_filesystem'])
 
     @property
+    def repo_name(self):
+        assert self, 'Image VM does not exist'
+        # The internal repository starts with an underscore in order to avoid a name-clash with user-defined repos
+        return '_' + self.vm.hostname.lower()
+
+    @property
+    def repo_url(self):
+        assert self, 'Image VM does not exist'
+        return 'http://%s' % self.vm.ips[0]
+
+    @property
     def sources(self):
         src = []
 
         if self:
             try:
-                src = ['http://%s' % self.vm.ips[0]]
+                src = [self.repo_url]
             except IndexError:
                 pass
 

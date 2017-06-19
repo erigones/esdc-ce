@@ -253,6 +253,11 @@ EMAIL_ADMINS = False
 TMPDIR = path.join(PROJECT_DIR, 'var', 'tmp')
 LIBDIR = path.join(PROJECT_DIR, 'var', 'lib')
 LOGDIR = path.join(PROJECT_DIR, 'var', 'log')
+
+# Location of key/cert files needed to authenticate against update server
+UPDATE_KEY_FILE = path.join(LIBDIR, 'update.key')
+UPDATE_CERT_FILE = path.join(LIBDIR, 'update.crt')
+
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
 # the site admins on every HTTP 500 error when DEBUG=False.
@@ -661,6 +666,3 @@ if THIRD_PARTY_APPS_ENABLED:
 
 MODULES = frozenset(MODULES)
 
-# location of key/cert files needed to authenticate against update server
-UPDATE_KEY_FILE = path.join(LIBDIR, 'update.key')
-UPDATE_CERT_FILE = path.join(LIBDIR, 'update.crt')

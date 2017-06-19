@@ -34,6 +34,11 @@ urlpatterns = patterns(
     # /node/<hostname>/backup - get
     url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/backup/$', 'node_vm_backup_list', name='api_node_vm_backup_list'),
 
+    # define backup
+    # /node/<hostname>/define/backup - get
+    url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/define/backup/$',
+        'node_vm_define_backup_list', name='api_node_vm_define_backup_list'),
+
     # vm
     # /node/<hostname>/vm-harvest - create (dc aware)
     url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/vm-harvest/$', 'harvest_vm', name='api_harvest_vm'),

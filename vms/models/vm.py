@@ -951,7 +951,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
                     'filesystems', 'image_uuid', 'internal_metadata', 'last_modified', 'limit_priv', 'nics',
                     'mdata_exec_timeout', 'nowait', 'pid', 'routes', 'server_uuid', 'state', 'tags', 'type',
                     'zfs_filesystem', 'zfs_root_recsize', 'zone_state', 'zoneid', 'zonename', 'zonepath', 'zpool',
-                    'datacenter_name', 'headnode_id', 'dns_domain')
+                    'datacenter_name', 'headnode_id', 'dns_domain', 'exit_status', 'exit_timestamp')
 
         noexist_false = ('do_not_inventory',)
         json = self.json

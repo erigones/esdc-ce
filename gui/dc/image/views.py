@@ -168,6 +168,7 @@ def imagestore_list(request, repo=None):
     qs_image_filter.pop('last', None)
     context['qs_image_filter'] = qs_image_filter.urlencode()
     context['default_limit'] = default_limit = 30
+    context['image_uuids'] = set(Image.objects.all().values_list('uuid', flat=True))
 
     try:
         created_since_days = int(request.GET.get('created_since', 0))
@@ -184,7 +185,7 @@ def imagestore_list(request, repo=None):
         except (ValueError, TypeError):
             limit = default_limit
 
-    repositories = ImageStore.get_repositories()
+    repositories = ImageStore.get_repositories(include_image_vm=request.user.is_staff)
     context['imagestores'] = imagestores = ImageStore.all(repositories)
     context['created_since'] = created_since_days
     context['limit'] = limit
@@ -219,7 +220,7 @@ def imagestore_update(request, repo):
     """
     Ajax page for refreshing imagestore repositories.
     """
-    if repo not in ImageStore.get_repositories():
+    if repo not in ImageStore.get_repositories(include_image_vm=request.user.is_staff):
         raise Http404
 
     res = call_api_view(request, 'PUT', imagestore_manage, repo, log_response=True)

@@ -456,7 +456,6 @@ _es() {
 		;;
 
 		/dc/*/node/*)
-
 			if [ ${COMP_CWORD} -eq 2 ]; then
 				COMPREPLY=( $(compgen -P "${cur%/*}" -W "/ /(hostname)" -- "/${cur##*/}" ) )
 			fi
@@ -547,8 +546,15 @@ _es() {
 			[[ "${action}" == "get" ]] && params="-extended"
 		;;
 
-		/node/*/define|/node/*/define/)
+		/node/*/define/backup)
 			[ ${COMP_CWORD} -eq 2 ] && COMPREPLY=( "${cur} " )
+			[[ "${action}" == "get" ]] && params="-full -extended"
+		;;
+
+		/node/*/define|/node/*/define/*)
+			if [ ${COMP_CWORD} -eq 2 ]; then
+				COMPREPLY=( $(compgen -P "${cur%/*}" -W "/ /backup" -- "/${cur##*/}" ) )
+			fi
 			[[ "${action}" == "get" ]] && params="-full"
 			[[ "${action}" == "create" ]] || [[ "${action}" == "set" ]] && params="-status -is_compute -is_backup -owner -cpu_coef -ram_coef"
 		;;
@@ -565,7 +571,7 @@ _es() {
 
 		/node/*/*)
 			if [ ${COMP_CWORD} -eq 2 ]; then
-				COMPREPLY=( $(compgen -P "${cur%/*}" -W "/define/ /storage/ /license /sysinfo" -- "/${cur##*/}" ) )
+				COMPREPLY=( $(compgen -P "${cur%/*}" -W "/define/backup /define/ /storage/ /license /sysinfo /backup /vm" -- "/${cur##*/}" ) )
 			fi
 		;;
 

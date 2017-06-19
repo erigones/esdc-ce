@@ -1,5 +1,7 @@
+from django.db.models import Q
+
 from api.api_views import APIView
-from api.exceptions import ObjectNotFound
+from api.exceptions import ObjectNotFound, ObjectAlreadyExists
 from api.task.response import SuccessTaskResponse
 from api.utils.views import call_api_view
 from api.image.base.views import image_manage
@@ -17,7 +19,7 @@ class ImageStoreImageView(APIView):
         self.data = data
         self.name = name
         self.uuid = uuid
-        repositories = ImageStore.get_repositories()
+        repositories = ImageStore.get_repositories(include_image_vm=request.user.is_staff)
 
         try:
             self.repo = ImageStore(name, url=repositories[name])
@@ -50,12 +52,19 @@ class ImageStoreImageView(APIView):
 
     def post(self):
         img = self.get_image()
+        uuid = img['uuid']
         data = self.data
-        data['manifest_url'] = self.repo.get_image_manifest_url(img['uuid'])
+        data['manifest_url'] = self.repo.get_image_manifest_url(uuid)
         data.pop('file_url', None)
         name = data.get('name', None)
 
         if not name:
             name = data['name'] = img['name']
+
+        # Although this is also checked inside the image_manage, doing it here is better because:
+        #   - checking the uniqueness of the UUID is done differently in image_manage and the result is not a 406 error
+        #   - it is faster - in case the name/uuid is not unique we don't have to call another view
+        if Image.objects.filter(Q(uuid=uuid) | Q(name=name)).exists():
+            raise ObjectAlreadyExists(model=Image)
 
         return call_api_view(self.request, 'POST', image_manage, name, data=data)

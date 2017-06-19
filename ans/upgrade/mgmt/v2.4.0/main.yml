@@ -14,9 +14,7 @@
 
 - name: Update postgresql config
   copy: src="{{ current_task_dir }}/files/pg-ansible.conf" dest=/var/lib/pgsql/9.5/data/conf.d/ansible.conf
-  notify: 
-    - restart postgresql95
-    - restart erigonesd-beat
+  # Restart of PostgreSQL service is not required for correct functioning
 
 - name: Remove default rabbitmq guest user
   rabbitmq_user: user=guest state=absent

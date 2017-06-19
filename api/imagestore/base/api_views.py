@@ -36,7 +36,7 @@ class ImageStoreView(APIView):
         self.data = data
         self.name = name
         self.many = many
-        repositories = ImageStore.get_repositories()
+        repositories = ImageStore.get_repositories(include_image_vm=request.user.is_staff)
 
         if name:
             assert not many
