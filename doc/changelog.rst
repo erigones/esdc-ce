@@ -7,6 +7,18 @@ Changelog
 Features
 --------
 
+- Added node_vm_define_backup_list API and GUI views -  `#139 <https://github.com/erigones/esdc-ce/issues/139>`__
+
+Bugs
+----
+
+
+2.5.3 (unreleased)
+==================
+
+Features
+--------
+
 - Added ability to import images from local image server - `#140 <https://github.com/erigones/esdc-ce/issues/140>`__
 
 Bugs
