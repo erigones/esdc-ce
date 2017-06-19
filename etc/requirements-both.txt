@@ -13,4 +13,4 @@ librabbitmq==1.6.1
 simplejson==3.10.0
 frozendict==1.2
 requests==2.13.0
-esdc-api==2.0
+esdc-api==2.0.1
