@@ -1236,8 +1236,12 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
 
         return dsk_size
 
-    def get_cpu_ram_disk(self, zpool=None, ram_overhead=False, ignore_cpu_ram=None, ignore_disk=False):
-        """Return tuple (vCPUS, RAM, sum(disk_size_on_zpool)) used in resource accounting"""
+    def get_cpu_ram_disk(self, zpool=None, ram_overhead=False, ignore_cpu_ram=None, ignore_disk=None):
+        """Return tuple (vCPUS, RAM, sum(disk_size_on_zpool)) used in resource accounting.
+        With `ignore_disk=True` or `ignore_cpu_ram=True` the returned corresponding values will be zero.
+        The default `ignore_cpu_ram=None` may return zero values for the vCPUS and RAM fields if the VM is a slave VM;
+        this behaviour can be disabled even for a slave VM with `ignore_cpu_ram` set to `False`.
+        """
         if ignore_cpu_ram:
             cpu, ram = 0, 0
         else:
