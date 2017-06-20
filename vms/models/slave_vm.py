@@ -74,7 +74,7 @@ class SlaveVm(_JsonPickleModel):
                 self.vm.lock()
                 return ret
         else:
-            return super(SlaveVm, self).save()
+            return super(SlaveVm, self).save(**kwargs)
 
     # noinspection PyUnusedLocal
     @staticmethod
@@ -109,6 +109,16 @@ class SlaveVm(_JsonPickleModel):
     def node(self, value):
         """Set node silently"""
         self.vm.node = self.vm._orig_node = value
+
+    @property
+    def reserve_resources(self):
+        """Whether to reserve resources (CPU, RAM) for the related VM object"""
+        return self.json.get('reserve_resources', True)
+
+    @reserve_resources.setter
+    def reserve_resources(self, value):
+        """Whether to reserve resources (CPU, RAM) for the related VM object"""
+        self.save_item('reserve_resources', bool(value), save=False)
 
     @property
     def rep_id(self):
@@ -215,6 +225,7 @@ class SlaveVm(_JsonPickleModel):
         return {
             'repname': self.name,
             'node': self.node.hostname,
+            'reserve_resources': self.reserve_resources,
             'sleep_time': self.rep_sleep_time,
             'enabled': self.rep_enabled,
             'reinit_required': self.rep_reinit_required,
@@ -261,6 +272,11 @@ class SlaveVm(_JsonPickleModel):
 
             # Update task log entries
             TaskLogEntry.objects.filter(object_pk=old_vm.pk).update(object_pk=new_vm.pk)
+
+        # Recalculate node resources after failover
+        if not self.reserve_resources:
+            old_vm.save(update_node_resources=True)
+            new_vm.save(update_node_resources=True)
 
         return new_vm
 
