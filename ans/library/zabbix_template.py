@@ -177,35 +177,41 @@ def import_template(module, zbx, filename, fmt):
             "rules": {
                 "items": {
                     "createMissing": True,
-                    "updateExisting": True
+                    "updateExisting": True,
+                    "deleteMissing": True,
                 },
                 "graphs": {
                     "createMissing": True,
-                    "updateExisting": True
+                    "updateExisting": True,
+                    "deleteMissing": True,
                 },
                 "applications": {
                     "createMissing": True,
-                    "updateExisting": True
+                    "updateExisting": True,
+                    "deleteMissing": True,
                 },
                 "triggers": {
                     "createMissing": True,
-                    "updateExisting": True
+                    "updateExisting": True,
+                    "deleteMissing": True,
                 },
                 "templates": {
                     "createMissing": True,
-                    "updateExisting": True
+                    "updateExisting": True,
                 },
                 "templateScreens": {
                     "createMissing": True,
-                    "updateExisting": True
+                    "updateExisting": True,
+                    "deleteMissing": True,
                 },
                 "templateLinkage": {
                     "createMissing": True,
-                    "updateExisting": True
+                    "updateExisting": True,
                 },
                 "discoveryRules": {
                     "createMissing": True,
-                    "updateExisting": True
+                    "updateExisting": True,
+                    "deleteMissing": True,
                 },
             }
         })
