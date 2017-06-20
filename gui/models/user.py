@@ -345,6 +345,7 @@ class User(AbstractBaseUser, PermissionsMixin, _AclMixin, _DcBoundMixin):
         from api.mon.zabbix import ZabbixMediaContainer
         if self.email:
             return ZabbixMediaContainer(ZabbixMediaContainer.MEDIAS['email'], sendto=self.email,
+                                        # TODO let the user pick up the severities
                                         severities=ZabbixMediaContainer.SEVERITIES,
                                         period=ZabbixMediaContainer.PERIOD_DEFAULT)
 
@@ -355,6 +356,7 @@ class User(AbstractBaseUser, PermissionsMixin, _AclMixin, _DcBoundMixin):
         from api.mon.zabbix import ZabbixMediaContainer
         if self.userprofile.phone:
             return ZabbixMediaContainer(ZabbixMediaContainer.MEDIAS['phone'], sendto=self.userprofile.phone,
+                                        # TODO let the user pick up the severities
                                         severities=ZabbixMediaContainer.SEVERITIES,
                                         period=ZabbixMediaContainer.PERIOD_DEFAULT_WORKING_HOURS)
 
@@ -365,5 +367,6 @@ class User(AbstractBaseUser, PermissionsMixin, _AclMixin, _DcBoundMixin):
         from api.mon.zabbix import ZabbixMediaContainer
         if self.userprofile.jabber:
             return ZabbixMediaContainer(ZabbixMediaContainer.MEDIAS['xmpp'], sendto=self.userprofile.jabber,
+                                        # TODO let the user pick up the severities
                                         severities=ZabbixMediaContainer.SEVERITIES,
                                         period=ZabbixMediaContainer.PERIOD_DEFAULT)

@@ -649,7 +649,7 @@ SECURITY_OWASP_AT_002 = False  # Testing for Account Enumeration and Guessable U
 ACL_ENABLED = True  # Module
 
 # Usernames that clashes with zabbix system usernames etc.
-INVALID_USERNAMES = frozenset(['profile','Admin','provisioner'])
+INVALID_USERNAMES = frozenset(['profile', 'Admin', 'provisioner'])
 
 
 # VVVVVVV        THIS BLOCK SHOULD BE ALWAYS AT THE BOTTOM      VVVVVVVVVVVVVVVV

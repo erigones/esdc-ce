@@ -1,10 +1,11 @@
+from unittest import TestCase
+
+from django.utils.crypto import get_random_string
 from zabbix_api import ZabbixAPIError
 
-from api.mon.zabbix import getZabbix, ZabbixUserGroupContainer, ZabbixUserContainer
+from api.mon.zabbix import getZabbix, ZabbixUserGroupContainer
 from vms.models import Dc
 from gui.models import User, Role
-from unittest import TestCase
-from django.utils.crypto import get_random_string
 
 
 class AlertingAPIAdapterTests(TestCase):

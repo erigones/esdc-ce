@@ -1298,7 +1298,8 @@ class ZabbixMediaContainer(object):
         SEVERITY_NOT_CLASSIFIED, SEVERITY_INFORMATION, SEVERITY_WARNING, SEVERITY_AVERAGE, SEVERITY_HIGH,
         SEVERITY_DISASTER
     )
-    PERIOD_DEFAULT_WORKING_HOURS = '1-5,09:00-18:00'  # TODO I'm not sure about zabbix's timezone
+    # TODO Time is in UTC and therefore we should adjust this for the user's timezone
+    PERIOD_DEFAULT_WORKING_HOURS = '1-5,09:00-18:00'
     PERIOD_DEFAULT = '1-7,00:00-24:00'
 
     def __init__(self, media_type, sendto, severities, period):
@@ -2202,7 +2203,7 @@ class Zabbix(object):
             kwargs['accessible_hostgroups'] = ()  # TODO
             kwargs['superusers'] = group.permissions.filter(name=AdminPermission.name).exists()
 
-        if self.internal_and_external_zabbix_share_backend:
+        if self.are_internal_and_external_backends_shared:
             self.ezx.synchronize_user_group(**kwargs)
         else:
             self.izx.synchronize_user_group(**kwargs)
@@ -2213,26 +2214,26 @@ class Zabbix(object):
             local_group_name=name,
             dc_name=self.dc.name)
 
-        if self.internal_and_external_zabbix_share_backend:
+        if self.are_internal_and_external_backends_shared:
             self.ezx.delete_user_group(zabbix_group_name=group_name)
         else:
             self.izx.delete_user_group(zabbix_group_name=group_name)
             self.ezx.delete_user_group(zabbix_group_name=group_name)
 
     def synchronize_user(self, user):
-        if self.internal_and_external_zabbix_share_backend:
+        if self.are_internal_and_external_backends_shared:
             self.ezx.synchronize_user(user)
         else:
             self.izx.synchronize_user(user)
             self.ezx.synchronize_user(user)
 
     def delete_user(self, name):
-        if self.internal_and_external_zabbix_share_backend:
+        if self.are_internal_and_external_backends_shared:
             self.ezx.delete_user(user_name=name)
         else:
             self.izx.delete_user(user_name=name)
             self.ezx.delete_user(user_name=name)
 
     @property
-    def internal_and_external_zabbix_share_backend(self):
+    def are_internal_and_external_backends_shared(self):
         return self.izx.zapi == self.ezx.zapi
