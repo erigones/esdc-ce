@@ -253,6 +253,7 @@ EMAIL_ADMINS = False
 TMPDIR = path.join(PROJECT_DIR, 'var', 'tmp')
 LIBDIR = path.join(PROJECT_DIR, 'var', 'lib')
 LOGDIR = path.join(PROJECT_DIR, 'var', 'log')
+RUNDIR = path.join(PROJECT_DIR, 'var', 'run')
 
 # Location of key/cert files needed to authenticate against update server
 UPDATE_KEY_FILE = path.join(LIBDIR, 'update.key')
