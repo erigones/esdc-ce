@@ -19,10 +19,10 @@ def mon_user_group_changed(task_id, sender, group_name=None, dc_name=None, *args
         # particular group under dc changed
         group = Role.objects.filter(dc=dc, name=group_name).first()
         if group:
-            logger.debug('going to update %s from %s', (group.name, dc.name))
+            logger.debug('going to update %s from %s', group.name, dc.name)
             zabbix.synchronize_user_group(group=group)
         else:
-            logger.debug('going to delete %s from %s', (group_name, dc.name))
+            logger.debug('going to delete %s from %s', group_name, dc.name)
             zabbix.delete_user_group(name=group_name)
     elif dc_name:
         # dc changed
@@ -48,18 +48,18 @@ def mon_user_group_changed(task_id, sender, group_name=None, dc_name=None, *args
             unrelated_dcs=Dc.objects.exclude(id__in=related_dcs)
 
             for dc in related_dcs:
-                logger.debug('going to update %s from %s', (group.name, dc.name))
+                logger.debug('going to update %s from %s', group.name, dc.name)
                 zabbix = getZabbix(dc)
                 zabbix.synchronize_user_group(group=group)
 
             for dc in unrelated_dcs:  # TODO this is quite expensive and I would like to avoid this somehow
-                logger.debug('going to delete %s from %s', (group.name, dc.name))
+                logger.debug('going to delete %s from %s', group.name, dc.name)
                 zabbix = getZabbix(dc)
                 zabbix.delete_user_group(name=group_name)
         else:
             # group does not exist-> remove from all dcs as we don't know where it was
             for dc in Dc.objects.all():
-                logger.debug('going to delete %s from %s', (group_name, dc.name))
+                logger.debug('going to delete %s from %s', group_name, dc.name)
                 zabbix = getZabbix(dc)
                 zabbix.delete_user_group(name=group_name)
 
