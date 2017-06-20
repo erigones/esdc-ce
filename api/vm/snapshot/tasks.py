@@ -13,7 +13,7 @@ from api.task.utils import callback, task_log_error, get_task_error_message
 from api.task.tasks import task_log_cb_success
 from api.task.response import to_string
 from api.vm.messages import LOG_SNAP_CREATE, LOG_SNAPS_DELETE
-from api.mon.zabbix import Zabbix
+from api.mon import MonitoringBackend
 
 __all__ = ('vm_snapshot_list_cb', 'vm_snapshot_cb', 'vm_snapshot_beat', 'vm_snapshot_sync_cb')
 
@@ -77,7 +77,7 @@ def _delete_oldest(model, define, view_function, view_item, task_id, msg):
     else:
         logger.error('Running DELETE %s(%s, %s) failed: %s (%s): %s', view_name, vm, view_data,
                      res.status_code, res.status_text, res.data)
-        Zabbix.vm_send_alert(vm, 'Automatic deletion of old %ss %s/disk-%s failed to start.' % (
+        MonitoringBackend.vm_send_alert(vm, 'Automatic deletion of old %ss %s/disk-%s failed to start.' % (
             model.__name__.lower(), vm.hostname, define.array_disk_id))
         # Need to log this, because nobody else does (+ there is no PENDING task)
         detail = 'hostname=%s, %s=%s, disk_id=%s, Error: %s' % (vm.hostname, view_item, ','.join(oldest),
@@ -132,7 +132,7 @@ def _vm_snapshot_cb_alert(result, task_id, snap_id=None, task_exception=None, **
     if snap.type == Snapshot.AUTO:
         vm = snap.vm
         if vm:
-            Zabbix.vm_send_alert(vm, 'Automatic snapshot %s of server %s@disk-%s could not be %s.' % (
+            MonitoringBackend.vm_send_alert(vm, 'Automatic snapshot %s of server %s@disk-%s could not be %s.' % (
                 snap.name, vm.hostname, snap.array_disk_id, action_msg))
 
 
@@ -161,9 +161,9 @@ def vm_snapshot_cb(result, task_id, vm_uuid=None, snap_id=None):
                 if 'freeze failed' in msg:
                     snap.fsfreeze = False
                     result['message'] += ' (filesystem freeze failed)'
-                    Zabbix.vm_send_alert(vm, 'Snapshot %s of server %s@disk-%s was created, but filesystem '
+                    MonitoringBackend.vm_send_alert(vm, 'Snapshot %s of server %s@disk-%s was created, but filesystem '
                                              'freeze failed.' % (snap.name, vm.hostname, snap.array_disk_id),
-                                         priority=Zabbix.zbx.WARNING)
+                                         priority=MonitoringBackend.WARNING)
 
             snap.save(update_fields=('status', 'fsfreeze'))
 
@@ -229,7 +229,7 @@ def vm_snapshot_beat(snap_define_id):
         else:
             logger.error('Running POST vm_snapshot(%s, %s, {disk_id=%s}) failed: %s (%s): %s',
                          vm, snap_name, disk_id, res.status_code, res.status_text, res.data)
-            Zabbix.vm_send_alert(vm, 'Automatic snapshot %s/disk-%s@%s failed to start.' % (vm.hostname, disk_id,
+            MonitoringBackend.vm_send_alert(vm, 'Automatic snapshot %s/disk-%s@%s failed to start.' % (vm.hostname, disk_id,
                                                                                             snap_define.name))
 
 

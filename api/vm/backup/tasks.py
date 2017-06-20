@@ -15,7 +15,7 @@ from api.task.response import to_string
 from api.vm.messages import LOG_BKP_CREATE, LOG_BKPS_DELETE
 # noinspection PyProtectedMember
 from api.vm.snapshot.tasks import _delete_oldest
-from api.mon.zabbix import Zabbix
+from api.mon import MonitoringBackend
 
 __all__ = ('vm_backup_list_cb', 'vm_backup_cb', 'vm_backup_beat')
 
@@ -152,7 +152,7 @@ def _vm_backup_cb_alert(result, task_id, bkp_id=None, task_exception=None, **kwa
 
     vm = bkp.vm
     if vm:
-        Zabbix.vm_send_alert(vm, 'Backup %s of server %s@disk-%s could not be %s.' % (
+        MonitoringBackend.vm_send_alert(vm, 'Backup %s of server %s@disk-%s could not be %s.' % (
             bkp.name, vm.hostname, bkp.array_disk_id, action_msg))
 
 
@@ -220,9 +220,9 @@ def vm_backup_cb(result, task_id, vm_uuid=None, node_uuid=None, bkp_id=None):
                 if 'freeze failed' in msg:
                     bkp.fsfreeze = False
                     result['message'] += ' (filesystem freeze failed)'
-                    Zabbix.vm_send_alert(bkp.vm, 'Backup %s of server %s@disk-%s was created, but filesystem freeze '
+                    MonitoringBackend.vm_send_alert(bkp.vm, 'Backup %s of server %s@disk-%s was created, but filesystem freeze '
                                                  'failed.' % (bkp.name, bkp.vm.hostname, bkp.array_disk_id),
-                                         priority=Zabbix.zbx.WARNING)
+                                         priority=MonitoringBackend.WARNING)
 
             bkp.manifest_path = data.get('metadata_file', '')
             bkp.time = data.get('time_elapsed', None)
@@ -297,5 +297,5 @@ def vm_backup_beat(bkp_define_id):
         else:
             logger.error('Running POST vm_backup(%s, %s, {disk_id=%s}) failed: %s (%s): %s',
                          vm, defname, disk_id, res.status_code, res.status_text, res.data)
-            Zabbix.vm_send_alert(vm, 'Automatic backup %s/disk-%s@%s failed to start.' %
+            MonitoringBackend.vm_send_alert(vm, 'Automatic backup %s/disk-%s@%s failed to start.' %
                                  (vm.hostname, disk_id, defname))

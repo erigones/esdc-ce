@@ -342,7 +342,7 @@ class User(AbstractBaseUser, PermissionsMixin, _AclMixin, _DcBoundMixin):
     def get_alerting_email(self):
         # todo add more logic
         # todo put to ZMC and call it 'extract_email_from_user'
-        from api.mon.zabbix import ZabbixMediaContainer
+        from api.mon.backends.zabbix import ZabbixMediaContainer
         if self.email:
             return ZabbixMediaContainer(ZabbixMediaContainer.MEDIAS['email'], sendto=self.email,
                                         # TODO let the user pick up the severities
@@ -353,7 +353,7 @@ class User(AbstractBaseUser, PermissionsMixin, _AclMixin, _DcBoundMixin):
     def get_alerting_phone(self):
         # todo add more logic - 1/0, verified/not etc
         # todo put to ZMC and call it 'extract_phone_from_user'
-        from api.mon.zabbix import ZabbixMediaContainer
+        from api.mon.backends.zabbix import ZabbixMediaContainer
         if self.userprofile.phone:
             return ZabbixMediaContainer(ZabbixMediaContainer.MEDIAS['phone'], sendto=self.userprofile.phone,
                                         # TODO let the user pick up the severities
@@ -364,7 +364,7 @@ class User(AbstractBaseUser, PermissionsMixin, _AclMixin, _DcBoundMixin):
     def get_alerting_xmpp(self):
         # todo add more logic - 1/0, verified/not etc
         # todo put to ZMC and call it 'extract_xmpp_from_user'
-        from api.mon.zabbix import ZabbixMediaContainer
+        from api.mon.backends.zabbix import ZabbixMediaContainer
         if self.userprofile.jabber:
             return ZabbixMediaContainer(ZabbixMediaContainer.MEDIAS['xmpp'], sendto=self.userprofile.jabber,
                                         # TODO let the user pick up the severities

@@ -7,6 +7,8 @@ from django.core.cache import cache
 from django.db.models import Q
 from django.utils.six import iteritems
 from frozendict import frozendict
+
+from api.mon.backends.abstract import AbstractMonitoringBackend
 from gui.models.permission import AdminPermission
 
 from zabbix_api import ZabbixAPI, ZabbixAPIException, ZabbixAPIError
@@ -53,6 +55,8 @@ def getZabbix(dc, **kwargs):
 
     return zx
 
+get_monitoring = getZabbix
+
 
 # noinspection PyPep8Naming
 def delZabbix(dc):
@@ -65,6 +69,9 @@ def delZabbix(dc):
         del __ZABBIX__[dc.id]
         return True
     return False
+
+
+del_monitoring = delZabbix
 
 
 def cache_result(f):
@@ -1015,7 +1022,7 @@ class _UserGroupAwareZabbix(_Zabbix):
         The question to which Zabbix is not solved on this layer.
         User has to be removed in case she is being removed from the last group
         :param group_name: should be the qualified group name (<DC>:<group name>:)
-        :return: 
+        :return:
         """
         # TODO synchronization of superadmins should be in the DC settings
         # todo will hosts be added in the next step?
@@ -1327,7 +1334,7 @@ class ZabbixMediaContainer(object):
     @classmethod
     def media_severity_generator(cls, active_severities):
         """
-        :param active_severities: (SEVERITY_WARNING, SEVERITY_HIGH) 
+        :param active_severities: (SEVERITY_WARNING, SEVERITY_HIGH)
         :return: number to be used as input for media.severity
         """
         result = 0
@@ -1803,7 +1810,7 @@ class ExternalZabbix(_UserGroupAwareZabbix):
                                templates=self._vm_templates(vm, log=log), proxy_id=self._vm_proxy_id(vm))
 
 
-class Zabbix(object):
+class Zabbix(AbstractMonitoringBackend):
     """
     Public Zabbix class used via getZabbix() and delZabbix() functions.
     """
@@ -2253,3 +2260,5 @@ class Zabbix(object):
     @property
     def are_internal_and_external_backends_shared(self):
         return self.izx.zapi == self.ezx.zapi
+
+MonitoringBackendClass = Zabbix
