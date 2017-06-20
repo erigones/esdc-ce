@@ -1223,17 +1223,24 @@ class ZabbixUserContainer(ZabbixNamedContainer):
         # This cannot be a set because it's serialized to json, which is not supported for sets:
         api_request_object['usrgrps'] = zabbix_ids_of_all_user_groups
 
-    def _attach_media(self, api_request_object):
-        api_request_object['user_medias'] = []
+    def _prepare_media(self):
+        media = []
         for media_type in ZabbixMediaContainer.MEDIAS:
             user_media = getattr(self._user, 'get_alerting_{}'.format(media_type), None)
             if user_media:
-                media = {'mediatypeid': user_media.media_type,
-                         'sendto': user_media.sendto,
-                         'period': user_media.period,
-                         'severity': user_media.severity,
-                         'active': self.MEDIA_ENABLED}
-                api_request_object['user_medias'].append(media)
+                medium = {'mediatypeid': user_media.media_type,
+                          'sendto': user_media.sendto,
+                          'period': user_media.period,
+                          'severity': user_media.severity,
+                          'active': self.MEDIA_ENABLED}
+                media.append(medium)
+        return media
+
+    def _attach_media_for_create_call(self, api_request_object):
+        api_request_object['user_medias'] = self._prepare_media()
+
+    def _attach_media_for_update_call(self, api_request_object):
+        api_request_object['medias'] = self._prepare_media()
 
     def _attach_basic_info(self, api_request_object):
         api_request_object['name'] = self._user.first_name
@@ -1244,15 +1251,24 @@ class ZabbixUserContainer(ZabbixNamedContainer):
         return {'userid': self.zabbix_id}
 
     def update_all(self):
+        """
+        When updating user in zabbix<3.4, two calls have to be done: first for updating user name and groups and
+        second to update user media.
+        """
         assert self.zabbix_id, 'A user in zabbix should be first created, then updated. %s has no zabbix_id.' % self
-        user_object = self._get_api_request_object_stub()
+        user_update_request_content = self._get_api_request_object_stub()
 
-        self._attach_group_membership(user_object)
-        self._attach_media(user_object)
-        self._attach_basic_info(user_object)
+        self._attach_group_membership(user_update_request_content)
+        self._attach_basic_info(user_update_request_content)
 
-        logger.debug('Updating user %s with data: %s', self.zabbix_id, user_object)
-        self._api_response = self._zapi.user.update(user_object)
+        logger.debug('Updating user %s with group info and identity: %s', self.zabbix_id, user_update_request_content)
+        self._api_response = self._zapi.user.update(user_update_request_content)
+
+        user_media_update_request_content = {'users': {'userid': self.zabbix_id}}
+        self._attach_media_for_update_call(user_media_update_request_content)
+
+        logger.debug('Updating user %s with media: %s', self.zabbix_id, user_media_update_request_content)
+        self._api_response = self._zapi.user.updatemedia(user_media_update_request_content)
 
     def to_zabbix(self):  # TODO Rename to create
         assert not self.zabbix_id, \
@@ -1261,7 +1277,7 @@ class ZabbixUserContainer(ZabbixNamedContainer):
         user_object = {}
 
         self._attach_group_membership(user_object)
-        self._attach_media(user_object)
+        self._attach_media_for_create_call(user_object)
         self._attach_basic_info(user_object)
 
         user_object['alias'] = self._user.username
