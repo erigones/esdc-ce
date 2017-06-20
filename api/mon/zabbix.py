@@ -1210,25 +1210,29 @@ class ZabbixUserContainer(ZabbixNamedContainer):
         # TODO refresh media etc
 
     def update_group_membership(self):
-        assert self.zabbix_id, 'Update cannot be done on nonexistent object, create should be done first'
+        assert self.zabbix_id, 'A user in zabbix should be first created, then updated. %s has no zabbix_id.' % self
         user_object = self._get_api_request_object_stub()
-
         self._attach_group_membership(user_object)
         logger.debug('Updating user: %s', user_object)
         self._api_response = self._zapi.user.update(user_object)
 
     def _attach_group_membership(self, api_request_object):
-        assert self.groups and all(group.zabbix_id for group in self.groups), self.groups
-        # this cannot be a set because it's serialized to json, which is not supported for sets:
-        api_request_object['usrgrps'] = [group.zabbix_id for group in self.groups]
+        zabbix_ids_of_all_user_groups = [group.zabbix_id for group in self.groups]
+        assert self.groups and all(zabbix_ids_of_all_user_groups), \
+            'To be able to attach groups (%s) to a user(%s), they all have to be in zabbix first.' % (self.groups, self)
+        # This cannot be a set because it's serialized to json, which is not supported for sets:
+        api_request_object['usrgrps'] = zabbix_ids_of_all_user_groups
 
     def _attach_media(self, api_request_object):
         api_request_object['user_medias'] = []
         for media_type in ZabbixMediaContainer.MEDIAS:
             user_media = getattr(self._user, 'get_alerting_{}'.format(media_type), None)
             if user_media:
-                media = {'mediatypeid': user_media.media_type, 'sendto': user_media.sendto, 'period': user_media.period,
-                         'severity': user_media.severity, 'active': self.MEDIA_ENABLED}
+                media = {'mediatypeid': user_media.media_type,
+                         'sendto': user_media.sendto,
+                         'period': user_media.period,
+                         'severity': user_media.severity,
+                         'active': self.MEDIA_ENABLED}
                 api_request_object['user_medias'].append(media)
 
     def _attach_basic_info(self, api_request_object):
@@ -1240,17 +1244,20 @@ class ZabbixUserContainer(ZabbixNamedContainer):
         return {'userid': self.zabbix_id}
 
     def update_all(self):
-        assert self.zabbix_id, 'use the appropriate (create) method'
+        assert self.zabbix_id, 'A user in zabbix should be first created, then updated. %s has no zabbix_id.' % self
         user_object = self._get_api_request_object_stub()
 
         self._attach_group_membership(user_object)
         self._attach_media(user_object)
         self._attach_basic_info(user_object)
+
         logger.debug('Updating user %s with data: %s', self.zabbix_id, user_object)
         self._api_response = self._zapi.user.update(user_object)
 
-    def to_zabbix(self):  #TODO Rename to create
-        assert not self.zabbix_id, 'use the appropriate (update) method'
+    def to_zabbix(self):  # TODO Rename to create
+        assert not self.zabbix_id, \
+            '%s has the zabbix_id already and therefore you should try to update the object, not create it.' % self
+
         user_object = {}
 
         self._attach_group_membership(user_object)
@@ -1258,7 +1265,7 @@ class ZabbixUserContainer(ZabbixNamedContainer):
         self._attach_basic_info(user_object)
 
         user_object['alias'] = self._user.username
-        user_object['passwd'] = self._user.__class__.objects.make_random_password(20)
+        user_object['passwd'] = self._user.__class__.objects.make_random_password(20)  # TODO let the user set it
 
         logger.debug('Creating user: %s', user_object)
 
@@ -1291,7 +1298,7 @@ class ZabbixMediaContainer(object):
         SEVERITY_NOT_CLASSIFIED, SEVERITY_INFORMATION, SEVERITY_WARNING, SEVERITY_AVERAGE, SEVERITY_HIGH,
         SEVERITY_DISASTER
     )
-    PERIOD_DEFAULT_WORKING_HOURS = '1-5,09:00-18:00'  # TODO I'm not sure whether it's utc or not
+    PERIOD_DEFAULT_WORKING_HOURS = '1-5,09:00-18:00'  # TODO I'm not sure about zabbix's timezone
     PERIOD_DEFAULT = '1-7,00:00-24:00'
 
     def __init__(self, media_type, sendto, severities, period):
@@ -1356,6 +1363,7 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
     @classmethod
     def from_zabbix_id(cls, zapi, zabbix_id):
         response = zapi.usergroup.get(dict(usrgrpids=[zabbix_id], **cls.QUERY_BASE))
+
         if response:
             return cls.from_zabbix_data(zapi, response[0])
         else:
@@ -1369,6 +1377,7 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
             query = cls.QUERY_WITHOUT_USERS
 
         response = zapi.usergroup.get(dict(search={'name': name}, **query))
+
         if response:
             return cls.from_zabbix_data(zapi, response[0])
         else:
@@ -1403,9 +1412,10 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
         :return: Object prepared to be sent to the zabbix api (for update if zabbix_id is present, for create if not)
         """
         assert self.zabbix_id or basic_info or hostgroups_info or users_info, \
-            'It\'s impossible to create an object without any information about it'
+            'It\'s impossible to create group %s in zabbix without any information about it.' % self
 
         user_group_object = {}
+
         if self.zabbix_id:
             user_group_object['usrgrpid'] = self.zabbix_id
         else:
@@ -1419,19 +1429,24 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
 
         if hostgroups_info:
             user_group_object['rights'] = []
-            hostgroups_access_permission = \
-                self.PERMISSION_READ_WRITE if self.superuser_group else self.PERMISSION_READ_ONLY
+
+            if self.superuser_group:
+                hostgroups_access_permission = self.PERMISSION_READ_WRITE
+            else:
+                hostgroups_access_permission = self.PERMISSION_READ_ONLY
+
             for host_group in self.host_groups:
                 if not host_group.zabbix_id:
-                    raise ObjectManipulationError('host group {} doesn\'t exist in zabbix yet, '
+                    raise ObjectManipulationError('Host group {} doesn\'t exist in zabbix yet, '
                                                   'it has to be created first'.format(host_group.name))
 
-                user_group_object['rights'].append(
-                    {'permission': hostgroups_access_permission, 'id': host_group.zabbix_id})
+                user_group_object['rights'].append({'permission': hostgroups_access_permission,
+                                                    'id': host_group.zabbix_id})
 
         if self.zabbix_id:
             logger.debug('Updating usergroup: %s', user_group_object)
             self._api_response = self._zapi.usergroup.update(user_group_object)
+
             if users_info:
                 raise NotImplementedError('Removing users is not implemented')
         else:
@@ -1453,8 +1468,6 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
                         # Create
                         user.groups.add(self)
                         user.to_zabbix()
-
-
 
     def refresh(self):
         response = self._zapi.usergroup.get(dict(usrgrpids=self.zabbix_id, **self.QUERY_BASE))
