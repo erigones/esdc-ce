@@ -33,10 +33,10 @@ class AdminGroupForm(SerializerForm):
 
     dc_bound = forms.BooleanField(label=_('DC-bound?'), required=False,
                                   widget=forms.CheckboxInput(attrs={'class': 'normal-check'}))
-    name = forms.CharField(label=_('Name'), max_length=80, required=True,
+    name = forms.CharField(label=_('Name'), max_length=32, required=True,
                            widget=forms.TextInput(attrs={'class': 'input-transparent narrow disable_created',
                                                          'required': 'required', 'pattern': '[A-Za-z0-9\._-]+'}))
-    alias = forms.CharField(label=_('Alias'), required=True, max_length=80,
+    alias = forms.CharField(label=_('Alias'), required=True, max_length=32,
                             widget=forms.TextInput(attrs={'class': 'input-transparent narrow', 'required': 'required'}))
     users = forms.MultipleChoiceField(label=_('Users'), required=False,
                                       widget=forms.SelectMultiple(attrs={'class': 'narrow input-select2 tags-select2'}))
