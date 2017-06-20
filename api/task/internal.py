@@ -48,8 +48,8 @@ class InternalTask(_InternalTask):
                 dc = Dc.objects.get_by_id(val)
 
             elif not isinstance(val, PRIMITIVES):
-                logger.debug('Non-primitive is passed as a task argument to internal task: %s is of type %s', val,
-                             type(val))
+                logger.warning('Non-primitive is passed as a task argument to internal task: %s is of type %s',
+                               val, type(val))
 
         # Do nothing if required setting is False
         if self.setting_required:
