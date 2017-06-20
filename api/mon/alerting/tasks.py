@@ -48,7 +48,10 @@ def mon_user_group_changed(task_id, sender, group_name=None, dc_name=None, *args
             for dc in Dc.objects.all():
                 logger.debug('Going to delete %s from %s.', group_name, dc.name)
                 zabbix = getZabbix(dc)
-                zabbix.delete_user_group(name=group_name)
+                try:
+                    zabbix.delete_user_group(name=group_name)
+                except Exception as e:
+                    logger.exception(e)  # we want to iterate over all dcs, not crash at any moment
         else:
             related_dcs = Dc.objects.filter(roles=group)
             unrelated_dcs = Dc.objects.exclude(id__in=related_dcs)
@@ -56,15 +59,21 @@ def mon_user_group_changed(task_id, sender, group_name=None, dc_name=None, *args
             for dc in related_dcs:
                 logger.debug('Going to update %s from %s.', group.name, dc.name)
                 zabbix = getZabbix(dc)
-                zabbix.synchronize_user_group(group=group)
+                try:
+                    zabbix.synchronize_user_group(group=group)
+                except Exception as e:
+                    logger.exception(e)  # we want to iterate over all dcs, not crash at any moment
 
             for dc in unrelated_dcs:  # TODO this is quite expensive and I would like to avoid this somehow
                 logger.debug('Going to delete %s from %s.', group.name, dc.name)
                 zabbix = getZabbix(dc)
-                zabbix.delete_user_group(name=group_name)
+                try:
+                    zabbix.delete_user_group(name=group_name)
+                except Exception as e:
+                    logger.exception(e)  # we want to iterate over all dcs, not crash at any moment
 
     else:
-        raise AssertionError('Either group name or dc name has to be defined!')
+        raise AssertionError('Either group name or dc name has to be defined.')
 
 
 # noinspection PyUnusedLocal
@@ -88,13 +97,19 @@ def mon_user_changed(task_id, sender, user_name, dc_name=None, affected_groups=(
                          'from zabbixes related to groups %s.', user_name, affected_groups)
             for dc in Dc.objects.filter(roles__in=affected_groups):
                 zabbix = getZabbix(dc)
-                zabbix.delete_user(name=user_name)
+                try:
+                    zabbix.delete_user(name=user_name)
+                except Exception as e:
+                    logger.exception(e)  # we want to iterate over all dcs, not crash at any moment
         else:
             logger.debug('As we don\'t know where does the user %s belonged to, '
                          'we are trying to delete it from all available zabbixes.', user_name)
             for dc in Dc.objects.all():  # Nasty
                 zabbix = getZabbix(dc)
-                zabbix.delete_user(name=user_name)
+                try:
+                    zabbix.delete_user(name=user_name)
+                except Exception as e:
+                    logger.exception(e)  # we want to iterate over all dcs, not crash at any moment
     else:
         if dc_name:
             dc = Dc.objects.get_by_name(dc_name)
@@ -105,10 +120,16 @@ def mon_user_changed(task_id, sender, user_name, dc_name=None, affected_groups=(
             logger.debug('Going to create/update user %s in zabbixes related to groups %s.', user_name, affected_groups)
             for dc in Dc.objects.filter(roles__in=affected_groups):
                 zabbix = getZabbix(dc)
-                zabbix.synchronize_user(user=user)
+                try:
+                    zabbix.synchronize_user(user=user)
+                except Exception as e:
+                    logger.exception(e)  # we want to iterate over all dcs, not crash at any moment
         else:
             logger.debug('Going to create/update user %s '
                          'in zabbixes related to all groups to which the user is related to.', user_name)
             for dc in Dc.objects.filter(roles__user=user):
                 zabbix = getZabbix(dc)
-                zabbix.synchronize_user(user=user)
+                try:
+                    zabbix.synchronize_user(user=user)
+                except Exception as e:
+                    logger.exception(e)  # we want to iterate over all dcs, not crash at any moment
