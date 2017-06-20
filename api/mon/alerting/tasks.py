@@ -30,8 +30,8 @@ def mon_user_group_changed(task_id, sender, group_name=None, dc_name=None, *args
         # dc changed
         try:
             dc = Dc.objects.get_by_name(dc_name)
-        except Exception:
-            raise NotImplementedError("TODO DC deletion hook is not implemented")
+        except Dc.DoesNotExist:
+            raise NotImplementedError('TODO DC deletion hook is not implemented')
             # When DC is deleted, we lose the access to the zabbix and therefore we don't know what to do
             # We have to provide information about zabbix connection so that we can delete related information in zabbix
         else:
@@ -84,8 +84,8 @@ def mon_user_changed(task_id, sender, user_name, dc_name=None, affected_groups=(
             logger.debug('Going to delete user with name %s in zabbix %s for dc %s.', user_name, zabbix, dc)
             zabbix.delete_user(name=user_name)
         elif affected_groups:
-            logger.debug(
-                'Going to delete user with name %s from zabbixes related to groups %s.', user_name, affected_groups)
+            logger.debug('Going to delete user with name %s '
+                         'from zabbixes related to groups %s.', user_name, affected_groups)
             for dc in Dc.objects.filter(roles__in=affected_groups):
                 zabbix = getZabbix(dc)
                 zabbix.delete_user(name=user_name)
