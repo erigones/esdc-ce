@@ -4,6 +4,8 @@ from celery.utils.log import get_task_logger
 from api.mon.utils import MonInternalTask
 from que.erigonesd import cq
 from api.mon.zabbix import getZabbix
+from vms.models import Dc
+from gui.models import Role, User
 
 logger = get_task_logger(__name__)
 
@@ -11,8 +13,6 @@ logger = get_task_logger(__name__)
 # noinspection PyUnusedLocal
 @cq.task(name='api.mon.base.tasks.mon_user_group_changed', base=MonInternalTask)  # logging will be done separately
 def mon_user_group_changed(task_id, sender, group_name=None, dc_name=None, *args, **kwargs):
-    from vms.models import Dc
-    from gui.models import Role
     if dc_name and group_name:
         dc = Dc.objects.get_by_name(dc_name)
         zabbix = getZabbix(dc)
@@ -74,10 +74,7 @@ def mon_user_changed(task_id, sender, user_name, dc_name=None, affected_groups=(
     When a user is removed from a group, this task doesn't know from which group the user was removed.
     We have to get all groups to which the user belongs to, get their respective zabbix apis
     and remove the complement(difference) of the sets of all relevant mgmt groups and the zabbix user groups
-
     """
-    from vms.models import Dc
-    from gui.models import User
 
     q = User.objects.filter(username=user_name)
     if q.exists():
