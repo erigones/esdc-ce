@@ -706,9 +706,10 @@ class _Zabbix(object):
                     # Zabbix host interface found, let's check it out
                     hi = iface
 
-                    if (iface['dns'] != interface['dns'] or iface['ip'] != interface['ip'] or
-                                str(iface['port']) != str(interface['port']) or
-                                str(iface['useip']) != str(interface['useip'])):
+                    if (iface['dns'] != interface['dns'] or
+                            iface['ip'] != interface['ip'] or
+                            str(iface['port']) != str(interface['port']) or
+                            str(iface['useip']) != str(interface['useip'])):
                         # Host ip or dns changed -> update host interface
                         interface['interfaceid'] = iface['interfaceid']
                         interfaces[i] = interface
