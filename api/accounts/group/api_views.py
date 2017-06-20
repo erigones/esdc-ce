@@ -144,6 +144,6 @@ class GroupView(APIView):
         dd = {'permissions': list(group.permissions.all().values_list('name', flat=True))}
         group.delete()
         connection.on_commit(lambda: mon_user_group_changed.call(self.request, group_name=group.name))
-        response = SuccessTaskResponse(self.request, None, obj=group, msg=LOG_GROUP_DELETE, detail_dict=dd,
-                                       dc_bound=False)
-        return response
+
+        return SuccessTaskResponse(self.request, None, obj=group, msg=LOG_GROUP_DELETE, detail_dict=dd, dc_bound=False)
+
