@@ -64,7 +64,7 @@ def mon_user_group_changed(task_id, sender, group_name=None, dc_name=None, *args
                 zabbix.delete_user_group(name=group_name)
 
     else:
-        raise AssertionError("Either group name or dc name has to be defined!")
+        raise AssertionError('Either group name or dc name has to be defined!')
 
 
 # noinspection PyUnusedLocal
