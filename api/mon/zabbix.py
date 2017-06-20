@@ -4,14 +4,16 @@ from datetime import datetime
 from subprocess import call
 from django.conf import settings as django_settings
 from django.core.cache import cache
+from django.db.models import Q
 from django.utils.six import iteritems
 from frozendict import frozendict
 from gui.models.permission import AdminPermission
 
 from zabbix_api import ZabbixAPI, ZabbixAPIException, ZabbixAPIError
 from api.decorators import catch_exception
-from vms.models import DefaultDc
+from vms.models import DefaultDc, Dc
 from gui.models import User
+
 
 logger = getLogger(__name__)
 
@@ -891,18 +893,16 @@ class _Zabbix(object):
 
 
 class _UserGroupAwareZabbix(_Zabbix):
-    # you can access zapi directly, no need to create something to access zapi
-
     def synchronize_user(self, user):
         """
-        We check whether the user object exists in zabbix, if not, we create it. If it does, we update it.
-        :param user: 
-        :return: 
+        We check whether the user object exists in zabbix. If not, we create it. If it does, we update it.
         """
+
         try:
             existing_zabbix_user = self._get_zabbix_user(zabbix_alias=user.username)
         except RemoteObjectDoesNotExist:
             existing_zabbix_user = None
+
         user_to_sync = ZabbixUserContainer.from_mgmt_data(self.zapi, user)
 
         if not user_to_sync.groups and existing_zabbix_user:
@@ -915,10 +915,10 @@ class _UserGroupAwareZabbix(_Zabbix):
         elif user_to_sync.groups and not existing_zabbix_user:
             user_to_sync.to_zabbix()
         else:
-            raise AssertionError('this should never happen')
+            raise AssertionError('This should never happen')
 
     def delete_user(self, zabbix_user=None, user_name=None):
-        logger.debug('trying to delete user %s', zabbix_user or user_name)
+        logger.debug('Trying to delete user %s', zabbix_user or user_name)
         assert (zabbix_user and (zabbix_user.zabbix_id or zabbix_user.name)) or user_name, 'Who should I delete?'
 
         if user_name:
@@ -926,20 +926,19 @@ class _UserGroupAwareZabbix(_Zabbix):
                 zabbix_user = self._get_zabbix_user(zabbix_alias=user_name)
             except RemoteObjectDoesNotExist:
                 return
-
         elif zabbix_user.zabbix_id:
             try:
                 zabbix_user = self._get_zabbix_user(zabbix_id=zabbix_user.zabbix_id)
             except RemoteObjectDoesNotExist:
                 return
-
         elif zabbix_user.name:
             try:
                 zabbix_user = self._get_zabbix_user(zabbix_alias=zabbix_user.name)
             except RemoteObjectDoesNotExist:
                 return
         else:
-            raise AssertionError()
+            raise AssertionError
+
         try:
             self.zapi.user.delete([zabbix_user.zabbix_id])
         except ZabbixAPIError:
@@ -952,10 +951,12 @@ class _UserGroupAwareZabbix(_Zabbix):
 
     def remove_user_from_user_group(self, user, user_group, delete_user_if_last=False):
         user.refresh()
+
         if user_group not in user.groups:
-            logger.warn('user is not in the group: %s %s (possible race condition)', (user_group, user.groups))
+            logger.warn('User is not in the group: %s %s (possible race condition)', (user_group, user.groups))
+
         if not user.groups - {user_group} and not delete_user_if_last:
-            raise ObjectManipulationError('cannot remove the last group without deleting the user itself')
+            raise ObjectManipulationError('Cannot remove the last group without deleting the user itself')
 
         user.groups -= {user_group}
 
@@ -983,11 +984,12 @@ class _UserGroupAwareZabbix(_Zabbix):
             group.refresh()
         else:
             raise ValueError
-        logger.debug('going to delete group %s', group.name)
-        logger.debug('group users before: %s', group.users)
-        users_to_remove = group.users.copy()
+
+        logger.debug('Going to delete group %s', group.name)
+        logger.debug('Group.users before: %s', group.users)
+        users_to_remove = group.users.copy()  # We have to copy it because group.users got messed up
         self._remove_users_from_user_group(group, users_to_remove, delete_users_if_last=True)  # remove all users
-        logger.debug('group users after: %s', group.users)
+        logger.debug('Group.users after: %s', group.users)
         self.zapi.usergroup.delete([group.zabbix_id])
 
     def _get_zabbix_user_group(self, group_name):
@@ -1012,16 +1014,18 @@ class _UserGroupAwareZabbix(_Zabbix):
         Make sure that in the end, there will be a user group with specified users in zabbix.
         The question to which Zabbix is not solved on this layer.
         User has to be removed in case she is being removed from the last group
-        :param superusers: permissions will be r-w and frontend access will be enabled
         :param group_name: should be the qualified group name (<DC>:<group name>:)
         :return: 
         """
         # TODO synchronization of superadmins should be in the DC settings
         # todo will hosts be added in the next step?
-        user_group = ZabbixUserGroupContainer.from_mgmt_data(self.zapi, group_name, users, accessible_hostgroups,
+        user_group = ZabbixUserGroupContainer.from_mgmt_data(self.zapi,
+                                                             group_name,
+                                                             users,
+                                                             accessible_hostgroups,
                                                              superusers)
-
         zabbix_user_group = self._get_zabbix_user_group(group_name)
+
         if zabbix_user_group:
             # if exists, we synchronize it
             self._update_user_group(zabbix_user_group, user_group)
@@ -1066,6 +1070,7 @@ class _UserGroupAwareZabbix(_Zabbix):
         for user in missing_users:
             user.refresh_id()
             user.groups.add(zabbix_user_group)
+
             if not user.zabbix_id:
                 user.to_zabbix()
             else:
@@ -1108,8 +1113,9 @@ class ZabbixNamedContainer(object):
 
 class ZabbixUserContainer(ZabbixNamedContainer):
     MEDIA_ENABLED = 0  # SIC in zabbix docs: 0 - enabled, 1 - disabled.
-    USER_QUERY_BASE = {'selectUsrgrps': ['usrgrpid', 'name', 'gui_access'],
-                       'selectMedias': ['mediatypeid', 'sendto']}
+    USER_QUERY_BASE = frozendict({'selectUsrgrps': ('usrgrpid', 'name', 'gui_access'),
+                                  'selectMedias': ('mediatypeid', 'sendto')
+                                  })
     _user = None
 
     def __init__(self, name, zapi=None):
@@ -1127,28 +1133,28 @@ class ZabbixUserContainer(ZabbixNamedContainer):
 
     @classmethod
     def from_zabbix_alias(cls, zapi, alias):
-        response = zapi.user.get(
-            dict(filter={'alias': alias}, **cls.USER_QUERY_BASE))
+        response = zapi.user.get(dict(filter={'alias': alias}, **cls.USER_QUERY_BASE))
+
         if response:
-            assert len(response) == 1, 'user mapping should be injective'
+            assert len(response) == 1, 'User mapping should be injective'
             return cls.from_zabbix_data(zapi, response[0])
         else:
-            raise RemoteObjectDoesNotExist()
+            raise RemoteObjectDoesNotExist
 
     @classmethod
     def from_zabbix_id(cls, zapi, zabbix_id):
         response = zapi.user.get(dict(userids=zabbix_id, **cls.USER_QUERY_BASE))
 
         if response:
-            assert len(response) == 1, 'user mapping should be injective'
+            assert len(response) == 1, 'User mapping should be injective'
             return cls.from_zabbix_data(zapi, response[0])
         else:
-            raise RemoteObjectDoesNotExist()
+            raise RemoteObjectDoesNotExist
 
     @classmethod
     def from_zabbix_data(cls, zapi, api_response_object):
         assert api_response_object
-        container = cls(zapi=zapi, name=api_response_object['alias'])
+        container = cls(name=api_response_object['alias'], zapi=zapi)
 
         container._api_response = api_response_object
         container.zabbix_id = api_response_object['userid']
@@ -1156,12 +1162,10 @@ class ZabbixUserContainer(ZabbixNamedContainer):
         return container
 
     def _prepare_groups(self):
-        from vms.models import Dc
-        from django.db.models import Q
         yielded_owned_dcs = set()
-        for dc_name, group_name, user_id in Dc.objects.filter(
-                        Q(owner=self._user) | Q(roles__user=self._user)).values_list('name', 'roles__name',
-                                                                                     'roles__user'):
+        user_related_dcs = Dc.objects.filter(Q(owner=self._user) | Q(roles__user=self._user))
+
+        for dc_name, group_name, user_id in user_related_dcs.values_list('name', 'roles__name', 'roles__user'):
             if user_id == self._user.id:
                 local_group_name = group_name
             elif dc_name not in yielded_owned_dcs:
@@ -1170,12 +1174,12 @@ class ZabbixUserContainer(ZabbixNamedContainer):
             else:
                 continue
 
+            qualified_group_name = ZabbixUserGroupContainer.user_group_name_factory(dc_name=dc_name,
+                                                                                    local_group_name=local_group_name)
             try:
-                yield ZabbixUserGroupContainer.from_zabbix_name(
-                    zapi=self._zapi,
-                    name=ZabbixUserGroupContainer.user_group_name_factory(dc_name=dc_name,
-                                                                          local_group_name=local_group_name),
-                    resolve_users=False)
+                yield ZabbixUserGroupContainer.from_zabbix_name(zapi=self._zapi,
+                                                                name=qualified_group_name,
+                                                                resolve_users=False)
             except RemoteObjectDoesNotExist:
                 pass  # We don't create/delete user groups when users are created.
 
@@ -1205,11 +1209,11 @@ class ZabbixUserContainer(ZabbixNamedContainer):
             # TODO refresh media etc
 
     def update_group_membership(self):
-        assert self.zabbix_id, 'update cannot be done on nonexistent object, create should be done first'
+        assert self.zabbix_id, 'Update cannot be done on nonexistent object, create should be done first'
         user_object = self._get_api_request_object_stub()
 
         self._attach_group_membership(user_object)
-        logger.debug('updating user: %s', user_object)
+        logger.debug('Updating user: %s', user_object)
         self._api_response = self._zapi.user.update(user_object)
 
     def _attach_group_membership(self, api_request_object):
@@ -1241,7 +1245,7 @@ class ZabbixUserContainer(ZabbixNamedContainer):
         self._attach_group_membership(user_object)
         self._attach_media(user_object)
         self._attach_basic_info(user_object)
-        logger.debug('updating user %s with data: %s', self.zabbix_id, user_object)
+        logger.debug('Updating user %s with data: %s', self.zabbix_id, user_object)
         self._api_response = self._zapi.user.update(user_object)
 
     def to_zabbix(self):
@@ -1255,7 +1259,8 @@ class ZabbixUserContainer(ZabbixNamedContainer):
         user_object['alias'] = self._user.username
         user_object['passwd'] = self._user.__class__.objects.make_random_password(20)
 
-        logger.debug('creating user: %s', user_object)
+        logger.debug('Creating user: %s', user_object)
+
         try:
             self._api_response = self._zapi.user.create(user_object)
         except ZabbixAPIError:
@@ -1269,11 +1274,11 @@ class ZabbixUserContainer(ZabbixNamedContainer):
 
 
 class ZabbixMediaContainer(object):
-    MEDIAS = {  # SIC in zabbix docs
-        'email': 1,
-        'phone': 2,
-        'xmpp': 3
-    }  # todo is this static or is it defined sowewhere?
+    MEDIAS = frozendict({
+            'email': 1,
+            'phone': 2,
+            'xmpp': 3
+    })  # todo is this static or is it defined sowewhere?
 
     SEVERITY_NOT_CLASSIFIED = 1  # TODO move to constants
     SEVERITY_INFORMATION = 2
@@ -1297,7 +1302,6 @@ class ZabbixMediaContainer(object):
     @classmethod
     def media_severity_generator(cls, active_severities):
         """
-    
         :param active_severities: (SEVERITY_WARNING, SEVERITY_HIGH) 
         :return: number to be used as input for media.severity
         """
@@ -1325,13 +1329,6 @@ class ZabbixHostGroupContainer(object):
 
     @staticmethod
     def hostgroup_name_factory(dc_name, node_name='', vm_uuid='', tag=''):
-        """    
-        :param dc_name: 
-        :param node_name: 
-        :param vm_uuid:  
-        :param tag: 
-        :return: 
-        """
         name = ':{}:{}:{}:{}:'.format(dc_name, node_name, vm_uuid, tag)
         return name
 
@@ -1343,7 +1340,7 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
     PERMISSION_DENY = 0
     PERMISSION_READ_ONLY = 2
     PERMISSION_READ_WRITE = 3
-    QUERY_BASE = {'selectUsers': ['alias'], 'limit': 1}
+    QUERY_BASE = frozendict({'selectUsers': ['alias'], 'limit': 1})
     QUERY_WITHOUT_USERS = {'limit': 1}
     OWNERS_GROUP = '#owner'
 
@@ -1361,7 +1358,7 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
         if response:
             return cls.from_zabbix_data(zapi, response[0])
         else:
-            raise RemoteObjectDoesNotExist()
+            raise RemoteObjectDoesNotExist
 
     @classmethod
     def from_zabbix_name(cls, zapi, name, resolve_users=True):
@@ -1374,7 +1371,7 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
         if response:
             return cls.from_zabbix_data(zapi, response[0])
         else:
-            raise RemoteObjectDoesNotExist()
+            raise RemoteObjectDoesNotExist
 
     @classmethod
     def from_mgmt_data(cls, zapi, group_name, users, accessible_hostgroups=(), superusers=False):
@@ -1399,7 +1396,7 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
     def to_zabbix(self, basic_info=False, users_info=False, hostgroups_info=False):
         """
         From Zabbix documentation:
-        The usrgrpid property must be defined for each user group, all other properties are optional. \
+        The usrgrpid property must be defined for each user group, all other properties are optional.
         Only the passed properties will be updated, all others will remain unchanged.
 
         :return: Object prepared to be sent to the zabbix api (for update if zabbix_id is present, for create if not)
@@ -1425,9 +1422,8 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
                 self.PERMISSION_READ_WRITE if self.superuser_group else self.PERMISSION_READ_ONLY
             for host_group in self.host_groups:
                 if not host_group.zabbix_id:
-                    raise ObjectManipulationError(
-                        'host group {} doesn\'t exist in zabbix yet, it has to be created first'.format(
-                            host_group.name))
+                    raise ObjectManipulationError('host group {} doesn\'t exist in zabbix yet, '
+                                                  'it has to be created first'.format(host_group.name))
                 else:
                     user_group_object['rights'].append(
                         {'permission': hostgroups_access_permission, 'id': host_group.zabbix_id})
@@ -1437,7 +1433,6 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
             self._api_response = self._zapi.usergroup.update(user_group_object)
             if users_info:
                 raise NotImplementedError('Removing users is not implemented')
-
         else:
             logger.debug('cr usergroup: %s', user_group_object)
             self._api_response = self._zapi.usergroup.create(user_group_object)
@@ -1448,6 +1443,7 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
 
                 for user in self.users:
                     user.refresh_id()
+
                     if not user.zabbix_id:
                         user.groups.add(self)
                         user.to_zabbix()
@@ -1457,6 +1453,7 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
 
     def refresh(self):
         response = self._zapi.usergroup.get(dict(usrgrpids=self.zabbix_id, **self.QUERY_BASE))
+
         if not response:
             raise ObjectManipulationError('%s doesn\'t exit anymore'.format(self))
         else:
@@ -1464,8 +1461,9 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
             self._refresh_users(self._api_response)
 
     def _refresh_users(self, api_response):
-        self.users = {ZabbixUserContainer.from_zabbix_data(self._zapi, userdata) for userdata in
-                      api_response.get('users', [])}
+        self.users = {
+            ZabbixUserContainer.from_zabbix_data(self._zapi, userdata) for userdata in api_response.get('users', [])
+        }
 
     def update_superuser_status(self):
         self.update_hostgroup_info()  # There is some hostgroup information depending on the superuser status
@@ -1477,10 +1475,8 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
     @staticmethod
     def user_group_name_factory(dc_name, local_group_name):
         """
-        We just append the dc name here to prevent name clashing among datacenter groups
-        :param dc_name: 
-        :param local_group_name: 
-        :return: 
+        We have to qualify the dc name to prevent name clashing among groups in different datacenters,
+        but in the same zabbix.
         """
         name = ':{}:{}:'.format(dc_name, local_group_name)
         return name
@@ -2182,7 +2178,6 @@ class Zabbix(object):
             kwargs['users'] = [User.objects.filter(dc=self.dc).first()]  # cannot use self.dc.owner due to cache !!!
             kwargs['accessible_hostgroups'] = ()  # TODO
         else:
-
             kwargs['group_name'] = ZabbixUserGroupContainer.user_group_name_factory(dc_name=self.dc.name,
                                                                                     local_group_name=group.name)
             kwargs['users'] = group.user_set.all()
@@ -2199,6 +2194,7 @@ class Zabbix(object):
         group_name = ZabbixUserGroupContainer.user_group_name_factory(
             local_group_name=name,
             dc_name=self.dc.name)
+
         if self.internal_and_external_zabbix_share_backend:
             self.ezx.delete_user_group(zabbix_group_name=group_name)
         else:
