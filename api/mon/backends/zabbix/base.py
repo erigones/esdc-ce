@@ -1,32 +1,19 @@
 from logging import getLogger
-
 from time import time
-
 from datetime import datetime
 from logging import INFO, WARNING, CRITICAL, ERROR
 from subprocess import call
 
 from django.utils.six import iteritems
+from django.db.models import Q
 from frozendict import frozendict
 from zabbix_api import ZabbixAPI, ZabbixAPIException, ZabbixAPIError
 
-from api.mon.backends.abstract import MonitoringError
+from vms.models import Dc
+from api.mon.backends.abstract import VM_KWARGS_KEYS, NODE_KWARGS_KEYS, MonitoringError
+
 logger = getLogger(__name__)
 
-
-_VM_KWARGS = (
-    ('ostype', 1),
-    ('ostype_text', 'test'),
-    ('dc_name', 'test'),
-    ('disk_image', 'test'),
-    ('disk_image_abbr', 'test'),
-)
-VM_KWARGS = frozendict(_VM_KWARGS)
-VM_KWARGS_KEYS = tuple(VM_KWARGS.keys())
-VM_KWARGS_NIC = frozendict(_VM_KWARGS + (('net', 1), ('nic_id', 2)))
-VM_KWARGS_DISK = frozendict(_VM_KWARGS + (('disk', 1), ('disk_id', 2)))
-NODE_KWARGS = frozendict()
-NODE_KWARGS_KEYS = tuple(NODE_KWARGS.keys())
 RESULT_CACHE_TIMEOUT = 3600
 
 
@@ -44,11 +31,11 @@ class ObjectManipulationError(ZabbixError):
 class RemoteObjectDoesNotExist(ZabbixError):
     pass
 
+
 def cache_result(f):
     """
     Decorator for caching simple function output.
     """
-
     def wrap(obj, *args, **kwargs):
         if kwargs.pop('bypass_cache', False):
             return f(obj, *args, **kwargs)
@@ -72,6 +59,7 @@ def cache_result(f):
         return res
 
     return wrap
+
 
 class _Zabbix(object):
     """
@@ -666,9 +654,9 @@ class _Zabbix(object):
                     hi = iface
 
                     if (iface['dns'] != interface['dns'] or
-                                iface['ip'] != interface['ip'] or
-                                str(iface['port']) != str(interface['port']) or
-                                str(iface['useip']) != str(interface['useip'])):
+                            iface['ip'] != interface['ip'] or
+                            str(iface['port']) != str(interface['port']) or
+                            str(iface['useip']) != str(interface['useip'])):
                         # Host ip or dns changed -> update host interface
                         interface['interfaceid'] = iface['interfaceid']
                         interfaces[i] = interface
@@ -1262,7 +1250,7 @@ class ZabbixMediaContainer(object):
         'email': 1,
         'phone': 2,
         'xmpp': 3
-    })  # todo is this static or is it defined sowewhere?
+    })  # todo is this static or is it defined somewhere?
 
     SEVERITY_NOT_CLASSIFIED = 1  # TODO move to constants
     SEVERITY_INFORMATION = 2

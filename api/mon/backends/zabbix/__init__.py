@@ -6,4 +6,4 @@ del_monitoring = delZabbix
 
 MonitoringBackendClass = Zabbix
 
-__all__ = ['get_monitoring', 'del_monitoring', 'MonitoringBackendClass']
+__all__ = ('get_monitoring', 'del_monitoring', 'MonitoringBackendClass')
