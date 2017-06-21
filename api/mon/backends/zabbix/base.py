@@ -976,7 +976,7 @@ class _UserGroupAwareZabbix(_Zabbix):
             self._update_user_group(zabbix_user_group, user_group)
         else:
             # otherwise we create it
-            user_group.to_zabbix()
+            user_group.create()
 
         return user_group
 
@@ -1369,7 +1369,7 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
                            zabbix_object.get('users', [])}
         return container
 
-    def to_zabbix(self):  # TODO rename to create
+    def create(self):
         assert not self.zabbix_id, \
             '%s has the zabbix_id already and therefore you should try to update the object, not create it.' % self
 
