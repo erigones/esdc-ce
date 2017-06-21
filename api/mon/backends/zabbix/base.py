@@ -1002,7 +1002,7 @@ class _UserGroupAwareZabbix(_Zabbix):
         missing_users = source_user_group.users - remote_user_group.users
         logger.debug('missing users: %s', missing_users)
         self._remove_users_from_user_group(remote_user_group, redundant_users, delete_users_if_last=True)
-        remote_user_group._add_users_to_user_group(missing_users)
+        remote_user_group.add_users(missing_users)
 
     def _remove_users_from_user_group(self, zabbix_user_group, redundant_users, delete_users_if_last):  # TODO move
         zabbix_user_group.users -= redundant_users
@@ -1426,8 +1426,8 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
         name = ':{}:{}:'.format(dc_name, local_group_name)
         return name
 
-    def _add_users_to_user_group(self, missing_users):
-        for user in missing_users:
+    def add_users(self, new_users):
+        for user in new_users:
             user.refresh_id()
             user.groups.add(self)
 
@@ -1436,4 +1436,4 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
             else:
                 user.create()
 
-        self.users.update(missing_users)
+        self.users.update(new_users)
