@@ -851,7 +851,7 @@ class _UserGroupAwareZabbix(_Zabbix):
         user_to_sync = ZabbixUserContainer.from_mgmt_data(self.zapi, user)
 
         if user_to_sync.groups and not existing_zabbix_user:  # Create
-            user_to_sync.to_zabbix()
+            user_to_sync.create()
         elif user_to_sync.groups and existing_zabbix_user:  # Update
             user_to_sync.zabbix_id = existing_zabbix_user.zabbix_id
             user_to_sync.update_all()
@@ -1019,7 +1019,7 @@ class _UserGroupAwareZabbix(_Zabbix):
             if user.zabbix_id:
                 user.update_group_membership()
             else:
-                user.to_zabbix()
+                user.create()
 
         zabbix_user_group.users.update(missing_users)
 
@@ -1218,7 +1218,7 @@ class ZabbixUserContainer(ZabbixNamedContainer):
         logger.debug('Updating user %s with media: %s', self.zabbix_id, user_media_update_request_content)
         self._api_response = self._zapi.user.updatemedia(user_media_update_request_content)
 
-    def to_zabbix(self):  # TODO Rename to create
+    def create(self):
         assert not self.zabbix_id, \
             '%s has the zabbix_id already and therefore you should try to update the object, not create it.' % self
 
@@ -1433,7 +1433,7 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
                     else:
                         # Create
                         user.groups.add(self)
-                        user.to_zabbix()
+                        user.create()
 
     def refresh(self):
         response = self._zapi.usergroup.get(dict(usrgrpids=self.zabbix_id, **self.QUERY_BASE))
