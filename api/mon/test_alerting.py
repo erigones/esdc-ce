@@ -3,7 +3,8 @@ from unittest import TestCase
 from django.utils.crypto import get_random_string
 from zabbix_api import ZabbixAPIError
 
-from api.mon.backends.zabbix import getZabbix, ZabbixUserGroupContainer
+from api.mon.backends.zabbix.base import ZabbixUserGroupContainer
+from api.mon.backends.zabbix import get_monitoring
 from vms.models import Dc
 from gui.models import User, Role
 
@@ -16,7 +17,7 @@ class AlertingAPIAdapterTests(TestCase):
 
     def setUp(self):
         self.dc = Dc.objects.all()[0]
-        self.zabbix = getZabbix(self.dc)
+        self.zabbix = get_monitoring(self.dc)
 
         self.db_users = []
         self.db_groups = []
