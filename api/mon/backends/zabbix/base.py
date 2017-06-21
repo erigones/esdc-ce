@@ -1027,11 +1027,11 @@ class _UserGroupAwareZabbix(_Zabbix):
 class ZabbixNamedContainer(object):
     zabbix_id = None
 
-    def __str__(self):
-        return '{}: zid:{} name: {}'.format(self.__class__.__name__, self.zabbix_id, self.name)
+    def __init__(self, name):
+        self._name = name
 
     def __repr__(self):
-        return '{}: zid:{} name: {}'.format(self.__class__.__name__, self.zabbix_id, self.name)
+        return '{}(name={:15.15}) with zabbix_id {}'.format(self.__class__.__name__, self.name, self.zabbix_id)
 
     def __eq__(self, other):
         if hasattr(other, 'name') and issubclass(self.__class__, other.__class__):
@@ -1045,16 +1045,13 @@ class ZabbixNamedContainer(object):
     def __hash__(self):
         return self.name.__hash__()
 
-    def __init__(self, name):
-        self._name = name
-
     @property
     def name(self):
         return self._name
 
     @name.setter
     def name(self, value):
-        raise ValueError('name is immutable')
+        raise ValueError('Name is immutable')
 
 
 class ZabbixUserContainer(ZabbixNamedContainer):
