@@ -4,6 +4,8 @@ from django.conf import settings
 from . import zabbix
 from . import dummy
 
+__all__ = ('get_monitoring', 'del_monitoring', 'MonitoringBackend')
+
 BACKEND_ALIASES = {
     'dummy': dummy,
     'zabbix': zabbix,
