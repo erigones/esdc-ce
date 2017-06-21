@@ -1002,7 +1002,7 @@ class _UserGroupAwareZabbix(_Zabbix):
         missing_users = source_user_group.users - remote_user_group.users
         logger.debug('missing users: %s', missing_users)
         self._remove_users_from_user_group(remote_user_group, redundant_users, delete_users_if_last=True)
-        self._add_users_to_user_group(remote_user_group, missing_users)
+        remote_user_group._add_users_to_user_group(missing_users)
 
     def _remove_users_from_user_group(self, zabbix_user_group, redundant_users, delete_users_if_last):  # TODO move
         zabbix_user_group.users -= redundant_users
@@ -1011,17 +1011,6 @@ class _UserGroupAwareZabbix(_Zabbix):
             self.remove_user_from_user_group(user, zabbix_user_group, delete_user_if_last=delete_users_if_last)
             # TODO create also a faster way of removal for users that has also different groups
 
-    def _add_users_to_user_group(self, zabbix_user_group, missing_users):  # TODO move
-        for user in missing_users:
-            user.refresh_id()
-            user.groups.add(zabbix_user_group)
-
-            if user.zabbix_id:
-                user.update_group_membership()
-            else:
-                user.create()
-
-        zabbix_user_group.users.update(missing_users)
 
 
 class ZabbixNamedContainer(object):
@@ -1436,3 +1425,15 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
         """
         name = ':{}:{}:'.format(dc_name, local_group_name)
         return name
+
+    def _add_users_to_user_group(self, missing_users):
+        for user in missing_users:
+            user.refresh_id()
+            user.groups.add(self)
+
+            if user.zabbix_id:
+                user.update_group_membership()
+            else:
+                user.create()
+
+        self.users.update(missing_users)
