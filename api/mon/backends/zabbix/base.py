@@ -976,7 +976,7 @@ class _UserGroupAwareZabbix(_Zabbix):
             self._update_user_group(zabbix_user_group, user_group)
         else:
             # otherwise we create it
-            user_group.to_zabbix(True, True, True)
+            user_group.to_zabbix()
 
         return user_group
 
@@ -1369,71 +1369,46 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
                            zabbix_object.get('users', [])}
         return container
 
-    def to_zabbix(self, basic_info=False, users_info=False, hostgroups_info=False):  # TODO rename to create
-        """
-        From Zabbix documentation:
-        The usrgrpid property must be defined for each user group, all other properties are optional.
-        Only the passed properties will be updated, all others will remain unchanged.
+    def to_zabbix(self):  # TODO rename to create
+        assert not self.zabbix_id, \
+            '%s has the zabbix_id already and therefore you should try to update the object, not create it.' % self
 
-        :return: Object prepared to be sent to the zabbix api (for update if zabbix_id is present, for create if not)
-        """
-        assert self.zabbix_id or basic_info or hostgroups_info or users_info, \
-            'It\'s impossible to create group %s in zabbix without any information about it.' % self
+        user_group_object = {'name': self.name,
+                             'users_status': self.USERS_STATUS_ENABLED,
+                             'gui_access': self.FRONTEND_ACCESS_DISABLED,
+                             'rights': [],
+                             }
 
-        user_group_object = {}
-
-        if self.zabbix_id:
-            user_group_object['usrgrpid'] = self.zabbix_id
+        if self.superuser_group:
+            hostgroups_access_permission = self.PERMISSION_READ_WRITE
         else:
-            # if group is not created, we force all information to be put into the object
-            basic_info = users_info = hostgroups_info = True
+            hostgroups_access_permission = self.PERMISSION_READ_ONLY
 
-        if basic_info:
-            user_group_object['name'] = self.name
-            user_group_object['users_status'] = self.USERS_STATUS_ENABLED
-            user_group_object['gui_access'] = self.FRONTEND_ACCESS_DISABLED
+        for host_group in self.host_groups:
+            if not host_group.zabbix_id:
+                raise ObjectManipulationError('Host group {} doesn\'t exist in zabbix yet, '
+                                              'it has to be created first'.format(host_group.name))
 
-        if hostgroups_info:
-            user_group_object['rights'] = []
+            user_group_object['rights'].append({'permission': hostgroups_access_permission,
+                                                'id': host_group.zabbix_id})
 
-            if self.superuser_group:
-                hostgroups_access_permission = self.PERMISSION_READ_WRITE
+        logger.debug('Creating usergroup: %s', user_group_object)
+        self._api_response = self._zapi.usergroup.create(user_group_object)
+        self.zabbix_id = self._api_response['usrgrpids'][0]
+
+        user_group_object['userids'] = []
+
+        for user in self.users:
+            user.refresh_id()
+
+            if user.zabbix_id:
+                # Update
+                user.groups.add(self)
+                user.update_group_membership()
             else:
-                hostgroups_access_permission = self.PERMISSION_READ_ONLY
-
-            for host_group in self.host_groups:
-                if not host_group.zabbix_id:
-                    raise ObjectManipulationError('Host group {} doesn\'t exist in zabbix yet, '
-                                                  'it has to be created first'.format(host_group.name))
-
-                user_group_object['rights'].append({'permission': hostgroups_access_permission,
-                                                    'id': host_group.zabbix_id})
-
-        if self.zabbix_id:
-            logger.debug('Updating usergroup: %s', user_group_object)
-            self._api_response = self._zapi.usergroup.update(user_group_object)
-
-            if users_info:
-                raise NotImplementedError('Removing users is not implemented')
-        else:
-            logger.debug('Creating usergroup: %s', user_group_object)
-            self._api_response = self._zapi.usergroup.create(user_group_object)
-            self.zabbix_id = self._api_response['usrgrpids'][0]
-
-            if users_info:
-                user_group_object['userids'] = []
-
-                for user in self.users:
-                    user.refresh_id()
-
-                    if user.zabbix_id:
-                        # Update
-                        user.groups.add(self)
-                        user.update_group_membership()
-                    else:
-                        # Create
-                        user.groups.add(self)
-                        user.create()
+                # Create
+                user.groups.add(self)
+                user.create()
 
     def refresh(self):
         response = self._zapi.usergroup.get(dict(usrgrpids=self.zabbix_id, **self.QUERY_BASE))
