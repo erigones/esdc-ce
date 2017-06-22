@@ -889,6 +889,31 @@ class ZabbixUserContainer(ZabbixNamedContainer):
         self._api_response = None
 
     @classmethod
+    def synchronize(cls, zapi, user):
+        """
+        We check whether the user object exists in zabbix. If not, we create it. If it does, we update it.
+        """
+
+        try:
+            existing_zabbix_user = cls.from_zabbix_alias(zapi, user.username)
+        except RemoteObjectDoesNotExist:
+            existing_zabbix_user = None
+
+        user_to_sync = cls.from_mgmt_data(zapi, user)
+
+        if user_to_sync.groups and not existing_zabbix_user:  # Create
+            user_to_sync.create()
+        elif user_to_sync.groups and existing_zabbix_user:  # Update
+            user_to_sync.zabbix_id = existing_zabbix_user.zabbix_id
+            user_to_sync.update_all()
+        elif not user_to_sync.groups and existing_zabbix_user:  # Delete
+            user_to_sync.delete()
+        elif not user_to_sync.groups and not existing_zabbix_user:  # No-op
+            pass
+        else:
+            raise AssertionError('This should never happen')
+
+    @classmethod
     def from_mgmt_data(cls, zapi, user):
         container = cls(zapi=zapi, name=user.username)
         container._user = user
@@ -925,35 +950,15 @@ class ZabbixUserContainer(ZabbixNamedContainer):
         container._refresh_groups(api_response_object)
         return container
 
-    def _prepare_groups(self):
-        yielded_owned_dcs = set()
-        user_related_dcs = Dc.objects.filter(Q(owner=self._user) | Q(roles__user=self._user))
+    @classmethod
+    def delete_by_name(cls, zapi, name):
+        zabbix_id = cls.fetch_zabbix_id(zapi, name)
+        if zabbix_id:
+            zapi.user.delete([zabbix_id])
 
-        for dc_name, group_name, user_id in user_related_dcs.values_list('name', 'roles__name', 'roles__user'):
-            if user_id == self._user.id:
-                local_group_name = group_name
-            elif dc_name not in yielded_owned_dcs:
-                local_group_name = ZabbixUserGroupContainer.OWNERS_GROUP
-                yielded_owned_dcs.add(dc_name)
-            else:
-                continue
-
-            qualified_group_name = ZabbixUserGroupContainer.user_group_name_factory(dc_name=dc_name,
-                                                                                    local_group_name=local_group_name)
-            try:
-                yield ZabbixUserGroupContainer.from_zabbix_name(zapi=self._zapi,
-                                                                name=qualified_group_name,
-                                                                resolve_users=False)
-            except RemoteObjectDoesNotExist:
-                pass  # We don't create/delete user groups when users are created.
-
-    def prepare_groups(self):
-        self.groups = set(self._prepare_groups())
-
-    def _refresh_groups(self, api_response):
-        self.groups = set(
-            ZabbixUserGroupContainer.from_zabbix_data(self._zapi, group) for group in api_response.get('usrgrps', [])
-        )
+    @staticmethod
+    def delete_by_id(zapi, zabbix_id):
+        zapi.user.delete([zabbix_id])
 
     @staticmethod
     def fetch_zabbix_id(zapi, username):
@@ -967,57 +972,6 @@ class ZabbixUserContainer(ZabbixNamedContainer):
 
     def renew_zabbix_id(self):
         self.zabbix_id = self.fetch_zabbix_id(self._zapi, self._user.username)
-
-    def refresh(self):
-        response = self._zapi.user.get(dict(userids=self.zabbix_id, **self.USER_QUERY_BASE))
-        if not response:
-            raise ObjectManipulationError('%s doesn\'t exit anymore'.format(self))
-
-        self._api_response = response[0]
-        self._refresh_groups(self._api_response)
-        # TODO refresh media etc
-
-    def update_group_membership(self):
-        assert self.zabbix_id, 'A user in zabbix should be first created, then updated. %s has no zabbix_id.' % self
-        user_object = self._get_api_request_object_stub()
-        self._attach_group_membership(user_object)
-        logger.debug('Updating user: %s', user_object)
-        self._api_response = self._zapi.user.update(user_object)
-
-    def _attach_group_membership(self, api_request_object):
-        zabbix_ids_of_all_user_groups = [group.zabbix_id for group in self.groups]
-        assert self.groups and all(zabbix_ids_of_all_user_groups), \
-            'To be able to attach groups (%s) to a user(%s), they all have to be in zabbix first.' % (
-                self.groups, self)
-        # This cannot be a set because it's serialized to json, which is not supported for sets:
-        api_request_object['usrgrps'] = zabbix_ids_of_all_user_groups
-
-    def _prepare_media(self):
-        media = []
-        for media_type in ZabbixMediaContainer.MEDIAS:
-            user_media = getattr(self._user, 'get_alerting_{}'.format(media_type), None)
-            if user_media:
-                medium = {'mediatypeid': user_media.media_type,
-                          'sendto': user_media.sendto,
-                          'period': user_media.period,
-                          'severity': user_media.severity,
-                          'active': self.MEDIA_ENABLED}
-                media.append(medium)
-        return media
-
-    def _attach_media_for_create_call(self, api_request_object):
-        api_request_object['user_medias'] = self._prepare_media()
-
-    def _attach_media_for_update_call(self, api_request_object):
-        api_request_object['medias'] = self._prepare_media()
-
-    def _attach_basic_info(self, api_request_object):
-        api_request_object['name'] = self._user.first_name
-        api_request_object['surname'] = self._user.last_name
-        # user_object['type']= FIXME self._user.is_superadmin but we miss request
-
-    def _get_api_request_object_stub(self):
-        return {'userid': self.zabbix_id}
 
     def update_all(self):
         """
@@ -1072,40 +1026,86 @@ class ZabbixUserContainer(ZabbixNamedContainer):
         self.delete_by_id(self._zapi, self.zabbix_id)
         self.zabbix_id = None
 
-    @classmethod
-    def delete_by_name(cls, zapi, name):
-        zabbix_id = cls.fetch_zabbix_id(zapi, name)
-        if zabbix_id:
-            zapi.user.delete([zabbix_id])
+    def _prepare_groups(self):
+        yielded_owned_dcs = set()
+        user_related_dcs = Dc.objects.filter(Q(owner=self._user) | Q(roles__user=self._user))
 
-    @staticmethod
-    def delete_by_id(zapi, zabbix_id):
-        zapi.user.delete([zabbix_id])
+        for dc_name, group_name, user_id in user_related_dcs.values_list('name', 'roles__name', 'roles__user'):
+            if user_id == self._user.id:
+                local_group_name = group_name
+            elif dc_name not in yielded_owned_dcs:
+                local_group_name = ZabbixUserGroupContainer.OWNERS_GROUP
+                yielded_owned_dcs.add(dc_name)
+            else:
+                continue
 
-    @classmethod
-    def synchronize(cls, zapi, user):
-        """
-        We check whether the user object exists in zabbix. If not, we create it. If it does, we update it.
-        """
+            qualified_group_name = ZabbixUserGroupContainer.user_group_name_factory(dc_name=dc_name,
+                                                                                    local_group_name=local_group_name)
+            try:
+                yield ZabbixUserGroupContainer.from_zabbix_name(zapi=self._zapi,
+                                                                name=qualified_group_name,
+                                                                resolve_users=False)
+            except RemoteObjectDoesNotExist:
+                pass  # We don't create/delete user groups when users are created.
 
-        try:
-            existing_zabbix_user = cls.from_zabbix_alias(zapi, user.username)
-        except RemoteObjectDoesNotExist:
-            existing_zabbix_user = None
+    def prepare_groups(self):
+        self.groups = set(self._prepare_groups())
 
-        user_to_sync = cls.from_mgmt_data(zapi, user)
+    def _refresh_groups(self, api_response):
+        self.groups = set(
+            ZabbixUserGroupContainer.from_zabbix_data(self._zapi, group) for group in api_response.get('usrgrps', [])
+        )
 
-        if user_to_sync.groups and not existing_zabbix_user:  # Create
-            user_to_sync.create()
-        elif user_to_sync.groups and existing_zabbix_user:  # Update
-            user_to_sync.zabbix_id = existing_zabbix_user.zabbix_id
-            user_to_sync.update_all()
-        elif not user_to_sync.groups and existing_zabbix_user:  # Delete
-            user_to_sync.delete()
-        elif not user_to_sync.groups and not existing_zabbix_user:  # No-op
-            pass
-        else:
-            raise AssertionError('This should never happen')
+    def refresh(self):
+        response = self._zapi.user.get(dict(userids=self.zabbix_id, **self.USER_QUERY_BASE))
+        if not response:
+            raise ObjectManipulationError('%s doesn\'t exit anymore'.format(self))
+
+        self._api_response = response[0]
+        self._refresh_groups(self._api_response)
+        # TODO refresh media etc
+
+    def update_group_membership(self):
+        assert self.zabbix_id, 'A user in zabbix should be first created, then updated. %s has no zabbix_id.' % self
+        user_object = self._get_api_request_object_stub()
+        self._attach_group_membership(user_object)
+        logger.debug('Updating user: %s', user_object)
+        self._api_response = self._zapi.user.update(user_object)
+
+    def _attach_group_membership(self, api_request_object):
+        zabbix_ids_of_all_user_groups = [group.zabbix_id for group in self.groups]
+        assert self.groups and all(zabbix_ids_of_all_user_groups), \
+            'To be able to attach groups (%s) to a user(%s), they all have to be in zabbix first.' % (
+                self.groups, self)
+        # This cannot be a set because it's serialized to json, which is not supported for sets:
+        api_request_object['usrgrps'] = zabbix_ids_of_all_user_groups
+
+    def _prepare_media(self):
+        media = []
+        for media_type in ZabbixMediaContainer.MEDIAS:
+            user_media = getattr(self._user, 'get_alerting_{}'.format(media_type), None)
+            if user_media:
+                medium = {'mediatypeid': user_media.media_type,
+                          'sendto': user_media.sendto,
+                          'period': user_media.period,
+                          'severity': user_media.severity,
+                          'active': self.MEDIA_ENABLED}
+                media.append(medium)
+        return media
+
+    def _attach_media_for_create_call(self, api_request_object):
+        api_request_object['user_medias'] = self._prepare_media()
+
+    def _attach_media_for_update_call(self, api_request_object):
+        api_request_object['medias'] = self._prepare_media()
+
+    def _attach_basic_info(self, api_request_object):
+        api_request_object['name'] = self._user.first_name
+        api_request_object['surname'] = self._user.last_name
+        # user_object['type']= FIXME self._user.is_superadmin but we miss request
+
+    def _get_api_request_object_stub(self):
+        return {'userid': self.zabbix_id}
 
 
 class ZabbixUserGroupContainer(ZabbixNamedContainer):
@@ -1204,15 +1204,6 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
             # Otherwise we update it
             zabbix_user_group.update_from(user_group)
 
-    def delete(self):
-        logger.debug('Going to delete group %s', self.name)
-        logger.debug('Group.users before: %s', self.users)
-        users_to_remove = self.users.copy()  # We have to copy it because group.users will get messed up
-        self.remove_users(users_to_remove, delete_users_if_last=True)  # remove all users
-        logger.debug('Group.users after: %s', self.users)
-        self._zapi.usergroup.delete([self.zabbix_id])
-        self.zabbix_id = None
-
     @staticmethod
     def delete_by_name(zapi, name):
         # for optimization: z.zapi.usergroup.get({'search': {'name': ":dc_name:*"}, 'searchWildcardsEnabled': True})
@@ -1222,6 +1213,15 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
             return
         else:
             group.delete()
+
+    def delete(self):
+        logger.debug('Going to delete group %s', self.name)
+        logger.debug('Group.users before: %s', self.users)
+        users_to_remove = self.users.copy()  # We have to copy it because group.users will get messed up
+        self.remove_users(users_to_remove, delete_users_if_last=True)  # remove all users
+        logger.debug('Group.users after: %s', self.users)
+        self._zapi.usergroup.delete([self.zabbix_id])
+        self.zabbix_id = None
 
     def create(self):
         assert not self.zabbix_id, \
@@ -1369,6 +1369,9 @@ class ZabbixHostGroupContainer(object):
 
 
 class ZabbixMediaContainer(object):
+    """
+    Container class for the Zabbix HostGroup object.
+    """
     SEVERITY_NOT_CLASSIFIED = 1  # TODO move to constants
     SEVERITY_INFORMATION = 2
     SEVERITY_WARNING = 3
