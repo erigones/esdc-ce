@@ -876,7 +876,7 @@ class ZabbixUserContainer(ZabbixNamedContainer):
     """
     Container class for the Zabbix User object.
     """
-    MEDIA_ENABLED = 0  # SIC in zabbix docs: 0 - enabled, 1 - disabled.
+    MEDIA_ENABLED = 0  # 0 - enabled, 1 - disabled [sic in zabbix docs]
     USER_QUERY_BASE = frozendict({'selectUsrgrps': ('usrgrpid', 'name', 'gui_access'),
                                   'selectMedias': ('mediatypeid', 'sendto')
                                   })
@@ -915,7 +915,7 @@ class ZabbixUserContainer(ZabbixNamedContainer):
 
     @classmethod
     def from_mgmt_data(cls, zapi, user):
-        container = cls(zapi=zapi, name=user.username)
+        container = cls(name=user.username, zapi=zapi)
         container._user = user
         container.prepare_groups()
         return container
@@ -1165,7 +1165,7 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
     @classmethod
     def from_mgmt_data(cls, zapi, group_name, users, accessible_hostgroups=(), superusers=False):
         # I should probably get all existing user ids for user names, and hostgroup ids for hostgroup names
-        container = cls(zapi=zapi, name=group_name)
+        container = cls(name=group_name, zapi=zapi)
         container.users = {ZabbixUserContainer.from_mgmt_data(zapi, user) for user in users}
         container.host_groups = {ZabbixHostGroupContainer.from_mgmt_data(zapi, hostgroup)
                                  for hostgroup in accessible_hostgroups}  # self._get_groups
@@ -1175,7 +1175,7 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
 
     @classmethod
     def from_zabbix_data(cls, zapi, zabbix_object):
-        container = cls(zapi=zapi, name=zabbix_object['name'])
+        container = cls(name=zabbix_object['name'], zapi=zapi)
         container.zabbix_id = zabbix_object['usrgrpid']
         #  container.superuser_group = FIXME cannot determine from this data
         container.users = {ZabbixUserContainer.from_zabbix_data(zapi, userdata) for userdata in
