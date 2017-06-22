@@ -838,6 +838,11 @@ class _Zabbix(object):
 
 
 class ZabbixNamedContainer(object):
+    """
+    Base class for ZabbixUserContainer etc.
+    As ZabbixUserGroupContainer.users contains instances of ZabbixUserContainer instances, making it a set allows us
+     to do useful operations with it. Therefore, we implemented this class so that those instances can be part of a set.
+    """
     zabbix_id = None
 
     def __init__(self, name):
@@ -868,6 +873,9 @@ class ZabbixNamedContainer(object):
 
 
 class ZabbixUserContainer(ZabbixNamedContainer):
+    """
+    Container class for the Zabbix User object.
+    """
     MEDIA_ENABLED = 0  # SIC in zabbix docs: 0 - enabled, 1 - disabled.
     USER_QUERY_BASE = frozendict({'selectUsrgrps': ('usrgrpid', 'name', 'gui_access'),
                                   'selectMedias': ('mediatypeid', 'sendto')
@@ -1101,6 +1109,9 @@ class ZabbixUserContainer(ZabbixNamedContainer):
 
 
 class ZabbixUserGroupContainer(ZabbixNamedContainer):
+    """
+    Container class for the Zabbix UserGroup object.
+    """
     FRONTEND_ACCESS_ENABLED_WITH_DEFAULT_AUTH = '0'
     FRONTEND_ACCESS_DISABLED = '2'
     USERS_STATUS_ENABLED = 0
@@ -1118,6 +1129,15 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
         self.host_groups = set()
         self.superuser_group = False
         self._api_response = None
+
+    @staticmethod
+    def user_group_name_factory(dc_name, local_group_name):
+        """
+        We have to qualify the dc name to prevent name clashing among groups in different datacenters,
+        but in the same zabbix.
+        """
+        name = ':{}:{}:'.format(dc_name, local_group_name)
+        return name
 
     @classmethod
     def from_zabbix_id(cls, zapi, zabbix_id):
@@ -1162,6 +1182,47 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
                            zabbix_object.get('users', [])}
         return container
 
+    @classmethod
+    def synchronize(cls, zapi, group_name, users, accessible_hostgroups, superusers=False):
+        """
+        Make sure that in the end, there will be a user group with specified users in zabbix.
+        :param group_name: should be the qualified group name (<DC>:<group name>:)
+        """
+        # TODO synchronization of superadmins should be in the DC settings
+        # todo will hosts be added in the next step?
+        user_group = ZabbixUserGroupContainer.from_mgmt_data(zapi,
+                                                             group_name,
+                                                             users,
+                                                             accessible_hostgroups,
+                                                             superusers)
+        try:
+            zabbix_user_group = ZabbixUserGroupContainer.from_zabbix_name(zapi, group_name, resolve_users=True)
+        except RemoteObjectDoesNotExist:
+            # We create it
+            user_group.create()
+        else:
+            # Otherwise we update it
+            zabbix_user_group.update_from(user_group)
+
+    def delete(self):
+        logger.debug('Going to delete group %s', self.name)
+        logger.debug('Group.users before: %s', self.users)
+        users_to_remove = self.users.copy()  # We have to copy it because group.users will get messed up
+        self.remove_users(users_to_remove, delete_users_if_last=True)  # remove all users
+        logger.debug('Group.users after: %s', self.users)
+        self._zapi.usergroup.delete([self.zabbix_id])
+        self.zabbix_id = None
+
+    @staticmethod
+    def delete_by_name(zapi, name):
+        # for optimization: z.zapi.usergroup.get({'search': {'name': ":dc_name:*"}, 'searchWildcardsEnabled': True})
+        try:
+            group = ZabbixUserGroupContainer.from_zabbix_name(zapi, name)
+        except RemoteObjectDoesNotExist:
+            return
+        else:
+            group.delete()
+
     def create(self):
         assert not self.zabbix_id, \
             '%s has the zabbix_id already and therefore you should try to update the object, not create it.' % self
@@ -1203,6 +1264,11 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
                 user.groups.add(self)
                 user.create()
 
+    def _refresh_users(self, api_response):
+        self.users = {
+            ZabbixUserContainer.from_zabbix_data(self._zapi, userdata) for userdata in api_response.get('users', [])
+        }
+
     def refresh(self):
         response = self._zapi.usergroup.get(dict(usrgrpids=self.zabbix_id, **self.QUERY_BASE))
 
@@ -1211,11 +1277,6 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
 
         self._api_response = response[0]
         self._refresh_users(self._api_response)
-
-    def _refresh_users(self, api_response):
-        self.users = {
-            ZabbixUserContainer.from_zabbix_data(self._zapi, userdata) for userdata in api_response.get('users', [])
-        }
 
     def update_superuser_status(self, superuser_group):
         if self.superuser_group != superuser_group:
@@ -1226,14 +1287,24 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
         logger.debug('TODO host group update %s', self.name)
         # TODO
 
-    @staticmethod
-    def user_group_name_factory(dc_name, local_group_name):
-        """
-        We have to qualify the dc name to prevent name clashing among groups in different datacenters,
-        but in the same zabbix.
-        """
-        name = ':{}:{}:'.format(dc_name, local_group_name)
-        return name
+    def update_users(self, user_group):
+        logger.debug('synchronizing %s', self)
+        logger.debug('remote_user_group.users %s', self.users)
+        logger.debug('source_user_group.users %s', user_group.users)
+        redundant_users = self.users - user_group.users
+        logger.debug('redundant_users: %s', redundant_users)
+        missing_users = user_group.users - self.users
+        logger.debug('missing users: %s', missing_users)
+        self.remove_users(redundant_users, delete_users_if_last=True)
+        self.add_users(missing_users)
+
+    def update_basic_information(self, user_group):
+        self.update_superuser_status(user_group.superuser_group)
+
+    def update_from(self, user_group):
+        self.update_users(user_group)
+        self.update_basic_information(user_group)
+        logger.debug('todo hostgroups')
 
     def add_users(self, new_users):
         for user in new_users:
@@ -1271,81 +1342,22 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
             self.remove_user(user, delete_user_if_last=delete_users_if_last)
             # TODO create also a faster way of removal for users that has also different groups
 
-    def delete(self):
-        logger.debug('Going to delete group %s', self.name)
-        logger.debug('Group.users before: %s', self.users)
-        users_to_remove = self.users.copy()  # We have to copy it because group.users will get messed up
-        self.remove_users(users_to_remove, delete_users_if_last=True)  # remove all users
-        logger.debug('Group.users after: %s', self.users)
-        self._zapi.usergroup.delete([self.zabbix_id])
-        self.zabbix_id = None
-
-    @staticmethod
-    def delete_by_name(zapi, name):
-        # for optimization: z.zapi.usergroup.get({'search': {'name': ":dc_name:*"}, 'searchWildcardsEnabled': True})
-        try:
-            group = ZabbixUserGroupContainer.from_zabbix_name(zapi, name)
-        except RemoteObjectDoesNotExist:
-            return
-        else:
-            group.delete()
-
-    def update_users(self, user_group):
-        logger.debug('synchronizing %s', self)
-        logger.debug('remote_user_group.users %s', self.users)
-        logger.debug('source_user_group.users %s', user_group.users)
-        redundant_users = self.users - user_group.users
-        logger.debug('redundant_users: %s', redundant_users)
-        missing_users = user_group.users - self.users
-        logger.debug('missing users: %s', missing_users)
-        self.remove_users(redundant_users, delete_users_if_last=True)
-        self.add_users(missing_users)
-
-    def update_basic_information(self, user_group):
-        self.update_superuser_status(user_group.superuser_group)
-
-    def update_from(self, user_group):
-        self.update_users(user_group)
-        self.update_basic_information(user_group)
-        logger.debug('todo hostgroups')
-
-    @classmethod
-    def synchronize(cls, zapi, group_name, users, accessible_hostgroups, superusers=False):
-        """
-        Make sure that in the end, there will be a user group with specified users in zabbix.
-        User has to be removed in case she is being removed from the last group
-        :param group_name: should be the qualified group name (<DC>:<group name>:)
-        :return:
-        """
-        # TODO synchronization of superadmins should be in the DC settings
-        # todo will hosts be added in the next step?
-        user_group = ZabbixUserGroupContainer.from_mgmt_data(zapi,
-                                                             group_name,
-                                                             users,
-                                                             accessible_hostgroups,
-                                                             superusers)
-        try:
-            zabbix_user_group = ZabbixUserGroupContainer.from_zabbix_name(zapi, group_name, resolve_users=True)
-        except RemoteObjectDoesNotExist:
-            # We create it
-            user_group.create()
-        else:
-            # Othewise we update it
-            zabbix_user_group.update_from(user_group)
-
 
 class ZabbixHostGroupContainer(object):
+    """
+    Container class for the Zabbix HostGroup object.
+    Incomplete, TODO
+    """
     zabbix_id = None
 
     @classmethod
-    def from_mgmt_data(cls, zapi, name, hosts=(), id=None):
+    def from_mgmt_data(cls, zapi, name):
         container = cls()
         container._zapi = zapi
         container.name = name  # TODO
         response = zapi.hostgroup.get({'filter': {'name': name}})
         if response:
-            assert len(
-                response) == 1, 'Hostgroup name => locally generated hostgroup name mapping should be injective'
+            assert len(response) == 1, 'Hostgroup name => locally generated hostgroup name mapping should be injective'
             container._zabbix_response = response[0]
         container.zabbix_id = container._zabbix_response['groupid']
         return container
@@ -1357,12 +1369,6 @@ class ZabbixHostGroupContainer(object):
 
 
 class ZabbixMediaContainer(object):
-    MEDIAS = frozendict({
-        'email': 1,
-        'phone': 2,
-        'xmpp': 3
-    })  # todo is this static or is it defined somewhere?
-
     SEVERITY_NOT_CLASSIFIED = 1  # TODO move to constants
     SEVERITY_INFORMATION = 2
     SEVERITY_WARNING = 3
@@ -1376,6 +1382,11 @@ class ZabbixMediaContainer(object):
     # TODO Time is in UTC and therefore we should adjust this for the user's timezone
     PERIOD_DEFAULT_WORKING_HOURS = '1-5,09:00-18:00'
     PERIOD_DEFAULT = '1-7,00:00-24:00'
+    MEDIAS = frozendict({
+        'email': 1,
+        'phone': 2,
+        'xmpp': 3
+    })  # todo is this static or is it defined somewhere?
 
     def __init__(self, media_type, sendto, severities, period):
         self.media_type = media_type
