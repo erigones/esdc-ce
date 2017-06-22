@@ -856,60 +856,15 @@ class _UserGroupAwareZabbix(_Zabbix):
             user_to_sync.zabbix_id = existing_zabbix_user.zabbix_id
             user_to_sync.update_all()
         elif not user_to_sync.groups and existing_zabbix_user:  # Delete
-            self.delete_user(zabbix_user=user_to_sync)
+            user_to_sync.delete()
         elif not user_to_sync.groups and not existing_zabbix_user:  # No-op
             pass
         else:
             raise AssertionError('This should never happen')
 
-    def delete_user(self, zabbix_user=None, user_name=None):
-        logger.debug('Trying to delete user %s', zabbix_user or user_name)
-        assert (zabbix_user and (zabbix_user.zabbix_id or zabbix_user.name)) or user_name, 'Who should I delete?'
-
-        if user_name:
-            try:
-                zabbix_user = self._get_zabbix_user(zabbix_alias=user_name)
-            except RemoteObjectDoesNotExist:
-                return
-        elif zabbix_user.zabbix_id:
-            try:
-                zabbix_user = self._get_zabbix_user(zabbix_id=zabbix_user.zabbix_id)
-            except RemoteObjectDoesNotExist:
-                return
-        elif zabbix_user.name:
-            try:
-                zabbix_user = self._get_zabbix_user(zabbix_alias=zabbix_user.name)
-            except RemoteObjectDoesNotExist:
-                return
-        else:
-            raise AssertionError
-
-        try:
-            self.zapi.user.delete([zabbix_user.zabbix_id])
-        except ZabbixAPIError:
-            # TODO perhaps we should ignore race condition errors, or repeat the task?
-            # Example:
-            # ZabbixAPIError: Application error. No permissions to referred object or it does not exist! [-32500]
-            raise
-        else:
-            zabbix_user.zabbix_id = None  # unnecessary perhaps?
-
-    def remove_user_from_user_group(self, user, user_group, delete_user_if_last=False):
-        user.refresh()
-
-        if user_group not in user.groups:
-            logger.warn('User is not in the group: %s %s (possible race condition)', user_group, user.groups)
-
-        if not user.groups - {user_group} and not delete_user_if_last:
-            raise ObjectManipulationError('Cannot remove the last group (%s) '
-                                          'without deleting the user %s itself!' % (user_group, user))
-
-        user.groups -= {user_group}
-
-        if user.groups:
-            user.update_group_membership()
-        else:
-            self.delete_user(user)
+    def delete_user(self, user_name=None):
+        logger.debug('Trying to delete user %s', user_name)
+        ZabbixUserContainer.delete_by_name(self.zapi, user_name)
 
     def delete_user_group(self, zabbix_id=None, zabbix_group_name=None, group=None):
         assert zabbix_id or zabbix_group_name or (group and group.zabbix_id)
@@ -933,7 +888,7 @@ class _UserGroupAwareZabbix(_Zabbix):
         logger.debug('Going to delete group %s', group.name)
         logger.debug('Group.users before: %s', group.users)
         users_to_remove = group.users.copy()  # We have to copy it because group.users got messed up
-        self._remove_users_from_user_group(group, users_to_remove, delete_users_if_last=True)  # remove all users
+        group.remove_users(users_to_remove, delete_users_if_last=True)  # remove all users
         logger.debug('Group.users after: %s', group.users)
         self.zapi.usergroup.delete([group.zabbix_id])
 
@@ -1001,14 +956,14 @@ class _UserGroupAwareZabbix(_Zabbix):
         logger.debug('redundant_users: %s', redundant_users)
         missing_users = source_user_group.users - remote_user_group.users
         logger.debug('missing users: %s', missing_users)
-        self._remove_users_from_user_group(remote_user_group, redundant_users, delete_users_if_last=True)
+        remote_user_group.remove_users(redundant_users, delete_users_if_last=True)
         remote_user_group.add_users(missing_users)
 
     def _remove_users_from_user_group(self, zabbix_user_group, redundant_users, delete_users_if_last):  # TODO move
         zabbix_user_group.users -= redundant_users
         # Some zabbix users has to be deleted as this is their last group. We have to go the slower way.
         for user in redundant_users:
-            self.remove_user_from_user_group(user, zabbix_user_group, delete_user_if_last=delete_users_if_last)
+            zabbix_user_group.remove_user(user, delete_user_if_last=delete_users_if_last)
             # TODO create also a faster way of removal for users that has also different groups
 
 
@@ -1120,17 +1075,21 @@ class ZabbixUserContainer(ZabbixNamedContainer):
 
     def _refresh_groups(self, api_response):
         self.groups = set(
-            ZabbixUserGroupContainer.from_zabbix_data(self._zapi, group) for group in
-            api_response.get('usrgrps', [])
+            ZabbixUserGroupContainer.from_zabbix_data(self._zapi, group) for group in api_response.get('usrgrps', [])
         )
 
-    def refresh_id(self):
-        response = self._zapi.user.get(dict(filter={'alias': self._user.username}))
-        if response:
-            self.zabbix_id = response[0]['userid']
-            return True
+    @staticmethod
+    def fetch_zabbix_id(zapi, username):
+        response = zapi.user.get(dict(filter={'alias': username}))
+        if not len(response):
+            return None
+        elif len(response) == 1:
+            return response[0]['userid']
         else:
-            return False
+            raise ZabbixAPIError
+
+    def renew_zabbix_id(self):
+        self.zabbix_id = self.fetch_zabbix_id(self._zapi, self._user.username)
 
     def refresh(self):
         response = self._zapi.user.get(dict(userids=self.zabbix_id, **self.USER_QUERY_BASE))
@@ -1229,6 +1188,22 @@ class ZabbixUserContainer(ZabbixNamedContainer):
             self.zabbix_id = self._api_response['userids'][0]
 
         return self
+
+    def delete(self):
+        if not self.zabbix_id:
+            self.renew_zabbix_id()
+        self.delete_by_id(self._zapi, self.zabbix_id)
+        self.zabbix_id = None
+
+    @classmethod
+    def delete_by_name(cls, zapi, name):
+        zabbix_id = cls.fetch_zabbix_id(zapi, name)
+        if zabbix_id:
+            zapi.user.delete([zabbix_id])
+
+    @staticmethod
+    def delete_by_id(zapi, zabbix_id):
+        zapi.user.delete([zabbix_id])
 
 
 class ZabbixMediaContainer(object):
@@ -1385,7 +1360,7 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
         user_group_object['userids'] = []
 
         for user in self.users:
-            user.refresh_id()
+            user.renew_zabbix_id()
 
             if user.zabbix_id:
                 # Update
@@ -1428,7 +1403,7 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
 
     def add_users(self, new_users):
         for user in new_users:
-            user.refresh_id()
+            user.renew_zabbix_id()
             user.groups.add(self)
 
             if user.zabbix_id:
@@ -1437,3 +1412,27 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
                 user.create()
 
         self.users.update(new_users)
+
+    def remove_user(self, user, delete_user_if_last=False):
+        user.refresh()
+
+        if self not in user.groups:
+            logger.warn('User is not in the group: %s %s (possible race condition)', self, user.groups)
+
+        if not user.groups - {self} and not delete_user_if_last:
+            raise ObjectManipulationError('Cannot remove the last group (%s) '
+                                          'without deleting the user %s itself!' % (self, user))
+
+        user.groups -= {self}
+
+        if user.groups:
+            user.update_group_membership()
+        else:
+            user.delete()
+
+    def remove_users(self, redundant_users, delete_users_if_last):  # TODO move
+        self.users -= redundant_users
+        # Some zabbix users has to be deleted as this is their last group. We have to go the slower way.
+        for user in redundant_users:
+            self.remove_user(user, delete_user_if_last=delete_users_if_last)
+            # TODO create also a faster way of removal for users that has also different groups
