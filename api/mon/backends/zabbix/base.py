@@ -844,7 +844,7 @@ class _UserGroupAwareZabbix(_Zabbix):
         """
 
         try:
-            existing_zabbix_user = self._get_zabbix_user(zabbix_alias=user.username)
+            existing_zabbix_user = ZabbixUserContainer.from_zabbix_alias(self.zapi, user.username)
         except RemoteObjectDoesNotExist:
             existing_zabbix_user = None
 
@@ -875,24 +875,6 @@ class _UserGroupAwareZabbix(_Zabbix):
             return
         group.delete()
 
-
-    def _get_zabbix_user_group(self, group_name):
-        existing_zabbix_group = self.zapi.usergroup.get({'search': {'name': group_name},
-                                                         'selectUsers': ['alias'],
-                                                         'limit': 1})
-        if existing_zabbix_group:
-            zabbix_group = existing_zabbix_group[0]
-            assert zabbix_group.get('name', '') == group_name
-            return ZabbixUserGroupContainer.from_zabbix_data(self.zapi, zabbix_group)
-        else:
-            return None
-
-    def _get_zabbix_user(self, zabbix_alias=None, zabbix_id=None):
-        if zabbix_alias:
-            return ZabbixUserContainer.from_zabbix_alias(self.zapi, zabbix_alias)
-        else:
-            return ZabbixUserContainer.from_zabbix_id(self.zapi, zabbix_id)
-
     def synchronize_user_group(self, group_name, users, accessible_hostgroups, superusers=False):  # TODO MERGE WITH CALLER
         """
         Make sure that in the end, there will be a user group with specified users in zabbix.
@@ -908,40 +890,16 @@ class _UserGroupAwareZabbix(_Zabbix):
                                                              users,
                                                              accessible_hostgroups,
                                                              superusers)
-        zabbix_user_group = self._get_zabbix_user_group(group_name)
-
-        if zabbix_user_group:
-            # if exists, we synchronize it
-            self._update_user_group(zabbix_user_group, user_group)
-        else:
-            # otherwise we create it
+        try:
+            zabbix_user_group = ZabbixUserGroupContainer.from_zabbix_name(self.zapi, group_name, resolve_users=True)
+        except RemoteObjectDoesNotExist:
+            # We create it
             user_group.create()
+        else:
+            # Othewise we update it
+            zabbix_user_group.update_from(user_group)
 
         return user_group
-
-    def _synchronize_basic_information_in_user_group(self, zabbix_user_group, user_group):
-        if zabbix_user_group.superuser_group != user_group.superuser_group:
-            zabbix_user_group.superuser_group = user_group.superuser_group
-            zabbix_user_group.update_superuser_status()
-
-    def _update_user_group(self, zabbix_user_group, user_group):
-        # todo this way or all in one call prepared?
-        self._synchronize_users_in_user_group(zabbix_user_group, user_group)
-        self._synchronize_basic_information_in_user_group(zabbix_user_group, user_group)
-        logger.debug('todo hostgroups')
-        # self._synchronize_host_groups_in_user_group(zabbix_user_group, user_group)  # todo
-        return
-
-    def _synchronize_users_in_user_group(self, remote_user_group, source_user_group):
-        logger.debug('synchronizing %s', remote_user_group)
-        logger.debug('remote_user_group.users %s', remote_user_group.users)
-        logger.debug('source_user_group.users %s', source_user_group.users)
-        redundant_users = remote_user_group.users - source_user_group.users
-        logger.debug('redundant_users: %s', redundant_users)
-        missing_users = source_user_group.users - remote_user_group.users
-        logger.debug('missing users: %s', missing_users)
-        remote_user_group.remove_users(redundant_users, delete_users_if_last=True)
-        remote_user_group.add_users(missing_users)
 
 
 class ZabbixNamedContainer(object):
@@ -1361,8 +1319,10 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
             ZabbixUserContainer.from_zabbix_data(self._zapi, userdata) for userdata in api_response.get('users', [])
         }
 
-    def update_superuser_status(self):
-        self.update_hostgroup_info()  # There is some hostgroup information depending on the superuser status
+    def update_superuser_status(self, superuser_group):
+        if self.superuser_group != superuser_group:
+            self.superuser_group = superuser_group
+            self.update_hostgroup_info()  # There is some hostgroup information depending on the superuser status
 
     def update_hostgroup_info(self):
         logger.debug('TODO host group update %s', self.name)
@@ -1421,3 +1381,22 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
         logger.debug('Group.users after: %s', self.users)
         self._zapi.usergroup.delete([self.zabbix_id])
         self.zabbix_id = None
+
+    def update_users(self, user_group):
+        logger.debug('synchronizing %s', self)
+        logger.debug('remote_user_group.users %s', self.users)
+        logger.debug('source_user_group.users %s', user_group.users)
+        redundant_users = self.users - user_group.users
+        logger.debug('redundant_users: %s', redundant_users)
+        missing_users = user_group.users - self.users
+        logger.debug('missing users: %s', missing_users)
+        self.remove_users(redundant_users, delete_users_if_last=True)
+        self.add_users(missing_users)
+
+    def update_basic_information(self, user_group):
+        self.update_superuser_status(user_group.superuser_group)
+
+    def update_from(self, user_group):
+        self.update_users(user_group)
+        self.update_basic_information(user_group)
+        logger.debug('todo hostgroups')
