@@ -463,7 +463,7 @@ class Zabbix(AbstractMonitoringBackend):
             kwargs['superusers'] = group.permissions.filter(name=AdminPermission.name).exists()
 
         for zapi in self._connections:
-            self._synchronize_user_group(zapi, **kwargs)
+            ZabbixUserGroupContainer.synchronize(zapi, **kwargs)
 
     def delete_user_group(self, name):
         group_name = ZabbixUserGroupContainer.user_group_name_factory(
@@ -471,75 +471,12 @@ class Zabbix(AbstractMonitoringBackend):
             dc_name=self.dc.name)
 
         for zapi in self._connections:
-            self._delete_user_group(zapi, zabbix_group_name=group_name)
+            ZabbixUserGroupContainer.delete_by_name(zapi, group_name)
 
     def synchronize_user(self, user):
         for zapi in self._connections:
-            self._synchronize_user(zapi, user)
+            ZabbixUserContainer.synchronize(zapi, user)
 
     def delete_user(self, name):
         for zapi in self._connections:
-            self._delete_user(zapi, user_name=name)
-
-    def _synchronize_user_group(self, zapi, group_name, users, accessible_hostgroups, superusers=False):
-        """
-        Make sure that in the end, there will be a user group with specified users in zabbix.
-        The question to which Zabbix is not solved on this layer.
-        User has to be removed in case she is being removed from the last group
-        :param group_name: should be the qualified group name (<DC>:<group name>:)
-        :return:
-        """
-        # TODO synchronization of superadmins should be in the DC settings
-        # todo will hosts be added in the next step?
-        user_group = ZabbixUserGroupContainer.from_mgmt_data(zapi,
-                                                             group_name,
-                                                             users,
-                                                             accessible_hostgroups,
-                                                             superusers)
-        try:
-            zabbix_user_group = ZabbixUserGroupContainer.from_zabbix_name(zapi, group_name, resolve_users=True)
-        except RemoteObjectDoesNotExist:
-            # We create it
-            user_group.create()
-        else:
-            # Othewise we update it
-            zabbix_user_group.update_from(user_group)
-
-        return user_group
-
-    def _synchronize_user(self, zapi, user):
-        """
-        We check whether the user object exists in zabbix. If not, we create it. If it does, we update it.
-        """
-
-        try:
-            existing_zabbix_user = ZabbixUserContainer.from_zabbix_alias(zapi, user.username)
-        except RemoteObjectDoesNotExist:
-            existing_zabbix_user = None
-
-        user_to_sync = ZabbixUserContainer.from_mgmt_data(zapi, user)
-
-        if user_to_sync.groups and not existing_zabbix_user:  # Create
-            user_to_sync.create()
-        elif user_to_sync.groups and existing_zabbix_user:  # Update
-            user_to_sync.zabbix_id = existing_zabbix_user.zabbix_id
-            user_to_sync.update_all()
-        elif not user_to_sync.groups and existing_zabbix_user:  # Delete
-            user_to_sync.delete()
-        elif not user_to_sync.groups and not existing_zabbix_user:  # No-op
-            pass
-        else:
-            raise AssertionError('This should never happen')
-
-    def _delete_user(self, zapi, user_name=None):
-        logger.debug('Trying to delete user %s', user_name)
-        ZabbixUserContainer.delete_by_name(zapi, user_name)
-
-    def _delete_user_group(self, zapi, zabbix_group_name=None):
-        # for optimization: z.zapi.usergroup.get({'search': {'name': ":dc_name:*"}, 'searchWildcardsEnabled': True})
-
-        try:
-            group = ZabbixUserGroupContainer.from_zabbix_name(zapi, zabbix_group_name)
-        except RemoteObjectDoesNotExist:
-            return
-        group.delete()
+            ZabbixUserContainer.delete_by_name(zapi, name)

@@ -1074,6 +1074,31 @@ class ZabbixUserContainer(ZabbixNamedContainer):
     def delete_by_id(zapi, zabbix_id):
         zapi.user.delete([zabbix_id])
 
+    @classmethod
+    def synchronize(cls, zapi, user):
+        """
+        We check whether the user object exists in zabbix. If not, we create it. If it does, we update it.
+        """
+
+        try:
+            existing_zabbix_user = cls.from_zabbix_alias(zapi, user.username)
+        except RemoteObjectDoesNotExist:
+            existing_zabbix_user = None
+
+        user_to_sync = cls.from_mgmt_data(zapi, user)
+
+        if user_to_sync.groups and not existing_zabbix_user:  # Create
+            user_to_sync.create()
+        elif user_to_sync.groups and existing_zabbix_user:  # Update
+            user_to_sync.zabbix_id = existing_zabbix_user.zabbix_id
+            user_to_sync.update_all()
+        elif not user_to_sync.groups and existing_zabbix_user:  # Delete
+            user_to_sync.delete()
+        elif not user_to_sync.groups and not existing_zabbix_user:  # No-op
+            pass
+        else:
+            raise AssertionError('This should never happen')
+
 
 class ZabbixMediaContainer(object):
     MEDIAS = frozendict({
@@ -1317,6 +1342,16 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
         self._zapi.usergroup.delete([self.zabbix_id])
         self.zabbix_id = None
 
+    @staticmethod
+    def delete_by_name(zapi, name):
+        # for optimization: z.zapi.usergroup.get({'search': {'name': ":dc_name:*"}, 'searchWildcardsEnabled': True})
+        try:
+            group = ZabbixUserGroupContainer.from_zabbix_name(zapi, name)
+        except RemoteObjectDoesNotExist:
+            return
+        else:
+            group.delete()
+
     def update_users(self, user_group):
         logger.debug('synchronizing %s', self)
         logger.debug('remote_user_group.users %s', self.users)
@@ -1335,3 +1370,29 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
         self.update_users(user_group)
         self.update_basic_information(user_group)
         logger.debug('todo hostgroups')
+
+    @classmethod
+    def synchronize(cls, zapi, group_name, users, accessible_hostgroups, superusers=False):
+        """
+        Make sure that in the end, there will be a user group with specified users in zabbix.
+        User has to be removed in case she is being removed from the last group
+        :param group_name: should be the qualified group name (<DC>:<group name>:)
+        :return:
+        """
+        # TODO synchronization of superadmins should be in the DC settings
+        # todo will hosts be added in the next step?
+        user_group = ZabbixUserGroupContainer.from_mgmt_data(zapi,
+                                                             group_name,
+                                                             users,
+                                                             accessible_hostgroups,
+                                                             superusers)
+        try:
+            zabbix_user_group = ZabbixUserGroupContainer.from_zabbix_name(zapi, group_name, resolve_users=True)
+        except RemoteObjectDoesNotExist:
+            # We create it
+            user_group.create()
+        else:
+            # Othewise we update it
+            zabbix_user_group.update_from(user_group)
+
+        return user_group
