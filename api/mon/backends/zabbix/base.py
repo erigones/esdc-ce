@@ -838,7 +838,7 @@ class _Zabbix(object):
 
 
 class _UserGroupAwareZabbix(_Zabbix):
-    def synchronize_user(self, user):
+    def synchronize_user(self, user):  # TODO MERGE WITH CALLER
         """
         We check whether the user object exists in zabbix. If not, we create it. If it does, we update it.
         """
@@ -862,35 +862,19 @@ class _UserGroupAwareZabbix(_Zabbix):
         else:
             raise AssertionError('This should never happen')
 
-    def delete_user(self, user_name=None):
+    def delete_user(self, user_name=None):  # TODO MERGE WITH CALLER
         logger.debug('Trying to delete user %s', user_name)
         ZabbixUserContainer.delete_by_name(self.zapi, user_name)
 
-    def delete_user_group(self, zabbix_id=None, zabbix_group_name=None, group=None):
-        assert zabbix_id or zabbix_group_name or (group and group.zabbix_id)
+    def delete_user_group(self, zabbix_group_name=None):  # TODO MERGE WITH CALLER
         # for optimization: z.zapi.usergroup.get({'search': {'name': ":dc_name:*"}, 'searchWildcardsEnabled': True})
 
-        if zabbix_id:
-            try:
-                group = ZabbixUserGroupContainer.from_zabbix_id(self.zapi, zabbix_id)
-            except RemoteObjectDoesNotExist:
-                return
-        elif zabbix_group_name:
-            try:
-                group = ZabbixUserGroupContainer.from_zabbix_name(self.zapi, zabbix_group_name)
-            except RemoteObjectDoesNotExist:
-                return
-        elif group:
-            group.refresh()
-        else:
-            raise ValueError
+        try:
+            group = ZabbixUserGroupContainer.from_zabbix_name(self.zapi, zabbix_group_name)
+        except RemoteObjectDoesNotExist:
+            return
+        group.delete()
 
-        logger.debug('Going to delete group %s', group.name)
-        logger.debug('Group.users before: %s', group.users)
-        users_to_remove = group.users.copy()  # We have to copy it because group.users got messed up
-        group.remove_users(users_to_remove, delete_users_if_last=True)  # remove all users
-        logger.debug('Group.users after: %s', group.users)
-        self.zapi.usergroup.delete([group.zabbix_id])
 
     def _get_zabbix_user_group(self, group_name):
         existing_zabbix_group = self.zapi.usergroup.get({'search': {'name': group_name},
@@ -909,7 +893,7 @@ class _UserGroupAwareZabbix(_Zabbix):
         else:
             return ZabbixUserContainer.from_zabbix_id(self.zapi, zabbix_id)
 
-    def synchronize_user_group(self, group_name, users, accessible_hostgroups, superusers=False):
+    def synchronize_user_group(self, group_name, users, accessible_hostgroups, superusers=False):  # TODO MERGE WITH CALLER
         """
         Make sure that in the end, there will be a user group with specified users in zabbix.
         The question to which Zabbix is not solved on this layer.
@@ -958,14 +942,6 @@ class _UserGroupAwareZabbix(_Zabbix):
         logger.debug('missing users: %s', missing_users)
         remote_user_group.remove_users(redundant_users, delete_users_if_last=True)
         remote_user_group.add_users(missing_users)
-
-    def _remove_users_from_user_group(self, zabbix_user_group, redundant_users, delete_users_if_last):  # TODO move
-        zabbix_user_group.users -= redundant_users
-        # Some zabbix users has to be deleted as this is their last group. We have to go the slower way.
-        for user in redundant_users:
-            zabbix_user_group.remove_user(user, delete_user_if_last=delete_users_if_last)
-            # TODO create also a faster way of removal for users that has also different groups
-
 
 
 class ZabbixNamedContainer(object):
@@ -1436,3 +1412,12 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
         for user in redundant_users:
             self.remove_user(user, delete_user_if_last=delete_users_if_last)
             # TODO create also a faster way of removal for users that has also different groups
+
+    def delete(self):
+        logger.debug('Going to delete group %s', self.name)
+        logger.debug('Group.users before: %s', self.users)
+        users_to_remove = self.users.copy()  # We have to copy it because group.users will get messed up
+        self.remove_users(users_to_remove, delete_users_if_last=True)  # remove all users
+        logger.debug('Group.users after: %s', self.users)
+        self._zapi.usergroup.delete([self.zabbix_id])
+        self.zabbix_id = None
