@@ -465,6 +465,10 @@ class Zabbix(AbstractMonitoringBackend):
         for zapi in self._connections:
             ZabbixUserGroupContainer.synchronize(zapi, **kwargs)
 
+    def synchronize_user(self, user):
+        for zapi in self._connections:
+            ZabbixUserContainer.synchronize(zapi, user)
+
     def delete_user_group(self, name):
         group_name = ZabbixUserGroupContainer.user_group_name_factory(
             local_group_name=name,
@@ -472,10 +476,6 @@ class Zabbix(AbstractMonitoringBackend):
 
         for zapi in self._connections:
             ZabbixUserGroupContainer.delete_by_name(zapi, group_name)
-
-    def synchronize_user(self, user):
-        for zapi in self._connections:
-            ZabbixUserContainer.synchronize(zapi, user)
 
     def delete_user(self, name):
         for zapi in self._connections:

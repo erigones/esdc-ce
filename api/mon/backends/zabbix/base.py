@@ -1100,68 +1100,6 @@ class ZabbixUserContainer(ZabbixNamedContainer):
             raise AssertionError('This should never happen')
 
 
-class ZabbixMediaContainer(object):
-    MEDIAS = frozendict({
-        'email': 1,
-        'phone': 2,
-        'xmpp': 3
-    })  # todo is this static or is it defined somewhere?
-
-    SEVERITY_NOT_CLASSIFIED = 1  # TODO move to constants
-    SEVERITY_INFORMATION = 2
-    SEVERITY_WARNING = 3
-    SEVERITY_AVERAGE = 4
-    SEVERITY_HIGH = 5
-    SEVERITY_DISASTER = 6
-    SEVERITIES = (
-        SEVERITY_NOT_CLASSIFIED, SEVERITY_INFORMATION, SEVERITY_WARNING, SEVERITY_AVERAGE, SEVERITY_HIGH,
-        SEVERITY_DISASTER
-    )
-    # TODO Time is in UTC and therefore we should adjust this for the user's timezone
-    PERIOD_DEFAULT_WORKING_HOURS = '1-5,09:00-18:00'
-    PERIOD_DEFAULT = '1-7,00:00-24:00'
-
-    def __init__(self, media_type, sendto, severities, period):
-        self.media_type = media_type
-        self.sendto = sendto
-        self.severity = self.media_severity_generator(severities)
-        self.period = period
-
-    @classmethod
-    def media_severity_generator(cls, active_severities):
-        """
-        :param active_severities: (SEVERITY_WARNING, SEVERITY_HIGH)
-        :return: number to be used as input for media.severity
-        """
-        result = 0
-        for severity in active_severities:
-            assert severity in cls.SEVERITIES
-            result += 2 ^ severity
-        return result
-
-
-class ZabbixHostGroupContainer(object):
-    zabbix_id = None
-
-    @classmethod
-    def from_mgmt_data(cls, zapi, name, hosts=(), id=None):
-        container = cls()
-        container._zapi = zapi
-        container.name = name  # TODO
-        response = zapi.hostgroup.get({'filter': {'name': name}})
-        if response:
-            assert len(
-                response) == 1, 'Hostgroup name => locally generated hostgroup name mapping should be injective'
-            container._zabbix_response = response[0]
-        container.zabbix_id = container._zabbix_response['groupid']
-        return container
-
-    @staticmethod
-    def hostgroup_name_factory(dc_name, node_name='', vm_uuid='', tag=''):
-        name = ':{}:{}:{}:{}:'.format(dc_name, node_name, vm_uuid, tag)
-        return name
-
-
 class ZabbixUserGroupContainer(ZabbixNamedContainer):
     FRONTEND_ACCESS_ENABLED_WITH_DEFAULT_AUTH = '0'
     FRONTEND_ACCESS_DISABLED = '2'
@@ -1395,4 +1333,64 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
             # Othewise we update it
             zabbix_user_group.update_from(user_group)
 
-        return user_group
+
+class ZabbixHostGroupContainer(object):
+    zabbix_id = None
+
+    @classmethod
+    def from_mgmt_data(cls, zapi, name, hosts=(), id=None):
+        container = cls()
+        container._zapi = zapi
+        container.name = name  # TODO
+        response = zapi.hostgroup.get({'filter': {'name': name}})
+        if response:
+            assert len(
+                response) == 1, 'Hostgroup name => locally generated hostgroup name mapping should be injective'
+            container._zabbix_response = response[0]
+        container.zabbix_id = container._zabbix_response['groupid']
+        return container
+
+    @staticmethod
+    def hostgroup_name_factory(dc_name, node_name='', vm_uuid='', tag=''):
+        name = ':{}:{}:{}:{}:'.format(dc_name, node_name, vm_uuid, tag)
+        return name
+
+
+class ZabbixMediaContainer(object):
+    MEDIAS = frozendict({
+        'email': 1,
+        'phone': 2,
+        'xmpp': 3
+    })  # todo is this static or is it defined somewhere?
+
+    SEVERITY_NOT_CLASSIFIED = 1  # TODO move to constants
+    SEVERITY_INFORMATION = 2
+    SEVERITY_WARNING = 3
+    SEVERITY_AVERAGE = 4
+    SEVERITY_HIGH = 5
+    SEVERITY_DISASTER = 6
+    SEVERITIES = (
+        SEVERITY_NOT_CLASSIFIED, SEVERITY_INFORMATION, SEVERITY_WARNING, SEVERITY_AVERAGE, SEVERITY_HIGH,
+        SEVERITY_DISASTER
+    )
+    # TODO Time is in UTC and therefore we should adjust this for the user's timezone
+    PERIOD_DEFAULT_WORKING_HOURS = '1-5,09:00-18:00'
+    PERIOD_DEFAULT = '1-7,00:00-24:00'
+
+    def __init__(self, media_type, sendto, severities, period):
+        self.media_type = media_type
+        self.sendto = sendto
+        self.severity = self.media_severity_generator(severities)
+        self.period = period
+
+    @classmethod
+    def media_severity_generator(cls, active_severities):
+        """
+        :param active_severities: (SEVERITY_WARNING, SEVERITY_HIGH)
+        :return: number to be used as input for media.severity
+        """
+        result = 0
+        for severity in active_severities:
+            assert severity in cls.SEVERITIES
+            result += 2 ^ severity
+        return result
