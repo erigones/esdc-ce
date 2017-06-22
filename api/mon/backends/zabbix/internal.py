@@ -4,10 +4,10 @@ from django.conf import settings as django_settings
 from zabbix_api import ZabbixAPIException
 
 from api.decorators import catch_exception
-from .base import _UserGroupAwareZabbix, ZabbixError, _Zabbix, logger
+from .base import ZabbixError, _Zabbix, logger
 
 
-class InternalZabbix(_UserGroupAwareZabbix):
+class InternalZabbix(_Zabbix):
     """
     Internal zabbix (monitoring from outside/node).
     """
