@@ -12,7 +12,7 @@ from vms.models import Node, NodeStorage, Storage, TaskLogEntry, Vm
 from gui.decorators import staff_required, ajax_required
 from gui.utils import collect_view_data, get_pager, reverse
 from gui.signals import view_node_list, view_node_details
-from gui.node.utils import get_dc1_settings, get_nodes_extended, get_node, get_node_backups
+from gui.node.utils import get_dc1_settings, get_nodes_extended, get_node, get_node_bkpdefs, get_node_backups
 from gui.node.forms import NodeForm, NodeStorageForm, UpdateBackupForm, NodeStorageImageForm, BackupFilterForm
 from gui.vm.forms import RestoreBackupForm
 from gui.vm.utils import get_vms
@@ -280,6 +280,21 @@ def _backup_list_context(request, node, context, vm_hostname=None):
     context.update(get_node_backups(request, bkps))
 
     return context
+
+
+@login_required
+@staff_required
+@setting_required('VMS_VM_BACKUP_ENABLED', dc_bound=False)
+def backup_definitions(request, hostname):
+    """
+    List of server backup definitions targeted onto this node.
+    """
+    context = collect_view_data(request, 'node_list')
+    context['node'] = node = get_node(request, hostname)
+    context['nodes'] = Node.all()
+    context['bkpdefs'] = get_node_bkpdefs(node)
+
+    return render(request, 'gui/node/backup_definitions.html', context)
 
 
 @login_required

@@ -1,7 +1,7 @@
 from django.http import Http404
 from django.db.models import Count, Sum
 
-from vms.models import DefaultDc, Node
+from vms.models import DefaultDc, Node, BackupDefine
 from gui.utils import get_order_by, get_pager
 from api.node.utils import get_nodes as api_get_nodes, get_node as api_get_node
 from api.node.base.serializers import ExtendedNodeSerializer
@@ -40,6 +40,15 @@ def get_node(request, hostname, **kwargs):
         return api_get_node(request, hostname, api=False, **kwargs)
     except Node.DoesNotExist:
         raise Http404
+
+
+def get_node_bkpdefs(node):
+    """
+    Return QuerySet of all backup definitions configured for this backup node.
+    """
+    return BackupDefine.objects.select_related('vm', 'vm__dc', 'node', 'periodic_task__crontab')\
+                               .filter(node=node).order_by('vm__hostname', 'id')\
+                               .annotate(backups=Count('backup'))
 
 
 def get_node_backups(request, queryset):
