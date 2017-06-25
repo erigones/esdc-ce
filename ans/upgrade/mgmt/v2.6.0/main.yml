@@ -1,0 +1,12 @@
+# https://github.com/erigones/esdc-factory/pull/52
+- name: Check local_settings.py
+  stat: path="{{ erigones_home }}/core/local_settings.py"
+  register: local_settings
+
+- name: Change database backend to use transaction hooks in local_settings.py
+  replace:
+    dest="{{ erigones_home }}/core/local_settings.py"
+    regexp="django\.db\.backends\.postgresql_psycopg2"
+    replace="transaction_hooks.backends.postgresql_psycopg2"
+  when: local_settings.stat.exists
+
