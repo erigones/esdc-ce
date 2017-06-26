@@ -12,8 +12,8 @@ from api.accounts.user.utils import get_user, get_users
 from api.accounts.messages import LOG_USER_CREATE, LOG_USER_UPDATE, LOG_USER_DELETE
 from api.task.response import SuccessTaskResponse, FailureTaskResponse
 from gui.models import User, AdminPermission
+from gui.signals import user_relationship_changed
 from vms.models import Dc, DefaultDc
-from api.mon.alerting.tasks import mon_user_changed
 
 
 class UserView(APIView):
@@ -107,9 +107,10 @@ class UserView(APIView):
             if ser.old_roles:
                 user.current_dc = DefaultDc()
 
-        connection.on_commit(lambda: mon_user_changed.call(self.request, user_name=ser.object.username,
-                                                           affected_groups=tuple(
-                                                               group.id for group in affected_groups)))
+        connection.on_commit(lambda: user_relationship_changed.send(sender='UserView.user_modify',
+                                                                    user_name=ser.object.username,
+                                                                    affected_groups=tuple(
+                                                                        group.id for group in affected_groups)))
         return res
 
     def get(self):
@@ -143,8 +144,10 @@ class UserView(APIView):
         old_roles = list(user.roles.all())
         ser = self.serializer(self.request, user)
         ser.object.delete()
-        connection.on_commit(lambda: mon_user_changed.call(self.request, user_name=ser.object.username,
-                                                           affected_groups=tuple(group.id for group in old_roles)))
+        connection.on_commit(lambda: user_relationship_changed.send(sender='UserView.delete',
+                                                                    user_name=ser.object.username,
+                                                                    affected_groups=tuple(
+                                                                        group.id for group in old_roles)))
         res = SuccessTaskResponse(self.request, None, obj=user, msg=LOG_USER_DELETE, detail_dict=dd, dc_bound=False)
 
         # User was removed, which may affect the cached list of DC admins for DCs which are attached to user's groups

@@ -11,8 +11,8 @@ from api.task.utils import task_log_success
 from api.dc.utils import attach_dc_virt_object
 from api.dc.messages import LOG_GROUP_ATTACH
 from gui.models import User, Role
+from gui.signals import group_relationship_changed
 from vms.models import DefaultDc
-from api.mon.alerting.tasks import mon_user_group_changed
 
 
 class GroupView(APIView):
@@ -75,7 +75,8 @@ class GroupView(APIView):
             msg = LOG_GROUP_CREATE
             status = HTTP_201_CREATED
 
-        connection.on_commit(lambda: mon_user_group_changed.call(request, group_name=ser.object.name))
+        connection.on_commit(lambda: group_relationship_changed.send(sender='GroupView.group_modify',
+                                                                     group_name=ser.object.name))
         res = SuccessTaskResponse(request, ser.data, status=status, obj=group, msg=msg,
                                   detail_dict=ser.detail_dict(), dc_bound=False)
 
@@ -143,7 +144,7 @@ class GroupView(APIView):
         group = self.group
         dd = {'permissions': list(group.permissions.all().values_list('name', flat=True))}
         group.delete()
-        connection.on_commit(lambda: mon_user_group_changed.call(self.request, group_name=group.name))
+        connection.on_commit(lambda: group_relationship_changed.send(sender='GroupView.delete', group_name=group.name))
 
         return SuccessTaskResponse(self.request, None, obj=group, msg=LOG_GROUP_DELETE, detail_dict=dd, dc_bound=False)
 

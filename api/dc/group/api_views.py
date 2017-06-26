@@ -11,7 +11,7 @@ from api.accounts.messages import LOG_GROUP_UPDATE
 from api.dc.messages import LOG_GROUP_ATTACH, LOG_GROUP_DETACH
 from api.task.response import SuccessTaskResponse
 from gui.models import Role
-from api.mon.alerting.tasks import mon_user_group_changed
+from gui.signals import group_relationship_changed
 
 
 class DcGroupView(APIView):
@@ -63,7 +63,9 @@ class DcGroupView(APIView):
         ser = self.serializer(self.request, group)
         group.dc_set.add(dc)
 
-        connection.on_commit(lambda: mon_user_group_changed.call(self.request, group_name=group.name, dc_name=dc.name))
+        connection.on_commit(lambda: group_relationship_changed.send(sender='DcGroupView.post',
+                                                                     group_name=group.name,
+                                                                     dc_name=dc.name))
         res = SuccessTaskResponse(self.request, ser.data, obj=group, status=status.HTTP_201_CREATED,
                                   detail_dict=ser.detail_dict(), msg=LOG_GROUP_ATTACH)
         self._remove_dc_binding(res)
@@ -79,7 +81,9 @@ class DcGroupView(APIView):
 
         ser = self.serializer(self.request, group)
         group.dc_set.remove(self.request.dc)
-        connection.on_commit(lambda: mon_user_group_changed.call(self.request, group_name=group.name, dc_name=dc.name))
+        connection.on_commit(lambda: group_relationship_changed.send(sender='DcGroupView.delete',
+                                                                     group_name=group.name,
+                                                                     dc_name=dc.name))
         res = SuccessTaskResponse(self.request, None, obj=group, detail_dict=ser.detail_dict(), msg=LOG_GROUP_DETACH)
         self._remove_dc_binding(res)
 
