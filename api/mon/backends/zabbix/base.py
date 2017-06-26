@@ -1121,6 +1121,7 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
     QUERY_BASE = frozendict({'selectUsers': ['alias'], 'limit': 1})
     QUERY_WITHOUT_USERS = {'limit': 1}
     OWNERS_GROUP = '#owner'
+    USER_GROUP_NAME_MAX_LENGTH = 64
 
     def __init__(self, name, zapi=None):
         super(ZabbixUserGroupContainer, self).__init__(name)
@@ -1130,13 +1131,16 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
         self.superuser_group = False
         self._api_response = None
 
-    @staticmethod
-    def user_group_name_factory(dc_name, local_group_name):
+    @classmethod
+    def user_group_name_factory(cls, dc_name, local_group_name):
         """
         We have to qualify the dc name to prevent name clashing among groups in different datacenters,
         but in the same zabbix.
         """
         name = ':{}:{}:'.format(dc_name, local_group_name)
+        if len(name) > cls.USER_GROUP_NAME_MAX_LENGTH:
+            raise ValueError('dc_name + group name should have less than 62 chars, '
+                             'but they have %d instead: %s %s' % (len(name), dc_name, local_group_name))
         return name
 
     @classmethod
