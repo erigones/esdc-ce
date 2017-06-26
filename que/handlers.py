@@ -17,6 +17,7 @@ ERIGONES_TASK_USER = cq.conf.ERIGONES_TASK_USER
 ERIGONES_UPDATE_SCRIPT = cq.conf.ERIGONES_UPDATE_SCRIPT
 SYSINFO_TASK = cq.conf.ERIGONES_NODE_SYSINFO_TASK
 STATUS_CHECK_TASK = cq.conf.ERIGONES_NODE_STATUS_CHECK_TASK
+MGMT_STARTUP_TASK = cq.conf.ERIGONES_MGMT_STARTUP_TASK
 
 logger = getLogger(__name__)
 
@@ -72,8 +73,10 @@ def mgmt_worker_start(sender):
     """
     Mgmt worker startup handler.
     """
-    task_id = generate_internal_task_id()
-    cq.send_task(STATUS_CHECK_TASK, args=(task_id,), task_id=task_id, queue=Q_MGMT)
+    mgmt_startup_task_id = generate_internal_task_id()
+    cq.send_task(MGMT_STARTUP_TASK, args=(mgmt_startup_task_id,), task_id=mgmt_startup_task_id, queue=Q_MGMT)
+    status_check_task_id = generate_internal_task_id()
+    cq.send_task(STATUS_CHECK_TASK, args=(status_check_task_id,), task_id=status_check_task_id, queue=Q_MGMT)
 
 
 def worker_start(worker_hostname):

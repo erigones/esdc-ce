@@ -20,6 +20,7 @@ PROG="$(basename "$0")"
 
 declare MODE								# string: "create" or "import"
 declare VERBOSE=""							# bool: print info messages if non-empty
+declare CHECK=""							# bool: validate image file if non-empty
 declare DATASETS							# string: path to datasets directory
 declare MANIFEST							# string: json manifest
 declare IMG_UUID							# string: image uuid
@@ -68,7 +69,16 @@ function techo() {
 
 function usage() {
 	cat << EOF
-Usage: ${PROG} {create|update|delete|import} [parameters] [< <image manifest>]
+Usage: ${PROG} {list|get|create|update|delete|import} [parameters] [< <image manifest>]
+
+  List mode parameters:
+    -d <datasets dir>       path to datasets directory on image server [required]
+    -v                      print extended information about every image folder (ls -l)
+
+  Get mode parameters:
+    -d <datasets dir>       path to datasets directory on image server [required]
+    -u                      image uuid [required]
+    -c                      verify image file checksum by comparing it to checksum in image manifest
 
   Create mode parameters:
     <image manifest>        valid json read from stdin will be saved as the image manifest [required]
@@ -80,6 +90,7 @@ Usage: ${PROG} {create|update|delete|import} [parameters] [< <image manifest>]
   Update mode parameters:
     <image manifest>        valid json read from stdin will be saved as the image manifest [required]
     -d <datasets dir>       path to datasets directory on image server [required]
+    -c                      verify image file checksum by comparing it to checksum in image manifest
     -v                      print information about each step of the creation process
 
   Delete mode parameters:
@@ -134,7 +145,7 @@ validate_image_paths() {
 	_set_image_paths
 
 	[[ ! -d "${IMG_DIR}" ]] && die ${ERR_MANIFEST_CHECK} "Target image directory does not exist"
-	[[ ! -f "${IMG_MANIFEST}" ]] && die ${ERR_MANIFEST_CHECK} "Target image manifest already exists"
+	[[ ! -f "${IMG_MANIFEST}" ]] && die ${ERR_MANIFEST_CHECK} "Target image manifest does not exist"
 }
 
 check_image_paths() {
@@ -321,6 +332,12 @@ validate_file() {
 	fi
 }
 
+check_file() {
+	if [[ -n "${CHECK}" ]]; then
+		validate_file
+	fi
+}
+
 save_manifest() {
 	if echo "${MANIFEST}" > "${IMG_MANIFEST}"; then
 		techo "Successfully saved image manifest: ${IMG_MANIFEST}"
@@ -366,6 +383,24 @@ cleanup() {
 	remove_image_dir
 }
 
+list_datasets() {
+	cd "${DATASETS}"
+
+	if [[ -n "${VERBOSE}" ]]; then
+		ls -ltr
+	else
+		ls -1tr
+	fi
+}
+
+get_manifest() {
+	MANIFEST=$(cat "${IMG_MANIFEST}")
+
+	check_file
+
+	echo "${MANIFEST}" | json
+}
+
 
 ###############################################################
 # main
@@ -382,10 +417,13 @@ set_opts() {
 
 	[[ ! -t 0 ]] && MANIFEST="$(cat /dev/stdin)" || MANIFEST=""
 
-	while getopts "vs:d:H:f:u:" opt; do
+	while getopts "vcs:d:H:f:u:" opt; do
 		case "${opt}" in
 			v)
 				VERBOSE="true"
+				;;
+			c)
+				CHECK="true"
 				;;
 			s)
 				DSNAP="${OPTARG}"
@@ -427,6 +465,7 @@ update() {
 	validate_manifest			# Check if manifest is valid and set/validate IMG_UUID
 	validate_image_paths		# Image directory and manifest must exist
 	# stage 2
+	check_file					# Optionally check image file checksum (-c parameter)
 	save_manifest				# Replace image manifest
 	# stage 3
 	success						# Print success message
@@ -477,11 +516,29 @@ import() {
 	success						# Print success message
 }
 
+list() {
+	# stage 1
+	set_opts "${@-}"			# Prepare all params
+	validate_datasets			# Check local datasets folder
+	# stage 2, 3
+	list_datasets				# Print contents of datasets directory
+}
+
+get() {
+	# stage 1
+	set_opts "${@-}"			# Prepare all params
+	validate_datasets			# Check local datasets folder
+	validate_image				# Validate IMG_UUID and check if image directory exists
+	validate_image_paths		# Image directory and manifest must exist
+	# stage 2, 3
+	get_manifest				# Print image manifest and optionally check image file (-c parameter)
+}
+
 main() {
 	MODE=${1-}
 
 	case "${MODE}" in
-		create|update|delete|import)
+		create|update|delete|import|list|get)
 			shift
 			${MODE} "${@-}"
 			exit ${OK}
