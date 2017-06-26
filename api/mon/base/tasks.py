@@ -19,8 +19,9 @@ logger = get_task_logger(__name__)
 @mgmt_lock(key_args=(1,), wait_for_release=True)
 def mon_clear_zabbix_cache(task_id, dc_id, full=True):
     """
-    Clear Zabbix instance from global zabbix cache used by getZabbix() if full==True.
+    Clear Zabbix instance from global zabbix cache used by get_monitoring() if full==True.
     Reset internal zabbix instance cache if full==False and the zabbix instance exists in global zabbix cache.
+    Should be reviewed with every new backend implemented.
     """
     dc = Dc.objects.get_by_id(int(dc_id))
 

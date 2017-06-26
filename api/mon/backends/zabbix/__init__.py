@@ -1,8 +1,8 @@
-from api.mon.backends.zabbix.monitor import Zabbix, getZabbix, delZabbix
+from api.mon.backends.zabbix.monitor import Zabbix, get_zabbix, del_zabbix
 
-get_monitoring = getZabbix
+get_monitoring = get_zabbix
 
-del_monitoring = delZabbix
+del_monitoring = del_zabbix
 
 MonitoringBackendClass = Zabbix
 

@@ -2,7 +2,7 @@ from logging import INFO, WARNING, ERROR, DEBUG, getLogger
 
 from api.decorators import catch_exception
 from api.mon.backends.abstract import AbstractMonitoringBackend, LOG
-from .base import ZabbixBase, ZabbixUserGroupContainer, ZabbixUserContainer, RemoteObjectDoesNotExist
+from .base import ZabbixBase, ZabbixUserGroupContainer, ZabbixUserContainer
 from .internal import InternalZabbix
 from .external import ExternalZabbix
 from gui.models import User, AdminPermission
@@ -13,7 +13,7 @@ logger = getLogger(__name__)
 __ZABBIX__ = {}  # This hold an instance of zabbix per DC
 
 
-def getZabbix(dc, **kwargs):
+def get_zabbix(dc, **kwargs):
     """
     Quick access to Zabbix instance.
     """
@@ -30,7 +30,7 @@ def getZabbix(dc, **kwargs):
     return zx
 
 
-def delZabbix(dc):
+def del_zabbix(dc):
     """
     Remove Zabbix instance from global cache.
     """
@@ -44,7 +44,7 @@ def delZabbix(dc):
 
 class Zabbix(AbstractMonitoringBackend):
     """
-    Public Zabbix class used via getZabbix() and delZabbix() functions.
+    Public Zabbix class used via get_zabbix and del_zabbix functions.
     """
     zbx = ZabbixBase
 
@@ -73,7 +73,6 @@ class Zabbix(AbstractMonitoringBackend):
 
         self.ezx = ExternalZabbix(dcns, name=dc.name, **kwargs)
 
-
     @property
     def connected(self):
         """We are connected only if both zabbix objects are connected"""
@@ -99,7 +98,7 @@ class Zabbix(AbstractMonitoringBackend):
             logger.warning('Not sending alert for VM %s, because it is not created', vm)
             return
 
-        izx = getZabbix(dc).izx  # InternalZabbix from cache
+        izx = get_zabbix(dc).izx  # InternalZabbix from cache
 
         return izx.send_alert(izx.host_id(vm), msg, priority=priority, **kwargs)
 
@@ -118,7 +117,7 @@ class Zabbix(AbstractMonitoringBackend):
             logger.warning('Not sending alert for Node %s, because it is not online', node)
             return
 
-        izx = getZabbix(dc).izx
+        izx = get_zabbix(dc).izx
 
         return izx.send_alert(izx.host_id(node), msg, priority=priority, **kwargs)
 
