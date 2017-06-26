@@ -61,7 +61,7 @@ def cache_result(f):
     return wrap
 
 
-class _Zabbix(object):
+class ZabbixBase(object):
     """
     Danube Cloud methods for working with Zabbix. #219
     """

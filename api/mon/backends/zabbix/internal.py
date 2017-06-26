@@ -4,10 +4,10 @@ from django.conf import settings as django_settings
 from zabbix_api import ZabbixAPIException
 
 from api.decorators import catch_exception
-from .base import ZabbixError, _Zabbix, logger
+from .base import ZabbixError, ZabbixBase, logger
 
 
-class InternalZabbix(_Zabbix):
+class InternalZabbix(ZabbixBase):
     """
     Internal zabbix (monitoring from outside/node).
     """
@@ -138,7 +138,7 @@ class InternalZabbix(_Zabbix):
 
         return sla
 
-    def send_alert(self, host, msg, priority=_Zabbix.NOT_CLASSIFIED, include_signature=True):
+    def send_alert(self, host, msg, priority=ZabbixBase.NOT_CLASSIFIED, include_signature=True):
         """Send alert by pushing data into custom alert items"""
         priority = int(priority)
 

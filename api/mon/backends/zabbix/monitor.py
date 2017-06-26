@@ -2,7 +2,7 @@ from logging import INFO, WARNING, ERROR, DEBUG, getLogger
 
 from api.decorators import catch_exception
 from api.mon.backends.abstract import AbstractMonitoringBackend, LOG
-from .base import _Zabbix, ZabbixUserGroupContainer, ZabbixUserContainer, RemoteObjectDoesNotExist
+from .base import ZabbixBase, ZabbixUserGroupContainer, ZabbixUserContainer, RemoteObjectDoesNotExist
 from .internal import InternalZabbix
 from .external import ExternalZabbix
 from gui.models import User, AdminPermission
@@ -46,7 +46,7 @@ class Zabbix(AbstractMonitoringBackend):
     """
     Public Zabbix class used via getZabbix() and delZabbix() functions.
     """
-    zbx = _Zabbix
+    zbx = ZabbixBase
 
     def __init__(self, dc, **kwargs):
         super(Zabbix, self).__init__(dc, **kwargs)
@@ -86,7 +86,7 @@ class Zabbix(AbstractMonitoringBackend):
 
     @classmethod
     @catch_exception
-    def vm_send_alert(cls, vm, msg, priority=_Zabbix.HIGH, **kwargs):
+    def vm_send_alert(cls, vm, msg, priority=ZabbixBase.HIGH, **kwargs):
         """[INTERNAL] Convenient shortcut for sending VM related alerts"""
         dc = vm.dc
         dcs = dc.settings
@@ -105,7 +105,7 @@ class Zabbix(AbstractMonitoringBackend):
 
     @classmethod
     @catch_exception
-    def node_send_alert(cls, node, msg, priority=_Zabbix.HIGH, **kwargs):
+    def node_send_alert(cls, node, msg, priority=ZabbixBase.HIGH, **kwargs):
         """[INTERNAL] Convenient shortcut for sending Node related alerts"""
         dc = DefaultDc()
         dcs = dc.settings

@@ -2,10 +2,10 @@ from logging import WARNING, INFO
 
 from django.core.cache import cache
 
-from .base import _Zabbix
+from .base import ZabbixBase
 
 
-class ExternalZabbix(_Zabbix):
+class ExternalZabbix(ZabbixBase):
     """
     Application zabbix per DC (monitoring from inside/VM agent).
     """
