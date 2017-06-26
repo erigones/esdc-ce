@@ -164,4 +164,3 @@ def mon_user_changed(self, task_id, sender, user_name, dc_name=None, affected_gr
 dc_relationship_changed.connect(mon_user_group_changed.call)
 group_relationship_changed.connect(mon_user_group_changed.call)
 user_relationship_changed.connect(mon_user_changed.call)
-
