@@ -1,0 +1,11 @@
+# https://github.com/erigones/esdc-factory/issues/48
+- name: Fetch pdns SMF properties
+  shell: svcprop pdns
+  register: pdns_smf_properties
+
+- name: Update pdns SMF manifest
+  shell: |
+    svccfg -s pdns addpropvalue startd/critical_failure_count count: 10
+    svccfg -s pdns addpropvalue startd/critical_failure_period count: 2
+    svcadm refresh pdns
+  when: "'critical_failure_period' not in pdns_smf_properties.stdout and 'critical_failure_count' not in pdns_smf_properties.stdout"
