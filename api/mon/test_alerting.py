@@ -40,7 +40,8 @@ class AlertingAPIAdapterTests(TestCase):
                 pass
             group.delete()
 
-    def _create_db_user(self):
+    @staticmethod
+    def _create_db_user():
         user = User()
         user.first_name = get_random_string(10)
         user.last_name = get_random_string(10)
