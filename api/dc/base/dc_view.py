@@ -143,8 +143,9 @@ class DcView(APIView):
         if ser.groups_changed:
             # The groups that are removed or added should not be DC-bound anymore
             for group in ser.groups_changed:
-                # TODO maybe it's duplicate so we don't have to do this
-                connection.on_commit(lambda: mon_user_group_changed.call(request, group_name=group.name))
+                connection.on_commit(lambda: mon_user_group_changed.call(request,
+                                                                         dc_name=dc.name,
+                                                                         group_name=group.name))
                 if group.dc_bound:
                     remove_dc_binding_virt_object(task_id, LOG_GROUP_UPDATE, group, user=request.user)
 
