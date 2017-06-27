@@ -107,8 +107,7 @@ class UserView(APIView):
             if ser.old_roles:
                 user.current_dc = DefaultDc()
 
-        connection.on_commit(lambda: user_relationship_changed.send(sender='UserView.user_modify',
-                                                                    user_name=ser.object.username,
+        connection.on_commit(lambda: user_relationship_changed.send(user_name=ser.object.username,
                                                                     affected_groups=tuple(
                                                                         group.id for group in affected_groups)))
         return res
@@ -144,8 +143,7 @@ class UserView(APIView):
         old_roles = list(user.roles.all())
         ser = self.serializer(self.request, user)
         ser.object.delete()
-        connection.on_commit(lambda: user_relationship_changed.send(sender='UserView.delete',
-                                                                    user_name=ser.object.username,
+        connection.on_commit(lambda: user_relationship_changed.send(user_name=ser.object.username,
                                                                     affected_groups=tuple(
                                                                         group.id for group in old_roles)))
         res = SuccessTaskResponse(self.request, None, obj=user, msg=LOG_USER_DELETE, detail_dict=dd, dc_bound=False)

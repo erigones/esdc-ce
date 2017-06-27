@@ -99,7 +99,7 @@ class DcView(APIView):
         # Copy custom settings from default DC and save new DC
         ser.object.custom_settings = default_custom_settings
         ser.save()
-        connection.on_commit(lambda: dc_relationship_changed.send(sender='DcView.post', dc_name=dc.name))
+        connection.on_commit(lambda: dc_relationship_changed.send(dc_name=dc.name))
 
         res = SuccessTaskResponse(request, ser.data, status=status.HTTP_201_CREATED, obj=dc,
                                   detail_dict=ser.detail_dict(), msg=LOG_DC_CREATE)
@@ -143,15 +143,14 @@ class DcView(APIView):
         if ser.groups_changed:
             # The groups that are removed or added should not be DC-bound anymore
             for group in ser.groups_changed:
-                connection.on_commit(lambda: group_relationship_changed.send(sender='DcView.put',
-                                                                             dc_name=dc.name,
+                connection.on_commit(lambda: group_relationship_changed.send(dc_name=dc.name,
                                                                              group_name=group.name))
                 if group.dc_bound:
                     remove_dc_binding_virt_object(task_id, LOG_GROUP_UPDATE, group, user=request.user)
 
         # After changing the DC owner or changing DC groups we have to invalidate the list of admins for this DC
         if ser.owner_changed or ser.groups_changed:
-            connection.on_commit(lambda: dc_relationship_changed.send(sender='DcView.put', dc_name=dc.name))
+            connection.on_commit(lambda: dc_relationship_changed.send(dc_name=dc.name))
             User.clear_dc_admin_ids(dc)
             # Remove user.dc_bound flag for new DC owner
             # Remove user.dc_bound flag for users in new dc.groups, which are DC-bound, but not to this datacenter
@@ -193,7 +192,7 @@ class DcView(APIView):
         # Remove cached tasklog for this DC (DB tasklog entries will be remove automatically)
         delete_tasklog_cached(dc_id)
 
-        connection.on_commit(lambda: dc_relationship_changed.send(sender='DcView.delete', dc_name=ser.object.name))
+        connection.on_commit(lambda: dc_relationship_changed.send(dc_name=ser.object.name))
         res = SuccessTaskResponse(request, None)  # no msg => won't be logged
 
         # Every DC-bound object looses their DC => becomes DC-unbound

@@ -1,3 +1,4 @@
+from gui.signals import dc_relationship_changed, group_relationship_changed, user_relationship_changed
 from vms.signals import (vm_defined, vm_undefined, vm_updated, node_status_changed, node_online, node_offline,
                          node_unlicensed, node_unreachable, node_deleted, dc_settings_changed)
 from api.node.sshkey.tasks import node_authorized_keys_sync
@@ -7,6 +8,7 @@ from api.node.status.events import node_status_changed_event
 from api.vm.status.tasks import vm_status_all
 from api.mon.vm.tasks import mon_vm_sync, mon_vm_delete
 from api.mon.node.tasks import mon_node_status_sync, mon_node_delete
+from api.mon.alerting.tasks import mon_user_group_changed, mon_user_changed
 from api.imagestore.base.handlers import imagestore_settings_changed_handler
 
 
@@ -29,5 +31,8 @@ node_unreachable.connect(noop)
 node_deleted.connect(mon_node_delete.call)
 dc_settings_changed.connect(dc_node_settings_changed_handler)
 dc_settings_changed.connect(imagestore_settings_changed_handler)
+dc_relationship_changed.connect(mon_user_group_changed.call)
+group_relationship_changed.connect(mon_user_group_changed.call)
+user_relationship_changed.connect(mon_user_changed.call)
 
 # Note: Other signals are connected in api.mon.vm.tasks and api.mon.node.tasks

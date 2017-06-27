@@ -63,8 +63,7 @@ class DcGroupView(APIView):
         ser = self.serializer(self.request, group)
         group.dc_set.add(dc)
 
-        connection.on_commit(lambda: group_relationship_changed.send(sender='DcGroupView.post',
-                                                                     group_name=group.name,
+        connection.on_commit(lambda: group_relationship_changed.send(group_name=group.name,
                                                                      dc_name=dc.name))
         res = SuccessTaskResponse(self.request, ser.data, obj=group, status=status.HTTP_201_CREATED,
                                   detail_dict=ser.detail_dict(), msg=LOG_GROUP_ATTACH)
@@ -81,9 +80,7 @@ class DcGroupView(APIView):
 
         ser = self.serializer(self.request, group)
         group.dc_set.remove(self.request.dc)
-        connection.on_commit(lambda: group_relationship_changed.send(sender='DcGroupView.delete',
-                                                                     group_name=group.name,
-                                                                     dc_name=dc.name))
+        connection.on_commit(lambda: group_relationship_changed.send(group_name=group.name, dc_name=dc.name))
         res = SuccessTaskResponse(self.request, None, obj=group, detail_dict=ser.detail_dict(), msg=LOG_GROUP_DETACH)
         self._remove_dc_binding(res)
 

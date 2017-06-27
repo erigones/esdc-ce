@@ -2,12 +2,13 @@
 from celery.utils.log import get_task_logger
 
 from api.mon.utils import MonInternalTask
-from gui.signals import user_relationship_changed, group_relationship_changed, dc_relationship_changed
 from que.erigonesd import cq
 from api.mon import get_monitoring, MonitoringError
 
 from vms.models import Dc
 from gui.models import Role, User
+
+__all__ = ('mon_user_group_changed', 'mon_user_changed')
 
 logger = get_task_logger(__name__)
 
@@ -161,6 +162,4 @@ def mon_user_changed(self, task_id, sender, user_name, dc_name=None, affected_gr
         self.retry(exc=exc)
 
 
-dc_relationship_changed.connect(mon_user_group_changed.call)
-group_relationship_changed.connect(mon_user_group_changed.call)
-user_relationship_changed.connect(mon_user_changed.call)
+

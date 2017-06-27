@@ -75,8 +75,7 @@ class GroupView(APIView):
             msg = LOG_GROUP_CREATE
             status = HTTP_201_CREATED
 
-        connection.on_commit(lambda: group_relationship_changed.send(sender='GroupView.group_modify',
-                                                                     group_name=ser.object.name))
+        connection.on_commit(lambda: group_relationship_changed.send(group_name=ser.object.name))
         res = SuccessTaskResponse(request, ser.data, status=status, obj=group, msg=msg,
                                   detail_dict=ser.detail_dict(), dc_bound=False)
 
@@ -144,7 +143,7 @@ class GroupView(APIView):
         group = self.group
         dd = {'permissions': list(group.permissions.all().values_list('name', flat=True))}
         group.delete()
-        connection.on_commit(lambda: group_relationship_changed.send(sender='GroupView.delete', group_name=group.name))
+        connection.on_commit(lambda: group_relationship_changed.send(group_name=group.name))
 
         return SuccessTaskResponse(self.request, None, obj=group, msg=LOG_GROUP_DELETE, detail_dict=dd, dc_bound=False)
 
