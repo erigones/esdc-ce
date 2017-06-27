@@ -80,11 +80,13 @@ def _user_group_changed(group_name, dc_name):
 @cq.task(name='api.mon.base.tasks.mon_user_group_changed',
          base=MonInternalTask,  # logging will be done separately
          max_retries=1,  # if there is a race, one retry may be enough
+         default_retry_delay=5,  # it's shorter so that we don't lose context
          bind=True)
 def mon_user_group_changed(self, task_id, sender, group_name=None, dc_name=None, *args, **kwargs):
     try:
         _user_group_changed(group_name, dc_name)
     except MonitoringError as exc:
+        logger.error("mon_user_group_changed task crashed, it's going to be retried")
         self.retry(exc=exc)
 
 
@@ -149,6 +151,7 @@ def _user_changed(user_name, dc_name, affected_groups):
 @cq.task(name='api.mon.base.tasks.mon_user_changed',
          base=MonInternalTask,  # logging will be done separately
          max_retries=1,  # if there is a race, one retry may be enough
+         default_retry_delay=5,  # it's shorter so that we don't lose context
          bind=True)
 def mon_user_changed(self, task_id, sender, user_name, dc_name=None, affected_groups=(), *args, **kwargs):
     """
@@ -159,6 +162,7 @@ def mon_user_changed(self, task_id, sender, user_name, dc_name=None, affected_gr
     try:
         _user_changed(user_name, dc_name, affected_groups)
     except MonitoringError as exc:
+        logger.error("mon_user_changed task crashed, it's going to be retried")
         self.retry(exc=exc)
 
 
