@@ -5,7 +5,9 @@
 
 - name: Update pdns SMF manifest
   shell: |
+    set -e
     svccfg -s pdns addpropvalue startd/critical_failure_count count: 10
     svccfg -s pdns addpropvalue startd/critical_failure_period count: 2
     svcadm refresh pdns
+    [[ "$(svcs -Ho state pdns)" == "maintenance" ]] && svcadm clear pdns || true
   when: "'critical_failure_period' not in pdns_smf_properties.stdout and 'critical_failure_count' not in pdns_smf_properties.stdout"
