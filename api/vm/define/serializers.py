@@ -364,12 +364,14 @@ class VmDefineSerializer(VmBaseSerializer):
                     raise s.ValidationError(_('Cannot change ostype.'))
             elif not is_kvm(self.object, ostype=value):
                 # Creating zone -> Issue #chili-461 (must be enabled globally and in DC)
-                # + disable LINUX_ZONE (lx brand)
-                if not (settings.VMS_ZONE_ENABLED and self.dc_settings.VMS_ZONE_ENABLED) or value == Vm.LINUX_ZONE:
+                if not (settings.VMS_ZONE_ENABLED and self.dc_settings.VMS_ZONE_ENABLED):
                     raise s.ValidationError(_('This OS type is not supported.'))
                 # Creating zone -> check if default zone image is available
                 try:
-                    default_zone_image = self.dc_settings.VMS_DISK_IMAGE_ZONE_DEFAULT
+                    if value == Vm.LINUX_ZONE:
+                        default_zone_image = self.dc_settings.VMS_DISK_IMAGE_LX_ZONE_DEFAULT
+                    else:
+                        default_zone_image = self.dc_settings.VMS_DISK_IMAGE_ZONE_DEFAULT
                     assert default_zone_image
                     self.zone_img = get_images(self.request).get(name=default_zone_image)
                 except (AssertionError, Image.DoesNotExist):
@@ -903,7 +905,11 @@ class ZVmDefineDiskSerializer(_VmDefineDiskSerializer):
 
     def __init__(self, request, vm, *args, **kwargs):
         super(ZVmDefineDiskSerializer, self).__init__(request, vm, *args, **kwargs)
-        self.fields['image'].default = vm.dc.settings.VMS_DISK_IMAGE_ZONE_DEFAULT
+        if vm.ostype == Vm.LINUX_ZONE:
+            self.fields['image'].default = vm.dc.settings.VMS_DISK_IMAGE_LX_ZONE_DEFAULT
+        else:
+            self.fields['image'].default = vm.dc.settings.VMS_DISK_IMAGE_ZONE_DEFAULT
+
         if self.disk_id > 0:
             if not self.object:
                 self.object = {}

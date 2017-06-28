@@ -487,10 +487,10 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
         This should be called when creating new VM.
         Also copy data from template if needed."""
         _json = self.json
+        dc_settings = self.dc.settings
 
         # new VM -> set the defaults
         if sync_defaults and 'uuid' not in _json:
-            dc_settings = self.dc.settings
             _json.update2(dc_settings.VMS_VM_JSON_DEFAULTS.copy())
             _json['resolvers'] = dc_settings.VMS_VM_RESOLVERS_DEFAULT
 
@@ -538,6 +538,9 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
             if settings.VMS_ZONE_FEATURE_LEVEL >= 2:
                 # Issue #chili-867 - these limits won't affect creating snapshots and datasets from global zone
                 _json['zfs_filesystem_limit'] = _json['zfs_snapshot_limit'] = 0
+
+            if self.ostype == self.LINUX_ZONE and 'kernel_version' not in _json:
+                _json['kernel_version'] = dc_settings.VMS_VM_LX_KERNEL_VERSION_DEFAULT
 
         self.json = _json
 

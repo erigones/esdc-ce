@@ -267,7 +267,7 @@ class DcSettingsSerializer(s.InstanceSerializer):
                                            help_text=_('Whether to log API user callback requests into the tasklog.'))
 
     VMS_ZONE_ENABLED = s.BooleanField(label='VMS_ZONE_ENABLED',  # Module
-                                      help_text=_('Whether to enable support for SunOS zones in '
+                                      help_text=_('Whether to enable support for SunOS and Linux zones in '
                                                   'this virtual datacenter.'))
     VMS_VM_OSTYPE_DEFAULT = s.IntegerChoiceField(label='VMS_VM_OSTYPE_DEFAULT', choices=Vm.OSTYPE,
                                                  help_text=_('Default operating system type. One of: 1 - Linux VM, '
