@@ -1,3 +1,4 @@
+import ipaddress
 import operator
 from functools import reduce
 
@@ -48,6 +49,13 @@ class NetworkIPView(APIView):
             if ips is not None:
                 if not isinstance(ips, (tuple, list)):
                     raise InvalidInput('Invalid ips')
+                # test is IPs have valid format
+                try:
+                    for ip in ips:
+                        ipaddress.ip_address(ip)
+                except ValueError:
+                    raise InvalidInput('Invalid IPs value')
+
                 ip_filter.append(Q(ip__in=ips))
 
             if request.method == 'GET':
@@ -76,6 +84,7 @@ class NetworkIPView(APIView):
             ip_filter = reduce(operator.and_, ip_filter)
             self.ip = get_object(request, IPAddress, {'ip': ip}, where=ip_filter, sr=('vm', 'vm__dc', 'subnet'))
 
+
     def get(self):
         if self.many:
             if self.full:
@@ -89,6 +98,7 @@ class NetworkIPView(APIView):
             res = NetworkIPSerializer(self.net, self.ip).data
 
         return SuccessTaskResponse(self.request, res, dc_bound=False)
+
 
     @atomic
     def post(self):
