@@ -849,7 +849,7 @@ class ZabbixNamedContainer(object):
         self._name = name
 
     def __repr__(self):
-        return '{}(name={:15.15}) with zabbix_id {}'.format(self.__class__.__name__, self.name, self.zabbix_id)
+        return '{}(name={}) with zabbix_id {}'.format(self.__class__.__name__, self.name, self.zabbix_id)
 
     def __eq__(self, other):
         if hasattr(other, 'name') and issubclass(self.__class__, other.__class__):
