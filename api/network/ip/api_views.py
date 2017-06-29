@@ -1,4 +1,3 @@
-import ipaddress
 import operator
 from functools import reduce
 
@@ -52,7 +51,7 @@ class NetworkIPView(APIView):
                 # test if IPs have valid format
                 try:
                     for ip in ips:
-                        ipaddress.ip_address(ip)
+                        IPAddress.get_ip_address(ip)
                 except ValueError:
                     raise InvalidInput('Invalid ips value')
 
