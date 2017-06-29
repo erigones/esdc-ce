@@ -971,7 +971,7 @@ class ZabbixUserContainer(ZabbixNamedContainer):
             raise ZabbixAPIError
 
     def renew_zabbix_id(self):
-        self.zabbix_id = self.fetch_zabbix_id(self._zapi, self._user.username)
+        self.zabbix_id = self.fetch_zabbix_id(self._zapi, self.name)
 
     def update_all(self):
         """
@@ -1255,18 +1255,8 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
         self.zabbix_id = self._api_response['usrgrpids'][0]
 
         user_group_object['userids'] = []
-
-        for user in self.users:
-            user.renew_zabbix_id()
-
-            if user.zabbix_id:
-                # Update
-                user.groups.add(self)
-                user.update_group_membership()
-            else:
-                # Create
-                user.groups.add(self)
-                user.create()
+        self._refetch_users()
+        self._push_current_users()
 
     def _refresh_users(self, api_response):
         self.users = {
@@ -1310,17 +1300,25 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
         self.update_basic_information(user_group)
         logger.debug('todo hostgroups')
 
-    def add_users(self, new_users):
-        for user in new_users:
+    def _refetch_users(self):
+        for user in self.users:
             user.renew_zabbix_id()
             user.groups.add(self)
+            if not user.zabbix_id:
+                try:
+                    user.create()
+                except ZabbixAPIException:
+                    user.renew_zabbix_id()
 
-            if user.zabbix_id:
-                user.update_group_membership()
-            else:
-                user.create()
-
+    def add_users(self, new_users):
         self.users.update(new_users)
+        self._refetch_users()
+        self._push_current_users()
+
+    def _push_current_users(self):
+        self._zapi.usergroup.update({'usrgrpid': self.zabbix_id,
+                                     'userids': [user.zabbix_id for user in self.users]}
+                                    )
 
     def remove_user(self, user, delete_user_if_last=False):
         user.refresh()
