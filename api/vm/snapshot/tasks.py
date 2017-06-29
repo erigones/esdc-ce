@@ -161,9 +161,10 @@ def vm_snapshot_cb(result, task_id, vm_uuid=None, snap_id=None):
                 if 'freeze failed' in msg:
                     snap.fsfreeze = False
                     result['message'] += ' (filesystem freeze failed)'
-                    MonitoringBackend.vm_send_alert(vm, 'Snapshot %s of server %s@disk-%s was created, but filesystem '
-                                             'freeze failed.' % (snap.name, vm.hostname, snap.array_disk_id),
-                                         priority=MonitoringBackend.WARNING)
+                    MonitoringBackend.vm_send_alert(vm,
+                                                    'Snapshot %s of server %s@disk-%s was created, but filesystem '
+                                                    'freeze failed.' % (snap.name, vm.hostname, snap.array_disk_id),
+                                                    priority=MonitoringBackend.WARNING)
 
             snap.save(update_fields=('status', 'fsfreeze'))
 
@@ -229,8 +230,8 @@ def vm_snapshot_beat(snap_define_id):
         else:
             logger.error('Running POST vm_snapshot(%s, %s, {disk_id=%s}) failed: %s (%s): %s',
                          vm, snap_name, disk_id, res.status_code, res.status_text, res.data)
-            MonitoringBackend.vm_send_alert(vm, 'Automatic snapshot %s/disk-%s@%s failed to start.' % (vm.hostname, disk_id,
-                                                                                            snap_define.name))
+            MonitoringBackend.vm_send_alert(vm, 'Automatic snapshot %s/disk-%s@%s failed to start.' % (
+                vm.hostname, disk_id, snap_define.name))
 
 
 def _parse_snapshot_list_line(line):

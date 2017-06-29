@@ -220,9 +220,10 @@ def vm_backup_cb(result, task_id, vm_uuid=None, node_uuid=None, bkp_id=None):
                 if 'freeze failed' in msg:
                     bkp.fsfreeze = False
                     result['message'] += ' (filesystem freeze failed)'
-                    MonitoringBackend.vm_send_alert(bkp.vm, 'Backup %s of server %s@disk-%s was created, but filesystem freeze '
-                                                 'failed.' % (bkp.name, bkp.vm.hostname, bkp.array_disk_id),
-                                         priority=MonitoringBackend.WARNING)
+                    MonitoringBackend.vm_send_alert(bkp.vm,
+                                                    'Backup %s of server %s@disk-%s was created, but filesystem freeze '
+                                                    'failed.' % (bkp.name, bkp.vm.hostname, bkp.array_disk_id),
+                                                    priority=MonitoringBackend.WARNING)
 
             bkp.manifest_path = data.get('metadata_file', '')
             bkp.time = data.get('time_elapsed', None)

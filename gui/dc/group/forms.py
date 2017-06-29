@@ -5,7 +5,7 @@ from api.accounts.group.views import group_manage
 from api.accounts.user.utils import ExcludeInternalUsers
 from api.dc.group.views import dc_group
 from gui.forms import SerializerForm
-from gui.models import Permission, User, Role
+from gui.models import Permission, User
 
 
 class DcGroupForm(SerializerForm):
