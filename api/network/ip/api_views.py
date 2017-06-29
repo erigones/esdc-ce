@@ -49,7 +49,7 @@ class NetworkIPView(APIView):
             if ips is not None:
                 if not isinstance(ips, (tuple, list)):
                     raise InvalidInput('Invalid ips')
-                # test is IPs have valid format
+                # test if IPs have valid format
                 try:
                     for ip in ips:
                         ipaddress.ip_address(ip)
@@ -84,7 +84,6 @@ class NetworkIPView(APIView):
             ip_filter = reduce(operator.and_, ip_filter)
             self.ip = get_object(request, IPAddress, {'ip': ip}, where=ip_filter, sr=('vm', 'vm__dc', 'subnet'))
 
-
     def get(self):
         if self.many:
             if self.full:
@@ -98,7 +97,6 @@ class NetworkIPView(APIView):
             res = NetworkIPSerializer(self.net, self.ip).data
 
         return SuccessTaskResponse(self.request, res, dc_bound=False)
-
 
     @atomic
     def post(self):
