@@ -54,7 +54,7 @@ class NetworkIPView(APIView):
                     for ip in ips:
                         ipaddress.ip_address(ip)
                 except ValueError:
-                    raise InvalidInput('Invalid IPs value')
+                    raise InvalidInput('Invalid ips value')
 
                 ip_filter.append(Q(ip__in=ips))
 
