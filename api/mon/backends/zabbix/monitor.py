@@ -64,14 +64,13 @@ class Zabbix(AbstractMonitoringBackend):
                           dcns.MON_ZABBIX_USERNAME == dc1s.MON_ZABBIX_USERNAME)
 
         self.izx = InternalZabbix(dc1s, name=default_dc.name, **kwargs)
-
+        self._connections = {self.izx.zapi}
         if reuse_zapi:
             kwargs['zapi'] = self.izx.zapi
-            self._connections = {self.izx.zapi}
-        else:
-            self._connections = {self.izx.zapi, self.ezx.zapi}
 
         self.ezx = ExternalZabbix(dcns, name=dc.name, **kwargs)
+        if not reuse_zapi:
+            self._connections.add(self.ezx.zapi)
 
     @property
     def connected(self):

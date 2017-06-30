@@ -9,6 +9,7 @@ from api.vm.status.tasks import vm_status_all
 from api.mon.vm.tasks import mon_vm_sync, mon_vm_delete
 from api.mon.node.tasks import mon_node_status_sync, mon_node_delete
 from api.mon.alerting.tasks import mon_user_group_changed, mon_user_changed
+from api.mon.alerting.handlers import dc_settings_changed_handler as mon_dc_settings_changed_handler
 from api.imagestore.base.handlers import imagestore_settings_changed_handler
 
 
@@ -31,6 +32,7 @@ node_unreachable.connect(noop)
 node_deleted.connect(mon_node_delete.call)
 dc_settings_changed.connect(dc_node_settings_changed_handler)
 dc_settings_changed.connect(imagestore_settings_changed_handler)
+dc_settings_changed.connect(mon_dc_settings_changed_handler)
 dc_relationship_changed.connect(mon_user_group_changed.call)
 group_relationship_changed.connect(mon_user_group_changed.call)
 user_relationship_changed.connect(mon_user_changed.call)
