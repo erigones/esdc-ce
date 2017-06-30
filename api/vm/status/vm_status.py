@@ -8,14 +8,13 @@ from vms.models import Vm
 from api.api_views import APIView
 from api.exceptions import (PermissionDenied, VmIsNotOperational, NodeIsNotOperational, PreconditionRequired,
                             ExpectationFailed)
-from api.serializers import ForceSerializer
 from api.task.response import SuccessTaskResponse, FailureTaskResponse, TaskResponse
 from api.vm.utils import get_vms, get_vm
 from api.vm.messages import (LOG_STATUS_GET, LOG_START, LOG_START_ISO, LOG_START_UPDATE, LOG_START_UPDATE_ISO,
                              LOG_STOP, LOG_STOP_FORCE, LOG_REBOOT, LOG_REBOOT_FORCE)
 from api.vm.status.tasks import vm_status_changed
 from api.vm.status.serializers import (VmStatusSerializer, VmStatusActionIsoSerializer, VmStatusFreezeSerializer,
-                                       VmStatusUpdateJSONSerializer)
+                                       VmStatusUpdateJSONSerializer, VmStatusStopSerializer)
 
 logger = getLogger(__name__)
 
@@ -50,10 +49,12 @@ class VmStatus(APIView):
     def apiview(self):
         return {'view': 'vm_status', 'method': self.request.method, 'action': self.action, 'hostname': self.vm.hostname}
 
-    def _action_cmd(self, action, force=False):
+    def _action_cmd(self, action, force=False, timeout=None):
         cmd = 'vmadm %s %s' % (action, self.vm.uuid)
         if force:
             cmd += ' -F'
+        elif timeout:
+            cmd += ' -t %s' % timeout
         return cmd
 
     def _stop_cmd(self, force=False):
@@ -258,8 +259,14 @@ class VmStatus(APIView):
                 return FailureTaskResponse(request, ser_update.errors, vm=vm)
 
         else:
-            force = ForceSerializer(data=self.data, default=False).is_true()
-            cmd = self._action_cmd(action, force=force)
+            ser_stop_reboot = VmStatusStopSerializer(request, vm, data=self.data)
+
+            if not ser_stop_reboot.is_valid():
+                return FailureTaskResponse(request, ser_stop_reboot.errors, vm=vm)
+
+            force = ser_stop_reboot.data['force']
+            timeout = ser_stop_reboot.data['timeout']
+            cmd = self._action_cmd(action, force=force, timeout=timeout)
 
             if action == 'reboot':
                 msg = LOG_REBOOT
