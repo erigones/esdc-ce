@@ -285,6 +285,14 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
     def name(self):  # task log requirement
         return self.hostname
 
+    @property
+    def _interface_prefix(self):
+        """Based on observation: behaviour is not documented by upstream."""
+        if self.ostype == self.LINUX_ZONE:
+            return 'eth'
+        else:
+            return 'net'
+
     def update_node_history(self, orig_node=None):
         """Store previous node into node_history"""
         _info = self.info
@@ -841,7 +849,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
 
         for i, nic in enumerate(nics):
             # Bug #chili-239
-            nics[i]['interface'] = u'net' + str(i)
+            nics[i]['interface'] = self._interface_prefix + str(i)
             # Remove MAC attribute if empty
             if 'mac' in nic and not nic['mac']:
                 del nics[i]['mac']
@@ -1136,7 +1144,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
     @staticmethod
     def get_real_nic_id(nic):
         """Return real network ID (net number in nics.*.interface) from nic object (dict)"""
-        return int(nic['interface'].lstrip('net'))
+        return int(nic['interface'].lstrip('net').lstrip('eth'))
 
     @classmethod
     def get_nics_map(cls, json):
