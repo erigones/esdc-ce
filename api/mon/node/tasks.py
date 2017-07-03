@@ -75,7 +75,7 @@ def mon_node_vm_history(task_id, node_uuid, items, zhistory, result, items_searc
     try:
         history = get_monitoring(DefaultDc()).vms_history(vm_uuids, items, zhistory, result['since'], result['until'],
                                                           items_search=items_search)
-    except ZabbixError as exc:
+    except MonitoringError as exc:
         raise MgmtTaskException(text_type(exc))
 
     result.update(history)
