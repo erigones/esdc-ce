@@ -298,5 +298,5 @@ def vm_backup_beat(bkp_define_id):
         else:
             logger.error('Running POST vm_backup(%s, %s, {disk_id=%s}) failed: %s (%s): %s',
                          vm, defname, disk_id, res.status_code, res.status_text, res.data)
-            MonitoringBackend.vm_send_alert(vm, 'Automatic backup %s/disk-%s@%s failed to start.' %
-                                 (vm.hostname, disk_id, defname))
+            MonitoringBackend.vm_send_alert(vm, 'Automatic backup %s/disk-%s@%s failed to start.' % (vm.hostname,
+                                                                                                     disk_id, defname))
