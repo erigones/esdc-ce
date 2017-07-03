@@ -373,7 +373,7 @@ class VmDefineSerializer(VmBaseSerializer):
                     else:
                         default_zone_image = self.dc_settings.VMS_DISK_IMAGE_ZONE_DEFAULT
                     assert default_zone_image
-                    self.zone_img = get_images(self.request).get(name=default_zone_image)
+                    self.zone_img = get_images(self.request, ostype=value).get(name=default_zone_image)
                 except (AssertionError, Image.DoesNotExist):
                     raise s.ValidationError(_('Default disk image for this OS type is not available.'))
 

@@ -189,6 +189,7 @@ class DcSettingsSerializer(s.InstanceSerializer):
         'SUPPORT_PHONE',
         'VMS_DISK_IMAGE_DEFAULT',
         'VMS_DISK_IMAGE_ZONE_DEFAULT',
+        'VMS_DISK_IMAGE_LX_ZONE_DEFAULT',
         'VMS_NET_DEFAULT',
         'VMS_STORAGE_DEFAULT',
         'MON_ZABBIX_HTTP_USERNAME',
@@ -303,6 +304,9 @@ class DcSettingsSerializer(s.InstanceSerializer):
     VMS_DISK_IMAGE_ZONE_DEFAULT = s.CharField(label='VMS_DISK_IMAGE_ZONE_DEFAULT', max_length=64, required=False,
                                               help_text=_('Name of the default disk image used for '
                                                           'newly created SunOS zone servers.'))
+    VMS_DISK_IMAGE_LX_ZONE_DEFAULT = s.CharField(label='VMS_DISK_IMAGE_LX_ZONE_DEFAULT', max_length=64, required=False,
+                                                 help_text=_('Name of the default disk image used for '
+                                                             'newly created Linux zone servers.'))
     VMS_NIC_MODEL_DEFAULT = s.ChoiceField(label='VMS_NIC_MODEL_DEFAULT', choices=Vm.NIC_MODEL,
                                           help_text=_('Default virtual NIC model of newly created server NICs. '
                                                       'One of: virtio, e1000, rtl8139.'))
