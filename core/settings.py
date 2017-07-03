@@ -21,7 +21,7 @@ MANAGERS = ADMINS
 # Default test DB
 DATABASES = {
     'esdc': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'transaction_hooks.backends.postgresql_psycopg2',
         'NAME': 'esdc',
         'USER': 'esdc',
         'PASSWORD': 'S3cr3tP4ssw0rd',
@@ -29,7 +29,7 @@ DATABASES = {
         'PORT': '6432',
     },
     'pdns': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'transaction_hooks.backends.postgresql_psycopg2',
         'NAME': 'pdns',
         'USER': 'esdc',
         'PASSWORD': 'S3cr3tP4ssw0rd',
@@ -651,6 +651,12 @@ SECURITY_OWASP_AT_002 = False  # Testing for Account Enumeration and Guessable U
 
 ACL_ENABLED = True  # Module
 
+# Usernames that clashes with zabbix system usernames etc.
+INVALID_USERNAMES = frozenset(['profile', 'Admin', 'provisioner'])
+
+
+# VVVVVVV        THIS BLOCK SHOULD BE ALWAYS AT THE BOTTOM      VVVVVVVVVVVVVVVV
+
 # Allow any settings to be defined in local_settings.py which is ignored in our
 # version control system allowing for settings to be defined (overwritten) per
 # machine, and also for security reasons not to store passwords in the VCS.
@@ -668,3 +674,5 @@ if THIRD_PARTY_APPS_ENABLED:
     MODULES += THIRD_PARTY_MODULES
 
 MODULES = frozenset(MODULES)
+
+# ^^^^^^^        THIS BLOCK SHOULD BE ALWAYS AT THE BOTTOM      ^^^^^^^^^^^^^^^^

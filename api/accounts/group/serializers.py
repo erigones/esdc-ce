@@ -15,7 +15,7 @@ class GroupSerializer(s.InstanceSerializer):
     _update_fields_ = ('alias', 'permissions', 'users', 'dc_bound')
     _default_fields_ = ('name', 'alias')
 
-    name = s.RegexField(r'^[A-Za-z0-9\._-]*$', max_length=80)
+    name = s.RegexField(r'^[A-Za-z0-9\._-]*$', max_length=32)  # FIXME post update do check on DB to reduce name length
     alias = s.SafeCharField(max_length=80)
     permissions = s.ArrayField(required=False, source='permissions_api')
     users = s.ArrayField(required=False, source='users_api')

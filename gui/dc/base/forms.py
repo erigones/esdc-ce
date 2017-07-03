@@ -7,7 +7,7 @@ from vms.models import Dc, Image
 from api.dc.base.views import dc_manage, dc_settings
 from api.dc.base.serializers import DcSettingsSerializer, DefaultDcSettingsSerializer
 from api.vm.utils import get_vms, get_owners, get_images, get_subnets, get_zpools
-from api.mon.zabbix import getZabbix
+from api.mon import get_monitoring
 from gui.forms import SerializerForm
 from gui.fields import ArrayAreaField
 from gui.widgets import ArrayAreaWidget
@@ -187,7 +187,7 @@ class DcSettingsForm(SerializerForm):
         if self._changed_data and 'MON_ZABBIX_SERVER' in self._changed_data:
             return  # Do not set error if setting has changed
 
-        zx = getZabbix(self._request.dc)
+        zx = get_monitoring(self._request.dc)
         zx_error = zx.ezx.login_error
 
         if zx_error:

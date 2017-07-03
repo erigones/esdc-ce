@@ -11,7 +11,7 @@ from api.exceptions import ObjectNotFound
 from api.validators import validate_owner, validate_alias, validate_mdata, validate_ssh_key, placeholder_validator
 from api.vm.utils import get_vm, get_owners
 from api.sms.utils import get_services
-from api.mon.zabbix import VM_KWARGS, VM_KWARGS_NIC, VM_KWARGS_DISK
+from api.mon.backends.abstract import VM_KWARGS, VM_KWARGS_NIC, VM_KWARGS_DISK
 from gui.models import User, UserProfile, Role
 from vms.models import Dc, DefaultDc, Vm, BackupDefine, Subnet
 from vms.utils import DefAttrDict
