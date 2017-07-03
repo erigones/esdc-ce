@@ -195,9 +195,7 @@ def mon_user_changed(self, task_id, sender, user_name, dc_name=None, affected_gr
 
 
 # noinspection PyUnusedLocal
-@cq.task(name='api.mon.base.tasks.mon_all_groups_sync',
-         base=MonInternalTask
-         )
+@cq.task(name='api.mon.base.tasks.mon_all_groups_sync', base=MonInternalTask)
 def mon_all_groups_sync(task_id, sender, dc_name=None, *args, **kwargs):
     if dc_name:
         for group in Role.objects.filter(dc__name=dc_name):
@@ -209,4 +207,3 @@ def mon_all_groups_sync(task_id, sender, dc_name=None, *args, **kwargs):
             mon_user_group_changed.call(sender='mon_all_groups_sync', group_name=group.name)
         for dc in Dc.objects.all():  # owner groups
             mon_user_group_changed.call(sender='mon_all_groups_sync', dc_name=dc.name)
-
