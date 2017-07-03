@@ -4,6 +4,7 @@ from django.conf import settings
 from api.task.utils import mgmt_lock
 from api.task.internal import InternalTask
 from que.tasks import cq, get_task_logger
+from api.mon.alerting.tasks import mon_all_groups_sync
 
 __all__ = ('mgmt_worker_startup',)
 
@@ -20,6 +21,8 @@ def vm_zabbix_sync(sender):
     for vm in get_mon_vms():
         logger.debug('Creating zabbix sync task for VM %s', vm)
         mon_vm_sync.call(sender, vm=vm)
+
+    mon_all_groups_sync.call(sender=sender)
 
 
 # noinspection PyUnusedLocal

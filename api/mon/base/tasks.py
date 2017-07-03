@@ -1,7 +1,7 @@
 from celery.utils.log import get_task_logger
 from django.utils.six import text_type
 
-from api.mon.zabbix import getZabbix, delZabbix, ZabbixError
+from api.mon import get_monitoring, del_monitoring, MonitoringError
 from api.task.utils import mgmt_lock, mgmt_task
 from que.erigonesd import cq
 from que.exceptions import MgmtTaskException
@@ -19,18 +19,19 @@ logger = get_task_logger(__name__)
 @mgmt_lock(key_args=(1,), wait_for_release=True)
 def mon_clear_zabbix_cache(task_id, dc_id, full=True):
     """
-    Clear Zabbix instance from global zabbix cache used by getZabbix() if full==True.
+    Clear Zabbix instance from global zabbix cache used by get_monitoring() if full==True.
     Reset internal zabbix instance cache if full==False and the zabbix instance exists in global zabbix cache.
+    Should be reviewed with every new backend implemented.
     """
     dc = Dc.objects.get_by_id(int(dc_id))
 
     if full:
-        if delZabbix(dc):
+        if del_monitoring(dc):
             logger.info('Zabbix instance for DC "%s" was successfully removed from global cache', dc)
         else:
             logger.info('Zabbix instance for DC "%s" was not found in global cache', dc)
     else:
-        zx = getZabbix(dc)
+        zx = get_monitoring(dc)
         zx.reset_cache()
         logger.info('Cleared cache for zabbix instance %s in DC "%s"', zx, dc)
 
@@ -45,8 +46,8 @@ def mon_template_list(task_id, dc_id, **kwargs):
     dc = Dc.objects.get_by_id(int(dc_id))
 
     try:
-        zabbix_templates = getZabbix(dc).template_list()
-    except ZabbixError as exc:
+        zabbix_templates = get_monitoring(dc).template_list()
+    except MonitoringError as exc:
         raise MgmtTaskException(text_type(exc))
 
     return [
@@ -70,8 +71,8 @@ def mon_hostgroup_list(task_id, dc_id, **kwargs):
     dc = Dc.objects.get_by_id(int(dc_id))
 
     try:
-        zabbix_hostgroups = getZabbix(dc).hostgroup_list()
-    except ZabbixError as exc:
+        zabbix_hostgroups = get_monitoring(dc).hostgroup_list()
+    except MonitoringError as exc:
         raise MgmtTaskException(text_type(exc))
 
     return [

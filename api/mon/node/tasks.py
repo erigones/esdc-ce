@@ -6,7 +6,7 @@ from que.mgmt import MgmtTask
 from que.exceptions import MgmtTaskException
 from api.task.utils import mgmt_task, mgmt_lock
 from api.mon.log import save_task_log
-from api.mon.zabbix import LOG, getZabbix, ZabbixError
+from api.mon import LOG, get_monitoring, MonitoringError
 from api.mon.messages import LOG_MON_NODE_UPDATE, LOG_MON_NODE_DELETE
 from api.mon.node.utils import NodeMonInternalTask
 from vms.models import DefaultDc, Node
@@ -25,8 +25,8 @@ def mon_node_sla(task_id, node_hostname, yyyymm, since, until, **kwargs):
     Return SLA (%) for compute node / month.
     """
     try:
-        sla = getZabbix(DefaultDc()).node_sla(node_hostname, since, until)
-    except ZabbixError as exc:
+        sla = get_monitoring(DefaultDc()).node_sla(node_hostname, since, until)
+    except MonitoringError as exc:
         raise MgmtTaskException(text_type(exc))
 
     return {
@@ -45,9 +45,9 @@ def mon_node_history(task_id, node_uuid, items, zhistory, result, items_search, 
     Return node's historical data for selected graph and period.
     """
     try:
-        history = getZabbix(DefaultDc()).node_history(node_uuid, items, zhistory, result['since'], result['until'],
-                                                      items_search=items_search)
-    except ZabbixError as exc:
+        history = get_monitoring(DefaultDc()).node_history(node_uuid, items, zhistory, result['since'], result['until'],
+                                                           items_search=items_search)
+    except MonitoringError as exc:
         raise MgmtTaskException(text_type(exc))
 
     result.update(history)
@@ -66,7 +66,7 @@ def mon_node_sync(task_id, sender, node_uuid=None, log=LOG, **kwargs):
     assert node_uuid
     node = log.obj = Node.objects.get(uuid=node_uuid)
 
-    return getZabbix(DefaultDc()).node_sync(node, task_log=log)
+    return get_monitoring(DefaultDc()).node_sync(node, task_log=log)
 
 
 # noinspection PyUnusedLocal
@@ -80,7 +80,7 @@ def mon_node_status_sync(task_id, sender, node_uuid=None, log=LOG, **kwargs):
     assert node_uuid
     node = log.obj = Node.objects.get(uuid=node_uuid)
 
-    return getZabbix(DefaultDc()).node_status_sync(node, task_log=log)
+    return get_monitoring(DefaultDc()).node_status_sync(node, task_log=log)
 
 
 # noinspection PyUnusedLocal
@@ -96,7 +96,7 @@ def mon_node_delete(task_id, sender, node_uuid=None, node_hostname=None, log=LOG
     node = Node(uuid=node_uuid, hostname=node_hostname)
     log.obj = node.log_list
 
-    return getZabbix(DefaultDc()).node_delete(node, task_log=log)
+    return get_monitoring(DefaultDc()).node_delete(node, task_log=log)
 
 
 # erigonesd context signals:

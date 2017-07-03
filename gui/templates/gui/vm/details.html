@@ -201,12 +201,12 @@
       <div class="modal-body separator">
         <form class="form-inline">
           <div class="vm_modal_text">
-            <div id="vm_migrate_modal_error" class="alert alert-error hide"><i class="icon-warning-sign"></i><span></span></div>
+            <div id="vm_migrate_modal_error" class="alert alert-error hide"><i class="icon-warning-sign"></i> <span></span></div>
             <div class="input">
               {% trans "Please choose target compute node:" %}
               <select id="id_migrate-node" name="migrate-node" class="input-select2" style="width: 220px">
                 {% for node in settingsform.vm_nodes %}
-                  <option{% if node == vm.node %} selected="selected"{% endif %} value="{{ node.hostname }}">{{ node.hostname }}</option>
+                  <option{% if node == vm.node %} disabled="disabled"{% endif %} value="{{ node.hostname }}">{{ node.hostname }}</option>
                 {% endfor %}
               </select>
             </div>
