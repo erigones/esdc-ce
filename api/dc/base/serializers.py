@@ -270,11 +270,9 @@ class DcSettingsSerializer(s.InstanceSerializer):
                                       help_text=_('Whether to enable support for SunOS zones in '
                                                   'this virtual datacenter.'))
     VMS_VM_STOP_TIMEOUT_DEFAULT = s.IntegerField(label='VMS_VM_STOP_TIMEOUT_DEFAULT',
-                                                 min_value=1, max_value=3600,
                                                  help_text='Default time period (in seconds) for a graceful VM stop or '
                                                            'reboot, after which a force stop/reboot is send to the VM.')
     VMS_VM_STOP_WIN_TIMEOUT_DEFAULT = s.IntegerField(label='VMS_VM_STOP_WIN_TIMEOUT_DEFAULT',
-                                                     min_value=1, max_value=3600,
                                                      help_text='This is the same setting as VMS_VM_STOP_TIMEOUT_DEFAULT'
                                                                ' but for a VM with Windows OS type, which usually takes'
                                                                ' longer to shutdown.')
