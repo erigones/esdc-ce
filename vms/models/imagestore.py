@@ -1,10 +1,12 @@
 from hashlib import md5
 from operator import itemgetter
 from frozendict import frozendict
+from collections import OrderedDict
 from django.utils.translation import ugettext_lazy as _
 from django.utils.text import Truncator
 from django.utils.dateparse import parse_datetime
 from django.core.cache import cache
+from django.utils.six import iteritems
 # noinspection PyUnresolvedReferences
 from django.utils.six.moves.urllib.parse import urljoin
 
@@ -98,8 +100,16 @@ class ImageStore(_DummyModel):
         return '<%s: %s>' % (self.__class__.__name__, self.name)
 
     @staticmethod
-    def get_repositories():
-        return DefaultDc().settings.VMS_IMAGE_REPOSITORIES
+    def get_repositories(include_image_vm=False):
+        from vms.models.image import ImageVm  # circular imports
+
+        repos = OrderedDict(sorted(iteritems(DefaultDc().settings.VMS_IMAGE_REPOSITORIES)))
+        image_vm = ImageVm()
+
+        if include_image_vm and image_vm:
+            repos[image_vm.repo_name] = image_vm.repo_url
+
+        return repos
 
     @classmethod
     def all(cls, repositories):

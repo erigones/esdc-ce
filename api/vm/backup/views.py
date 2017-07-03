@@ -41,7 +41,8 @@ def vm_define_backup_list_all(request, data=None):
     """
     extra = output_extended_backup_count(request, data)
     # TODO: check indexes
-    bkp_define = BackupDefine.objects.select_related('vm', 'node', 'zpool', 'periodic_task', 'periodic_task__crontab')\
+    bkp_define = BackupDefine.objects.select_related('vm', 'vm__dc', 'node', 'zpool', 'periodic_task',
+                                                     'periodic_task__crontab')\
                                      .filter(vm__in=get_vms(request)).order_by(*BackupDefineView.get_order_by(data))
 
     if extra:
@@ -89,7 +90,8 @@ def vm_define_backup_list(request, hostname_or_uuid, data=None):
 
     extra = output_extended_backup_count(request, data)
     # TODO: check indexes
-    bkp_define = BackupDefine.objects.select_related('vm', 'node', 'zpool', 'periodic_task', 'periodic_task__crontab')\
+    bkp_define = BackupDefine.objects.select_related('vm', 'vm__dc', 'node', 'zpool', 'periodic_task',
+                                                     'periodic_task__crontab')\
                                      .filter(**query_filter).order_by(*BackupDefineView.get_order_by(data))
 
     if extra:
@@ -239,7 +241,7 @@ creating backup snapshot (requires QEMU Guest Agent) (default: false)
     extra = output_extended_backup_count(request, data)
 
     define = get_object(request, BackupDefine, {'name': bkpdef, 'vm': vm, 'disk_id': real_disk_id},
-                        sr=('vm', 'node', 'periodic_task', 'periodic_task__crontab'), extra={'select': extra})
+                        sr=('vm', 'vm__dc', 'node', 'periodic_task', 'periodic_task__crontab'), extra={'select': extra})
 
     return BackupDefineView(request, data=data).response(vm, define, extended=bool(extra))
 

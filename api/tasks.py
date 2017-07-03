@@ -3,6 +3,8 @@ from importlib import import_module
 from django.conf import settings
 
 # noinspection PyUnresolvedReferences
+from api.system.tasks import *
+# noinspection PyUnresolvedReferences
 from api.task.tasks import *
 # noinspection PyUnresolvedReferences
 from api.vm.tasks import *

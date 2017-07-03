@@ -1,8 +1,28 @@
 Changelog
 #########
 
-2.5.3 (unreleased)
+2.6.0 (unreleased)
 ==================
+
+Features
+--------
+
+- Added ability to disable reservation of replicated VM resources - `#99 <https://github.com/erigones/esdc-ce/issues/99>`__
+- Removed VM zoneid fetching and updated monitoring templates - `#129 <https://github.com/erigones/esdc-ce/issues/129>`__
+- Added node_vm_define_backup_list API and GUI views -  `#139 <https://github.com/erigones/esdc-ce/issues/139>`__
+- Added ability to import images from local image server - `#140 <https://github.com/erigones/esdc-ce/issues/140>`__
+- Added reflection of users and user groups from management to Zabbix monitoring - `#91 <https://github.com/erigones/esdc-ce/issues/91>`__
+
+Bugs
+----
+
+- Fixed problem with high amount of network traffic in the celeryev exchange - `#179 <https://github.com/erigones/esdc-ce/issues/179>`__
+- Fixed IP address validation, when multiple IPs are being added - `#177 <https://github.com/erigones/esdc-ce/issues/177>`__
+- Disable current compute in VM migration dialog - `#191 <https://github.com/erigones/esdc-ce/issues/191>`__
+
+
+2.5.3 (released on 2017-05-16)
+==============================
 
 Features
 --------
@@ -12,6 +32,7 @@ Features
 - Add support for appending additional SSH authorized_keys into the service VMs - `esdc-factory#43 <https://github.com/erigones/esdc-factory/issues/43>`__
 - Added GET mon_template_list and GET mon_hostgroup_list API views for listing monitoring templates and hostgroups - `#90 <https://github.com/erigones/esdc-ce/issues/90>`__
 - Added dropdown menus (with tags support) to form fields for selecting monitoring templates and hostgroups - `#90 <https://github.com/erigones/esdc-ce/issues/90>`__
+- Hidden input fields for disabled modules - `#146 <https://github.com/erigones/esdc-ce/issues/146>`__
 - Create required `domainmetadata` for every newly created domain - `#151 <https://github.com/erigones/esdc-ce/issues/151>`__
 - Updated API call `PUT vm_manage` to support forced change of the node on the VM - `#154 <https://github.com/erigones/esdc-ce/issues/154>`__
 - Updated backup functionality to store metadata on backup node - `#155 <https://github.com/erigones/esdc-ce/issues/155>`__

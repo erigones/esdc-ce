@@ -1,0 +1,467 @@
+{
+    "zabbix_export": {
+        "date": "2016-01-05T10:10:32Z",
+        "templates": [
+            {
+                "templates": [],
+                "name": "t_vm_zone_cpu",
+                "macros": [],
+                "items": [
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "10",
+                        "publickey": "",
+                        "params": "last(\"vm.cpu.sys\")+last(\"vm.cpu.user\")",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "15",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "%",
+                        "value_type": "3",
+                        "key": "vm.cpu.total",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "cpu usage in %",
+                        "applications": [
+                            {
+                                "name": "CPU"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "10",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "ns",
+                        "value_type": "3",
+                        "key": "kstat.get[zones::{$UUID_SHORT}:nsec_sys]",
+                        "delta": "1",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "nsec_sys",
+                        "applications": [
+                            {
+                                "name": "CPU"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "10",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "ns",
+                        "value_type": "3",
+                        "key": "kstat.get[zones::{$UUID_SHORT}:nsec_user]",
+                        "delta": "1",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "nsec_user",
+                        "applications": [
+                            {
+                                "name": "CPU"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "10",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "ns",
+                        "value_type": "3",
+                        "key": "kstat.get[zones::{$UUID_SHORT}:nsec_waitrq]",
+                        "delta": "1",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "nsec_waitrq",
+                        "applications": [
+                            {
+                                "name": "CPU"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "1",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "10",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "0.00390625",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "",
+                        "value_type": "0",
+                        "key": "kstat.get[zones::{$UUID_SHORT}:avenrun_1min]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Processor load",
+                        "applications": [
+                            {
+                                "name": "CPU"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "10",
+                        "publickey": "",
+                        "params": "last(\"kstat.get[zones::{$UUID_SHORT}:nsec_sys]\")/1000000000*100",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "15",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "%",
+                        "value_type": "3",
+                        "key": "vm.cpu.sys",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "sys time in %",
+                        "applications": [
+                            {
+                                "name": "CPU"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "10",
+                        "publickey": "",
+                        "params": "last(\"kstat.get[zones::{$UUID_SHORT}:nsec_user]\")/1000000000 *100",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "15",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "%",
+                        "value_type": "3",
+                        "key": "vm.cpu.user",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "usr time in %",
+                        "applications": [
+                            {
+                                "name": "CPU"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "10",
+                        "publickey": "",
+                        "params": "last(\"kstat.get[zones::{$UUID_SHORT}:nsec_user]\")/1000000000",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "15",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "s",
+                        "value_type": "0",
+                        "key": "vm.cpu.wait",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "waittime",
+                        "applications": [
+                            {
+                                "name": "CPU"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    }
+                ],
+                "screens": [],
+                "applications": [
+                    {
+                        "name": "CPU"
+                    }
+                ],
+                "discovery_rules": [],
+                "groups": [
+                    {
+                        "name": "Templates"
+                    }
+                ],
+                "template": "t_vm_zone_cpu"
+            }
+        ],
+        "version": "2.0",
+        "groups": [
+            {
+                "name": "Templates"
+            }
+        ],
+        "graphs": [
+            {
+                "show_3d": "0",
+                "graph_items": [
+                    {
+                        "calc_fnc": "2",
+                        "color": "00C800",
+                        "item": {
+                            "host": "t_vm_zone_cpu",
+                            "key": "vm.cpu.user"
+                        },
+                        "sortorder": "1",
+                        "drawtype": "5",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "C80000",
+                        "item": {
+                            "host": "t_vm_zone_cpu",
+                            "key": "vm.cpu.sys"
+                        },
+                        "sortorder": "0",
+                        "drawtype": "5",
+                        "type": "0",
+                        "yaxisside": "0"
+                    }
+                ],
+                "ymin_type_1": "0",
+                "name": "CPU usage by type",
+                "percent_left": "0.0000",
+                "type": "1",
+                "ymax_type_1": "0",
+                "height": "200",
+                "yaxismax": "100.0000",
+                "width": "900",
+                "show_legend": "1",
+                "show_work_period": "1",
+                "ymax_item_1": "0",
+                "ymin_item_1": "0",
+                "show_triggers": "1",
+                "yaxismin": "0.0000",
+                "percent_right": "0.0000"
+            },
+            {
+                "show_3d": "0",
+                "graph_items": [
+                    {
+                        "calc_fnc": "2",
+                        "color": "C80000",
+                        "item": {
+                            "host": "t_vm_zone_cpu",
+                            "key": "vm.cpu.total"
+                        },
+                        "sortorder": "0",
+                        "drawtype": "5",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "00C800",
+                        "item": {
+                            "host": "t_vm_zone_cpu",
+                            "key": "vm.cpu.wait"
+                        },
+                        "sortorder": "1",
+                        "drawtype": "0",
+                        "type": "0",
+                        "yaxisside": "1"
+                    }
+                ],
+                "ymin_type_1": "0",
+                "name": "CPU waittime",
+                "percent_left": "0.0000",
+                "type": "0",
+                "ymax_type_1": "0",
+                "height": "200",
+                "yaxismax": "100.0000",
+                "width": "900",
+                "show_legend": "1",
+                "show_work_period": "1",
+                "ymax_item_1": "0",
+                "ymin_item_1": "0",
+                "show_triggers": "1",
+                "yaxismin": "0.0000",
+                "percent_right": "0.0000"
+            }
+        ]
+    }
+}

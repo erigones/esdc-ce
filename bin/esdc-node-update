@@ -1,0 +1,75 @@
+#!/bin/bash
+
+set -e
+
+if [[ "$(id -u)" != "0" ]]; then
+	echo "This script must be run as root" >&2
+	exit 6
+fi
+
+MAINDIR="$(cd "$(dirname "$0")/.." ; pwd -P)"
+ERIGONES_HOME="${ERIGONES_HOME:-"${MAINDIR}"}"
+ANS_BASE="${ERIGONES_HOME}/ans"
+UPG_BASE="${ERIGONES_HOME}/ans/upgrade"
+export ERIGONES_HOME UPG_BASE
+
+PYTHONPATH="${ERIGONES_HOME}:${PYTHONPATH}:${ERIGONES_HOME}/envs/lib/python2.7/site-packages"
+VIRTUAL_ENV="${ERIGONES_HOME}/envs"
+export PYTHONPATH VIRTUAL_ENV
+
+VERSIONDIR="/opt/custom"
+VERSIONFILE="${VERSIONDIR}/esdc.version"
+UPG_DIR="${UPG_BASE}/node"
+
+# Extracting current node version
+[[ ! -d "${VERSIONDIR}" ]] && mkdir -p "${VERSIONDIR}"
+
+if [[ -f "${VERSIONFILE}" ]]; then
+	VERSION=$(cat "${VERSIONFILE}")
+else
+	VERSION="v2.5.99"
+fi
+
+UPG_SUBDIRS="$(find "${UPG_DIR}" -maxdepth 1 -type d -name 'v*')"
+
+cd "${UPG_DIR}"
+
+RUN_VERSIONS=$(python -c "from pkg_resources import parse_version
+import os
+upg_subdirs = (i for i in os.listdir('${UPG_DIR}') if os.path.isdir(i) and i.startswith('v'))
+version = parse_version('${VERSION}')
+for i in sorted(upg_subdirs, key=parse_version):
+    if parse_version(i) > version:
+        print(i)
+")
+
+
+echo -e "Current node version: ${VERSION}\n"
+
+if [[ -z "${RUN_VERSIONS}" ]]; then
+	echo "No updates available"
+	exit 0
+fi
+
+set +e
+
+for version in "${RUN_VERSIONS}"; do
+	update_script="${UPG_DIR}/${version}/main.sh"
+
+	if [[ ! -x "${update_script}" ]]; then
+		echo -e "* ${version}:\tSkipping node update\n"
+		continue
+	fi
+
+	echo -e "* ${version}:\tApplying node update"
+	"${update_script}"
+	ec=$?
+
+	if [[ "${ec}" -eq 0 ]]; then
+		echo -e "* ${version}:\tSUCCESS\n"
+		echo "${version}" > "${VERSIONFILE}"
+	else
+		echo -e "* ${version}:\tERROR\n"
+		exit ${ec}
+	fi
+done

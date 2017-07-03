@@ -1,0 +1,32 @@
+# https://github.com/erigones/esdc-factory/issues/50
+- name: Download zookeepercli
+  local_action:
+    module: get_url
+    args:
+      url: https://github.com/erigones/esdc-factory/raw/master/ansible/files/usb/scripts/zookeepercli
+      dest: /tmp/zookeepercli
+      mode: 0755
+
+- name: Install zookeepercli
+  copy:
+    src: /tmp/zookeepercli
+    dest: /usr/local/bin/zookeepercli
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Install query_cfgdb
+  copy:
+    src: "{{ current_task_dir }}/files/query_cfgdb-VM"
+    dest: /usr/local/bin/query_cfgdb
+    owner: root
+    group: root
+    mode: 0755
+
+# Related to:
+#  - https://github.com/erigones/esdc-factory/commit/3e3ed30abcd485d58c548625a39802234fbb57dc
+- name: Updating master IPs in cfgdb
+  script: "{{ current_task_dir }}/files/update_master_ips_in_cfgdb.sh"
+  environment:
+    ERIGONES_HOME: "{{ erigones_home }}"
+    PATH: "{{ erigones_home }}/bin:{{ erigones_home }}/envs/bin:/usr/bin:/usr/sbin:/usr/local/bin"
