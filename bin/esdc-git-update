@@ -39,6 +39,7 @@ ERIGONES_HOME=${ERIGONES_HOME:-"${MAINDIR}"}
 CTLSH="${ERIGONES_HOME}/bin/ctl.sh"
 DEPLOY_CMD="${CTLSH} deploy --update"
 APPLIANCE_UPDATE_CMD="${ERIGONES_HOME}/bin/esdc-appliance-update"
+NODE_UPDATE_CMD="${ERIGONES_HOME}/bin/esdc-node-update"
 
 # ##########
 # Functions
@@ -143,6 +144,19 @@ fi
 
 if [[ "$(uname -s)" == "SunOS" ]] && [[ -f /usr/bin/zonename ]] && [[ "$(/usr/bin/zonename)" == "global" ]]; then
 	DEPLOY_CMD="${DEPLOY_CMD} --node"
+
+	# run node upgrade
+	if [[ -x "${NODE_UPDATE_CMD}" ]]; then
+		echo "Upgrading compute node software (please wait) ..."
+		node_update_output=$("${NODE_UPDATE_CMD}" 2>&1)
+
+		if [[ ${?} -eq 0 ]]; then
+			echo "Compute node upgrade was successful"
+		else
+			echo "${node_update_output}" >&2
+			die $UPGRADE_FAILED "Compute node upgrade failed"
+		fi
+	fi
 else
 	# run appliance upgrade
 	if [[ -x "${APPLIANCE_UPDATE_CMD}" ]]; then

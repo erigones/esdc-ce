@@ -114,7 +114,7 @@ class VmStatus(APIView):
 
         apiview = self.apiview
         msg = LOG_STATUS_GET
-        cmd = 'vmadm list -p -H -o state,zoneid uuid=' + vm.uuid
+        cmd = 'vmadm list -p -H -o state uuid=' + vm.uuid
         meta = {
             'output': {'returncode': 'returncode', 'stdout': 'stdout', 'stderr': 'stderr', 'hostname': vm.hostname},
             'msg': msg,

@@ -10,8 +10,6 @@ from blinker import signal
 
 # (task_id, vm=vm, old_state=old_state, new_state=state)
 vm_status_changed = signal('vm_status_changed', doc='VM status on node changed.')
-# (task_id, vm_uuid=uuid, zoneid=zoneid, old_zoneid=zoneid_cache)
-vm_zoneid_changed = signal('vm_zoneid_changed', doc='VM zone ID on node changed.')
 # (task_id, vm=vm, old_state=old_state)
 vm_running = signal('vm_running', doc='VM changed status to RUNNING.')
 # (task_id, vm=vm, old_state=old_state)

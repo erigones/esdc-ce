@@ -48,6 +48,13 @@ class NetworkIPView(APIView):
             if ips is not None:
                 if not isinstance(ips, (tuple, list)):
                     raise InvalidInput('Invalid ips')
+                # test if IPs have valid format
+                try:
+                    for ip in ips:
+                        IPAddress.get_ip_address(ip)
+                except ValueError:
+                    raise InvalidInput('Invalid ips value')
+
                 ip_filter.append(Q(ip__in=ips))
 
             if request.method == 'GET':

@@ -1,4 +1,7 @@
 from django.dispatch import Signal
+from blinker import signal
+
+
 """
 View signals
 ------------
@@ -36,3 +39,13 @@ navigation_initialized = Signal(providing_args=['request', 'nav'])
 Signal that is to restrict user profile to be company only.
 """
 allow_switch_company_profile = Signal(providing_args=['user'])
+
+"""
+These signals are called after relationship changes among Dc, User and Role models. 
+"""
+# (sender, dc_name)
+dc_relationship_changed = signal('dc_relationship_changed', doc='DC relationship changed.')
+# (sender, group_name, dc_name)
+group_relationship_changed = signal('group_relationship_changed', doc="Role relationship changed.")
+# (sender, user_name, dc_name, affected_groups)
+user_relationship_changed = signal('user_relationship_changed', doc="User relationship changed.")

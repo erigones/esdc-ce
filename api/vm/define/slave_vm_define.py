@@ -121,16 +121,13 @@ class SlaveVmDefine(object):
 
         return disk_zpools
 
-    def validate_node_resources(self, ignore_cpu_ram=False):
+    def validate_node_resources(self, ignore_cpu_ram=False, ignore_disk=False):
         """Validate dc_node resources"""
         vm = self.vm
         node = vm.node
         dc_node = node.get_dc_node(vm.dc)
-
-        if ignore_cpu_ram:
-            vm_resources = (0, 0, sum(vm.get_disks(zpool=node.zpool).values()))
-        else:
-            vm_resources = vm.get_cpu_ram_disk(zpool=node.zpool, ram_overhead=True)
+        vm_resources = vm.get_cpu_ram_disk(zpool=node.zpool, ram_overhead=True, ignore_cpu_ram=ignore_cpu_ram,
+                                           ignore_disk=ignore_disk)
 
         if not dc_node.check_free_resources(*vm_resources):
             raise APIValidationError(_('Not enough free resources on target node.'))

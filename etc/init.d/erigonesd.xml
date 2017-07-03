@@ -10,7 +10,7 @@
 	</dependency>
 
 	<exec_method type='method' name='start'
-		exec='%{config/erigones_home}/bin/erigonesd %{config/queue} multi start %{config/queue} --loglevel=%{config/loglevel} --logfile="%{config/erigones_home}%{config/logfile}" --pidfile="%{config/erigones_home}%{config/pidfile}" -c %{config/concurrency} %{config/celeryd}' timeout_seconds='0'>
+		exec='%{config/erigones_home}/bin/erigonesd %{config/queue} multi start %{config/queue} --loglevel=%{config/loglevel} --logfile="%{config/erigones_home}%{config/logfile}" --pidfile="%{config/erigones_home}%{config/pidfile}" -c %{config/concurrency} %{config/celeryd} --without-gossip' timeout_seconds='0'>
 	</exec_method>
 
 	<exec_method type='method' name='stop'

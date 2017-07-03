@@ -1,3 +1,5 @@
+from django.db import connection
+
 from api import status
 from api.api_views import APIView
 from api.exceptions import ObjectAlreadyExists, ObjectNotFound
@@ -9,6 +11,7 @@ from api.accounts.messages import LOG_GROUP_UPDATE
 from api.dc.messages import LOG_GROUP_ATTACH, LOG_GROUP_DETACH
 from api.task.response import SuccessTaskResponse
 from gui.models import Role
+from gui.signals import group_relationship_changed
 
 
 class DcGroupView(APIView):
@@ -32,7 +35,7 @@ class DcGroupView(APIView):
             roles = self.dc.roles.all().order_by(*self.order_by)
 
             if self.full or self.extended:
-                roles = roles.select_related('dc_bound',).prefetch_related('permissions', 'user_set')
+                roles = roles.select_related('dc_bound', ).prefetch_related('permissions', 'user_set')
 
         self.role = roles
 
@@ -59,6 +62,9 @@ class DcGroupView(APIView):
 
         ser = self.serializer(self.request, group)
         group.dc_set.add(dc)
+
+        connection.on_commit(lambda: group_relationship_changed.send(group_name=group.name,
+                                                                     dc_name=dc.name))
         res = SuccessTaskResponse(self.request, ser.data, obj=group, status=status.HTTP_201_CREATED,
                                   detail_dict=ser.detail_dict(), msg=LOG_GROUP_ATTACH)
         self._remove_dc_binding(res)
@@ -74,6 +80,7 @@ class DcGroupView(APIView):
 
         ser = self.serializer(self.request, group)
         group.dc_set.remove(self.request.dc)
+        connection.on_commit(lambda: group_relationship_changed.send(group_name=group.name, dc_name=dc.name))
         res = SuccessTaskResponse(self.request, None, obj=group, detail_dict=ser.detail_dict(), msg=LOG_GROUP_DETACH)
         self._remove_dc_binding(res)
 

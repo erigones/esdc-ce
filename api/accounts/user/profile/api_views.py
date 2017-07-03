@@ -1,9 +1,12 @@
+from django.db import connection
+
 from api.api_views import APIView
 from api.exceptions import OperationNotSupported
 from api.accounts.user.profile.serializers import UserProfileSerializer
 from api.accounts.user.utils import get_user, get_user_profiles
 from api.accounts.messages import LOG_PROFILE_UPDATE
 from api.task.response import SuccessTaskResponse, FailureTaskResponse
+from gui.signals import user_relationship_changed
 
 
 class UserProfileView(APIView):
@@ -41,7 +44,7 @@ class UserProfileView(APIView):
             return FailureTaskResponse(self.request, ser.errors, obj=profile, dc_bound=False)
 
         ser.save()
-
+        connection.on_commit(lambda: user_relationship_changed.send(user_name=ser.object.user.username))
         return SuccessTaskResponse(self.request, ser.data, obj=self.user, detail_dict=ser.detail_dict(),
                                    owner=ser.object.user, msg=LOG_PROFILE_UPDATE, dc_bound=False)
 

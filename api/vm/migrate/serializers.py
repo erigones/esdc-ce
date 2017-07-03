@@ -78,6 +78,7 @@ class VmMigrateSerializer(s.Serializer):
         # When node is changing we have to have all disks in a ghost VM.
         # When changing only disk pools, only the changed disks have to be in a ghost VM.
         ghost_vm = SlaveVm(_master_vm=vm)
+        ghost_vm.reserve_resources = changing_node
         ghost_vm.set_migration_hostname()
         ghost_vm.node = node
         ghost_vm_define = SlaveVmDefine(ghost_vm)

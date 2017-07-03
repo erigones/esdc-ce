@@ -1,10 +1,12 @@
+# https://github.com/erigones/esdc-factory/pull/52
+- name: Check local_settings.py
+  stat: path="{{ erigones_home }}/core/local_settings.py"
+  register: local_settings
 
-# Related to:
-#  - https://github.com/erigones/esdc-factory/commit/3e3ed30abcd485d58c548625a39802234fbb57dc
-- name: Updating master IPs in cfgdb
-  local_action:
-    module: shell
-    args: "bash -e {{ current_task_dir }}/files/update_master_ips_in_cfgdb.sh"
-  environment:
-    ERIGONES_HOME: "{{ erigones_home }}"
-    PATH: "{{ erigones_home }}/bin:{{ erigones_home }}/envs/bin:$PATH"
+- name: Change database backend to use transaction hooks in local_settings.py
+  replace:
+    dest="{{ erigones_home }}/core/local_settings.py"
+    regexp="django\.db\.backends\.postgresql_psycopg2"
+    replace="transaction_hooks.backends.postgresql_psycopg2"
+  when: local_settings.stat.exists
+
