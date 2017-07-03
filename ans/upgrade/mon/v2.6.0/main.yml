@@ -1,0 +1,14 @@
+- name: Load Zabbix credentials
+  include: "{{ upg_base }}/lib/zabbix_credentials.yml"
+
+# https://github.com/erigones/esdc-ce/issues/129
+- name: Update fixed templates
+  include: "{{ upg_base }}/lib/zabbix_import_templates.yml"
+
+# https://github.com/erigones/esdc-ce/issues/129
+- name: Create vm_zabbix_sync_required file (for erigonesd on mgmt)
+  local_action:
+    module: file
+    args:
+      path: "{{ erigones_home }}/var/run/vm_zabbix_sync_required"
+      state: touch

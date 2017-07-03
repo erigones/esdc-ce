@@ -1,6 +1,7 @@
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.db.models import Q
+from django.db import connection
 
 from api.api_views import APIView
 from api.fields import get_boolean_value
@@ -11,6 +12,7 @@ from api.accounts.user.utils import get_user, get_users
 from api.accounts.messages import LOG_USER_CREATE, LOG_USER_UPDATE, LOG_USER_DELETE
 from api.task.response import SuccessTaskResponse, FailureTaskResponse
 from gui.models import User, AdminPermission
+from gui.signals import user_relationship_changed
 from vms.models import Dc, DefaultDc
 
 
@@ -61,6 +63,8 @@ class UserView(APIView):
             return True
 
     def user_modify(self, update=False, serializer=None):
+        affected_groups = ()
+
         if not serializer:
             serializer = self.serializer
 
@@ -71,7 +75,6 @@ class UserView(APIView):
             return FailureTaskResponse(self.request, ser.errors, obj=user, dc_bound=False)
 
         ser.save()
-
         if update:
             msg = LOG_USER_UPDATE
             status = HTTP_200_OK
@@ -104,6 +107,9 @@ class UserView(APIView):
             if ser.old_roles:
                 user.current_dc = DefaultDc()
 
+        connection.on_commit(lambda: user_relationship_changed.send(user_name=ser.object.username,
+                                                                    affected_groups=tuple(
+                                                                        group.id for group in affected_groups)))
         return res
 
     def get(self):
@@ -137,7 +143,9 @@ class UserView(APIView):
         old_roles = list(user.roles.all())
         ser = self.serializer(self.request, user)
         ser.object.delete()
-
+        connection.on_commit(lambda: user_relationship_changed.send(user_name=ser.object.username,
+                                                                    affected_groups=tuple(
+                                                                        group.id for group in old_roles)))
         res = SuccessTaskResponse(self.request, None, obj=user, msg=LOG_USER_DELETE, detail_dict=dd, dc_bound=False)
 
         # User was removed, which may affect the cached list of DC admins for DCs which are attached to user's groups

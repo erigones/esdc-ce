@@ -337,3 +337,36 @@ class User(AbstractBaseUser, PermissionsMixin, _AclMixin, _DcBoundMixin):
                 rels.setdefault(obj_model_name, []).append(str(obj))
 
         return rels
+
+    @property
+    def get_alerting_email(self):
+        # todo add more logic
+        # todo put to ZMC and call it 'extract_email_from_user'
+        from api.mon.backends.zabbix.base import ZabbixMediaContainer
+        if self.email:
+            return ZabbixMediaContainer(ZabbixMediaContainer.MEDIAS['email'], sendto=self.email,
+                                        # TODO let the user pick up the severities
+                                        severities=ZabbixMediaContainer.SEVERITIES,
+                                        period=ZabbixMediaContainer.PERIOD_DEFAULT)
+
+    @property
+    def get_alerting_phone(self):
+        # todo add more logic - 1/0, verified/not etc
+        # todo put to ZMC and call it 'extract_phone_from_user'
+        from api.mon.backends.zabbix.base import ZabbixMediaContainer
+        if self.userprofile.phone:
+            return ZabbixMediaContainer(ZabbixMediaContainer.MEDIAS['phone'], sendto=self.userprofile.phone,
+                                        # TODO let the user pick up the severities
+                                        severities=ZabbixMediaContainer.SEVERITIES,
+                                        period=ZabbixMediaContainer.PERIOD_DEFAULT_WORKING_HOURS)
+
+    @property
+    def get_alerting_xmpp(self):
+        # todo add more logic - 1/0, verified/not etc
+        # todo put to ZMC and call it 'extract_xmpp_from_user'
+        from api.mon.backends.zabbix.base import ZabbixMediaContainer
+        if self.userprofile.jabber:
+            return ZabbixMediaContainer(ZabbixMediaContainer.MEDIAS['xmpp'], sendto=self.userprofile.jabber,
+                                        # TODO let the user pick up the severities
+                                        severities=ZabbixMediaContainer.SEVERITIES,
+                                        period=ZabbixMediaContainer.PERIOD_DEFAULT)

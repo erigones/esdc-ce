@@ -160,17 +160,17 @@
 {% include "gui/table_form_field.html" with field=form.SMS_SMSAPI_FROM trclass="setting" %}
 {% endif %}
 
-{% for app, details, icon in form.third_party_settings %}
-<tr><td colspan="2" class="row-header"><i class="{{ icon }}"></i> {{ app }}</td></tr>
+{% for app, details, name, icon in form.third_party_settings %}
+<tr><td colspan="2" class="row-header"><i class="{{ icon }}"></i> {{ name }}</td></tr>
   {% for module, template in details %}
 {% include template with field=form|get_item:module %}
   {% endfor %}
 {% endfor %}
 
 {% if all %}
-{% for app, details, icon in form.default_dc_third_party_settings %}
+{% for app, details, name, icon in form.default_dc_third_party_settings %}
   {% if not form.third_party_settings %}
-<tr><td colspan="2" class="row-header"><i class="{{ icon }}"></i> {{ app }}</td></tr>
+<tr><td colspan="2" class="row-header"><i class="{{ icon }}"></i> {{ name }}</td></tr>
   {% endif %}
   {% for module, template in details %}
 {% include template with field=form|get_item:module trclass="setting" %}

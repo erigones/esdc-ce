@@ -3,6 +3,7 @@ from django.conf import settings
 from api.task.internal import InternalTask
 from api.task.response import mgmt_task_response
 from vms.utils import AttrDict
+from vms.models import Vm
 from que import TG_DC_UNBOUND, TG_DC_BOUND
 
 
@@ -29,6 +30,17 @@ class MonInternalTask(InternalTask):
             return None
 
         return super(MonInternalTask, self).call(*args, **kwargs)
+
+
+def get_mon_vms(sr=('dc',), order_by=('hostname',), **filters):
+    """Return iterator of Vm objects which are monitoring by an internal Zabbix"""
+    filters['slavevm__isnull'] = True
+    vms = Vm.objects.select_related(*sr).filter(**filters)\
+                                        .exclude(status=Vm.NOTCREATED)\
+                                        .order_by(*order_by)
+
+    return (vm for vm in vms
+            if vm.dc.settings.MON_ZABBIX_ENABLED and vm.is_zabbix_sync_active() and not vm.is_deploying())
 
 
 def call_mon_history_task(request, task_function, view_fun_name, obj, dc_bound,

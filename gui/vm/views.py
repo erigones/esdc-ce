@@ -67,7 +67,7 @@ def details(request, hostname):
     """
     dc_settings = request.dc.settings
     context = collect_view_data(request, 'vm_list', mb_addon=SIZE_FIELD_MB_ADDON)
-    context['vm'] = vm = get_vm(request, hostname, sr=('dc', 'owner', 'template'))
+    context['vm'] = vm = get_vm(request, hostname, sr=('dc', 'owner', 'template', 'slavevm'))
     context['vms'] = vms = get_vms(request)
     context['vms_tags'] = get_vms_tags(vms)
     context['vm_disks'] = vm_disks = get_vm_define_disk(request, vm)
@@ -135,7 +135,7 @@ def snapshot(request, hostname):
     Snapshot list and snapshot definitions.
     """
     context = collect_view_data(request, 'vm_list')
-    context['vm'] = vm = get_vm(request, hostname, sr=('dc', 'owner', 'template'))
+    context['vm'] = vm = get_vm(request, hostname, sr=('dc', 'owner', 'template', 'slavevm'))
     context['vms'] = vms = get_vms(request)
     context['vms_tags'] = get_vms_tags(vms)
     context['can_edit'] = request.user.is_admin(request)
@@ -170,7 +170,7 @@ def backup(request, hostname):
     """
     dc_settings = request.dc.settings
     context = collect_view_data(request, 'vm_list')
-    context['vm'] = vm = get_vm(request, hostname, sr=('dc', 'owner', 'template'))
+    context['vm'] = vm = get_vm(request, hostname, sr=('dc', 'owner', 'template', 'slavevm'))
     context['vms'] = vms = get_vms(request)
     context['vms_tags'] = get_vms_tags(vms)
     context['can_edit'] = request.user.is_admin(request)

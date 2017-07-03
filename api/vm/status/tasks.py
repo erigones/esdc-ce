@@ -19,7 +19,7 @@ from api.vm.base.utils import is_vm_missing, vm_deploy, vm_update_ipaddress_usag
 from api.vm.messages import LOG_STATUS_CHANGE
 from api.vm.status.events import VmStatusChanged
 from vms.models import Vm, Node
-from vms.signals import (vm_running, vm_stopped, vm_json_active_changed, vm_zoneid_changed,
+from vms.signals import (vm_running, vm_stopped, vm_json_active_changed,
                          vm_status_changed as vm_status_changed_sig)
 
 __all__ = (
@@ -77,12 +77,12 @@ def vm_status_all(task_id, node, **kwargs):
         return
 
     logger.info('Running vm_status_all on compute node %s by %s', node, task_id)
-    tid, err = execute(ERIGONES_TASK_USER, None, 'vmadm list -p -H -o uuid,state,zoneid,exit_timestamp,boot_timestamp',
+    tid, err = execute(ERIGONES_TASK_USER, None, 'vmadm list -p -H -o uuid,state,exit_timestamp,boot_timestamp',
                        callback=('api.vm.status.tasks.vm_status_all_cb', {'node_uuid': node.uuid}),
                        queue=node.fast_queue, nolog=True, ping_worker=False, check_user_tasks=False)
 
     if err:
-        logger.error('Got error (%s) when running task execute[%s]("vmadm list -p -H -o uuid,state,zoneid") on %s',
+        logger.error('Got error (%s) when running task execute[%s]("vmadm list -p -H -o uuid,state") on %s',
                      err, tid, node.hostname)
     else:
         logger.info('Created vm_status_all task %s by %s', tid, task_id)
@@ -100,12 +100,12 @@ def vm_status_one(task_id, vm):
     logger.info('Running vm_status_one for VM %s by %s', vm, task_id)
     node = vm.node
     tid, err = execute(ERIGONES_TASK_USER, None,
-                       'vmadm list -p -H -o uuid,state,zoneid,exit_timestamp,boot_timestamp uuid=' + vm.uuid,
+                       'vmadm list -p -H -o uuid,state,exit_timestamp,boot_timestamp uuid=' + vm.uuid,
                        callback=('api.vm.status.tasks.vm_status_all_cb', {'node_uuid': node.uuid}),
                        queue=node.fast_queue, nolog=True, ping_worker=False, check_user_tasks=False)
 
     if err:
-        logger.error('Got error (%s) when running task execute[%s]("vmadm list -p -H -o uuid,state,zoneid") on %s',
+        logger.error('Got error (%s) when running task execute[%s]("vmadm list -p -H -o uuid,state") on %s',
                      err, tid, node.hostname)
     else:
         logger.info('Created vm_status_one task %s by %s', tid, task_id)
@@ -182,28 +182,7 @@ def _save_vm_status(task_id, vm, new_state, old_state=None, **kwargs):
     vm_status_changed(task_id, vm, new_state, old_state=old_state, **kwargs)  # calls save()
 
 
-def _vm_zoneid_check(task_id, uuid, zoneid, zoneid_cache=None, change_time=None):
-    """Check/save new zoneid and zoneid_change"""
-    if zoneid_cache is not None:
-        zoneid_cache = int(zoneid_cache)
-
-    if zoneid_cache != zoneid:  # Save new zoneid into cache
-        logger.warn('Detected zone ID change %s->%s for vm %s', zoneid_cache, zoneid, uuid)
-
-        if change_time:
-            old_change_time = cache.get(Vm.zoneid_change_key(uuid))
-
-            if old_change_time and old_change_time > change_time:
-                logger.warn('Ignoring zone ID change %s->%s of VM %s because it is too old: %s > %s',
-                            zoneid_cache, zoneid, uuid, old_change_time, change_time)
-                return
-
-        cache.set(Vm.zoneid_key(uuid), zoneid)
-        cache.set(Vm.zoneid_change_key(uuid), change_time or timezone.now())
-        vm_zoneid_changed.send(task_id, vm_uuid=uuid, zoneid=zoneid, old_zoneid=zoneid_cache)  # Signal!
-
-
-def _vm_status_check(task_id, node_uuid, uuid, zoneid, state, state_cache=None, zoneid_cache=None, vm=None,
+def _vm_status_check(task_id, node_uuid, uuid, state, state_cache=None, vm=None,
                      change_time=None, **kwargs):
     """Helper function for checking VM's new/actual state used by following callbacks:
         - vm_status_all_cb
@@ -212,7 +191,7 @@ def _vm_status_check(task_id, node_uuid, uuid, zoneid, state, state_cache=None, 
     """
     if state_cache is None:
         try:  # vm state not in cache, loading from DB...
-            vm = Vm.objects.get(uuid=uuid)
+            vm = Vm.objects.select_related('slavevm').get(uuid=uuid)
         except Vm.DoesNotExist:
             logger.warn('Got status of undefined vm (%s) - ignoring', uuid)
             return
@@ -221,8 +200,6 @@ def _vm_status_check(task_id, node_uuid, uuid, zoneid, state, state_cache=None, 
             cache.set(Vm.status_key(uuid), vm.status)
     else:
         state_cache = int(state_cache)
-
-    _vm_zoneid_check(task_id, uuid, zoneid, zoneid_cache, change_time=change_time)
 
     if state_cache == state:
         return
@@ -327,7 +304,7 @@ def _vm_status_check(task_id, node_uuid, uuid, zoneid, state, state_cache=None, 
                     **kwargs)
 
 
-# noinspection PyBroadException,PyUnusedLocal
+# noinspection PyUnusedLocal
 @cq.task(name='api.vm.status.tasks.vm_status_all_cb', ignore_result=True)
 def vm_status_all_cb(result, task_id, node_uuid=None):
     """
@@ -342,46 +319,44 @@ def vm_status_all_cb(result, task_id, node_uuid=None):
 
     vms = []
     r_states = redis.pipeline()
-    r_zoneids = redis.pipeline()
 
+    # The result['stdout'] contains output from `vmadm list -o uuid,state,exit_timestamp,boot_timestamp`
+    # Only one property of exit_timestamp and boot_timestamp will be in the command output
     for line in result['stdout'].splitlines():
-        try:
-            i = line.strip().split(':', 3)
-            uuid = i[0]
-            state = Vm.STATUS_DICT[i[1]]  # int
-            zoneid = int(i[2] or Vm.STOPPED_ZONEID)  # int; "-1" means that the VM not running
-            exit_or_boot_timestamp = i[3]
-        except:
-            try:
-                # noinspection PyUnboundLocalVariable
-                if i[1] in Vm.STATUS_UNUSED:  # 255
-                    logger.info('Ignoring unusable status ("%s") from output of task %s(%s)',
-                                line, 'vm_status_all', node_uuid)
-                    continue
-            except:
-                pass
+        i = line.strip().split(':', 2)  # uuid:state:exit_timestamp,boot_timestamp
 
+        if len(i) != 3:
             logger.error('Could not parse line ("%s") from output of task %s(%s)',
                          line, 'vm_status_all', node_uuid)
             continue
 
-        vms.append((uuid, state, zoneid, exit_or_boot_timestamp))
+        if i[1] in Vm.STATUS_UNUSED:  # 255
+            logger.info('Ignoring unusable status ("%s") from output of task %s(%s)',
+                        line, 'vm_status_all', node_uuid)
+            continue
+
+        if i[1] not in Vm.STATUS_DICT:
+            logger.error('Unknown status in vmadm list output ("%s") from output of task %s(%s)',
+                         line, 'vm_status_all', node_uuid)
+            continue
+
+        uuid = i[0]
+        state = Vm.STATUS_DICT[i[1]]  # returns int
+        exit_or_boot_timestamp = i[2]
+        # Save vm status line into vms list for later status check because we need to pair it to the redis result list
+        vms.append((uuid, state, exit_or_boot_timestamp))
         r_states.get(KEY_PREFIX + Vm.status_key(uuid))
-        r_zoneids.get(KEY_PREFIX + Vm.zoneid_key(uuid))
 
     if not vms:
         return
 
     vm_states = r_states.execute()
-    vm_zoneids = r_zoneids.execute()
 
     for i, line in enumerate(vms):
-        vm = None
-        uuid, state, zoneid, exit_or_boot_timestamp = line
+        uuid, state, exit_or_boot_timestamp = line
         state_cache = vm_states[i]  # None or string
-        zoneid_cache = vm_zoneids[i]  # None or string
         # Check and eventually save VM's status
-        _vm_status_check(tid, node_uuid, uuid, zoneid, state, state_cache=state_cache, zoneid_cache=zoneid_cache,
+        _vm_status_check(tid, node_uuid, uuid, state, state_cache=state_cache,
                          change_time=_parse_timestamp(exit_or_boot_timestamp))
 
 
@@ -392,18 +367,11 @@ def vm_status_event_cb(result, task_id):
     """
     vm_uuid = result['zonename']
     state_cache = cache.get(Vm.status_key(vm_uuid))
-    zoneid_cache = cache.get(Vm.zoneid_key(vm_uuid))
     state = Vm.STATUS_DICT[result['state']]
-    zoneid = result['zoneid']
     when = result['when']
     change_time = datetime.utcfromtimestamp(float(when) / pow(10, int(log10(when)) - 9)).replace(tzinfo=utc)
-
-    if state == Vm.STOPPED:
-        zoneid = Vm.STOPPED_ZONEID  # The sysevent monitor sends the last known zoneid even for stopped VMs
-
     # Check and eventually save VM's status
-    _vm_status_check(task_id, result['node_uuid'], vm_uuid, zoneid, state,
-                     state_cache=state_cache, zoneid_cache=zoneid_cache, change_time=change_time)
+    _vm_status_check(task_id, result['node_uuid'], vm_uuid, state, state_cache=state_cache, change_time=change_time)
 
 
 @cq.task(name='api.vm.status.tasks.vm_status_current_cb', base=MgmtCallbackTask, bind=True)
@@ -423,22 +391,20 @@ def vm_status_current_cb(result, task_id, vm_uuid=None):
 
     line = stdout.strip().split(':')
     result['status'] = line[0]
-    vm = Vm.objects.select_related('node').get(uuid=vm_uuid)
+    vm = Vm.objects.select_related('node', 'slavevm').get(uuid=vm_uuid)
 
     try:
         state = Vm.STATUS_DICT[result['status']]
-        zoneid = int(line[1] or Vm.STOPPED_ZONEID)
     except (KeyError, IndexError):
         result['message'] = 'Unidentified VM status'
     else:
         result['message'] = ''
         state_cache = cache.get(Vm.status_key(vm_uuid))
-        zoneid_cache = cache.get(Vm.zoneid_key(vm_uuid))
 
-        if state_cache != state or zoneid_cache != zoneid:
+        if state_cache != state:
             # Check and eventually save VM's status
-            _vm_status_check(task_id, vm.node.uuid, vm_uuid, zoneid, state, state_cache=state_cache,
-                             zoneid_cache=zoneid_cache, change_time=_get_task_time(result, 'exec_time'))
+            _vm_status_check(task_id, vm.node.uuid, vm_uuid, state, state_cache=state_cache,
+                             change_time=_get_task_time(result, 'exec_time'))
 
     vm.tasks_del(task_id)
     return result
@@ -464,7 +430,7 @@ def vm_status_cb(result, task_id, vm_uuid=None):
     A callback function for PUT api.vm.status.views.vm_status.
     Always updates the VM's status in DB.
     """
-    vm = Vm.objects.get(uuid=vm_uuid)
+    vm = Vm.objects.select_related('slavevm').get(uuid=vm_uuid)
     msg = result.get('message', '')
     json = result.pop('json', None)
 

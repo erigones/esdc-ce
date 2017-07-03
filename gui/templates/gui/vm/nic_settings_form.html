@@ -10,11 +10,15 @@
 {% if vm.is_kvm %}{% include "gui/form_field.html" with field=nic_settingsform.model %}{% endif %}
 {% include "gui/form_field.html" with field=nic_settingsform.net %}
 {% include "gui/form_field.html" with field=nic_settingsform.ip %}
+{% if dc_settings.DNS_ENABLED %}
 {% include "gui/form_field_checkbox.html" with field=nic_settingsform.dns class="thin" %}
+{% endif %}
 <div class="advanced hide">
 {% include "gui/form_field.html" with field=nic_settingsform.mac %}
 {% include "gui/form_field_checkbox.html" with field=nic_settingsform.primary %}
+{% if dc_settings.MON_ZABBIX_ENABLED %}
 {% include "gui/form_field_checkbox.html" with field=nic_settingsform.monitoring %}
+{% endif %}
 {# {% include "gui/form_field.html" with field=nic_settingsform.allowed_ips %} #}
 {# {% include "gui/form_field.html" with field=nic_settingsform.blocked_outgoing_ports %} #}
 {% include "gui/form_field_checkbox.html" with field=nic_settingsform.allow_dhcp_spoofing %}

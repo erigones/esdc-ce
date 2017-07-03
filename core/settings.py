@@ -21,7 +21,7 @@ MANAGERS = ADMINS
 # Default test DB
 DATABASES = {
     'esdc': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'transaction_hooks.backends.postgresql_psycopg2',
         'NAME': 'esdc',
         'USER': 'esdc',
         'PASSWORD': 'S3cr3tP4ssw0rd',
@@ -29,7 +29,7 @@ DATABASES = {
         'PORT': '6432',
     },
     'pdns': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'transaction_hooks.backends.postgresql_psycopg2',
         'NAME': 'pdns',
         'USER': 'esdc',
         'PASSWORD': 'S3cr3tP4ssw0rd',
@@ -253,6 +253,12 @@ EMAIL_ADMINS = False
 TMPDIR = path.join(PROJECT_DIR, 'var', 'tmp')
 LIBDIR = path.join(PROJECT_DIR, 'var', 'lib')
 LOGDIR = path.join(PROJECT_DIR, 'var', 'log')
+RUNDIR = path.join(PROJECT_DIR, 'var', 'run')
+
+# Location of key/cert files needed to authenticate against update server
+UPDATE_KEY_FILE = path.join(LIBDIR, 'update.key')
+UPDATE_CERT_FILE = path.join(LIBDIR, 'update.crt')
+
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
 # the site admins on every HTTP 500 error when DEBUG=False.
@@ -643,6 +649,12 @@ SECURITY_OWASP_AT_002 = False  # Testing for Account Enumeration and Guessable U
 
 ACL_ENABLED = True  # Module
 
+# Usernames that clashes with zabbix system usernames etc.
+INVALID_USERNAMES = frozenset(['profile', 'Admin', 'provisioner'])
+
+
+# VVVVVVV        THIS BLOCK SHOULD BE ALWAYS AT THE BOTTOM      VVVVVVVVVVVVVVVV
+
 # Allow any settings to be defined in local_settings.py which is ignored in our
 # version control system allowing for settings to be defined (overwritten) per
 # machine, and also for security reasons not to store passwords in the VCS.
@@ -661,6 +673,4 @@ if THIRD_PARTY_APPS_ENABLED:
 
 MODULES = frozenset(MODULES)
 
-# location of key/cert files needed to authenticate against update server
-UPDATE_KEY_FILE = path.join(LIBDIR, 'update.key')
-UPDATE_CERT_FILE = path.join(LIBDIR, 'update.crt')
+# ^^^^^^^        THIS BLOCK SHOULD BE ALWAYS AT THE BOTTOM      ^^^^^^^^^^^^^^^^

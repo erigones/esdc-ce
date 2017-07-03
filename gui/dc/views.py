@@ -51,11 +51,22 @@ def dc_switch(request, dc_name):
 @staff_required
 def dc_vm_details(request, dc, hostname):
     """
-    Switch current datacenter and redirect vm_details page.
+    Switch current datacenter and redirect to VM details page.
     """
     dc_switch(request, dc)
 
     return redirect('vm_details', hostname=hostname)
+
+
+@login_required
+@staff_required
+def dc_vm_backup(request, dc, hostname):
+    """
+    Switch current datacenter and redirect to VM backup page.
+    """
+    dc_switch(request, dc)
+
+    return redirect('vm_backup', hostname=hostname)
 
 
 @login_required

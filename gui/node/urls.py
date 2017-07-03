@@ -14,6 +14,7 @@ urlpatterns = patterns(
         'images_zpool', name='node_images_zpool'),
     url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/servers/(?P<zpool>[A-Za-z0-9\._-]+)$', 'vms', name='node_vms_zpool'),
     url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/servers/$', 'vms', name='node_vms'),
+    url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/backup-definitions/$', 'backup_definitions', name='node_backup_definitions'),
     url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/backups/$', 'backups', name='node_backups'),
     url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/backups/form/$', 'backup_form', name='node_backup_form'),
     url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/backups/list/$', 'backup_list', name='node_backup_list'),

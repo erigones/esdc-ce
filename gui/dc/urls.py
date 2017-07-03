@@ -28,10 +28,13 @@ urlpatterns = patterns(
     url(r'^group/', include('gui.dc.group.urls')),
     # dc switch
     url(r'^switch/$', 'dc_switch_form', name='dc_switch_form'),
-    # dc redirect to VM details
+    # DC redirect to VM details
     url(r'^switch/(?P<dc>[A-Za-z0-9\._-]+)/server/(?P<hostname>[A-Za-z0-9\._-]+)/$', 'dc_vm_details',
         name='dc_vm_details'),
-    # dc redirect do DC settings
+    # DC redirect to VM backups
+    url(r'^switch/(?P<dc>[A-Za-z0-9\._-]+)/server/(?P<hostname>[A-Za-z0-9\._-]+)/backup/$', 'dc_vm_backup',
+        name='dc_vm_backup'),
+    # DC redirect do DC settings
     url(r'^switch/(?P<dc>[A-Za-z0-9\._-]+)/settings/$', 'dc_dc_settings',
         name='dc_dc_settings'),
     url(r'^switch/dc-settings/$', 'dc_dc_settings',

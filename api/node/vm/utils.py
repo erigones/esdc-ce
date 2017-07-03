@@ -69,7 +69,6 @@ def vm_from_json(request, task_id, json, dc, owner=settings.ADMIN_USER, template
     vm = Vm(uuid=json['uuid'], hostname=json['hostname'][:hostname_length], status=Vm.STATUS_DICT[json['state']], dc=dc)
     vm.new = True
     brand = json['brand']
-    zoneid = json.get('zoneid', None)
 
     # json and json_active
     vm.json = vm.json_active = json
@@ -138,9 +137,6 @@ def vm_from_json(request, task_id, json, dc, owner=settings.ADMIN_USER, template
         logger.info('Server %s (%s) was saved', vm.uuid, vm)
         exc = None
         primary_ip = None
-
-        if zoneid:
-            vm.save_zoneid(zoneid)
 
         if update_ips:
             for i, nic in enumerate(vm.json_get_nics()):
