@@ -1,17 +1,15 @@
-from django.db.transaction import atomic
-from django.db.models import Q
-from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
+from django.db.models import Q
+from django.db.transaction import atomic
+from django.utils.translation import ugettext_lazy as _
 
 from api import serializers as s
+from api.dc.utils import get_dc
 from api.email import sendmail
 from api.fields import get_boolean_value
 from api.permissions import generate_random_security_hash
-from api.dc.utils import get_dc
 from gui.models import User, Role
 from vms.models import Dc
-
-INVALID_USERNAMES = frozenset(['profile'])
 
 
 class ApiKeysSerializer(s.InstanceSerializer):
@@ -120,7 +118,7 @@ class UserSerializer(ApiKeysSerializer):
         else:
             if self.object.id == settings.ADMIN_USER:
                 raise s.NoPermissionToModify
-            elif value in INVALID_USERNAMES:
+            elif value in settings.INVALID_USERNAMES:
                 raise s.ValidationError(s.WritableField.default_error_messages['invalid'])
 
         return attrs
