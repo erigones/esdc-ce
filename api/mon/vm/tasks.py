@@ -7,7 +7,7 @@ from que.exceptions import MgmtTaskException
 from que.utils import dc_id_from_task_id
 from api.task.utils import mgmt_task, mgmt_lock
 from api.mon.log import save_task_log
-from api.mon.zabbix import LOG, getZabbix, ZabbixError
+from api.mon import LOG, get_monitoring, MonitoringError
 from api.mon.messages import LOG_MON_VM_UPDATE, LOG_MON_VM_DELETE
 from api.mon.vm.utils import VmMonInternalTask
 from vms.signals import vm_deployed, vm_json_active_changed, vm_node_changed, vm_notcreated
@@ -28,8 +28,8 @@ def mon_vm_sla(task_id, vm_hostname, yyyymm, vm_node_history, **kwargs):
     dc = Dc.objects.get_by_id(int(dc_id_from_task_id(task_id)))
 
     try:
-        sla = getZabbix(dc).vm_sla(vm_node_history)
-    except ZabbixError as exc:
+        sla = get_monitoring(dc).vm_sla(vm_node_history)
+    except MonitoringError as exc:
         raise MgmtTaskException(text_type(exc))
 
     result = {
@@ -52,9 +52,9 @@ def mon_vm_history(task_id, vm_uuid, items, zhistory, result, items_search, **kw
     dc = Dc.objects.get_by_id(int(dc_id_from_task_id(task_id)))
 
     try:
-        history = getZabbix(dc).vm_history(vm_uuid, items, zhistory, result['since'], result['until'],
-                                           items_search=items_search)
-    except ZabbixError as exc:
+        history = get_monitoring(dc).vm_history(vm_uuid, items, zhistory, result['since'], result['until'],
+                                                items_search=items_search)
+    except MonitoringError as exc:
         raise MgmtTaskException(text_type(exc))
 
     result.update(history)
@@ -88,7 +88,7 @@ def mon_vm_sync(task_id, sender, vm_uuid=None, log=LOG, **kwargs):
         logger.info('Skipping VM %s zabbix sync, because zabbix module is completely disabled in DC %s', vm, vm.dc)
         return None
 
-    zx = getZabbix(vm.dc)
+    zx = get_monitoring(vm.dc)
     force_update = kwargs.get('force_update', False)
 
     return zx.vm_sync(vm, force_update=force_update, task_log=log)
@@ -106,7 +106,7 @@ def mon_vm_disable(task_id, sender, vm_uuid=None, log=LOG, **kwargs):
     vm = log.obj = Vm.objects.select_related('dc').get(uuid=vm_uuid)
 
     if vm.is_zabbix_sync_active() or vm.is_external_zabbix_sync_active():
-        return getZabbix(vm.dc).vm_disable(vm, task_log=log)
+        return get_monitoring(vm.dc).vm_disable(vm, task_log=log)
     else:
         logger.info('Zabbix synchronization completely disabled for VM %s', vm)
         return None
@@ -131,8 +131,8 @@ def mon_vm_delete(task_id, sender, vm_uuid=None, vm_hostname=None, vm_alias=None
 
     if zabbix_sync or external_zabbix_sync:
         dc = Dc.objects.get_by_id(dc_id)
-        return getZabbix(dc).vm_delete(Vm(uuid=vm_uuid, hostname=vm_hostname), internal=zabbix_sync,
-                                       external=external_zabbix_sync, task_log=log)
+        return get_monitoring(dc).vm_delete(Vm(uuid=vm_uuid, hostname=vm_hostname), internal=zabbix_sync,
+                                            external=external_zabbix_sync, task_log=log)
     else:
         logger.info('Zabbix synchronization completely disabled for VM %s', vm_uuid)
         return None

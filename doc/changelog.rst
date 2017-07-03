@@ -12,11 +12,14 @@ Features
 - Added node_vm_define_backup_list API and GUI views -  `#139 <https://github.com/erigones/esdc-ce/issues/139>`__
 - Added ability to import images from local image server - `#140 <https://github.com/erigones/esdc-ce/issues/140>`__
 - Added comparative VM graphs (CPU, memory, disk) per compute node - `#140 <https://github.com/erigones/esdc-ce/issues/182>`__
+- Added reflection of users and user groups from management to Zabbix monitoring - `#91 <https://github.com/erigones/esdc-ce/issues/91>`__
 
 Bugs
 ----
 
 - Fixed problem with high amount of network traffic in the celeryev exchange - `#179 <https://github.com/erigones/esdc-ce/issues/179>`__
+- Fixed IP address validation, when multiple IPs are being added - `#177 <https://github.com/erigones/esdc-ce/issues/177>`__
+- Disable current compute in VM migration dialog - `#191 <https://github.com/erigones/esdc-ce/issues/191>`__
 
 
 2.5.3 (released on 2017-05-16)

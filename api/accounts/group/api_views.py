@@ -1,3 +1,5 @@
+from django.db import connection
+
 from api.status import HTTP_201_CREATED, HTTP_200_OK
 from api.api_views import APIView
 from api.utils.db import get_virt_object
@@ -9,6 +11,7 @@ from api.task.utils import task_log_success
 from api.dc.utils import attach_dc_virt_object
 from api.dc.messages import LOG_GROUP_ATTACH
 from gui.models import User, Role
+from gui.signals import group_relationship_changed
 from vms.models import DefaultDc
 
 
@@ -65,7 +68,6 @@ class GroupView(APIView):
             return FailureTaskResponse(request, ser.errors, obj=group, dc_bound=False)
 
         ser.save()
-
         if update:
             msg = LOG_GROUP_UPDATE
             status = HTTP_200_OK
@@ -73,6 +75,7 @@ class GroupView(APIView):
             msg = LOG_GROUP_CREATE
             status = HTTP_201_CREATED
 
+        connection.on_commit(lambda: group_relationship_changed.send(group_name=ser.object.name))
         res = SuccessTaskResponse(request, ser.data, status=status, obj=group, msg=msg,
                                   detail_dict=ser.detail_dict(), dc_bound=False)
 
@@ -140,5 +143,7 @@ class GroupView(APIView):
         group = self.group
         dd = {'permissions': list(group.permissions.all().values_list('name', flat=True))}
         group.delete()
+        connection.on_commit(lambda: group_relationship_changed.send(group_name=group.name))
 
         return SuccessTaskResponse(self.request, None, obj=group, msg=LOG_GROUP_DELETE, detail_dict=dd, dc_bound=False)
+
