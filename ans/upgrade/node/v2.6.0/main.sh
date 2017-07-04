@@ -12,6 +12,10 @@ cat "${VERSION_DIR}/files/kstat" > "/opt/zabbix/etc/scripts/kstat"
 # https://github.com/erigones/esdc-ce/issues/183
 echo "+ Updating /opt/zabbix/etc/scripts/dataset-discovery"
 cat "${VERSION_DIR}/files/dataset-discovery" > "/opt/zabbix/etc/scripts/dataset-discovery"
+echo "+ Updating /opt/zabbix/etc/scripts/vm-network-monitor"
+cat "${VERSION_DIR}/files/vm-network-monitor" > "/opt/zabbix/etc/scripts/vm-network-monitor"
+echo "+ Restarting svc:/application/zabbix/vm-network-monitor"
+svcadm restart svc:/application/zabbix/vm-network-monitor
 
 # https://github.com/erigones/esdc-ce/issues/179
 # After /opt/custom/smf/erigonesd.xml is updated the user should do one of the two things:
