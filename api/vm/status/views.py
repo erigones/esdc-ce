@@ -61,7 +61,7 @@ def vm_status(request, hostname_or_uuid, action=None, data=None):
 
     .. http:get:: /vm/(hostname_or_uuid)/status/current
 
-        Retrieves current status from compute node.
+        Retrieves current VM status from compute node.
 
         :DC-bound?:
             * |dc-yes|
@@ -80,7 +80,7 @@ def vm_status(request, hostname_or_uuid, action=None, data=None):
 
     .. http:put:: /vm/(hostname_or_uuid)/status/current
 
-        Retrieves current status from compute node.
+        Retrieves current VM status from compute node and updates status value in DB for the VM.
 
         :DC-bound?:
             * |dc-yes|
