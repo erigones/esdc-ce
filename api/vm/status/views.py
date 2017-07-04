@@ -78,6 +78,27 @@ def vm_status(request, hostname_or_uuid, action=None, data=None):
         :status 404: VM not found
         :status 423: Node is not operational / VM is not operational
 
+    .. http:put:: /vm/(hostname_or_uuid)/status/current
+
+        Retrieves current status from compute node.
+
+        :DC-bound?:
+            * |dc-yes|
+        :Permissions:
+            * |SuperAdmin|
+        :Asynchronous?:
+            * |async-yes|
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
+        :arg data.force: Force change of the current status (default: false)
+        :type data.force: boolean
+        :status 200: SUCCESS
+        :status 201: PENDING
+        :status 400: FAILURE
+        :status 403: Forbidden
+        :status 404: VM not found
+        :status 423: Node is not operational
+
     .. http:put:: /vm/(hostname_or_uuid)/status/start
 
         :DC-bound?:
