@@ -14,6 +14,7 @@ Features
 - Added reflection of users and user groups from management to Zabbix monitoring - `#91 <https://github.com/erigones/esdc-ce/issues/91>`__
 - Updated mbuffer to version 20170515 - `#156 <https://github.com/erigones/esdc-ce/issues/156>`__
 - Updated Python requirements - `#185 <https://github.com/erigones/esdc-ce/issues/185>`__
+- Disabled GSSAPIKeyExchange for every SSH operation - `#185 <https://github.com/erigones/esdc-ce/issues/195>`__
 
 Bugs
 ----
