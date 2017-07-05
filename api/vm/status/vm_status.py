@@ -12,7 +12,8 @@ from api.serializers import ForceSerializer
 from api.task.response import SuccessTaskResponse, FailureTaskResponse, TaskResponse
 from api.vm.utils import get_vms, get_vm
 from api.vm.messages import (LOG_STATUS_GET, LOG_START, LOG_START_ISO, LOG_START_UPDATE, LOG_START_UPDATE_ISO,
-                             LOG_STOP, LOG_STOP_FORCE, LOG_REBOOT, LOG_REBOOT_FORCE)
+                             LOG_STOP, LOG_STOP_FORCE, LOG_REBOOT, LOG_REBOOT_FORCE, LOG_REBOOT_UPDATE, LOG_STOP_UPDATE,
+                             LOG_REBOOT_FORCE_UPDATE, LOG_STOP_FORCE_UPDATE)
 from api.vm.status.tasks import vm_status_changed
 from api.vm.status.serializers import (VmStatusSerializer, VmStatusActionIsoSerializer, VmStatusFreezeSerializer,
                                        VmStatusUpdateJSONSerializer)
@@ -50,17 +51,35 @@ class VmStatus(APIView):
     def apiview(self):
         return {'view': 'vm_status', 'method': self.request.method, 'action': self.action, 'hostname': self.vm.hostname}
 
+    def _add_update_cmd(self, orig_cmd, os_cmd_allowed=False, pre_cmd=''):
+        from api.vm.base.vm_manage import VmManage
+        vm = self.vm
+        json_update, os_cmd = VmManage.fix_update(vm.json_update())
+
+        if os_cmd:
+            if os_cmd_allowed:
+                VmManage.validate_update(vm, json_update, os_cmd)
+            else:  # Dangerous, explicit update needed
+                # TODO: fix in gui
+                raise PreconditionRequired('VM must be updated first')
+        else:
+            os_cmd = ''
+
+        stdin = json_update.dump()
+        logger.info('VM % is going to be updated with json """%s"""', vm, stdin)
+        update_cmd = 'vmadm update %s >&2; e=$?; vmadm get %s 2>/dev/null; ' % (vm.uuid, vm.uuid)
+        cmd = os_cmd + update_cmd + orig_cmd + '; exit $e'
+
+        if pre_cmd:
+            cmd = pre_cmd + ' && ' + cmd
+
+        return cmd, stdin
+
     def _action_cmd(self, action, force=False):
         cmd = 'vmadm %s %s' % (action, self.vm.uuid)
         if force:
             cmd += ' -F'
         return cmd
-
-    def _stop_cmd(self, force=False):
-        return self._action_cmd('stop', force=force)
-
-    def _reboot_cmd(self, force=False):
-        return self._action_cmd('stop', force=force)
 
     def _start_cmd(self, iso=None, iso2=None, once=False):
         vm = self.vm
@@ -208,8 +227,20 @@ class VmStatus(APIView):
         apiview['update'] = False
         transition_to_stopping = False
 
+        # The update parameter is used by all actions (start, stop, reboot)
+        ser_update = VmStatusUpdateJSONSerializer(data=self.data)
+
+        if not ser_update.is_valid():
+            return FailureTaskResponse(request, ser_update.errors, vm=vm)
+
+        if vm.json_changed():
+            apiview['update'] = ser_update.data['update']
+            logger.info('VM %s json != json_active', vm)
+
+            if not apiview['update']:
+                logger.info('VM %s json_active update disabled', vm)
+
         if action == 'start':
-            msg = LOG_START
             ser = VmStatusActionIsoSerializer(request, vm, data=self.data)
 
             if not ser.is_valid():
@@ -224,59 +255,62 @@ class VmStatus(APIView):
                 iso = ser.iso
                 cmd = self._start_cmd(iso=iso, iso2=ser.iso2, once=ser.data['cdimage_once'])
             else:
+                msg = LOG_START
                 iso = None
                 cmd = self._start_cmd()
 
-            ser_update = VmStatusUpdateJSONSerializer(data=self.data)
+            if apiview['update']:
+                cmd, stdin = self._add_update_cmd(cmd, os_cmd_allowed=False)
 
-            if ser_update.is_valid():
-                if vm.json_changed():
-                    apiview['update'] = ser_update.data['update']
-                    logger.info('VM %s json != json_active', vm)
-
-                    if apiview['update']:
-                        from api.vm.base.vm_manage import VmManage
-                        stdin, os_cmd = VmManage.fix_update(vm.json_update())
-                        stdin = stdin.dump()
-
-                        if os_cmd:  # Dangerous, explicit update needed
-                            # TODO: fix in gui
-                            raise PreconditionRequired('VM must be updated first')
-
-                        if iso:
-                            msg = LOG_START_UPDATE_ISO
-                        else:
-                            msg = LOG_START_UPDATE
-
-                        cmd_update = 'vmadm update %s >&2; e=$?; vmadm get %s 2>/dev/null; ' % (vm.uuid, vm.uuid)
-                        cmd = cmd_update + cmd + '; exit $e'
-                        # logger.info('VM %s json_active is going to be updated with json """%s"""', vm, stdin)
-                    else:
-                        logger.warning('VM %s json_active update disabled', vm)
-
-            else:
-                return FailureTaskResponse(request, ser_update.errors, vm=vm)
+                if iso:
+                    msg = LOG_START_UPDATE_ISO
+                else:
+                    msg = LOG_START_UPDATE
 
         else:
-            force = ForceSerializer(data=self.data, default=False).is_true()
-            cmd = self._action_cmd(action, force=force)
+            apiview['force'] = ForceSerializer(data=self.data, default=False).is_true()
 
-            if action == 'reboot':
-                msg = LOG_REBOOT
-            else:
-                msg = LOG_STOP
-
-            if force:
-                apiview['force'] = True
+            if apiview['update']:
+                # This will always perform a vmadm stop command, followed by a vmadm update command and optionally
+                # followed by a vmadm start command (reboot)
+                pre_cmd = self._action_cmd('stop', force=apiview['force'])
 
                 if action == 'reboot':
-                    msg = LOG_REBOOT_FORCE
-                else:
-                    lock += ' force'
-                    msg = LOG_STOP_FORCE
+                    if apiview['force']:
+                        msg = LOG_REBOOT_FORCE_UPDATE
+                    else:
+                        msg = LOG_REBOOT_UPDATE
 
-            elif vm.status == Vm.STOPPING:
-                raise VmIsNotOperational('VM is already stopping; try to use force')
+                    post_cmd = self._action_cmd('start')
+                else:
+                    if apiview['force']:
+                        msg = LOG_STOP_FORCE_UPDATE
+                    else:
+                        msg = LOG_STOP_UPDATE
+
+                    post_cmd = ''
+
+                cmd, stdin = self._add_update_cmd(post_cmd, os_cmd_allowed=True, pre_cmd=pre_cmd)
+            else:
+                cmd = self._action_cmd(action, force=apiview['force'])
+
+                if apiview['force']:
+                    if action == 'reboot':
+                        msg = LOG_REBOOT_FORCE
+                    else:
+                        lock += ' force'
+                        msg = LOG_STOP_FORCE
+                else:
+                    if action == 'reboot':
+                        msg = LOG_REBOOT
+                    else:
+                        msg = LOG_STOP
+
+            if vm.status == Vm.STOPPING:
+                if apiview['update']:
+                    raise PreconditionRequired('Cannot perform update while VM is stopping')
+                if not apiview['force']:
+                    raise VmIsNotOperational('VM is already stopping; try to use force')
             else:
                 transition_to_stopping = True
 

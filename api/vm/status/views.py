@@ -128,8 +128,9 @@ def vm_status(request, hostname_or_uuid, action=None, data=None):
         :status 400: FAILURE
         :status 403: Forbidden
         :status 404: VM not found
-        :status 417: Bad action
+        :status 417: Bad action / VM has snapshots (disk size update)
         :status 423: Node is not operational / VM is not operational / VM is already stopping
+        :status 428: Cannot perform update while VM is stopping
 
     .. http:put:: /vm/(hostname_or_uuid)/status/reboot
 
@@ -148,8 +149,9 @@ def vm_status(request, hostname_or_uuid, action=None, data=None):
         :status 400: FAILURE
         :status 403: Forbidden
         :status 404: VM not found
-        :status 417: Bad action
+        :status 417: Bad action / VM has snapshots (disk size update)
         :status 423: Node is not operational / VM is not operational / VM is already stopping
+        :status 428: Cannot perform update while VM is stopping
 
     """
     return VmStatus(request, hostname_or_uuid, action, data).response()
