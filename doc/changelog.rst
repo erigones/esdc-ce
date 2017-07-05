@@ -13,6 +13,7 @@ Features
 - Added ability to import images from local image server - `#140 <https://github.com/erigones/esdc-ce/issues/140>`__
 - Added reflection of users and user groups from management to Zabbix monitoring - `#91 <https://github.com/erigones/esdc-ce/issues/91>`__
 - Updated mbuffer to version 20170515 - `#156 <https://github.com/erigones/esdc-ce/issues/156>`__
+- Updated Python requirements - `#185 <https://github.com/erigones/esdc-ce/issues/185>`__
 
 Bugs
 ----
