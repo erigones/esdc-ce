@@ -288,11 +288,11 @@ class VmStatus(APIView):
             if not ser_stop_reboot.is_valid():
                 return FailureTaskResponse(request, ser_stop_reboot.errors, vm=vm)
 
+            update = apiview.get('update', False)  # VmStatusUpdateJSONSerializer
+            force = apiview['force'] = ser_stop_reboot.data['force']
             timeout = ser_stop_reboot.data['timeout']
-            force = apiview['force'] = ser_stop_reboot['force']
-            update = apiview['update']
 
-            if not apiview['force']:
+            if not force:
                 apiview['timeout'] = timeout
 
             if update:
