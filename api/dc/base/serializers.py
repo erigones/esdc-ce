@@ -271,7 +271,8 @@ class DcSettingsSerializer(s.InstanceSerializer):
                                                   'this virtual datacenter.'))
     VMS_VM_STOP_TIMEOUT_DEFAULT = s.IntegerField(label='VMS_VM_STOP_TIMEOUT_DEFAULT',
                                                  help_text='Default time period (in seconds) for a graceful VM stop or '
-                                                           'reboot, after which a force stop/reboot is send to the VM.')
+                                                           'reboot, after which a force stop/reboot is send to the VM '
+                                                           '(KVM only).')
     VMS_VM_STOP_WIN_TIMEOUT_DEFAULT = s.IntegerField(label='VMS_VM_STOP_WIN_TIMEOUT_DEFAULT',
                                                      help_text='This is the same setting as VMS_VM_STOP_TIMEOUT_DEFAULT'
                                                                ' but for a VM with Windows OS type, which usually takes'
