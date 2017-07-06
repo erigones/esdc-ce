@@ -209,6 +209,13 @@ class AdminServerSettingsForm(ServerSettingsForm):
                              widget=forms.TextInput(attrs={'class': 'input-transparent narrow input-mbytes',
                                                            'required': 'required',
                                                            'pattern': '[0-9\.]+[BKMGTPEbkmgtpe]?'}))
+    notes = forms.CharField(label=_('Notes'),
+                      help_text=_('Text visible for every user with access to VM.'),
+                      required=False,
+                      widget=forms.Textarea(attrs={
+                          'class': 'input-transparent small',
+                          'rows': 5})
+                      )
     monitored = forms.BooleanField(label=_('Monitored?'), required=False,
                                    widget=forms.CheckboxInput(attrs={'class': 'normal-check'}))
     installed = forms.BooleanField(label=_('Installed?'), required=False,

@@ -30,6 +30,7 @@
 {% include "gui/form_field.html" with field=settingsform.ostype %}
 {% include "gui/form_field.html" with field=settingsform.vcpus %}
 {% include "gui/form_field.html" with field=settingsform.ram addon=mb_addon %}
+{% include "gui/form_field.html" with field=settingsform.notes %}
 
 <div class="advanced hide">
 {% if dc_settings.MON_ZABBIX_ENABLED %}
