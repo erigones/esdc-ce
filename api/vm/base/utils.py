@@ -43,31 +43,6 @@ def _is_ip_ok(ip_queryset, vm_ip, vm_network_uuid):
                for ip in ip_queryset)
 
 
-def _save_ip_vm_association(vm, nic_id, ip, network_uuid, allowed_ips=False):
-    """Helper function used below for unassociated IP addresses. Check if an IP address can be associated with a VM
-    and update the VM<->IPAddress association if possible."""
-    try:
-        wanted_ip = IPAddress.objects.select_related('vm').get(subnet__uuid=network_uuid, ip=ip)
-    except IPAddress.DoesNotExist:
-        logger.error('IP address %s (subnet %s) for VM %s NIC ID %s (allowed_ips=%s) does not exist',
-                     ip, network_uuid, vm, nic_id, allowed_ips)
-    else:
-        if not wanted_ip.vm and wanted_ip.usage in (IPAddress.VM, IPAddress.VM_REAL):
-            logger.warning('Saving IP address %s (subnet %s) association with VM %s NIC ID %s (allowed_ips=%s)',
-                           ip, network_uuid, vm, nic_id, allowed_ips)
-            wanted_ip.usage = IPAddress.VM_REAL
-
-            if allowed_ips:
-                wanted_ip.vms.add(vm)
-            else:
-                wanted_ip.vm = vm
-
-            wanted_ip.save()
-        else:
-            logger.critical('IP address %s (subnet %s) for VM %s NIC ID %s (allowed_ips=%s) is already used by %s %s',
-                            ip, network_uuid, vm, nic_id, allowed_ips, wanted_ip.get_usage_display(), wanted_ip.vm)
-
-
 def vm_update_ipaddress_usage(vm):
     """
     This helper function is responsible for updating IPAddress.usage and IPAddress.vm of server IPs (#chili-615,1029),
@@ -76,6 +51,9 @@ def vm_update_ipaddress_usage(vm):
         - when a VM is created or updated all IP usages are set to IPAddress.VM_REAL (on hypervisor) and
 
     Always call this function _only_ after vm.json_active is synced with vm.json!!!
+
+    In order to properly understand this code you have understand the association between an IPAddress and Vm model.
+    This function may raise a ValueError if the VM and IP address were not properly associated (e.g. via vm_define_nic).
     """
     current_ips = set(vm.json_active_get_ips(primary_ips=True, allowed_ips=False))
     current_ips.update(vm.json_get_ips(primary_ips=True, allowed_ips=False))
@@ -120,15 +98,17 @@ def vm_update_ipaddress_usage(vm):
                 if _is_ip_ok(vm_ips, ip, network_uuid):
                     logger.debug('VM %s NIC ID %s IP address %s is OK', vm, nic_id, ip)
                 else:
-                    _save_ip_vm_association(vm, nic_id, ip, network_uuid, allowed_ips=False)
+                    raise ValueError('VM %s NIC ID %s IP address %s is not properly associated with VM!' %
+                                     (vm, nic_id, ip))
 
             for ip in allowed_ips:
                 if _is_ip_ok(vm_allowed_ips, ip, network_uuid):
                     logger.debug('VM %s NIC ID %s allowed IP address %s is OK', vm, nic_id, ip)
                 else:
-                    _save_ip_vm_association(vm, nic_id, ip, network_uuid, allowed_ips=True)
+                    raise ValueError('VM %s NIC ID %s allowed IP address %s is not properly associated with VM!' %
+                                     (vm, nic_id, ip))
         else:
-            logger.error('VM %s NIC ID %s does not have a network uuid!', vm, nic_id)
+            raise ValueError('VM %s NIC ID %s does not have a network uuid!' % (vm, nic_id))
 
 
 def vm_deploy(vm, force_stop=False):
