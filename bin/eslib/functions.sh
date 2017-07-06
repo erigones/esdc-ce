@@ -52,7 +52,7 @@ QGA_SNAPSHOT=${QGA_SNAPSHOT:-"${ERIGONES_HOME}/bin/qga-snapshot"}
 ###############################################################
 # Arguments passed to ssh
 ###############################################################
-SSH_ARGS=${SSH_ARGS:-"-c chacha20-poly1305@openssh.com -o BatchMode=yes -o StrictHostKeyChecking=no "}
+SSH_ARGS=${SSH_ARGS:-"-c chacha20-poly1305@openssh.com -o BatchMode=yes -o StrictHostKeyChecking=no -o GSSAPIKeyExchange=no "}
 
 ###############################################################
 # Arguments passed to mbuffer

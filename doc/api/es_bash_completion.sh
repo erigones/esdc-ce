@@ -254,9 +254,14 @@ _es() {
 			params="-force -cb_url -cb_method"
 		;;
 
+		/vm/*/status/current|/vm/*/status/current/)
+			[ ${COMP_CWORD} -eq 2 ] && COMPREPLY=( "${cur} " )
+			params="-force"
+		;;
+
 		/vm/*/status|/vm/*/status/*)
 			if [ ${COMP_CWORD} -eq 2 ]; then
-				COMPREPLY=( $(compgen -P "${cur%/*}" -W "/ /start /stop /reboot" -- "/${cur##*/}" ) )
+				COMPREPLY=( $(compgen -P "${cur%/*}" -W "/ /start /stop /reboot /current" -- "/${cur##*/}" ) )
 				COMPREPLY=( "${COMPREPLY[@]/%/ }" )
 			fi
 		;;
