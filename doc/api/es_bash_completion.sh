@@ -3,7 +3,7 @@
 # bash completion for es - Erigones command-line tool
 ################################################################################
 # Compatible with es >= 1.1
-# Copyright (C) 2014 - 2016 Erigones, s. r. o.
+# Copyright (C) 2014 - 2017 Erigones, s. r. o.
 #							info@erigones.com
 ################################################################################
 
@@ -238,17 +238,22 @@ _es() {
 
 		/vm/*/status/stop|/vm/*/status/stop/)
 			[ ${COMP_CWORD} -eq 2 ] && COMPREPLY=( "${cur} " )
-			params="-force -freeze -unfreeze -cb_url -cb_method"
+			params="-force -timeout -freeze -unfreeze -cb_url -cb_method"
 		;;
 
 		/vm/*/status/reboot|/vm/*/status/reboot/)
 			[ ${COMP_CWORD} -eq 2 ] && COMPREPLY=( "${cur} " )
-			params="-force -cb_url -cb_method"
+			params="-force -timeout -cb_url -cb_method"
+		;;
+
+		/vm/*/status/current|/vm/*/status/current/)
+			[ ${COMP_CWORD} -eq 2 ] && COMPREPLY=( "${cur} " )
+			params="-force"
 		;;
 
 		/vm/*/status|/vm/*/status/*)
 			if [ ${COMP_CWORD} -eq 2 ]; then
-				COMPREPLY=( $(compgen -P "${cur%/*}" -W "/ /start /stop /reboot" -- "/${cur##*/}" ) )
+				COMPREPLY=( $(compgen -P "${cur%/*}" -W "/ /start /stop /reboot /current" -- "/${cur##*/}" ) )
 				COMPREPLY=( "${COMPREPLY[@]/%/ }" )
 			fi
 		;;

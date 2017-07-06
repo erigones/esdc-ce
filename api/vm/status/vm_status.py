@@ -8,7 +8,6 @@ from vms.models import Vm
 from api.api_views import APIView
 from api.exceptions import (PermissionDenied, VmIsNotOperational, NodeIsNotOperational, PreconditionRequired,
                             ExpectationFailed)
-from api.serializers import ForceSerializer
 from api.task.response import SuccessTaskResponse, FailureTaskResponse, TaskResponse
 from api.vm.utils import get_vms, get_vm
 from api.vm.messages import (LOG_STATUS_GET, LOG_START, LOG_START_ISO, LOG_START_UPDATE, LOG_START_UPDATE_ISO,
@@ -16,7 +15,7 @@ from api.vm.messages import (LOG_STATUS_GET, LOG_START, LOG_START_ISO, LOG_START
                              LOG_REBOOT_FORCE_UPDATE, LOG_STOP_FORCE_UPDATE)
 from api.vm.status.tasks import vm_status_changed
 from api.vm.status.serializers import (VmStatusSerializer, VmStatusActionIsoSerializer, VmStatusFreezeSerializer,
-                                       VmStatusUpdateJSONSerializer)
+                                       VmStatusUpdateJSONSerializer, VmStatusStopSerializer)
 
 logger = getLogger(__name__)
 
@@ -27,7 +26,7 @@ class VmStatus(APIView):
     """
     order_by_default = order_by_fields = ('hostname',)
     detail = ''
-    actions = ('start', 'stop', 'reboot')
+    actions = ('start', 'stop', 'reboot', 'current')
     statuses = (Vm.RUNNING, Vm.STOPPED, Vm.STOPPING, Vm.FROZEN)
 
     def __init__(self, request, hostname_or_uuid, action, data):
@@ -75,10 +74,12 @@ class VmStatus(APIView):
 
         return cmd, stdin
 
-    def _action_cmd(self, action, force=False):
+    def _action_cmd(self, action, force=False, timeout=None):
         cmd = 'vmadm %s %s' % (action, self.vm.uuid)
         if force:
             cmd += ' -F'
+        elif timeout:
+            cmd += ' -t %s' % timeout
         return cmd
 
     def _start_cmd(self, iso=None, iso2=None, once=False):
@@ -121,12 +122,9 @@ class VmStatus(APIView):
 
         return ' '.join(cmd) % cmd_dict
 
-    def get_current_status(self):
+    def get_current_status(self, force_change=False):
         """Get current VM status"""
         request, vm = self.request, self.vm
-
-        if vm.status not in (Vm.RUNNING, Vm.STOPPED, Vm.STOPPING, Vm.ERROR):
-            raise VmIsNotOperational
 
         if vm.node.status not in vm.node.STATUS_OPERATIONAL:
             raise NodeIsNotOperational
@@ -143,7 +141,7 @@ class VmStatus(APIView):
         }
         callback = (
             'api.vm.status.tasks.vm_status_current_cb',
-            {'vm_uuid': vm.uuid}
+            {'vm_uuid': vm.uuid, 'force_change': force_change}
         )
 
         tid, err = execute(request, vm.owner.id, cmd, meta=meta, callback=callback, queue=vm.node.fast_queue,
@@ -165,7 +163,11 @@ class VmStatus(APIView):
             return SuccessTaskResponse(request, res)
 
         if self.action == 'current':
+            if vm.status not in (Vm.RUNNING, Vm.STOPPED, Vm.STOPPING, Vm.ERROR):
+                raise VmIsNotOperational
+
             return self.get_current_status()
+
         else:
             ser = VmStatusSerializer(vm)
             return SuccessTaskResponse(request, ser.data, vm=vm)
@@ -174,7 +176,7 @@ class VmStatus(APIView):
         request, vm, action = self.request, self.vm, self.action
 
         # Cannot change status unless the VM is created on node
-        if vm.status not in self.statuses:
+        if vm.status not in self.statuses and action != 'current':
             raise VmIsNotOperational
 
         if action not in self.actions:
@@ -213,6 +215,19 @@ class VmStatus(APIView):
             res = {'message': 'Removing frozen status for VM %s.' % vm.hostname}
 
             return SuccessTaskResponse(request, res, task_id=tid, vm=vm)
+
+        elif action == 'current':
+            # for PUT /current/ action user needs to be SuperAdmin
+            # since this operation will forcibly change whatever status a VM has in the DB
+            if not request.user.is_super_admin(request):
+                raise PermissionDenied
+
+            force = self.data.get('force', False)
+
+            if not force:
+                raise PreconditionRequired('Force parameter must be used!')
+
+            return self.get_current_status(force_change=force)
 
         else:
             raise ExpectationFailed('Bad action')
@@ -268,22 +283,32 @@ class VmStatus(APIView):
                     msg = LOG_START_UPDATE
 
         else:
-            apiview['force'] = ForceSerializer(data=self.data, default=False).is_true()
+            ser_stop_reboot = VmStatusStopSerializer(request, vm, data=self.data)
 
-            if apiview['update']:
+            if not ser_stop_reboot.is_valid():
+                return FailureTaskResponse(request, ser_stop_reboot.errors, vm=vm)
+
+            timeout = ser_stop_reboot.data['timeout']
+            force = apiview['force']
+            update = apiview['update']
+
+            if not apiview['force']:
+                apiview['timeout'] = timeout
+
+            if update:
                 # This will always perform a vmadm stop command, followed by a vmadm update command and optionally
                 # followed by a vmadm start command (reboot)
-                pre_cmd = self._action_cmd('stop', force=apiview['force'])
+                pre_cmd = self._action_cmd('stop', force=force, timeout=timeout)
 
                 if action == 'reboot':
-                    if apiview['force']:
+                    if force:
                         msg = LOG_REBOOT_FORCE_UPDATE
                     else:
                         msg = LOG_REBOOT_UPDATE
 
                     post_cmd = self._action_cmd('start')
                 else:
-                    if apiview['force']:
+                    if force:
                         msg = LOG_STOP_FORCE_UPDATE
                     else:
                         msg = LOG_STOP_UPDATE
@@ -292,9 +317,9 @@ class VmStatus(APIView):
 
                 cmd, stdin = self._add_update_cmd(post_cmd, os_cmd_allowed=True, pre_cmd=pre_cmd)
             else:
-                cmd = self._action_cmd(action, force=apiview['force'])
+                cmd = self._action_cmd(action, force=force, timeout=timeout)
 
-                if apiview['force']:
+                if force:
                     if action == 'reboot':
                         msg = LOG_REBOOT_FORCE
                     else:
@@ -307,9 +332,9 @@ class VmStatus(APIView):
                         msg = LOG_STOP
 
             if vm.status == Vm.STOPPING:
-                if apiview['update']:
+                if update:
                     raise PreconditionRequired('Cannot perform update while VM is stopping')
-                if not apiview['force']:
+                if not force:
                     raise VmIsNotOperational('VM is already stopping; try to use force')
             else:
                 transition_to_stopping = True
