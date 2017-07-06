@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from api import serializers as s
 from api.vm.utils import get_iso_images
 from vms.models import Vm, Node, Iso
@@ -63,3 +65,17 @@ class VmStatusFreezeSerializer(s.Serializer):
 
 class VmStatusUpdateJSONSerializer(s.Serializer):
     update = s.BooleanField(default=True)
+
+
+class VmStatusStopSerializer(s.Serializer):
+    timeout = s.IntegerField(default=settings.VMS_VM_STOP_TIMEOUT_DEFAULT)
+    force = s.BooleanField(default=False)
+
+    def __init__(self, request, vm, *args, **kwargs):
+        super(VmStatusStopSerializer, self).__init__(*args, **kwargs)
+        dc_settings = request.dc.settings
+
+        if vm.ostype == vm.WINDOWS:
+            self.fields['timeout'].default = dc_settings.VMS_VM_STOP_WIN_TIMEOUT_DEFAULT
+        else:
+            self.fields['timeout'].default = dc_settings.VMS_VM_STOP_TIMEOUT_DEFAULT
