@@ -289,7 +289,7 @@ class VmStatus(APIView):
                 return FailureTaskResponse(request, ser_stop_reboot.errors, vm=vm)
 
             timeout = ser_stop_reboot.data['timeout']
-            force = apiview['force']
+            force = apiview['force'] = ser_stop_reboot['force']
             update = apiview['update']
 
             if not apiview['force']:
