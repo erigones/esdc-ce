@@ -147,7 +147,7 @@ def vm_status(request, hostname_or_uuid, action=None, data=None):
 VM on compute node (default: false)
         :type data.update: boolean
         :arg data.timeout: Time period (in seconds) for a graceful shutdown, after which the force shutdown \
-is send to the VM (default: 180 seconds / 300 seconds for Windows VM)
+is send to the VM (KVM only) (default: 180 seconds / 300 seconds for Windows VM)
         :type data.timeout: integer
         :arg data.freeze: Set frozen status after successful stop action (default: false)
         :type data.freeze: boolean
@@ -178,7 +178,7 @@ is send to the VM (default: 180 seconds / 300 seconds for Windows VM)
 VM on compute node (default: false)
         :type data.update: boolean
         :arg data.timeout: Time period (in seconds) for a graceful reboot, after which the force reboot \
-is send to the VM (default: 180 seconds / 300 seconds for Windows VM)
+is send to the VM (KVM only) (default: 180 seconds / 300 seconds for Windows VM)
         :type data.timeout: integer
         :status 200: SUCCESS
         :status 201: PENDING
