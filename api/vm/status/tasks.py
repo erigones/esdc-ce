@@ -439,7 +439,7 @@ def vm_status_cb(result, task_id, vm_uuid=None):
 
     if result['returncode'] == 0 and msg and msg.find('Successfully') == 0:
         # json was updated
-        if result['meta']['apiview']['update'] and msg.find('Successfully updated') == 0:
+        if result['meta']['apiview']['update'] and msg.find('Successfully updated') != -1:
             try:  # save json from smartos
                 json_active = vm.json.load(json)
                 vm_delete_snapshots_of_removed_disks(vm)  # Do this before updating json and json_active
