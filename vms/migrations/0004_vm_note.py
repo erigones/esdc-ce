@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='vm',
-            name='notes',
-            field=models.TextField(verbose_name='Notes', blank=True),
+            name='note',
+            field=models.TextField(verbose_name='Note', blank=True),
         ),
     ]

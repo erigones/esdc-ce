@@ -227,7 +227,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
                                  verbose_name=_('Template'))
     uptime = models.IntegerField(_('Aggregated uptime'), default=0, editable=False)
     uptime_changed = models.IntegerField(_('Last update of aggregated uptime'), default=0, editable=False)
-    notes = models.TextField(_('Notes'), blank=True)
+    note = models.TextField(_('Note'), blank=True)
 
     # don't access 'encoded_data' directly, use the 'data' property instead, etc
     # default is an empty dict
