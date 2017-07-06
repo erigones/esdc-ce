@@ -243,7 +243,7 @@ class VmStatus(APIView):
         transition_to_stopping = False
 
         # The update parameter is used by all actions (start, stop, reboot)
-        ser_update = VmStatusUpdateJSONSerializer(data=self.data)
+        ser_update = VmStatusUpdateJSONSerializer(data=self.data, default=(action == 'start'))
 
         if not ser_update.is_valid():
             return FailureTaskResponse(request, ser_update.errors, vm=vm)
