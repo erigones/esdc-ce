@@ -97,6 +97,8 @@ def vm_define(request, hostname_or_uuid, data=None):
         :type data.vcpus: integer
         :arg data.ram: **required** - Size of RAM inside VM (32 - 524288 MB)
         :type data.ram: integer
+        :arg data.note: Text note visible to every user with access to VM.
+        :type data.note: string
         :arg data.owner: User that owns the VM (default: logged in user)
         :type data.owner: string
         :arg data.node: Name of the host system \
@@ -160,6 +162,8 @@ Items will be set as static routes in the OS (SunOS Zone only, default: {})
         :type data.vcpus: integer
         :arg data.ram: Size of RAM inside VM (32 - 524288 MB)
         :type data.ram: integer
+        :arg data.note: Text note visible to every user with access to VM.
+        :type data.note: string
         :arg data.owner: User that owns the VM
         :type data.owner: string
         :arg data.node: Name of the host system
