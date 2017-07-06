@@ -204,6 +204,8 @@
                     "VMS_VM_SNAPSHOT_LIMIT_MANUAL_DEFAULT": null,
                     "VMS_VM_SNAPSHOT_SIZE_LIMIT": null,
                     "VMS_VM_SNAPSHOT_SIZE_LIMIT_DEFAULT": null,
+                    "VMS_VM_STOP_TIMEOUT_DEFAULT": 180,
+                    "VMS_VM_STOP_WIN_TIMEOUT_DEFAULT": 300,
                     "VMS_VM_SSH_KEYS_DEFAULT": [],
                     "VMS_VM_ZFS_IO_PRIORITY_DEFAULT": 100, 
                     "VMS_ZONE_ENABLED": false, 

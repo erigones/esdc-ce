@@ -818,11 +818,16 @@ a.white {
 }
 
 /* line 714, ../scss/vm.scss */
+.narrowest {
+  width: 60px;
+}
+
+/* line 718, ../scss/vm.scss */
 .wide {
   width: 260px;
 }
 
-/* line 718, ../scss/vm.scss */
+/* line 722, ../scss/vm.scss */
 .vms_tags.select2-container .select2-choices {
   -webkit-box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 0.5), 0px 1px 0px rgba(255, 255, 255, 0.3);
   -moz-box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 0.5), 0px 1px 0px rgba(255, 255, 255, 0.3);
@@ -837,23 +842,23 @@ a.white {
   font-weight: normal;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
-/* line 733, ../scss/vm.scss */
+/* line 737, ../scss/vm.scss */
 .vms_tags.select2-container .select2-choices .select2-search-field input {
   color: #eee;
 }
 
-/* line 738, ../scss/vm.scss */
+/* line 742, ../scss/vm.scss */
 .define_changed i {
   color: lime !important;
 }
 
-/* line 742, ../scss/vm.scss */
+/* line 746, ../scss/vm.scss */
 .oneline label {
   display: inline-block;
   margin-bottom: 13px;
 }
 
-/* line 747, ../scss/vm.scss */
+/* line 751, ../scss/vm.scss */
 select.select-transparent {
   height: 32px;
   -webkit-box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.5) inset, 0px 1px 0px rgba(255, 255, 255, 0.3);
@@ -865,11 +870,11 @@ select.select-transparent {
   border: medium none;
   color: #FFF;
 }
-/* line 758, ../scss/vm.scss */
+/* line 762, ../scss/vm.scss */
 select.select-transparent option {
   color: #000;
 }
-/* line 762, ../scss/vm.scss */
+/* line 766, ../scss/vm.scss */
 select.select-transparent.uneditable-input {
   background: #ccc;
   color: #444;
@@ -879,7 +884,7 @@ select.select-transparent.uneditable-input {
   box-shadow: none;
 }
 
-/* line 772, ../scss/vm.scss */
+/* line 776, ../scss/vm.scss */
 textarea.uneditable-input, input[type="text"].uneditable-input, input[type="password"].uneditable-input, input[type="datetime"].uneditable-input, input[type="datetime-local"].uneditable-input, input[type="date"].uneditable-input, input[type="month"].uneditable-input, input[type="time"].uneditable-input, input[type="week"].uneditable-input, input[type="number"].uneditable-input, input[type="email"].uneditable-input, input[type="url"].uneditable-input, input[type="search"].uneditable-input, input[type="tel"].uneditable-input, input[type="color"].uneditable-input {
   background: #ccc;
   color: #444;
@@ -889,34 +894,34 @@ textarea.uneditable-input, input[type="text"].uneditable-input, input[type="pass
   box-shadow: none;
 }
 
-/* line 781, ../scss/vm.scss */
+/* line 785, ../scss/vm.scss */
 .tiny {
   font-size: 9px;
 }
 
-/* line 785, ../scss/vm.scss */
+/* line 789, ../scss/vm.scss */
 .vm_snapshot_note {
   white-space: pre;
   white-space: pre-line;
 }
 
-/* line 790, ../scss/vm.scss */
+/* line 794, ../scss/vm.scss */
 .icon-enabled i {
   color: #468847;
 }
 
-/* line 793, ../scss/vm.scss */
+/* line 797, ../scss/vm.scss */
 .icon-disabled i {
   color: #b94a48;
 }
 
-/* line 797, ../scss/vm.scss */
+/* line 801, ../scss/vm.scss */
 .vm_flags {
   white-space: nowrap;
   margin-left: 3px;
 }
 
-/* line 802, ../scss/vm.scss */
+/* line 806, ../scss/vm.scss */
 div.vm_node_color {
   display: inline-block;
   width: 18px;

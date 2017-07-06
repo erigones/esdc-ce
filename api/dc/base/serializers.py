@@ -270,6 +270,13 @@ class DcSettingsSerializer(s.InstanceSerializer):
     VMS_ZONE_ENABLED = s.BooleanField(label='VMS_ZONE_ENABLED',  # Module
                                       help_text=_('Whether to enable support for SunOS and Linux zones in '
                                                   'this virtual datacenter.'))
+    VMS_VM_STOP_TIMEOUT_DEFAULT = s.IntegerField(label='VMS_VM_STOP_TIMEOUT_DEFAULT',
+                                                 help_text='Default time period (in seconds) for a graceful VM stop or '
+                                                           'reboot, after which a force stop/reboot is send to the VM.')
+    VMS_VM_STOP_WIN_TIMEOUT_DEFAULT = s.IntegerField(label='VMS_VM_STOP_WIN_TIMEOUT_DEFAULT',
+                                                     help_text='This is the same setting as VMS_VM_STOP_TIMEOUT_DEFAULT'
+                                                               ' but for a VM with Windows OS type, which usually takes'
+                                                               ' longer to shutdown.')
     VMS_VM_OSTYPE_DEFAULT = s.IntegerChoiceField(label='VMS_VM_OSTYPE_DEFAULT', choices=Vm.OSTYPE,
                                                  help_text=_('Default operating system type. One of: 1 - Linux VM, '
                                                              '2 - SunOS VM, 3 - BSD VM, 4 - Windows VM, '
