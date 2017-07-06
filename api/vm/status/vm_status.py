@@ -25,7 +25,7 @@ class VmStatus(APIView):
     """
     order_by_default = order_by_fields = ('hostname',)
     detail = ''
-    actions = ('start', 'stop', 'reboot')
+    actions = ('start', 'stop', 'reboot', 'current')
     statuses = (Vm.RUNNING, Vm.STOPPED, Vm.STOPPING, Vm.FROZEN)
 
     def __init__(self, request, hostname_or_uuid, action, data):
@@ -103,12 +103,9 @@ class VmStatus(APIView):
 
         return ' '.join(cmd) % cmd_dict
 
-    def get_current_status(self):
+    def get_current_status(self, force_change=False):
         """Get current VM status"""
         request, vm = self.request, self.vm
-
-        if vm.status not in (Vm.RUNNING, Vm.STOPPED, Vm.STOPPING, Vm.ERROR):
-            raise VmIsNotOperational
 
         if vm.node.status not in vm.node.STATUS_OPERATIONAL:
             raise NodeIsNotOperational
@@ -125,7 +122,7 @@ class VmStatus(APIView):
         }
         callback = (
             'api.vm.status.tasks.vm_status_current_cb',
-            {'vm_uuid': vm.uuid}
+            {'vm_uuid': vm.uuid, 'force_change': force_change}
         )
 
         tid, err = execute(request, vm.owner.id, cmd, meta=meta, callback=callback, queue=vm.node.fast_queue,
@@ -147,7 +144,11 @@ class VmStatus(APIView):
             return SuccessTaskResponse(request, res)
 
         if self.action == 'current':
+            if vm.status not in (Vm.RUNNING, Vm.STOPPED, Vm.STOPPING, Vm.ERROR):
+                raise VmIsNotOperational
+
             return self.get_current_status()
+
         else:
             ser = VmStatusSerializer(vm)
             return SuccessTaskResponse(request, ser.data, vm=vm)
@@ -156,7 +157,7 @@ class VmStatus(APIView):
         request, vm, action = self.request, self.vm, self.action
 
         # Cannot change status unless the VM is created on node
-        if vm.status not in self.statuses:
+        if vm.status not in self.statuses and action != 'current':
             raise VmIsNotOperational
 
         if action not in self.actions:
@@ -195,6 +196,19 @@ class VmStatus(APIView):
             res = {'message': 'Removing frozen status for VM %s.' % vm.hostname}
 
             return SuccessTaskResponse(request, res, task_id=tid, vm=vm)
+
+        elif action == 'current':
+            # for PUT /current/ action user needs to be SuperAdmin
+            # since this operation will forcibly change whatever status a VM has in the DB
+            if not request.user.is_super_admin(request):
+                raise PermissionDenied
+
+            force = self.data.get('force', False)
+
+            if not force:
+                raise PreconditionRequired('Force parameter must be used!')
+
+            return self.get_current_status(force_change=force)
 
         else:
             raise ExpectationFailed('Bad action')

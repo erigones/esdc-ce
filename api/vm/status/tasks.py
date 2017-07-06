@@ -183,7 +183,7 @@ def _save_vm_status(task_id, vm, new_state, old_state=None, **kwargs):
 
 
 def _vm_status_check(task_id, node_uuid, uuid, state, state_cache=None, vm=None,
-                     change_time=None, **kwargs):
+                     change_time=None, force_change=False, **kwargs):
     """Helper function for checking VM's new/actual state used by following callbacks:
         - vm_status_all_cb
         - vm_status_event_cb
@@ -211,7 +211,10 @@ def _vm_status_check(task_id, node_uuid, uuid, state, state_cache=None, vm=None,
     deploy_over = False
     deploy_dummy = False
 
-    if state_cache == Vm.CREATING:
+    if force_change:
+        logger.warn('Detected FORCED status change for vm %s', uuid)
+
+    elif state_cache == Vm.CREATING:
         if state == Vm.RUNNING:
             logger.warn('Detected new status %s for vm %s. We were waiting for this. '
                         'Switching state to (A) "running (2)" or (B) "deploying_start (12)" or '
@@ -376,7 +379,7 @@ def vm_status_event_cb(result, task_id):
 
 @cq.task(name='api.vm.status.tasks.vm_status_current_cb', base=MgmtCallbackTask, bind=True)
 @callback()
-def vm_status_current_cb(result, task_id, vm_uuid=None):
+def vm_status_current_cb(result, task_id, vm_uuid=None, force_change=False):
     """
     A callback function for GET api.vm.status.views.vm_status.
     It is responsible for displaying the actual VM status to the user and optionally changing status in DB.
@@ -403,7 +406,7 @@ def vm_status_current_cb(result, task_id, vm_uuid=None):
 
         if state_cache != state:
             # Check and eventually save VM's status
-            _vm_status_check(task_id, vm.node.uuid, vm_uuid, state, state_cache=state_cache,
+            _vm_status_check(task_id, vm.node.uuid, vm_uuid, state, state_cache=state_cache, force_change=force_change,
                              change_time=_get_task_time(result, 'exec_time'))
 
     vm.tasks_del(task_id)
