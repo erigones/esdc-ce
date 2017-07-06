@@ -28,16 +28,19 @@ function vm_start(hostname, cdimage, update, onetime, cdimage2) {
 }
 
 // Stop or reboot VM (with optional force boolean)
-function vm_stop_or_reboot(hostname, action, force) {
+function vm_stop_or_reboot(hostname, action, force, timeout) {
   var kwargs = {'action': action};
   if (force) {
     kwargs['data'] = {'force': true};
+  }
+  else if (typeof(timeout) !== 'undefined' && timeout) {
+    kwargs['data'] = {'timeout': timeout};
   }
   return esio('set', 'vm_status', [hostname], kwargs);
 }
 
 // Stop and freeze/unfreeze VM (with optional force boolean)
-function vm_freeze(hostname, freeze, force) {
+function vm_freeze(hostname, freeze, force, timeout) {
   var kwargs = {'action': 'stop', 'data': {}};
   if (freeze) {
     kwargs['data']['freeze'] = true;
@@ -46,6 +49,9 @@ function vm_freeze(hostname, freeze, force) {
   }
   if (force) {
     kwargs['data']['force'] = true;
+  }
+  else if (typeof(timeout) !== 'undefined' && timeout) {
+    kwargs['data']['timeout'] = timeout;
   }
   return esio('set', 'vm_status', [hostname], kwargs);
 }

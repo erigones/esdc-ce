@@ -135,6 +135,14 @@ function vm_settings_links(hostname) {
   });
 }
 
+// Enable timeout period link
+function vm_stop_period_link() {
+  $('#btn_stop_timeout_period').click(function() {
+    $('#stop_timeout_period_form').toggle().toggleClass('active');
+    return false;
+  });
+}
+
 // Return current status or null
 function vm_status_display(hostname) {
   var _hostname = _jq(hostname); // escaping dots in hostname
@@ -1110,13 +1118,18 @@ function vm_control(hostname, btn) {
 
     case 'stop':
     case 'reboot':
-      return vm_modal($('#vm_control_modal'), btn,
-        function() {
-          return vm_stop_or_reboot(hostname, action[1], false);
+      return vm_modal($('#vm_stop_or_reboot_modal'), btn,
+        function(e) {
+          if (validate_html_form($('#stop_timeout_period_form'))) {
+            vm_stop_or_reboot(hostname, action[1], false, $('#stop_timeout_period_input').val());
+            e.data.modal.mod.modal('hide');
+          }
         },
-        function() {
-          return vm_stop_or_reboot(hostname, action[1], true);
-        }
+        function(e) {
+          vm_stop_or_reboot(hostname, action[1], true);
+          e.data.modal.mod.modal('hide');
+        },
+        vm_stop_period_link
       );
 
     case 'console':
@@ -1225,13 +1238,18 @@ function vm_control(hostname, btn) {
       );
 
     case 'freeze':
-      return vm_modal($('#vm_control_modal'), btn,
-        function() {
-          return vm_freeze(hostname, true, false);
+      return vm_modal($('#vm_stop_or_reboot_modal'), btn,
+        function(e) {
+          if (validate_html_form($('#stop_timeout_period_form'))) {
+            vm_freeze(hostname, true, false, $('#stop_timeout_period_input').val());
+            e.data.modal.mod.modal('hide');
+          }
         },
-        function() {
-          return vm_freeze(hostname, true, true);
-        }
+        function(e) {
+          vm_freeze(hostname, true, true);
+          e.data.modal.mod.modal('hide');
+        },
+        vm_stop_period_link
       );
 
     case 'unfreeze':

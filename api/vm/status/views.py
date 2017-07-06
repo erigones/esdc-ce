@@ -143,6 +143,9 @@ def vm_status(request, hostname_or_uuid, action=None, data=None):
         :type hostname_or_uuid: string
         :arg data.force: Force change of the status (default: false)
         :type data.force: boolean
+        :arg data.timeout: Time period (in seconds) for a graceful shutdown, after which the force shutdown \
+is send to the VM (default: 180 seconds / 300 seconds for Windows VM)
+        :type data.timeout: integer
         :arg data.freeze: Set frozen status after successful stop action (default: false)
         :type data.freeze: boolean
         :arg data.unfreeze: Remove frozen status and set it back to stopped (default: false)
@@ -167,6 +170,9 @@ def vm_status(request, hostname_or_uuid, action=None, data=None):
         :type hostname_or_uuid: string
         :arg data.force: Force change of the status (default: false)
         :type data.force: boolean
+        :arg data.timeout: Time period (in seconds) for a graceful reboot, after which the force reboot \
+is send to the VM (default: 180 seconds / 300 seconds for Windows VM)
+        :type data.timeout: integer
         :status 200: SUCCESS
         :status 201: PENDING
         :status 400: FAILURE

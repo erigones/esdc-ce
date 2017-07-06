@@ -559,7 +559,7 @@ function disable_form_submit(form) {
 }
 
 // Display modal window and run handler if OK button is clicked
-function vm_modal(mod, btn, handler, handler_force) {
+function vm_modal(mod, btn, handler, handler_force, init) {
   if (typeof(handler_force) === 'undefined') {
     handler_force = function() { };
   }
@@ -655,6 +655,11 @@ function vm_modal(mod, btn, handler, handler_force) {
 
   self.select.select2({dropdownCssClass: self.select.attr('class')});
   activate_modal_ux(mod, form);
+
+  if (typeof(init) !== 'undefined') {
+    init(mod, form);
+  }
+
   mod.modal('show');
   MODAL = mod;
 }
@@ -957,6 +962,17 @@ function mbytes_enable(fields) {
 /*
  * Browser hacks and usability improvements
  */
+
+function validate_html_form(form) {
+  if (!form.length) {
+    return null;
+  }
+
+  // Fake HTML 5 validation
+  $('<input type="submit">').hide().appendTo(form).click().remove();
+
+  return form[0].checkValidity();
+}
 
 function is_touch_device() {
   return (!!('ontouchstart' in window) || !!('onmsgesturechange' in window));
