@@ -55,6 +55,7 @@ def my_list(request):
     context['vms_tags'] = get_vms_tags(vms)
     context['can_edit'] = request.user.is_admin(request)
     context['vms_node_online'] = not Vm.objects.filter(node__isnull=False).exclude(node__status=Node.ONLINE).exists()
+    context['stop_timeout_period'] = request.dc.settings.VMS_VM_STOP_TIMEOUT_DEFAULT
 
     return render(request, 'gui/vm/list.html', context)
 
@@ -84,6 +85,11 @@ def details(request, hostname):
 
     if vm.is_kvm():
         context['iso_images'] = get_iso_images(request, vm.ostype)
+
+    if vm.ostype == Vm.WINDOWS:
+        context['stop_timeout_period'] = dc_settings.VMS_VM_STOP_WIN_TIMEOUT_DEFAULT
+    else:
+        context['stop_timeout_period'] = dc_settings.VMS_VM_STOP_TIMEOUT_DEFAULT
 
     if context['can_edit']:
         context['settingsform'] = AdminServerSettingsForm(request, vm, prefix='opt')

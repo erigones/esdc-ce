@@ -11,6 +11,7 @@ Features
 - Removed VM zoneid fetching and updated monitoring templates - `#129 <https://github.com/erigones/esdc-ce/issues/129>`__
 - Added node_vm_define_backup_list API and GUI views -  `#139 <https://github.com/erigones/esdc-ce/issues/139>`__
 - Added ability to import images from local image server - `#140 <https://github.com/erigones/esdc-ce/issues/140>`__
+- Added ability to change the timeout period for graceful VM stop, reboot and freeze operations - `#111 <https://github.com/erigones/esdc-ce/issues/111>`__
 - Added reflection of users and user groups from management to Zabbix monitoring - `#91 <https://github.com/erigones/esdc-ce/issues/91>`__
 - Updated mbuffer to version 20170515 - `#156 <https://github.com/erigones/esdc-ce/issues/156>`__
 - Updated Python requirements - `#185 <https://github.com/erigones/esdc-ce/issues/185>`__

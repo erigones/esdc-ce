@@ -133,6 +133,7 @@ function ServerList(admin) {
     'vms_reboot':   $('#vms_reboot'),
     'vms_stop':     $('#vms_stop'),
     'vms_control_modal': $('#vms_control_modal'),
+    'vm_stop_or_reboot_modal': $('#vm_stop_or_reboot_modal'),
     'vms_export':   $('#vms_export'),
     'vms_iframe_download': $('#vms_iframe_download'),
   };
@@ -363,9 +364,9 @@ function ServerList(admin) {
   /*
    * Stop all servers in server_list
    */
-  function vms_stop(force) {
+  function vms_stop(force, timeout) {
     _.each(server_list, function(data, hostname, i) {
-      vm_stop_or_reboot(hostname, 'stop', force);
+      vm_stop_or_reboot(hostname, 'stop', force, timeout);
     });
     //self.reset_server_list();
   }
@@ -373,9 +374,9 @@ function ServerList(admin) {
   /*
    * Reboot all servers in server_list
    */
-  function vms_reboot(force) {
+  function vms_reboot(force, timeout) {
     _.each(server_list, function(data, hostname, i) {
-      vm_stop_or_reboot(hostname, 'reboot', force);
+      vm_stop_or_reboot(hostname, 'reboot', force, timeout);
     });
     //self.reset_server_list();
   }
@@ -432,9 +433,9 @@ function ServerList(admin) {
   /*
    * Freeze/Unfreeze all servers in server_list
    */
-  function vms_freeze(freeze, force) {
+  function vms_freeze(freeze, force, timeout) {
     _.each(server_list, function(data, hostname, i) {
-      vm_freeze(hostname, freeze, force);
+      vm_freeze(hostname, freeze, force, timeout);
     });
     //self.reset_server_list();
   }
@@ -571,9 +572,18 @@ function ServerList(admin) {
   elements.vms_stop.click(function(e) {
     if (!check_btn(elements.vms_stop)) { return false; }
 
-    vm_modal(elements.vms_control_modal, elements.vms_stop,
-      function() { return vms_stop(false); },
-      function() { return vms_stop(true); }
+    vm_modal(elements.vm_stop_or_reboot_modal, elements.vms_stop,
+      function(e) {
+        if (validate_html_form($('#stop_timeout_period_form'))) {
+          vms_stop(false, $('#stop_timeout_period_input').val());
+          e.data.modal.mod.modal('hide');
+        }
+      },
+      function(e) {
+        vms_stop(true);
+        e.data.modal.mod.modal('hide');
+      },
+      vm_stop_period_link
     );
 
     return false;
@@ -585,9 +595,18 @@ function ServerList(admin) {
   elements.vms_reboot.click(function(e) {
     if (!check_btn(elements.vms_reboot)) { return false; }
 
-    vm_modal(elements.vms_control_modal, elements.vms_reboot,
-      function() { return vms_reboot(false); },
-      function() { return vms_reboot(true); }
+    vm_modal(elements.vm_stop_or_reboot_modal, elements.vms_reboot,
+      function(e) {
+        if (validate_html_form($('#stop_timeout_period_form'))) {
+          vms_reboot(false, $('#stop_timeout_period_input').val());
+          e.data.modal.mod.modal('hide');
+        }
+      },
+      function(e) {
+        vms_reboot(true);
+        e.data.modal.mod.modal('hide');
+      },
+      vm_stop_period_link
     );
 
     return false;
@@ -660,9 +679,18 @@ function ServerList(admin) {
     elements.vms_freeze.click(function(e) {
       if (!check_btn(elements.vms_freeze)) { return false; }
 
-      vm_modal(elements.vms_control_modal, elements.vms_freeze,
-        function() { return vms_freeze(true, false); },
-        function() { return vms_freeze(true, true); }
+      vm_modal(elements.vm_stop_or_reboot_modal, elements.vms_freeze,
+        function(e) {
+          if (validate_html_form($('#stop_timeout_period_form'))) {
+            vms_freeze(true, false, $('#stop_timeout_period_input').val());
+            e.data.modal.mod.modal('hide');
+          }
+        },
+        function(e) {
+          vms_freeze(true, true);
+          e.data.modal.mod.modal('hide');
+        },
+        vm_stop_period_link
       );
 
       return false;
