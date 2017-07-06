@@ -153,6 +153,12 @@
             <td>{% trans "Status" %}:</td>
             <td><span class="label status_node{{ node.status }}" id="node_label_{{ node.hostname }}">{{ node.get_status_display }}</span></td>
           </tr>
+          <tr>
+            <td>{% trans "Note" %}:</td>
+            <td>
+                <span class="node_note">{{ node.note }}</span>
+            </td>
+          </tr>
 
           {% if details_rows %}{% for template in details_rows %}  {# used by esdc-ee-eslic #}
           {% include template %}

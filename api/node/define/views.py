@@ -71,6 +71,8 @@ def node_define(request, hostname, data=None):
         :type data.is_compute: boolean
         :arg data.is_backup: Backup capability
         :type data.is_backup: boolean
+        :arg data.note: Text note visible to every user with access to node.
+        :type data.note: string
         :arg data.owner: Node owner
         :type data.owner: string
         :arg data.cpu_coef: Coefficient for calculating the the total number of virtual CPUs

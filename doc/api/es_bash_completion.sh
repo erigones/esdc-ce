@@ -561,7 +561,7 @@ _es() {
 				COMPREPLY=( $(compgen -P "${cur%/*}" -W "/ /backup" -- "/${cur##*/}" ) )
 			fi
 			[[ "${action}" == "get" ]] && params="-full"
-			[[ "${action}" == "create" ]] || [[ "${action}" == "set" ]] && params="-status -is_compute -is_backup -owner -cpu_coef -ram_coef"
+			[[ "${action}" == "create" ]] || [[ "${action}" == "set" ]] && params="-status -is_compute -is_backup -owner -cpu_coef -ram_coef -note"
 		;;
 
 		/node/*/license|/node/*/license/)

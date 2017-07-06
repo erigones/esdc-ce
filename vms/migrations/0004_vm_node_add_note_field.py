@@ -12,6 +12,11 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AddField(
+            model_name='node',
+            name='note',
+            field=models.TextField(verbose_name='Note', blank=True),
+        ),
+        migrations.AddField(
             model_name='vm',
             name='note',
             field=models.TextField(verbose_name='Note', blank=True),
