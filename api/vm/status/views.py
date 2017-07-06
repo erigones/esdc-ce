@@ -82,6 +82,8 @@ def vm_status(request, hostname_or_uuid, action=None, data=None):
 
         Retrieves current VM status from compute node and updates status value in DB for the VM.
 
+        .. warning:: This API call is intended for internal administrative purposes only and should be used with care.
+
         :DC-bound?:
             * |dc-yes|
         :Permissions:
@@ -98,6 +100,7 @@ def vm_status(request, hostname_or_uuid, action=None, data=None):
         :status 403: Forbidden
         :status 404: VM not found
         :status 423: Node is not operational
+        :status 428: Force parameter must be used
 
     .. http:put:: /vm/(hostname_or_uuid)/status/start
 
