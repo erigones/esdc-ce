@@ -55,7 +55,7 @@ function vm_tasks(hostname, res, view, method) {
   var ret = null;
 
   try {
-    if (view == 'vm_define' || view.substring(0, 3) !== 'vm_' ) {
+    if (view && (view == 'vm_define' || view.substring(0, 3) !== 'vm_' )) {
       return null;
     }
 
@@ -518,11 +518,8 @@ function vm_control_update(hostname, state, apiview) {
       vm_update.removeClass('disabled').addClass('define_changed');
       vm_undo.removeClass('disabled').addClass('define_changed_undo');
       vm_start.addClass('define_changed');
-      vm_reboot.addClass('define_changed');
     } else { // admin can run update even when nothing has changed
       vm_update.removeClass('disabled');
-      vm_start.removeClass('define_changed');
-      vm_reboot.removeClass('define_changed');
     }
   }
 
