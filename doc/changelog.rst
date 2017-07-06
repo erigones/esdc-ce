@@ -23,6 +23,7 @@ Bugs
 - Fixed problem with high amount of network traffic in the celeryev exchange - `#179 <https://github.com/erigones/esdc-ce/issues/179>`__
 - Fixed IP address validation, when multiple IPs are being added - `#177 <https://github.com/erigones/esdc-ce/issues/177>`__
 - Disable current compute in VM migration dialog - `#191 <https://github.com/erigones/esdc-ce/issues/191>`__
+- Fixed displaying of disk IO monitoring graphs of KVMs - `#193 <https://github.com/erigones/esdc-ce/issues/193>`__
 - Force change of the VM status in the DB with current status from vmadm - `#171 <https://github.com/erigones/esdc-ce/issues/171>`__
 
 
