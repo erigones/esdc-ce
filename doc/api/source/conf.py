@@ -23,7 +23,7 @@ try:
     # noinspection PyPep8Naming
     from core.version import __version__ as VERSION
 except ImportError:
-    VERSION = '2.0.?'
+    VERSION = '2.?'
 
 # -- General configuration -----------------------------------------------------
 

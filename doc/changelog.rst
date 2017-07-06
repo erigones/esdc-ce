@@ -13,6 +13,9 @@ Features
 - Added ability to import images from local image server - `#140 <https://github.com/erigones/esdc-ce/issues/140>`__
 - Added basic support for Linux Zones (lx brand) - `#183 <https://github.com/erigones/esdc-ce/issues/183>`__
 - Added reflection of users and user groups from management to Zabbix monitoring - `#91 <https://github.com/erigones/esdc-ce/issues/91>`__
+- Updated mbuffer to version 20170515 - `#156 <https://github.com/erigones/esdc-ce/issues/156>`__
+- Updated Python requirements - `#185 <https://github.com/erigones/esdc-ce/issues/185>`__
+- Disabled GSSAPIKeyExchange for every SSH operation - `#185 <https://github.com/erigones/esdc-ce/issues/195>`__
 
 Bugs
 ----
@@ -20,6 +23,7 @@ Bugs
 - Fixed problem with high amount of network traffic in the celeryev exchange - `#179 <https://github.com/erigones/esdc-ce/issues/179>`__
 - Fixed IP address validation, when multiple IPs are being added - `#177 <https://github.com/erigones/esdc-ce/issues/177>`__
 - Disable current compute in VM migration dialog - `#191 <https://github.com/erigones/esdc-ce/issues/191>`__
+- Force change of the VM status in the DB with current status from vmadm - `#171 <https://github.com/erigones/esdc-ce/issues/171>`__
 
 
 2.5.3 (released on 2017-05-16)
