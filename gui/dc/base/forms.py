@@ -61,12 +61,20 @@ class DcSettingsForm(SerializerForm):
     _changed_data = None
     _serializer = DcSettingsSerializer
     _api_call = dc_settings
-    _ignore_empty_fields = frozenset(['VMS_DISK_IMAGE_ZONE_DEFAULT', 'VMS_NET_DEFAULT', 'VMS_STORAGE_DEFAULT'])
-    _exclude_fields = frozenset(['VMS_NODE_SSH_KEYS_SYNC'])
+    _ignore_empty_fields = frozenset([
+        'VMS_DISK_IMAGE_ZONE_DEFAULT',
+        'VMS_DISK_IMAGE_LX_ZONE_DEFAULT',
+        'VMS_NET_DEFAULT',
+        'VMS_STORAGE_DEFAULT',
+    ])
+    _exclude_fields = frozenset([
+        'VMS_NODE_SSH_KEYS_SYNC',
+    ])
     _custom_fields = frozendict({
         'VMS_VM_DOMAIN_DEFAULT': forms.ChoiceField,
         'VMS_DISK_IMAGE_DEFAULT': forms.ChoiceField,
         'VMS_DISK_IMAGE_ZONE_DEFAULT': forms.ChoiceField,
+        'VMS_DISK_IMAGE_LX_ZONE_DEFAULT': forms.ChoiceField,
         'VMS_IMAGE_SOURCES': ArrayAreaField,
         'VMS_IMAGE_VM': forms.ChoiceField,
         'VMS_NET_DEFAULT': forms.ChoiceField,
@@ -78,6 +86,7 @@ class DcSettingsForm(SerializerForm):
         'VMS_VM_DOMAIN_DEFAULT': forms.Select,
         'VMS_DISK_IMAGE_DEFAULT': forms.Select,
         'VMS_DISK_IMAGE_ZONE_DEFAULT': forms.Select,
+        'VMS_DISK_IMAGE_LX_ZONE_DEFAULT': forms.Select,
         'VMS_IMAGE_SOURCES': ArrayAreaWidget,
         'VMS_IMAGE_VM': forms.Select,
         'VMS_NET_DEFAULT': forms.Select,
@@ -90,6 +99,7 @@ class DcSettingsForm(SerializerForm):
         'VMS_VM_DOMAIN_DEFAULT': select_widget,
         'VMS_DISK_IMAGE_DEFAULT': select_widget,
         'VMS_DISK_IMAGE_ZONE_DEFAULT': select_widget,
+        'VMS_DISK_IMAGE_LX_ZONE_DEFAULT': select_widget,
         'VMS_IMAGE_VM': select_widget,
         'VMS_NET_DEFAULT': select_widget,
         'VMS_STORAGE_DEFAULT': select_widget,
@@ -130,6 +140,8 @@ class DcSettingsForm(SerializerForm):
                                                                                    .values_list('name', 'alias'))
         self.fields['VMS_DISK_IMAGE_ZONE_DEFAULT'].choices = list(get_images(request, ostype=Image.SUNOS_ZONE)
                                                                   .values_list('name', 'alias'))
+        self.fields['VMS_DISK_IMAGE_LX_ZONE_DEFAULT'].choices = list(get_images(request, ostype=Image.LINUX_ZONE)
+                                                                     .values_list('name', 'alias'))
         self.fields['VMS_NET_DEFAULT'].choices = get_subnets(request).values_list('name', 'alias')
         self.fields['VMS_STORAGE_DEFAULT'].choices = get_zpools(request).values_list('zpool', 'storage__alias')\
                                                                         .distinct()
