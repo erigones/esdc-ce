@@ -15,6 +15,7 @@ Features
 - Added node_vm_define_backup_list API and GUI views -  `#139 <https://github.com/erigones/esdc-ce/issues/139>`__
 - Added ability to import images from local image server - `#140 <https://github.com/erigones/esdc-ce/issues/140>`__
 - Updated mbuffer to version 20170515 - `#156 <https://github.com/erigones/esdc-ce/issues/156>`__
+- Added VM update capability to VM reboot and stop operations - `#170 <https://github.com/erigones/esdc-ce/issues/170>`__
 - Added basic support for Linux Zones (lx brand) - `#183 <https://github.com/erigones/esdc-ce/issues/183>`__
 - Updated Python requirements - `#185 <https://github.com/erigones/esdc-ce/issues/185>`__
 - Disabled GSSAPIKeyExchange for every SSH operation - `#195 <https://github.com/erigones/esdc-ce/issues/195>`__

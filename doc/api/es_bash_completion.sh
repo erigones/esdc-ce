@@ -238,12 +238,12 @@ _es() {
 
 		/vm/*/status/stop|/vm/*/status/stop/)
 			[ ${COMP_CWORD} -eq 2 ] && COMPREPLY=( "${cur} " )
-			params="-force -timeout -freeze -unfreeze -cb_url -cb_method"
+			params="-force -timeout -update -freeze -unfreeze -cb_url -cb_method"
 		;;
 
 		/vm/*/status/reboot|/vm/*/status/reboot/)
 			[ ${COMP_CWORD} -eq 2 ] && COMPREPLY=( "${cur} " )
-			params="-force -timeout -cb_url -cb_method"
+			params="-force -timeout -update -cb_url -cb_method"
 		;;
 
 		/vm/*/status/current|/vm/*/status/current/)
