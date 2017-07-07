@@ -209,6 +209,12 @@ class AdminServerSettingsForm(ServerSettingsForm):
                              widget=forms.TextInput(attrs={'class': 'input-transparent narrow input-mbytes',
                                                            'required': 'required',
                                                            'pattern': '[0-9\.]+[BKMGTPEbkmgtpe]?'}))
+    note = forms.CharField(label=_('Note'), help_text=_('Text visible for every user with access to VM.'),
+                           required=False,
+                           widget=forms.Textarea(attrs={
+                               'class': 'input-transparent',
+                               'rows': 5})
+                           )
     monitored = forms.BooleanField(label=_('Monitored?'), required=False,
                                    widget=forms.CheckboxInput(attrs={'class': 'normal-check'}))
     installed = forms.BooleanField(label=_('Installed?'), required=False,
@@ -280,13 +286,12 @@ class AdminServerSettingsForm(ServerSettingsForm):
                 self.fields['zpool'].widget.attrs['class'] += ' disable_created2'
         else:
             empty_template_data = self.initial
-            # Remove Linux Zone support (lx brand)
-            ostype = [i for i in Vm.OSTYPE if i[0] != Vm.LINUX_ZONE]
+            ostype = Vm.OSTYPE
 
             # Disable zone support _only_ when adding new VM (zone must be available in edit mode) - Issue #chili-461
             if not dc_settings.VMS_ZONE_ENABLED:
                 # Remove SunOS Zone support
-                ostype = [i for i in ostype if i[0] != Vm.SUNOS_ZONE]
+                ostype = [i for i in ostype if i[0] not in Vm.ZONE]
 
             self.fields['ostype'].choices = ostype
 

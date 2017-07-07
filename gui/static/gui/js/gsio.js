@@ -759,7 +759,7 @@ function _task_status_callback(res, apiview) {
         var result_msg = result.message || '';
         // Sometimes the vm configuration gets updated during vm_status.
         // If this happens we should refresh server details page (see vm_manage below)
-        if (result_msg.indexOf('Successfully updated') === 0 && t) {
+        if (result_msg.indexOf('Successfully updated') >= 0 && t) {
           vm_refresh_page(hostname);
         }
 

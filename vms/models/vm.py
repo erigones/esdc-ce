@@ -227,6 +227,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
                                  verbose_name=_('Template'))
     uptime = models.IntegerField(_('Aggregated uptime'), default=0, editable=False)
     uptime_changed = models.IntegerField(_('Last update of aggregated uptime'), default=0, editable=False)
+    note = models.TextField(_('Note'), blank=True)
 
     # don't access 'encoded_data' directly, use the 'data' property instead, etc
     # default is an empty dict
@@ -284,6 +285,14 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
     @property
     def name(self):  # task log requirement
         return self.hostname
+
+    @property
+    def _interface_prefix(self):
+        """Based on observation: behaviour is not documented by upstream."""
+        if self.ostype == self.LINUX_ZONE:
+            return 'eth'
+        else:
+            return 'net'
 
     def update_node_history(self, orig_node=None):
         """Store previous node into node_history"""
@@ -487,10 +496,10 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
         This should be called when creating new VM.
         Also copy data from template if needed."""
         _json = self.json
+        dc_settings = self.dc.settings
 
         # new VM -> set the defaults
         if sync_defaults and 'uuid' not in _json:
-            dc_settings = self.dc.settings
             _json.update2(dc_settings.VMS_VM_JSON_DEFAULTS.copy())
             _json['resolvers'] = dc_settings.VMS_VM_RESOLVERS_DEFAULT
 
@@ -538,6 +547,9 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
             if settings.VMS_ZONE_FEATURE_LEVEL >= 2:
                 # Issue #chili-867 - these limits won't affect creating snapshots and datasets from global zone
                 _json['zfs_filesystem_limit'] = _json['zfs_snapshot_limit'] = 0
+
+            if self.ostype == self.LINUX_ZONE and 'kernel_version' not in _json:
+                _json['kernel_version'] = dc_settings.VMS_VM_LX_KERNEL_VERSION_DEFAULT
 
         self.json = _json
 
@@ -838,7 +850,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
 
         for i, nic in enumerate(nics):
             # Bug #chili-239
-            nics[i]['interface'] = u'net' + str(i)
+            nics[i]['interface'] = self._interface_prefix + str(i)
             # Remove MAC attribute if empty
             if 'mac' in nic and not nic['mac']:
                 del nics[i]['mac']
@@ -1133,7 +1145,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
     @staticmethod
     def get_real_nic_id(nic):
         """Return real network ID (net number in nics.*.interface) from nic object (dict)"""
-        return int(nic['interface'].lstrip('net'))
+        return int(nic['interface'].lstrip('net').lstrip('eth'))
 
     @classmethod
     def get_nics_map(cls, json):

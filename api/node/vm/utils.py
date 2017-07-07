@@ -178,7 +178,12 @@ def vm_from_json(request, task_id, json, dc, owner=settings.ADMIN_USER, template
             logger.info('Server %s was deleted', json['uuid'])
             raise exc
 
-        vm_update_ipaddress_usage(vm)
+        try:
+            vm_update_ipaddress_usage(vm)
+        except ValueError as exc:
+            vm.delete()
+            logger.info('Server %s was deleted', json['uuid'])
+            raise exc
 
         if update_dns and primary_ip:
             # This will fail silently (exception is logged)
