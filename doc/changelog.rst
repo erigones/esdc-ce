@@ -22,6 +22,7 @@ Features
 Bugs
 ----
 
+- Allowed IP address <-> VM association updates after manual VM configuration on hypervisor - `#168 <https://github.com/erigones/esdc-ce/issues/168>`__
 - Force change of the VM status in the DB with current status from vmadm - `#171 <https://github.com/erigones/esdc-ce/issues/171>`__
 - Fixed IP address validation, when multiple IPs are being added - `#177 <https://github.com/erigones/esdc-ce/issues/177>`__
 - Fixed problem with high amount of network traffic in the celeryev exchange - `#179 <https://github.com/erigones/esdc-ce/issues/179>`__
