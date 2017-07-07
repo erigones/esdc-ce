@@ -73,6 +73,7 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
     is_compute = models.BooleanField(_('Compute'), default=True)
     is_backup = models.BooleanField(_('Backup'), default=False)
     is_head = models.BooleanField(_('Head node'), default=False)
+    note = models.TextField(_('Note'), blank=True)
 
     class Meta:
         app_label = 'vms'
@@ -99,6 +100,7 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
             'owner': self.owner.username,
             'is_compute': self.is_compute,
             'is_backup': self.is_backup,
+            'note': self.note,
             'cpu_coef': self.cpu_coef,
             'ram_coef': self.ram_coef,
             'monitoring_templates': self.monitoring_templates,

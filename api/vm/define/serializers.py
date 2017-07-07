@@ -77,6 +77,7 @@ class VmDefineSerializer(VmBaseSerializer):
     cpu_type = s.ChoiceField(choices=Vm.CPU_TYPE, default=settings.VMS_VM_CPU_TYPE_DEFAULT)
     vcpus = s.IntegerField(max_value=64, min_value=1)
     ram = s.IntegerField(max_value=524288, min_value=32)
+    note = s.CharField(required=False)
     owner = s.SlugRelatedField(slug_field='username', queryset=User.objects, read_only=False, required=False)  # vv
     node = s.SlugRelatedField(slug_field='hostname', queryset=Node.objects, read_only=False, required=False)  # vv
     template = s.SlugRelatedField(slug_field='name', queryset=VmTemplate.objects, read_only=False, required=False)  # vv
