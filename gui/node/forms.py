@@ -40,6 +40,12 @@ class NodeForm(SerializerForm):
                                     widget=forms.CheckboxInput(attrs={'class': 'normal-check'}))
     is_backup = forms.BooleanField(label=_('Backup?'), required=False,
                                    widget=forms.CheckboxInput(attrs={'class': 'normal-check'}))
+    note = forms.CharField(label=_('Note'), help_text=_('Text visible for every user with access to node.'),
+                           required=False,
+                           widget=forms.Textarea(attrs={
+                               'class': 'input-transparent small',
+                               'rows': 5})
+                           )
     cpu_coef = forms.DecimalField(label=_('CPUs coefficient'), max_digits=4, decimal_places=2,
                                   help_text=_('Coefficient for calculating the the total number of virtual CPUs.'),
                                   widget=forms.TextInput(attrs={'class': 'input-transparent narrow',

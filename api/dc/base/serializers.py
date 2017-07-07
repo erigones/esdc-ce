@@ -189,6 +189,7 @@ class DcSettingsSerializer(s.InstanceSerializer):
         'SUPPORT_PHONE',
         'VMS_DISK_IMAGE_DEFAULT',
         'VMS_DISK_IMAGE_ZONE_DEFAULT',
+        'VMS_DISK_IMAGE_LX_ZONE_DEFAULT',
         'VMS_NET_DEFAULT',
         'VMS_STORAGE_DEFAULT',
         'MON_ZABBIX_HTTP_USERNAME',
@@ -267,11 +268,12 @@ class DcSettingsSerializer(s.InstanceSerializer):
                                            help_text=_('Whether to log API user callback requests into the tasklog.'))
 
     VMS_ZONE_ENABLED = s.BooleanField(label='VMS_ZONE_ENABLED',  # Module
-                                      help_text=_('Whether to enable support for SunOS zones in '
+                                      help_text=_('Whether to enable support for SunOS and Linux zones in '
                                                   'this virtual datacenter.'))
     VMS_VM_STOP_TIMEOUT_DEFAULT = s.IntegerField(label='VMS_VM_STOP_TIMEOUT_DEFAULT',
                                                  help_text='Default time period (in seconds) for a graceful VM stop or '
-                                                           'reboot, after which a force stop/reboot is send to the VM.')
+                                                           'reboot, after which a force stop/reboot is send to the VM '
+                                                           '(KVM only).')
     VMS_VM_STOP_WIN_TIMEOUT_DEFAULT = s.IntegerField(label='VMS_VM_STOP_WIN_TIMEOUT_DEFAULT',
                                                      help_text='This is the same setting as VMS_VM_STOP_TIMEOUT_DEFAULT'
                                                                ' but for a VM with Windows OS type, which usually takes'
@@ -310,6 +312,9 @@ class DcSettingsSerializer(s.InstanceSerializer):
     VMS_DISK_IMAGE_ZONE_DEFAULT = s.CharField(label='VMS_DISK_IMAGE_ZONE_DEFAULT', max_length=64, required=False,
                                               help_text=_('Name of the default disk image used for '
                                                           'newly created SunOS zone servers.'))
+    VMS_DISK_IMAGE_LX_ZONE_DEFAULT = s.CharField(label='VMS_DISK_IMAGE_LX_ZONE_DEFAULT', max_length=64, required=False,
+                                                 help_text=_('Name of the default disk image used for '
+                                                             'newly created Linux zone servers.'))
     VMS_NIC_MODEL_DEFAULT = s.ChoiceField(label='VMS_NIC_MODEL_DEFAULT', choices=Vm.NIC_MODEL,
                                           help_text=_('Default virtual NIC model of newly created server NICs. '
                                                       'One of: virtio, e1000, rtl8139.'))

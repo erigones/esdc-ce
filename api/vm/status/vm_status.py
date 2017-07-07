@@ -278,9 +278,12 @@ class VmStatus(APIView):
             if not ser_stop_reboot.is_valid():
                 return FailureTaskResponse(request, ser_stop_reboot.errors, vm=vm)
 
-            force = ser_stop_reboot.data['force']
+            force = apiview['force'] = ser_stop_reboot.data['force']
             timeout = ser_stop_reboot.data['timeout']
             cmd = self._action_cmd(action, force=force, timeout=timeout)
+
+            if not force and timeout:
+                apiview['timeout'] = timeout
 
             if action == 'reboot':
                 msg = LOG_REBOOT

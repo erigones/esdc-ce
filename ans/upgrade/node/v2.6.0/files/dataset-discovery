@@ -1,0 +1,18 @@
+#!/bin/bash
+
+
+echo -n '{"data":['
+
+for line in $(zoneadm -z $1 list -p | egrep ":joyent:|:lx:" | cut -d: -f2,4); do
+        UUID=$(echo $line | cut -d: -f1)
+        ZONEROOT=$(echo $line | cut -d: -f2)
+
+        for i in $(awk '$3 ~ /zfs/ && $1 !~ /^.*\/cores\// { ds = $1; mnt = $2; len = split($4, a, ","); dev = substr(a[len], 5) ; printf "%s:%s:%s\n", ds, mnt, dev}'  ${ZONEROOT}/root/etc/mnttab); do
+                DS=$(echo $i | cut -d: -f1)
+                MNT=$(echo $i | cut -d: -f2)
+                DEV=$(echo $i | cut -d: -f3)
+                echo -n "{\"{#ZONENANE}\": \"${UUID}\", \"{#DATASET}\":\"${DS}\", \"{#MOUNTPOINT}\": \"${MNT}\", \"{#DEV}\":\"${DEV}\"},"
+        done 
+done | sed 's:,$::'
+
+echo ']}'

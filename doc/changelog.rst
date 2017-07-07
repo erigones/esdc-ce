@@ -7,24 +7,27 @@ Changelog
 Features
 --------
 
+- Added reflection of users and user groups from management to Zabbix monitoring - `#91 <https://github.com/erigones/esdc-ce/issues/91>`__
+- Added user editable notes for VM and node - `#98 <https://github.com/erigones/esdc-ce/issues/98>`__
 - Added ability to disable reservation of replicated VM resources - `#99 <https://github.com/erigones/esdc-ce/issues/99>`__
+- Added ability to change the timeout period for graceful VM stop, reboot and freeze operations - `#111 <https://github.com/erigones/esdc-ce/issues/111>`__
 - Removed VM zoneid fetching and updated monitoring templates - `#129 <https://github.com/erigones/esdc-ce/issues/129>`__
 - Added node_vm_define_backup_list API and GUI views -  `#139 <https://github.com/erigones/esdc-ce/issues/139>`__
 - Added ability to import images from local image server - `#140 <https://github.com/erigones/esdc-ce/issues/140>`__
-- Added ability to change the timeout period for graceful VM stop, reboot and freeze operations - `#111 <https://github.com/erigones/esdc-ce/issues/111>`__
-- Added reflection of users and user groups from management to Zabbix monitoring - `#91 <https://github.com/erigones/esdc-ce/issues/91>`__
 - Updated mbuffer to version 20170515 - `#156 <https://github.com/erigones/esdc-ce/issues/156>`__
+- Added basic support for Linux Zones (lx brand) - `#183 <https://github.com/erigones/esdc-ce/issues/183>`__
 - Updated Python requirements - `#185 <https://github.com/erigones/esdc-ce/issues/185>`__
-- Disabled GSSAPIKeyExchange for every SSH operation - `#185 <https://github.com/erigones/esdc-ce/issues/195>`__
+- Disabled GSSAPIKeyExchange for every SSH operation - `#195 <https://github.com/erigones/esdc-ce/issues/195>`__
 
 Bugs
 ----
 
 - Allowed IP address <-> VM association updates after manual VM configuration on hypervisor - `#168 <https://github.com/erigones/esdc-ce/issues/168>`__
-- Fixed problem with high amount of network traffic in the celeryev exchange - `#179 <https://github.com/erigones/esdc-ce/issues/179>`__
-- Fixed IP address validation, when multiple IPs are being added - `#177 <https://github.com/erigones/esdc-ce/issues/177>`__
-- Disable current compute in VM migration dialog - `#191 <https://github.com/erigones/esdc-ce/issues/191>`__
 - Force change of the VM status in the DB with current status from vmadm - `#171 <https://github.com/erigones/esdc-ce/issues/171>`__
+- Fixed IP address validation, when multiple IPs are being added - `#177 <https://github.com/erigones/esdc-ce/issues/177>`__
+- Fixed problem with high amount of network traffic in the celeryev exchange - `#179 <https://github.com/erigones/esdc-ce/issues/179>`__
+- Disable current compute in VM migration dialog - `#191 <https://github.com/erigones/esdc-ce/issues/191>`__
+- Fixed displaying of disk IO monitoring graphs of KVMs - `#193 <https://github.com/erigones/esdc-ce/issues/193>`__
 
 
 2.5.3 (released on 2017-05-16)
