@@ -6,6 +6,10 @@
       <li class="{{ mon_mem }}"><a href="{% url 'node_monitoring_graphs' node.hostname 'memory' %}" data-toggle="tab">{% trans "Memory" %}</a></li>
       <li class="{{ mon_net }}"><a href="{% url 'node_monitoring_graphs' node.hostname 'network' %}" data-toggle="tab">{% trans "Networks" %}</a></li>
       <li class="{{ mon_disk }}"><a href="{% url 'node_monitoring_graphs' node.hostname 'storage' %}" data-toggle="tab">{% trans "Storages" %}</a></li>
+      <li class="{{ mon_vm_cpu }}"><a href="{% url 'node_monitoring_graphs' node.hostname 'vm-cpu' %}" data-toggle="tab">{% trans "Servers: CPU" %}</a></li>
+      <li class="{{ mon_vm_mem }}"><a href="{% url 'node_monitoring_graphs' node.hostname 'vm-memory' %}" data-toggle="tab">{% trans "Servers: Memory" %}</a></li>
+      <li class="{{ mon_vm_disk_throughput }}"><a href="{% url 'node_monitoring_graphs' node.hostname 'vm-disk-throughput' %}" data-toggle="tab">{% trans "Servers: VM Disk Throughput" %}</a></li>
+      <li class="{{ mon_vm_disk_io }}"><a href="{% url 'node_monitoring_graphs' node.hostname 'vm-disk-io' %}" data-toggle="tab">{% trans "Servers: VM Disk I/O" %}</a></li>
     </ul>
   </div>
 </div>

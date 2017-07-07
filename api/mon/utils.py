@@ -60,6 +60,7 @@ def call_mon_history_task(request, task_function, view_fun_name, obj, dc_bound,
     result['graph'] = graph
     result['options'] = graph_settings.get('options', {})
     result['update_interval'] = graph_settings.get('update_interval', None)
+    result['add_host_name'] = graph_settings.get('add_host_name', False)
     tidlock = '%s obj:%s graph:%s item_id:%s since:%d until:%d' % (task_function.__name__,
                                                                    obj.uuid, graph, serializer.item_id,
                                                                    round(serializer.object['since'], -2),

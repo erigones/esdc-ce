@@ -292,6 +292,7 @@ class ZabbixBase(object):
             search_params = {'filter': {'host': host, 'key_': keys}, 'sortfield': ['itemid'], 'sortorder': 0}
 
         search_params['output'] = ['itemid', 'name', 'status', 'units', 'description']
+        search_params['selectHosts'] = ['hostid', 'host', 'name']
 
         return self.zapi.item.get(search_params)
 
@@ -760,9 +761,9 @@ class ZabbixBase(object):
             logger.exception(e)
             raise ZabbixError(e)
 
-    def get_history(self, host, items, history, since, until, items_search=None):
+    def get_history(self, hosts, items, history, since, until, items_search=None):
         """Return monitoring history for selected zabbix host, items and period"""
-        res = {'history': []}
+        res = {'history': [], 'items': []}
 
         now = int(datetime.now().strftime('%s'))
         max_period = self.settings.MON_ZABBIX_GRAPH_MAX_PERIOD
@@ -772,6 +773,7 @@ class ZabbixBase(object):
         until_history = None
         since_trend = None
         until_trend = None
+        itemids = set()
 
         if until < max_history or period > max_period:  # trends only
             until_trend = until
@@ -781,14 +783,18 @@ class ZabbixBase(object):
             since_history = since
 
         try:
-            res['items'] = self._zabbix_get_items(host, items, search_params=items_search)
+            for host in hosts:
+                host_items = self._zabbix_get_items(host, items, search_params=items_search)
 
-            if not res['items']:
-                raise ZabbixAPIException('Cannot find items for selected host in Zabbix')
+                if not host_items:
+                    raise ZabbixAPIException('Cannot find items for host "%s" in Zabbix' % host)
+
+                itemids.update(i['itemid'] for i in host_items)
+                res['items'].extend(host_items)
 
             # noinspection PyTypeChecker
             params = {
-                'itemids': [i['itemid'] for i in res['items']],
+                'itemids': list(itemids),
                 'history': history,
                 'sortfield': 'clock',
                 'sortorder': 'ASC',
@@ -806,7 +812,7 @@ class ZabbixBase(object):
                 res['history'] += self.zapi.history.get(params)
 
         except ZabbixAPIException as exc:
-            self.log(ERROR, 'Zabbix API Error in get_history(%s, %s): %s', host, items, exc)
+            self.log(ERROR, 'Zabbix API Error in get_history(%s, %s): %s', hosts, items, exc)
             raise ZabbixError('Zabbix API Error while retrieving history (%s)' % exc)
 
         else:
