@@ -150,9 +150,9 @@ network interface. *requires data.nic_id*
 the virtual hard drive. *requires data.disk_id*
         |  *disk-io* (KVM only) - The amount of write and read I/O operations performed on \
 the virtual hard drive. *requires data.disk_id*
-        |  *fs-throughput* (SunOS Zone only) - The amount of written and read data \
+        |  *fs-throughput* (SunOS and Linux Zone only) - The amount of written and read data \
 on the virtual hard drive. *requires data.disk_id*
-        |  *fs-io* (SunOS Zone only) - The amount of write and read I/O operations performed on \
+        |  *fs-io* (SunOS and Linux Zone only) - The amount of write and read I/O operations performed on \
 the virtual hard drive. *requires data.disk_id*
         |  *vm-disk-logical-throughput* - Aggregated disk throughput on the logical layer \
 (with acceleration mechanisms included).
