@@ -15,6 +15,7 @@ Features
 - Added node_vm_define_backup_list API and GUI views -  `#139 <https://github.com/erigones/esdc-ce/issues/139>`__
 - Added ability to import images from local image server - `#140 <https://github.com/erigones/esdc-ce/issues/140>`__
 - Updated mbuffer to version 20170515 - `#156 <https://github.com/erigones/esdc-ce/issues/156>`__
+- Added basic support for Linux Zones (lx brand) - `#183 <https://github.com/erigones/esdc-ce/issues/183>`__
 - Updated Python requirements - `#185 <https://github.com/erigones/esdc-ce/issues/185>`__
 - Disabled GSSAPIKeyExchange for every SSH operation - `#195 <https://github.com/erigones/esdc-ce/issues/195>`__
 
@@ -25,6 +26,7 @@ Bugs
 - Fixed IP address validation, when multiple IPs are being added - `#177 <https://github.com/erigones/esdc-ce/issues/177>`__
 - Fixed problem with high amount of network traffic in the celeryev exchange - `#179 <https://github.com/erigones/esdc-ce/issues/179>`__
 - Disable current compute in VM migration dialog - `#191 <https://github.com/erigones/esdc-ce/issues/191>`__
+- Fixed displaying of disk IO monitoring graphs of KVMs - `#193 <https://github.com/erigones/esdc-ce/issues/193>`__
 
 
 2.5.3 (released on 2017-05-16)

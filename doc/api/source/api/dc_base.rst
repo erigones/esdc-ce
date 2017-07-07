@@ -156,6 +156,7 @@
                     "VMS_DISK_COMPRESSION_DEFAULT": "lz4", 
                     "VMS_DISK_IMAGE_DEFAULT": "", 
                     "VMS_DISK_IMAGE_ZONE_DEFAULT": "base64", 
+                    "VMS_DISK_IMAGE_LX_ZONE_DEFAULT": "alpine-3",
                     "VMS_DISK_MODEL_DEFAULT": "virtio", 
                     "VMS_NET_DEFAULT": "lan", 
                     "VMS_NET_NIC_TAGS": [

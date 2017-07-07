@@ -78,7 +78,8 @@ class DiskVmMonHistorySerializer(MonHistorySerializer):
         assert disk_id
 
         try:
-            self.item_id = self.obj.get_real_disk_id(self.obj.json_active_get_disks()[disk_id - 1])
+            self.item_id = disk_id - 1  # KVM IO templates are using "array_disk_id"
+            self.obj.get_real_disk_id(self.obj.json_active_get_disks()[self.item_id])
         except IndexError:
             raise s.ValidationError(_('Disk ID not defined on VM.'))
 
