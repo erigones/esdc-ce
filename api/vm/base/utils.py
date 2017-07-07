@@ -95,15 +95,13 @@ def vm_update_ipaddress_usage(vm):
             allowed_ips = nic.get('allowed_ips', ())
 
             if ip:
-                logger.debug('VM: %s | NIC ID: %s | NIC network: %s | IP address: %s (%s) | IP usage: %s',
-                             vm, nic_id, network_uuid, ip, ip.subnet, ip.usage)
+                logger.debug('VM: %s | NIC ID: %s | NIC network: %s | IP address: %s', vm, nic_id, network_uuid, ip)
                 if not _is_ip_ok(vm_ips, ip, network_uuid):
                     raise ValueError('VM %s NIC ID %s IP address %s is not properly associated with VM!' %
                                      (vm, nic_id, ip))
 
             for ip in allowed_ips:
-                logger.debug('VM: %s | NIC ID: %s | NIC network: %s | IP address: %s (%s) | IP usage: %s',
-                             vm, nic_id, network_uuid, ip, ip.subnet, ip.usage)
+                logger.debug('VM: %s | NIC ID: %s | NIC network: %s | IP address: %s', vm, nic_id, network_uuid, ip)
                 if not _is_ip_ok(vm_allowed_ips, ip, network_uuid):
                     raise ValueError('VM %s NIC ID %s allowed IP address %s is not properly associated with VM!' %
                                      (vm, nic_id, ip))

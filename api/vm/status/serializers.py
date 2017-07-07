@@ -66,6 +66,11 @@ class VmStatusFreezeSerializer(s.Serializer):
 class VmStatusUpdateJSONSerializer(s.Serializer):
     update = s.BooleanField(default=True)
 
+    def __init__(self, *args, **kwargs):
+        update_default = kwargs.get('default', False)
+        super(VmStatusUpdateJSONSerializer, self).__init__(*args, **kwargs)
+        self.fields['update'].default = update_default
+
 
 class VmStatusStopSerializer(s.Serializer):
     timeout = s.IntegerField(default=settings.VMS_VM_STOP_TIMEOUT_DEFAULT)

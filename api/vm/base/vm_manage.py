@@ -81,6 +81,16 @@ class VmManage(APIView):
 
         return json_update, cmd
 
+    # noinspection PyUnusedLocal
+    @staticmethod
+    def validate_update(vm, json_update, os_cmd):
+        """Check if (json_update, os_cmd) tuple from fix_update() can be run on a VM"""
+        # cmd = zfs set... >&2;
+        if os_cmd and vm.snapshot_set.exists():
+            raise ExpectationFailed('VM has snapshots')
+
+        return True
+
     @staticmethod
     def _check_disk_update(disk_update):
         for disk in disk_update:
@@ -335,11 +345,8 @@ class VmManage(APIView):
 
             # create json suitable for update
             stdin, cmd1 = self.fix_update(json_update)
+            self.validate_update(vm, stdin, cmd1)
             stdin = stdin.dump()
-
-            # cmd = zfs set... >&2;
-            if cmd1 and vm.snapshot_set.exists():
-                raise ExpectationFailed('VM has snapshots')
 
             # final cmd
             cmd = cmd1 + 'vmadm update %s >&2; e=$?; vmadm get %s 2>/dev/null; exit $e' % (vm.uuid, vm.uuid)
