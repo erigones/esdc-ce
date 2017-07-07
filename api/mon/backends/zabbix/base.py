@@ -786,11 +786,11 @@ class ZabbixBase(object):
             for host in hosts:
                 host_items = self._zabbix_get_items(host, items, search_params=items_search)
 
-                if host_items:
-                    itemids.update(i['itemid'] for i in host_items)
-                    res['items'].extend(host_items)
-                else:
+                if not host_items:
                     raise ZabbixAPIException('Cannot find items for host "%s" in Zabbix' % host)
+
+                itemids.update(i['itemid'] for i in host_items)
+                res['items'].extend(host_items)
 
             # noinspection PyTypeChecker
             params = {
