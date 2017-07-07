@@ -71,7 +71,7 @@ def node_define(request, hostname, data=None):
         :type data.is_compute: boolean
         :arg data.is_backup: Backup capability
         :type data.is_backup: boolean
-        :arg data.note: Text note visible to every user with access to node.
+        :arg data.note: Text note visible to every user with access to node
         :type data.note: string
         :arg data.owner: Node owner
         :type data.owner: string

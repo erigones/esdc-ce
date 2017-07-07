@@ -212,7 +212,7 @@ class AdminServerSettingsForm(ServerSettingsForm):
     note = forms.CharField(label=_('Note'), help_text=_('Text visible for every user with access to VM.'),
                            required=False,
                            widget=forms.Textarea(attrs={
-                               'class': 'input-transparent small',
+                               'class': 'input-transparent',
                                'rows': 5})
                            )
     monitored = forms.BooleanField(label=_('Monitored?'), required=False,
