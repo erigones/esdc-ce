@@ -8,7 +8,7 @@ from django.db.models import Count, Q
 from django.http import HttpResponse, Http404, QueryDict
 from django.conf import settings
 
-from vms.models import Node, NodeStorage, Storage, TaskLogEntry
+from vms.models import Node, NodeStorage, Storage, TaskLogEntry, Vm
 from gui.decorators import staff_required, ajax_required
 from gui.utils import collect_view_data, get_pager, reverse
 from gui.signals import view_node_list, view_node_details
@@ -395,7 +395,10 @@ def monitoring(request, hostname, graph_type='cpu'):
 
     context['graph_items'] = GRAPH_ITEMS
     context['obj_lifetime'] = node.lifetime
-    context['obj_operational'] = node.status != Node.STATUS_AVAILABLE_MONITORING
+    context['obj_operational'] = node.status != Node.STATUS_AVAILABLE_MONITORING and (
+        not graph_type.startswith('vm-') or
+        node.vm_set.exclude(status=Vm.NOTCREATED).filter(slavevm__isnull=True).exists()
+    )
 
     if graph_type == 'memory':
         graphs = (
@@ -413,6 +416,28 @@ def monitoring(request, hostname, graph_type='cpu'):
             (Graph('storage-throughput', zpool=i), Graph('storage-io', zpool=i), Graph('storage-space', zpool=i))
             for i in node_zpools
         ]))
+    elif graph_type == 'vm-cpu':
+        graphs = (
+            Graph('vm-cpu-usage'),
+        )
+    elif graph_type == 'vm-memory':
+        graphs = (
+            Graph('vm-mem-usage'),
+        )
+    elif graph_type == 'vm-disk-throughput':
+        graphs = (
+            Graph('vm-disk-logical-throughput-reads'),
+            Graph('vm-disk-logical-throughput-writes'),
+            Graph('vm-disk-physical-throughput-reads'),
+            Graph('vm-disk-physical-throughput-writes'),
+        )
+    elif graph_type == 'vm-disk-io':
+        graphs = (
+            Graph('vm-disk-logical-io-reads'),
+            Graph('vm-disk-logical-io-writes'),
+            Graph('vm-disk-physical-io-reads'),
+            Graph('vm-disk-physical-io-writes'),
+        )
     else:
         graph_type = 'cpu'
         graphs = (

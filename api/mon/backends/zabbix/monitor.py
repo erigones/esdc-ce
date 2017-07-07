@@ -126,7 +126,11 @@ class Zabbix(AbstractMonitoringBackend):
 
     def vm_history(self, vm_host_id, items, zhistory, since, until, items_search=None):
         """[INTERNAL] Return VM history data for selected graph and period"""
-        return self.izx.get_history(vm_host_id, items, zhistory, since, until, items_search=items_search)
+        return self.izx.get_history((vm_host_id,), items, zhistory, since, until, items_search=items_search)
+
+    def vms_history(self, vm_host_ids, items, zhistory, since, until, items_search=None):
+        """[INTERNAL] Return VM history data for selected VMs, graph and period"""
+        return self.izx.get_history(vm_host_ids, items, zhistory, since, until, items_search=items_search)
 
     @staticmethod
     def _vm_disable_sync(zx, vm, log=None):
@@ -431,7 +435,7 @@ class Zabbix(AbstractMonitoringBackend):
 
     def node_history(self, node_id, items, zhistory, since, until, items_search=None):
         """[INTERNAL] Return node history data for selected graph and period"""
-        return self.izx.get_history(node_id, items, zhistory, since, until, items_search=items_search)
+        return self.izx.get_history((node_id,), items, zhistory, since, until, items_search=items_search)
 
     def template_list(self):
         """[EXTERNAL] Return list of available templates"""

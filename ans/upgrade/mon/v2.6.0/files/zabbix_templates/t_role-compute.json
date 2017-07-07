@@ -1,0 +1,61 @@
+{
+    "zabbix_export": {
+        "date": "2016-01-05T10:10:12Z",
+        "templates": [
+            {
+                "templates": [
+                    {
+                        "name": "t_erigonos"
+                    },
+                    {
+                        "name": "t_icmp"
+                    },
+                    {
+                        "name": "t_solaris_disk"
+                    },
+                    {
+                        "name": "t_svc-erigonesd-compute"
+                    },
+                    {
+                        "name": "t_zabbix-agent"
+                    },
+                    {
+                        "name": "t_zfs_arc"
+                    },
+                    {
+                        "name": "t_zfs_io_throttle"
+                    },
+                    {
+                        "name": "t_vm_zone_vfs"
+                    },
+                    {
+                        "name": "t_vm_zone_zfs"
+                    }
+                ],
+                "name": "t_role-compute",
+                "macros": [
+                    {
+                        "macro": "{$UUID_SHORT}",
+                        "value": "global"
+                    }
+                ],
+                "items": [],
+                "screens": [],
+                "applications": [],
+                "discovery_rules": [],
+                "groups": [
+                    {
+                        "name": "Templates"
+                    }
+                ],
+                "template": "t_role-compute"
+            }
+        ],
+        "version": "2.0",
+        "groups": [
+            {
+                "name": "Templates"
+            }
+        ]
+    }
+}

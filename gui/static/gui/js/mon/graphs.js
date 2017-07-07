@@ -89,22 +89,39 @@ function MonitoringGraph(obj_type, hostname, graph_name, graph_params, graph_id)
    * Parse mon_*_history result and return plot data
    */
   function _parse_history(result) {
-    var i, data = {};
+    var i;
+    var data = [];  // data for plotting; array of series objects {'data': [], 'label': ''}
+    var data_itemid_map = {};  // itemid->series object mapping, used for filling the correct series with data points
 
     // items
     for (i = 0; i < result.items.length; i++) {
       var item = result.items[i];
       var label = item.name;
+      var host_name;
 
       if (item.units) {
         label = label + ' (' + item.units + ')';
       }
 
-      data[item.itemid] = {
+      if (result.add_host_name && item.hosts) {
+        host_name = item.hosts[0].name;
+
+        if (host_name) {
+          label = host_name.replace(/^_/, '') + ': ' + label;
+        }
+      }
+
+      var _series = {
         'label': label,
         'data': [],
       };
+
+      data_itemid_map[item.itemid] = _series;
+      data.push(_series);
     }
+
+    // the data object will be in a specific order
+    _.sortBy(data, 'label');
 
     // history
     for (i = 0; i < result.history.length; i++) {
@@ -125,11 +142,10 @@ function MonitoringGraph(obj_type, hostname, graph_name, graph_params, graph_id)
       dataitem = [parseInt(point.clock) * 1000, value];
       dataitem.source = point; // Save point metadata
 
-      data[point.itemid]['data'].push(dataitem);
+      data_itemid_map[point.itemid]['data'].push(dataitem);
     }
 
-    // object -> array
-    return $.map(data, function(v, i){ return v; });
+    return data;
   }
 
   /*

@@ -6,13 +6,21 @@ from que.mgmt import MgmtTask
 from que.exceptions import MgmtTaskException
 from api.task.utils import mgmt_task, mgmt_lock
 from api.mon.log import save_task_log
+from api.mon.utils import get_mon_vms
 from api.mon import LOG, get_monitoring, MonitoringError
 from api.mon.messages import LOG_MON_NODE_UPDATE, LOG_MON_NODE_DELETE
 from api.mon.node.utils import NodeMonInternalTask
 from vms.models import DefaultDc, Node
 from vms.signals import node_created, node_json_changed
 
-__all__ = ('mon_node_sla', 'mon_node_sync', 'mon_node_status_sync', 'mon_node_delete')
+__all__ = (
+    'mon_node_sla',
+    'mon_node_sync',
+    'mon_node_history',
+    'mon_node_vm_history',
+    'mon_node_status_sync',
+    'mon_node_delete',
+)
 
 logger = get_task_logger(__name__)
 
@@ -47,6 +55,26 @@ def mon_node_history(task_id, node_uuid, items, zhistory, result, items_search, 
     try:
         history = get_monitoring(DefaultDc()).node_history(node_uuid, items, zhistory, result['since'], result['until'],
                                                            items_search=items_search)
+    except MonitoringError as exc:
+        raise MgmtTaskException(text_type(exc))
+
+    result.update(history)
+
+    return result
+
+
+# noinspection PyUnusedLocal
+@cq.task(name='api.mon.node.tasks.mon_node_vm_history', base=MgmtTask)
+@mgmt_task()
+def mon_node_vm_history(task_id, node_uuid, items, zhistory, result, items_search, **kwargs):
+    """
+    Return node's historical data for selected graph and period.
+    """
+    vm_uuids = [vm.uuid for vm in get_mon_vms(node__uuid=node_uuid)]
+
+    try:
+        history = get_monitoring(DefaultDc()).vms_history(vm_uuids, items, zhistory, result['since'], result['until'],
+                                                          items_search=items_search)
     except MonitoringError as exc:
         raise MgmtTaskException(text_type(exc))
 
