@@ -76,6 +76,24 @@ virtual network interface. *requires data.nic*
         |  *storage-throughput* - The amount of read and written data on the zpool.
         |  *storage-io* - The amount of I/O read and write operations performed on the zpool.
         |  *storage-space* - ZFS zpool space usage by type.
+        |  *vm-cpu-usage* - CPU consumed by each virtual machine on the compute node.
+        |  *vm-mem-usage* - Physical memory consumed by each virtual machine on the compute node.
+        |  *vm-disk-logical-throughput-reads* - Amount of data read on the logical layer \
+(with acceleration mechanisms included) by each virtual machine on the compute node.
+        |  *vm-disk-logical-throughput-writes* - Amount of data written on the logical layer \
+(with acceleration mechanisms included) by each virtual machine on the compute node.
+        |  *vm-disk-logical-io-reads* - Number of read operation performed on the logical layer \
+(with acceleration mechanisms included) by each virtual machine on the compute node.
+        |  *vm-disk-logical-io-writes* - Number of write operation performed on the logical layer \
+(with acceleration mechanisms included) by each virtual machine on the compute node.
+        |  *vm-disk-physical-throughput-reads* - Amount of data read on the physical (disk) layer \
+by each virtual machine on the compute node.
+        |  *vm-disk-physical-throughput-writes* - Amount of data written on the physical (disk) layer \
+by each virtual machine on the compute node.
+        |  *vm-disk-physical-io-reads* - Number of read operation performed on the physical (disk) layer \
+by each virtual machine on the compute node.
+        |  *vm-disk-physical-io-writes* - Number of write operation performed on the physical (disk) layer \
+by each virtual machine on the compute node.
 
         :arg data.since: Return only values that have been received after the given UNIX timestamp \
 (default: now - 1 hour)

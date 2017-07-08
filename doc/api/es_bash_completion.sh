@@ -28,7 +28,7 @@ __vm_hostname_is_valid() {
 _es() {
 	local cur prev actions prefix action params
 	local es_output="--json --csv --tabulate --tabulate-plain --tabulate-simple --tabulate-grid"
-	local vm_define="-hostname -alias -template -ostype -vcpus -ram -owner -node -tags -monitored -installed -snapshot_limit_manual -zpool -cpu_shares -zfs_io_priority -mdata -full -routes"
+	local vm_define="-hostname -alias -template -ostype -vcpus -ram -owner -node -tags -monitored -installed -snapshot_limit_manual -zpool -cpu_shares -zfs_io_priority -mdata -full -routes -note"
 	local vm_snapshot="-disk_id -note -force"
 	local vm_backup="-disk_id -note"
 
@@ -246,12 +246,12 @@ _es() {
 
 		/vm/*/status/stop|/vm/*/status/stop/)
 			[ ${COMP_CWORD} -eq 2 ] && COMPREPLY=( "${cur} " )
-			params="-force -timeout -freeze -unfreeze -cb_url -cb_method"
+			params="-force -timeout -update -freeze -unfreeze -cb_url -cb_method"
 		;;
 
 		/vm/*/status/reboot|/vm/*/status/reboot/)
 			[ ${COMP_CWORD} -eq 2 ] && COMPREPLY=( "${cur} " )
-			params="-force -timeout -cb_url -cb_method"
+			params="-force -timeout -update -cb_url -cb_method"
 		;;
 
 		/vm/*/status/current|/vm/*/status/current/)
@@ -569,7 +569,7 @@ _es() {
 				COMPREPLY=( $(compgen -P "${cur%/*}" -W "/ /backup" -- "/${cur##*/}" ) )
 			fi
 			[[ "${action}" == "get" ]] && params="-full"
-			[[ "${action}" == "create" ]] || [[ "${action}" == "set" ]] && params="-status -is_compute -is_backup -owner -cpu_coef -ram_coef"
+			[[ "${action}" == "create" ]] || [[ "${action}" == "set" ]] && params="-status -is_compute -is_backup -owner -cpu_coef -ram_coef -note"
 		;;
 
 		/node/*/license|/node/*/license/)

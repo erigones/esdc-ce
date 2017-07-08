@@ -34,7 +34,7 @@ class Image(_VirtModel, _JsonPickleModel, _OSType, _DcMixin, _UserTasksModel):
         _OSType.WINDOWS: u'windows',
         _OSType.SUNOS: u'illumos',
         _OSType.SUNOS_ZONE: u'smartos',
-        _OSType.LINUX_ZONE: u'other',
+        _OSType.LINUX_ZONE: u'linux',
     })
 
     # Used in add server and in payments during define_vm

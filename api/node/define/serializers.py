@@ -20,7 +20,7 @@ class NodeDefineSerializer(s.InstanceSerializer):
     error_negative_resources = s.ErrorList([_('Value is too low because of existing virtual machines.')])
 
     _model_ = Node
-    _update_fields_ = ('status', 'owner', 'is_compute', 'is_backup', 'cpu_coef', 'ram_coef',
+    _update_fields_ = ('status', 'owner', 'is_compute', 'is_backup', 'note', 'cpu_coef', 'ram_coef',
                        'monitoring_hostgroups', 'monitoring_templates')
 
     hostname = s.CharField(read_only=True)
@@ -32,6 +32,7 @@ class NodeDefineSerializer(s.InstanceSerializer):
     is_head = s.BooleanField(read_only=True)
     is_compute = s.BooleanField()
     is_backup = s.BooleanField()
+    note = s.CharField(required=False)
     cpu = s.IntegerField(source='cpu_total', read_only=True)
     ram = s.IntegerField(source='ram_total', read_only=True)
     cpu_coef = s.DecimalField(min_value=0, max_digits=4, decimal_places=2)

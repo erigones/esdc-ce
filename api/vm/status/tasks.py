@@ -5,6 +5,7 @@ from pytz import utc
 from dateutil.parser import parse as datetime_parse
 from django.core.cache import cache, caches
 from django.utils import timezone
+from django.db import transaction
 from django.db.models import F
 from celery import states
 
@@ -439,7 +440,7 @@ def vm_status_cb(result, task_id, vm_uuid=None):
 
     if result['returncode'] == 0 and msg and msg.find('Successfully') == 0:
         # json was updated
-        if result['meta']['apiview']['update'] and msg.find('Successfully updated') == 0:
+        if result['meta']['apiview']['update'] and msg.find('Successfully updated') != -1:
             try:  # save json from smartos
                 json_active = vm.json.load(json)
                 vm_delete_snapshots_of_removed_disks(vm)  # Do this before updating json and json_active
@@ -449,10 +450,11 @@ def vm_status_cb(result, task_id, vm_uuid=None):
                 logger.exception(e)
                 logger.error('Could not parse json output from vm_status(%s). Error: %s', vm_uuid, e)
             else:
-                vm.save(update_node_resources=True, update_storage_resources=True,
-                        update_fields=('enc_json', 'enc_json_active', 'changed'))
-                vm_update_ipaddress_usage(vm)
-                vm_json_active_changed.send(task_id, vm=vm)  # Signal!
+                with transaction.atomic():
+                    vm.save(update_node_resources=True, update_storage_resources=True,
+                            update_fields=('enc_json', 'enc_json_active', 'changed'))
+                    vm_update_ipaddress_usage(vm)
+                    vm_json_active_changed.send(task_id, vm=vm)  # Signal!
 
         change_time = _get_task_time(result, 'exec_time')
 

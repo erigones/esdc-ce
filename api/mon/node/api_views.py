@@ -2,7 +2,8 @@ from api.api_views import APIView
 from api.exceptions import NodeIsNotOperational, InvalidInput
 from api.mon.node.graphs import GRAPH_ITEMS
 from api.mon.node.serializers import NetworkNodeMonHistorySerializer, StorageNodeMonHistorySerializer
-from api.mon.node.tasks import mon_node_sla as t_mon_node_sla, mon_node_history as t_mon_node_history
+from api.mon.node.tasks import (mon_node_sla as t_mon_node_sla, mon_node_history as t_mon_node_history,
+                                mon_node_vm_history as t_mon_node_vm_history)
 from api.mon.node.utils import parse_yyyymm
 from api.mon.serializers import MonHistorySerializer
 from api.mon.utils import call_mon_history_task
@@ -58,6 +59,7 @@ class NodeHistoryView(APIView):
 
     def get(self):
         request, node, graph = self.request, self.node, self.graph_type
+        task = t_mon_node_history
 
         if node.status not in node.STATUS_AVAILABLE_MONITORING:
             raise NodeIsNotOperational
@@ -71,6 +73,9 @@ class NodeHistoryView(APIView):
             ser_class = NetworkNodeMonHistorySerializer
         elif graph.startswith(('storage-', )):
             ser_class = StorageNodeMonHistorySerializer
+        elif graph.startswith(('vm-', )):
+            ser_class = MonHistorySerializer
+            task = t_mon_node_vm_history
         else:
             ser_class = MonHistorySerializer
 
@@ -80,7 +85,7 @@ class NodeHistoryView(APIView):
             return FailureTaskResponse(request, ser.errors, obj=node)
 
         return call_mon_history_task(
-            request, t_mon_node_history,
+            request, task,
             view_fun_name='mon_node_history',
             obj=self.node,
             dc_bound=False,

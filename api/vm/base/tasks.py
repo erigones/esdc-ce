@@ -1,4 +1,5 @@
 from gevent import sleep
+from django.db import transaction
 
 from que.tasks import cq, get_task_logger
 from que.mgmt import MgmtCallbackTask
@@ -119,11 +120,12 @@ def vm_create_cb(result, task_id, vm_uuid=None):
             raise TaskException(result, 'Could not parse json output')
 
         else:
-            # save all
-            vm.save(update_node_resources=True, update_storage_resources=True)
-            vm_update_ipaddress_usage(vm)
-            # vm_json_active_changed.send(task_id, vm=vm)  # Signal! -> not needed because vm_deployed is called below
-            vm_created.send(task_id, vm=vm)  # Signal!
+            with transaction.atomic():
+                # save all
+                vm.save(update_node_resources=True, update_storage_resources=True)
+                vm_update_ipaddress_usage(vm)
+                # vm_json_active_changed.send(task_id, vm=vm)  # Signal! not needed because vm_deployed is called below
+                vm_created.send(task_id, vm=vm)  # Signal!
 
             if msg.find('Successfully started') < 0:  # VM was created, but could not be started
                 logger.error('VM %s was created, but could not be started! Error: %s', vm_uuid, msg)
@@ -247,9 +249,10 @@ def vm_update_cb(result, task_id, vm_uuid=None, new_node_uuid=None):
             node = Node.objects.get(uuid=new_node_uuid)
             vm.set_node(node)
 
-        vm.save(update_node_resources=True, update_storage_resources=True, update_fields=update_fields)
-        vm_update_ipaddress_usage(vm)
-        vm_json_active_changed.send(task_id, vm=vm)  # Signal!
+        with transaction.atomic():
+            vm.save(update_node_resources=True, update_storage_resources=True, update_fields=update_fields)
+            vm_update_ipaddress_usage(vm)
+            vm_json_active_changed.send(task_id, vm=vm)  # Signal!
 
         if new_node_uuid:
             vm_node_changed.send(task_id, vm=vm, force_update=True)  # Signal!

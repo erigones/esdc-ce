@@ -49,9 +49,13 @@ LOG_START_UPDATE = _('Update and start server')
 LOG_START_ISO = _('Start server from CD image')
 LOG_START_UPDATE_ISO = _('Update and start server from CD image')
 LOG_REBOOT = _('Reboot server')
+LOG_REBOOT_UPDATE = _('Update and reboot server')
 LOG_REBOOT_FORCE = _('Force server reboot')
+LOG_REBOOT_FORCE_UPDATE = _('Update and force server reboot')
 LOG_STOP = _('Stop server')
+LOG_STOP_UPDATE = _('Update and stop server')
 LOG_STOP_FORCE = _('Force server stop')
+LOG_STOP_FORCE_UPDATE = _('Update and force server stop')
 
 
 LOG_MIGRATE = _('Migrate server')

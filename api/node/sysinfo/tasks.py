@@ -6,6 +6,7 @@ from api.node.sysinfo.utils import parse_esysinfo
 from api.node.messages import LOG_NODE_CREATE, LOG_NODE_UPDATE
 from api.node.sshkey.tasks import run_node_authorized_keys_sync
 from api.node.image.tasks import run_node_img_sources_sync
+from api.node.snapshot.api_views import NodeVmSnapshotList
 from api.vm.status.tasks import vm_status_all
 from api.dns.record.api_views import RecordView
 from vms.models import Node, DefaultDc
@@ -141,5 +142,11 @@ def node_sysinfo_cb(result, task_id, node_uuid=None):
     else:
         # Always run vm_status_all for an old compute node
         vm_status_all(task_id, node)
+
+        # Sync snapshots and backup for every node storage
+        try:
+            NodeVmSnapshotList.sync(node)
+        except Exception as e:
+            logger.exception(e)
 
     return result

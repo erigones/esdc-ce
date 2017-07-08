@@ -143,8 +143,11 @@ def vm_status(request, hostname_or_uuid, action=None, data=None):
         :type hostname_or_uuid: string
         :arg data.force: Force change of the status (default: false)
         :type data.force: boolean
+        :arg data.update: Update VM configuration (if changed) after stopping \
+VM on compute node (default: false)
+        :type data.update: boolean
         :arg data.timeout: Time period (in seconds) for a graceful shutdown, after which the force shutdown \
-is send to the VM (default: 180 seconds / 300 seconds for Windows VM)
+is send to the VM (KVM only) (default: 180 seconds / 300 seconds for Windows VM)
         :type data.timeout: integer
         :arg data.freeze: Set frozen status after successful stop action (default: false)
         :type data.freeze: boolean
@@ -155,8 +158,9 @@ is send to the VM (default: 180 seconds / 300 seconds for Windows VM)
         :status 400: FAILURE
         :status 403: Forbidden
         :status 404: VM not found
-        :status 417: Bad action
+        :status 417: Bad action / VM has snapshots (disk size update)
         :status 423: Node is not operational / VM is not operational / VM is already stopping
+        :status 428: Cannot perform update while VM is stopping
 
     .. http:put:: /vm/(hostname_or_uuid)/status/reboot
 
@@ -170,16 +174,20 @@ is send to the VM (default: 180 seconds / 300 seconds for Windows VM)
         :type hostname_or_uuid: string
         :arg data.force: Force change of the status (default: false)
         :type data.force: boolean
+        :arg data.update: Update VM configuration (if changed) before starting (after stop)\
+VM on compute node (default: false)
+        :type data.update: boolean
         :arg data.timeout: Time period (in seconds) for a graceful reboot, after which the force reboot \
-is send to the VM (default: 180 seconds / 300 seconds for Windows VM)
+is send to the VM (KVM only) (default: 180 seconds / 300 seconds for Windows VM)
         :type data.timeout: integer
         :status 200: SUCCESS
         :status 201: PENDING
         :status 400: FAILURE
         :status 403: Forbidden
         :status 404: VM not found
-        :status 417: Bad action
+        :status 417: Bad action / VM has snapshots (disk size update)
         :status 423: Node is not operational / VM is not operational / VM is already stopping
+        :status 428: Cannot perform update while VM is stopping
 
     """
     return VmStatus(request, hostname_or_uuid, action, data).response()

@@ -66,6 +66,11 @@ class VmStatusFreezeSerializer(s.Serializer):
 class VmStatusUpdateJSONSerializer(s.Serializer):
     update = s.BooleanField(default=True)
 
+    def __init__(self, *args, **kwargs):
+        update_default = kwargs.get('default', False)
+        super(VmStatusUpdateJSONSerializer, self).__init__(*args, **kwargs)
+        self.fields['update'].default = update_default
+
 
 class VmStatusStopSerializer(s.Serializer):
     timeout = s.IntegerField(default=settings.VMS_VM_STOP_TIMEOUT_DEFAULT)
@@ -73,9 +78,22 @@ class VmStatusStopSerializer(s.Serializer):
 
     def __init__(self, request, vm, *args, **kwargs):
         super(VmStatusStopSerializer, self).__init__(*args, **kwargs)
-        dc_settings = request.dc.settings
 
-        if vm.ostype == vm.WINDOWS:
-            self.fields['timeout'].default = dc_settings.VMS_VM_STOP_WIN_TIMEOUT_DEFAULT
+        if vm.is_kvm():
+            dc_settings = request.dc.settings
+
+            if vm.ostype == vm.WINDOWS:
+                self.fields['timeout'].default = dc_settings.VMS_VM_STOP_WIN_TIMEOUT_DEFAULT
+            else:
+                self.fields['timeout'].default = dc_settings.VMS_VM_STOP_TIMEOUT_DEFAULT
         else:
-            self.fields['timeout'].default = dc_settings.VMS_VM_STOP_TIMEOUT_DEFAULT
+            del self.fields['timeout']
+
+    @property
+    def data(self):
+        data = super(VmStatusStopSerializer, self).data
+
+        if 'timeout' not in data:
+            data['timeout'] = None
+
+        return data
