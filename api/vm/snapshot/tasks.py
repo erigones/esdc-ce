@@ -244,6 +244,14 @@ def parse_node_snaps(data):
     return dict(_parse_snapshot_list_line(line) for line in data.strip().split('\n') if line)
 
 
+def is_snapshot_task_running(vm):
+    """Return True if a PUT/POST/DELETE snapshot task is running for a VM"""
+    snap_tasks = vm.get_tasks(match_dict={'view': 'vm_snapshot'})
+    snap_tasks.update(vm.get_tasks(match_dict={'view': 'vm_snapshot_list'}))
+
+    return any(t.get('method', '').upper() in ('POST', 'PUT', 'DELETE') for t in snap_tasks.values())
+
+
 def sync_snapshots(db_snaps, node_snaps):
     """Sync snapshot DB status and size with real information from compute node.
     Used by PUT vm_snapshot_list and PUT node_vm_snapshot_list."""
@@ -265,8 +273,22 @@ def sync_snapshots(db_snaps, node_snaps):
                     if snap.size != snap_size:
                         snap.size = snap_size
                         snap.save(update_fields=('size',), force_update=True)
+                    if snap.locked:  # PENDING or ROLLBACK status
+                        logger.warn('Snapshot %s (ID %s) is OK on compute node, but in %s status since %s',
+                                    snap, snap.id, snap.get_status_display(), snap.status_change)
+                        if is_snapshot_task_running(snap.vm):
+                            logger.warn('Ignoring snapshot %s (ID %s) because a snapshot task is running for VM %s',
+                                        snap, snap.id, snap.vm)
+                        else:
+                            logger.warn('Changing snapshot %s (ID %s) status to OK', snap, snap.id)
+                            snap.status = snap.OK
+                            snap.save(update_fields=('status', 'status_change'), force_update=True)
             else:
                 logger.warn('Snapshot %s (ID %s) does not exist on compute node', snap, snap.id)
+                if is_snapshot_task_running(snap.vm):
+                    logger.warn('Ignoring snapshot %s (ID %s) because a snapshot task is running for VM %s',
+                                snap, snap.id, snap.vm)
+                    continue
                 if snap.status != snap.LOST:
                     snap.status = snap.LOST
                     snap.save(update_fields=('status', 'status_change', 'size'), force_update=True)
@@ -296,7 +318,7 @@ def vm_snapshot_sync_cb(result, task_id, vm_uuid=None, disk_id=None):
 
     node_snaps = parse_node_snaps(data)
     logger.info('Found %d snapshots for VM %s on disk ID %s', len(node_snaps), vm, disk_id)
-    lost = sync_snapshots(vm.snapshot_set.filter(disk_id=disk_id).all(), node_snaps)
+    lost = sync_snapshots(vm.snapshot_set.select_related('vm').filter(disk_id=disk_id).all(), node_snaps)
 
     # Remaining snapshots on compute node are internal or old lost snapshots which do not exist in DB
     # remaining es- and as- snapshots must be created in DB; some is- and rs- could be probably removed, but

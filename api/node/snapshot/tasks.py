@@ -1,4 +1,4 @@
-from vms.models import NodeStorage, Snapshot, Node
+from vms.models import NodeStorage, Snapshot, Backup, Node
 from que.tasks import cq, get_task_logger
 from que.mgmt import MgmtCallbackTask
 from que.exceptions import TaskException
@@ -6,6 +6,7 @@ from api.task.utils import callback
 from api.task.tasks import task_log_cb_success
 from api.vm.snapshot.tasks import t_long, parse_node_snaps, sync_snapshots
 from api.node.snapshot.api_views import NodeVmSnapshotList
+from api.vm.backup.utils import sync_backups
 
 __all__ = ('node_vm_snapshot_sync_cb', 'node_vm_snapshot_sync_all')
 
@@ -30,7 +31,7 @@ def node_vm_snapshot_sync_cb(result, task_id, nodestorage_id=None):
 
     node_snaps = parse_node_snaps(data)
     logger.info('Found %d snapshots on node storage %s@%s', len(node_snaps), ns.zpool, node.hostname)
-    ns_snaps = ns.snapshot_set.all()
+    ns_snaps = ns.snapshot_set.select_related('vm').all()
     lost = sync_snapshots(ns_snaps, node_snaps)
 
     # Remaining snapshots on compute node are internal or old lost snapshots which do not exist in DB
@@ -39,6 +40,13 @@ def node_vm_snapshot_sync_cb(result, task_id, nodestorage_id=None):
     rep_snaps_size = sum(t_long(node_snaps.pop(snap)[1]) for snap in tuple(node_snaps.keys())
                          if snap.startswith(snap_prefix))
     ns.set_rep_snapshots_size(rep_snaps_size)
+
+    # The internal snapshots also include dataset backups on a backup node
+    if node.is_backup:
+        node_bkps = ns.backup_set.select_related('node', 'vm').filter(type=Backup.DATASET)
+        lost_bkps = sync_backups(node_bkps, node_snaps)
+    else:
+        lost_bkps = 0
 
     logger.info('Node storage %s@%s has %s bytes of replicated snapshots', ns.zpool, node.hostname, rep_snaps_size)
     logger.info('Node storage %s@%s has following internal/service snapshots: %s',
@@ -56,6 +64,8 @@ def node_vm_snapshot_sync_cb(result, task_id, nodestorage_id=None):
         msg = 'Snapshots successfully synced'
         if lost:
             msg += '; WARNING: %d snapshot(s) lost' % lost
+        if lost_bkps:
+            msg += '; WARNING: %d backup(s) lost' % lost_bkps
 
         result['message'] = msg
         task_log_cb_success(result, task_id, obj=ns, **result['meta'])
@@ -69,7 +79,7 @@ def node_vm_snapshot_sync_all():
     This is a periodic beat task responsible for syncing node snapshot sizes of all VMs on a compute node.
     """
     for node in Node.all():
-        if node.is_online() and node.is_compute:
+        if node.is_online() and (node.is_compute or node.is_backup):
             try:
                 NodeVmSnapshotList.sync(node)
             except Exception as exc:
