@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Erigones GUI JS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-02-09 13:34+0000\n"
+"POT-Creation-Date: 2017-07-08 19:53+0000\n"
 "PO-Revision-Date: 2013-10-18 14:02+0100\n"
 "Last-Translator: Richard Kellner <richard.kellner@erigones.com>\n"
 "Language-Team: Erigones s. r. o. <erigones@erigones.com>\n"
@@ -22,109 +22,109 @@ msgstr ""
 msgid "'"
 msgstr ""
 
-#: static/guacamole/scripts/guacamole-erigones.js:183
+#: static/guacamole/scripts/guacamole-erigones.js:204
 msgid "Idle."
 msgstr "Nečinný."
 
-#: static/guacamole/scripts/guacamole-erigones.js:186
+#: static/guacamole/scripts/guacamole-erigones.js:207
 msgid "Connecting..."
 msgstr "Pripájanie..."
 
-#: static/guacamole/scripts/guacamole-erigones.js:189
+#: static/guacamole/scripts/guacamole-erigones.js:210
 msgid "Connected, waiting for first update..."
 msgstr "Pripojený, čáka sa na prvú odozvu..."
 
-#: static/guacamole/scripts/guacamole-erigones.js:195
+#: static/guacamole/scripts/guacamole-erigones.js:216
 msgid "Disconnecting..."
 msgstr "Odpájanie..."
 
-#: static/guacamole/scripts/guacamole-erigones.js:198
+#: static/guacamole/scripts/guacamole-erigones.js:219
 msgid "Disconnected."
 msgstr "Odpojený."
 
-#: static/guacamole/scripts/guacamole-erigones.js:201
+#: static/guacamole/scripts/guacamole-erigones.js:222
 msgid "Unknown status"
 msgstr "Neznámy stav"
 
-#: static/gui/js/gsio.js:327
+#: static/gui/js/gsio.js:339
 msgid "Socket.io connection error."
 msgstr "Chyba v spojení so Socket.io."
 
-#: static/gui/js/gsio.js:336
+#: static/gui/js/gsio.js:348
 msgid "Socket.io connection problem. Please try again later."
 msgstr "Chyba v spojení so Socket.io. Prosím skúste to znovu."
 
-#: static/gui/js/gsio.js:345
+#: static/gui/js/gsio.js:357
 msgid ""
 "Your current datacenter was changed by another user session. Please refresh "
 "your browser."
 msgstr ""
 
-#: static/gui/js/gsio.js:654
+#: static/gui/js/gsio.js:699
 msgid "Server"
 msgstr "Server"
 
-#: static/gui/js/gsio.js:654
+#: static/gui/js/gsio.js:699
 msgid "changed status to"
 msgstr "zmenil stav na"
 
-#: static/gui/js/gsio.js:762
+#: static/gui/js/gsio.js:802
 msgid "Snapshot successfully created"
 msgstr "Snapshot bol úspešne vytvorený"
 
-#: static/gui/js/gsio.js:765
+#: static/gui/js/gsio.js:805
 msgid "Snapshot successfully deleted"
 msgstr "Snapshot bol úspešne vymazaný"
 
-#: static/gui/js/gsio.js:768
+#: static/gui/js/gsio.js:808
 msgid "Snapshot successfully restored"
 msgstr "Snapshot bol úspešne obnovený"
 
-#: static/gui/js/gsio.js:776
+#: static/gui/js/gsio.js:816
 msgid "Creating new snapshot failed"
 msgstr "Vytvorenie snapshotu zlyhalo"
 
-#: static/gui/js/gsio.js:779
+#: static/gui/js/gsio.js:819
 msgid "Deleting snapshot failed"
 msgstr "Vymazanie snapshotu zlyhalo"
 
-#: static/gui/js/gsio.js:782
+#: static/gui/js/gsio.js:822
 msgid "Restoring snapshot failed"
 msgstr "Obnova snapshotu zlyhala"
 
-#: static/gui/js/gsio.js:827
+#: static/gui/js/gsio.js:867
 msgid "Backup successfully created"
 msgstr ""
 
-#: static/gui/js/gsio.js:830
+#: static/gui/js/gsio.js:870
 msgid "Backup successfully deleted"
 msgstr ""
 
-#: static/gui/js/gsio.js:833
+#: static/gui/js/gsio.js:873
 msgid "Backup successfully restored"
 msgstr ""
 
-#: static/gui/js/gsio.js:841
+#: static/gui/js/gsio.js:881
 msgid "Creating new backup failed"
 msgstr ""
 
-#: static/gui/js/gsio.js:844
+#: static/gui/js/gsio.js:884
 msgid "Deleting backup failed"
 msgstr ""
 
-#: static/gui/js/gsio.js:847
+#: static/gui/js/gsio.js:887
 msgid "Restoring backup failed"
 msgstr ""
 
-#: static/gui/js/helpers.js:243
+#: static/gui/js/helpers.js:273
 msgid "Unknown error"
 msgstr ""
 
-#: static/gui/js/helpers.js:247
+#: static/gui/js/helpers.js:277
 msgid "Network error"
 msgstr ""
 
-#: static/gui/js/mon.js:99
+#: static/gui/js/mon/sla.js:99
 msgid "N/A"
 msgstr "N/A"
 
@@ -140,30 +140,30 @@ msgstr ""
 msgid "Hide Search Matches"
 msgstr ""
 
-#: static/user-guide/_static/searchtools.js:300
+#: static/user-guide/_static/searchtools.js:400
 msgid "Searching"
 msgstr ""
 
-#: static/user-guide/_static/searchtools.js:305
+#: static/user-guide/_static/searchtools.js:405
 msgid "Preparing search..."
 msgstr ""
 
-#: static/user-guide/_static/searchtools.js:461
+#: static/user-guide/_static/searchtools.js:566
 msgid "Search Results"
 msgstr ""
 
-#: static/user-guide/_static/searchtools.js:463
+#: static/user-guide/_static/searchtools.js:568
 msgid ""
 "Your search did not match any documents. Please make sure that all words are "
 "spelled correctly and that you've selected enough categories."
 msgstr ""
 
-#: static/user-guide/_static/searchtools.js:465
+#: static/user-guide/_static/searchtools.js:570
 #, javascript-format
 msgid "Search finished, found %s page(s) matching the search query."
 msgstr ""
 
-#: static/user-guide/_static/searchtools.js:517
+#: static/user-guide/_static/searchtools.js:623
 msgid ", in "
 msgstr ""
 

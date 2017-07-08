@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-02-09 13:33+0000\n"
+"POT-Creation-Date: 2017-07-08 19:52+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,103 +17,103 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
-#: models/domain.py:58
+#: models/domain.py:74
 msgid "Public"
 msgstr ""
 
-#: models/domain.py:59
+#: models/domain.py:75
 msgid "Private"
 msgstr ""
 
-#: models/domain.py:66 models/record.py:109
+#: models/domain.py:82 models/record.py:112
 msgid "Name"
 msgstr "Názov"
 
-#: models/domain.py:70
+#: models/domain.py:86
 msgid "Master"
 msgstr "Master"
 
-#: models/domain.py:72
+#: models/domain.py:88
 msgid "Last check"
 msgstr "Posledná kontrola"
 
-#: models/domain.py:74 models/record.py:111
+#: models/domain.py:90 models/record.py:114
 msgid "Type"
 msgstr "Typ"
 
-#: models/domain.py:75
+#: models/domain.py:91
 msgid "Notified serial"
 msgstr "Sériové číslo"
 
-#: models/domain.py:78
+#: models/domain.py:94
 msgid "Account"
 msgstr "Účet"
 
-#: models/domain.py:80
+#: models/domain.py:96
 msgid "User"
 msgstr "Používateľ"
 
-#: models/domain.py:83
+#: models/domain.py:99
 msgid "Description"
 msgstr ""
 
-#: models/domain.py:84
+#: models/domain.py:100
 msgid "Access"
 msgstr ""
 
-#: models/domain.py:85
+#: models/domain.py:101
 msgid "Created"
 msgstr ""
 
-#: models/domain.py:87
+#: models/domain.py:103
 msgid "Last changed"
 msgstr ""
 
-#: models/domain.py:89
+#: models/domain.py:105
 msgid "Datacenter"
 msgstr ""
 
-#: models/domain.py:94
+#: models/domain.py:110
 msgid "Domain"
 msgstr "Doména"
 
-#: models/domain.py:95
+#: models/domain.py:111
 msgid "Domains"
 msgstr "Domény"
 
-#: models/record.py:113
+#: models/record.py:116
 msgid "Content"
 msgstr "Obsah"
 
-#: models/record.py:115
+#: models/record.py:118
 msgid "TTL"
 msgstr "TTL"
 
-#: models/record.py:118
+#: models/record.py:121
 msgid "Priority"
 msgstr "Priorita"
 
-#: models/record.py:120
+#: models/record.py:123
 msgid "Changed"
 msgstr "Posledná zmena"
 
-#: models/record.py:122
+#: models/record.py:125
 msgid "Disabled?"
 msgstr ""
 
-#: models/record.py:125
+#: models/record.py:128
 msgid "Ordername"
 msgstr ""
 
-#: models/record.py:126
+#: models/record.py:129
 msgid "Auth"
 msgstr ""
 
-#: models/record.py:130
+#: models/record.py:133
 msgid "Record"
 msgstr "Záznam"
 
-#: models/record.py:131
+#: models/record.py:134
 msgid "Records"
 msgstr "Záznamy"
 
