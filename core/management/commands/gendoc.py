@@ -52,6 +52,10 @@ class Command(DanubeCloudCommand):
         """Generate user guide"""
         doc_dst = self._path(self.PROJECT_DIR, 'gui', 'static', 'user-guide')
 
+        with lcd(self.PROJECT_DIR):
+            branch = self.local('git rev-parse --abbrev-ref HEAD', capture=True).strip()
+            self.display('We are on branch "%s"' % branch)
+
         if self._path_exists(self.DOC_TMP_DIR):
             self.display('%s already exists in %s' % (self.DOC_REPO, self.DOC_TMP_DIR), color='yellow')
             with lcd(self.DOC_TMP_DIR):
@@ -60,6 +64,12 @@ class Command(DanubeCloudCommand):
         else:
             self.local('git clone %s %s' % (self.DOC_REPO, self.DOC_TMP_DIR))
             self.display('%s has been successfully cloned.' % self.DOC_TMP_DIR, color='green')
+
+        with lcd(self.DOC_TMP_DIR):
+            if self.local('git checkout %s' % branch, raise_on_error=False) == 0:
+                self.display('Checked out esdc-docs branch "%s"' % branch, color='green')
+            else:
+                self.display('Could not checkout esdc-docs branch "%s"' % branch, color='red')
 
         # Build sphinx docs
         with lcd(self._path(self.DOC_TMP_DIR, 'user-guide')):
