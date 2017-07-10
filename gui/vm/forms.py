@@ -209,7 +209,7 @@ class AdminServerSettingsForm(ServerSettingsForm):
                              widget=forms.TextInput(attrs={'class': 'input-transparent narrow input-mbytes',
                                                            'required': 'required',
                                                            'pattern': '[0-9\.]+[BKMGTPEbkmgtpe]?'}))
-    note = forms.CharField(label=_('Note'), help_text=_('Text visible for every user with access to VM.'),
+    note = forms.CharField(label=_('Note'), help_text=_('Text visible to every user with access to this server.'),
                            required=False,
                            widget=forms.Textarea(attrs={
                                'class': 'input-transparent',

@@ -40,7 +40,7 @@ class NodeForm(SerializerForm):
                                     widget=forms.CheckboxInput(attrs={'class': 'normal-check'}))
     is_backup = forms.BooleanField(label=_('Backup?'), required=False,
                                    widget=forms.CheckboxInput(attrs={'class': 'normal-check'}))
-    note = forms.CharField(label=_('Note'), help_text=_('Text visible for every user with access to node.'),
+    note = forms.CharField(label=_('Note'), help_text=_('Custom text information about this compute node.'),
                            required=False,
                            widget=forms.Textarea(attrs={
                                'class': 'input-transparent small',

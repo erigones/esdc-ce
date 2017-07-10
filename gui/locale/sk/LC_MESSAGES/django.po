@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Erigones GUI\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-07-08 19:53+0000\n"
+"POT-Creation-Date: 2017-07-10 16:10+0000\n"
 "PO-Revision-Date: 2014-02-27 10:46+0100\n"
 "Last-Translator: Erigones, s. r. o. <erigones@erigones.com>\n"
 "Language-Team: Erigones, s. r. o. <erigones@erigones.com>\n"
@@ -2180,7 +2180,7 @@ msgid "Backup?"
 msgstr ""
 
 #: node/forms.py:43
-msgid "Text visible for every user with access to node."
+msgid "Custom text information about this compute node."
 msgstr ""
 
 #: node/forms.py:49
@@ -7789,7 +7789,7 @@ msgid ""
 msgstr ""
 
 #: vm/forms.py:212
-msgid "Text visible for every user with access to VM."
+msgid "Text visible to every user with access to this server."
 msgstr ""
 
 #: vm/forms.py:218
