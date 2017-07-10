@@ -268,8 +268,18 @@ function obj_form_modal(btn, mod_selector, init, handler) {
     self.text.html(text_default);
   });
 
+  var delete_handler = function(e) {
+    if ($(this).data('confirm')) {
+      return confirm2(gettext('Are you sure you want to delete this?'), function() {
+        return handler(e);
+      });
+    } else {
+      return handler(e);
+    }
+  };
+
   btn_update.length && btn_update.on('click', {action: 'update'}, handler);
-  btn_delete.length && btn_delete.on('click', {action: 'delete'}, handler);
+  btn_delete.length && btn_delete.on('click', {action: 'delete'}, delete_handler);
   btn_create.length && btn_create.on('click', {action: 'create'}, handler);
   btn_more.length && btn_more.on('click', morehandler);
 
