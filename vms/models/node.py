@@ -424,18 +424,17 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
         self.hostname = sysinfo['Hostname']
 
         if update_ip:
-            ip = None  # get ip address from sysinfo
-            admin_iface = None
+            # First, try the 'admin0' VNIC
+            admin_iface = sysinfo.get('Virtual Network Interfaces', {}).get('admin0', {})
+            ip = admin_iface.get('ip4addr', None)
 
-            for iface, iface_info in sysinfo['Network Interfaces'].items():
-                if 'admin' in iface_info.get('NIC Names', ()):
-                    admin_iface = iface_info
-                    ip = admin_iface.get('ip4addr', None)
-                    break
-
+            # Then, walk through all NICs and search for the 'admin' NIC tag
             if not ip:
-                admin_iface = sysinfo.get('Virtual Network Interfaces', {}).get('admin0', {})
-                ip = admin_iface.get('ip4addr', None)
+                for iface, iface_info in sysinfo['Network Interfaces'].items():
+                    if 'admin' in iface_info.get('NIC Names', ()):
+                        admin_iface = iface_info
+                        ip = admin_iface.get('ip4addr', None)
+                        break
 
             assert ip, 'Node IP Address not found in sysinfo output'
 
