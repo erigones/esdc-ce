@@ -11,6 +11,7 @@ from api.utils.request import get_dummy_request
 from api.utils.views import call_api_view
 from api.system.utils import get_local_netinfo
 from api.dns.domain.utils import reverse_domain_from_network
+from api.mon.alerting.tasks import mon_all_groups_sync
 from vms.models import Dc, Image, Vm, DcNode
 
 logger = getLogger(__name__)
@@ -247,5 +248,8 @@ def init_mgmt(head_node, images=None):
             api_put(dc_settings, admin, VMS_VM_RESOLVERS_DEFAULT=[vm_dns01_ip])
     except Exception as e:
         logger.exception(e)
+
+    # Initial user group zabbix synchronization
+    mon_all_groups_sync.call(sender='init_mgmt')
 
     return ret
