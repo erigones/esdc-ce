@@ -343,8 +343,8 @@ class User(AbstractBaseUser, PermissionsMixin, _AclMixin, _DcBoundMixin):
         # todo add more logic
         # todo put to ZMC and call it 'extract_email_from_user'
         from api.mon.backends.zabbix.base import ZabbixMediaContainer
-        if self.email:
-            return ZabbixMediaContainer(ZabbixMediaContainer.MEDIAS['email'], sendto=self.email,
+        if self.userprofile.alerting_email:
+            return ZabbixMediaContainer(ZabbixMediaContainer.MEDIAS['email'], sendto=self.userprofile.alerting_email,
                                         # TODO let the user pick up the severities
                                         severities=ZabbixMediaContainer.SEVERITIES,
                                         period=ZabbixMediaContainer.PERIOD_DEFAULT)
@@ -354,8 +354,8 @@ class User(AbstractBaseUser, PermissionsMixin, _AclMixin, _DcBoundMixin):
         # todo add more logic - 1/0, verified/not etc
         # todo put to ZMC and call it 'extract_phone_from_user'
         from api.mon.backends.zabbix.base import ZabbixMediaContainer
-        if self.userprofile.phone:
-            return ZabbixMediaContainer(ZabbixMediaContainer.MEDIAS['phone'], sendto=self.userprofile.phone,
+        if self.userprofile.alerting_phone:
+            return ZabbixMediaContainer(ZabbixMediaContainer.MEDIAS['phone'], sendto=self.userprofile.alerting_phone,
                                         # TODO let the user pick up the severities
                                         severities=ZabbixMediaContainer.SEVERITIES,
                                         period=ZabbixMediaContainer.PERIOD_DEFAULT_WORKING_HOURS)
@@ -365,8 +365,8 @@ class User(AbstractBaseUser, PermissionsMixin, _AclMixin, _DcBoundMixin):
         # todo add more logic - 1/0, verified/not etc
         # todo put to ZMC and call it 'extract_xmpp_from_user'
         from api.mon.backends.zabbix.base import ZabbixMediaContainer
-        if self.userprofile.jabber:
-            return ZabbixMediaContainer(ZabbixMediaContainer.MEDIAS['xmpp'], sendto=self.userprofile.jabber,
+        if self.userprofile.alerting_jabber:
+            return ZabbixMediaContainer(ZabbixMediaContainer.MEDIAS['xmpp'], sendto=self.userprofile.alerting_jabber,
                                         # TODO let the user pick up the severities
                                         severities=ZabbixMediaContainer.SEVERITIES,
                                         period=ZabbixMediaContainer.PERIOD_DEFAULT)

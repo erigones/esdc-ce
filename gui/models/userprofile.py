@@ -85,6 +85,10 @@ class UserProfile(models.Model):
     vatid = models.CharField(_('VAT ID'), max_length=64, blank=True)
     bankid = models.CharField(_('Bank Account Number'), max_length=255, blank=True)
 
+    alerting_phone = models.CharField(_('Phone'), max_length=32, blank=True)
+    alerting_email = models.EmailField(_('Email address'), max_length=255, blank=True)
+    alerting_jabber = models.EmailField(_('Jabber'), max_length=255, blank=True)
+
     class Meta:
         app_label = 'gui'
         verbose_name = _('User profile')
