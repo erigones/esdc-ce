@@ -34,7 +34,7 @@
       <span class="pull-left"><a class="vm_modal_more btn btn-small btn-inverse no-ajax">{% trans "Show advanced settings" %}</a></span>
       <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
       <a class="vm_modal_update button green no-ajax" data-enter="true">{% trans "Update" %}</a>
-      <a class="vm_modal_delete{% if node_vms or node_backups %}_no disabled{% endif %} button red no-ajax">{% trans "Delete" %}</a>
+      <a class="vm_modal_delete{% if node_vms or node_backups %}_no disabled{% endif %} button red no-ajax" data-confirm="true">{% trans "Delete" %}</a>
     </div>
   </div>
 </div>
