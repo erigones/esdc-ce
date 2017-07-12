@@ -156,7 +156,8 @@ class VmMigrateSerializer(s.Serializer):
         if self.changing_node:
             node = self.object['node']
             params.append('-H %s' % node.address)
-            ssh = 'ssh -o ConnectTimeout=10 -o BatchMode=yes -o StrictHostKeyChecking=no -o LogLevel=QUIET -l root'
+            ssh = 'ssh -o ConnectTimeout=10 -o BatchMode=yes -o StrictHostKeyChecking=no ' \
+                  '-o GSSAPIKeyExchange=no -o LogLevel=QUIET -l root'
             get_json = '%s %s "%s"' % (ssh, node.address, get_json)
 
         if self._root_zpool:

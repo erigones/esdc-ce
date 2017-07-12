@@ -809,7 +809,7 @@ _delete_vm() {
 	local uuid="$1"
 
 	if _vm_property "${JSON_SRC}" "indestructible_zoneroot" &> /dev/null; then
-		_vm_remove_indestructible_property &>/dev/null
+		_vm_remove_indestructible_property "${uuid}" &>/dev/null
 	fi
 
 	_vm_destroy "${uuid}" > /dev/null
