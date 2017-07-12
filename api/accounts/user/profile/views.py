@@ -118,6 +118,12 @@ def userprofile_manage(request, username, data=None):
         :type data.vatid: string
         :arg data.bankid: Bank Account Number
         :type data.bankid: string
+        :arg data.alerting_email: Email address used for alerting purposes (valid email address format)
+        :type data.alerting_email: string
+        :arg data.alerting_phone: Phone number used for alerting purposes
+        :type data.alerting_phone: string
+        :arg data.alerting_jabber: Jabber account used for alerting purposes (valid email address format)
+        :type data.alerting_jabber: string
 
         :status 200: SUCCESS
         :status 400: FAILURE
