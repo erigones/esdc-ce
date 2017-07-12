@@ -33,6 +33,7 @@ Bugs
 - Fixed problem with high amount of network traffic in the celeryev exchange - `#179 <https://github.com/erigones/esdc-ce/issues/179>`__
 - Disable current compute in VM migration dialog - `#191 <https://github.com/erigones/esdc-ce/issues/191>`__
 - Fixed displaying of disk IO monitoring graphs of KVMs - `#193 <https://github.com/erigones/esdc-ce/issues/193>`__
+- Fixed plotting of stacked graph when a series has no data - `#205 <https://github.com/erigones/esdc-ce/issues/205>`__
 
 
 2.5.3 (released on 2017-05-16)

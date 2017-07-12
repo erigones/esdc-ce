@@ -47,7 +47,7 @@ charts or filled areas).
                 if (s == allseries[i])
                     break;
                 
-                if (allseries[i].stack == s.stack)
+                if (allseries[i].stack == s.stack && allseries[i].datapoints.points.length)
                     res = allseries[i];
             }
             
