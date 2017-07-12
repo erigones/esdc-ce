@@ -26,6 +26,7 @@ Features
 Bugs
 ----
 
+- Fixed migration of Danube Cloud internal (service) VMs - `#167 <https://github.com/erigones/esdc-ce/issues/167>`__
 - Allowed IP address <-> VM association updates after manual VM configuration on hypervisor - `#168 <https://github.com/erigones/esdc-ce/issues/168>`__
 - Force change of the VM status in the DB with current status from vmadm - `#171 <https://github.com/erigones/esdc-ce/issues/171>`__
 - Fixed IP address validation, when multiple IPs are being added - `#177 <https://github.com/erigones/esdc-ce/issues/177>`__
