@@ -48,7 +48,10 @@ def update(request):
     if request.method == 'POST':
         uform = UserForm(request, request.user, request.POST)
         upform = UserProfileForm(request, profile, request.POST)
-        if uform.is_valid() and upform.is_valid():
+        if uform.is_valid() and upform.is_valid():  # The real validation is not happening here but below
+            # The validation happens in these two forms and they inform about the result which we process.
+            # However, if upform save fails, uform is saved already and we cannot do anything about that.
+            # FIXME bad design here and in gui.dc.user.views.dc_user_profile_form
             ustatus = uform.save(action='update', args=(request.user.username,))
             upstatus = upform.save(action='update', args=(request.user.username,))
 
