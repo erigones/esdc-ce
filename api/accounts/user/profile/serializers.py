@@ -128,7 +128,18 @@ class UserProfileSerializer(InstanceSerializer):
 
         return attrs
 
-    validate_alerting_phone = validate_phone2
+    # noinspection PyMethodMayBeStatic
+    def validate_alerting_phone(self, attrs, source):
+        try:
+            value = attrs[source]
+        except KeyError:
+            pass
+        else:
+            if value:
+                # Store formatted phone number
+                attrs[source] = clean_international_phonenumber(value)
+
+        return attrs
 
     def validate_email_verified(self, attrs, source):
         try:

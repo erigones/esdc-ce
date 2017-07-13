@@ -175,6 +175,7 @@ class TelPrefixInput(widgets.MultiWidget):
     """
     # noinspection PyUnusedLocal
     def __init__(self, attrs=None, initial=None):
+        self.erase_on_empty_input = attrs.pop('erase_on_empty_input', False)
         multi_widgets = [TelPrefixSelect(attrs=attrs), TelInput(attrs=attrs)]
         super(TelPrefixInput, self).__init__(multi_widgets, attrs=attrs)
 
@@ -192,7 +193,10 @@ class TelPrefixInput(widgets.MultiWidget):
 
     def value_from_datadict(self, data, files, name):
         values = super(TelPrefixInput, self).value_from_datadict(data, files, name)
-        return '%s %s' % tuple(values)
+        if self.erase_on_empty_input and not values[1]:
+            return ''
+        else:
+            return '%s %s' % tuple(values)
 
 
 def clean_international_phonenumber(value):

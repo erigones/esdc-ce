@@ -247,7 +247,9 @@ class UserProfileForm(SerializerForm):
                                  )
     alerting_phone = forms.CharField(label=_('Phone'),
                                      required=False,
-                                     widget=TelPrefixInput(attrs={'maxlength': 32}),
+                                     widget=TelPrefixInput(attrs={
+                                         'maxlength': 32,
+                                         'erase_on_empty_input': True}),
                                      )
     alerting_jabber = forms.CharField(label=_('Jabber'),
                                       required=False,

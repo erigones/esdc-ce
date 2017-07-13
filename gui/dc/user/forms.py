@@ -148,7 +148,7 @@ class AdminUserProfileForm(SerializerForm):
         'companyid': COMPANY_ACCOUNT_ATTRS,
         'taxid': COMPANY_ACCOUNT_ATTRS,
         'vatid': COMPANY_ACCOUNT_ATTRS,
-        'alerting_phone': {'maxlength': 32},
+        'alerting_phone': {'maxlength': 32, 'erase_on_empty_input': True},
 
     })
     _field_text_class = ''
