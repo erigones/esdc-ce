@@ -358,7 +358,7 @@ class User(AbstractBaseUser, PermissionsMixin, _AclMixin, _DcBoundMixin):
             return ZabbixMediaContainer(ZabbixMediaContainer.MEDIAS['phone'], sendto=self.userprofile.alerting_phone,
                                         # TODO let the user pick up the severities
                                         severities=ZabbixMediaContainer.SEVERITIES,
-                                        period=ZabbixMediaContainer.PERIOD_DEFAULT_WORKING_HOURS)
+                                        period=ZabbixMediaContainer.PERIOD_DEFAULT)
 
     @property
     def get_alerting_xmpp(self):
