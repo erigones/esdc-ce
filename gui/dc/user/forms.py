@@ -134,6 +134,7 @@ class AdminUserProfileForm(SerializerForm):
         'phone': TelPrefixInput,
         'phone2': TelPrefixInput,
         'usertype': forms.RadioSelect,
+        'alerting_phone': TelPrefixInput,
     })
     _custom_widget_attrs = frozendict({
         'website': {'maxlength': 255},
@@ -147,6 +148,8 @@ class AdminUserProfileForm(SerializerForm):
         'companyid': COMPANY_ACCOUNT_ATTRS,
         'taxid': COMPANY_ACCOUNT_ATTRS,
         'vatid': COMPANY_ACCOUNT_ATTRS,
+        'alerting_phone': {'maxlength': 32},
+
     })
     _field_text_class = ''
 
@@ -167,6 +170,9 @@ class AdminUserProfileForm(SerializerForm):
 
         phone2 = cleaned_data.get('phone2')
         cleaned_data['phone2'] = phone2.replace(' ', '')
+
+        alerting_phone = cleaned_data.get('alerting_phone')
+        cleaned_data['alerting_phone'] = alerting_phone.replace(' ', '')
 
         return cleaned_data
 

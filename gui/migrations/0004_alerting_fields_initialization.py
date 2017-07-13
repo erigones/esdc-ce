@@ -8,11 +8,9 @@ from django.db import migrations, models, transaction
 def initialize_alerting_fields(apps, schema_editor):
     former_user_profile = apps.get_model('gui', 'UserProfile')
     if former_user_profile.objects.count() > 10000:
-        warning_text = "\n It looks like there is a lot of users in your database and " \
-                       "it would take a lot of time to update their profiles. This migration is therefore skipped. " \
-                       "If you need to, perform this operation manually."
-        Warning(warning_text)
-        # Migrate command does not print warnings to the stdout
+        warning_text = '\n It looks like there is a lot of users in your database and ' \
+                       'it would take a lot of time to update their profiles. This migration is therefore skipped. ' \
+                       'Please perform this operation manually.'
         print(warning_text)
     else:
         with transaction.atomic():

@@ -153,6 +153,9 @@ input:-webkit-autofill:focus {
 #id_fax_0 {
   @extend %phone0;
 }
+#id_alerting_phone_0 {
+  @extend %phone0;
+}
 
 %phone1 {
   overflow: hidden;
@@ -166,6 +169,9 @@ input:-webkit-autofill:focus {
   @extend %phone1;
 }
 #id_fax_1 {
+  @extend %phone1;
+}
+#id_alerting_phone_1 {
   @extend %phone1;
 }
 
@@ -212,6 +218,12 @@ div.multiwidget {
       @extend %phone0_multiwidget_option;
     }
   }
+  #id_alerting_phone_0 {
+    @extend %phone0_multiwidget;
+    option {
+      @extend %phone0_multiwidget_option;
+    }
+  }
 
   #id_phone_1 {
     @extend %phone1_multiwidget;
@@ -220,6 +232,9 @@ div.multiwidget {
     @extend %phone1_multiwidget;
   }
   #id_fax_1 {
+    @extend %phone1_multiwidget;
+  }
+  #id_alerting_phone_1 {
     @extend %phone1_multiwidget;
   }
 }
@@ -237,6 +252,9 @@ div.multiwidget {
 }
 
 #id_fax_1.narrow {
+  @extend %phone1_narrow;
+}
+#id_alerting_phone_1.narrow {
   @extend %phone1_narrow;
 }
 
