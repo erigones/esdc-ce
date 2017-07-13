@@ -1256,6 +1256,7 @@ html[dir="rtl"] .tags-select2 .select2-search input {
 
 /* Profile form customization */
 /* line 703, ../scss/form-elements.scss */
-#profile_user_form #id_phone_1, #profile_billing_address_form #id_phone2_1, #profile_billing_address_form #id_fax_1 {
+#profile_user_form #id_phone_1, #profile_billing_address_form #id_phone2_1, #profile_billing_address_form #id_fax_1,
+#profile_alerting_media_form #id_alerting_phone_1 {
   margin-top: 0;
 }

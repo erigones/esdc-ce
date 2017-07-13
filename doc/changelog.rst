@@ -8,6 +8,7 @@ Features
 --------
 
 - Added reflection of users and user groups from management to Zabbix monitoring - `#91 <https://github.com/erigones/esdc-ce/issues/91>`__
+- Added option to configure SMS, Jabber and Email alerting for users in their user profiles - `#92 <https://github.com/erigones/esdc-ce/issues/92>`__
 - Added user editable notes for VM and node - `#98 <https://github.com/erigones/esdc-ce/issues/98>`__
 - Added ability to disable reservation of replicated VM resources - `#99 <https://github.com/erigones/esdc-ce/issues/99>`__
 - Added ability to change the timeout period for graceful VM stop, reboot and freeze operations - `#111 <https://github.com/erigones/esdc-ce/issues/111>`__

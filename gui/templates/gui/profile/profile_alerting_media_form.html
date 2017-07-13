@@ -1,0 +1,22 @@
+{% load i18n %}
+{% csrf_token %}
+<input type="hidden" name="action" value="update" />
+
+<table class="table box table-striped form">
+  <thead>
+  </thead>
+  <tbody>
+    {% include "gui/profile/profile_user_field.html" with field=upform.alerting_email %}
+    {% spaceless %}{% include "gui/profile/profile_user_field.html" with field=upform.alerting_phone %}{% endspaceless %}
+    {% include "gui/profile/profile_user_field.html" with field=upform.alerting_jabber %}
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="2">
+        <div class="vm_control">
+          <a href="#" id="profile_update" class="button gray no-ajax profile_control"><i class="icon-check"></i> {% trans "Update profile" %}</a>
+        </div>
+      </td>
+    </tr>
+  </tfoot>
+</table>

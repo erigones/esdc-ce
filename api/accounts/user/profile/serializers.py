@@ -18,16 +18,18 @@ class UserProfileSerializer(InstanceSerializer):
                        'newsletter_tech', 'newsletter_buss', 'usertype', 'language', 'timezone', 'currency', 'title',
                        'first_name', 'middle_name', 'last_name', 'website', 'jabber', 'street_1', 'street2_1', 'city',
                        'postcode', 'state', 'country', 'different_billing', 'street_2', 'street2_2', 'city2',
-                       'postcode2', 'state2', 'country2', 'company', 'companyid', 'taxid', 'vatid', 'bankid')
+                       'postcode2', 'state2', 'country2', 'company', 'companyid', 'taxid', 'vatid', 'bankid',
+                       'alerting_email', 'alerting_phone', 'alerting_jabber')
     _default_fields_ = ('username', 'tos_acceptation', 'email_verified', 'email2', 'phone_verified', 'phone2',
                         'newsletter_tech', 'newsletter_buss', 'usertype', 'language', 'timezone', 'currency', 'title',
                         'middle_name', 'website', 'jabber', 'street_1', 'street2_1', 'city', 'postcode', 'state',
                         'country', 'different_billing', 'street_2', 'street2_2', 'city2', 'postcode2', 'state2',
-                        'country2', 'company', 'companyid', 'taxid', 'vatid', 'bankid')
+                        'country2', 'company', 'companyid', 'taxid', 'vatid', 'bankid',
+                        'alerting_email', 'alerting_phone', 'alerting_jabber')
     _blank_fields_ = ('email_token', 'email2', 'email2_token', 'phone_token', 'phone2', 'phone2_token', 'title',
                       'middle_name', 'website', 'jabber', 'street_1', 'street2_1', 'city', 'postcode', 'state',
                       'street_2', 'street2_2', 'city2', 'postcode2', 'state2', 'country2', 'company', 'companyid',
-                      'taxid', 'vatid', 'bankid')
+                      'taxid', 'vatid', 'bankid', 'alerting_email', 'alerting_phone', 'alerting_jabber')
 
     username = SafeCharField(source='user.username', label=_('Username'), read_only=True)
     tos_acceptation = BooleanField(label=_('Terms of Service'), help_text=_('TOS acceptation check.'))
@@ -76,6 +78,10 @@ class UserProfileSerializer(InstanceSerializer):
     bankid = SafeCharField(label=_('Bank Account Number'), max_length=255, required=False)
     old_phone = None
 
+    alerting_phone = SafeCharField(label=_('Phone'), max_length=32, required=False)
+    alerting_jabber = EmailField(label=_('Jabber'), max_length=255, required=False)
+    alerting_email = EmailField(label=_('Email'), max_length=255, required=False)
+
     # noinspection PyProtectedMember
     def save(self, **kwargs):
         profile = self.object
@@ -119,6 +125,19 @@ class UserProfileSerializer(InstanceSerializer):
         else:
             # Store formatted phone number
             attrs[source] = value
+
+        return attrs
+
+    # noinspection PyMethodMayBeStatic
+    def validate_alerting_phone(self, attrs, source):
+        try:
+            value = attrs[source]
+        except KeyError:
+            pass
+        else:
+            if value:
+                # Store formatted phone number
+                attrs[source] = clean_international_phonenumber(value)
 
         return attrs
 

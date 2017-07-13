@@ -70,6 +70,13 @@
           </div>
       </div>
 
+      <div class="tab-header">
+        <i class="icon-envelope"></i> {% trans "Alerting Media" %}
+      </div>
+      <div id="profile_alerting_media_form">
+        {% include "gui/profile/profile_alerting_media_form.html" %}
+      </div>
+
       {% if user.api_access %}
       <div class="tab-header">
         <i class="icon-lock"></i> {% trans "API Keys" %}
@@ -85,6 +92,7 @@
       <div id="profile_sshkey_list">
         {% include "gui/profile/profile_sshkey_list.html" %}
       </div>
+
     </div>
   </div>
 </form>

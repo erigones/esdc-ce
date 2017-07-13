@@ -142,8 +142,11 @@ def dc_user_profile_form(request, username):
         uform = AdminUserForm(request, user, request.POST)
         upform = AdminUserProfileForm(request, profile, request.POST)
 
-        if uform.is_valid() and upform.is_valid():
+        if uform.is_valid() and upform.is_valid():  # The real validation is not happening here but below
             args = (uform.cleaned_data['username'],)
+            # The validation happens in these two forms and they inform about the result which we process.
+            # However, if upform save fails, uform is saved already and we cannot do anything about that.
+            # FIXME bad design here and in gui.profile.views.update
             ustatus = uform.save(action='update', args=args)
             upstatus = upform.save(action='update', args=args)
 

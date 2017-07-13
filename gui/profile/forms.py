@@ -245,6 +245,21 @@ class UserProfileForm(SerializerForm):
                                  choices=settings.CURRENCY,
                                  widget=forms.Select(),
                                  )
+    alerting_phone = forms.CharField(label=_('Phone'),
+                                     required=False,
+                                     widget=TelPrefixInput(attrs={
+                                         'maxlength': 32,
+                                         'erase_on_empty_input': True}),
+                                     )
+    alerting_jabber = forms.CharField(label=_('Jabber'),
+                                      required=False,
+                                      widget=EmailInput(attrs={'maxlength': 255}),
+                                      )
+    alerting_email = forms.CharField(label=_('Email'),
+                                     required=False,
+                                     widget=forms.TextInput(attrs={
+                                         'maxlength': 255}),
+                                     )
 
     def __init__(self, request, profile, *args, **kwargs):
         super(UserProfileForm, self).__init__(request, profile, *args, **kwargs)

@@ -1380,12 +1380,12 @@ class ZabbixMediaContainer(object):
     """
     Container class for the Zabbix HostGroup object.
     """
-    SEVERITY_NOT_CLASSIFIED = 1  # TODO move to constants
-    SEVERITY_INFORMATION = 2
-    SEVERITY_WARNING = 3
-    SEVERITY_AVERAGE = 4
-    SEVERITY_HIGH = 5
-    SEVERITY_DISASTER = 6
+    SEVERITY_NOT_CLASSIFIED = 0  # TODO move to constants
+    SEVERITY_INFORMATION = 1
+    SEVERITY_WARNING = 2
+    SEVERITY_AVERAGE = 3
+    SEVERITY_HIGH = 4
+    SEVERITY_DISASTER = 5
     SEVERITIES = (
         SEVERITY_NOT_CLASSIFIED, SEVERITY_INFORMATION, SEVERITY_WARNING, SEVERITY_AVERAGE, SEVERITY_HIGH,
         SEVERITY_DISASTER
@@ -1414,5 +1414,5 @@ class ZabbixMediaContainer(object):
         result = 0
         for severity in active_severities:
             assert severity in cls.SEVERITIES
-            result += 2 ^ severity
+            result += 2 ** severity
         return result

@@ -88,7 +88,7 @@ _es() {
 		;;
 
 		/accounts/user/*/profile|/accounts/user/*/profile/)
-			[[ "${action}" == "set" ]] && params="-tos_acceptation -email_verified -email2 -email2_verified -phone -phone_verified -phone2 -phone2_verified -newsletter_tech -newsletter_buss -usertype -language -timezone -currency -title -middle_name -website -jabber -street_1 -street2_1 -city -postcode -state -country -different_billing -street_2 -street2_2 -city2 -postcode2 -state2 -country2 -company -companyid -taxid -vatid -bankid"	
+			[[ "${action}" == "set" ]] && params="-tos_acceptation -email_verified -email2 -email2_verified -phone -phone_verified -phone2 -phone2_verified -newsletter_tech -newsletter_buss -usertype -language -timezone -currency -title -middle_name -website -jabber -street_1 -street2_1 -city -postcode -state -country -different_billing -street_2 -street2_2 -city2 -postcode2 -state2 -country2 -company -companyid -taxid -vatid -bankid -alerting_jabber -alerting_phone -alerting_email"	
 		;;
 
 		/accounts/user/*/sshkey/*)

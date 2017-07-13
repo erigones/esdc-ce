@@ -45,7 +45,7 @@ function profile_control_links(elem) {
 
   $('#profile_form').on('keypress', {btn_enter: $('#profile_update')}, enter_click).find(':input:enabled:visible:first').focus();
   $('#profile_user_form input[name=usertype]').change(profile_user_form_usertype);
-  $('#id_phone_0, #id_phone2_0').select2();
+  $('#id_phone_0, #id_phone2_0, #id_alerting_phone_0').select2();
   $('#id_language, #id_timezone, #id_country, #id_country2, #id_currency, #id_groups').select2({width: '100%'});
   profile_user_form_usertype();
   profile_billing_address();
