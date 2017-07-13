@@ -173,9 +173,12 @@ class TelPrefixInput(widgets.MultiWidget):
     - a country select box for phone prefix
     - an input for local phone number
     """
+    erase_on_empty_input = False
+
     # noinspection PyUnusedLocal
     def __init__(self, attrs=None, initial=None):
-        self.erase_on_empty_input = attrs.pop('erase_on_empty_input', False)
+        if attrs:
+            self.erase_on_empty_input = attrs.pop('erase_on_empty_input', False)
         multi_widgets = [TelPrefixSelect(attrs=attrs), TelInput(attrs=attrs)]
         super(TelPrefixInput, self).__init__(multi_widgets, attrs=attrs)
 
