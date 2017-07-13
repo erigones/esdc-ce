@@ -128,6 +128,8 @@ class UserProfileSerializer(InstanceSerializer):
 
         return attrs
 
+    validate_alerting_phone = validate_phone2
+
     def validate_email_verified(self, attrs, source):
         try:
             attrs[source]
