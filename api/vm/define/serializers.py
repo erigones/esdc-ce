@@ -368,14 +368,19 @@ class VmDefineSerializer(VmBaseSerializer):
                 if not (settings.VMS_ZONE_ENABLED and self.dc_settings.VMS_ZONE_ENABLED):
                     raise s.ValidationError(_('This OS type is not supported.'))
                 # Creating zone -> check if default zone image is available
+                if value == Vm.LINUX_ZONE:
+                    default_zone_image = self.dc_settings.VMS_DISK_IMAGE_LX_ZONE_DEFAULT
+                else:
+                    default_zone_image = self.dc_settings.VMS_DISK_IMAGE_ZONE_DEFAULT
+
+                zone_images = get_images(self.request, ostype=value)  # Linux Zone or SunOS Zone images ordered by name
+
                 try:
-                    if value == Vm.LINUX_ZONE:
-                        default_zone_image = self.dc_settings.VMS_DISK_IMAGE_LX_ZONE_DEFAULT
-                    else:
-                        default_zone_image = self.dc_settings.VMS_DISK_IMAGE_ZONE_DEFAULT
-                    assert default_zone_image
-                    self.zone_img = get_images(self.request, ostype=value).get(name=default_zone_image)
-                except (AssertionError, Image.DoesNotExist):
+                    self.zone_img = zone_images.get(name=default_zone_image)
+                except Image.DoesNotExist:
+                    self.zone_img = zone_images.first()
+
+                if not self.zone_img:
                     raise s.ValidationError(_('Default disk image for this OS type is not available.'))
 
         return attrs
