@@ -1,12 +1,12 @@
 from django.db import connection
 
 from api.api_views import APIView
+from api.signals import user_relationship_changed
 from api.exceptions import OperationNotSupported
 from api.accounts.user.profile.serializers import UserProfileSerializer
 from api.accounts.user.utils import get_user, get_user_profiles
 from api.accounts.messages import LOG_PROFILE_UPDATE
 from api.task.response import SuccessTaskResponse, FailureTaskResponse
-from gui.signals import user_relationship_changed
 
 
 class UserProfileView(APIView):

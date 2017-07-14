@@ -4,6 +4,7 @@ from django.utils.translation import ugettext_noop as _
 from api import status
 from api.api_views import APIView
 from api.exceptions import PermissionDenied, PreconditionRequired
+from api.signals import dc_relationship_changed, group_relationship_changed
 from api.task.response import SuccessTaskResponse, FailureTaskResponse
 from api.task.log import delete_tasklog_cached
 from api.utils.db import get_object
@@ -14,7 +15,6 @@ from api.dc.messages import LOG_DC_CREATE, LOG_DC_UPDATE
 from api.accounts.user.utils import remove_user_dc_binding
 from api.accounts.messages import LOG_GROUP_UPDATE
 from api.messages import LOG_VIRT_OBJECT_UPDATE_MESSAGES
-from gui.signals import dc_relationship_changed, group_relationship_changed
 from vms.models import Dc, DefaultDc
 from gui.models import User
 

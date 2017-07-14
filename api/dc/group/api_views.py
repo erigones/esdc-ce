@@ -3,6 +3,7 @@ from django.db import connection
 from api import status
 from api.api_views import APIView
 from api.exceptions import ObjectAlreadyExists, ObjectNotFound
+from api.signals import group_relationship_changed
 from api.utils.db import get_object
 from api.dc.utils import remove_dc_binding_virt_object
 from api.dc.group.serializers import GroupSerializer
@@ -11,7 +12,6 @@ from api.accounts.messages import LOG_GROUP_UPDATE
 from api.dc.messages import LOG_GROUP_ATTACH, LOG_GROUP_DETACH
 from api.task.response import SuccessTaskResponse
 from gui.models import Role
-from gui.signals import group_relationship_changed
 
 
 class DcGroupView(APIView):

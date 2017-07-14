@@ -6,13 +6,13 @@ from django.db import connection
 from api.api_views import APIView
 from api.fields import get_boolean_value
 from api.status import HTTP_201_CREATED, HTTP_200_OK
+from api.signals import user_relationship_changed
 from api.exceptions import PermissionDenied
 from api.accounts.user.base.serializers import ApiKeysSerializer, UserSerializer, ExtendedUserSerializer
 from api.accounts.user.utils import get_user, get_users
 from api.accounts.messages import LOG_USER_CREATE, LOG_USER_UPDATE, LOG_USER_DELETE
 from api.task.response import SuccessTaskResponse, FailureTaskResponse
 from gui.models import User, AdminPermission
-from gui.signals import user_relationship_changed
 from vms.models import Dc, DefaultDc
 
 

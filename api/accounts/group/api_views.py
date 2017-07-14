@@ -2,6 +2,7 @@ from django.db import connection
 
 from api.status import HTTP_201_CREATED, HTTP_200_OK
 from api.api_views import APIView
+from api.signals import group_relationship_changed
 from api.utils.db import get_virt_object
 from api.accounts.group.serializers import GroupSerializer, ExtendedGroupSerializer
 from api.accounts.user.utils import remove_user_dc_binding
@@ -11,7 +12,6 @@ from api.task.utils import task_log_success
 from api.dc.utils import attach_dc_virt_object
 from api.dc.messages import LOG_GROUP_ATTACH
 from gui.models import User, Role
-from gui.signals import group_relationship_changed
 from vms.models import DefaultDc
 
 
