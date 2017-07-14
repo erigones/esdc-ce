@@ -68,7 +68,7 @@ def details(request, hostname):
     """
     dc_settings = request.dc.settings
     context = collect_view_data(request, 'vm_list', mb_addon=SIZE_FIELD_MB_ADDON)
-    context['vm'] = vm = get_vm(request, hostname, sr=('dc', 'owner', 'template', 'slavevm'))
+    context['vm'] = vm = get_vm(request, hostname, sr=('dc', 'owner', 'node', 'template', 'slavevm'))
     context['vms'] = vms = get_vms(request)
     context['vms_tags'] = get_vms_tags(vms)
     context['vm_disks'] = vm_disks = get_vm_define_disk(request, vm)
