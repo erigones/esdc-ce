@@ -15,7 +15,7 @@ class Command(DanubeCloudCommand):
     def handle(self, dc=None, include_nodes=False, **options):
         from vms.models import Vm, Node
 
-        qs = Vm.objects
+        qs = Vm.objects.only('uuid', 'hostname', 'alias', 'ostype', 'enc_json', 'enc_json_active')
 
         if dc:
             qs = qs.filter(dc__name=dc)
@@ -43,7 +43,7 @@ class Command(DanubeCloudCommand):
             # print all nodes
             print('')
             print('[nodes]')
-            nodes = Node.objects.all()
+            nodes = Node.objects.only('uuid', 'hostname', 'address').all()
 
             for node in nodes:
                 line = [
