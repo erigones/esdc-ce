@@ -1,4 +1,7 @@
 # https://github.com/erigones/esdc-factory/pull/52
+- name: Install django-transaction-hooks (update requirements)
+  shell: "{{ erigones_home }}/bin/ctl.sh" pip_install --update
+
 - name: Check local_settings.py
   stat: path="{{ erigones_home }}/core/local_settings.py"
   register: local_settings
