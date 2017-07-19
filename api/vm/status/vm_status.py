@@ -7,7 +7,7 @@ from que.utils import task_id_from_request
 from vms.models import Vm
 from api.api_views import APIView
 from api.exceptions import (PermissionDenied, VmIsNotOperational, NodeIsNotOperational, PreconditionRequired,
-                            ExpectationFailed)
+                            ExpectationFailed, VmHasPendingTasks)
 from api.task.response import SuccessTaskResponse, FailureTaskResponse, TaskResponse
 from api.vm.utils import get_vms, get_vm
 from api.vm.messages import (LOG_STATUS_GET, LOG_START, LOG_START_ISO, LOG_START_UPDATE, LOG_START_UPDATE_ISO,
@@ -275,6 +275,9 @@ class VmStatus(APIView):
                 cmd = self._start_cmd()
 
             if apiview['update']:
+                if vm.tasks:
+                    raise VmHasPendingTasks
+
                 cmd, stdin = self._add_update_cmd(cmd, os_cmd_allowed=False)
 
                 if iso:
@@ -296,6 +299,9 @@ class VmStatus(APIView):
                 apiview['timeout'] = timeout
 
             if update:
+                if vm.tasks:
+                    raise VmHasPendingTasks
+
                 # This will always perform a vmadm stop command, followed by a vmadm update command and optionally
                 # followed by a vmadm start command (reboot)
                 pre_cmd = self._action_cmd('stop', force=force, timeout=timeout)

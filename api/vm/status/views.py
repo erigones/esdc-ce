@@ -126,6 +126,7 @@ def vm_status(request, hostname_or_uuid, action=None, data=None):
         :status 400: FAILURE
         :status 403: Forbidden
         :status 404: VM not found
+        :status 409: VM has pending tasks (`update=true`)
         :status 417: Bad action
         :status 423: Node is not operational / VM is not operational
         :status 428: VM must be updated first / VM is not installed
@@ -158,6 +159,7 @@ is send to the VM (KVM only) (default: 180 seconds / 300 seconds for Windows VM)
         :status 400: FAILURE
         :status 403: Forbidden
         :status 404: VM not found
+        :status 409: VM has pending tasks (`update=true`)
         :status 417: Bad action / VM has snapshots (disk size update)
         :status 423: Node is not operational / VM is not operational / VM is already stopping
         :status 428: Cannot perform update while VM is stopping
@@ -185,6 +187,7 @@ is send to the VM (KVM only) (default: 180 seconds / 300 seconds for Windows VM)
         :status 400: FAILURE
         :status 403: Forbidden
         :status 404: VM not found
+        :status 409: VM has pending tasks (`update=true`)
         :status 417: Bad action / VM has snapshots (disk size update)
         :status 423: Node is not operational / VM is not operational / VM is already stopping
         :status 428: Cannot perform update while VM is stopping
