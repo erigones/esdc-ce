@@ -55,7 +55,7 @@ def _user_group_changed(group_name, dc_name):
                     # we will let it try again in a separate task and not crash this one
                     logger.exception("Creating a separate task for dc %s and group %s because it crashed.",
                                      dc.name, group_name)
-                    mon_user_group_changed.call(group_name=group_name, dc_name=dc.name)
+                    mon_user_group_changed.call(sender='parent mon_user_group_changed', group_name=group_name, dc_name=dc.name)
 
         else:
             related_dcs = Dc.objects.filter(roles=group)
@@ -70,7 +70,7 @@ def _user_group_changed(group_name, dc_name):
                     # we will let it try again in a separate task and not crash this one
                     logger.exception("Creating a separate task for dc %s and group %s because it crashed.",
                                      dc.name, group_name)
-                    mon_user_group_changed.call(group_name=group_name, dc_name=dc.name)
+                    mon_user_group_changed.call(sender='parent mon_user_group_changed', group_name=group_name, dc_name=dc.name)
 
             for dc in unrelated_dcs:  # TODO this is quite expensive and I would like to avoid this somehow
                 logger.debug('Going to delete %s from %s.', group.name, dc.name)
@@ -81,7 +81,7 @@ def _user_group_changed(group_name, dc_name):
                     # we will let it try again in a separate task and not crash this one
                     logger.exception("Creating a separate task for dc %s and group %s because it crashed.",
                                      dc.name, group_name)
-                    mon_user_group_changed.call(group_name=group_name, dc_name=dc.name)
+                    mon_user_group_changed.call(sender='parent mon_user_group_changed', group_name=group_name, dc_name=dc.name)
 
     else:
         raise AssertionError('Either group name or dc name has to be defined.')
@@ -124,7 +124,7 @@ def _user_changed(user_name, dc_name, affected_groups):
                     # we will let it try again in a separate task and not crash this one
                     logger.exception("Creating a separate task for dc %s and user %s because it crashed.",
                                      dc.name, user_name)
-                    mon_user_changed.call(user_name=user_name, dc_name=dc.name)
+                    mon_user_changed.call(sender='parent mon_user_changed', user_name=user_name, dc_name=dc.name)
         else:
             logger.debug('As we don\'t know where does the user %s belonged to, '
                          'we are trying to delete it from all available zabbixes.', user_name)
@@ -137,7 +137,7 @@ def _user_changed(user_name, dc_name, affected_groups):
                     # we will let it try again in a separate task and not crash this one
                     logger.exception("Creating a separate task for dc %s and user %s because it crashed.",
                                      dc.name, user_name)
-                    mon_user_changed.call(user_name=user_name, dc_name=dc.name)
+                    mon_user_changed.call(sender='parent mon_user_changed', user_name=user_name, dc_name=dc.name)
     else:
         if dc_name:
             dc = Dc.objects.get_by_name(dc_name)
@@ -156,7 +156,7 @@ def _user_changed(user_name, dc_name, affected_groups):
                     # we will let it try again in a separate task and not crash this one
                     logger.exception("Creating a separate task for dc %s and user %s because it crashed.",
                                      dc.name, user_name)
-                    mon_user_changed.call(user_name=user_name, dc_name=dc.name)
+                    mon_user_changed.call(sender='parent mon_user_changed', user_name=user_name, dc_name=dc.name)
 
         else:
             logger.debug('Going to create/update user %s '
@@ -170,7 +170,7 @@ def _user_changed(user_name, dc_name, affected_groups):
                     # we will let it try again in a separate task and not crash this one
                     logger.exception("Creating a separate task for dc %s and user %s because it crashed.",
                                      dc.name, user_name)
-                    mon_user_changed.call(user_name=user_name, dc_name=dc.name)
+                    mon_user_changed.call(sender='parent mon_user_changed', user_name=user_name, dc_name=dc.name)
 
 
 # noinspection PyUnusedLocal
