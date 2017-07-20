@@ -226,6 +226,38 @@ function MonitoringGraph(obj_type, hostname, graph_name, graph_params, graph_id)
     elements.chartable.removeClass('problem').addClass('disabled');
   }
 
+  function _find_range(data) {
+    var min = Number.POSITIVE_INFINITY;
+    var max = Number.NEGATIVE_INFINITY;
+
+    $(data).each(function () {
+      var _min, _max, _avg = this[1];
+
+      if ('value_avg' in this.source) {
+        _min = this.source.value_min;
+        _max = this.source.value_max;
+      } else {
+        _min = _max = _avg;
+      }
+
+      if (_min < min) {
+        min = _min;
+      }
+      if (_max > max) {
+        max = _max;
+      }
+    });
+
+    if (min === Number.POSITIVE_INFINITY) {
+      min = undefined;
+    }
+    if (max === Number.NEGATIVE_INFINITY) {
+      max = undefined;
+    }
+
+    return {minimum: min, maximum: max};
+  }
+
   /*
    * Calculate average, maximum and minimum values for currently showed graph range
    */
@@ -237,30 +269,14 @@ function MonitoringGraph(obj_type, hostname, graph_name, graph_params, graph_id)
         return;
       }
 
-      var min = Number.MAX_VALUE;
-      var max = Number.MIN_VALUE;
-      var label;
+      var series_name = this.label.split(' | ', 1)[0];
 
-      $(this.data).each(function() {
-        var _min, _max, _avg = this[1];
-
-        if ('value_avg' in this.source) {
-          _min = this.source.value_min;
-          _max = this.source.value_max;
-        } else {
-          _min = _max = _avg;
-        }
-
-        if (_min < min) {
-          min = _min;
-        }
-        if (_max > max) {
-          max = _max;
-        }
-      });
-
-      label = this.label.split(' | ', 1)[0];
-      this.label = label + ' | min: '+ _yformat(min) + ' | max: '+ _yformat(max);
+      if (this.data.length) {
+        var range = _find_range(this.data);
+        this.label = series_name + ' | min: ' + _yformat(range.minimum) + ' | max: ' + _yformat(range.maximum);
+      } else {
+        this.label = series_name + ' | No data';
+      }
     });
   }
 
