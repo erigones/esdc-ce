@@ -7,6 +7,16 @@
   include: "{{ upg_base }}/lib/zabbix_import_templates.yml"
 
 # https://github.com/erigones/esdc-ce/issues/129
+- name: Increase max_client_conn in pgbouncer.ini
+  ini_file:
+    dest: /etc/pgbouncer/pgbouncer.ini
+    backup: yes
+    section: pgbouncer
+    option: max_client_conn
+    value: 1000
+  notify: restart pgbouncer
+
+# https://github.com/erigones/esdc-ce/issues/129
 - name: Create vm_zabbix_sync_required file (for erigonesd on mgmt)
   local_action:
     module: file
