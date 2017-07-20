@@ -14,7 +14,7 @@
     section: pgbouncer
     option: max_client_conn
     value: 1000
-  notify: restart pgbouncer
+  notify: restart pgbouncer on zabbix
 
 # https://github.com/erigones/esdc-ce/issues/129
 - name: Create vm_zabbix_sync_required file (for erigonesd on mgmt)
