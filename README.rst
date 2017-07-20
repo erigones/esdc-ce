@@ -14,7 +14,7 @@ Links
 - Wiki: https://github.com/erigones/esdc-ce/wiki
 - Bug Tracker: https://github.com/erigones/esdc-ce/issues
 - Twitter: https://twitter.com/danubecloud
-- Mailing list: `danubecloud@googlegroups.com <danubecloud+subscribe@googlegroups.com>`__
+- Forum (Q&A): https://qa.danubecloud.org
 - IRC: `irc.freenode.net#danubecloud <https://webchat.freenode.net/#danubecloud>`__
 
 
