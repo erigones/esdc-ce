@@ -29,8 +29,9 @@
   - name: restart postgresql95
     service: name=postgresql-9.5 state=restarted
     notify: sleep 15
-  - name: restart pgbouncer
+  - name: restart pgbouncer on zabbix
     service: name=pgbouncer state=restarted
+    notify: restart zabbix-server
   - name: restart erigonesd-beat
     service: name=erigonesd-beat state=restarted
   - name: reload haproxy
