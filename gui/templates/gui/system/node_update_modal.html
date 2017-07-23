@@ -1,0 +1,21 @@
+{% load i18n %}
+<div id="node_update_modal" class="black-box modal hide fade vm_modal">
+  <div class="modal-head tab-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <span class="title_edit"><i class="icon-download"></i> {% trans "Update compute node(s)" %}</span>
+    <span class="title_add"></span>
+  </div>
+  <div class="modal-body separator">
+    <div class="text_edit"></div>
+    <div class="text_add"></div>
+    <form class="form-horizontal" action="#" data-source="{% url 'system_node_update_form' %}" method="POST">
+      {% include "gui/system/node_update_form.html" with form=node_update_form %}
+    </form>
+  </div>
+  <div class="modal-footer">
+    <div class="inner-well">
+      <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
+      <a class="vm_modal_update button red no-ajax" data-enter="true">{% trans "Run update" %}</a>
+    </div>
+  </div>
+</div>

@@ -21,6 +21,9 @@ td, th {
 }
 
 td {
+  &.center-text {
+    text-align: center;
+  }
 
   .button {
 

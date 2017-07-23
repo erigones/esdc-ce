@@ -1,0 +1,134 @@
+{% extends load_base %}
+{% load i18n %}
+
+{% block javascript %}
+<script type="text/javascript">
+  $(document).ready(function() {
+    SYSTEM_UPDATE = new SystemUpdate();
+  });
+</script>
+{% endblock %}
+
+{% block base_content %}
+{% include "gui/node/status_modal.html" %}
+{% include "gui/system/update_modal.html" %}
+{% include "gui/system/node_update_modal.html" %}
+
+<div class="container-fluid">
+
+  <div class="row-fluid">
+    <div class="span6">
+      <div class="box">
+        <div class="tab-header">
+          <i class="icon-wrench"></i> {% trans "System maintenance" %}
+        </div>
+        <div>
+          <table class="table box table-striped form">
+            <tbody>
+              <tr>
+                <th>{% trans "Hostname" %}</th>
+                <td>{{ system.hostname }}</td>
+              </tr>
+              <tr>
+                <th>{% trans "DC Version" %}</th>
+                <td>{{ system.version }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="2">
+                  <div class="vm_control">
+                    <a href="#" id="system_update" class="button gray no-ajax" title="{% trans "Update Danube Cloud software on mgmt server" %}" data-toggle="tooltip" data-placement="top"><i class="icon-download"></i> {% trans "Update Danube Cloud on mgmt" %}</a>
+                  </div>
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div> <!-- end row-fluid -->
+
+  <div class="row-fluid">
+    <div class="span12">
+      <div class="box">
+        <div class="tab-header">
+          <i class="icon-wrench"></i> {% trans "Compute nodes maintenance" %}
+        </div>
+        <table class="table box table-striped table-hover table-responsive" id="etable">
+          <thead>
+            {% if node_list %}
+            <tr>
+              <th class="hidden-phone-small row_menu_icon">
+                <i class="icon-search row_icon"></i>
+              </th>
+              <th colspan="5" class="row_menu">
+                <input type="search" results="5" id="node_search" class="quick-search" name="node_search" placeholder="{% trans "enter node hostname" %}">
+              </th>
+            </tr>
+            <tr>
+              <th class="top chbox hidden-phone-small">
+                <div class="input">
+                  <input type="checkbox" class="normal-check" id="id_all"/>
+                  <label for="id_all"></label>
+                </div>
+              </th>
+              <th>{% trans "Hostname" %}</th>
+              <th class="hidden-phone">{% trans "Vendor" %}</th>
+              <th class="hidden-phone">{% trans "Model" %}</th>
+              <th>{% trans "Status" %}</th>
+              <th>{% trans "DC Version" %}</th>
+            </tr>
+            {% endif %}
+          </thead>
+          <tbody id="node_list">
+             {% for node in node_list %}
+            <tr>
+              <td class="top chbox hidden-phone-small">
+                <div class="input">
+                  <input type="checkbox" class="normal-check" id="id_{{ node.hostname}}"/>
+                  <label for="id_{{ node.hostname }}"></label>
+                </div>
+              </td>
+              <td class="nowrap">
+                <a href="{% url 'node_details' node.hostname %}" class="btn-link"><i class="icon-sitemap" style="color: {{ node.color }};"></i> <span class="node_hostname">{{ node.hostname }}</span></a>
+              </td>
+              <td class="hidden-phone nowrap">
+                <span class="vm_hostname">{{ node.vendor }}</span>
+              </td>
+              <td class="hidden-phone nowrap">
+                <span class="vm_hostname">{{ node.model }}</span>
+              </td>
+              <td>
+                {% with status_display=node.get_status_display %}
+                <span class="label status_node{{ node.status }}" id="node_label_{{ node.hostname }}" data-status_display="{{ status_display }}">{{ status_display }}</span>
+                {% endwith %}
+              </td>
+              <td>
+                {{ node.system_version }}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="6">
+                <span>
+                  {% blocktrans count node_len=node_list|length %}Selected <span id="selected">0</span> of {{ node_len }} node
+                  {% plural %}Selected <span id="selected">0</span> of {{ node_len }} nodes{% endblocktrans %}
+                </span>
+                <div class="vm_control">
+                  <a href="#" id="node_status" class="button gray no-ajax" title="{% trans "Change status of selected compute nodes" %}" data-toggle="tooltip" data-placement="top"><i class="icon-ok"></i> {% trans "Change status" %}</a>
+                  <a href="#" id="node_system_update" class="button gray no-ajax" title="{% trans "Update Danube Cloud software on selected compute nodes" %}" data-toggle="tooltip" data-placement="top"><i class="icon-download"></i> {% trans "Update Danube Cloud on compute node(s)" %}</a>
+
+                </div>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </div> <!-- end row-fluid -->
+
+</div> <!-- end container-fluid -->
+{% endblock %}

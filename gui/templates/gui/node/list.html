@@ -10,6 +10,7 @@
 {% endblock %}
 
 {% block base_content %}
+{% include "gui/node/status_modal.html" %}
 {% if modals %}{% for template in modals %}{% include template %}{% endfor %}{% endif %} {# used by esdc-ee-eslic #}
 
 <div class="container-fluid">
@@ -122,6 +123,7 @@
                 {% plural %}Selected <span id="selected">0</span> of {{ node_len }} nodes{% endblocktrans %}
               </span>
               <div class="vm_control">
+                <a href="#" id="node_status" class="button gray no-ajax" title="{% trans "Change status of selected compute nodes" %}" data-toggle="tooltip" data-placement="top"><i class="icon-ok"></i> {% trans "Change status" %}</a>
                 {% if node_controls %}{% for template in node_controls %}  {# used by esdc-ee-eslic #}
                 {% include template %}
                 {% endfor %}{% endif %}

@@ -4,7 +4,7 @@ from operator import and_
 
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-from django.db.models import Q, Count
+from django.db.models import Q
 from django.contrib.contenttypes.models import ContentType
 from celery import states
 from pytz import UTC
@@ -124,25 +124,3 @@ class TaskLogFilterSerializer(s.Serializer):
             return reduce(and_, query)
         else:
             return None
-
-
-class TaskLogReportSerializer(s.Serializer):
-    """
-    Display task log stats.
-    """
-    pending = s.IntegerField(read_only=True)
-    revoked = s.IntegerField(read_only=True)
-    succeeded = s.IntegerField(read_only=True)
-    failed = s.IntegerField(read_only=True)
-
-    @classmethod
-    def get_report(cls, basequery):
-        def get_count(status):
-            return basequery.filter(status=status).aggregate(count=Count('id')).get('count', 0)
-
-        return {
-            'pending': get_count(states.PENDING),
-            'revoked': get_count(states.REVOKED),
-            'succeeded': get_count(states.SUCCESS),
-            'failed': get_count(states.FAILURE),
-        }

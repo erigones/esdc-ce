@@ -4,6 +4,7 @@ urlpatterns = patterns(
     'gui.node.views',
 
     url(r'^$', 'node_list', name='node_list'),
+    url(r'status/form/$', 'status_form', name='node_status_form'),
     url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/$', 'details', name='node_details'),
     url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/define/$', 'define_form', name='node_define_form'),
     url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/storages/$', 'storages', name='node_storages'),

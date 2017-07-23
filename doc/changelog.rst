@@ -7,6 +7,18 @@ Changelog
 Features
 --------
 
+- Added maintenance view with system update functionality into GUI - `#172 <https://github.com/erigones/esdc-ce/issues/172>`__
+
+Bugs
+----
+
+
+2.5.3 (unreleased)
+==================
+
+Features
+--------
+
 - Added reflection of users and user groups from management to Zabbix monitoring - `#91 <https://github.com/erigones/esdc-ce/issues/91>`__
 - Added option to configure SMS, Jabber and Email alerting for users in their user profiles - `#92 <https://github.com/erigones/esdc-ce/issues/92>`__
 - Added user editable notes for VM and node - `#98 <https://github.com/erigones/esdc-ce/issues/98>`__

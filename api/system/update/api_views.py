@@ -6,6 +6,7 @@ from api.api_views import APIView
 from api.exceptions import TaskIsAlreadyRunning, PreconditionRequired
 from api.system.messages import LOG_SYSTEM_UPDATE
 from api.system.update.serializers import UpdateSerializer
+from api.system.update.events import SystemUpdateStarted, SystemUpdateFinished
 from api.system.update.utils import process_update_reply
 from api.system.service.control import SystemReloadThread
 from api.task.response import SuccessTaskResponse, FailureTaskResponse
@@ -56,6 +57,11 @@ class UpdateView(APIView):
 
         return response
 
+    @classmethod
+    def get_task_lock(cls):
+        # Also used in socket.io namespace
+        return TaskLock(cls._lock_key, desc='System task')
+
     def put(self):
         assert self.request.dc.id == DefaultDc().id
 
@@ -67,15 +73,21 @@ class UpdateView(APIView):
         version = ser.object['version']
         from core.version import __version__ as mgmt_version
 
+        # noinspection PyUnboundLocalVariable
         if version == ('v' + mgmt_version):
             raise PreconditionRequired('System is already up-to-date')
 
-        lock = TaskLock(self._lock_key, desc='System task')
+        lock = self.get_task_lock()
 
         if not lock.acquire(self.task_id, timeout=7200, save_reverse=False):
             raise TaskIsAlreadyRunning
 
         try:
+            # Emit event into socket.io
+            SystemUpdateStarted(self.task_id, request=self.request).send()
+
             return self._update(version, key=ser.object.get('key'), cert=ser.object.get('cert'))
         finally:
             lock.delete(fail_silently=True, delete_reverse=False)
+            # Emit event into socket.io
+            SystemUpdateFinished(self.task_id, request=self.request).send()
