@@ -1,7 +1,7 @@
-from logging import getLogger
+from logging import getLogger, INFO, WARNING, CRITICAL, ERROR
 from time import time
+from operator import itemgetter
 from datetime import datetime
-from logging import INFO, WARNING, CRITICAL, ERROR
 from subprocess import call
 
 from django.utils.six import iteritems
@@ -804,7 +804,8 @@ class ZabbixBase(object):
             if since_trend and until_trend:
                 params['time_from'] = since_trend
                 params['time_till'] = until_trend
-                res['history'] = self.zapi.trend.get(params)
+                # Zabbix trend.get does not support sorting -> https://support.zabbix.com/browse/ZBXNEXT-3974
+                res['history'] = sorted(self.zapi.trend.get(params), key=itemgetter('clock'))
 
             if since_history and until_history:
                 params['time_from'] = since_history
