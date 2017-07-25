@@ -10,7 +10,7 @@ Features
 Bugs
 ----
 
-- Fixed plotting of longterm graphs - `#209 <https://github.com/erigones/esdc-ce/issues/209>`__
+- Fixed rendering of long-term graphs in GUI - `#209 <https://github.com/erigones/esdc-ce/issues/209>`__
 
 
 2.6.0 (released on 2017-07-21)
