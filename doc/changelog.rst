@@ -1,6 +1,18 @@
 Changelog
 #########
 
+2.6.1 (unreleased)
+==================
+
+Features
+--------
+
+Bugs
+----
+
+- Fixed plotting of longterm graphs - `#209 <https://github.com/erigones/esdc-ce/issues/209>`__
+
+
 2.6.0 (released on 2017-07-21)
 ==============================
 
