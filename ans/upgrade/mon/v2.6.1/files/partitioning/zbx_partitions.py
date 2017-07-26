@@ -21,7 +21,6 @@ tables = {
     'history_text': ('day', 7),
     'trends': ('month', 12),
     'trends_uint': ('month', 12),
-    'events': ('month', 12),
 }
 
 # change these settings
