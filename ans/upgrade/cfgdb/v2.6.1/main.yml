@@ -1,4 +1,4 @@
-# https://github.com/erigones/esdc-factory/pull/64
+# https://github.com/erigones/esdc-factory/issues/64
 - name: Install cfgdb_disco_server.py script
   copy:
     src: "{{ current_task_dir }}/files/cfgdb_disco_server.py"
