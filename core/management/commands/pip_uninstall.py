@@ -1,14 +1,17 @@
-from ._base import DanubeCloudCommand, lcd
+from ._base import DanubeCloudCommand, lcd, CommandOption
 
 
 class Command(DanubeCloudCommand):
-    help = 'Uninstall dependencies according to *etc/requirements-remove.txt*.'
+    help = 'Shortcut for pip uninstall within the application\'s virtual environment.'
+    option_list = (
+        CommandOption('--library', action='store', dest='library', default='',
+                      help='Library to be uninstalled from the virtual environment'),
+    )
 
-    def pip_uninstall(self, req_rem_path, params='-y'):
-        if self._path_exists(req_rem_path):
-            self.local('pip uninstall %s -r %s' % (params, req_rem_path))
-            self.display('%s have been successfully uninstalled.\n\n ' % req_rem_path, color='green')
+    def pip_uninstall(self, library, params='-y'):
+        self.local('pip uninstall %s %s' % (params, library))
+        self.display('%s have been successfully uninstalled.\n\n ' % library, color='green')
 
-    def handle(self, *args, **options):
+    def handle(self, **options):
         with lcd(self.PROJECT_DIR):
-            self.pip_uninstall(self._path(self.PROJECT_DIR, 'etc', 'requirements-remove.txt'))
+            self.pip_uninstall(options['library'])
