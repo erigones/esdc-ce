@@ -178,10 +178,16 @@ CREATE OR REPLACE FUNCTION zbx_enable_partitions(
 ) RETURNS VOID AS $$
 	DECLARE
 		time_format			TEXT;
+		time_interval		INTERVAL;
 		partition_name		TEXT;
+		first_partition_name	TEXT;
+		ins_count			INTEGER DEFAULT 0;
 	BEGIN
 		-- set time_format, used to format the partition suffix
 		time_format := (SELECT zbx_time_format_by(partition_by));
+
+		-- compute time interval for partition period
+		time_interval := '1 ' || partition_by;
 
 		-- default trigger name
 		IF trigger_name = '' THEN
@@ -205,6 +211,25 @@ CREATE OR REPLACE FUNCTION zbx_enable_partitions(
 		EXECUTE 'CREATE TRIGGER ' || QUOTE_IDENT(trigger_name) || '
 				BEFORE INSERT ON ' || parent_schema_name || '.' || table_name || '
 				FOR EACH ROW EXECUTE PROCEDURE zbx_route_insert_by_clock(' || QUOTE_IDENT(schema_name) || ', ' || QUOTE_LITERAL(time_format) || ');';
+
+		-- create first partition to store current data in parent table
+		first_partition_name :=  table_name || '_' || TO_CHAR(NOW() - time_interval, time_format);
+
+		EXECUTE 'CREATE TABLE ' || schema_name || '.' || first_partition_name || ' (
+			LIKE ' || parent_schema_name || '.' || table_name || '
+				INCLUDING DEFAULTS
+				INCLUDING CONSTRAINTS
+				INCLUDING INDEXES
+		) INHERITS (' || parent_schema_name || '.' || table_name || ');';
+
+		-- if you want to disable the Housekeeper now, we need to move
+		-- all data from the parent table to the first partition
+		-- (the ONLY keyword is important here)
+		EXECUTE 'INSERT INTO ' || schema_name || '.' || first_partition_name || ' SELECT * FROM ONLY ' || parent_schema_name || '.' || table_name;
+		GET DIAGNOSTICS ins_count := ROW_COUNT;
+		EXECUTE 'TRUNCATE ONLY ' || parent_schema_name || '.' || table_name;
+		-- notify
+		RAISE NOTICE 'Moved % rows from %.% to %.%', ins_count, parent_schema_name, table_name, schema_name, first_partition_name;
 	END;
 $$ LANGUAGE plpgsql;
 

@@ -47,6 +47,19 @@ def execute_sql(query, params):
         print('***')
 
 
+def get_days(partition_by):
+    if partition_by == 'month':
+        days = 365/12
+    elif partition_by == 'year':
+        days = 365
+    elif partition_by == 'day':
+        days = 1
+    else:
+        raise ValueError('Invalid partitioning schema: %s' % partition_by)
+
+    return days
+
+
 db_connection = psycopg2.connect(database=db_name, user=db_user, password=db_pw, host=db_host)
 db_cursor = db_connection.cursor()
 
@@ -62,7 +75,7 @@ else:
     now = datetime.now()
     # Cleanup old partitions
     for table_name, options in tables.items():
-        cutoff = now - timedelta(days=options[1])
+        cutoff = now - timedelta(days=get_days(options[0]) * options[1])
         execute_sql('''SELECT zbx_drop_old_partitions(%s, %s)''', (table_name, cutoff))
 
 db_connection.commit()
