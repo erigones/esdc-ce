@@ -1,0 +1,34 @@
+---
+- name: Create /usr/local/share/doc/zabbix-pgsql-partitioning directory
+  file: path=/usr/local/share/doc/zabbix-pgsql-partitioning state=directory mode=0755
+
+- name: Copy partitioning scripts
+  copy: src="{{ current_task_dir }}/files/partitioning/{{ item }}"
+        dest="/usr/local/share/doc/zabbix-pgsql-partitioning/{{ item }}"
+        mode=0644
+  with_items:
+    - bootstrap.sql
+    - repair-zabbix-3.2.0.sql
+    - README.md
+
+- name: Create /usr/local/sbin/zbx_partitions.py script
+  copy: src="{{ current_task_dir }}/files/partitioning/zbx_partitions.py"
+        dest="/usr/local/sbin/zbx_partitions.py"
+        mode=0700
+        owner=root
+        group=root
+
+- name: Import partitioning SQL functions and create partitions schema
+  shell: |
+    echo 'CREATE SCHEMA partitions AUTHORIZATION zabbix' | psql -U zabbix -d zabbix
+    cat /usr/local/share/doc/zabbix-pgsql-partitioning/bootstrap.sql | psql -U zabbix -d zabbix
+  environment:
+    PGPASSWORD: "zabbix"
+
+- name: Prepare crontab entry for periodical maintenance of partitions
+  cron: name="Zabbix partitioning -> create new + delete old partitions"
+        disabled=yes
+        minute=30
+        hour=1
+        job="/usr/local/sbin/zbx_partitions.py"
+
