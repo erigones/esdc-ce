@@ -22,7 +22,6 @@ envs
 .initialized
 
 # Databases
-*.sql
 *.db
 
 # Installer logs
