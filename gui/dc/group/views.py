@@ -40,7 +40,7 @@ def dc_group_list(request):
             context['can_add'] = groups.exclude(dc=dc).count()
 
         context['url_form_admin'] = reverse('admin_group_form', query_string=qs)
-        context['form_admin'] = AdminGroupForm(request, None, prefix='adm', initial={'dc_bound': True})
+        context['form_admin'] = AdminGroupForm(request, None, prefix='adm', initial={'dc_bound': not is_staff})
 
         context['form_dc'] = DcGroupForm(request, groups)
         context['url_form_dc'] = reverse('dc_group_form', query_string=qs)

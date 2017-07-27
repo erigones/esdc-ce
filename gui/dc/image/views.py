@@ -59,7 +59,7 @@ def dc_image_list(request):
         context['url_form_admin'] = reverse('admin_image_form', query_string=qs)
         context['form_admin'] = AdminImageForm(request, None, prefix='adm', initial={'owner': user.username,
                                                                                      'access': Image.PRIVATE,
-                                                                                     'dc_bound': True})
+                                                                                     'dc_bound': not is_staff})
 
     return render(request, 'gui/dc/image_list.html', context)
 

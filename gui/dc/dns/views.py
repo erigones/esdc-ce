@@ -59,7 +59,7 @@ def dc_domain_list(request):
         context['form_dc'] = DcDomainForm(request, domains)
         context['form_admin'] = AdminDomainForm(request, None, prefix='adm', initial={'owner': user.username,
                                                                                       'access': Domain.PRIVATE,
-                                                                                      'dc_bound': True})
+                                                                                      'dc_bound': not is_staff})
         context['url_form_dc'] = reverse('dc_domain_form', query_string=qs)
         context['url_form_admin'] = reverse('admin_domain_form', query_string=qs)
 

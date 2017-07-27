@@ -57,7 +57,7 @@ def dc_network_list(request):
         context['url_form_admin'] = reverse('admin_network_form', query_string=qs)
         context['form_admin'] = AdminNetworkForm(request, None, prefix='adm', initial={'owner': user.username,
                                                                                        'access': Subnet.PRIVATE,
-                                                                                       'dc_bound': True})
+                                                                                       'dc_bound': not is_staff})
 
     return render(request, 'gui/dc/network_list.html', context)
 
