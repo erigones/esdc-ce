@@ -1,0 +1,26 @@
+# https://github.com/erigones/esdc-factory/issues/64
+- name: Install cfgdb_disco_server.py script
+  copy:
+    src: "{{ current_task_dir }}/files/cfgdb_disco_server.py"
+    dest: /usr/local/bin/cfgdb_disco_server.py
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Check presence of discovery service (failure is ok)
+  shell: "/usr/bin/svcs svc:/application/cfgdb-disco:default"
+  ignore_errors: True
+  register: disco_svc
+
+- name: Copy cfgdb-disco SMF manifest
+  copy:
+    src: cfgdb-disco.xml
+    dest: /tmp/cfgdb-disco.xml
+    owner: root
+    group: root
+    mode: 0644
+  when: disco_svc|failed
+
+- name: Import cfgdb-disco SMF manifest
+  command: /usr/sbin/svccfg import /tmp/cfgdb-disco.xml
+  when: disco_svc|failed
