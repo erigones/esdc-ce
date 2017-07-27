@@ -7,6 +7,8 @@ Changelog
 Features
 --------
 
+- Disabled GSSAPIAuthentication for every SSH operation - `#212 <https://github.com/erigones/esdc-ce/issues/212>`__
+
 Bugs
 ----
 
