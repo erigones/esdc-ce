@@ -61,7 +61,7 @@ def dc_user_list(request):
 
     if can_edit:
         context['url_form_admin'] = reverse('dc_user_modal_form', query_string=qs)
-        context['form_admin'] = AdminUserModalForm(request, None, prefix='adm', initial={'dc_bound': True,
+        context['form_admin'] = AdminUserModalForm(request, None, prefix='adm', initial={'dc_bound': not is_staff,
                                                                                          'is_active': True})
 
     return render(request, 'gui/dc/user_list.html', context)

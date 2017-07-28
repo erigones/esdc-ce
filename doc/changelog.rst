@@ -7,6 +7,7 @@ Changelog
 Features
 --------
 
+- Updated DC-bound form field to be unchecked by default when SuperAdmin creates a new virt object - `#206 <https://github.com/erigones/esdc-ce/issues/206>`__
 - Disabled GSSAPIAuthentication for every SSH operation - `#212 <https://github.com/erigones/esdc-ce/issues/212>`__
 
 Bugs

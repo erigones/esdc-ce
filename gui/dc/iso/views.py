@@ -49,7 +49,7 @@ def dc_iso_list(request):
         context['url_form_admin'] = reverse('admin_iso_form', query_string=qs)
         context['form_admin'] = AdminIsoForm(request, None, prefix='adm', initial={'owner': user.username,
                                                                                    'access': Iso.PRIVATE,
-                                                                                   'dc_bound': True})
+                                                                                   'dc_bound': not is_staff})
 
     return render(request, 'gui/dc/iso_list.html', context)
 
