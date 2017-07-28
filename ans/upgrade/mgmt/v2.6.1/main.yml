@@ -1,2 +1,2 @@
 - name: Uninstall librabbitmq
-  shell: "{{ erigones_home }}/bin/ctl.sh pip_uninstall --package librabbitmq"
+  shell: "{{ erigones_home }}/bin/ctl.sh pip_uninstall --package librabbitmq || true"
