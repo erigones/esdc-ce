@@ -1,14 +1,28 @@
-from ._base import DanubeCloudCommand, lcd
+from ._base import DanubeCloudCommand, lcd, CommandOption, CommandError
 
 
 class Command(DanubeCloudCommand):
-    help = 'Uninstall dependencies according to *etc/requirements-remove.txt*.'
+    help = 'Shortcut for pip uninstall within the application\'s virtual environment.'
+    args = '<package1> [package2] ...'
 
-    def pip_uninstall(self, req_rem_path, params='-y'):
-        if self._path_exists(req_rem_path):
-            self.local('pip uninstall %s -r %s' % (params, req_rem_path))
-            self.display('%s have been successfully uninstalled.\n\n ' % req_rem_path, color='green')
+    option_list = (
+        CommandOption('-s', '--silence-errors', action='store_true', dest='silence_errors', default=False,
+                      help='Do not propagate pip errors.'),
+    )
 
-    def handle(self, *args, **options):
+    def pip_uninstall(self, package, raise_on_error, params='-y'):
+        erroneous_return_code = self.local('pip uninstall %s %s' % (params, package), raise_on_error=raise_on_error)
+        if erroneous_return_code:
+            self.display('An error has occurred while uninstalling %s!\n\n ' % package, color='red')
+            if not raise_on_error:
+                self.display('The library may be uninstalled already, we suppress the error.\n', color='magenta')
+        else:
+            self.display('%s have been successfully uninstalled.\n\n ' % package, color='green')
+
+    def handle(self, *packages, **options):
+        if not packages:
+            raise CommandError('No packages selected for removal.')
+
         with lcd(self.PROJECT_DIR):
-            self.pip_uninstall(self._path(self.PROJECT_DIR, 'etc', 'requirements-remove.txt'))
+            for package in packages:
+                self.pip_uninstall(package, raise_on_error=not options.get('silence_errors'))

@@ -9,7 +9,6 @@ kombu==3.0.37
 anyjson==0.3.3
 redis==2.10.5
 pytz==2017.2
-librabbitmq==1.6.1
 simplejson==3.11.1
 frozendict==1.2
 requests==2.13.0
