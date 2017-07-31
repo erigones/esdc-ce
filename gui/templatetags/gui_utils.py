@@ -7,6 +7,7 @@ from django.utils.safestring import mark_safe
 from json import dumps
 from datetime import datetime, timedelta
 
+import markdown
 import re
 import pytz
 # noinspection PyCompatibility
@@ -304,3 +305,8 @@ def qs_del(query_string, param):
     qs = QueryDict(query_string, mutable=True)
     qs.pop(param, None)
     return qs.urlencode()
+
+
+@register.filter
+def markdownify(text):
+    return markdown.markdown(text, safe_mode='escape')

@@ -156,7 +156,7 @@
           <tr>
             <td>{% trans "Note" %}:</td>
             <td>
-                <span class="vm_hostname">{{ node.note }}</span>
+                <span class="vm_hostname">{{ node.note|markdownify|safe }}</span>
             </td>
           </tr>
 
