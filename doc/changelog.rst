@@ -1,6 +1,14 @@
 Changelog
 #########
 
+2.6.2 (unreleased)
+==================
+
+Features
+--------
+
+- Added support for markdown in vm and node notes field - `#214 <https://github.com/erigones/esdc-ce/issues/214>`__
+
 2.6.1 (unreleased)
 ==================
 
