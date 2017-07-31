@@ -3,9 +3,10 @@ from ._base import DanubeCloudCommand, lcd, CommandOption
 
 class Command(DanubeCloudCommand):
     help = 'Shortcut for pip uninstall within the application\'s virtual environment.'
+    args = '<package1> <package2> ...'
+    missing_args_message = ("No database fixture specified. Please provide the "
+                            "path of at least one fixture in the command line.")
     option_list = (
-        CommandOption('-p', '--package', action='store', dest='package', default='',
-                      help='Package to be uninstalled from the virtual environment'),
         CommandOption('-s', '--silence-errors', action='store_true', dest='silence_errors', default=False,
                       help='Do not propagate pip errors.'),
     )
@@ -19,6 +20,10 @@ class Command(DanubeCloudCommand):
         else:
             self.display('%s have been successfully uninstalled.\n\n ' % package, color='green')
 
-    def handle(self, **options):
+    def handle(self, *packages, **options):
+        if not packages:
+            self.display('No packages selected for removal.')
+
         with lcd(self.PROJECT_DIR):
-            self.pip_uninstall(options['package'], raise_on_error=not options['silence_errors'])
+            for package in packages:
+                self.pip_uninstall(package, raise_on_error=not options.get('silence_errors'))
