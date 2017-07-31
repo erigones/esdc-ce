@@ -1,5 +1,5 @@
 from ._base import DanubeCloudCommand, lcd, CommandOption, CommandError
-import sys
+
 
 class Command(DanubeCloudCommand):
     help = 'Shortcut for pip uninstall within the application\'s virtual environment.'
