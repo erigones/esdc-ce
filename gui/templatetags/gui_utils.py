@@ -7,11 +7,11 @@ from django.utils.safestring import mark_safe
 from json import dumps
 from datetime import datetime, timedelta
 
-import markdown
 import re
 import pytz
 # noinspection PyCompatibility
 import ipaddress
+import markdown
 
 from api.utils.encoders import JSONEncoder
 from pdns.models import Record
@@ -307,6 +307,17 @@ def qs_del(query_string, param):
     return qs.urlencode()
 
 
-@register.filter
+def _markdownify(text):
+    text = conditional_escape(text)
+
+    try:
+        md = markdown.markdown(text)
+    except:
+        md = text
+
+    return mark_safe(md)
+
+
+@register.filter(is_safe=True)
 def markdownify(text):
-    return markdown.markdown(text, safe_mode='escape')
+    return _markdownify(text)
