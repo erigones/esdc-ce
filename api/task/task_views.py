@@ -5,14 +5,14 @@ from que.utils import user_owner_dc_ids_from_task_id
 from que.user_tasks import UserTasks
 from api.decorators import api_view, request_data
 from api.serializers import ForceSerializer
-from api.permissions import IsSuperAdminOrReadOnly
+from api.permissions import IsSuperAdminOrReadOnly, IsAdmin
 from api.task.response import TaskStatusResponse, TaskDoneResponse, TaskSuccessResponse, TaskFailureResponse
 from api.task.permissions import IsUserTask, IsTaskCreator
 from api.task.utils import get_user_tasks, cancel_task, delete_task
 from api.task.serializers import TaskCancelSerializer
 from api.task.task_log import TaskLogView
 
-__all__ = ('task_list', 'task_details', 'task_status', 'task_done', 'task_cancel', 'task_log', 'task_log_report')
+__all__ = ('task_list', 'task_details', 'task_status', 'task_done', 'task_cancel', 'task_log', 'task_log_stats')
 
 
 # noinspection PyUnusedLocal
@@ -231,20 +231,23 @@ dc, vm, node, nodestorage, subnet, image, vmtemplate, iso, domain, user, role)
 
 
 @api_view(('GET',))
-@request_data()
-def task_log_report(request, data=None):
+@request_data(permissions=(IsAdmin,))
+def task_log_stats(request, data=None):
     """
-    Display (:http:get:`GET </task/log/report>`) task log statistics.
+    Display (:http:get:`GET </task/log/stats>`) task log statistics.
 
-    .. http:get:: /task/log/report
+    .. http:get:: /task/log/stats
 
         :DC-bound?:
             * |dc-yes|
         :Permissions:
+            * |Admin|
+        :Asynchronous?:
+            * |async-no|
         :arg data.last: Use task log entries which are n seconds old (default: 86400)
         :type data.last: integer
         :status 200: Object with *succeeded*, *failed*, *pending* and *revoked* attributes
         :status 400: Error object with "detail" attribute
         :status 403: Forbidden
     """
-    return TaskLogView(request, data=data).report()
+    return TaskLogView(request, data=data).get_stats_response()

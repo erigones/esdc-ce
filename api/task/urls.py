@@ -4,7 +4,7 @@ urlpatterns = patterns(
     'api.task.views',
 
     url(r'^log/$', 'task_log', name='api_task_log'),
-    url(r'^log/report/$', 'task_log_report', name='api_task_log_report'),
+    url(r'^log/stats/$', 'task_log_stats', name='api_task_log_stats'),
     url(r'^(?P<task_id>[A-Za-z0-9-]+)/done/$', 'task_done', name='api_task_done'),
     url(r'^(?P<task_id>[A-Za-z0-9-]+)/status/$', 'task_status', name='api_task_status'),
     url(r'^(?P<task_id>[A-Za-z0-9-]+)/state/$', 'task_status', name='api_task_state'),
