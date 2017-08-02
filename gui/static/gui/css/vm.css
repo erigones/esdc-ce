@@ -162,6 +162,7 @@ td.vm_admin {
 /* line 99, ../scss/vm.scss */
 .vm_hostname {
   font-size: 11px;
+  word-wrap: break-word;
 }
 
 /* line 103, ../scss/vm.scss */

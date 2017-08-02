@@ -78,6 +78,7 @@ td .msg {
 /* line 85, ../scss/tables.scss */
 table.box {
   background-color: #FAFAFA;
+  table-layout: fixed;
 }
 /* line 89, ../scss/tables.scss */
 table.box thead, table.box tfoot {
