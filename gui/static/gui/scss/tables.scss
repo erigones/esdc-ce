@@ -85,7 +85,8 @@ td {
 table.box {
 
   background-color: #FAFAFA;
-  table-layout: fixed;
+  word-wrap: break-word;
+  word-break: break-all;
 
   thead, tfoot {
     @include std-bg(#ebebeb, #e5e5e5);

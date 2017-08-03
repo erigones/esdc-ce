@@ -78,7 +78,8 @@ td .msg {
 /* line 85, ../scss/tables.scss */
 table.box {
   background-color: #FAFAFA;
-  table-layout: fixed;
+  word-wrap: break-word;
+  word-break: break-all;
 }
 /* line 89, ../scss/tables.scss */
 table.box thead, table.box tfoot {
