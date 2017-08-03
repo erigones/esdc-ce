@@ -25,20 +25,11 @@ def parse_items(itemstring, sort=False):
 
     itemstring = force_text(itemstring)
 
-    # Special case - if there are no commas or double quotes in the
-    # input, we don't *do* a recall... I mean, we know we only need to
-    # split on spaces.
-    if ',' not in itemstring and '"' not in itemstring:
-        words = split_strip(itemstring, ' ')
-        return words
-
     words = []
     buf = []
     # Defer splitting of non-quoted sections until we know if there are
     # any unquoted commas.
     to_be_split = []
-    saw_loose_comma = False
-    open_quote = False
     i = iter(itemstring)
     try:
         while True:
@@ -48,7 +39,6 @@ def parse_items(itemstring, sort=False):
                     to_be_split.append(''.join(buf))
                     buf = []
                 # Find the matching quote
-                open_quote = True
                 c = six.next(i)
                 while c != '"':
                     buf.append(c)
@@ -58,24 +48,17 @@ def parse_items(itemstring, sort=False):
                     if word:
                         words.append(word)
                     buf = []
-                open_quote = False
             else:
-                if not saw_loose_comma and c == ',':
-                    saw_loose_comma = True
                 buf.append(c)
     except StopIteration:
         # If we were parsing an open quote which was never closed treat
         # the buffer as unquoted.
         if buf:
-            if open_quote and ',' in buf:
-                saw_loose_comma = True
             to_be_split.append(''.join(buf))
 
     if to_be_split:
-        if saw_loose_comma:
-            delimiter = ','
-        else:
-            delimiter = ' '
+        delimiter = ','
+
         for chunk in to_be_split:
             words.extend(split_strip(chunk, delimiter))
 
