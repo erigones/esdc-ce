@@ -769,6 +769,17 @@ function vm_settings_modal(hostname, btn, mod_selector) {
         });
       }
 
+      mod.on('focus', '#id_opt-note', function () {
+        mod.off('keypress');
+        $(this).width('303px');
+        $(this)[0]['rows'] = 15;
+      });
+
+      mod.on('focusout', '#id_opt-note', function () {
+        $(this).width('186px');
+        $(this)[0]['rows'] = 5;
+      });
+
     } else if (mod_selector == '#vm_nic_settings_modal') {
       var nic_ip = $('#id_opt-nic-ip');
       var ip_placeholder = nic_ip.attr('placeholder');
