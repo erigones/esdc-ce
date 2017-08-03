@@ -13,6 +13,7 @@ Features
 Bugs
 ----
 
+- Fixed single element representation in array fields - `#216 <https://github.com/erigones/esdc-ce/issues/216>`__
 - Fixed rendering of long-term graphs in GUI - `#209 <https://github.com/erigones/esdc-ce/issues/209>`__
 - Fixed memory leak on nodes by removing librabbitmq package and using pyamqp instead - `#207 <https://github.com/erigones/esdc-ce/issues/207>`__
 
