@@ -721,6 +721,10 @@ function _task_event_callback(result) {
       alert2(result.message);
       break;
 
+    case 'user_current_dc_changed':
+      alert2(gettext('Your current datacenter was changed. Please refresh your browser.'));
+      break;
+
     default: // send notification
       if (typeof(result.message) !== 'undefined') {
         notify('info', result.message);

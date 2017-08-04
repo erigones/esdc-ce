@@ -176,10 +176,15 @@ class User(AbstractBaseUser, PermissionsMixin, _AclMixin, _DcBoundMixin):
 
     @current_dc.setter
     def current_dc(self, dc):
+        from api.accounts.user.events import UserCurrentDcChanged
+
         if self.default_dc != dc:
             logger.debug('Default DC for user "%s" changed to "%s"', self.username, dc.name)
+            old_current_dc_id = self.current_dc_id
             self.default_dc = dc
             self.save(update_fields=('default_dc',))
+            # Send direct event to the user working in the old DC
+            UserCurrentDcChanged(self.id, dc_id=old_current_dc_id).send()
 
     @property
     def current_dc_id(self):
