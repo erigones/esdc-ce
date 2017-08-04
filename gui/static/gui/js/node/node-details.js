@@ -19,16 +19,17 @@ function Node(hostname) {
   }
 
   $('#node_define').click(function() {
-    new obj_form_modal($(this), '#node_define_modal', function(mod) {
-      var mod = mod.mod;
+    new obj_form_modal($(this), '#node_define_modal', function(modal) {
+      var mod = modal.mod;
 
-      mod.on('focus', '#id_note', function () {
-        mod.off('keypress');
-        $(this).addClass("large_modal_textarea");
+      mod.on('focus', '#id_note', function() {
+        $(this).addClass('large_modal_textarea');
+        disable_modal_form_enter(mod);
       });
 
-      mod.on('focusout', '#id_note', function () {
-        $(this).removeClass("large_modal_textarea");
+      mod.on('focusout', '#id_note', function() {
+        $(this).removeClass('large_modal_textarea');
+        enable_modal_form_enter(mod);
       });
     });
 
