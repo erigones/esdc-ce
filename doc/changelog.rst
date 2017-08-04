@@ -1,14 +1,6 @@
 Changelog
 #########
 
-2.6.2 (unreleased)
-==================
-
-Features
---------
-
-- Added support for markdown in vm and node notes field - `#214 <https://github.com/erigones/esdc-ce/issues/214>`__
-
 2.6.1 (unreleased)
 ==================
 
@@ -17,6 +9,7 @@ Features
 
 - Updated DC-bound form field to be unchecked by default when SuperAdmin creates a new virt object - `#206 <https://github.com/erigones/esdc-ce/issues/206>`__
 - Disabled GSSAPIAuthentication for every SSH operation - `#212 <https://github.com/erigones/esdc-ce/issues/212>`__
+- Added support for markdown in vm and node notes field - `#214 <https://github.com/erigones/esdc-ce/issues/214>`__
 
 Bugs
 ----
