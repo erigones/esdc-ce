@@ -307,7 +307,8 @@ def qs_del(query_string, param):
     return qs.urlencode()
 
 
-def _markdownify(text):
+@register.filter(is_safe=True)
+def markdownify(text):
     safe_text = conditional_escape(text)
 
     # noinspection PyBroadException
@@ -318,8 +319,3 @@ def _markdownify(text):
         pass
 
     return mark_safe(safe_text)
-
-
-@register.filter(is_safe=True)
-def markdownify(text):
-    return _markdownify(text)
