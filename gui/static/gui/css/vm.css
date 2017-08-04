@@ -930,3 +930,9 @@ div.vm_node_color {
   border-radius: 50%;
   border: 1px solid #999;
 }
+
+/* line 816, ../scss/vm.scss */
+.markdown ol, .markdown ul {
+  list-style-type: disc;
+  margin: 0 0 10px 25px;
+}

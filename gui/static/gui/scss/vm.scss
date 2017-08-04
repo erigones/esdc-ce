@@ -811,3 +811,10 @@ div.vm_node_color {
   border-radius: 50%;
   border: 1px solid #999;
 }
+
+.markdown {
+  ol, ul {
+    list-style-type: disc;
+    margin: 0 0 10px 25px;
+  }
+}
