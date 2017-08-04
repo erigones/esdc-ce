@@ -933,6 +933,29 @@ div.vm_node_color {
 
 /* line 816, ../scss/vm.scss */
 .markdown ol, .markdown ul {
-  list-style-type: disc;
   margin: 0 0 10px 25px;
+}
+/* line 820, ../scss/vm.scss */
+.markdown ul {
+  list-style-type: disc;
+}
+/* line 822, ../scss/vm.scss */
+.markdown ul ol {
+  list-style-type: decimal;
+}
+/* line 825, ../scss/vm.scss */
+.markdown ul ul {
+  list-style-type: circle;
+}
+/* line 830, ../scss/vm.scss */
+.markdown ol {
+  list-style-type: decimal;
+}
+/* line 833, ../scss/vm.scss */
+.markdown ol ol {
+  list-style-type: upper-roman;
+}
+/* line 836, ../scss/vm.scss */
+.markdown ol ul {
+  list-style-type: circle;
 }

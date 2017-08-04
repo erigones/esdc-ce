@@ -313,7 +313,8 @@ def markdownify(text):
 
     # noinspection PyBroadException
     try:
-        safe_text = markdown.markdown(safe_text)
+        safe_text = markdown.markdown(safe_text, extensions=('markdown.extensions.tables',
+                                                             'markdown.extensions.fenced_code'))
     except Exception:
         """We want too broad exception as we don't know what can get wrong in the markdown library."""
         pass
