@@ -35,10 +35,16 @@ def que_monitor(app, _info=print, _debug=print):
         if event.get('queue', None) == 'mgmt':
             return  # sent task on mgmt
 
-        users = User.get_super_admin_ids()  # SuperAdmins
-        users.update(User.get_dc_admin_ids(dc_id=task_prefix[4]))  # DcAdmins
-        users.add(int(task_prefix[0]))  # TaskCreator
-        users.add(int(task_prefix[2]))  # ObjectOwner
+        if event.get('direct', None):
+            # Send signal to ObjectOwner only
+            users = (int(task_prefix[2]),)  # ObjectOwner
+        else:
+            # Send signal to all affected users
+            users = User.get_super_admin_ids()  # SuperAdmins
+            users.update(User.get_dc_admin_ids(dc_id=task_prefix[4]))  # DcAdmins
+            users.add(int(task_prefix[0]))  # TaskCreator
+            users.add(int(task_prefix[2]))  # ObjectOwner
+
         debug('Sending signal for %s task %s to %s', event_status, task_id, users)
 
         # Signal!
