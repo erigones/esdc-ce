@@ -43,3 +43,4 @@ django-timezone-field==2.0
 blinker==1.4
 lxml==3.6.4
 openpyxl==2.3.5
+Markdown==2.6.8
