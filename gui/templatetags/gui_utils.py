@@ -310,12 +310,14 @@ def qs_del(query_string, param):
 def _markdownify(text):
     text = conditional_escape(text)
 
+    # noinspection PyBroadException
     try:
-        md = markdown.markdown(text)
+        safe_text = markdown.markdown(text)
     except:
-        md = text
+        """We want too broad exception as we don't know what can get wrong in the markdown library."""
+        safe_text = text
 
-    return mark_safe(md)
+    return mark_safe(safe_text)
 
 
 @register.filter(is_safe=True)
