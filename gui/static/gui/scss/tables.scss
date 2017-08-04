@@ -85,8 +85,6 @@ td {
 table.box {
 
   background-color: #FAFAFA;
-  word-wrap: break-word;
-  word-break: break-all;
 
   thead, tfoot {
     @include std-bg(#ebebeb, #e5e5e5);
@@ -98,6 +96,12 @@ table.box {
   &.table-striped tbody tr:nth-child(odd) td, &.table-striped tbody tr:nth-child(odd) th {
     background: #FDFDFD;
   }
+
+  &.form {
+    word-wrap: break-word;
+    word-break: break-all;
+  }
+
   &.table-striped tbody {
 	tr.info td {
 	  background-color: #d9edf7;
