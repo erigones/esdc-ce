@@ -17,7 +17,7 @@ function support_control_links(elem) {
   });
 
   // Submit on pressing enter
-  $('#add-ticket-form').on('keypress', {btn_enter: $('#support_addticket')}, enter_click).find(':input:enabled:visible:first').focus();
+  $('#add-ticket-form').find(':input:enabled:visible:first').focus();
 }
 
 // Support control commands
