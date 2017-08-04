@@ -24,13 +24,11 @@ function Node(hostname) {
 
       mod.on('focus', '#id_note', function () {
         mod.off('keypress');
-        $(this).width('303px');
-        $(this)[0]['rows'] = 15;
+        $(this).addClass("large_modal_textarea");
       });
 
       mod.on('focusout', '#id_note', function () {
-        $(this).width('186px');
-        $(this)[0]['rows'] = 5;
+        $(this).removeClass("large_modal_textarea");
       });
     });
 
