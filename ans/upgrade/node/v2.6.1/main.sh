@@ -25,6 +25,9 @@ if [[ "${BOOTED_FROM_HDD}" -eq 1 ]]; then
 # in order to support network/physical configuration from usbkey/config.
 
 > /etc/dladm/datalink.conf
+> /etc/dladm/flowadm.conf
+> /etc/dladm/flowprop.conf
+> /etc/ipadm/ipadm.conf
 EOF
 	chmod +x /lib/svc/method/net-cleanup
 
