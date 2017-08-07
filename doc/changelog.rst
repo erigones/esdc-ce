@@ -14,6 +14,7 @@ Features
 Bugs
 ----
 
+- Disabled locale switching when editing other user's settings - `#224 <https://github.com/erigones/esdc-ce/issues/224>`__
 - Disabled form submit when pressing Enter in Add Ticket form - `#220 <https://github.com/erigones/esdc-ce/issues/220>`__
 - Fixed critical problem with Detach button calling the Delete action - `#219 <https://github.com/erigones/esdc-ce/issues/219>`__
 - Fixed single element representation in array fields - `#216 <https://github.com/erigones/esdc-ce/issues/216>`__
