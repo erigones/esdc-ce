@@ -42,11 +42,11 @@ class DcSwitch(forms.Form):
         ref = self.request.POST.get('referrer', None)
 
         if ref and (ref.startswith('/node') or ref.startswith('/dc') or ref.startswith('/tasklog')):
-
-            if ref.startswith(reverse('dc_domain_record_list')):
-                return reverse('dc_domain_list')
-
             if self.request.user.is_admin(self.request, dc=self.request.user.current_dc):
-                return ref
+
+                if ref.startswith(reverse('dc_domain_record_list')):
+                    return reverse('dc_domain_list')
+                else:
+                    return ref
 
         return None
