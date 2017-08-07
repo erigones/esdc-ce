@@ -43,7 +43,7 @@ class DcSwitch(forms.Form):
 
         if ref and (ref.startswith('/node') or ref.startswith('/dc') or ref.startswith('/tasklog')):
             if self.request.user.is_admin(self.request, dc=self.request.user.current_dc):
-
+                # Switching Datacenter in DNS record list causes 403: https://github.com/erigones/esdc-ce/issues/143
                 if ref.startswith(reverse('dc_domain_record_list')):
                     return reverse('dc_domain_list')
                 else:
