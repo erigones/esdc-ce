@@ -10,6 +10,8 @@ Features
 Bugs
 ----
 
+- Fixed behaviour after user permission change that leads to change of user's current DC - `#108 <https://github.com/erigones/esdc-ce/issues/108>`__
+
 
 2.6.1 (released on 2017-08-07)
 ==============================
@@ -30,7 +32,6 @@ Bugs
 - Fixed single element representation in array fields - `#216 <https://github.com/erigones/esdc-ce/issues/216>`__
 - Fixed rendering of long-term graphs in GUI - `#209 <https://github.com/erigones/esdc-ce/issues/209>`__
 - Fixed memory leak on nodes by removing librabbitmq package and using pyamqp instead - `#207 <https://github.com/erigones/esdc-ce/issues/207>`__
-- Fixed behaviour after user permission change that leads to change of user's current DC - `#108 <https://github.com/erigones/esdc-ce/issues/108>`__
 - Fixed 403 Forbidden message when switching datacenter in DNS domain records - `#143 <https://github.com/erigones/esdc-ce/issues/143>`__
 
 
