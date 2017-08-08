@@ -4,7 +4,7 @@ from blinker import signal
 from gevent import sleep
 
 from que.erigonesd import cq
-from que.utils import task_prefix_from_task_id
+from que.utils import user_owner_dc_ids_from_task_id
 from gui.models import User
 from api.exceptions import OPERATIONAL_ERRORS
 
@@ -27,9 +27,9 @@ def que_monitor(app, _info=print, _debug=print):
 
     def _announce_task(event, event_status):
         task_id = event['uuid']
-        task_prefix = task_prefix_from_task_id(task_id)
+        user_id, owner_id, dc_id = user_owner_dc_ids_from_task_id(task_id)
 
-        if task_prefix[2] == internal_id:  # owner_id
+        if owner_id == internal_id:
             return  # probably beat task
 
         if event.get('queue', None) == 'mgmt':
@@ -37,13 +37,13 @@ def que_monitor(app, _info=print, _debug=print):
 
         if event.get('direct', None):
             # Send signal to ObjectOwner only
-            users = (int(task_prefix[2]),)  # ObjectOwner
+            users = (int(owner_id),)
         else:
             # Send signal to all affected users
             users = User.get_super_admin_ids()  # SuperAdmins
-            users.update(User.get_dc_admin_ids(dc_id=task_prefix[4]))  # DcAdmins
-            users.add(int(task_prefix[0]))  # TaskCreator
-            users.add(int(task_prefix[2]))  # ObjectOwner
+            users.update(User.get_dc_admin_ids(dc_id=dc_id))  # DcAdmins
+            users.add(int(user_id))  # TaskCreator
+            users.add(int(owner_id))  # ObjectOwner
 
         debug('Sending signal for %s task %s to %s', event_status, task_id, users)
 
