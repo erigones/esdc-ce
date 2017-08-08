@@ -1,6 +1,7 @@
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import messages
+from django.core.urlresolvers import reverse
 from logging import getLogger
 
 from api.dc.utils import get_dc, get_dcs
@@ -42,6 +43,10 @@ class DcSwitch(forms.Form):
 
         if ref and (ref.startswith('/node') or ref.startswith('/dc') or ref.startswith('/tasklog')):
             if self.request.user.is_admin(self.request, dc=self.request.user.current_dc):
-                return ref
+                # Switching Datacenter in DNS record list causes 403: https://github.com/erigones/esdc-ce/issues/143
+                if ref.startswith(reverse('dc_domain_record_list')):
+                    return reverse('dc_domain_list')
+                else:
+                    return ref
 
         return None

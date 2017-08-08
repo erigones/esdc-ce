@@ -96,6 +96,12 @@ table.box {
   &.table-striped tbody tr:nth-child(odd) td, &.table-striped tbody tr:nth-child(odd) th {
     background: #FDFDFD;
   }
+
+  &.break-words {
+    word-wrap: break-word;
+    word-break: break-all;
+  }
+
   &.table-striped tbody {
 	tr.info td {
 	  background-color: #d9edf7;

@@ -98,7 +98,10 @@ class UserProfileSerializer(InstanceSerializer):
             send_sms(profile.phone, msg)
 
         profile.save()
-        profile.activate_locale(self.request)
+
+        # We cannot change active language settings for other user than ourself
+        if self.request.user == profile.user:
+            profile.activate_locale(self.request)
 
     def validate_phone(self, attrs, source):
         try:
