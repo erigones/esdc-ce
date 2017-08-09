@@ -4,6 +4,8 @@ Changelog
 2.6.2 (unreleased)
 ==================
 
+- Corrected version list handling during node upgrade - `#229 <https://github.com/erigones/esdc-ce/pull/229`__
+
 Features
 --------
 
