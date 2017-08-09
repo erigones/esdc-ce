@@ -20,7 +20,7 @@ Features
 Bugs
 ----
 
-- Corrected version list handling during node upgrade - `#229 <https://github.com/erigones/esdc-ce/pull/229`__
+- Corrected version list handling during node upgrade - `#229 <https://github.com/erigones/esdc-ce/pull/229>`__
 
 
 2.6.1 (released on 2017-08-07)
