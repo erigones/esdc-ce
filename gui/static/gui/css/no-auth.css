@@ -63,23 +63,23 @@ body.no-auth div.container {
   }
 }
 @media (min-width: 980px) and (max-width: 1199px) {
-  /* line 234, ../scss/mixins.scss */
+  /* line 225, ../scss/mixins.scss */
   body.no-auth div.container {
     width: 940px;
   }
 
-  /* line 237, ../scss/mixins.scss */
+  /* line 228, ../scss/mixins.scss */
   .no-auth-content {
     margin-left: 320px;
   }
 }
 @media (min-width: 748px) and (max-width: 979px) {
-  /* line 234, ../scss/mixins.scss */
+  /* line 225, ../scss/mixins.scss */
   body.no-auth div.container {
     width: 724px;
   }
 
-  /* line 237, ../scss/mixins.scss */
+  /* line 228, ../scss/mixins.scss */
   .no-auth-content {
     margin-left: 212px;
   }

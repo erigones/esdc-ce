@@ -722,7 +722,7 @@ function _task_event_callback(result) {
       break;
 
     case 'user_current_dc_changed':
-      alert2(gettext('Your current datacenter was changed. Please refresh your browser.'));
+      alert2(gettext('Your current datacenter was changed. Please log out and log in again or <a class="btn-link" href="/">navigate to the default page</a>.'));
       break;
 
     default: // send notification
