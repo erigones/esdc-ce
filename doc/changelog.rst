@@ -1,6 +1,18 @@
 Changelog
 #########
 
+2.6.3 (not released yet)
+==============================
+
+Features
+--------
+
+Bugs
+----
+
+- Fixed SMSAPI return response status code 200 but text of the response is ERROR - `#230 <https://github.com/erigones/esdc-ce/issues/230>`__
+
+
 2.6.2 (released on 2017-08-09)
 ==============================
 
