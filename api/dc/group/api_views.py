@@ -55,11 +55,12 @@ class DcGroupView(APIView):
         for user in self.role.user_set.filter(dc_bound__isnull=False).exclude(dc_bound=self.dc):
             remove_user_dc_binding(task_id, user)
 
-    def _update_affected_users(self):
+    def _update_affected_users(self, detach=False):
         # DC groups have changed -> invalidate the list of admins for this DC
         User.clear_dc_admin_ids(self.dc)
         # DC groups have changed on a non-default DC -> update the current_dc on every affected user
-        if not self.dc.is_default():
+        # This is only required when the group is being removed from a DC and does not make sense when attaching
+        if detach and not self.dc.is_default():
             default_dc = DefaultDc()
 
             for user in self.role.user_set.select_related('default_dc').filter(default_dc=self.dc)\
@@ -96,6 +97,6 @@ class DcGroupView(APIView):
         connection.on_commit(lambda: group_relationship_changed.send(group_name=group.name, dc_name=dc.name))
         res = SuccessTaskResponse(self.request, None, obj=group, detail_dict=ser.detail_dict(), msg=LOG_GROUP_DETACH)
         self._remove_dc_binding(res)
-        self._update_affected_users()
+        self._update_affected_users(detach=True)
 
         return res
