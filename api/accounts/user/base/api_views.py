@@ -104,7 +104,7 @@ class UserView(APIView):
 
             # User was removed from some groups and may loose access to DCs which are attached to this group
             # So we better set his current_dc to default_dc
-            if ser.old_roles:
+            if ser.old_roles and not user.is_staff:
                 user.current_dc = DefaultDc()
 
         connection.on_commit(lambda: user_relationship_changed.send(user_name=ser.object.username,

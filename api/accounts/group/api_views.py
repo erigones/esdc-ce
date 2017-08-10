@@ -57,7 +57,7 @@ class GroupView(APIView):
         if update:
             # We are deleting users that are not assigned to group any more, so we have to store all of them before
             # deleting because we have to update task log for user so he can see he was removed from group
-            original_group_users = set(group.user_set.select_related('dc_bound').all())
+            original_group_users = set(group.user_set.select_related('dc_bound', 'default_dc').all())
         else:
             group.alias = group.name  # just a default
             original_group_users = set()
@@ -123,7 +123,8 @@ class GroupView(APIView):
             if removed_users:
                 default_dc = DefaultDc()
                 for user in removed_users:
-                    user.current_dc = default_dc
+                    if not user.is_staff:
+                        user.current_dc = default_dc
 
         return res
 
@@ -146,4 +147,3 @@ class GroupView(APIView):
         connection.on_commit(lambda: group_relationship_changed.send(group_name=group.name))
 
         return SuccessTaskResponse(self.request, None, obj=group, msg=LOG_GROUP_DELETE, detail_dict=dd, dc_bound=False)
-
