@@ -166,7 +166,8 @@ class DcView(APIView):
                 ser.owner_changed.current_dc = default_dc
 
             if ser.removed_users:
-                ser.removed_users.exclude(is_staff=True).update(default_dc=default_dc)
+                for user in ser.removed_users.select_related('default_dc').exclude(is_staff=True):
+                    user.current_dc = default_dc
 
         return res
 
