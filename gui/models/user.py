@@ -191,9 +191,6 @@ class User(AbstractBaseUser, PermissionsMixin, _AclMixin, _DcBoundMixin):
             self.save(update_fields=('default_dc',))
             # Send direct event to the user working in the old DC
             UserCurrentDcChanged(self.id, dc_id=old_current_dc_id).send()
-            return True
-
-        return False
 
     def reset_current_dc(self):
         from vms.models import DefaultDc  # Circular imports
