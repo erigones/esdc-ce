@@ -50,12 +50,12 @@ def login_data():
 def _smsapi_response_adapter(response):
     """
     Adapter to correct response code if there is error with the SMS.
-    SMSAPI return response status code 200 but text of the response is ERROR #230
+    SMSAPI returns response status code 200 but text of the response is ERROR #230
     """
     if response.status_code == requests.codes.ok and response.text.startswith('ERROR'):
         new_status_code = 406
-        logger.warning('Response got status code %s and contain "%s". Updating status code to %s!',
-                       response.status_code, response.text, new_status_code)
+        logger.warning('SMSAPI response got status code %s and contains "%s". Updating SMSAPI response status code to '
+                       '%s!', response.status_code, response.text, new_status_code)
         response.status_code = new_status_code
 
     return response
