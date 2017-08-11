@@ -154,7 +154,7 @@ class DcView(APIView):
             User.clear_dc_admin_ids(dc)
             # Remove user.dc_bound flag for new DC owner
             # Remove user.dc_bound flag for users in new dc.groups, which are DC-bound, but not to this datacenter
-            self._remove_user_dc_binding(task_id, owner=ser.owner_changed, groups=ser.groups_added)
+            self._remove_user_dc_binding(task_id, owner=dc.owner, groups=ser.groups_added)
 
         # When a user is removed as owner from non-default DC or groups are changed on a non-default DC
         # we have to update the current_dc on every affected user, because he could remain access to this DC
