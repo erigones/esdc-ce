@@ -469,22 +469,29 @@ function enter_click(e) {
   }
 }
 
-function activate_modal_ux(mod, mod_form, mod_confirm_btn) {
+function disable_modal_form_enter(mod) {
   mod.off('keypress');
+}
+
+function enable_modal_form_enter(mod, mod_confirm_btn) {
+  if (!mod_confirm_btn) {
+    mod_confirm_btn = mod.find('a[data-enter="true"]:visible:last');
+  }
+
+  if ((mod_confirm_btn.length === 1) && !mod_confirm_btn.hasClass('disabled') && mod_confirm_btn.is(':visible')) {
+    mod.on('keypress', {btn_enter: mod_confirm_btn}, enter_click);
+  }
+}
+
+function activate_modal_ux(mod, mod_form, mod_confirm_btn) {
+  disable_modal_form_enter(mod);
 
   mod.one('shown.bs.modal', function() {
     if (mod_form.length) {
       mod_form.find(':input:enabled:visible:first').focus();
     }
 
-    if (!mod_confirm_btn) {
-      mod_confirm_btn = mod.find('a[data-enter="true"]:visible:last');
-    }
-
-    if ((mod_confirm_btn.length === 1) && !mod_confirm_btn.hasClass('disabled') && mod_confirm_btn.is(':visible')) {
-      mod.on('keypress', {btn_enter: mod_confirm_btn}, enter_click);
-    }
-
+    enable_modal_form_enter(mod, mod_confirm_btn);
     return false;
   });
 }

@@ -11,5 +11,5 @@ redis==2.10.5
 pytz==2017.2
 simplejson==3.11.1
 frozendict==1.2
-requests==2.18.2
+requests==2.18.3
 esdc-api==2.0.1

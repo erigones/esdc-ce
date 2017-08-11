@@ -28,6 +28,7 @@ xmltodict==0.11.0
 python-dateutil==2.6.0
 django-taggit==0.22.1
 django-celery==3.1.17
+idna==2.5
 cryptography==1.5.3
 netifaces==0.10.6
 dictdiffer==0.6.1
@@ -43,3 +44,4 @@ django-timezone-field==2.0
 blinker==1.4
 lxml==3.6.4
 openpyxl==2.3.5
+Markdown==2.6.8

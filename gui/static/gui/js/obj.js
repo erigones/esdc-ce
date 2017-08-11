@@ -194,6 +194,12 @@ function obj_form_modal(btn, mod_selector, init, handler) {
 
     handler = function(e) {
       var action_btn = $(this);
+
+      // Protection against accidental context (this) changes - Issue #219
+      if (!action_btn.length || !action_btn.hasClass('button')) {
+        $.error('Invalid button');
+      }
+
       if (action_btn.hasClass('disabled')) {
         return false;
       }
@@ -269,12 +275,14 @@ function obj_form_modal(btn, mod_selector, init, handler) {
   });
 
   var delete_handler = function(e) {
+    var that = this;
+
     if ($(this).data('confirm')) {
       return confirm2(gettext('Are you sure you want to delete this?'), function() {
-        return handler(e);
+        return handler.call(that, e);
       });
     } else {
-      return handler(e);
+      return handler.call(that, e);
     }
   };
 

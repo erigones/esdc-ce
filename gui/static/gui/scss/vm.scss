@@ -98,6 +98,7 @@ td.vm_admin {
 
 .vm_hostname {
   font-size: 11px;
+  word-wrap: break-word;
 }
 
 .visible-bigscreen {
@@ -809,4 +810,32 @@ div.vm_node_color {
   height: 18px;
   border-radius: 50%;
   border: 1px solid #999;
+}
+
+.markdown {
+  ol, ul {
+    margin: 0 0 10px 25px;
+  }
+
+  ul {
+    list-style-type: disc;
+
+    ol {
+      list-style-type: decimal;
+    }
+    ul {
+      list-style-type: circle;
+    }
+  }
+
+  ol {
+    list-style-type: decimal;
+
+    ol {
+      list-style-type: upper-roman;
+    }
+    ul {
+      list-style-type: circle;
+    }
+  }
 }

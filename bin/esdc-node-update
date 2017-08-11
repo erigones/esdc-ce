@@ -53,7 +53,7 @@ fi
 
 set +e
 
-for version in "${RUN_VERSIONS}"; do
+for version in ${RUN_VERSIONS}; do
 	update_script="${UPG_DIR}/${version}/main.sh"
 
 	if [[ ! -x "${update_script}" ]]; then
