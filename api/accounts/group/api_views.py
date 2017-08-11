@@ -12,7 +12,6 @@ from api.task.utils import task_log_success
 from api.dc.utils import attach_dc_virt_object
 from api.dc.messages import LOG_GROUP_ATTACH
 from gui.models import User, Role
-from vms.models import DefaultDc
 
 
 class GroupView(APIView):
@@ -121,10 +120,9 @@ class GroupView(APIView):
             # Users were removed from this group and may loose access to DCs which are attached to this group
             # So we better set all users current_dc to default_dc
             if removed_users:
-                default_dc = DefaultDc()
                 for user in removed_users:
                     if not user.is_staff:
-                        user.current_dc = default_dc
+                        user.reset_current_dc()
 
         return res
 

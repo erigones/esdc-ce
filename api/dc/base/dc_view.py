@@ -160,14 +160,12 @@ class DcView(APIView):
         # we have to update the current_dc on every affected user, because he could remain access to this DC
         # (this is because get_dc() uses current_dc as a shortcut)
         if not dc.is_default():
-            default_dc = DefaultDc()
-
             if ser.owner_changed and not ser.owner_changed.is_staff:
-                ser.owner_changed.current_dc = default_dc
+                ser.owner_changed.reset_current_dc()
 
             if ser.removed_users:
                 for user in ser.removed_users.select_related('default_dc').exclude(is_staff=True):
-                    user.current_dc = default_dc
+                    user.reset_current_dc()
 
         return res
 

@@ -12,7 +12,6 @@ from api.accounts.messages import LOG_GROUP_UPDATE
 from api.dc.messages import LOG_GROUP_ATTACH, LOG_GROUP_DETACH
 from api.task.response import SuccessTaskResponse
 from gui.models import User, Role
-from vms.models import DefaultDc
 
 
 class DcGroupView(APIView):
@@ -61,11 +60,9 @@ class DcGroupView(APIView):
         # DC groups have changed on a non-default DC -> update the current_dc on every affected user
         # This is only required when the group is being removed from a DC and does not make sense when attaching
         if detach and not self.dc.is_default():
-            default_dc = DefaultDc()
-
             for user in self.role.user_set.select_related('default_dc').filter(default_dc=self.dc)\
                                                                        .exclude(is_staff=True):
-                user.current_dc = default_dc
+                user.reset_current_dc()
 
     def post(self):
         dc, group = self.dc, self.role
