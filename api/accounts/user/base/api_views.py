@@ -13,7 +13,7 @@ from api.accounts.user.utils import get_user, get_users
 from api.accounts.messages import LOG_USER_CREATE, LOG_USER_UPDATE, LOG_USER_DELETE
 from api.task.response import SuccessTaskResponse, FailureTaskResponse
 from gui.models import User, AdminPermission
-from vms.models import Dc, DefaultDc
+from vms.models import Dc
 
 
 class UserView(APIView):
@@ -104,8 +104,8 @@ class UserView(APIView):
 
             # User was removed from some groups and may loose access to DCs which are attached to this group
             # So we better set his current_dc to default_dc
-            if ser.old_roles:
-                user.current_dc = DefaultDc()
+            if ser.old_roles and not user.is_staff:
+                user.reset_current_dc()
 
         connection.on_commit(lambda: user_relationship_changed.send(user_name=ser.object.username,
                                                                     affected_groups=tuple(
