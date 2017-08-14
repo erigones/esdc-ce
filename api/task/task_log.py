@@ -53,18 +53,15 @@ class TaskLogView(APIView):
         }
 
     def get_stats(self):
+        """api.task.views.task_log_stats"""
         try:
             last = int(self.data.get('last', 86400))
             startime = timezone.now() - timedelta(seconds=last)
-        except:
+        except Exception:  # This also catches the OverflowError raised during startime calculation
             raise InvalidInput('Invalid "last" parameter')
 
         qs = get_tasklog(self.request, sr=(), time__gte=startime)
         res = self._get_stats_result(qs)
         res['_last'] = last
 
-        return res
-
-    def get_stats_response(self):
-        """api.task.views.task_log_stats"""
-        return TaskSuccessResponse(self.request, self.get_stats())
+        return TaskSuccessResponse(self.request, res)
