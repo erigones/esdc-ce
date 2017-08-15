@@ -58,15 +58,6 @@ $experimental-support-for-svg: true;
 
   color: #fff;
   @include text-shadow-bottom(#000);
-
-  .separator a {
-    color: #fff;
-    @include text-shadow-bottom(#000);
-    font-weight: bold;
-    &:hover {
-      color: #fff;
-    }
-  }
 }
 
 // ********************

@@ -1,20 +1,55 @@
 Changelog
 #########
 
-2.6.1 (unreleased)
+
+2.6.3 (unreleased)
 ==================
+
+Features
+--------
+
+- Renamed ``GET /task/log/report`` to ``GET /task/log/stats`` to be consistent with future *stats* views - `#232 <https://github.com/erigones/esdc-ce/issues/232>`__
+
+Bugs
+----
+
+- Fixed behaviour after user permission change that leads to change of user's current DC - `#108 <https://github.com/erigones/esdc-ce/issues/108>`__
+- Fixed SMSAPI return response status code 200 but text of the response is ERROR - `#230 <https://github.com/erigones/esdc-ce/issues/230>`__
+
+
+2.6.2 (released on 2017-08-09)
+==============================
+
+Features
+--------
+
+Bugs
+----
+
+- Corrected version list handling during node upgrade - `#229 <https://github.com/erigones/esdc-ce/pull/229>`__
+
+
+2.6.1 (released on 2017-08-07)
+==============================
 
 Features
 --------
 
 - Updated DC-bound form field to be unchecked by default when SuperAdmin creates a new virt object - `#206 <https://github.com/erigones/esdc-ce/issues/206>`__
 - Disabled GSSAPIAuthentication for every SSH operation - `#212 <https://github.com/erigones/esdc-ce/issues/212>`__
+- Added support for markdown in vm and node notes field - `#214 <https://github.com/erigones/esdc-ce/issues/214>`__
 
 Bugs
 ----
 
+- Disabled locale switching when editing other user's settings - `#224 <https://github.com/erigones/esdc-ce/issues/224>`__
+- Disabled form submit when pressing Enter in Add Ticket form - `#220 <https://github.com/erigones/esdc-ce/issues/220>`__
+- Fixed critical problem with Detach button calling the Delete action - `#219 <https://github.com/erigones/esdc-ce/issues/219>`__
+- Fixed single element representation in array fields - `#216 <https://github.com/erigones/esdc-ce/issues/216>`__
 - Fixed rendering of long-term graphs in GUI - `#209 <https://github.com/erigones/esdc-ce/issues/209>`__
 - Fixed memory leak on nodes by removing librabbitmq package and using pyamqp instead - `#207 <https://github.com/erigones/esdc-ce/issues/207>`__
+- Fixed 403 Forbidden message when switching datacenter in DNS domain records - `#143 <https://github.com/erigones/esdc-ce/issues/143>`__
+
 
 2.6.0 (released on 2017-07-21)
 ==============================

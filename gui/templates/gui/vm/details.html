@@ -275,7 +275,7 @@
         </div>
 
         <form>
-          <table class="table box table-striped form">
+          <table class="table box table-striped form break-words">
             <tbody>
             <tr>
               <td>{% trans "Name" %}:</td>
@@ -370,7 +370,7 @@
             <tr>
               <td>{% trans "Note" %}:</td>
               <td>
-                  <span class="vm_hostname">{{ vm.note }}</span>
+                  <div class="markdown">{{ vm.note|markdownify }}</div>
               </td>
             </tr>
             </tbody>

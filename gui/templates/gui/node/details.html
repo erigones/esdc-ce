@@ -48,7 +48,7 @@
         <i class="icon-sitemap"></i> {{ node.hostname }} &rsaquo; {% trans "details" %}
       </div>
 
-      <form><table class="table box table-striped form">
+      <form><table class="table box table-striped form break-words">
         <tbody>
           <tr>
             <td>{% trans "Hostname" %}:</td>
@@ -156,7 +156,7 @@
           <tr>
             <td>{% trans "Note" %}:</td>
             <td>
-                <span class="vm_hostname">{{ node.note }}</span>
+                <div class="markdown">{{ node.note|markdownify }}</div>
             </td>
           </tr>
 
