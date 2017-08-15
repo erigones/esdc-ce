@@ -162,3 +162,30 @@
                 ]
             }
         }
+
+
+/task/log/stats
+---------------
+
+.. autofunction:: api.task.views.task_log_stats
+
+    |es example|:
+
+    .. sourcecode:: bash
+
+        es get /task/log/stats
+
+    .. sourcecode:: json
+
+        {
+            "url": "https://my.erigones.com/api/task/log/stats/",
+            "status": 200,
+            "method": "GET",
+            "text": {
+                "failed": 0,
+                "pending": 7722,
+                "succeeded": 7738,
+                "revoked": 0,
+                "_last": 86400
+            }
+        }

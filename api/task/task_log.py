@@ -1,6 +1,8 @@
 from datetime import timedelta
 
+from celery import states
 from django.utils import timezone
+from django.db.models import Count
 
 from api import status
 from api.api_views import APIView
@@ -9,7 +11,7 @@ from api.exceptions import InvalidInput
 from api.task.response import TaskSuccessResponse, SimpleTaskResponse
 from api.task.log import get_tasklog, get_tasklog_cached
 from api.task.utils import get_user_tasks
-from api.task.serializers import TaskLogEntrySerializer, TaskLogFilterSerializer, TaskLogReportSerializer
+from api.task.serializers import TaskLogEntrySerializer, TaskLogFilterSerializer
 from vms.models import TaskLogEntry
 
 
@@ -38,14 +40,28 @@ class TaskLogView(APIView):
 
         return TaskSuccessResponse(request, res)
 
-    def report(self):
-        """api.task.views.task_log_report"""
+    @staticmethod
+    def _get_stats_result(basequery):
+        def get_count(state):
+            return basequery.filter(status=state).aggregate(count=Count('id')).get('count', 0)
+
+        return {
+            'pending': get_count(states.PENDING),
+            'revoked': get_count(states.REVOKED),
+            'succeeded': get_count(states.SUCCESS),
+            'failed': get_count(states.FAILURE),
+        }
+
+    def get_stats(self):
+        """api.task.views.task_log_stats"""
         try:
-            startime = timezone.now() - timedelta(seconds=int(self.data.get('last', 86400)))
-        except:
+            last = int(self.data.get('last', 86400))
+            startime = timezone.now() - timedelta(seconds=last)
+        except Exception:  # This also catches the OverflowError raised during startime calculation
             raise InvalidInput('Invalid "last" parameter')
 
         qs = get_tasklog(self.request, sr=(), time__gte=startime)
-        report = TaskLogReportSerializer.get_report(qs)
+        res = self._get_stats_result(qs)
+        res['_last'] = last
 
-        return TaskSuccessResponse(self.request, TaskLogReportSerializer(report).data)
+        return TaskSuccessResponse(self.request, res)
