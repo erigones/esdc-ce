@@ -1,12 +1,14 @@
 {% extends "base_no_auth.html" %}
 {% load i18n %}
 
+{% block body_class %} onload="document.getElementById('submitForm').submit();"{% endblock %}
+
 {% block login_content %}{% if validlink %}
-<form class="form-horizontal"  action="" method="POST">
+<form class="form-horizontal" id="submitForm" action="" method="POST">
   {% csrf_token %}
   <div class="no-auth-message black-box inner-well">
     <h4>{% trans "Password reset" %}</h4>
-    <p>{% trans "Your new password will be send as text message to your phone number." %}</p>
+    <p>{% trans "Your new password will be send as a text message (SMS) to your phone number." %}</p>
   </div>
   <button type="submit" class="no-auth-button">{% trans "Reset my password" %}</button>
 </form>
