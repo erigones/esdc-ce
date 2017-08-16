@@ -4,13 +4,13 @@
 {% block head %}
 <script type="text/javascript">
 $(document).ready(function(){
-   $("form#submitForm").submit();
+   $('#password-reset').submit();
 });
 </script>
 {% endblock %}
 
 {% block login_content %}{% if validlink %}
-<form class="form-horizontal" id="submitForm" action="" method="POST">
+<form class="form-horizontal" id="password-reset" action="" method="POST">
   {% csrf_token %}
   <div class="no-auth-message black-box inner-well">
     <h4>{% trans "Password reset" %}</h4>
