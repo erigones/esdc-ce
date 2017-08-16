@@ -9,6 +9,7 @@ Features
 --------
 
 - Renamed ``GET /task/log/report`` to ``GET /task/log/stats`` to be consistent with future *stats* views - `#232 <https://github.com/erigones/esdc-ce/issues/232>`__
+- Simplified registration and password reset - `#225 <https://github.com/erigones/esdc-ce/issues/225>`__
 
 Bugs
 ----

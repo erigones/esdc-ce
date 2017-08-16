@@ -79,14 +79,13 @@ class ForgotForm(_PasswordResetForm):
             'placeholder': _('Your email address'),
             'required': 'required'
         }
-        self.fields['email'].help_text = _('You will receive a validation email with instruction on how to reset your '
-                                           'password.')
+        self.fields['email'].help_text = _('You will receive an email with instructions on how to reset your password.')
 
     # noinspection PyArgumentList,PyUnusedLocal
     def clean_email(self, *args, **kwargs):
         """
-        We never raise an ValidationError, because of bug #chili-295 -
-        user Enumeration and Guessable User Account OWASP-AT-002.
+        We never raise an ValidationError, because user Enumeration and Guessable User Account OWASP-AT-002.
+        Change this behaviour with settings.SECURITY_OWASP_AT_002.
         """
         email = self.cleaned_data['email']
         users = User.objects.filter(email__iexact=email, is_active=True).exclude(password=UNUSABLE_PASSWORD)
@@ -167,7 +166,7 @@ class RegisterForm(forms.ModelForm):
     User details registration form, for basic user data (Django users table)
     """
     validate_against_users = True
-    email_help_text = _('You will receive a validation email to activate your account.')
+    email_help_text = _('You will receive an email to activate your account.')
 
     class Meta:
         model = User
@@ -218,8 +217,7 @@ class UserProfileRegisterForm(forms.ModelForm):
     include_company = False
     include_tos = bool(settings.TOS_LINK)
     include_others = True
-    phone_help_text = _('You will receive a text message with an auto-generated password which you can change after '
-                        'login.')
+    phone_help_text = _('You will receive a text message (SMS) with password.')
 
     class Meta:
         model = UserProfile
