@@ -21,5 +21,7 @@ if [[ -n "$1" ]]; then
 else
 	echo '[]'
 fi
+echo "||||"
+(nictagadm list -i -d'|')
 
 exit 0

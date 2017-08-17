@@ -320,6 +320,14 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
         self.save(update_resources=False, update_fields=('enc_json', 'changed'))
 
     @property
+    def nictags(self):
+        return self.json.get('nictags', None)
+
+    @nictags.setter
+    def nictags(self, value):
+        self.save_item('nictags', value, save=False)
+
+    @property
     def lifetime(self):
         return int(timezone.now().strftime('%s')) - int(self.created.strftime('%s'))
 
@@ -419,6 +427,7 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
         """Get useful information from sysinfo"""
         self.config = esysinfo.pop('config', '')
         self.sshkey = esysinfo.pop('sshkey', '')
+        self.nictags = esysinfo.pop('nictags', '')
         self.esysinfo = esysinfo
         sysinfo = self._sysinfo
         self.hostname = sysinfo['Hostname']

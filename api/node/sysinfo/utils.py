@@ -78,6 +78,7 @@ def parse_esysinfo(stdout):
     zpools = {}
     config = x[6].strip()
     sshkey = x[7].strip()
+    nictags = []
 
     # noinspection PyBroadException
     try:
@@ -104,6 +105,11 @@ def parse_esysinfo(stdout):
             pool, data = _parse_zpool_status(i)
             zpools[pool]['config'] = data
 
+    if x[9].strip():
+        for i in x[9].strip().splitlines():
+            name, mac, link, typ = map(lambda x: None if x == '-' else x, map(str.strip, i.split('|')))
+            nictags.append({'name': name, 'mac': mac, 'link':link, 'type': typ})
+
     return {
         'sysinfo': sysinfo,
         'diskinfo': diskinfo,
@@ -112,4 +118,5 @@ def parse_esysinfo(stdout):
         'sshkey': sshkey,
         'img_sources': img_sources,
         'img_initial': img_initial,
+        'nictags': nictags,
     }
