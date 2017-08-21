@@ -56,8 +56,9 @@ def registration_done(request):
         'header': _('Registration almost complete!'),
         'blocks': (
             (_('Thank you for registering at %s.') % request.dc.settings.SITE_NAME),
-            _('A verification email has been send to your email address. Please click on the link in the email to '
-              'activate your account.'),
+            _('You should receive an email shortly. Please click on the link in the email to activate your account.'),
+            _('If you don\'t receive an email, please check your spam folder.'),
+            _('Once your account is active, you will receive a text message (SMS) with your password.')
         )
     }
     return render(request, 'gui/note.html', context)
@@ -196,7 +197,7 @@ def forgot_passwd_check_done(request):
     context = {
         'header': _('Password reset!'),
         'blocks': (
-            _('Your password has been reset and send to your phone number via text message.'),
+            _('Your password has been reset and send to your phone number via text message (SMS).'),
         ),
         'links': (
             {'label': 'You may go ahead and log in now.', 'url': reverse('login')},

@@ -1,15 +1,26 @@
 Changelog
 #########
 
-
-2.6.3 (unreleased)
+2.6.4 (unreleased)
 ==================
 
 Features
 --------
 
+Bugs
+----
+
+
+2.6.3 (released on 2017-08-21)
+==============================
+
+Features
+--------
+
+- Added homepage links to images in image lists - `#239 <https://github.com/erigones/esdc-ce/issues/239>`__
 - Renamed ``GET /task/log/report`` to ``GET /task/log/stats`` to be consistent with future *stats* views - `#232 <https://github.com/erigones/esdc-ce/issues/232>`__
 - Added ``GET /system/stats`` API function - `#233 <https://github.com/erigones/esdc-ce/issues/233>`__
+- Simplified registration and password reset - `#225 <https://github.com/erigones/esdc-ce/issues/225>`__
 
 Bugs
 ----

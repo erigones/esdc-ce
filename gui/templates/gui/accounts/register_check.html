@@ -8,12 +8,13 @@
   <h4>{% trans "Registration complete!" %}</h4>
   <br>
   <p>{% blocktrans %}Welcome to {{ site_name }}!{% endblocktrans %}</p>
-  <p>{% blocktrans with phone=profile.phone %}Your password has been sent to your phone number {{ phone }} as text message.{% endblocktrans %} <a href="{% url 'login' %}" class="btn-link">{% trans "You may go ahead and log in now." %}</a></p>
+  <p>{% blocktrans with phone=profile.phone %}Your password has been sent to your phone number {{ phone }} as text message (SMS).{% endblocktrans %}</p>
+  <p><a href="{% url 'login' %}" class="btn-link">{% trans "You may go ahead and log in now." %}</a></p>
   {% else %}
   <h4>{% trans "Registration problem :(" %}</h4>
   <br>
   <p>{% blocktrans %}Welcome to {{ site_name }}!{% endblocktrans %}</p>
-  <p>{% blocktrans with phone=profile.phone %}There was an error while sending a text message with your new password to your phone number {{ phone }}. Please contact us at <b>{{ support_email }}</b>.{% endblocktrans %}
+  <p>{% blocktrans with phone=profile.phone %}There was an error while sending a text message (SMS) with your new password to your phone number {{ phone }}. Please contact us at <b>{{ support_email }}</b>.{% endblocktrans %}
   {% endif %}
   {% else  %}
   <h4>{% trans "Registration problem :(" %}</h4>
