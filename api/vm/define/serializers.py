@@ -1059,7 +1059,7 @@ class VmDefineNicSerializer(s.Serializer):
             except IPAddress.DoesNotExist:
                 raise APIError(detail='Unknown ip in NIC definition.')
 
-        allowed_ips = data.get('allowed_ips', [])
+        allowed_ips = data.get('allowed_ips', None)
 
         if allowed_ips is not None:
             self._ips = IPAddress.objects.filter(ip__in=allowed_ips, subnet=self._net)
