@@ -165,7 +165,7 @@ def vm_from_json(request, task_id, json, dc, owner=settings.ADMIN_USER, template
                 if i == 0:
                     primary_ip = ip
 
-                for ipaddress in nic.get('allowed_ips', ()):
+                for ipaddress in nic.get('allowed_ips', []):
                     _, err = _vm_save_ip_from_json(vm, net, ipaddress, allowed_ips=True)
 
                     if err:

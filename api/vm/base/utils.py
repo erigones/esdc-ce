@@ -92,7 +92,7 @@ def vm_update_ipaddress_usage(vm):
 
         if network_uuid:
             ip = nic.get('ip', '')
-            allowed_ips = nic.get('allowed_ips', ())
+            allowed_ips = nic.get('allowed_ips', [])
 
             if ip:
                 logger.debug('VM: %s | NIC ID: %s | NIC network: %s | IP address: %s', vm, nic_id, network_uuid, ip)
