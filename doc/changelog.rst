@@ -24,6 +24,7 @@ Features
 Bugs
 ----
 
+- Fixed allowed_ips type on all occurrences to list instead of set to enable JSON serialization - `#242 <https://github.com/erigones/esdc-ce/issues/242>`__
 - Fixed behaviour after user permission change that leads to change of user's current DC - `#108 <https://github.com/erigones/esdc-ce/issues/108>`__
 - Fixed SMSAPI return response status code 200 but text of the response is ERROR - `#230 <https://github.com/erigones/esdc-ce/issues/230>`__
 
