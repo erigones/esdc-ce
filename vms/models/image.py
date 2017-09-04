@@ -218,6 +218,10 @@ class Image(_VirtModel, _JsonPickleModel, _OSType, _DcMixin, _UserTasksModel):
     def max_platform(self):
         return self.requirements.get('max_platform', {}).get(settings.VMS_SDC_VERSION, None)
 
+    @property
+    def homepage(self):
+        return self.manifest_active.get('homepage', '')
+
     def build_manifest(self):
         """Create new manifest from DB fields"""
         manifest = dict(self._MANIFEST_TEMPLATE)
