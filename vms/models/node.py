@@ -23,7 +23,7 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
     """
     Node (host) object.
     """
-    _esysinfo = ('sysinfo', 'diskinfo', 'zpools')
+    _esysinfo = ('sysinfo', 'diskinfo', 'zpools', 'nictags')
     _vlan_id = None
 
     ZPOOL = 'zones'
@@ -178,7 +178,8 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
         return {
             'Network Interfaces': self.network_interfaces,
             'Virtual Network Interfaces': self.virtual_network_interfaces,
-            'Link Aggregations': self.network_aggregations
+            'Link Aggregations': self.network_aggregations,
+            'NIC Tags': self.nictags
         }
 
     @property
@@ -321,11 +322,7 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
 
     @property
     def nictags(self):
-        return self.json.get('nictags', None)
-
-    @nictags.setter
-    def nictags(self, value):
-        self.save_item('nictags', value, save=False)
+        return self.json.get('nictags', [])
 
     @property
     def lifetime(self):
@@ -427,7 +424,6 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
         """Get useful information from sysinfo"""
         self.config = esysinfo.pop('config', '')
         self.sshkey = esysinfo.pop('sshkey', '')
-        self.nictags = esysinfo.pop('nictags', '')
         self.esysinfo = esysinfo
         sysinfo = self._sysinfo
         self.hostname = sysinfo['Hostname']

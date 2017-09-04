@@ -105,10 +105,9 @@ def parse_esysinfo(stdout):
             pool, data = _parse_zpool_status(i)
             zpools[pool]['config'] = data
 
-    if x[9].strip():
-        for i in x[9].strip().splitlines():
-            name, mac, link, typ = map(lambda x: None if x == '-' else x, map(str.strip, i.split('|')))
-            nictags.append({'name': name, 'mac': mac, 'link':link, 'type': typ})
+    for i in x[9].strip().splitlines():
+        name, mac, link, typ = map(lambda x: None if x == '-' else x, map(str.strip, i.split('|')))
+        nictags.append({'name': name, 'mac': mac, 'link':link, 'type': typ})
 
     return {
         'sysinfo': sysinfo,
