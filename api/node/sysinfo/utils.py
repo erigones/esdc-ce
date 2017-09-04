@@ -72,6 +72,7 @@ def _parse_imgadm_sources(imgadm_sources):
 def parse_esysinfo(stdout):
     """Return dict of parsed esysinfo elements {sysinfo, diskinfo, zpools, config}"""
     x = stdout.split('||||')
+    num_intems = len(x)
     sysinfo = json.loads(x[0])
     img_sources = _parse_imgadm_sources(json.loads(x[1]))
     diskinfo = {}
@@ -105,9 +106,10 @@ def parse_esysinfo(stdout):
             pool, data = _parse_zpool_status(i)
             zpools[pool]['config'] = data
 
-    for i in x[9].strip().splitlines():
-        name, mac, link, typ = map(lambda x: None if x == '-' else x, map(str.strip, i.split('|')))
-        nictags.append({'name': name, 'mac': mac, 'link':link, 'type': typ})
+    if num_items >= 10:
+        for i in x[9].strip().splitlines():
+            name, mac, link, typ = map(lambda x: None if x == '-' else x, map(str.strip, str(i).split('|')))
+            nictags.append({'name': name, 'mac': mac, 'link':link, 'type': typ})
 
     return {
         'sysinfo': sysinfo,

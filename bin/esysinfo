@@ -22,6 +22,6 @@ else
 	echo '[]'
 fi
 echo "||||"
-(nictagadm list -i -d'|')
+(nictagadm list -p -d'|')
 
 exit 0
