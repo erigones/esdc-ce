@@ -7,6 +7,8 @@ Changelog
 Features
 --------
 
+- Added code to collect NIC tags via node_sysinfo API call - `#226 <https://github.com/erigones/esdc-ce/issues/226>`__
+
 Bugs
 ----
 
