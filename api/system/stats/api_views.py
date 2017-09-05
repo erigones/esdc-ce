@@ -13,12 +13,11 @@ class SystemStatsView(APIView):
     dc_bound = False
 
     @classmethod
-    def get_stats(cls, from_cache=True, cache_timeout=30):
-        if from_cache:
-            res = cache.get(cls._cache_key)
+    def get_stats(cls, cache_timeout=30):
+        res = cache.get(cls._cache_key)
 
-            if res:
-                return res
+        if res:
+            return res
 
         created = now()
         dcs = {force_text(label).lower(): Dc.objects.filter(access=access).count()
