@@ -17,6 +17,8 @@ from gui.models import User
 
 NODES_ALL_KEY = 'nodes_list'
 NODES_ALL_EXPIRES = 300
+NICTAGS_ALL_KEY = 'nictag_choices_list'
+NICTAGS_ALL_EXPIRES = 300
 
 
 class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
@@ -406,6 +408,22 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
 
         return nodes
 
+    @classmethod
+    def all_nictags_choices(cls, clear_cache=False):
+       """Return list of all nodes from cache"""
+       if clear_cache:
+           return cache.delete(NICTAGS_ALL_KEY)
+
+       nictags = cache.get(NICTAGS_ALL_KEY)
+
+       if not nictags:
+           nodes = cls.objects.all()
+           nictags = {(nic['name'], '%s (%s)' % (nic['name'], nic['type'])) for node in nodes for nic in node.nictags}
+
+           cache.set(NODES_ALL_KEY, nictags, NICTAGS_ALL_EXPIRES)
+
+       return nictags
+
     @property
     def _initializing_key(self):
         return 'node:%s:initializing' % self.uuid
@@ -601,6 +619,7 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
 
         if clear_cache or status_changed:
             self.all(clear_cache=True)
+            self.all_nictags_choices(clear_cache=True)
 
         if self.zpool and (zpool_update or zpool_create):
             self.storage.save()  # size parameters were updated during update_resources()
@@ -637,6 +656,7 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
         """Clear list of all nodes from cache"""
         ret = super(Node, self).delete(**kwargs)
         self.all(clear_cache=True)
+        self.all_nictags_choices(clear_cache=True)
         return ret
 
     def _get_queue(self, speed):

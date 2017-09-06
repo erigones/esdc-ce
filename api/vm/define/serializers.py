@@ -57,7 +57,7 @@ def validate_nic_tags(vm, new_node=None, new_net=None):
     if not new_node:
         new_node = vm.node
 
-    node_nic_tags = set([tag for nic in new_node.network_interfaces.values() for tag in nic.get('NIC Names', [])])
+    node_nic_tags = set([nictag['name'] for nictag in new_node.nictags])
     vm_nic_tags = set([Subnet.objects.get(uuid=nic['network_uuid']).nic_tag for nic in vm.json_get_nics()])
 
     if new_net:

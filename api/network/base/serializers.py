@@ -6,7 +6,7 @@ from api import serializers as s
 from api.validators import validate_alias, validate_dc_bound
 from api.vm.utils import get_owners
 from gui.models import User
-from vms.models import Subnet, IPAddress, DefaultDc
+from vms.models import Subnet, IPAddress, Node
 from pdns.models import Domain
 
 
@@ -45,7 +45,7 @@ class NetworkSerializer(s.InstanceSerializer):
         if not kwargs.get('many', False):
             self._dc_bound = net.dc_bound
             self.fields['owner'].queryset = get_owners(request, all=True)
-            self.fields['nic_tag'].choices = [(i, i) for i in DefaultDc().settings.VMS_NET_NIC_TAGS]
+            self.fields['nic_tag'].choices = Node.all_nictags_choices()
 
     def _normalize(self, attr, value):
         if attr == 'dc_bound':
