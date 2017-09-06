@@ -23,7 +23,7 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
     """
     Node (host) object.
     """
-    _esysinfo = ('sysinfo', 'diskinfo', 'zpools')
+    _esysinfo = ('sysinfo', 'diskinfo', 'zpools', 'nictags')
     _vlan_id = None
 
     ZPOOL = 'zones'
@@ -178,7 +178,8 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
         return {
             'Network Interfaces': self.network_interfaces,
             'Virtual Network Interfaces': self.virtual_network_interfaces,
-            'Link Aggregations': self.network_aggregations
+            'Link Aggregations': self.network_aggregations,
+            'NIC Tags': self.nictags
         }
 
     @property
@@ -318,6 +319,10 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
     def save_authorized_keys(self, value):
         self.authorized_keys = value
         self.save(update_resources=False, update_fields=('enc_json', 'changed'))
+
+    @property
+    def nictags(self):
+        return self.json.get('nictags', [])
 
     @property
     def lifetime(self):
