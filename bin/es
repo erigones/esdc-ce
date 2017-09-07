@@ -210,7 +210,9 @@ METHOD = {
     'logout': requests.get,
     'get': requests.get,
     'create': requests.post,
+    'post': requests.post,
     'set': requests.put,
+    'put': requests.put,
     'delete': requests.delete,
     'help': requests.options,
 }
@@ -220,11 +222,11 @@ USAGE = '''es - Swiss Army Knife for the Danube Cloud API
 
 Usage: es action [/resource] [parameters] [output format]
 
- action:\t{%s}
+ action:\t{get|create|set|delete|login|logout}
  resource:\t/some/resource/in/api
  parameters:\t-foo baz -bar qux ...
  output format:\t--json (default)
-''' % ('|'.join(ACTION))
+'''
 
 HEADERS = {
     'User-Agent': USER_AGENT,
