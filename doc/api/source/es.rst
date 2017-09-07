@@ -102,7 +102,15 @@ Parameters
 ----------
 
 Parameters begin with a single dash followed by the name of the parameter, then followed by a value.
-Parameters are internally translated into :http:method:`POST`/:http:method:`PUT`/:http:method:`DELETE` JSON encoded data or :http:method:`GET` query strings and send to the server.
+Parameters are internally translated into :http:method:`POST`/:http:method:`PUT`/:http:method:`DELETE` JSON encoded data or :http:method:`GET` query strings and sent to the server.
+
+Some parameters require JSON objects as values, which cannot be expressed as strings or numbers from the command line. It is possible to specify a JSON object as a value by using the ``json::`` prefix. For example, the following command will create a simple template:
+
+.. sourcecode:: bash
+
+    es create /template/small-server -vm_define 'json::{"vcpus": 1, "ram": 512}'
+
+The ``file::`` prefix followed by a path leading to the file can be used to load contents of a file as a value for a parameter.
 
 .. note:: A special parameter ``-api-key`` can be used to perform an authenticated request without the need to log in.
 
