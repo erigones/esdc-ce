@@ -108,7 +108,7 @@ Some parameters require JSON objects as values, which cannot be expressed as str
 
 .. sourcecode:: bash
 
-    es create /template/small-server -vm_define 'json::{"vcpus": 1, "ram": 512}'
+    es create /template/small-server -vm_define "json::{\"vcpus\": 1, \"ram\": 512}"
 
 The ``file::`` prefix followed by a path leading to the file can be used to load contents of a file as a value for a parameter.
 
