@@ -210,7 +210,9 @@ METHOD = {
     'logout': requests.get,
     'get': requests.get,
     'create': requests.post,
+    'post': requests.post,
     'set': requests.put,
+    'put': requests.put,
     'delete': requests.delete,
     'help': requests.options,
 }
@@ -220,11 +222,11 @@ USAGE = '''es - Swiss Army Knife for the Danube Cloud API
 
 Usage: es action [/resource] [parameters] [output format]
 
- action:\t{%s}
+ action:\t{help|get|create|set|delete|login|logout}
  resource:\t/some/resource/in/api
  parameters:\t-foo baz -bar qux ...
  output format:\t--json (default)
-''' % ('|'.join(ACTION))
+'''
 
 HEADERS = {
     'User-Agent': USER_AGENT,
@@ -284,11 +286,11 @@ for i, arg in enumerate(ARGS):
         OUTPUT_FORMAT = arg[2:]
         del ARGS[i]
 
-if len(ARGS) < 1 or ARGS[0] not in ACTION:
+if len(ARGS) < 1 or ARGS[0].lower() not in ACTION:
     sys.stderr.write(USAGE)
     sys.exit(11)
 
-action = ARGS[0]
+action = ARGS[0].lower()
 
 if len(ARGS) > 1 and ARGS[1][0] == '/':
     res = ARGS[1]
