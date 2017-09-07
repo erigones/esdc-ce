@@ -8,6 +8,7 @@ Features
 --------
 
 - Added code to collect NIC tags via node_sysinfo API call - `#226 <https://github.com/erigones/esdc-ce/issues/226>`__
+- Added ``GET /system/stats`` API function - `#233 <https://github.com/erigones/esdc-ce/issues/233>`__
 
 Bugs
 ----

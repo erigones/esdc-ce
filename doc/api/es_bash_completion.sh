@@ -203,6 +203,10 @@ _es() {
 			params=""
 		;;
 
+		/system/stats)
+			params=""
+		;;
+
 		/system/update)
 			[[ "${action}" == "set" ]] && params="-version -key -cert"
 		;;
@@ -217,7 +221,7 @@ _es() {
 
 		/system/*)
 			if [ ${COMP_CWORD} -eq 2 ]; then
-				COMPREPLY=( $(compgen -P "${cur%/*}" -W "/version /service/status /update /node/version /node/(hostname)/version /node/(hostname)/service/status /node/(hostname)/update /node/(hostname)/logs /logs /settings/ssl-certificate" -- "/${cur##*/}" ) )
+				COMPREPLY=( $(compgen -P "${cur%/*}" -W "/version /service/status /stats /update /node/version /node/(hostname)/version /node/(hostname)/service/status /node/(hostname)/update /node/(hostname)/logs /logs /settings/ssl-certificate" -- "/${cur##*/}" ) )
 				COMPREPLY=( "${COMPREPLY[@]/%/ }" )
 			fi
 		;;
