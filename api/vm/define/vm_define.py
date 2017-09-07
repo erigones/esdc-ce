@@ -75,26 +75,25 @@ class VmDefineView(VmDefineBaseView):
 
     def _create_disks_and_nics(self, vm):
         """Try to create disks and nics defined by template"""
-        # WARNING: This will temporary change the request.method to POST
-        request = set_request_method(self.request, 'POST')
+        # WARNING: This will temporary change the request.method to PUT as we are updating existing vm?
+        request = set_request_method(self.request, 'PUT')
 
-        if not vm.json_get_disks():
-            vm_define_disk = VmDefineDiskView(request)
-            for i, data in enumerate(vm.template.vm_define_disk):
-                if data:
-                    if i == 0 and not vm.is_kvm():  # Non-global zone's 1st disk can be only modified
-                        logger.info('Updating disk_id=%d for vm %s defined by template %s', i, vm, vm.template)
-                        res = vm_define_disk.put(vm, i, data)
-                        if res.status_code != scode.HTTP_200_OK:
-                            logger.warn('Failed (%s) to modify disk_id=%s in vm %s defined by template %s. '
-                                        'Error: %s', res.status_code, i, vm, vm.template, res.data)
-                    else:
-                        logger.info('Creating disk_id=%d for vm %s defined by template %s', i, vm, vm.template)
-                        res = vm_define_disk.post(vm, i, data)
-                        if res.status_code != scode.HTTP_201_CREATED:
-                            logger.warn('Failed (%s) to add disk_id=%s into vm %s defined by template %s. '
-                                        'Error: %s', res.status_code, i, vm, vm.template, res.data)
-                            break
+        vm_define_disk = VmDefineDiskView(request)
+        for i, data in enumerate(vm.template.vm_define_disk):
+            if data:
+                if i == 0 and not vm.is_kvm():  # Non-global zone's 1st disk can be only modified
+                    logger.info('Updating disk_id=%d for vm %s defined by template %s', i, vm, vm.template)
+                    res = vm_define_disk.put(vm, i, data)
+                    if res.status_code != scode.HTTP_200_OK:
+                        logger.warn('Failed (%s) to modify disk_id=%s in vm %s defined by template %s. '
+                                    'Error: %s', res.status_code, i, vm, vm.template, res.data)
+                else:
+                    logger.info('Creating disk_id=%d for vm %s defined by template %s', i, vm, vm.template)
+                    res = vm_define_disk.post(vm, i, data)
+                    if res.status_code != scode.HTTP_201_CREATED:
+                        logger.warn('Failed (%s) to add disk_id=%s into vm %s defined by template %s. '
+                                    'Error: %s', res.status_code, i, vm, vm.template, res.data)
+                        break
 
         if not vm.json_get_nics():
             vm_define_nic = VmDefineNicView(request)
