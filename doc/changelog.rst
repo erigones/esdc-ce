@@ -10,6 +10,7 @@ Features
 - Added code to collect NIC tags via node_sysinfo API call - `#226 <https://github.com/erigones/esdc-ce/issues/226>`__
 - Added ``GET /system/stats`` API function - `#233 <https://github.com/erigones/esdc-ce/issues/233>`__
 - Added ability to reset VM status back to ``notcreated`` when VM does not exist on compute node - `#248 <https://github.com/erigones/esdc-ce/issues/248>`__
+- Changed *es* TOKEN_STORE default to be OS independent - `#251 <https://github.com/erigones/esdc-ce/issues/251>`__
 
 Bugs
 ----
