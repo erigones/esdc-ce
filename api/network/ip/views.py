@@ -33,6 +33,25 @@ def net_ip_list(request, name, data=None):
         :status 403: Forbidden
         :status 404: Network not found
         :status 412: Invalid usage
+
+    .. http:delete:: /network/(name)/ip
+
+        :DC-bound?:
+            * |dc-yes| - ``dc_bound=true``
+            * |dc-no| - ``dc_bound=false``
+        :Permissions:
+            * |NetworkAdmin| - ``dc_bound=true``
+            * |SuperAdmin| - ``dc_bound=false``
+        :Asynchronous?:
+            * |async-no|
+        :arg name: **required** - Network name
+        :type name: string
+        :arg data.ips: **required** List of IPs to be deleted.
+        :type data.ips: list
+        :status 200: SUCCESS
+        :status 403: Forbidden
+        :status 404: Network not found
+        :status 412: Invalid ips
     """
     return NetworkIPView(request, name, None, data, many=True).response()
 

@@ -13,6 +13,7 @@ Bugs
 ----
 
 - Fixed allowed_ips type on all occurrences to list instead of set to enable JSON serialization - `#242 <https://github.com/erigones/esdc-ce/issues/242>`__
+- Documented and implemented hidden DELETE methods for snapshot, backup, DNS records, and IP list API calls - `#237 <https://github.com/erigones/esdc-ce/issues/237>`__
 
 
 2.6.3 (released on 2017-08-21)

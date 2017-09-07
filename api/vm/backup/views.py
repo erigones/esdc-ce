@@ -276,6 +276,22 @@ def vm_backup_list(request, hostname_or_uuid, data=None):
         :status 200: SUCCESS
         :status 403: Forbidden
         :status 412: Invalid disk_id
+
+    .. http:delete:: /vm/(hostname_or_uuid)/backup
+
+        :DC-bound?:
+            * |dc-yes|
+        :Permissions:
+            * |VmOwner|
+        :Asynchronous?:
+            * |async-no|
+        :arg hostname_or_uuid: **required** - Original server hostname or uuid
+        :type hostname_or_uuid: string
+        :arg data.bkpnames: **required** - List of backups to be deleted.
+        :type data.bkpnames: list
+        :status 200: SUCCESS
+        :status 403: Forbidden
+        :status 412: Invalid bkpnames
     """
     return VmBackupList(request, hostname_or_uuid, data).response()
 

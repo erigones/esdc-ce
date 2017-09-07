@@ -291,6 +291,26 @@ def vm_snapshot_list(request, hostname_or_uuid, data=None):
         :status 423: Node is not operational / VM is not operational
         :status 428: VM is not installed
 
+    .. http:delete:: /vm/(hostname_or_uuid)/snapshot
+
+        :DC-bound?:
+            * |dc-yes|
+        :Permissions:
+            * |VmOwner|
+        :Asynchronous?:
+            * |async-yes|
+        :arg hostname_or_uuid: **required** - Server hostname or uuid
+        :type hostname_or_uuid: string
+        :arg data.snapnames: **required** - List of snapshot names to be deleted
+        :type data.snapnames: list
+        :status 200: SUCCESS
+        :status 201: PENDING
+        :status 400: FAILURE
+        :status 403: Forbidden
+        :status 404: VM not found
+        :status 412: Invalid snapnames
+        :status 423: Node is not operational / VM is not operational
+        :status 428: VM is not installed
     """
     return VmSnapshotList(request, hostname_or_uuid, data).response()
 
