@@ -286,11 +286,11 @@ for i, arg in enumerate(ARGS):
         OUTPUT_FORMAT = arg[2:]
         del ARGS[i]
 
-if len(ARGS) < 1 or ARGS[0] not in ACTION:
+if len(ARGS) < 1 or ARGS[0].lower() not in ACTION:
     sys.stderr.write(USAGE)
     sys.exit(11)
 
-action = ARGS[0]
+action = ARGS[0].lower()
 
 if len(ARGS) > 1 and ARGS[1][0] == '/':
     res = ARGS[1]
