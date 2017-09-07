@@ -11,6 +11,7 @@ Features
 - Added ``GET /system/stats`` API function - `#233 <https://github.com/erigones/esdc-ce/issues/233>`__
 - Added ability to reset VM status back to ``notcreated`` when VM does not exist on compute node - `#248 <https://github.com/erigones/esdc-ce/issues/248>`__
 - Changed *es* TOKEN_STORE default to be OS independent - `#251 <https://github.com/erigones/esdc-ce/issues/251>`__
+- Added ``post`` and ``put`` actions into *es* - `#252 <https://github.com/erigones/esdc-ce/issues/252>`__
 
 Bugs
 ----
