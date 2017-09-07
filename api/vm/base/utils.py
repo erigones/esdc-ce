@@ -37,8 +37,11 @@ def _reset_allowed_ip_usage(vm, ip):
 
 
 def _is_ip_ok(ip_queryset, vm_ip, vm_network_uuid):
-    """Helper function used below. Return True if vm_ip (string) is found in the IPAddress queryset and has the
-    expected usage flag and subnet uuid."""
+    """Helper function used below. Return True if vm_ip (string) is "dhcp" or is found in the IPAddress queryset
+    and has the expected usage flag and subnet uuid."""
+    if vm_ip == 'dhcp':
+        return True
+
     return any(ip.ip == vm_ip and ip.subnet.uuid == vm_network_uuid and ip.usage == IPAddress.VM_REAL
                for ip in ip_queryset)
 
