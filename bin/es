@@ -222,7 +222,7 @@ USAGE = '''es - Swiss Army Knife for the Danube Cloud API
 
 Usage: es action [/resource] [parameters] [output format]
 
- action:\t{get|create|set|delete|login|logout}
+ action:\t{help|get|create|set|delete|login|logout}
  resource:\t/some/resource/in/api
  parameters:\t-foo baz -bar qux ...
  output format:\t--json (default)
