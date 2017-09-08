@@ -9,4 +9,5 @@
     system_service
     system_settings
     system_update
+    system_stats
 

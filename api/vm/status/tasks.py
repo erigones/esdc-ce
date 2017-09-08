@@ -398,7 +398,12 @@ def vm_status_current_cb(result, task_id, vm_uuid=None, force_change=False):
     vm = Vm.objects.select_related('node', 'slavevm').get(uuid=vm_uuid)
 
     try:
-        state = Vm.STATUS_DICT[result['status']]
+        if result['status']:
+            state = Vm.STATUS_DICT[result['status']]
+        else:
+            # vmadm list returned with rc=0 and empty stdout => VM does not exist on compute node
+            state = Vm.NOTCREATED
+            result['status'] = dict(Vm.STATUS).get(state)
     except (KeyError, IndexError):
         result['message'] = 'Unidentified VM status'
     else:

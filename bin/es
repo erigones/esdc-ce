@@ -8,7 +8,7 @@
 ################################################################################
 API_URL = 'http://127.0.0.1:8000/api'
 API_KEY = None
-TOKEN_STORE = '/tmp/esdc.session'
+TOKEN_STORE = None
 SSL_VERIFY = False
 TIMEOUT = None
 DEBUG = False
@@ -21,8 +21,8 @@ CSV_QUOTING = 0  # csv.QUOTE_MINIMAL
 ################################################################################
 
 __author__ = 'Erigones, s. r. o.'
-__copyright__ = 'Copyright 2013-2016, Erigones, s. r. o.'
-__version__ = '1.3.1'
+__copyright__ = 'Copyright 2013-2017, Erigones, s. r. o.'
+__version__ = '1.3.2'
 __email__ = 'info@erigones.com'
 
 ################################################################################
@@ -30,9 +30,13 @@ __email__ = 'info@erigones.com'
 import os
 import sys
 from functools import partial
+from tempfile import gettempdir
 
 PY3 = sys.version_info[0] > 2
 ENCODING = 'UTF-8'
+
+if not TOKEN_STORE:
+    TOKEN_STORE = os.path.join(gettempdir(), 'esdc.session')
 
 try:
     import simplejson as json
@@ -206,7 +210,9 @@ METHOD = {
     'logout': requests.get,
     'get': requests.get,
     'create': requests.post,
+    'post': requests.post,
     'set': requests.put,
+    'put': requests.put,
     'delete': requests.delete,
     'help': requests.options,
 }
@@ -216,11 +222,11 @@ USAGE = '''es - Swiss Army Knife for the Danube Cloud API
 
 Usage: es action [/resource] [parameters] [output format]
 
- action:\t{%s}
+ action:\t{help|get|create|set|delete|login|logout}
  resource:\t/some/resource/in/api
  parameters:\t-foo baz -bar qux ...
  output format:\t--json (default)
-''' % ('|'.join(ACTION))
+'''
 
 HEADERS = {
     'User-Agent': USER_AGENT,
@@ -280,11 +286,11 @@ for i, arg in enumerate(ARGS):
         OUTPUT_FORMAT = arg[2:]
         del ARGS[i]
 
-if len(ARGS) < 1 or ARGS[0] not in ACTION:
+if len(ARGS) < 1 or ARGS[0].lower() not in ACTION:
     sys.stderr.write(USAGE)
     sys.exit(11)
 
-action = ARGS[0]
+action = ARGS[0].lower()
 
 if len(ARGS) > 1 and ARGS[1][0] == '/':
     res = ARGS[1]
