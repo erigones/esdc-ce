@@ -75,19 +75,20 @@ class VmDefineView(VmDefineBaseView):
 
     def _create_disks_and_nics(self, vm):
         """Try to create disks and nics defined by template"""
-        # WARNING: This will temporary change the request.method to PUT as we are updating existing vm?
-        request = set_request_method(self.request, 'PUT')
 
-        vm_define_disk = VmDefineDiskView(request)
         for i, data in enumerate(vm.template.vm_define_disk):
             if data:
-                if i == 0 and not vm.is_kvm():  # Non-global zone's 1st disk can be only modified
+                if i == 0 and not vm.is_kvm():  # Disk represntation within a zone is created together with VM
+                    request = set_request_method(self.request, 'PUT')
+                    vm_define_disk = VmDefineDiskView(request)
                     logger.info('Updating disk_id=%d for vm %s defined by template %s', i, vm, vm.template)
                     res = vm_define_disk.put(vm, i, data)
                     if res.status_code != scode.HTTP_200_OK:
                         logger.warn('Failed (%s) to modify disk_id=%s in vm %s defined by template %s. '
                                     'Error: %s', res.status_code, i, vm, vm.template, res.data)
                 else:
+                    request = set_request_method(self.request, 'POST')
+                    vm_define_disk = VmDefineDiskView(request)
                     logger.info('Creating disk_id=%d for vm %s defined by template %s', i, vm, vm.template)
                     res = vm_define_disk.post(vm, i, data)
                     if res.status_code != scode.HTTP_201_CREATED:
@@ -96,6 +97,7 @@ class VmDefineView(VmDefineBaseView):
                         break
 
         if not vm.json_get_nics():
+            request = set_request_method(self.request, 'POST')
             vm_define_nic = VmDefineNicView(request)
             for i, data in enumerate(vm.template.vm_define_nic):
                 if data:
@@ -166,12 +168,8 @@ class VmDefineView(VmDefineBaseView):
                 # Task event for GUI
                 VmDefineHostnameChanged(self.request, vm, ser.old_hostname).send()
 
-            try:
-                return SuccessTaskResponse(self.request, ser.data, vm=vm, task_id=task_id,
-                                           msg=LOG_DEF_UPDATE, detail_dict=ser.detail_dict())
-            finally:
-                if ser.template_changed:
-                    self._create_disks_and_nics(vm)
+            return SuccessTaskResponse(self.request, ser.data, vm=vm, task_id=task_id,
+                                       msg=LOG_DEF_UPDATE, detail_dict=ser.detail_dict())
 
         return FailureTaskResponse(self.request, ser.errors, vm=vm, task_id=task_id)
 
