@@ -19,6 +19,7 @@ Bugs
 
 - Fixed allowed_ips type on all occurrences to list instead of set to enable JSON serialization - `#242 <https://github.com/erigones/esdc-ce/issues/242>`__
 - Fixed bug when deploying VM with dhcp_passthrough network - `#249 <https://github.com/erigones/esdc-ce/issues/249>`__
+- Fixed the process how disks are defined when template is used. - `#247 <https://github.com/erigones/esdc-ce/issues/247>`__
 
 
 2.6.3 (released on 2017-08-21)
