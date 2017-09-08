@@ -310,8 +310,7 @@ def vm_snapshot_list(request, hostname_or_uuid, data=None):
         :status 400: FAILURE
         :status 403: Forbidden
         :status 404: VM not found
-        :status 412: Invalid snapnames
-        :status 412: Invalid disk_id
+        :status 412: Invalid snapnames / Invalid disk_id
         :status 417: VM snapshot status is not OK
         :status 423: Node is not operational / VM is not operational
         :status 428: VM is not installed
