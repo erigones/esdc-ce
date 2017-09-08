@@ -11,7 +11,7 @@ __all__ = ('dns_record_list', 'dns_record')
 def dns_record_list(request, name, data=None):
     """
     List (:http:get:`GET </dns/domain/(name)/record>`) all DNS records which belong to a DNS domain.
-    Delete (:http:delete:`DELETE </dns/domain/(name)/record>`) all DNS records which belong to a DNS domain.
+    Delete (:http:delete:`DELETE </dns/domain/(name)/record>`) specified DNS records that belong to a DNS domain.
 
     .. http:get:: /dns/domain/(name)/record
 
@@ -22,6 +22,8 @@ def dns_record_list(request, name, data=None):
             * |DnsAdmin| or |DomainOwner|
         :Asynchronous?:
             * |async-no|
+        :arg name: **required** - Domain name
+        :type name: string
         :arg data.full: Return list of objects with all record details (default: false)
         :type data.full: boolean
         :arg data.order_by: :ref:`Available fields for sorting <order_by>`: ``id``, ``name``, ``type``, ``ttl``, \
@@ -39,10 +41,14 @@ def dns_record_list(request, name, data=None):
             * |DnsAdmin| or |DomainOwner|
         :Asynchronous?:
             * |async-no|
+        :arg name: **required** - Domain name
+        :type name: string
         :arg data.records: **required** List of DNS record ids to be deleted
-        :type data.records: list
+        :type data.records: array
         :status 200: SUCCESS
+        :status 400: FAILURE
         :status 403: Forbidden
+        :status 404: Domain not found / Record not found
         :status 412: Invalid records
     """
     if request.method == 'POST':

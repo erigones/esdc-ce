@@ -253,6 +253,7 @@ creating backup snapshot (requires QEMU Guest Agent) (default: false)
 def vm_backup_list(request, hostname_or_uuid, data=None):
     """
     List (:http:get:`GET </vm/(hostname_or_uuid)/backup>`) all VM backups.
+    Delete (:http:delete:`DELETE </vm/(hostname_or_uuid)/backup>`) VM backups specified by the list (data.bkpnames).
 
     .. http:get:: /vm/(hostname_or_uuid)/backup
 
@@ -284,14 +285,17 @@ def vm_backup_list(request, hostname_or_uuid, data=None):
         :Permissions:
             * |VmOwner|
         :Asynchronous?:
-            * |async-no|
+            * |async-yes|
         :arg hostname_or_uuid: **required** - Original server hostname or uuid
         :type hostname_or_uuid: string
-        :arg data.bkpnames: **required** - List of backups to be deleted.
-        :type data.bkpnames: list
+        :arg data.bkpnames: **required** - List of backups to be deleted
+        :type data.bkpnames: array
         :status 200: SUCCESS
         :status 403: Forbidden
+        :status 404: Backup not found
         :status 412: Invalid bkpnames
+        :status 417: VM backup status is not OK
+        :status 423: Node is not operational / VM is not operational
     """
     return VmBackupList(request, hostname_or_uuid, data).response()
 

@@ -243,6 +243,8 @@ def vm_snapshot_list(request, hostname_or_uuid, data=None):
     List (:http:get:`GET </vm/(hostname_or_uuid)/snapshot>`) all VM snapshots or
     synchronize (:http:put:`PUT </vm/(hostname_or_uuid)/snapshot>`) snapshots of VM's disk on compute node
     with snapshots saved in database.
+    Delete (:http:delete:`DELETE </vm/(hostname_or_uuid)/snapshot>`) VM snapshots specified
+    by the list (data.snapnames).
 
     .. http:get:: /vm/(hostname_or_uuid)/snapshot
 
@@ -302,13 +304,15 @@ def vm_snapshot_list(request, hostname_or_uuid, data=None):
         :arg hostname_or_uuid: **required** - Server hostname or uuid
         :type hostname_or_uuid: string
         :arg data.snapnames: **required** - List of snapshot names to be deleted
-        :type data.snapnames: list
+        :type data.snapnames: array
         :status 200: SUCCESS
         :status 201: PENDING
         :status 400: FAILURE
         :status 403: Forbidden
         :status 404: VM not found
         :status 412: Invalid snapnames
+        :status 412: Invalid disk_id
+        :status 417: VM snapshot status is not OK
         :status 423: Node is not operational / VM is not operational
         :status 428: VM is not installed
     """

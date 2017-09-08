@@ -10,6 +10,7 @@ __all__ = ('net_ip_list', 'net_ip', 'subnet_ip_list')
 def net_ip_list(request, name, data=None):
     """
     List (:http:get:`GET </network/(name)/ip>`) all IP addresses in a network (name).
+    Delete (:http:delete:`DELETE </network/(name)/ip>`) list (data.ips) of IP addresses in the network (name).
 
     .. http:get:: /network/(name)/ip
 
@@ -46,12 +47,13 @@ def net_ip_list(request, name, data=None):
             * |async-no|
         :arg name: **required** - Network name
         :type name: string
-        :arg data.ips: **required** List of IPs to be deleted.
-        :type data.ips: list
+        :arg data.ips: **required** List of IPs to be deleted
+        :type data.ips: array
         :status 200: SUCCESS
         :status 403: Forbidden
-        :status 404: Network not found
-        :status 412: Invalid ips
+        :status 404: Network not found / IP address not found
+        :status 412: Invalid ips / Invalid ips value
+        :status 428: IP address is used by VM / IP address is used by Compute node
     """
     return NetworkIPView(request, name, None, data, many=True).response()
 
