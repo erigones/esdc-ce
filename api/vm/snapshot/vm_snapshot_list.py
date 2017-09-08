@@ -58,7 +58,6 @@ class VmSnapshotList(APIView):
 
     def delete(self):
         """Delete multiple snapshots"""
-        # TODO: not documented
         request, data, vm = self.request, self.data, self.vm
 
         disk_id, real_disk_id, zfs_filesystem = get_disk_id(request, vm, data)
