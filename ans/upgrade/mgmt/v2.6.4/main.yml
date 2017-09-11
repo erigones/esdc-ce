@@ -13,3 +13,20 @@
     DJANGO_SETTINGS_MODULE: "core.settings"
   register: internal_images_update_result
   changed_when: "'Updated image' in internal_images_update_result.stdout"
+
+- name: Create directory for custom rabbit-systemd settings
+  file: path=/etc/systemd/system/rabbitmq-server.service.d
+        owner=root
+        group=root
+        mode=0755
+        state=directory
+
+- name: Copy cusotm configuration file for rabbitmq-service
+  copy: src= {{ current_task_dir }}/files/custom.conf
+        dest=dest=/etc/systemd/system/rabbitmq-server.service.d/custom.conf
+        owner=root
+        group=root
+        mode=0644
+
+- name: Reload systemd configuration files
+  shell: systemctl daemon-reload
