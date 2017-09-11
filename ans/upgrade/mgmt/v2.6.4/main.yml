@@ -22,11 +22,9 @@
         state=directory
 
 - name: Copy cusotm configuration file for rabbitmq-service
-  copy: src= {{ current_task_dir }}/files/custom.conf
-        dest=dest=/etc/systemd/system/rabbitmq-server.service.d/custom.conf
+  copy: src="{{ current_task_dir }}/files/custom.conf"
+        dest=/etc/systemd/system/rabbitmq-server.service.d/custom.conf
         owner=root
         group=root
         mode=0644
-
-- name: Reload systemd configuration files
-  shell: systemctl daemon-reload
+  notify: reload systemd
