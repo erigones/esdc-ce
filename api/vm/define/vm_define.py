@@ -96,17 +96,16 @@ class VmDefineView(VmDefineBaseView):
                                     'Error: %s', res.status_code, i, vm, vm.template, res.data)
                         break
 
-        if not vm.json_get_nics():
-            request = set_request_method(self.request, 'POST')
-            vm_define_nic = VmDefineNicView(request)
-            for i, data in enumerate(vm.template.vm_define_nic):
-                if data:
-                    logger.info('Creating nic_id=%d for vm %s defined by template %s', i, vm, vm.template)
-                    res = vm_define_nic.post(vm, i, data)
-                    if res.status_code != scode.HTTP_201_CREATED:
-                        logger.warn('Failed (%s) to add nic_id=%s into vm %s defined by template %s. '
-                                    'Error: %s', res.status_code, i, vm, vm.template, res.data)
-                        break
+        request = set_request_method(self.request, 'POST')
+        vm_define_nic = VmDefineNicView(request)
+        for i, data in enumerate(vm.template.vm_define_nic):
+            if data:
+                logger.info('Creating nic_id=%d for vm %s defined by template %s', i, vm, vm.template)
+                res = vm_define_nic.post(vm, i, data)
+                if res.status_code != scode.HTTP_201_CREATED:
+                    logger.warn('Failed (%s) to add nic_id=%s into vm %s defined by template %s. '
+                                'Error: %s', res.status_code, i, vm, vm.template, res.data)
+                    break
 
     # noinspection PyUnusedLocal
     def get(self, vm, data, many=False, **kwargs):
