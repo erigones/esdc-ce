@@ -3,6 +3,22 @@
 set -e
 
 #
+# https://github.com/erigones/esdc-ce/issues/258
+# https://github.com/erigones/esdc-factory/issues/76
+#
+ERIGONES_HOME="${ERIGONES_HOME:-"/opt/erigones"}"
+VERSION_DIR="$(cd "$(dirname "$0")" ; pwd -P)"
+REPO_FILE="/opt/local/etc/pkgin/repositories.conf"
+
+if grep -q "/2016Q4/" "${REPO_FILE}" && ! grep -q "pkgsrc.erigones.org" "${REPO_FILE}"; then
+	sed -i '' '/pkgsrc.joyent.com/i \
+https://pkgsrc.erigones.org/packages/SmartOS/2016Q4/x86_64/All \
+' "${REPO_FILE}"
+	gpg --no-default-keyring --keyring /opt/local/etc/gnupg/pkgsrc.gpg --import "${VERSION_DIR}/files/pkgsrc.erigones.org.key.pub"
+fi
+
+
+#
 # https://github.com/erigones/esdc-ce/issues/244
 #
 VM_IMG01="2b504f53-1c0b-4ceb-bfda-352f549a70e1"
