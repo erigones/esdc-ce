@@ -1,4 +1,5 @@
 from django import forms
+from django.core.validators import RegexValidator
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.template.defaultfilters import filesizeformat
@@ -245,6 +246,7 @@ class AdminServerSettingsForm(ServerSettingsForm):
                                       widget=ArrayWidget(tags=True, escape_space=False,
                                                          attrs={'class': 'tags-select2 narrow'}))
     monitoring_hostgroups = ArrayField(label=_('Monitoring hostgroups'), required=False, tags=True,
+                                       validators=[RegexValidator(regex=r'^[\w\s\.\-\,\"\{\}]+$')],
                                        help_text=_('Comma-separated list of custom monitoring hostgroups.'),
                                        widget=ArrayWidget(tags=True, escape_space=False,
                                                           attrs={'class': 'tags-select2 narrow'}))

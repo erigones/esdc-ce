@@ -1,5 +1,7 @@
 from logging import INFO, WARNING, ERROR, DEBUG, getLogger
 
+import re
+
 from api.decorators import catch_exception
 from api.mon.backends.abstract import AbstractMonitoringBackend, LOG
 from .base import ZabbixBase, ZabbixUserGroupContainer, ZabbixUserContainer
@@ -441,9 +443,21 @@ class Zabbix(AbstractMonitoringBackend):
         """[EXTERNAL] Return list of available templates"""
         return self.ezx.get_template_list()
 
+    def _get_filtered_hostgroups(self):
+        qualified_host_group_name_regexp = re.compile(r'^\:(?P<dc>.+)\:(?P<hostgroup>.+)')
+        for host_group in self.ezx.get_hostgroup_list():
+            match = qualified_host_group_name_regexp.match(host_group['name'])
+            if match:
+                dc_name, host_group_name = match.groups()
+                if dc_name == self.dc.name:
+                    host_group['name'] = host_group_name
+                    yield host_group
+            else:
+                yield host_group
+
     def hostgroup_list(self):
         """[EXTERNAL] Return list of available hostgroups"""
-        return self.ezx.get_hostgroup_list()
+        return [hostgroup for hostgroup in self._get_filtered_hostgroups()]
 
     def synchronize_user_group(self, group=None, dc_as_group=None):
         kwargs = {}

@@ -39,7 +39,8 @@ class ExternalZabbix(ZabbixBase):
         hostgroups = set(self.settings.MON_ZABBIX_HOSTGROUPS_VM)
         hostgroups.update(vm.monitoring_hostgroups)
 
-        return self._get_groups(self._vm_kwargs(vm), self.settings.MON_ZABBIX_HOSTGROUP_VM, hostgroups, log=log)
+        return self._get_groups(self._vm_kwargs(vm), self.settings.MON_ZABBIX_HOSTGROUP_VM, hostgroups, log=log,
+                                dc_name=vm.dc.name)
 
     def _vm_templates(self, vm, log=None):
         """Return set of zabbix template IDs for a VM"""
@@ -74,10 +75,13 @@ class ExternalZabbix(ZabbixBase):
 
     def create_vm_host(self, vm, log=None):
         """Create new Zabbix host from VM object"""
-        return self._create_host(vm, self._vm_host_interface(vm), groups=self._vm_groups(vm, log=log),
+        return self._create_host(vm, self._vm_host_interface(vm),
+                                 groups=self._vm_groups(vm, log=log),
                                  templates=self._vm_templates(vm, log=log))
 
     def diff_vm_host(self, vm, host, log=None):
         """Compare VM (DB) and host (Zabbix) configuration and create an update dict"""
-        return self._diff_host(vm, host, self._vm_host_interface(vm), groups=self._vm_groups(vm, log=log),
-                               templates=self._vm_templates(vm, log=log), proxy_id=self._vm_proxy_id(vm))
+        return self._diff_host(vm, host, self._vm_host_interface(vm),
+                               groups=self._vm_groups(vm, log=log),
+                               templates=self._vm_templates(vm, log=log),
+                               proxy_id=self._vm_proxy_id(vm))

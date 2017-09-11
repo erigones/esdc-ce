@@ -25,7 +25,7 @@ class _MonBaseView(APIView):
             tg = TG_DC_UNBOUND
 
         ter = self.mgmt_task.call(request, None, (request.dc.id,), meta={'apiview': _apiview_}, tg=tg,
-                                  tidlock=tidlock, cache_result=tidlock, cache_timeout=300)
+                                  tidlock=tidlock, cache_result=tidlock, cache_timeout=10)  # TODO discuss the timeout
 
         return mgmt_task_response(request, *ter, obj=request.dc, api_view=_apiview_, dc_bound=self.dc_bound,
                                   data=self.data)

@@ -28,7 +28,7 @@ class InternalZabbix(ZabbixBase):
     def _vm_groups(self, vm, log=None):
         """Return set of zabbix hostgroup IDs for a VM"""
         return self._get_groups(self._vm_kwargs(vm), django_settings._MON_ZABBIX_HOSTGROUP_VM,
-                                django_settings._MON_ZABBIX_HOSTGROUPS_VM, log=log)
+                                django_settings._MON_ZABBIX_HOSTGROUPS_VM, log=log, dc_name=vm.dc.name)
 
     def _node_groups(self, node, log=None):
         """Return set of zabbix hostgroup IDs for a Compute node"""

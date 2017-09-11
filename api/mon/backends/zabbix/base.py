@@ -339,7 +339,11 @@ class ZabbixBase(object):
             logger.exception(ex)
             raise ZabbixError('Cannot find zabbix proxy id for proxy "%s"' % proxy)
 
-    def _get_groups(self, obj_kwargs, hostgroup, hostgroups=(), log=None):
+    @staticmethod
+    def _qualify_hostgroup(dc_name, hostgroup_name):
+        return ":{}:{}".format(dc_name, hostgroup_name)
+
+    def _get_groups(self, obj_kwargs, hostgroup, hostgroups=(), log=None, dc_name=""):
         """Return set of zabbix hostgroup IDs for an object"""
         log = log or self.log
         gids = set()
@@ -360,11 +364,19 @@ class ZabbixBase(object):
             if isinstance(name, int):
                 gids.add(name)
             else:
+                # Local hostgroup has to be checked first.
                 try:
-                    gids.add(int(self._zabbix_get_groupid(name.format(**obj_kwargs))))
+                    gids.add(int(self._zabbix_get_groupid(self._qualify_hostgroup(dc_name, name.format(**obj_kwargs)))))
                 except ZabbixError:
-                    log(ERROR, 'Could not fetch zabbix hostgroup id for hostgroup "%s"', name)
-                    continue
+                    if dc_name:
+                        try:
+                            gids.add(int(self._zabbix_get_groupid(name.format(**obj_kwargs))))
+                        except ZabbixError:
+                            log(ERROR, 'Could not fetch zabbix hostgroup id for hostgroup "%s"', name)
+                            continue
+                    else:
+                        log(ERROR, 'Could not fetch zabbix hostgroup id for hostgroup "%s"', name)
+                        continue
 
         return gids
 
