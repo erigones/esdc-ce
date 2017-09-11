@@ -644,20 +644,17 @@ class ZabbixBase(object):
             logger.exception(e)
             raise ZabbixError(e)
 
-    def _diff_host(self, obj, host, interface, groups=(), templates=(), macros=None, status=HOST_MONITORED,
-                   proxy_id=NO_PROXY):
-        """Compare DB object and host (Zabbix) configuration and create an update dict; Issue #chili-331"""
-
-        # Empty params means no update is needed
+    @classmethod
+    def _diff_interfaces(cls, obj, host, interface):
         params = {}
 
         # There should be one zabbix agent interface
         hi = None
         try:
-            interfaces = self._parse_host_interfaces(host)
+            interfaces = cls._parse_host_interfaces(host)
 
             for i, iface in enumerate(interfaces):
-                if int(iface['type']) == self.HOSTINTERFACE_AGENT and int(iface['main']) == self.YES:
+                if int(iface['type']) == cls.HOSTINTERFACE_AGENT and int(iface['main']) == cls.YES:
                     if hi:
                         # noinspection PyProtectedMember
                         raise ZabbixAPIException('Zabbix host ID "%s" for %s %s has multiple Zabbix Agent '
@@ -666,10 +663,10 @@ class ZabbixBase(object):
                     # Zabbix host interface found, let's check it out
                     hi = iface
 
-                    if (iface['dns'] != interface['dns'] or
-                            iface['ip'] != interface['ip'] or
-                            str(iface['port']) != str(interface['port']) or
-                            str(iface['useip']) != str(interface['useip'])):
+                    if (iface['dns'] != interface['dns']
+                            or iface['ip'] != interface['ip']
+                            or str(iface['port']) != str(interface['port'])
+                            or str(iface['useip']) != str(interface['useip'])):
                         # Host ip or dns changed -> update host interface
                         interface['interfaceid'] = iface['interfaceid']
                         interfaces[i] = interface
@@ -682,22 +679,27 @@ class ZabbixBase(object):
             # noinspection PyProtectedMember
             raise ZabbixAPIException('Zabbix host ID "%s" for %s %s is missing a valid main '
                                      'Zabbix Agent configuration' % (host['hostid'], obj._meta.verbose_name_raw, obj))
+        return params
+
+    @classmethod
+    def _diff_basic_info(cls, obj, host, proxy_id, status):
+        params = {}
 
         # Check zabbix host ID (name)
-        host_id = self.host_id(obj)
+        host_id = cls.host_id(obj)
 
         if host['host'] != host_id:
             params['host'] = host_id
 
         # Check zabbix visible name
-        host_name = self.host_name(obj)
+        host_name = cls.host_name(obj)
 
         if host['name'] != host_name:
             # Hostname changed! -> update name
             params['name'] = host_name
 
         # Check zabbix proxy ID
-        proxy_hostid = int(host.get('proxy_hostid', self.NO_PROXY))
+        proxy_hostid = int(host.get('proxy_hostid', cls.NO_PROXY))
 
         if proxy_hostid != proxy_id:
             params['proxy_hostid'] = proxy_id
@@ -707,34 +709,64 @@ class ZabbixBase(object):
             # Status changed! -> update status
             params['status'] = status
 
+        return params
+
+    @classmethod
+    def _diff_templates(cls, host, templates):
+        params = {}
         # Always replace current zabbix templates with configured templates
-        zx_templates = self._parse_host_templates(host)
+        zx_templates = cls._parse_host_templates(host)
         new_templates = set(templates)
 
         if zx_templates != new_templates:
             # Templates configuration changed!
-            params['templates'] = self._gen_host_templates(new_templates)
+            params['templates'] = cls._gen_host_templates(new_templates)
             # Removed templates need to be cleared properly
             removed_templates = zx_templates - new_templates
 
             if removed_templates:
-                params['templates_clear'] = self._gen_host_templates(removed_templates)
+                params['templates_clear'] = cls._gen_host_templates(removed_templates)
 
+        return params
+
+    @classmethod
+    def _diff_host_groups(cls, host, groups):
+        params = {}
         # Always replace current zabbix groups with configured groups
-        zx_groups = self._parse_host_groups(host)
+        zx_groups = cls._parse_host_groups(host)
         new_groups = set(groups)
 
         if zx_groups != new_groups:
             # Groups configuration changed!
-            params['groups'] = self._gen_host_groups(new_groups)
+            params['groups'] = cls._gen_host_groups(new_groups)
 
+        return params
+
+    @classmethod
+    def _diff_macros(cls, host, macros):
+        params = {}
         # Replace macros only if specified
         if macros is not None:
-            zx_macros = self._parse_host_macros(host)
+            zx_macros = cls._parse_host_macros(host)
 
             if zx_macros != macros:
                 # Host macros changed!
-                params['macros'] = self._gen_host_macros(macros)
+                params['macros'] = cls._gen_host_macros(macros)
+
+        return params
+
+    def _diff_host(self, obj, host, interface, groups=(), templates=(), macros=None, status=HOST_MONITORED,
+                   proxy_id=NO_PROXY):
+        """Compare DB object and host (Zabbix) configuration and create an update dict; Issue #chili-331"""
+
+        # Empty params means no update is needed
+        params = {}
+
+        params.update(self._diff_interfaces(obj, host, interface))
+        params.update(self._diff_basic_info(obj, host, proxy_id, status))
+        params.update(self._diff_templates(host, templates))
+        params.update(self._diff_host_groups(host, groups))
+        params.update(self._diff_macros(host, macros))
 
         return params
 
