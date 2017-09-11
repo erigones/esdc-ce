@@ -138,7 +138,6 @@ class VmBackupList(TaskAPIView):
     # noinspection PyAttributeOutsideInit
     def delete(self):
         """Delete multiple backups"""
-        # TODO: not documented :(
         bkp_filter = filter_disk_id(None, self.bkp_filter, self.data, default=1)  # vm_disk_id instead of disk_id
         bkps, __ = get_backups(self.request, bkp_filter, self.data)   # Parse data['bkpnames']
         bkps_lost = bkps.filter(status=Backup.LOST)

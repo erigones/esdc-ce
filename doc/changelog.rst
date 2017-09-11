@@ -17,9 +17,11 @@ Features
 Bugs
 ----
 
+- Documented and implemented hidden DELETE methods for snapshot, backup, DNS records, and IP list API calls - `#237 <https://github.com/erigones/esdc-ce/issues/237>`__
 - Fixed allowed_ips type on all occurrences to list instead of set to enable JSON serialization - `#242 <https://github.com/erigones/esdc-ce/issues/242>`__
+- Updated all internal service VM images to be available from the image server and mgmt system - `#244 <https://github.com/erigones/esdc-ce/issues/244>`__
+- Fixed the process how disks are defined when template is used - `#247 <https://github.com/erigones/esdc-ce/issues/247>`__
 - Fixed bug when deploying VM with dhcp_passthrough network - `#249 <https://github.com/erigones/esdc-ce/issues/249>`__
-- Fixed the process how disks are defined when template is used. - `#247 <https://github.com/erigones/esdc-ce/issues/247>`__
 
 
 2.6.3 (released on 2017-08-21)
