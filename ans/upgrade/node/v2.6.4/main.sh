@@ -11,10 +11,11 @@ VERSION_DIR="$(cd "$(dirname "$0")" ; pwd -P)"
 REPO_FILE="/opt/local/etc/pkgin/repositories.conf"
 
 if grep -q "/2016Q4/" "${REPO_FILE}" && ! grep -q "pkgsrc.erigones.org" "${REPO_FILE}"; then
+	echo "+ Adding pkgsrc.erigones.org into pkgsrc.erigones.org"
 	sed -i '' '/pkgsrc.joyent.com/i \
 https://pkgsrc.erigones.org/packages/SmartOS/2016Q4/x86_64/All \
 ' "${REPO_FILE}"
-	gpg --no-default-keyring --keyring /opt/local/etc/gnupg/pkgsrc.gpg --import "${VERSION_DIR}/files/pkgsrc.erigones.org.key.pub"
+	gpg --quiet --no-default-keyring --keyring /opt/local/etc/gnupg/pkgsrc.gpg --import "${VERSION_DIR}/files/pkgsrc.erigones.org.key.pub"
 fi
 
 
