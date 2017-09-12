@@ -363,20 +363,30 @@ class ZabbixBase(object):
 
             if isinstance(name, int):
                 gids.add(name)
-            else:
-                # Local hostgroup has to be checked first.
+                continue
+
+            # Local hostgroup has to be checked first.
+            if dc_name:
+                qualified_hostgroup_name = ZabbixHostGroupContainer.hostgroup_name_factory(name.format(**obj_kwargs),
+                                                                                           dc_name=dc_name)
                 try:
-                    gids.add(int(self._zabbix_get_groupid(self._qualify_hostgroup(dc_name, name.format(**obj_kwargs)))))
+                    gids.add(int(self._zabbix_get_groupid(qualified_hostgroup_name)))
                 except ZabbixError:
-                    if dc_name:
-                        try:
-                            gids.add(int(self._zabbix_get_groupid(name.format(**obj_kwargs))))
-                        except ZabbixError:
-                            log(ERROR, 'Could not fetch zabbix hostgroup id for hostgroup "%s"', name)
-                            continue
-                    else:
-                        log(ERROR, 'Could not fetch zabbix hostgroup id for hostgroup "%s"', name)
-                        continue
+                    pass
+                else:
+                    continue
+
+            try:
+                gids.add(int(self._zabbix_get_groupid(name.format(**obj_kwargs))))
+            except ZabbixError:
+                log(WARNING, 'Could not fetch zabbix hostgroup id for hostgroup "%s". '
+                             'Creating new hostgroup %s instead.', name, qualified_hostgroup_name)
+            else:
+                continue
+
+            if dc_name:
+                #  If we have the dc_name, we are free to create a dc qualified host group
+                gids.add(ZabbixHostGroupContainer(qualified_hostgroup_name, zapi=self.zapi).create().zabbix_id)
 
         return gids
 
@@ -1396,18 +1406,21 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
             # TODO create also a faster way of removal for users that has also different groups
 
 
-class ZabbixHostGroupContainer(object):
+class ZabbixHostGroupContainer(ZabbixNamedContainer):
     """
     Container class for the Zabbix HostGroup object.
     Incomplete, TODO
     """
     zabbix_id = None
 
+    def __init__(self, name, zapi=None):
+        super(ZabbixHostGroupContainer, self).__init__(name)
+        self._zapi = zapi
+
     @classmethod
-    def from_mgmt_data(cls, zapi, name):
-        container = cls()
+    def from_mgmt_data(cls, name, zapi):
+        container = cls(name, zapi)
         container._zapi = zapi
-        container.name = name  # TODO
         response = zapi.hostgroup.get({'filter': {'name': name}})
         if response:
             assert len(response) == 1, 'Hostgroup name => locally generated hostgroup name mapping should be injective'
@@ -1416,9 +1429,20 @@ class ZabbixHostGroupContainer(object):
         return container
 
     @staticmethod
-    def hostgroup_name_factory(dc_name, node_name='', vm_uuid='', tag=''):
-        name = ':{}:{}:{}:{}:'.format(dc_name, node_name, vm_uuid, tag)
+    def hostgroup_name_factory(hostgroup_name, dc_name=''):
+        if dc_name:
+            name = ':{}:{}:'.format(dc_name, hostgroup_name)
+        else:
+            name = dc_name
+
         return name
+
+    def create(self):
+        response = self._zapi.hostgroup.create({
+                'name': self.name,
+        })
+        self.zabbix_id = response['groupids'][0]
+        return self
 
 
 class ZabbixMediaContainer(object):
