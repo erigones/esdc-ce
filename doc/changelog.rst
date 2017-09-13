@@ -10,6 +10,8 @@ Features
 Bugs
 ----
 
+- Fixed highlighting of backups clicked on in the node's backup list - `#260 <https://github.com/erigones/esdc-ce/issues/260>`__
+
 
 2.6.4 (released on 2017-09-11)
 ==============================
