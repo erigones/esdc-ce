@@ -132,6 +132,7 @@ def DummyDc():
     dc.is_dummy = True
     return dc
 
+
 DummyDc.id = settings.VMS_DC_DEFAULT
 
 
@@ -141,6 +142,7 @@ def DefaultDc():
     Return default Datacenter from cache.
     """
     return Dc.objects.get_by_id(settings.VMS_DC_DEFAULT)
+
 
 DefaultDc.id = settings.VMS_DC_DEFAULT
 

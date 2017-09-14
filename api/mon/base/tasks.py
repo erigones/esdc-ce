@@ -1,5 +1,6 @@
 from celery.utils.log import get_task_logger
 from django.utils.six import text_type
+from vms.models.dc import DefaultDc
 
 from api.mon import get_monitoring, del_monitoring, MonitoringError
 from api.task.utils import mgmt_lock, mgmt_task
@@ -39,7 +40,7 @@ def mon_clear_zabbix_cache(task_id, dc_id, full=True):
 # noinspection PyUnusedLocal
 @cq.task(name='api.mon.base.tasks.mon_template_list', base=MgmtTask)
 @mgmt_task()
-def mon_template_list(task_id, dc_id, **kwargs):
+def mon_template_list(task_id, dc_id, *args, **kwargs):
     """
     Return list of templates available in Zabbix.
     """
@@ -64,14 +65,17 @@ def mon_template_list(task_id, dc_id, **kwargs):
 # noinspection PyUnusedLocal
 @cq.task(name='api.mon.base.tasks.mon_hostgroup_list', base=MgmtTask)
 @mgmt_task()
-def mon_hostgroup_list(task_id, dc_id, **kwargs):
+def mon_hostgroup_list(task_id, dc_id, dc_bound, *args, **kwargs):
     """
     Return list of hostgroups available in Zabbix.
     """
-    dc = Dc.objects.get_by_id(int(dc_id))
+    if dc_bound:
+        dc = Dc.objects.get_by_id(int(dc_id))
+    else:
+        dc = DefaultDc()
 
     try:
-        zabbix_hostgroups = get_monitoring(dc).hostgroup_list()
+        zabbix_hostgroups = get_monitoring(dc).hostgroup_list(exclude_dc_specific=not dc_bound)
     except MonitoringError as exc:
         raise MgmtTaskException(text_type(exc))
 

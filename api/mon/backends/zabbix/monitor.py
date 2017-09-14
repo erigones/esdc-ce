@@ -1,10 +1,8 @@
 from logging import INFO, WARNING, ERROR, DEBUG, getLogger
 
-import re
-
 from api.decorators import catch_exception
 from api.mon.backends.abstract import AbstractMonitoringBackend, LOG
-from .base import ZabbixBase, ZabbixUserGroupContainer, ZabbixUserContainer
+from .base import ZabbixBase, ZabbixUserGroupContainer, ZabbixUserContainer, ZabbixHostGroupContainer
 from .internal import InternalZabbix
 from .external import ExternalZabbix
 from gui.models import User, AdminPermission
@@ -443,11 +441,13 @@ class Zabbix(AbstractMonitoringBackend):
         """[EXTERNAL] Return list of available templates"""
         return self.ezx.get_template_list()
 
-    def _get_filtered_hostgroups(self):
-        qualified_host_group_name_regexp = re.compile(r'^\:(?P<dc>.+)\:(?P<hostgroup>.+)')
+    def _get_filtered_hostgroups(self, exclude_dc_specific):
+        qualified_host_group_name_regexp = ZabbixHostGroupContainer.QUALIFIED_NAME_REGEXP
         for host_group in self.ezx.get_hostgroup_list():
             match = qualified_host_group_name_regexp.match(host_group['name'])
-            if match:
+            if match and exclude_dc_specific:
+                pass
+            elif match:
                 dc_name, host_group_name = match.groups()
                 if dc_name == self.dc.name:
                     host_group['name'] = host_group_name
@@ -455,9 +455,9 @@ class Zabbix(AbstractMonitoringBackend):
             else:
                 yield host_group
 
-    def hostgroup_list(self):
+    def hostgroup_list(self, exclude_dc_specific=False):
         """[EXTERNAL] Return list of available hostgroups"""
-        return [hostgroup for hostgroup in self._get_filtered_hostgroups()]
+        return [hostgroup for hostgroup in self._get_filtered_hostgroups(exclude_dc_specific=exclude_dc_specific)]
 
     def synchronize_user_group(self, group=None, dc_as_group=None):
         kwargs = {}

@@ -3,6 +3,7 @@ from time import time
 from operator import itemgetter
 from datetime import datetime
 from subprocess import call
+import re
 
 from django.utils.six import iteritems
 from django.db.models import Q
@@ -338,10 +339,6 @@ class ZabbixBase(object):
         except ZabbixError as ex:
             logger.exception(ex)
             raise ZabbixError('Cannot find zabbix proxy id for proxy "%s"' % proxy)
-
-    @staticmethod
-    def _qualify_hostgroup(dc_name, hostgroup_name):
-        return ":{}:{}".format(dc_name, hostgroup_name)
 
     def _get_groups(self, obj_kwargs, hostgroup, hostgroups=(), log=None, dc_name=""):
         """Return set of zabbix hostgroup IDs for an object"""
@@ -1411,6 +1408,7 @@ class ZabbixHostGroupContainer(ZabbixNamedContainer):
     Container class for the Zabbix HostGroup object.
     Incomplete, TODO
     """
+    QUALIFIED_NAME_REGEXP = re.compile(r'^:(?P<dc>.+):(?P<hostgroup>.+):')
     zabbix_id = None
 
     def __init__(self, name, zapi=None):

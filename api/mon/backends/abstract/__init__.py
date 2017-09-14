@@ -99,7 +99,7 @@ class AbstractMonitoringBackend(object):
     def template_list(self):
         raise NotImplementedError
 
-    def hostgroup_list(self):
+    def hostgroup_list(self, exclude_dc_specific=False):
         raise NotImplementedError
 
     def synchronize_user_group(self, group=None, dc_as_group=None):

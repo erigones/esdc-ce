@@ -17,14 +17,17 @@ class _MonBaseView(APIView):
     def get(self):
         request = self.request
         _apiview_ = {'view': self.api_view_name, 'method': request.method}
-        tidlock = '%s:%s' % (self.api_view_name, request.dc.id)
+        tidlock = '%s:%s:%s' % (self.api_view_name, request.dc.id, self.dc_bound)
 
         if self.dc_bound:
             tg = TG_DC_BOUND
         else:
             tg = TG_DC_UNBOUND
 
-        ter = self.mgmt_task.call(request, None, (request.dc.id,), meta={'apiview': _apiview_}, tg=tg,
+        ter = self.mgmt_task.call(request, None,
+                                  (request.dc.id, self.dc_bound),
+                                  meta={'apiview': _apiview_},
+                                  tg=tg,
                                   tidlock=tidlock, cache_result=tidlock, cache_timeout=10)  # TODO discuss the timeout
 
         return mgmt_task_response(request, *ter, obj=request.dc, api_view=_apiview_, dc_bound=self.dc_bound,
