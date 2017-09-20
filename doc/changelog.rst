@@ -10,6 +10,7 @@ Features
 Bugs
 ----
 
+- Added ability to send Post-registration email - `#261 <https://github.com/erigones/esdc-ce/issues/261>`__
 - Fixed highlighting of backups clicked on in the node's backup list - `#260 <https://github.com/erigones/esdc-ce/issues/260>`__
 
 
