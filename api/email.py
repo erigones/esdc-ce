@@ -30,7 +30,7 @@ class SMTPEmailBackend(EmailBackend):
 
 
 def send_mail(subject, body, recipient_list, bcc_list=None, from_email=None, connection=None, attachments=None,
-              fail_silently=False, headers=None, cc_list=None, dc1_settings=None):
+              fail_silently=False, headers=None, cc_list=None, dc1_settings=None, content_subtype=None):
     """
     Like https://docs.djangoproject.com/en/dev/topics/email/#send-mail
     Attachment is a list of tuples (filename, content, mime_type), where mime_type can be None.
@@ -64,12 +64,15 @@ def send_mail(subject, body, recipient_list, bcc_list=None, from_email=None, con
     else:
         logger.info('Sending mail to "%s" with subject "%s"', recipient_list, subject)
 
+    if content_subtype:
+        msg.content_subtype = content_subtype
+
     return msg.send(fail_silently=fail_silently)
 
 
 def _sendmail(user, subject_template_name, body_template_name, recipient_list=None, bcc_list=None, from_email=None,
               connection=None, attachments=None, fail_silently=False, headers=None, cc_list=None, extra_context=None,
-              user_i18n=False, billing_email=False, dc=None):
+              user_i18n=False, billing_email=False, dc=None, content_subtype=None):
     """
     Like https://docs.djangoproject.com/en/dev/topics/email/#send-mail
     But we are using templates instead of subject/message text.
@@ -141,7 +144,8 @@ def _sendmail(user, subject_template_name, body_template_name, recipient_list=No
         timezone.deactivate()
 
     return send_mail(subject, body, recipient_list, bcc_list=bcc_list, from_email=from_email, connection=connection,
-                     attachments=attachments, fail_silently=fail_silently, headers=default_headers, cc_list=cc_list)
+                     attachments=attachments, fail_silently=fail_silently, headers=default_headers, cc_list=cc_list,
+                     content_subtype=content_subtype)
 
 
 def sendmail(*args, **kwargs):
