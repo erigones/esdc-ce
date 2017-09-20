@@ -1,4 +1,4 @@
-from os.path import exists
+from os import path
 
 from django.conf import settings
 from django.shortcuts import render, redirect
@@ -108,22 +108,24 @@ def registration_check(request, uidb64=None, token=None):
         }
         sms_sent = send_sms(profile.phone, msg)
 
-        template_path = '/opt/erigones/gui/templates/'
+        template_path = dc_settings.PROJECT_DIR + '/gui/templates/'
         subject = 'gui/accounts/post_register_subject.txt'
+        subject_path = path.join(template_path, subject)
         body_file_prefix = 'gui/accounts/post_register_email'
         content_subtype = None
+        body = None
 
-        if exists(template_path + subject) and exists(template_path + body_file_prefix + '.html'):
+        if path.exists(subject_path) and path.exists(path.join(template_path, body_file_prefix + '.html')):
             content_subtype = 'html'
             body = body_file_prefix + '.html'
-        elif exists(template_path + subject) and exists(template_path + body_file_prefix + '.txt'):
+        elif path.exists(subject_path) and path.exists(path.join(template_path, body_file_prefix + '.txt')):
             body = body_file_prefix + '.txt'
 
-        try:
+        if body:
             sendmail(None, subject, body, recipient_list=[user.email], dc=request.dc, content_subtype=content_subtype)
-        except NameError:
-            logger.info('Could not find post registration email subject: "%s" or template: "%s"' %
-                        (template_path + subject, template_path + body_file_prefix + '.[html|txt]'))
+        else:
+            logger.info('Post registration email subject template: "%s" or body template: "%s" does not exists.' %
+                        (subject_path, path.join(template_path, body_file_prefix + '.[html|txt]')))
 
     return render(request, 'gui/accounts/register_check.html', {
         'user': user,
