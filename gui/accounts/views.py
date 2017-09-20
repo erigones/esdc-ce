@@ -108,6 +108,7 @@ def registration_check(request, uidb64=None, token=None):
         }
         sms_sent = send_sms(profile.phone, msg)
 
+        # Section below has been created so we are able to send optional email after successful registration issue #261
         template_path = path.join(settings.PROJECT_DIR, 'gui', 'templates')
         subject = 'gui/accounts/post_register_subject.txt'
         subject_path = path.join(template_path, subject)
