@@ -8,6 +8,7 @@ from datetime import datetime
 import pytz
 import re
 
+from api.mon import MonitoringBackend
 from pdns.models import Record
 from vms.models import Vm, Snapshot, Backup, BackupDefine
 from vms.utils import AttrDict
@@ -246,7 +247,8 @@ class AdminServerSettingsForm(ServerSettingsForm):
                                       widget=ArrayWidget(tags=True, escape_space=False,
                                                          attrs={'class': 'tags-select2 narrow'}))
     monitoring_hostgroups = ArrayField(label=_('Monitoring hostgroups'), required=False, tags=True,
-                                       validators=[RegexValidator(regex=r'^[\w\s\.\-\,\"\{\}]+$')],
+                                       validators=[
+                                           RegexValidator(regex=MonitoringBackend.VALID_MONITORING_HOSTGROUP_REGEX)],
                                        help_text=_('Comma-separated list of custom monitoring hostgroups.'),
                                        widget=ArrayWidget(tags=True, escape_space=False,
                                                           attrs={'class': 'tags-select2 narrow'}))

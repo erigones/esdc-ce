@@ -7,6 +7,7 @@ from django.utils.six import iteritems
 from django.core import validators
 from django.conf import settings
 
+from api.mon import MonitoringBackend
 from gui.models import User
 from vms.models import VmTemplate, Vm, Node, Image, Subnet, IPAddress, NodeStorage
 from api import serializers as s
@@ -86,7 +87,8 @@ class VmDefineSerializer(VmBaseSerializer):
     monitored_internal = s.BooleanField(default=settings.MON_ZABBIX_ENABLED)
     monitored = s.BooleanField(default=settings.VMS_VM_MONITORED_DEFAULT)
     monitoring_hostgroups = s.ArrayField(max_items=16, default=[],
-                                         validators=(RegexValidator(regex=r'^[\w\s\.\-\,\"\{\}]+$'),))
+                                         validators=(
+                                             RegexValidator(regex=MonitoringBackend.VALID_MONITORING_HOSTGROUP_REGEX),))
     monitoring_templates = s.ArrayField(max_items=32, default=[])
     installed = s.BooleanField(default=False)
     snapshot_limit_manual = s.IntegerField(required=False)  # Removed from json if null, limits set below

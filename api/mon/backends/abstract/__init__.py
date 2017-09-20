@@ -45,6 +45,8 @@ class AbstractMonitoringBackend(object):
     HIGH = 4
     DISASTER = 5
 
+    VALID_MONITORING_HOSTGROUP_REGEX = r'^[\w\s\.\-\,\"\{\}]+$'
+
     def __init__(self, dc, **kwargs):
         self.dc = dc
 
