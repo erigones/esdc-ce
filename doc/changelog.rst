@@ -7,6 +7,8 @@ Changelog
 Features
 --------
 
+- Added ability to send Post-registration email - `#261 <https://github.com/erigones/esdc-ce/issues/261>`__
+
 Bugs
 ----
 
