@@ -57,15 +57,15 @@ def send_mail(subject, body, recipient_list, bcc_list=None, from_email=None, con
     msg = EmailMessage(subject, body, from_email, recipient_list, bcc_list, connection=connection,
                        attachments=attachments, headers=headers, cc=cc_list)
 
+    if content_subtype:
+        msg.content_subtype = content_subtype
+
     # Send mail
     if attachments:
         logger.info('Sending mail to "%s" with subject "%s" and attachments "%s"',
                     recipient_list, subject, [i[0] for i in attachments])
     else:
         logger.info('Sending mail to "%s" with subject "%s"', recipient_list, subject)
-
-    if content_subtype:
-        msg.content_subtype = content_subtype
 
     return msg.send(fail_silently=fail_silently)
 
@@ -132,9 +132,10 @@ def _sendmail(user, subject_template_name, body_template_name, recipient_list=No
     if extra_context is not None:
         context.update(extra_context)
 
-    content_subtype = None
-    if body_template_name.endswith('html'):
+    if body_template_name.endswith('.html'):
         content_subtype = 'html'
+    else:
+        content_subtype = None
 
     # Render email subject and body
     body = render_to_string(body_template_name, context)
