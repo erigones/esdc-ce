@@ -88,7 +88,6 @@ __all__ = (
     'ArrayField',
     'DictArrayField',
     'IntegerArrayField',
-    'URLArrayField',
     'IPAddressArrayField',
     'CronField',
     'CIDRField',
@@ -119,14 +118,14 @@ def is_simple_callable(obj):
     """
     True if the object is a callable that takes no arguments.
     """
-    function = inspect.isfunction(obj)
+    function_ = inspect.isfunction(obj)
     method = inspect.ismethod(obj)
 
-    if not (function or method):
+    if not (function_ or method):
         return False
 
     args, _, _, defaults = inspect.getargspec(obj)
-    len_args = len(args) if function else len(args) - 1
+    len_args = len(args) if function_ else len(args) - 1
     len_defaults = len(defaults) if defaults else 0
 
     return len_args <= len_defaults
@@ -1191,7 +1190,7 @@ class DictField(WritableField):
     def from_native(self, value):
         try:
             return dict(value)
-        except:
+        except Exception:
             raise ValidationError(self.error_messages['invalid'])
 
 
@@ -1316,15 +1315,6 @@ class IntegerArrayField(BaseArrayField):
     _field = IntegerField()
     type_name = 'IntegerArrayField'
     type_label = 'integers'
-
-
-class URLArrayField(BaseArrayField):
-    """
-    ArrayField with url validation.
-    """
-    _field = URLField()
-    type_name = 'URLArrayField'
-    type_label = 'urls'
 
 
 class IPAddressArrayField(BaseArrayField):
