@@ -1,3 +1,5 @@
+from os.path import exists
+
 from django.conf import settings
 from django.shortcuts import render, redirect
 from django.views.decorators.cache import never_cache
@@ -16,6 +18,7 @@ from gui.accounts.utils import get_client_ip, clear_attempts_cache
 from gui.decorators import logout_required
 from api.sms.views import internal_send as send_sms
 from api.decorators import setting_required
+from api.email import sendmail
 
 logger = getLogger(__name__)
 auth_logger = getLogger('gui.auth')
@@ -104,6 +107,23 @@ def registration_check(request, uidb64=None, token=None):
             'password': password
         }
         sms_sent = send_sms(profile.phone, msg)
+
+        template_path = '/opt/erigones/gui/templates/'
+        subject = 'gui/accounts/post_register_subject.txt'
+        body_file_prefix = 'gui/accounts/post_register_email'
+        content_subtype = None
+
+        if exists(template_path + subject) and exists(template_path + body_file_prefix + '.html'):
+            content_subtype = 'html'
+            body = body_file_prefix + '.html'
+        elif exists(template_path + subject) and exists(template_path + body_file_prefix + '.txt'):
+            body = body_file_prefix + '.txt'
+
+        try:
+            sendmail(None, subject, body, recipient_list=[user.email], dc=request.dc, content_subtype=content_subtype)
+        except NameError:
+            logger.info('Could not find post registration email subject: "%s" or template: "%s"' %
+                        (template_path + subject, template_path + body_file_prefix + '.[html|txt]'))
 
     return render(request, 'gui/accounts/register_check.html', {
         'user': user,
