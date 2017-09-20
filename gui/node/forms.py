@@ -1,12 +1,14 @@
 from operator import and_
 from functools import reduce
 from django import forms
+from django.core.validators import RegexValidator
 from django.db.models import Q, Count
 from django.utils.translation import ugettext_lazy as _
 from django.template.defaultfilters import filesizeformat
 from django.http import Http404
 from django.utils.six import PY3
 
+from api.mon import MonitoringBackend
 from api.vm.utils import get_owners
 from api.dc.utils import get_dcs
 from api.node.define.views import node_define
@@ -65,6 +67,8 @@ class NodeForm(SerializerForm):
                                                                 'data-tags-api-call': 'mon_node_template_list'}))
     monitoring_hostgroups = ArrayField(label=_('Monitoring hostgroups'), required=False, tags=True,
                                        help_text=_('Comma-separated list of custom monitoring hostgroups.'),
+                                       validators=[
+                                           RegexValidator(regex=MonitoringBackend.VALID_MONITORING_HOSTGROUP_REGEX)],
                                        widget=ArrayWidget(tags=True, escape_space=False,
                                                           attrs={'class': 'tags-select2 narrow',
                                                                  'data-tags-type': 'mon_hostgroups',

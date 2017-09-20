@@ -376,8 +376,12 @@ class ZabbixBase(object):
             try:
                 gids.add(int(self._zabbix_get_groupid(name.format(**obj_kwargs))))
             except ZabbixError:
-                log(WARNING, 'Could not fetch zabbix hostgroup id for hostgroup "%s". '
-                             'Creating new hostgroup %s instead.', name, qualified_hostgroup_name)
+                if dc_name:
+                    log(WARNING, 'Could not fetch zabbix hostgroup id for hostgroup "%s". '
+                                 'Creating new hostgroup %s instead.', name, qualified_hostgroup_name)
+                else:
+                    log(WARNING, 'Could not fetch zabbix hostgroup id for hostgroup "%s". '
+                                 'Skipping creation as no dc_name is provided.', name)
             else:
                 continue
 
