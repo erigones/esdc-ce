@@ -72,7 +72,7 @@ def send_mail(subject, body, recipient_list, bcc_list=None, from_email=None, con
 
 def _sendmail(user, subject_template_name, body_template_name, recipient_list=None, bcc_list=None, from_email=None,
               connection=None, attachments=None, fail_silently=False, headers=None, cc_list=None, extra_context=None,
-              user_i18n=False, billing_email=False, dc=None, content_subtype=None):
+              user_i18n=False, billing_email=False, dc=None):
     """
     Like https://docs.djangoproject.com/en/dev/topics/email/#send-mail
     But we are using templates instead of subject/message text.
@@ -131,6 +131,10 @@ def _sendmail(user, subject_template_name, body_template_name, recipient_list=No
     # Add extra context if specified
     if extra_context is not None:
         context.update(extra_context)
+
+    content_subtype = None
+    if body_template_name.endswith('html'):
+        content_subtype = 'html'
 
     # Render email subject and body
     body = render_to_string(body_template_name, context)
