@@ -1238,6 +1238,8 @@ class BaseArrayField(CharField):
         self.max_items = kwargs.pop('max_items', None)
         self.min_items = kwargs.pop('min_items', None)
         self.exact_items = kwargs.pop('exact_items', None)
+        # We want to use custom validators on each used field, not on the array itself:
+        self._field.validators.extend(kwargs.pop('validators', ()))
         super(BaseArrayField, self).__init__(*args, **kwargs)
 
     def to_native(self, value):
