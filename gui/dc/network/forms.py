@@ -12,7 +12,7 @@ from api.vm.utils import get_owners
 from gui.forms import SerializerForm
 from gui.fields import ArrayField
 from gui.widgets import ArrayWidget
-from vms.models import Subnet, IPAddress, DefaultDc, Node
+from vms.models import Subnet, IPAddress, Node
 
 TEXT_INPUT_ATTRS = {'class': 'input-transparent narrow', 'required': 'required'}
 SELECT_ATTRS = {'class': 'narrow input-select2'}
@@ -84,7 +84,6 @@ class AdminNetworkForm(SerializerForm):
     def __init__(self, request, net, *args, **kwargs):
         super(AdminNetworkForm, self).__init__(request, net, *args, **kwargs)
         self.fields['owner'].choices = get_owners(request).values_list('username', 'username')
-        self.fields['nic_tag'].choices = [(i, i) for i in sorted(DefaultDc().settings.VMS_NET_NIC_TAGS)]
         self.fields['nic_tag'].choices = Node.all_nictags_choices()
 
         if not request.user.is_staff:

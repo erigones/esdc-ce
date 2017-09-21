@@ -17,7 +17,7 @@ from gui.models import User
 
 NODES_ALL_KEY = 'nodes_list'
 NODES_ALL_EXPIRES = 300
-NICTAGS_ALL_KEY = 'nictag_choices_list'
+NICTAGS_ALL_KEY = 'nictag_list'
 NICTAGS_ALL_EXPIRES = 300
 
 
@@ -409,20 +409,32 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
         return nodes
 
     @classmethod
-    def all_nictags_choices(cls, clear_cache=False):
-       """Return list of all nodes from cache"""
-       if clear_cache:
-           return cache.delete(NICTAGS_ALL_KEY)
+    def all_nictags(cls, clear_cache=False):
+        """Return dictionary with of nictags {name:type}"""
+        if clear_cache:
+            cache.delete(NICTAGS_ALL_KEY)
 
-       nictags = cache.get(NICTAGS_ALL_KEY)
+        nictags = cache.get(NICTAGS_ALL_KEY)
 
-       if not nictags:
-           nodes = cls.objects.all()
-           nictags = {(nic['name'], '%s (%s)' % (nic['name'], nic['type'])) for node in nodes for nic in node.nictags}
+        if not nictags:
+            nodes = cls.objects.all()
+            nictags = {}
 
-           cache.set(NODES_ALL_KEY, nictags, NICTAGS_ALL_EXPIRES)
+            for node in nodes:
+                for nic in node.nictags:
+                    if nic['name'] in nictags and nic['type'] != nictags[nic['name']]:
+                        raise ValueError('Duplicate NIC tag name with different type exists on another compute node!')
 
-       return nictags
+                    nictags[nic['name']] = nic['type']
+
+            cache.set(NODES_ALL_KEY, nictags, NICTAGS_ALL_EXPIRES)
+
+        return nictags
+
+    @classmethod
+    def all_nictags_choices(cls):
+        """Return set of tuples that are used as choices in nictag field in NetworkSerializer"""
+        return sorted({(name, '%s (%s)' % (name, typ)) for name, typ in six.iteritems(cls.all_nictags())})
 
     @property
     def _initializing_key(self):
@@ -617,9 +629,9 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
             if save_ip and self._ip:
                 self._ip.save()
 
-        if clear_cache or status_changed:
-            self.all(clear_cache=True)
-            self.all_nictags_choices(clear_cache=True)
+            if clear_cache or status_changed:
+                self.all(clear_cache=True)
+                self.all_nictags(clear_cache=True)
 
         if self.zpool and (zpool_update or zpool_create):
             self.storage.save()  # size parameters were updated during update_resources()
@@ -656,7 +668,7 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
         """Clear list of all nodes from cache"""
         ret = super(Node, self).delete(**kwargs)
         self.all(clear_cache=True)
-        self.all_nictags_choices(clear_cache=True)
+        self.all_nictags(clear_cache=True)
         return ret
 
     def _get_queue(self, speed):
