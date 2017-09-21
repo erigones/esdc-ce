@@ -105,7 +105,6 @@ class VmDefineSerializer(VmBaseSerializer):
         self.request = request
         self.old_hostname = None
         self.hostname_changed = False
-        self.template_changed = False
         self.zpool_changed = False
         self.node_changed = False
         self.update_node_resources = False
@@ -307,7 +306,7 @@ class VmDefineSerializer(VmBaseSerializer):
             pass
         else:
             if self.object and value and self.object.template != value:
-                self.template_changed = True
+                raise s.ValidationError(_('Cannot change template.'))
 
         return attrs
 

@@ -1,18 +1,39 @@
 Changelog
 #########
 
-2.6.4 (unreleased)
+2.6.5 (unreleased)
 ==================
 
 Features
 --------
 
+Bugs
+----
+
+- Fixed highlighting of backups clicked on in the node's backup list - `#260 <https://github.com/erigones/esdc-ce/issues/260>`__
+
+
+2.6.4 (released on 2017-09-11)
+==============================
+
+Features
+--------
+
 - Added code to collect NIC tags via node_sysinfo API call - `#226 <https://github.com/erigones/esdc-ce/issues/226>`__
+- Added ``GET /system/stats`` API function - `#233 <https://github.com/erigones/esdc-ce/issues/233>`__
+- Added ability to reset VM status back to ``notcreated`` when VM does not exist on compute node - `#248 <https://github.com/erigones/esdc-ce/issues/248>`__
+- Added documentation of ``json::`` and ``file::`` prefixes for *es* parameters - `esdc-docs#23 <https://github.com/erigones/esdc-docs/issues/23>`__
+- Changed *es* TOKEN_STORE default to be OS independent - `#251 <https://github.com/erigones/esdc-ce/issues/251>`__
+- Added ``post`` and ``put`` actions into *es* - `#252 <https://github.com/erigones/esdc-ce/issues/252>`__
 
 Bugs
 ----
 
+- Documented and implemented hidden DELETE methods for snapshot, backup, DNS records, and IP list API calls - `#237 <https://github.com/erigones/esdc-ce/issues/237>`__
 - Fixed allowed_ips type on all occurrences to list instead of set to enable JSON serialization - `#242 <https://github.com/erigones/esdc-ce/issues/242>`__
+- Updated all internal service VM images to be available from the image server and mgmt system - `#244 <https://github.com/erigones/esdc-ce/issues/244>`__
+- Fixed the process how disks are defined when template is used - `#247 <https://github.com/erigones/esdc-ce/issues/247>`__
+- Fixed bug when deploying VM with dhcp_passthrough network - `#249 <https://github.com/erigones/esdc-ce/issues/249>`__
 
 
 2.6.3 (released on 2017-08-21)

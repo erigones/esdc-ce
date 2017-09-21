@@ -57,6 +57,10 @@ class NetworkIPView(APIView):
 
                 ip_filter.append(Q(ip__in=ips))
 
+            else:
+                if request.method == 'DELETE':
+                    raise InvalidInput('Invalid ips')
+
             if request.method == 'GET':
                 usage = data.get('usage', None)
 

@@ -30,4 +30,6 @@ urlpatterns = patterns(
     url(r'^logs/$', 'system_logs', name='system_logs'),
     # /system/settings/ssl-certificate - set
     url(r'^settings/ssl-certificate/$', 'system_settings_ssl_certificate', name='system_settings_ssl_certificate'),
+    # /system/stats
+    url(r'^stats/$', 'system_stats', name='system_stats'),
 )
