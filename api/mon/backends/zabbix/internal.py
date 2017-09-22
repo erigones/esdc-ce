@@ -4,6 +4,7 @@ from django.conf import settings as django_settings
 from zabbix_api import ZabbixAPIException
 
 from api.decorators import catch_exception
+from vms.models import DefaultDc
 from .base import ZabbixError, ZabbixBase, logger
 
 
@@ -27,15 +28,22 @@ class InternalZabbix(ZabbixBase):
     # noinspection PyProtectedMember
     def _vm_groups(self, vm, log=None):
         """Return set of zabbix hostgroup IDs for a VM"""
-        return self._get_groups(self._vm_kwargs(vm), django_settings._MON_ZABBIX_HOSTGROUP_VM,
-                                django_settings._MON_ZABBIX_HOSTGROUPS_VM, log=log, dc_name=vm.dc.name)
+        return self._get_or_create_groups(self._vm_kwargs(vm),
+                                          django_settings._MON_ZABBIX_HOSTGROUP_VM,
+                                          vm.dc.name,
+                                          django_settings._MON_ZABBIX_HOSTGROUPS_VM,
+                                          log)
 
     def _node_groups(self, node, log=None):
         """Return set of zabbix hostgroup IDs for a Compute node"""
         hostgroups = set(self.settings.MON_ZABBIX_HOSTGROUPS_NODE)
         hostgroups.update(node.monitoring_hostgroups)
 
-        return self._get_groups(self._node_kwargs(node), self.settings.MON_ZABBIX_HOSTGROUP_NODE, hostgroups, log=log)
+        return self._get_or_create_groups(self._node_kwargs(node),
+                                          self.settings.MON_ZABBIX_HOSTGROUP_NODE,
+                                          DefaultDc().name,
+                                          hostgroups,
+                                          log)
 
     # noinspection PyProtectedMember
     def _vm_templates(self, vm, log=None):

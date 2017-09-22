@@ -340,7 +340,7 @@ class ZabbixBase(object):
             logger.exception(ex)
             raise ZabbixError('Cannot find zabbix proxy id for proxy "%s"' % proxy)
 
-    def _get_groups(self, obj_kwargs, hostgroup, hostgroups=(), log=None, dc_name=""):
+    def _get_or_create_groups(self, obj_kwargs, hostgroup, dc_name, hostgroups=(), log=None):
         """Return set of zabbix hostgroup IDs for an object"""
         log = log or self.log
         gids = set()
@@ -363,31 +363,26 @@ class ZabbixBase(object):
                 continue
 
             # Local hostgroup has to be checked first.
-            if dc_name:
-                qualified_hostgroup_name = ZabbixHostGroupContainer.hostgroup_name_factory(name.format(**obj_kwargs),
-                                                                                           dc_name=dc_name)
-                try:
-                    gids.add(int(self._zabbix_get_groupid(qualified_hostgroup_name)))
-                except ZabbixError:
-                    pass
-                else:
-                    continue
+
+            qualified_hostgroup_name = ZabbixHostGroupContainer.hostgroup_name_factory(name.format(**obj_kwargs),
+                                                                                       dc_name=dc_name)
+            try:
+                gids.add(int(self._zabbix_get_groupid(qualified_hostgroup_name)))
+            except ZabbixError:
+                pass
+            else:
+                continue
 
             try:
                 gids.add(int(self._zabbix_get_groupid(name.format(**obj_kwargs))))
             except ZabbixError:
-                if dc_name:
-                    log(WARNING, 'Could not fetch zabbix hostgroup id for hostgroup "%s". '
-                                 'Creating new hostgroup %s instead.', name, qualified_hostgroup_name)
-                else:
-                    log(WARNING, 'Could not fetch zabbix hostgroup id for hostgroup "%s". '
-                                 'Skipping creation as no dc_name is provided.', name)
+                log(WARNING, 'Could not fetch zabbix hostgroup id for hostgroup "%s". '
+                             'Creating new hostgroup %s instead.', name, qualified_hostgroup_name)
             else:
                 continue
 
-            if dc_name:
-                #  If we have the dc_name, we are free to create a dc qualified host group
-                gids.add(ZabbixHostGroupContainer(qualified_hostgroup_name, zapi=self.zapi).create().zabbix_id)
+            #  If we got here, we are free to create a dc qualified host group
+            gids.add(ZabbixHostGroupContainer(qualified_hostgroup_name, zapi=self.zapi).create().zabbix_id)
 
         return gids
 
@@ -1234,7 +1229,7 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
         container = cls(name=group_name, zapi=zapi)
         container.users = {ZabbixUserContainer.from_mgmt_data(zapi, user) for user in users}
         container.host_groups = {ZabbixHostGroupContainer.from_mgmt_data(zapi, hostgroup)
-                                 for hostgroup in accessible_hostgroups}  # self._get_groups
+                                 for hostgroup in accessible_hostgroups}  # self._get_or_create_groups
         container.superuser_group = superusers  # FIXME this information is not used anywhere by now
 
         return container

@@ -39,8 +39,11 @@ class ExternalZabbix(ZabbixBase):
         hostgroups = set(self.settings.MON_ZABBIX_HOSTGROUPS_VM)
         hostgroups.update(vm.monitoring_hostgroups)
 
-        return self._get_groups(self._vm_kwargs(vm), self.settings.MON_ZABBIX_HOSTGROUP_VM, hostgroups, log=log,
-                                dc_name=vm.dc.name)
+        return self._get_or_create_groups(self._vm_kwargs(vm),
+                                          self.settings.MON_ZABBIX_HOSTGROUP_VM,
+                                          vm.dc.name,
+                                          hostgroups,
+                                          log)
 
     def _vm_templates(self, vm, log=None):
         """Return set of zabbix template IDs for a VM"""
