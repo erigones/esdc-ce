@@ -283,6 +283,10 @@ class AdminServerSettingsForm(ServerSettingsForm):
         if dc_settings.MON_ZABBIX_HOSTGROUPS_VM_RESTRICT:
             self.fields['monitoring_hostgroups'].widget.tag_choices = dc_settings.MON_ZABBIX_HOSTGROUPS_VM_ALLOWED
 
+        if dc_settings.MON_ZABBIX_HOSTGROUPS_VM:
+            self.fields['monitoring_hostgroups'].help_text += ' Automatically added templates: ' \
+                                                              + ', '.join(dc_settings.MON_ZABBIX_HOSTGROUPS_VM)
+
         if vm:
             empty_template_data = {}
             self.fields['ostype'].widget.attrs['disabled'] = 'disabled'
