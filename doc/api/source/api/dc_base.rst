@@ -159,12 +159,6 @@
                     "VMS_DISK_IMAGE_LX_ZONE_DEFAULT": "alpine-3",
                     "VMS_DISK_MODEL_DEFAULT": "virtio", 
                     "VMS_NET_DEFAULT": "lan", 
-                    "VMS_NET_NIC_TAGS": [
-                        "admin", 
-                        "external", 
-                        "internal", 
-                        "storage"
-                    ], 
                     "VMS_NET_VLAN_ALLOWED": [],
                     "VMS_NET_VLAN_RESTRICT": true,
                     "VMS_NET_LIMIT": null,

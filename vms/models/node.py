@@ -629,6 +629,7 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
             if save_ip and self._ip:
                 self._ip.save()
 
+            # this may eventually block the creation or update of the node from sysinfo
             if clear_cache or status_changed:
                 self.all(clear_cache=True)
                 self.all_nictags(clear_cache=True)

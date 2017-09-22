@@ -32,6 +32,7 @@ class NetworkSerializer(s.InstanceSerializer):
     netmask = s.IPAddressField()
     gateway = s.IPAddressField(required=False)  # can be null
     nic_tag = s.ChoiceField()
+    nic_tag_type = s.CharField(read_only=True)
     vlan_id = s.IntegerField(min_value=0, max_value=4096)
     resolvers = s.IPAddressArrayField(source='resolvers_api', required=False, max_items=8)
     dns_domain = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\._-]*$', max_length=250, required=False)  # can be blank
