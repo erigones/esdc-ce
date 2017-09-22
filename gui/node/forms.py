@@ -77,6 +77,11 @@ class NodeForm(SerializerForm):
     def __init__(self, request, node, *args, **kwargs):
         super(NodeForm, self).__init__(request, node, *args, **kwargs)
         self.fields['owner'].choices = get_owners(request).values_list('username', 'username')
+        dc_settings = request.dc.settings
+
+        if dc_settings.MON_ZABBIX_HOSTGROUPS_VM:
+            self.fields['monitoring_hostgroups'].help_text += _(' Automatically added hostgroups: ') \
+                                                              + ', '.join(dc_settings.MON_ZABBIX_HOSTGROUPS_VM)
 
         if node.is_unlicensed():
             self.fields['status'].choices = Node.STATUS_DB
