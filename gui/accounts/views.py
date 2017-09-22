@@ -121,7 +121,7 @@ def registration_check(request, uidb64=None, token=None):
             body = body_file_prefix + '.txt'
 
         if body:
-            sendmail(None, subject, body, recipient_list=[user.email], dc=request.dc)
+            sendmail(user, subject, body, dc=request.dc)
         else:
             logger.info('Post registration email subject template: "%s" or body template: "%s" does not exists.' %
                         (subject_path, path.join(template_path, body_file_prefix + '.[html|txt]')))
