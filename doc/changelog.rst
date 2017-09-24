@@ -8,6 +8,7 @@ Features
 --------
 
 - Added ability to send Post-registration email - `#261 <https://github.com/erigones/esdc-ce/issues/261>`__
+- Added node version caching and internal update events - `#271 <https://github.com/erigones/esdc-ce/issues/271>`__
 
 Bugs
 ----
