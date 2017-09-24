@@ -721,6 +721,10 @@ function _task_event_callback(result) {
       alert2(result.message);
       break;
 
+    case 'user_current_dc_changed':
+      alert2(gettext('Your current datacenter was changed. Please log out and log in again or <a class="btn-link" href="/">navigate to the default page</a>.'));
+      break;
+
     default: // send notification
       if (typeof(result.message) !== 'undefined') {
         notify('info', result.message);

@@ -174,19 +174,28 @@ class User(AbstractBaseUser, PermissionsMixin, _AclMixin, _DcBoundMixin):
             self.save(update_fields=('default_dc',))
         return self.default_dc
 
-    @current_dc.setter
-    def current_dc(self, dc):
-        if self.default_dc != dc:
-            logger.debug('Default DC for user "%s" changed to "%s"', self.username, dc.name)
-            self.default_dc = dc
-            self.save(update_fields=('default_dc',))
-
     @property
     def current_dc_id(self):
         if not self.default_dc_id:
             self.default_dc_id = settings.VMS_DC_DEFAULT
             self.save(update_fields=('default_dc',))
         return self.default_dc_id
+
+    def save_current_dc(self, dc):
+        from api.accounts.user.events import UserCurrentDcChanged
+
+        if self.default_dc != dc:
+            logger.debug('Default DC for user "%s" changed to "%s"', self.username, dc.name)
+            old_current_dc_id = self.current_dc_id
+            self.default_dc = dc
+            self.save(update_fields=('default_dc',))
+            # Send direct event to the user working in the old DC
+            UserCurrentDcChanged(self.id, dc_id=old_current_dc_id).send()
+
+    def reset_current_dc(self):
+        from vms.models import DefaultDc  # Circular imports
+
+        return self.save_current_dc(DefaultDc())
 
     @property
     def vms_tags(self):

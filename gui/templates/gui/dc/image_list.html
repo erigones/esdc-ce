@@ -149,7 +149,13 @@
             {% if all %}
             <td class="hidden-phone"><small class="vm_hostname">{{ img.dc.all|dcify }}</small></td>
             {% else %}
-            <td class="hidden-phone"><small class="vm_snapshot_note">{{ img.desc|wordwrap:44 }}</small></td>
+            <td class="hidden-phone">
+              {% if img.homepage %}
+              <a href="{{ img.homepage }}" target="_blank" class="btn-icon-external-link btn-text btn-link no-ajax"><small class="vm_snapshot_note">{{ img.desc|wordwrap:44 }}</small></a>
+              {% else %}
+              <small class="vm_snapshot_note">{{ img.desc|wordwrap:44 }}</small>
+              {% endif %}
+            </td>
             {% endif %}
           </tr>
           {% endfor %}
