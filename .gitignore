@@ -1,3 +1,8 @@
+# Danube Cloud stuff
+gui/templates/gui/accounts/post_register_subject.txt
+gui/templates/gui/accounts/post_register_email.txt
+gui/templates/gui/accounts/post_register_email.html
+
 # Django stuff
 *.log
 *.pot

@@ -250,4 +250,4 @@ def task_log_stats(request, data=None):
         :status 400: Error object with "detail" attribute
         :status 403: Forbidden
     """
-    return TaskLogView(request, data=data).get_stats_response()
+    return TaskLogView(request, data=data).get_stats()

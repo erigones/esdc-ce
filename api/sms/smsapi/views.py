@@ -47,6 +47,20 @@ def login_data():
     }
 
 
+def _smsapi_response_adapter(response):
+    """
+    Adapter to correct response code if there is error with the SMS.
+    SMSAPI returns response status code 200 but text of the response is ERROR #230
+    """
+    if response.status_code == requests.codes.ok and response.text.startswith('ERROR'):
+        new_status_code = 406
+        logger.warning('SMSAPI response got status code %s and contains "%s". Updating SMSAPI response status code to '
+                       '%s!', response.status_code, response.text, new_status_code)
+        response.status_code = new_status_code
+
+    return response
+
+
 def sms_send(phone, message):
     """
     Send text message.
@@ -56,7 +70,7 @@ def sms_send(phone, message):
     data['to'] = phone.replace('+', '')
     data['message'] = message
 
-    return requests.post('https://api.smsapi.com/sms.do', data)
+    return _smsapi_response_adapter(requests.post('https://api.smsapi.com/sms.do', data))
 
 
 def _get_callback_param(data, attr, index):

@@ -113,7 +113,7 @@ class DcSerializer(s.InstanceSerializer):
                 if self.object.is_default() and not user.is_staff:
                     raise s.ValidationError(_('Default datacenter must be owned by user with SuperAdmin rights.'))
                 if user != self.object.owner:
-                    self.owner_changed = user
+                    self.owner_changed = self.object.owner  # Save old owner
                     # Cannot change owner while pending tasks exist
                     validate_owner(self.object, user, _('Datacenter'))
 
@@ -149,6 +149,7 @@ class ExtendedDcSerializer(SuperDcSerializer):
     """
     Include extended datacenter statistics (only available for staff).
     """
+    # noinspection SqlDialectInspection,SqlNoDataSourceInspection
     extra_select = frozendict({
         'nodes': '''SELECT COUNT(*) FROM "vms_dcnode" WHERE "vms_dc"."id" = "vms_dcnode"."dc_id"''',
         'vms': '''SELECT COUNT(*) FROM "vms_vm" WHERE "vms_dc"."id" = "vms_vm"."dc_id"''',

@@ -41,9 +41,9 @@ def execute_sql(query, params):
     db_cursor.execute(query, params)
 
     if debug:
-	for notice in db_connection.notices:
-	    print(notice.strip())
-	del db_connection.notices[:]
+        for notice in db_connection.notices:
+            print(notice.strip())
+        del db_connection.notices[:]
         print('***')
 
 

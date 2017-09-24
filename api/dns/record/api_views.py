@@ -57,6 +57,8 @@ class RecordView(APIView):
             qs = self.domain.record_set.select_related('domain').order_by(*self.order_by)
 
             if records is None:
+                if request.method == 'DELETE':
+                    raise InvalidInput('Invalid records')
                 self.record = qs
             else:
                 if not isinstance(records, (tuple, list)):

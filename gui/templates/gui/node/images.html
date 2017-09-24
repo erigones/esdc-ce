@@ -113,7 +113,13 @@
             <td class="hidden-phone-small"><span class="ns_image_status">{{ ns_status.display }}</span></td>
             <td><span{% if vms %} data-toggle="tooltip" data-placement="bottom" title="{% for vm in vms %}{{ vm.hostname }} ({% trans "DC" %}: {{ vm.dc }}){% if not forloop.last %}, {% endif %}{% endfor %}"{% endif %}><i class="icon-hdd"></i> {{ vms_count }}</span></td>
             <td class="hidden-phone"><i class="icon-cloud"></i> {{ img.dcs }}</td>
-            <td class="hidden-phone"><small class="vm_snapshot_note">{{ img.desc|wordwrap:44 }}</small></td>
+            <td class="hidden-phone">
+              {% if img.homepage %}
+              <a href="{{ img.homepage }}" target="_blank" class="btn-icon-external-link btn-text btn-link no-ajax"><small class="vm_snapshot_note">{{ img.desc|wordwrap:44 }}</small></a>
+              {% else %}
+              <small class="vm_snapshot_note">{{ img.desc|wordwrap:44 }}</small>
+              {% endif %}
+            </td>
           </tr>
           {% endwith %}{% endwith %}{% endfor %}
         </tbody>

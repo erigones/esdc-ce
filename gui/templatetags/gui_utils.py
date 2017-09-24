@@ -11,6 +11,7 @@ import re
 import pytz
 # noinspection PyCompatibility
 import ipaddress
+import markdown
 
 from api.utils.encoders import JSONEncoder
 from pdns.models import Record
@@ -304,3 +305,18 @@ def qs_del(query_string, param):
     qs = QueryDict(query_string, mutable=True)
     qs.pop(param, None)
     return qs.urlencode()
+
+
+@register.filter(is_safe=True)
+def markdownify(text):
+    safe_text = conditional_escape(text)
+
+    # noinspection PyBroadException
+    try:
+        safe_text = markdown.markdown(safe_text, extensions=('markdown.extensions.tables',
+                                                             'markdown.extensions.fenced_code'))
+    except Exception:
+        """We want too broad exception as we don't know what can get wrong in the markdown library."""
+        pass
+
+    return mark_safe(safe_text)
