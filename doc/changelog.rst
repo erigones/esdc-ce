@@ -7,6 +7,8 @@ Changelog
 Features
 --------
 
+- NIC tags will no longer be hardcoded, but rather colected from nodes - `#227 <https://github.com/erigones/esdc-ce/issues/227>`__
+
 Bugs
 ----
 
