@@ -8,6 +8,7 @@ from api.dc.utils import get_dc
 from api.email import sendmail
 from api.fields import get_boolean_value
 from api.permissions import generate_random_security_hash
+from api.serializers import ConditionalDCBoundSerializer
 from gui.models import User, Role
 from vms.models import Dc
 
@@ -38,7 +39,7 @@ class ApiKeysSerializer(s.InstanceSerializer):
         return attrs
 
 
-class UserSerializer(ApiKeysSerializer):
+class UserSerializer(ApiKeysSerializer, ConditionalDCBoundSerializer):
     """
     gui.models.User
     """
@@ -56,7 +57,6 @@ class UserSerializer(ApiKeysSerializer):
     is_active = s.BooleanField()
     api_access = s.BooleanField()
     groups = s.ArrayField(required=False, source='roles_api')
-    dc_bound = s.BooleanField(source='dc_bound_bool', default=True)
     created = s.DateTimeField(source='date_joined', read_only=True)
     password = s.CharField()
     old_email = None  # variable for value storage on email change
@@ -171,23 +171,13 @@ class UserSerializer(ApiKeysSerializer):
 
         return attrs
 
-    def validate_dc_bound(self, attrs, source):
-        try:
-            value = bool(attrs[source])
-        except KeyError:
-            pass
+    def _validate_dc_bound(self, value):  # Overrides superclass method
+
+        if value:
+            data = self.init_data or {}
+            return get_dc(self.request, data.get('dc', self.request.dc.name))
         else:
-            if value != self.object.dc_bound_bool:
-                if not self.request.user.is_staff:
-                    raise s.NoPermissionToModify
-
-                if value:
-                    data = self.init_data or {}
-                    self._dc_bound = get_dc(self.request, data.get('dc', self.request.dc.name))
-                else:
-                    self._dc_bound = None
-
-        return attrs
+            return None
 
     def validate_is_super_admin(self, attrs, source):
         try:

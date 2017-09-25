@@ -65,6 +65,9 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from api.relations import *
 from api.fields import *
 from api.fields import is_simple_callable, get_component
+from gui.models import Role
+from pdns.models import Domain
+from vms.models import Dc
 
 
 def _resolve_model(obj):
@@ -1432,3 +1435,48 @@ class InstanceSerializer(Serializer):
         self._delayed_data = None
 
         return self.object
+
+
+class ConditionalDCBoundSerializer(InstanceSerializer):
+    _dc_bound = None
+    dc_bound = BooleanField(source='dc_bound_bool', default=True)
+
+    def validate(self, attrs):
+        return super(ConditionalDCBoundSerializer, self).validate(attrs)
+
+    def _validate_dc_bound(self, value):
+        if value:
+            if isinstance(self.object, Domain):
+                dcs = Dc.objects.filter(domaindc__domain_id=self.object.id)
+            elif isinstance(self.object, Role):
+                dcs = Dc.objects.filter(roles=self.object)
+            else:
+                dcs = self.object.dc.all()
+
+            dcs_len = len(dcs)
+
+            if dcs_len == 1:
+                return dcs[0]
+            else:
+                # noinspection PyProtectedMember 2x
+                err = {'model': self._model_._meta.verbose_name}
+
+                if dcs_len > 1:
+                    raise ValidationError(_('%(model)s is attached into more than one datacenter.') % err)
+                elif dcs_len == 0:
+                    raise ValidationError(_('%(model)s is not attached into any datacenters.') % err)
+        else:
+            return None
+
+    def validate_dc_bound(self, attrs, source):
+        try:
+            value = bool(attrs[source])
+        except KeyError:
+            pass
+        else:
+            if value != self.object.dc_bound_bool:
+                if not self.request.user.is_staff:
+                    raise NoPermissionToModify
+                self._dc_bound = self._validate_dc_bound(value)
+
+        return attrs
