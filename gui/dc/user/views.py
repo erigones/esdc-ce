@@ -97,12 +97,13 @@ def dc_user_modal_form(request):
                 return redirect('dc_user_profile', username=form.cleaned_data['username'])
             else:
                 messages.success(request, _('User profile was successfully updated'))
-                user = user.__class__.objects.get(pk=user.pk)  # Reload user object from DB (modified in API)
-                # You can modify yourself and lose access to /dc - Issue #108
-                if request.user == user and not user.is_admin(dc=request.dc):
-                    redirect_to = '/'
-                else:
-                    redirect_to = 'dc_user_list'
+                redirect_to = 'dc_user_list'
+
+                if user:
+                    user = user.__class__.objects.get(pk=user.pk)  # Reload user object from DB (modified in API)
+                    # You can modify yourself and lose access to /dc - Issue #108
+                    if request.user == user and not user.is_admin(dc=request.dc):
+                        redirect_to = '/'
 
                 return redirect(redirect_to, query_string=qs)
 

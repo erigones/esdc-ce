@@ -1,3 +1,5 @@
+from os import path
+
 from django.conf import settings
 from django.shortcuts import render, redirect
 from django.views.decorators.cache import never_cache
@@ -16,6 +18,7 @@ from gui.accounts.utils import get_client_ip, clear_attempts_cache
 from gui.decorators import logout_required
 from api.sms.views import internal_send as send_sms
 from api.decorators import setting_required
+from api.email import sendmail
 
 logger = getLogger(__name__)
 auth_logger = getLogger('gui.auth')
@@ -104,6 +107,24 @@ def registration_check(request, uidb64=None, token=None):
             'password': password
         }
         sms_sent = send_sms(profile.phone, msg)
+
+        # Section below has been created so we are able to send optional email after successful registration issue #261
+        template_path = path.join(settings.PROJECT_DIR, 'gui', 'templates')
+        subject = 'gui/accounts/post_register_subject.txt'
+        subject_path = path.join(template_path, subject)
+        body_file_prefix = 'gui/accounts/post_register_email'
+        body = None
+
+        if path.exists(subject_path) and path.exists(path.join(template_path, body_file_prefix + '.html')):
+            body = body_file_prefix + '.html'
+        elif path.exists(subject_path) and path.exists(path.join(template_path, body_file_prefix + '.txt')):
+            body = body_file_prefix + '.txt'
+
+        if body:
+            sendmail(user, subject, body, dc=request.dc)
+        else:
+            logger.info('Post registration email subject template: "%s" or body template: "%s" does not exists.' %
+                        (subject_path, path.join(template_path, body_file_prefix + '.[html|txt]')))
 
     return render(request, 'gui/accounts/register_check.html', {
         'user': user,
