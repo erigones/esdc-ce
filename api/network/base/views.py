@@ -83,8 +83,7 @@ def net_manage(request, name, data=None):
         :type data.netmask: string
         :arg data.gateway: **required** - IPv4 gateway in quad-dotted format
         :type data.gateway: string
-        :arg data.nic_tag: **required** - NIC tag or device name on compute node. \
-One of admin, internal, external and storage
+        :arg data.nic_tag: **required** - NIC tag or device name on compute node.
         :type data.nic_tag: string
         :arg data.vlan_id: **required** - 802.1Q virtual LAN ID (0 - 4096; 0 = none)
         :type data.vlan_id: integer
@@ -134,7 +133,7 @@ One of admin, internal, external and storage
         :type data.netmask: string
         :arg data.gateway: IPv4 gateway in quad-dotted format
         :type data.gateway: string
-        :arg data.nic_tag: NIC tag or device name on compute node. One of admin, internal, external and storage
+        :arg data.nic_tag: NIC tag or device name on compute node.
         :type data.nic_tag: string
         :arg data.vlan_id: 802.1Q virtual LAN ID (0 - 4096; 0 = none)
         :type data.vlan_id: integer
