@@ -434,7 +434,7 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
     @classmethod
     def all_nictags_choices(cls):
         """Return set of tuples that are used as choices in nictag field in NetworkSerializer"""
-        return sorted({(name, '%s (%s)' % (name, typ)) for name, typ in six.iteritems(cls.all_nictags())})
+        return sorted([(name, '%s (%s)' % (name, typ)) for name, typ in six.iteritems(cls.all_nictags())])
 
     @property
     def _initializing_key(self):
