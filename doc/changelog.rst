@@ -15,6 +15,7 @@ Bugs
 
 - Fixed highlighting of backups clicked on in the node's backup list - `#260 <https://github.com/erigones/esdc-ce/issues/260>`__
 - Fixed Super admin delete user and got error 500 - `#263 <https://github.com/erigones/esdc-ce/issues/263>`__
+- Fixed NIC discovery in mgmt and mon VMs - `#270 <https://github.com/erigones/esdc-ce/issues/270>`__
 
 
 2.6.4 (released on 2017-09-11)

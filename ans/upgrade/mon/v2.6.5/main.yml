@@ -1,0 +1,13 @@
+#
+# https://github.com/erigones/esdc-ce/wiki/Known-Issues#network-down-in-vms-after-update-of-cloud-init-or-centos
+#
+- name: Fix parsing of network interfaces
+  lineinfile: dest="/etc/rc.d/rc.local"
+              regexp="^interfaces=\"\$\(ifconfig -a | grep \^eth | awk -F':' \'{print \$1}\'\)\""
+              line="interfaces=\"$(ifconfig -a | grep -E \'^eth|^net\' | awk -F':' \'{print $1}\')\""
+
+- name: Make /etc/rc.d/rc.local executable
+  file: path=/etc/rc.d/rc.local
+        owner=root
+        group=root
+        mode=0755
