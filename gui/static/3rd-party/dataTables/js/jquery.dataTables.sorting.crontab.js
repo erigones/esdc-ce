@@ -3,6 +3,7 @@ jQuery.extend(jQuery.fn.dataTableExt.oSort, {
     var crontab_entry = a.split(' ');
     var result = '';
     var item;
+    var i;
 
     // Use only minute and hour and ignore the rest
     for (i=1; i >= 0; i--) {
