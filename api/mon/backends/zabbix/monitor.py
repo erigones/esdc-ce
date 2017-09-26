@@ -442,7 +442,7 @@ class Zabbix(AbstractMonitoringBackend):
         return self.ezx.get_template_list()
 
     def _get_filtered_hostgroups(self, exclude_dc_specific):
-        qualified_host_group_name_regexp = ZabbixHostGroupContainer.QUALIFIED_NAME_REGEXP
+        qualified_host_group_name_regexp = ZabbixHostGroupContainer.RE_NAME_WITH_DC_PREFIX
         for host_group in self.ezx.get_hostgroup_list():
             match = qualified_host_group_name_regexp.match(host_group['name'])
             if match and exclude_dc_specific:

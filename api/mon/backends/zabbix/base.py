@@ -1409,7 +1409,7 @@ class ZabbixHostGroupContainer(ZabbixNamedContainer):
     Container class for the Zabbix HostGroup object.
     Incomplete, TODO
     """
-    QUALIFIED_NAME_REGEXP = re.compile(r'^:(?P<dc>.+):(?P<hostgroup>.+):')
+    RE_NAME_WITH_DC_PREFIX = re.compile(r'^:(?P<dc>.+):(?P<hostgroup>.+):$')
     zabbix_id = None
 
     def __init__(self, name, zapi=None):
