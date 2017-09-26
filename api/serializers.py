@@ -1436,12 +1436,24 @@ class InstanceSerializer(Serializer):
 
         return self.object
 
+    @property
+    def _model_verbose_name(self):
+        # noinspection PyProtectedMember 2x
+        return self._model_._meta.verbose_name
+
 
 class ConditionalDCBoundSerializer(InstanceSerializer):
     _dc_bound = None
     dc_bound = BooleanField(source='dc_bound_bool', default=True)
 
     def validate(self, attrs):
+        if attrs.get('dc_bound_bool', self.object.dc_bound_bool) and not self.request.data.get('dc', None):
+            err = {'model': self._model_verbose_name.lower()}
+            self._errors['dc_bound'] = self._errors['dc'] = (
+                _('You have to specify to which datacenter shall the %(model)s be bound. '
+                  'Either use the *dc* parameter or set the *dc_bound* parameter to False.') % err
+            )
+
         return super(ConditionalDCBoundSerializer, self).validate(attrs)
 
     def _validate_dc_bound(self, value):
@@ -1458,8 +1470,7 @@ class ConditionalDCBoundSerializer(InstanceSerializer):
             if dcs_len == 1:
                 return dcs[0]
             else:
-                # noinspection PyProtectedMember 2x
-                err = {'model': self._model_._meta.verbose_name}
+                err = {'model': self._model_verbose_name}
 
                 if dcs_len > 1:
                     raise ValidationError(_('%(model)s is attached into more than one datacenter.') % err)

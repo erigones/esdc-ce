@@ -134,7 +134,7 @@ class NetworkSerializer(s.ConditionalDCBoundSerializer):
             if dc_settings.VMS_NET_VLAN_RESTRICT and vlan_id not in dc_settings.VMS_NET_VLAN_ALLOWED:
                 self._errors['vlan_id'] = s.ErrorList([_('VLAN ID is not available in datacenter.')])
 
-        return attrs
+        return super(NetworkSerializer, self).validate(attrs)
 
     # noinspection PyMethodMayBeStatic
     def update_errors(self, fields, err_msg):

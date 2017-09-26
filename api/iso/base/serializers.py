@@ -54,7 +54,7 @@ class IsoSerializer(s.ConditionalDCBoundSerializer):
                 if Iso.objects.filter(dc_bound=self._dc_bound).count() >= int(limit):
                     raise s.ValidationError(_('Maximum number of ISO images reached'))
 
-        return attrs
+        return super(IsoSerializer, self).validate(attrs)
 
 
 class ExtendedIsoSerializer(IsoSerializer):

@@ -239,7 +239,7 @@ class UserSerializer(ApiKeysSerializer, ConditionalDCBoundSerializer):
             if Dc.objects.filter(roles__in=groups).exclude(id=dc.id).exists():
                 self._errors['dc_bound'] = s.ErrorList([_("User's group(s) are attached into another datacenter(s).")])
 
-        return attrs
+        return super(UserSerializer, self).validate(attrs)
 
     def _setattr(self, instance, source, value):
         """Update user password if parameter was passed from es"""

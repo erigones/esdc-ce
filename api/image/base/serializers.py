@@ -97,7 +97,7 @@ class ImageSerializer(s.ConditionalDCBoundSerializer):
                 if Image.objects.filter(dc_bound=self._dc_bound).count() >= int(limit):
                     raise s.ValidationError(_('Maximum number of server disk images reached'))
 
-        return attrs
+        return super(ImageSerializer, self).validate(attrs)
 
 
 class ExtendedImageSerializer(ImageSerializer):

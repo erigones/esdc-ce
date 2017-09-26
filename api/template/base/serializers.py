@@ -147,7 +147,7 @@ class TemplateSerializer(s.ConditionalDCBoundSerializer):
                 if VmTemplate.objects.filter(dc_bound=self._dc_bound).count() >= int(limit):
                     raise s.ValidationError(_('Maximum number of server templates reached'))
 
-        return attrs
+        return super(TemplateSerializer, self).validate(attrs)
 
 
 class ExtendedTemplateSerializer(TemplateSerializer):
