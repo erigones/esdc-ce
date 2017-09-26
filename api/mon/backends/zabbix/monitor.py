@@ -461,7 +461,7 @@ class Zabbix(AbstractMonitoringBackend):
 
     def hostgroup_list(self, exclude_dc_specific=False):
         """[EXTERNAL] Return list of available hostgroups"""
-        return [hostgroup for hostgroup in self._get_filtered_hostgroups(exclude_dc_specific=exclude_dc_specific)]
+        return list(self._get_filtered_hostgroups(exclude_dc_specific=exclude_dc_specific))
 
     def synchronize_user_group(self, group=None, dc_as_group=None):
         kwargs = {}
