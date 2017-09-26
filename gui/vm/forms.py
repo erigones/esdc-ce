@@ -248,7 +248,7 @@ class AdminServerSettingsForm(ServerSettingsForm):
                                                          attrs={'class': 'tags-select2 narrow'}))
     monitoring_hostgroups = ArrayField(label=_('Monitoring hostgroups'), required=False, tags=True,
                                        validators=[
-                                           RegexValidator(regex=MonitoringBackend.VALID_MONITORING_HOSTGROUP_REGEX)],
+                                           RegexValidator(regex=MonitoringBackend.RE_MONITORING_HOSTGROUP)],
                                        help_text=_('Comma-separated list of custom monitoring hostgroups.'),
                                        widget=ArrayWidget(tags=True, escape_space=False,
                                                           attrs={'class': 'tags-select2 narrow'}))

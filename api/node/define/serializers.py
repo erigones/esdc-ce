@@ -45,7 +45,7 @@ class NodeDefineSerializer(s.InstanceSerializer):
     sysinfo = s.Field(source='api_sysinfo')  # Field is read_only=True by default
     monitoring_hostgroups = s.ArrayField(max_items=16, default=[],
                                          validators=(
-                                             RegexValidator(regex=MonitoringBackend.VALID_MONITORING_HOSTGROUP_REGEX),))
+                                             RegexValidator(regex=MonitoringBackend.RE_MONITORING_HOSTGROUP),))
     monitoring_templates = s.ArrayField(max_items=32, default=[])
     created = s.DateTimeField(read_only=True, required=False)
 

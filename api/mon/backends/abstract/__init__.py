@@ -1,4 +1,6 @@
 from frozendict import frozendict
+import re
+
 
 _VM_KWARGS = (
     ('ostype', 1),
@@ -44,8 +46,7 @@ class AbstractMonitoringBackend(object):
     AVERAGE = 3
     HIGH = 4
     DISASTER = 5
-
-    VALID_MONITORING_HOSTGROUP_REGEX = r'^[\w\s\.\-\,\"\{\}]+$'
+    RE_MONITORING_HOSTGROUP = re.compile(r'^[\w\s.\-,\"{\}]+$')
 
     def __init__(self, dc, **kwargs):
         self.dc = dc
