@@ -364,8 +364,11 @@ class ZabbixBase(object):
                 continue
 
             # Otherwise, local hostgroup has to be checked first.
-            qualified_hostgroup_name = ZabbixHostGroupContainer.hostgroup_name_factory(name.format(**obj_kwargs),
-                                                                                       dc_name=dc_name)
+            qualified_hostgroup_name = ZabbixHostGroupContainer.hostgroup_name_factory(
+                hostgroup_name=name.format(**obj_kwargs),
+                dc_name=dc_name
+            )
+
             try:
                 gids.add(int(self._zabbix_get_groupid(qualified_hostgroup_name)))
             except ZabbixError:
@@ -378,8 +381,8 @@ class ZabbixBase(object):
             try:
                 gids.add(int(self._zabbix_get_groupid(name.format(**obj_kwargs))))
             except ZabbixError:
-                log(WARNING, 'Could not fetch zabbix hostgroup id for hostgroup "%s". '
-                             'Creating new hostgroup %s instead.', name, qualified_hostgroup_name)
+                log(WARNING, 'Could not fetch zabbix hostgroup id for the hostgroup "%s". '
+                             'Creating a new hostgroup %s instead.', name, qualified_hostgroup_name)
             else:
                 continue
 
@@ -1432,7 +1435,7 @@ class ZabbixHostGroupContainer(ZabbixNamedContainer):
         if dc_name:
             name = ':{}:{}:'.format(dc_name, hostgroup_name)
         else:
-            name = dc_name
+            name = hostgroup_name
 
         return name
 
