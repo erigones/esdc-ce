@@ -12,6 +12,7 @@ Features
 Bugs
 ----
 
+- Restricted dc_bound API calls to require datacenter to be explicitly set. - `#265 <https://github.com/erigones/esdc-ce/issues/265>`__
 - Fixed highlighting of backups clicked on in the node's backup list - `#260 <https://github.com/erigones/esdc-ce/issues/260>`__
 - Fixed Super admin delete user and got error 500 - `#263 <https://github.com/erigones/esdc-ce/issues/263>`__
 
