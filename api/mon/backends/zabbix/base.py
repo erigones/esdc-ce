@@ -358,12 +358,12 @@ class ZabbixBase(object):
         for name in hostgroups:
             name = self._id_or_name(name)
 
+            # If we already know the id of the hostgroup, we use it.
             if isinstance(name, int):
                 gids.add(name)
                 continue
 
-            # Local hostgroup has to be checked first.
-
+            # Otherwise, local hostgroup has to be checked first.
             qualified_hostgroup_name = ZabbixHostGroupContainer.hostgroup_name_factory(name.format(**obj_kwargs),
                                                                                        dc_name=dc_name)
             try:
@@ -373,6 +373,8 @@ class ZabbixBase(object):
             else:
                 continue
 
+            # If the ~local~ hostgroup (with dc_name prefix) doesn't exist,
+            # we look for a ~global~ hostgroup (without dc_name prefix).
             try:
                 gids.add(int(self._zabbix_get_groupid(name.format(**obj_kwargs))))
             except ZabbixError:
@@ -381,7 +383,7 @@ class ZabbixBase(object):
             else:
                 continue
 
-            #  If we got here, we are free to create a dc qualified host group
+            #  If not even the ~global~ hostgroup exists, we are free to create a ~local~ hostgroup.
             gids.add(ZabbixHostGroupContainer(qualified_hostgroup_name, zapi=self.zapi).create().zabbix_id)
 
         return gids
