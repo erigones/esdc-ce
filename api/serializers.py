@@ -1447,12 +1447,12 @@ class ConditionalDCBoundSerializer(InstanceSerializer):
     dc_bound = BooleanField(source='dc_bound_bool', default=True)
 
     def validate(self, attrs):
-        if attrs.get('dc_bound_bool', self.object.dc_bound_bool) and not self.request.data.get('dc', None):
+        if attrs.get('dc_bound_bool', self.object.dc_bound_bool) and not self.init_data.get('dc', None):
             err = {'model': self._model_verbose_name.lower()}
-            self._errors['dc_bound'] = self._errors['dc'] = (
+            self._errors['dc_bound'] = self._errors['dc'] = ErrorList([
                 _('You have to specify to which datacenter shall the %(model)s be bound. '
                   'Either use the *dc* parameter or set the *dc_bound* parameter to False.') % err
-            )
+            ])
 
         return super(ConditionalDCBoundSerializer, self).validate(attrs)
 
