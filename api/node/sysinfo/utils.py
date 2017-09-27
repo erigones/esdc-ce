@@ -108,7 +108,7 @@ def parse_esysinfo(stdout):
 
     if num_items >= 10:
         for i in x[9].strip().splitlines():
-            name, mac, link, typ = map(lambda x: None if x == '-' else x, map(str.strip, str(i).split('|')))
+            name, mac, link, typ = map(lambda c: None if c == '-' else c, map(str.strip, str(i).split('|')))
             nictags.append({'name': name, 'mac': mac, 'link': link, 'type': typ})
 
     return {

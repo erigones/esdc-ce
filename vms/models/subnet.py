@@ -12,6 +12,7 @@ from vms.mixins import _DcMixin
 # noinspection PyProtectedMember
 from vms.models.base import _VirtModel, _UserTasksModel
 from vms.models.vm import Vm
+from vms.models.node import Node
 
 
 class Subnet(_VirtModel, _DcMixin, _UserTasksModel):
@@ -96,6 +97,12 @@ class Subnet(_VirtModel, _DcMixin, _UserTasksModel):
     resolvers_api = property(get_resolvers, set_resolvers)
 
     @property
+    def nic_tag_type(self):
+        """Return type of the NIC tag"""
+        # return type of the nictag or empty string if self.nic_tag is not found in Node.all_nictags
+        return Node.all_nictags().get(self.nic_tag, '')
+
+    @property
     def web_data(self):
         """Return dict used in server web templates"""
         return {'dhcp_passthrough': self.dhcp_passthrough}
@@ -114,6 +121,7 @@ class Subnet(_VirtModel, _DcMixin, _UserTasksModel):
             'netmask': self.netmask,
             'gateway': self.gateway,
             'nic_tag': self.nic_tag,
+            'nic_tag_type': self.nic_tag_type,
             'vlan_id': self.vlan_id,
             'resolvers': self.get_resolvers(),
             'dns_domain': self.dns_domain,
