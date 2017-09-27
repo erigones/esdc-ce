@@ -87,6 +87,6 @@ class Role(_DcBoundMixin):
             'dcs': self.dcs_api,
         }
 
-    def get_dc_count(self):
+    def get_related_datacenters(self):
         from vms.models import Dc
         return Dc.objects.filter(roles=self)

@@ -1446,11 +1446,13 @@ class ConditionalDCBoundSerializer(InstanceSerializer):
 
     def _validate_dc_bound(self, value):
         if value:
-            if hasattr(self.object, 'get_dcs'):
-                dcs = self.object.get_dc_count()
-            else:
+            if hasattr(self.object, 'get_related_datacenters'):
+                dcs = self.object.get_related_datacenters()
+            elif hasattr(self.object, 'dc'):
                 dcs = self.object.dc.all()
-
+            else:
+                raise AssertionError(
+                    '%s has to implement either get_dcs method or have a dc relation.' % self._model_verbose_name)
             dcs_len = len(dcs)
 
             if dcs_len == 1:

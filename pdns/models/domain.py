@@ -211,6 +211,6 @@ class Domain(models.Model):
                 cursor.execute("INSERT INTO domainmetadata (domain_id, kind, content) VALUES "
                                "(%s, 'ALLOW-AXFR-FROM', 'AUTO-NS')", [instance.id])
 
-    def get_dc_count(self):
+    def get_related_datacenters(self):
         from vms.models import Dc
         return Dc.objects.filter(domaindc__domain_id=self.id)
