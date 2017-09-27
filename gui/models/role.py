@@ -86,3 +86,7 @@ class Role(_DcBoundMixin):
             'permissions': self.permissions_api,  # Not using values_list, because permissions.all() is prefetched
             'dcs': self.dcs_api,
         }
+
+    def get_dc_count(self):
+        from vms.models import Dc
+        return Dc.objects.filter(roles=self)

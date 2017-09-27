@@ -1445,15 +1445,9 @@ class ConditionalDCBoundSerializer(InstanceSerializer):
     dc_bound = BooleanField(source='dc_bound_bool', default=True)
 
     def _validate_dc_bound(self, value):
-        from gui.models import Role
-        from pdns.models import Domain
-        from vms.models import Dc
-
         if value:
-            if isinstance(self.object, Domain):
-                dcs = Dc.objects.filter(domaindc__domain_id=self.object.id)
-            elif isinstance(self.object, Role):
-                dcs = Dc.objects.filter(roles=self.object)
+            if hasattr(self.object, 'get_dcs'):
+                dcs = self.object.get_dc_count()
             else:
                 dcs = self.object.dc.all()
 
