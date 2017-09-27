@@ -65,9 +65,6 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from api.relations import *
 from api.fields import *
 from api.fields import is_simple_callable, get_component
-from gui.models import Role
-from pdns.models import Domain
-from vms.models import Dc
 
 
 def _resolve_model(obj):
@@ -1443,20 +1440,15 @@ class InstanceSerializer(Serializer):
 
 
 class ConditionalDCBoundSerializer(InstanceSerializer):
+    """This serializer handles the common logic when a model is being bound to a datacenter."""
     _dc_bound = None
     dc_bound = BooleanField(source='dc_bound_bool', default=True)
 
-    def validate(self, attrs):
-        if attrs.get('dc_bound_bool', self.object.dc_bound_bool) and not self.init_data.get('dc', None):
-            err = {'model': self._model_verbose_name.lower()}
-            self._errors['dc_bound'] = self._errors['dc'] = ErrorList([
-                _('You have to specify to which datacenter shall the %(model)s be bound. '
-                  'Either use the *dc* parameter or set the *dc_bound* parameter to False.') % err
-            ])
-
-        return super(ConditionalDCBoundSerializer, self).validate(attrs)
-
     def _validate_dc_bound(self, value):
+        from gui.models import Role
+        from pdns.models import Domain
+        from vms.models import Dc
+
         if value:
             if isinstance(self.object, Domain):
                 dcs = Dc.objects.filter(domaindc__domain_id=self.object.id)
@@ -1491,3 +1483,15 @@ class ConditionalDCBoundSerializer(InstanceSerializer):
                 self._dc_bound = self._validate_dc_bound(value)
 
         return attrs
+
+    def validate(self, attrs):
+        if (self.request.method == 'POST'
+                and attrs.get('dc_bound_bool', self.object.dc_bound_bool)
+                and not self.init_data.get('dc', None)):
+            err = {'model': self._model_verbose_name.lower()}
+            self._errors['dc_bound'] = self._errors['dc'] = ErrorList([
+                _('You have to specify to which datacenter shall the %(model)s be bound. '
+                  'Either use the "dc" parameter or set the "dc_bound" parameter to false.') % err
+            ])
+
+        return super(ConditionalDCBoundSerializer, self).validate(attrs)
