@@ -427,7 +427,7 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
 
                     nictags[nic['name']] = nic['type']
 
-            cache.set(NODES_ALL_KEY, nictags, NICTAGS_ALL_EXPIRES)
+            cache.set(NICTAGS_ALL_KEY, nictags, NICTAGS_ALL_EXPIRES)
 
         return nictags
 
