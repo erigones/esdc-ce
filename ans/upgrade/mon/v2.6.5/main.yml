@@ -11,3 +11,9 @@
         owner=root
         group=root
         mode=0755
+
+- name: Load Zabbix credentials
+  include: "{{ upg_base }}/lib/zabbix_credentials.yml"
+
+- name: Update fixed Zabbix templates
+  include: "{{ upg_base }}/lib/zabbix_import_templates.yml"
