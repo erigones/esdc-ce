@@ -2,12 +2,12 @@ from django.db.transaction import atomic
 from django.utils.translation import ugettext_lazy as _
 
 from api import serializers as s
-from api.validators import validate_alias, validate_dc_bound
+from api.validators import validate_alias
 from api.accounts.user.utils import ExcludeInternalUsers
 from gui.models import User, Role, Permission
 
 
-class GroupSerializer(s.InstanceSerializer):
+class GroupSerializer(s.ConditionalDCBoundSerializer):
     """
     gui.models.role
     """
@@ -52,17 +52,6 @@ class GroupSerializer(s.InstanceSerializer):
             pass
         else:
             validate_alias(self.object, value)
-
-        return attrs
-
-    def validate_dc_bound(self, attrs, source):
-        try:
-            value = bool(attrs[source])
-        except KeyError:
-            pass
-        else:
-            if value != self.object.dc_bound_bool:
-                self._dc_bound = validate_dc_bound(self.request, self.object, value, _('Group'))
 
         return attrs
 

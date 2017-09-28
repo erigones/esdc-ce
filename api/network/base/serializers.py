@@ -3,14 +3,14 @@ from django.conf import settings
 from frozendict import frozendict
 
 from api import serializers as s
-from api.validators import validate_alias, validate_dc_bound
+from api.validators import validate_alias
 from api.vm.utils import get_owners
 from gui.models import User
 from vms.models import Subnet, IPAddress, Node
 from pdns.models import Domain
 
 
-class NetworkSerializer(s.InstanceSerializer):
+class NetworkSerializer(s.ConditionalDCBoundSerializer):
     """
     vms.models.Subnet
     """
@@ -38,7 +38,6 @@ class NetworkSerializer(s.InstanceSerializer):
     dns_domain = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\._-]*$', max_length=250, required=False)  # can be blank
     ptr_domain = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\._-]*$', max_length=250, required=False)  # can be blank
     dhcp_passthrough = s.BooleanField(default=False)
-    dc_bound = s.BooleanField(source='dc_bound_bool', default=True)
     created = s.DateTimeField(read_only=True, required=False)
 
     def __init__(self, request, net, *args, **kwargs):
@@ -53,17 +52,6 @@ class NetworkSerializer(s.InstanceSerializer):
             return self._dc_bound
         # noinspection PyProtectedMember
         return super(NetworkSerializer, self)._normalize(attr, value)
-
-    def validate_dc_bound(self, attrs, source):
-        try:
-            value = bool(attrs[source])
-        except KeyError:
-            pass
-        else:
-            if value != self.object.dc_bound_bool:
-                self._dc_bound = validate_dc_bound(self.request, self.object, value, _('Network'))
-
-        return attrs
 
     def validate_alias(self, attrs, source):
         try:
@@ -147,7 +135,7 @@ class NetworkSerializer(s.InstanceSerializer):
             if dc_settings.VMS_NET_VLAN_RESTRICT and vlan_id not in dc_settings.VMS_NET_VLAN_ALLOWED:
                 self._errors['vlan_id'] = s.ErrorList([_('VLAN ID is not available in datacenter.')])
 
-        return attrs
+        return super(NetworkSerializer, self).validate(attrs)
 
     # noinspection PyMethodMayBeStatic
     def update_errors(self, fields, err_msg):
