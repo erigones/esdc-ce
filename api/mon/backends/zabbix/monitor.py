@@ -441,27 +441,25 @@ class Zabbix(AbstractMonitoringBackend):
         """[EXTERNAL] Return list of available templates"""
         return self.ezx.get_template_list()
 
-    def _get_filtered_hostgroups(self, exclude_dc_specific):
+    def _get_filtered_hostgroups(self, prefix):
         """This is a generator function"""
 
         for host_group in self.ezx.get_hostgroup_list():
             match = ZabbixHostGroupContainer.RE_NAME_WITH_DC_PREFIX.match(host_group['name'])
 
-            if match and exclude_dc_specific:
-                pass
-            elif match:
+            if match:
                 # RE_NAME_WITH_DC_PREFIX results in exactly two (named) groups: dc name and hostgroup name:
                 dc_name, host_group_name = match.groups()
-                if dc_name == self.dc.name:
+                if dc_name == prefix:
                     # This will remove the prefix from the hostgroup name as we don't want to show this to the user.
                     host_group['name'] = host_group_name
                     yield host_group
             else:
                 yield host_group
 
-    def hostgroup_list(self, exclude_dc_specific=False):
+    def hostgroup_list(self, prefix=''):
         """[EXTERNAL] Return list of available hostgroups"""
-        return list(self._get_filtered_hostgroups(exclude_dc_specific=exclude_dc_specific))
+        return list(self._get_filtered_hostgroups(prefix=prefix))
 
     def synchronize_user_group(self, group=None, dc_as_group=None):
         kwargs = {}

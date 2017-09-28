@@ -69,13 +69,14 @@ def mon_hostgroup_list(task_id, dc_id, dc_bound, *args, **kwargs):
     """
     Return list of hostgroups available in Zabbix.
     """
+    dc = Dc.objects.get_by_id(int(dc_id))
     if dc_bound:
-        dc = Dc.objects.get_by_id(int(dc_id))
+        prefix = dc.name
     else:
-        dc = DefaultDc()
+        prefix = ''
 
     try:
-        zabbix_hostgroups = get_monitoring(dc).hostgroup_list(exclude_dc_specific=not dc_bound)
+        zabbix_hostgroups = get_monitoring(dc).hostgroup_list(prefix=prefix)
     except MonitoringError as exc:
         raise MgmtTaskException(text_type(exc))
 
