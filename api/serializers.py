@@ -1446,8 +1446,8 @@ class ConditionalDCBoundSerializer(InstanceSerializer):
 
     def _validate_dc_bound(self, value):
         if value:
-            if hasattr(self.object, 'get_related_datacenters'):
-                dcs = self.object.get_related_datacenters()
+            if hasattr(self.object, 'get_related_dcs'):
+                dcs = self.object.get_related_dcs()
             elif hasattr(self.object, 'dc'):
                 dcs = self.object.dc.all()
             else:
