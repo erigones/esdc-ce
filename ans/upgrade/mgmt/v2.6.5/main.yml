@@ -23,4 +23,5 @@
     - 'UserParameter=pgsql.ha.connected_slaves[*],/usr/bin/psql -h 127.0.0.1 -p 5432 -U stats -d postgres -At -c "SELECT count(*) FROM pg_stat_replication"'
     - "UserParameter=pgsql.ha.is_slave[*],/usr/bin/psql -h 127.0.0.1 -p 5432 -U stats -d postgres -At -c \"SELECT CASE WHEN pg_is_in_recovery() = 't' THEN 1 ELSE 0 END AS in_recovery;\""
     - 'UserParameter=pgsql.ha.master_exists[*],/usr/sbin/crm_resource --resource postgres-ha | grep -Ec "Masters: \[ [^ ]+ \]"'
+  notify: restart zabbix-agent
 
