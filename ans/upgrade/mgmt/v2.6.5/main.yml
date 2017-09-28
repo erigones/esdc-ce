@@ -12,6 +12,19 @@
         group=root
         mode=0755
 
+- name: Fix firewall rules (eth0 -> net0)
+  lineinfile:
+    dest=/etc/sysconfig/iptables
+    state=present
+    insertafter='^-A INPUT -m state --state NEW'
+    line='{{ item }}'
+  with_items:
+    - '-A INPUT -m state --state NEW -m tcp -p tcp --dport 22 -i net0 -j ACCEPT'
+    - '-A INPUT -m state --state NEW -m tcp -p tcp --dport 5672 -i net0 -j ACCEPT'
+    - '-A INPUT -m state --state NEW -m tcp -p tcp --dport 6379 -i net0 -j ACCEPT'
+    - '-A INPUT -m state --state NEW -m tcp -p tcp --dport 6432 -i net0 -j ACCEPT'
+    - '-A INPUT -m state --state NEW -m tcp -p tcp --dport 10050 -i net0 -j ACCEPT'
+
 # https://github.com/erigones/esdc-factory/pull/73
 # https://github.com/erigones/esdc-factory/pull/79
 - name: Add items for monitoring HA of the mgmt DB
