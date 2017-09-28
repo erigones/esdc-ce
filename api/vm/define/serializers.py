@@ -88,7 +88,7 @@ class VmDefineSerializer(VmBaseSerializer):
     monitored = s.BooleanField(default=settings.VMS_VM_MONITORED_DEFAULT)
     monitoring_hostgroups = s.ArrayField(max_items=16, default=[],
                                          validators=(
-                                             RegexValidator(regex=MonitoringBackend.RE_MONITORING_HOSTGROUP),))
+                                             RegexValidator(regex=MonitoringBackend.RE_MONITORING_HOSTGROUPS),))
     monitoring_templates = s.ArrayField(max_items=32, default=[])
     installed = s.BooleanField(default=False)
     snapshot_limit_manual = s.IntegerField(required=False)  # Removed from json if null, limits set below

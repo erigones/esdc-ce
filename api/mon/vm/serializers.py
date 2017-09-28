@@ -28,7 +28,7 @@ class VmMonitoringSerializer(s.InstanceSerializer):
     proxy = s.CharField(source='monitoring_proxy', required=False, min_length=1, max_length=128)
     templates = s.ArrayField(source='monitoring_templates', max_items=32, required=False, default=[])
     hostgroups = s.ArrayField(source='monitoring_hostgroups', max_items=16, required=False, default=[],
-                              validators=(RegexValidator(regex=MonitoringBackend.RE_MONITORING_HOSTGROUP),))
+                              validators=(RegexValidator(regex=MonitoringBackend.RE_MONITORING_HOSTGROUPS),))
 
     def __init__(self, request, vm, *args, **kwargs):
         super(VmMonitoringSerializer, self).__init__(request, vm, *args, **kwargs)
