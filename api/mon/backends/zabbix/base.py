@@ -1431,8 +1431,8 @@ class ZabbixHostGroupContainer(ZabbixNamedContainer):
         return container
 
     @staticmethod
-    def hostgroup_name_factory(hostgroup_name, dc_name=''):
-        if dc_name:
+    def hostgroup_name_factory(hostgroup_name, dc_name):
+        if dc_name is not None:
             name = ':{}:{}:'.format(dc_name, hostgroup_name)
         else:
             name = hostgroup_name

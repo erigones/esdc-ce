@@ -38,10 +38,11 @@ class InternalZabbix(ZabbixBase):
         """Return set of zabbix hostgroup IDs for a Compute node"""
         hostgroups = set(self.settings.MON_ZABBIX_HOSTGROUPS_NODE)
         hostgroups.update(node.monitoring_hostgroups)
+        empty_prefix = ''
 
         return self._get_or_create_groups(self._node_kwargs(node),
                                           self.settings.MON_ZABBIX_HOSTGROUP_NODE,
-                                          DefaultDc().name,
+                                          empty_prefix,
                                           hostgroups,
                                           log)
 
