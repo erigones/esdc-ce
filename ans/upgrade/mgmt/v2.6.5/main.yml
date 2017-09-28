@@ -12,6 +12,7 @@
         group=root
         mode=0755
 
+# https://github.com/erigones/esdc-factory/pull/73
 # https://github.com/erigones/esdc-factory/pull/79
 - name: Add items for monitoring HA of the mgmt DB
   lineinfile:
