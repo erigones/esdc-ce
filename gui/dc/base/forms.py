@@ -52,6 +52,9 @@ class DcForm(SerializerForm):
 select_widget = {'class': 'narrow input-select2'}
 mon_templates_widget = {'class': 'table-tags-select2', 'data-tags-type': 'mon_templates'}
 mon_hostgroups_widget = {'class': 'table-tags-select2', 'data-tags-type': 'mon_hostgroups'}
+mon_node_hostgroups_widget = {'class': 'table-tags-select2',
+                              'data-tags-type': 'mon_hostgroups',
+                              'data-tags-api-call': 'mon_node_hostgroup_list'}
 
 
 class DcSettingsForm(SerializerForm):
@@ -112,7 +115,9 @@ class DcSettingsForm(SerializerForm):
     third_party_settings = DcSettingsSerializer.third_party_settings
     mon_hostgroup_list_fields = (
         'MON_ZABBIX_HOSTGROUPS_VM',
-        'MON_ZABBIX_HOSTGROUPS_VM_ALLOWED',
+        'MON_ZABBIX_HOSTGROUPS_VM_ALLOWED'
+    )
+    mon_node_hostgroup_list_fields = (
         'MON_ZABBIX_HOSTGROUPS_NODE',
     )
     mon_template_list_fields = (
@@ -169,6 +174,11 @@ class DcSettingsForm(SerializerForm):
                 form_field_options['widget'].tags = True
                 form_field_options['widget'].escape_space = False
                 form_field_options['widget'].attrs = mon_hostgroups_widget
+            elif source in self.mon_node_hostgroup_list_fields:
+                form_field_options['tags'] = True
+                form_field_options['widget'].tags = True
+                form_field_options['widget'].escape_space = False
+                form_field_options['widget'].attrs = mon_node_hostgroups_widget
             elif source in self.mon_template_list_fields:
                 form_field_options['tags'] = True
                 form_field_options['widget'].tags = True
