@@ -53,7 +53,7 @@ select_widget = {'class': 'narrow input-select2'}
 mon_templates_widget = {'class': 'table-tags-select2', 'data-tags-type': 'mon_templates'}
 mon_hostgroups_widget = {'class': 'table-tags-select2', 'data-tags-type': 'mon_hostgroups'}
 mon_node_hostgroups_widget = {'class': 'table-tags-select2',
-                              'data-tags-type': 'mon_hostgroups',
+                              'data-tags-type': 'mon_node_hostgroups',
                               'data-tags-api-call': 'mon_node_hostgroup_list'}
 
 
