@@ -184,8 +184,12 @@ class Guacamole(object):
                 )
                 r.raise_for_status()
             except requests.exceptions.RequestException as exc:
-                logger.exception(exc)
-                logger.error('User %s could not logout from guacamole (%r).', self.usr, exc)
+                if exc.response and exc.response.status_code == 404:
+                    logger.warning('User %s could not logout from guacamole because the token "%s" '
+                                   'does not exist anymore', self.usr, token)
+                else:
+                    logger.exception(exc)
+                    logger.error('User %s could not logout from guacamole (%r).', self.usr, exc)
         else:
             logger.info('User %s has no guacamole cookie and/or token.', self.usr)
 
