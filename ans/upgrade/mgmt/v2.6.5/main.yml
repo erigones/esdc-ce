@@ -1,29 +1,10 @@
 #
 # https://github.com/erigones/esdc-ce/wiki/Known-Issues#network-down-in-vms-after-update-of-cloud-init-or-centos
 #
-- name: Fix parsing of network interfaces
-  lineinfile: dest="/etc/rc.d/rc.local"
-              regexp="^interfaces=\"\$\(ifconfig -a | grep \^eth | awk -F':' \'{print \$1}\'\)\""
-              line="interfaces=\"$(ifconfig -a | grep -E \'^eth|^net\' | awk -F':' \'{print $1}\')\""
-
-- name: Make /etc/rc.d/rc.local executable
-  file: path=/etc/rc.d/rc.local
-        owner=root
-        group=root
-        mode=0755
-
-- name: Fix firewall rules (eth0 -> net0)
-  lineinfile:
-    dest=/etc/sysconfig/iptables
-    state=present
-    insertafter='^-A INPUT -m state --state NEW'
-    line='{{ item }}'
-  with_items:
-    - '-A INPUT -m state --state NEW -m tcp -p tcp --dport 22 -i net0 -j ACCEPT'
-    - '-A INPUT -m state --state NEW -m tcp -p tcp --dport 5672 -i net0 -j ACCEPT'
-    - '-A INPUT -m state --state NEW -m tcp -p tcp --dport 6379 -i net0 -j ACCEPT'
-    - '-A INPUT -m state --state NEW -m tcp -p tcp --dport 6432 -i net0 -j ACCEPT'
-    - '-A INPUT -m state --state NEW -m tcp -p tcp --dport 10050 -i net0 -j ACCEPT'
+- name: Disable cloud-init network configuration
+  copy: src="{{ current_task_dir }}/files/cloud.cfg"
+        dest="/etc/cloud/cloud.cfg"
+        mode=0644
 
 # https://github.com/erigones/esdc-factory/pull/73
 # https://github.com/erigones/esdc-factory/pull/79
