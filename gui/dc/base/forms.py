@@ -163,11 +163,6 @@ class DcSettingsForm(SerializerForm):
         if source in self._serializer._override_disabled_ and not getattr(settings, source, False):
             form_field_options['widget'].attrs['disabled'] = 'disabled'
 
-        # Show disabled global settings (only useful for DefaultDcSettingsForm)
-        if self._disable_globals and source in self.globals:
-            form_field_options['widget'].attrs['disabled'] = 'disabled'
-            form_field_options['required'] = False
-
         if self.table:
             if source in self.mon_hostgroup_list_fields:
                 form_field_options['tags'] = True
@@ -185,6 +180,11 @@ class DcSettingsForm(SerializerForm):
                 form_field_options['widget'].escape_space = False
                 form_field_options['widget'].attrs = mon_templates_widget
 
+        # This part has to be below widgets set-up
+        # Show disabled global settings (only useful for DefaultDcSettingsForm)
+        if self._disable_globals and source in self.globals:
+            form_field_options['widget'].attrs['disabled'] = 'disabled'
+            form_field_options['required'] = False
         return super(DcSettingsForm, self)._build_field(name, serializer_field, form_field_class, **form_field_options)
 
     def _initial_data(self, request, obj):
