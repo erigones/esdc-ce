@@ -113,10 +113,8 @@ SERVERS = {
 MONITORING = {
     'title': _('Monitoring'),
     'icon': 'bar-chart',
-    'url': 'monitoring_server_redirect',
-    'active_views': {'monitoring'},
-    'a_class': 'no-ajax',
-    'a_target': '_blank',
+    'url': 'mon_actions_list',
+    'active_views': {'monitoring'}
 }
 
 TASKLOG = {

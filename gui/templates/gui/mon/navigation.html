@@ -1,0 +1,10 @@
+{% load i18n %}{% load gui_utils %}
+<div class="row-fluid">
+  <div class="span12 tabbable black-box">
+    <ul class="nav nav-tabs vm_control vm_control_nohide">
+      <li><a href="{% url 'mon_actions_list' %}" data-toggle="tab" title="{% trans "Show action list" %}"><i class="icon-bell"></i> {% trans "Alerting actions" %}</a></li>
+      <li><a class="no-ajax" href="{% url 'monitoring_server_redirect' %}" data-toggle="tab" target="_blank" title="{% trans "Open dedicated monitoring tool in a new window" %}"><i class="icon-bar-chart"></i> {% trans "Fallback monitoring" %}<i class="icon-external-link"></i></a></li>
+
+    </ul>
+  </div>
+</div>
