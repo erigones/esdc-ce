@@ -25,7 +25,7 @@ be performed after successful system update.
             * |SuperAdmin|
         :Asynchronous?:
             * |async-no|
-        :arg data.version: **required** - version to which system should be updated
+        :arg data.version: **required** - git tag (e.g. ``v2.6.5``) or git commit to which the system should be updated
         :type data.version: string
         :arg data.key: X509 private key file used for authentication against EE git server. \
 Please note that file MUST contain standard x509 file BEGIN/END header/footer. \

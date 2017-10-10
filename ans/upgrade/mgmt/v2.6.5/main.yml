@@ -6,6 +6,10 @@
         dest="/etc/cloud/cloud.cfg"
         mode=0644
 
+# Preparation for system update
+- name: Disable redis package from remi
+  shell: yum-config-manager --setopt=remi.exclude=redis --save remi
+
 # https://github.com/erigones/esdc-factory/pull/73
 # https://github.com/erigones/esdc-factory/pull/79
 - name: Add items for monitoring HA of the mgmt DB

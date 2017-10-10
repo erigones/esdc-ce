@@ -422,10 +422,13 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
 
             for node in nodes:
                 for nic in node.nictags:
-                    if nic['name'] in nictags and nic['type'] != nictags[nic['name']]:
+                    nic_name = nic['name']
+                    nic_type = nic['type'].replace('aggr', 'normal')
+                    # if nictag name is already present and types are not equal
+                    if nic_name in nictags and nic_type != nictags[nic_name]:
                         raise ValueError('Duplicate NIC tag name with different type exists on another compute node!')
 
-                    nictags[nic['name']] = nic['type']
+                    nictags[nic_name] = nic_type
 
             cache.set(NICTAGS_ALL_KEY, nictags, NICTAGS_ALL_EXPIRES)
 
