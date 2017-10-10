@@ -175,6 +175,8 @@ class ImageView(TaskAPIView):
         assert request.dc == vm.dc
 
         data.pop('dc_bound', None)  # Default DC binding cannot be changed when creating Image for the first time
+        data['dc'] = vm.dc_name  # Dc parameter has to be set by system as we are forcing the task to be dc_bound
+
         img.dc_bound = vm.dc        # Default DC binding set to VM DC (cannot be changed, ^^^)
         img.ostype = vm.ostype      # Default ostype inherited from VM (cannot be changed)
         img.size = snap.disk_size   # Default disk size inherited from VM (cannot be changed)

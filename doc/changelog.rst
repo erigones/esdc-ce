@@ -10,6 +10,8 @@ Features
 Bugs
 ----
 
+- Image creation from snapshot fixed - `#277 <https://github.com/erigones/esdc-ce/issues/277>`__
+
 
 2.6.5 (released on 2017-10-04)
 ==============================
