@@ -20,3 +20,4 @@ access_log_format = '"%(h)s %({X-FORWARDED-FOR}i)s %(l)s %(u)s %(t)s "%(r)s" %(s
 x_forwarded_for_header = 'X-FORWARDED-FOR'
 forwarded_allow_ips = '127.0.0.1'
 graceful_timeout = 10
+timeout = 75

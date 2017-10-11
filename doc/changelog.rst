@@ -11,6 +11,7 @@ Bugs
 ----
 
 - Image creation from snapshot fixed - `#277 <https://github.com/erigones/esdc-ce/issues/277>`__
+- Added longer timeout to gunicorn-gui - `#279 <https://github.com/erigones/esdc-ce/issues/279>`__
 
 
 2.6.5 (released on 2017-10-04)
