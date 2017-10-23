@@ -64,6 +64,8 @@ class AdminNetworkForm(SerializerForm):
     nic_tag = forms.ChoiceField(label=_('NIC Tag'), required=True,
                                 help_text=_('NIC tag or device name on compute node.'),
                                 widget=forms.Select(attrs=SELECT_ATTRS))
+    vxlan_id = forms.IntegerField(label=_('VXLAN ID'), required=False, widget=forms.TextInput(attrs=TEXT_INPUT_ATTRS),
+                                  help_text=_('VXLAN ID required for overlay NIC tags (1 - 16777215).'))
 
     # Advanced options
     resolvers = ArrayField(label=_('Resolvers'), required=False,

@@ -137,7 +137,7 @@ class NetworkSerializer(s.ConditionalDCBoundSerializer):
 
         # retrieve all available nictags and see what is the type of the current nic tag
         # if type is overlay then vxlan is mandatory argument
-        if Node.all_nictags[nic_tag] == 'overlay':
+        if Node.all_nictags()[nic_tag] == 'overlay':
             if not vxlan_id:
                 self._errors['vxlan_id'] = s.ErrorList([_('VXLAN ID is required when an '
                                                           'overlay NIC tag is selected.')])
