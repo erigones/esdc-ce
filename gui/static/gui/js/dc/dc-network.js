@@ -2,6 +2,15 @@ var DC_NETWORKS = null;
 function DcNetworkList() {
   var self = this;
 
+  function show_vxlan() {
+    if ($('#id_adm-nic_tag option:selected').text().match(/(overlay)/g)) {
+      $('#id_adm-vxlan_id').parent().parent().show();
+    }
+    else {
+      $('#id_adm-vxlan_id').parent().parent().hide();
+    }
+  }
+
   // Sortable list
   this.list = new ObjList($.noop, [-1], {'icon-tag': [3]}, null);
 
@@ -14,6 +23,10 @@ function DcNetworkList() {
 
       btn_delete_dc.hide();
       btn_create_dc.hide();
+
+      show_vxlan();
+      $('#id_adm-nic_tag').change(show_vxlan);
+
 
       if (!mod.add) {
         if (mod.btn.hasClass('obj_edit_or_add_dc')) {
@@ -38,6 +51,9 @@ function DcNetworkList() {
 
       var alias = $('#id_adm-alias');
       var name = $('#id_adm-name');
+
+      show_vxlan();
+      $('#id_adm-nic_tag').change(show_vxlan);
 
       name.off('focusout').focusout(function() {
         if (!alias.val()) {
