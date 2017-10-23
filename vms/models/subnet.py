@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
@@ -42,6 +43,7 @@ class Subnet(_VirtModel, _DcMixin, _UserTasksModel):
     ptr_domain = models.CharField(_('PTR Domain'), max_length=255, blank=True,
                                   help_text=_('Name of a Pdns Domain.'))
     dhcp_passthrough = models.BooleanField(_('DHCP Passthrough'), default=False)
+    vxlan_id = models.PositiveIntegerField(_('VXLAN segment ID'), null=True, blank=True, default=None)
 
     class Meta:
         app_label = 'vms'

@@ -16,7 +16,7 @@ class NetworkSerializer(s.ConditionalDCBoundSerializer):
     """
     _model_ = Subnet
     _update_fields_ = ('alias', 'owner', 'access', 'desc', 'network', 'netmask', 'gateway', 'resolvers',
-                       'dns_domain', 'ptr_domain', 'nic_tag', 'vlan_id', 'dc_bound', 'dhcp_passthrough')
+                       'dns_domain', 'ptr_domain', 'nic_tag', 'vlan_id', 'dc_bound', 'dhcp_passthrough', 'vxlan_id')
     _default_fields_ = ('name', 'alias', 'owner')
     _blank_fields_ = frozenset({'desc', 'dns_domain', 'ptr_domain'})
     _null_fields_ = frozenset({'gateway'})
@@ -34,6 +34,7 @@ class NetworkSerializer(s.ConditionalDCBoundSerializer):
     nic_tag = s.ChoiceField()
     nic_tag_type = s.CharField(read_only=True)
     vlan_id = s.IntegerField(min_value=0, max_value=4096)
+    vxlan_id = s.IntegerField(min_value=1, max_value=16777215, required=False)  # (2**24 - 1) based on RFC 7348
     resolvers = s.IPAddressArrayField(source='resolvers_api', required=False, max_items=8)
     dns_domain = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\._-]*$', max_length=250, required=False)  # can be blank
     ptr_domain = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\._-]*$', max_length=250, required=False)  # can be blank
@@ -110,6 +111,16 @@ class NetworkSerializer(s.ConditionalDCBoundSerializer):
             netmask = self.object.netmask
 
         try:
+            vxlan_id = attrs['vxlan_id']
+        except KeyError:
+            vxlan_id = self.object.vxlan_id
+
+        try:
+            nic_tag = attrs['nic_tag']
+        except KeyError:
+            nic_tag = self.object.nic_tag
+
+        try:
             ip_network = Subnet.get_ip_network(network, netmask)
             if ip_network.is_reserved:
                 raise ValueError
@@ -122,7 +133,16 @@ class NetworkSerializer(s.ConditionalDCBoundSerializer):
 
             if limit is not None:
                 if Subnet.objects.filter(dc_bound=self._dc_bound).count() >= int(limit):
-                    raise s.ValidationError(_('Maximum number of networks reached'))
+                    raise s.ValidationError(_('Maximum number of networks reached.'))
+
+        # retrieve all available nictags and see what is the type of the current nic tag
+        # if type is overlay then vxlan is mandatory argument
+        if Node.all_nictags[nic_tag] == 'overlay':
+            if not vxlan_id:
+                self._errors['vxlan_id'] = s.ErrorList([_('VXLAN ID is required when an '
+                                                          'overlay NIC tag is selected.')])
+        else:
+            attrs['vxlan_id'] = None
 
         if self._dc_bound:
             try:
@@ -134,6 +154,10 @@ class NetworkSerializer(s.ConditionalDCBoundSerializer):
 
             if dc_settings.VMS_NET_VLAN_RESTRICT and vlan_id not in dc_settings.VMS_NET_VLAN_ALLOWED:
                 self._errors['vlan_id'] = s.ErrorList([_('VLAN ID is not available in datacenter.')])
+
+            if dc_settings.VMS_NET_VXLAN_RESTRICT and vxlan_id not in dc_settings.VMS_NET_VXLAN_ALLOWED:
+                self._errors['vxlan_id'] = s.ErrorList([_('VXLAN ID is not available in datacenter.')])
+
 
         return super(NetworkSerializer, self).validate(attrs)
 
