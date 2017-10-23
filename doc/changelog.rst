@@ -7,6 +7,8 @@ Changelog
 Features
 --------
 
+- Added limit for maximum number of VMs in a virtual datacenter - `#280 <https://github.com/erigones/esdc-ce/issues/280>`__
+
 Bugs
 ----
 
