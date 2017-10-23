@@ -7,6 +7,8 @@ Changelog
 Features
 --------
 
+- Added overlay/VXLAN support to net_manage - `#228 <https://github.com/erigones/esdc-ce/issues/228>`__
+
 Bugs
 ----
 
