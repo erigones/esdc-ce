@@ -87,7 +87,7 @@ def net_manage(request, name, data=None):
         :type data.nic_tag: string
         :arg data.vlan_id: **required** - 802.1Q virtual LAN ID (0 - 4096; 0 = none)
         :type data.vlan_id: integer
-        :arg data.vxlan_id: VXLAN ID required for overlay NIC tags (1 - 16777215, default=``null``)
+        :arg data.vxlan_id: VXLAN ID required for overlay NIC tags (1 - 16777215, default: null)
         :type data.vxlan_id: integer
         :arg data.resolvers: List of IPv4 addresses that can be used as resolvers
         :type data.resolvers: array
