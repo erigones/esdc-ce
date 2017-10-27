@@ -7,6 +7,8 @@ Changelog
 Features
 --------
 
+- Updated default resolver for the admin network - `esdc-factory#57 <https://github.com/erigones/esdc-factory/issues/57>`__
+
 Bugs
 ----
 
