@@ -246,6 +246,7 @@ def init_mgmt(head_node, images=None):
         else:
             api_put(dc_settings, main, VMS_VM_RESOLVERS_DEFAULT=[vm_dns01_ip])
             api_put(dc_settings, admin, VMS_VM_RESOLVERS_DEFAULT=[vm_dns01_ip])
+            api_put(net_manage, settings.VMS_NET_ADMIN, resolvers=[vm_dns01_ip])
     except Exception as e:
         logger.exception(e)
 
