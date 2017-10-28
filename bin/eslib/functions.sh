@@ -434,7 +434,7 @@ _zfs_snap_vm_mount() {
 	local mountpoint="${zone_root}${zone_mountpath}"
 	local snapshot_zfs_dir="/${zfs_filesystem}/.zfs/snapshot/${snapshot_name}"
 
-	[[ "$(echo "${zfs_filesystem}" | grep -c '/')" -eq 1 ]] && snapshot_zfs_dir="${snapshot_zfs_dir}/root"
+	[[ "$(echo "${zfs_filesystem}" | ${AWK} -F"/" '{print NF-1}')" -eq 1 ]] && snapshot_zfs_dir="${snapshot_zfs_dir}/root"
 
 	if [[ -d "${snapshot_zfs_dir}" ]] && [[ ! -e "${mountpoint}" ]] && assert_safe_zone_path "${zone_root}" "${zone_mountpath}" "${zone_check}" 2>/dev/null; then 
 		${MKDIR} -m 0700 "${mountpoint}" && \
