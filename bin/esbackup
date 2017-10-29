@@ -6,7 +6,7 @@ from eslib.esbackup import Backup
 from eslib.cmd_args import t_dataset, t_file, t_int, t_ascii, JSONFileType
 
 
-def t_snapshot(value):
+def _t_snapshot(value, prefix):
     """Snapshot validator"""
     dsnap = value.split('@')
 
@@ -15,7 +15,7 @@ def t_snapshot(value):
             t_dataset(dsnap[0])
             t_ascii(dsnap[1])
 
-            if not dsnap[1].startswith(Backup.SNAP_PREFIX[1:]):
+            if not dsnap[1].startswith(prefix):
                 raise ArgumentTypeError
         except ArgumentTypeError:
             pass
@@ -23,6 +23,16 @@ def t_snapshot(value):
             return value
 
     raise ArgumentTypeError('Invalid snapshot: "%s"' % value)
+
+
+def t_snapshot_backup(value):
+    """Snapshot used for dataset backups"""
+    return _t_snapshot(value, Backup.SNAP_PREFIX[1:])
+
+
+def t_snapshot_normal(value):
+    """Classic VM snapshot"""
+    return _t_snapshot(value, ('es', 'as'))
 
 
 def main():
@@ -36,7 +46,7 @@ def main():
     ds_create = subparsers.add_parser('ds-create', help='Create dataset backup', parents=(verbose,))
     ds_create.add_argument('-d', '--destination', required=True, metavar='DATASET', type=t_dataset,
                            help='Destination dataset')
-    ds_create.add_argument('-s', '--snapshot', required=True, metavar='DATASET@NAME', type=t_snapshot,
+    ds_create.add_argument('-s', '--snapshot', required=True, metavar='DATASET@NAME', type=t_snapshot_backup,
                            help='Source snapshot name, including dataset')
     ds_create.add_argument('-n', '--name', required=True, metavar='NAME', type=t_ascii, help='Backup name')
     ds_create.add_argument('-H', '--host', help='Source host', metavar='HOST', type=t_ascii)
@@ -47,9 +57,9 @@ def main():
                            help='Send fsfreeze command to qemu agent socket')
 
     ds_delete = subparsers.add_parser('ds-delete', help='Delete dataset backup', parents=(verbose,))
-    ds_delete.add_argument('-s', '--snapshot', nargs='+', required=True, metavar='DATASET@NAME', type=t_snapshot,
+    ds_delete.add_argument('-s', '--snapshot', nargs='+', required=True, metavar='DATASET@NAME', type=t_snapshot_backup,
                            help='Backup snapshot name(s), including dataset')
-    ds_delete.add_argument('-r', '--remote-snapshot', nargs='*', metavar='DATASET@NAME', type=t_snapshot,
+    ds_delete.add_argument('-r', '--remote-snapshot', nargs='*', metavar='DATASET@NAME', type=t_snapshot_backup,
                            help='Remote snapshot name(s) to destroy, including dataset')
     ds_delete.add_argument('-H', '--host', metavar='HOST', type=t_ascii, help='Destination host')
     ds_delete.add_argument('-m', '--metadata', help='VM metadata file storage path', type=t_file)
@@ -57,7 +67,7 @@ def main():
     ds_restore = subparsers.add_parser('ds-restore', help='Restore dataset backup', parents=(verbose,))
     ds_restore.add_argument('-d', '--destination', required=True, metavar='DATASET', type=t_dataset,
                             help='Destination dataset')
-    ds_restore.add_argument('-s', '--snapshot', required=True, metavar='DATASET@NAME', type=t_snapshot,
+    ds_restore.add_argument('-s', '--snapshot', required=True, metavar='DATASET@NAME', type=t_snapshot_backup,
                             help='Source snapshot name, including dataset')
     ds_restore.add_argument('-H', '--host', metavar='HOST', type=t_ascii, help='Destination host')
 
@@ -85,6 +95,13 @@ def main():
     file_restore.add_argument('-c', '--checksum', required=True, metavar='SHA1', type=t_ascii, help='File checksum')
     file_restore.add_argument('-H', '--host', metavar='HOST', type=t_ascii, help='Destination host')
 
+    snap_restore = subparsers.add_parser('snap-restore', help='Restore dataset snapshot', parents=(verbose,))
+    snap_restore.add_argument('-d', '--destination', required=True, metavar='DATASET', type=t_dataset,
+                              help='Destination dataset')
+    snap_restore.add_argument('-s', '--snapshot', required=True, metavar='DATASET@NAME', type=t_snapshot_normal,
+                              help='Source snapshot name, including dataset')
+    snap_restore.add_argument('-H', '--host', metavar='HOST', type=t_ascii, help='Destination host')
+
     args = parser.parse_args()
     # Create backup instance
     bkp = Backup(**args.__dict__)
@@ -95,7 +112,7 @@ def main():
                             fsfreeze=args.fsfreeze)
     elif cmd == 'ds-delete':
         res = bkp.ds_delete(args.snapshot, last_snapshots=args.remote_snapshot, metadata=args.metadata)
-    elif cmd == 'ds-restore':
+    elif cmd == 'ds-restore' or 'snap-restore':
         res = bkp.ds_restore(args.snapshot, args.destination)
     elif cmd == 'file-create':
         res = bkp.file_create(args.source, args.file, metadata=args.metadata, json=args.json,

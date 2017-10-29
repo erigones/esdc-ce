@@ -391,6 +391,7 @@ function message_callback(code, res, view, method, args, kwargs, apiview, apidat
   var target_hostname = hostname;  // get target_hostname (real VM)
   var data = kwargs;
   var task_id = res.task_id || null;
+  var state;
 
   if (task_id && task_id in LAST_TASKS) {
     console.log('Ignoring task', task_id);
@@ -444,10 +445,16 @@ function message_callback(code, res, view, method, args, kwargs, apiview, apidat
         }
 
         if (method == 'PUT') { // is a rollback in progress?
+          if (hostname == target_hostname) {
+            // used in vm_snapshots_update
+            state = 'stopped-';
+          } else {
+            state = null;
+          }
           // do not need to update the list, but the status changed to stopped- in DB (notready)
-          _update_vm_visuals(hostname, 'stopped-');
+          _update_vm_visuals(target_hostname, 'stopped-');
           // if there is a list of snapshots/backups, then we need to update it
-          vm_snapshots_update(hostname, 'stopped-');
+          vm_snapshots_update(hostname, state);
         } else { // create/delete snapshot in progress
           // if there is a list of snapshots/backups, then we need to update it
           vm_snapshots_update(hostname, null);
@@ -464,7 +471,7 @@ function message_callback(code, res, view, method, args, kwargs, apiview, apidat
 
       case 'vm_backup': // vm_backup started
       case 'vm_backup_list': // vm_backup_list started
-        var state = null; // used in vm_snaphosts_update
+        state = null; // used in vm_snaphosts_update
 
         if (method == 'PUT') { // a restore is in progress
           if (hostname == target_hostname) {
@@ -751,6 +758,7 @@ function _task_status_callback(res, apiview) {
   var hostname = apiview.hostname || null;
   var msg = '';
   var task_prefix = '';
+  var state;
 
   // always update task list if it exists and if apiview.hostname is defined
   var t = vm_tasks(apiview.hostname || null, res, apiview.view, apiview.method);
@@ -792,6 +800,10 @@ function _task_status_callback(res, apiview) {
           break;
 
         } else {
+          if (apiview.source_hostname && apiview.source_hostname != hostname) { // -> restore to another VM
+            // if there is a list of snapshots on the source VM, then we need to update it (rollback status)
+            vm_snapshots_update(apiview.source_hostname, null, apiview.snapname, apiview.disk_id);
+          }
           // doing a rollback (PUT vm_snapshot)
           _update_vm_visuals(hostname, apiview.status_display, apiview);
         }
@@ -838,7 +850,7 @@ function _task_status_callback(res, apiview) {
 
     case 'vm_backup':
     case 'vm_backup_list':
-      var state = apiview.status_display || null;
+      state = apiview.status_display || null;
 
       // doing a restore
       if (apiview.method == 'PUT') {

@@ -4,12 +4,11 @@ from que.tasks import execute
 from api.api_views import APIView
 from api.exceptions import (VmIsNotOperational, NodeIsNotOperational, VmIsLocked, PreconditionRequired,
                             ExpectationFailed, VmHasPendingTasks)
-from api.serializers import ForceSerializer
 from api.utils.db import get_object
 from api.task.response import SuccessTaskResponse, TaskResponse, FailureTaskResponse
 from api.vm.utils import get_vm
 from api.vm.messages import LOG_SNAP_CREATE, LOG_SNAP_UPDATE, LOG_SNAP_DELETE
-from api.vm.snapshot.serializers import SnapshotSerializer
+from api.vm.snapshot.serializers import SnapshotSerializer, SnapshotRestoreSerializer
 from api.vm.snapshot.utils import get_disk_id, snap_meta, snap_callback
 
 
@@ -31,8 +30,8 @@ class VmSnapshot(APIView):
     def zpool(self):
         return self.zfs_filesystem.split('/')[0]
 
-    def _check_vm_status(self):
-        request, vm = self.request, self.vm
+    def _check_vm_status(self, vm=None):
+        request, vm = self.request, vm or self.vm
 
         if not (request.user.is_admin(request) or vm.is_installed()):
             raise PreconditionRequired('VM is not installed')
@@ -161,42 +160,82 @@ class VmSnapshot(APIView):
 
         request, vm, snap = self.request, self.vm, self.snap
 
+        ser = SnapshotRestoreSerializer(request, vm, data=self.data)
+        if not ser.is_valid():
+            return FailureTaskResponse(self.request, ser.errors)
+
+        target_vm, target_vm_disk_id = ser.target_vm, ser.target_vm_disk_id
+
         if vm.node.status not in vm.node.STATUS_OPERATIONAL:
             raise NodeIsNotOperational
 
-        if vm.locked:
+        if target_vm.locked:
             raise VmIsLocked
+
+        if target_vm != vm:
+            if target_vm.node.status not in target_vm.node.STATUS_OPERATIONAL:
+                raise NodeIsNotOperational
+
+            self._check_vm_status(vm=target_vm)
+
+            if vm.brand != target_vm.brand:
+                raise PreconditionRequired('VM brand mismatch')
+
+            source_disk = vm.json_active_get_disks()[self.disk_id - 1]
+            target_disk = target_vm.json_active_get_disks()[target_vm_disk_id - 1]
+
+            if target_disk['size'] != source_disk['size']:
+                raise PreconditionRequired('Disk size mismatch')
 
         self._check_vm_status()
         self._check_snap_status()
         apiview, detail = self._get_apiview_detail()
+        apiview['force'] = ser.data['force']
 
-        apiview['force'] = bool(ForceSerializer(data=self.data, default=True))
+        if target_vm != vm:
+            detail += ", source_hostname='%s', target_hostname='%s', target_disk_id=%s" % (vm.hostname,
+                                                                                           target_vm.hostname,
+                                                                                           target_vm_disk_id)
+            apiview['source_hostname'] = vm.hostname
+            apiview['target_hostname'] = target_vm.hostname
+            apiview['target_disk_id'] = target_vm_disk_id
 
-        if not apiview['force']:
+            if not apiview['force']:
+                if Snapshot.objects.only('id').filter(vm=target_vm, disk_id=ser.target_vm_real_disk_id).exists():
+                    raise ExpectationFailed('Target VM has snapshots')
+
+        elif not apiview['force']:
             snaplast = Snapshot.objects.only('id').filter(vm=vm, disk_id=snap.disk_id).order_by('-id')[0]
             if snap.id != snaplast.id:
                 raise ExpectationFailed('VM has more recent snapshots')
 
-        if vm.status != vm.STOPPED:
+        if target_vm.status != vm.STOPPED:
             raise VmIsNotOperational('VM is not stopped')
 
-        if vm.tasks:
+        if target_vm.tasks:
             raise VmHasPendingTasks
 
         msg = LOG_SNAP_UPDATE
         lock = self.LOCK % (vm.uuid, snap.disk_id)
-        cmd = 'esnapshot rollback "%s@%s" 2>&1' % (self.zfs_filesystem, snap.zfs_name)
-        vm.set_notready()
-        tid, err = execute(request, vm.owner.id, cmd, meta=snap_meta(vm, msg, apiview, detail), lock=lock,
-                           callback=snap_callback(vm, snap), queue=vm.node.fast_queue)
+
+        if target_vm == vm:
+            cmd = 'esnapshot rollback "%s@%s" 2>&1' % (self.zfs_filesystem, snap.zfs_name)
+        else:
+            cmd = 'esbackup snap-restore -s %s@%s -d %s' % (self.zfs_filesystem, snap.zfs_name,
+                                                            ser.target_vm_disk_zfs_filesystem)
+            if vm.node != target_vm.node:
+                cmd += ' -H %s' % target_vm.node.address
+
+        target_vm.set_notready()
+        tid, err = execute(request, target_vm.owner.id, cmd, meta=snap_meta(target_vm, msg, apiview, detail), lock=lock,
+                           callback=snap_callback(target_vm, snap), queue=vm.node.fast_queue)
 
         if err:
-            vm.revert_notready()
-            return FailureTaskResponse(request, err, vm=vm)
+            target_vm.revert_notready()
+            return FailureTaskResponse(request, err, vm=target_vm)
         else:
             snap.save_status(snap.ROLLBACK)
-            return TaskResponse(request, tid, msg=msg, vm=vm, api_view=apiview, detail=detail, data=self.data)
+            return TaskResponse(request, tid, msg=msg, vm=target_vm, api_view=apiview, detail=detail, data=self.data)
 
     def delete(self):
         self._check_vm_status()
