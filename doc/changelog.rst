@@ -1,6 +1,18 @@
 Changelog
 #########
 
+2.7.0 (unreleased)
+==================
+
+Features
+--------
+
+- Added node version caching and internal update events - `#271 <https://github.com/erigones/esdc-ce/issues/271>`__
+
+Bugs
+----
+
+
 2.6.7 (unreleased)
 ==================
 
@@ -34,7 +46,6 @@ Features
 
 - NIC tags will no longer be hardcoded, but rather colected from nodes - `#227 <https://github.com/erigones/esdc-ce/issues/227>`__
 - Added ability to send Post-registration email - `#261 <https://github.com/erigones/esdc-ce/issues/261>`__
-- Added node version caching and internal update events - `#271 <https://github.com/erigones/esdc-ce/issues/271>`__
 - Added ability to sort backup definitions by the schedule column - `#272 <https://github.com/erigones/esdc-ce/issues/272>`__
 
 Bugs
