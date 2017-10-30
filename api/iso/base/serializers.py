@@ -1,13 +1,13 @@
 from django.utils.translation import ugettext_lazy as _
 
 from api import serializers as s
-from api.validators import validate_alias, validate_dc_bound
+from api.validators import validate_alias
 from api.vm.utils import get_owners
 from gui.models import User
 from vms.models import Iso
 
 
-class IsoSerializer(s.InstanceSerializer):
+class IsoSerializer(s.ConditionalDCBoundSerializer):
     """
     vms.models.Iso
     """
@@ -22,7 +22,6 @@ class IsoSerializer(s.InstanceSerializer):
     access = s.IntegerChoiceField(choices=Iso.ACCESS, default=Iso.PRIVATE)
     desc = s.SafeCharField(max_length=128, required=False)
     ostype = s.IntegerChoiceField(choices=Iso.OSTYPE, required=False)
-    dc_bound = s.BooleanField(source='dc_bound_bool', default=True)
     created = s.DateTimeField(read_only=True, required=False)
 
     def __init__(self, request, iso, *args, **kwargs):
@@ -36,17 +35,6 @@ class IsoSerializer(s.InstanceSerializer):
             return self._dc_bound
         # noinspection PyProtectedMember
         return super(IsoSerializer, self)._normalize(attr, value)
-
-    def validate_dc_bound(self, attrs, source):
-        try:
-            value = bool(attrs[source])
-        except KeyError:
-            pass
-        else:
-            if value != self.object.dc_bound_bool:
-                self._dc_bound = validate_dc_bound(self.request, self.object, value, _('ISO image'))
-
-        return attrs
 
     def validate_alias(self, attrs, source):
         try:
@@ -66,7 +54,7 @@ class IsoSerializer(s.InstanceSerializer):
                 if Iso.objects.filter(dc_bound=self._dc_bound).count() >= int(limit):
                     raise s.ValidationError(_('Maximum number of ISO images reached'))
 
-        return attrs
+        return super(IsoSerializer, self).validate(attrs)
 
 
 class ExtendedIsoSerializer(IsoSerializer):

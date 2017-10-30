@@ -15,8 +15,20 @@ Bugs
 ----
 
 
-2.6.5 (unreleased)
+2.6.7 (unreleased)
 ==================
+
+Features
+--------
+
+- Updated default resolver for the admin network - `esdc-factory#57 <https://github.com/erigones/esdc-factory/issues/57>`__
+
+Bugs
+----
+
+
+2.6.6 (released on 2017-10-11)
+==============================
 
 Features
 --------
@@ -24,7 +36,28 @@ Features
 Bugs
 ----
 
+- Image creation from snapshot fixed - `#277 <https://github.com/erigones/esdc-ce/issues/277>`__
+- Added longer timeout to gunicorn-gui - `#279 <https://github.com/erigones/esdc-ce/issues/279>`__
+
+
+2.6.5 (released on 2017-10-04)
+==============================
+
+Features
+--------
+
+- NIC tags will no longer be hardcoded, but rather colected from nodes - `#227 <https://github.com/erigones/esdc-ce/issues/227>`__
+- Added ability to send Post-registration email - `#261 <https://github.com/erigones/esdc-ce/issues/261>`__
+- Added ability to sort backup definitions by the schedule column - `#272 <https://github.com/erigones/esdc-ce/issues/272>`__
+
+Bugs
+----
+
+- Restricted dc_bound API calls to require datacenter to be explicitly set via dc parameter - `#265 <https://github.com/erigones/esdc-ce/issues/265>`__
 - Fixed highlighting of backups clicked on in the node's backup list - `#260 <https://github.com/erigones/esdc-ce/issues/260>`__
+- Fixed Super admin delete user and got error 500 - `#263 <https://github.com/erigones/esdc-ce/issues/263>`__
+- Disabled cloud-init network configuration in mgmt and mon VMs - `#270 <https://github.com/erigones/esdc-ce/issues/270>`__ + `#276 <https://github.com/erigones/esdc-ce/issues/276>`__ 
+- Fixed VM stop and reboot actions in compute node's server list - `#275 <https://github.com/erigones/esdc-ce/issues/275>`__
 
 
 2.6.4 (released on 2017-09-11)

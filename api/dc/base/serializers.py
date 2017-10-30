@@ -13,7 +13,7 @@ from api.vm.utils import get_vm, get_owners
 from api.sms.utils import get_services
 from api.mon.backends.abstract import VM_KWARGS, VM_KWARGS_NIC, VM_KWARGS_DISK
 from gui.models import User, UserProfile, Role
-from vms.models import Dc, DefaultDc, Vm, BackupDefine, Subnet
+from vms.models import Dc, DefaultDc, Vm, BackupDefine
 from vms.utils import DefAttrDict
 from pdns.models import Domain
 
@@ -607,9 +607,6 @@ class DefaultDcSettingsSerializer(DcSettingsSerializer):
     VMS_NODE_SSH_KEYS_DEFAULT = s.ArrayField(label='VMS_NODE_SSH_KEYS_DEFAULT',
                                              help_text=_('List of SSH keys to be added to compute nodes by default'))
 
-    VMS_NET_NIC_TAGS = s.ArrayField(label='VMS_NET_NIC_TAGS', min_items=1, max_items=24,
-                                    help_text=_('List of aliases of network devices configured on compute nodes.'))
-
     VMS_IMAGE_VM = s.SafeCharField(label='VMS_IMAGE_VM', required=False,
                                    help_text=_('Global image server (hostname or uuid) - primary IMGAPI source on all '
                                                'compute nodes. Empty value means that most of the image-related '
@@ -721,21 +718,6 @@ class DefaultDcSettingsSerializer(DcSettingsSerializer):
                         raise s.ValidationError(_('Invalid OS type; VM must be a SunOS Zone.'))
 
                     attrs[source] = vm.uuid
-
-        return attrs
-
-    # noinspection PyMethodMayBeStatic,PyPep8Naming
-    def validate_VMS_NET_NIC_TAGS(self, attrs, source):
-        try:
-            value = attrs[source]
-        except KeyError:
-            pass
-        else:
-            new_nic_tags = set(value)
-            used_nic_tags = set(Subnet.objects.all().values_list('nic_tag', flat=True).distinct())
-
-            if not used_nic_tags.issubset(new_nic_tags):
-                raise s.ValidationError(_('Cannot remove used NIC tags.'))
 
         return attrs
 

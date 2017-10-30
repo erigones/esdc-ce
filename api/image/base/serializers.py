@@ -1,14 +1,14 @@
 from django.utils.translation import ugettext_lazy as _
 
 from api import serializers as s
-from api.validators import validate_owner, validate_dc_bound
+from api.validators import validate_owner
 from api.utils.http import HttpClient, RequestException, TooLarge
 from api.vm.utils import get_owners
 from gui.models import User
 from vms.models import Image
 
 
-class ImageSerializer(s.InstanceSerializer):
+class ImageSerializer(s.ConditionalDCBoundSerializer):
     """
     vms.models.Image
     Also used in api.dc.image.serializers.
@@ -36,7 +36,6 @@ class ImageSerializer(s.InstanceSerializer):
     # nic_model = s.ChoiceField(choices=Vm.NIC_MODEL)   # KVM only
     # disk_model = s.ChoiceField(choices=Vm.DISK_MODEL)  # KVM only
     tags = s.TagField(required=False, default=[])
-    dc_bound = s.BooleanField(source='dc_bound_bool', default=True)
     status = s.IntegerChoiceField(choices=Image.STATUS, read_only=True, required=False)
     created = s.DateTimeField(read_only=True, required=False)
 
@@ -63,17 +62,6 @@ class ImageSerializer(s.InstanceSerializer):
     def validate_owner(self, attrs, source):
         """Cannot change owner while pending tasks exist"""
         validate_owner(self.object, attrs.get(source, None), _('Image'))
-
-        return attrs
-
-    def validate_dc_bound(self, attrs, source):
-        try:
-            value = bool(attrs[source])
-        except KeyError:
-            pass
-        else:
-            if value != self.object.dc_bound_bool:
-                self._dc_bound = validate_dc_bound(self.request, self.object, value, _('Image'))
 
         return attrs
 
@@ -109,7 +97,7 @@ class ImageSerializer(s.InstanceSerializer):
                 if Image.objects.filter(dc_bound=self._dc_bound).count() >= int(limit):
                     raise s.ValidationError(_('Maximum number of server disk images reached'))
 
-        return attrs
+        return super(ImageSerializer, self).validate(attrs)
 
 
 class ExtendedImageSerializer(ImageSerializer):

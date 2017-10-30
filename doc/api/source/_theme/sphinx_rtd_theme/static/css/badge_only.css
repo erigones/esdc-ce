@@ -18,8 +18,8 @@
   font-family: FontAwesome;
   font-weight: normal;
   font-style: normal;
-  src: url("../font/fontawesome_webfont.eot");
-  src: url("../font/fontawesome_webfont.eot?#iefix") format("embedded-opentype"), url("../font/fontawesome_webfont.woff") format("woff"), url("../font/fontawesome_webfont.ttf") format("truetype"), url("../font/fontawesome_webfont.svg#FontAwesome") format("svg");
+  src: url("../fonts/fontawesome-webfont.eot");
+  src: url("../fonts/fontawesome-webfont.eot?#iefix") format("embedded-opentype"), url("../fonts/fontawesome-webfont.woff") format("woff"), url("../fonts/fontawesome-webfont.ttf") format("truetype"), url("../fonts/fontawesome-webfont.svg#FontAwesome") format("svg");
 }
 .fa:before {
   display: inline-block;
@@ -215,11 +215,6 @@ ul.fas li .fa-large:before {
   }
   .rst-versions.shift {
     display: block;
-  }
-
-  img {
-    width: 100%;
-    height: auto;
   }
 }
 
