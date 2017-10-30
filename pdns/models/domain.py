@@ -210,3 +210,7 @@ class Domain(models.Model):
             with connections['pdns'].cursor() as cursor:
                 cursor.execute("INSERT INTO domainmetadata (domain_id, kind, content) VALUES "
                                "(%s, 'ALLOW-AXFR-FROM', 'AUTO-NS')", [instance.id])
+
+    def get_related_dcs(self):
+        from vms.models import Dc
+        return Dc.objects.filter(domaindc__domain_id=self.id)

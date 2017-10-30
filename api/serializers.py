@@ -1432,3 +1432,62 @@ class InstanceSerializer(Serializer):
         self._delayed_data = None
 
         return self.object
+
+    @property
+    def _model_verbose_name(self):
+        # noinspection PyProtectedMember 2x
+        return self._model_._meta.verbose_name
+
+
+class ConditionalDCBoundSerializer(InstanceSerializer):
+    """This serializer handles the common logic when a model is being bound to a datacenter."""
+    _dc_bound = None
+    dc_bound = BooleanField(source='dc_bound_bool', default=True)
+
+    def _validate_dc_bound(self, value):
+        if value:
+            if hasattr(self.object, 'get_related_dcs'):
+                dcs = self.object.get_related_dcs()
+            elif hasattr(self.object, 'dc'):
+                dcs = self.object.dc.all()
+            else:
+                raise AssertionError(
+                    '%s has to implement either get_dcs method or have a dc relation.' % self._model_verbose_name)
+            dcs_len = len(dcs)
+
+            if dcs_len == 1:
+                return dcs[0]
+            else:
+                err = {'model': self._model_verbose_name}
+
+                if dcs_len > 1:
+                    raise ValidationError(_('%(model)s is attached into more than one datacenter.') % err)
+                elif dcs_len == 0:
+                    raise ValidationError(_('%(model)s is not attached into any datacenters.') % err)
+        else:
+            return None
+
+    def validate_dc_bound(self, attrs, source):
+        try:
+            value = bool(attrs[source])
+        except KeyError:
+            pass
+        else:
+            if value != self.object.dc_bound_bool:
+                if not self.request.user.is_staff:
+                    raise NoPermissionToModify
+                self._dc_bound = self._validate_dc_bound(value)
+
+        return attrs
+
+    def validate(self, attrs):
+        if (self.request.method == 'POST'
+                and attrs.get('dc_bound_bool', self.object.dc_bound_bool)
+                and not self.init_data.get('dc', None)):
+            err = {'model': self._model_verbose_name.lower()}
+            self._errors['dc_bound'] = self._errors['dc'] = ErrorList([
+                _('You have to specify to which datacenter shall the %(model)s be bound. '
+                  'Either use the "dc" parameter or set the "dc_bound" parameter to false.') % err
+            ])
+
+        return super(ConditionalDCBoundSerializer, self).validate(attrs)

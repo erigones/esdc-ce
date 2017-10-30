@@ -1,13 +1,10 @@
-from django.utils.translation import ugettext_lazy as _
-
 from api import serializers as s
-from api.validators import validate_dc_bound
 from pdns.models import Domain
 from pdns.validators import validate_dns_name
 from gui.models import User
 
 
-class DomainSerializer(s.InstanceSerializer):
+class DomainSerializer(s.ConditionalDCBoundSerializer):
     """
     pdns.models.Domain
     """
@@ -23,7 +20,6 @@ class DomainSerializer(s.InstanceSerializer):
     access = s.IntegerChoiceField(choices=Domain.ACCESS, default=Domain.PRIVATE)
     desc = s.SafeCharField(max_length=128, required=False)
     created = s.DateTimeField(read_only=True, required=False)
-    dc_bound = s.BooleanField(source='dc_bound_bool', default=True)
 
     def __init__(self, request, domain, *args, **kwargs):
         super(DomainSerializer, self).__init__(request, domain, *args, **kwargs)
@@ -35,22 +31,6 @@ class DomainSerializer(s.InstanceSerializer):
             return self._dc_bound
         # noinspection PyProtectedMember
         return super(DomainSerializer, self)._normalize(attr, value)
-
-    def validate_dc_bound(self, attrs, source):
-        try:
-            value = bool(attrs[source])
-        except KeyError:
-            pass
-        else:
-            if value != self.object.dc_bound_bool:
-                dc = validate_dc_bound(self.request, self.object, value, _('Domain'))
-
-                if dc:
-                    self._dc_bound = dc.id
-                else:
-                    self._dc_bound = None
-
-        return attrs
 
     def validate_name(self, attrs, source):
         try:

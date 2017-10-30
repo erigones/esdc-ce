@@ -9,9 +9,7 @@ from django.core.exceptions import ValidationError
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 
-from pdns.models import Domain
-from gui.models import Role, UserSSHKey
-from vms.models import Dc
+from gui.models import UserSSHKey
 
 SSH_KEY_TYPES = (
     'ssh-rsa',
@@ -47,35 +45,6 @@ def validate_alias(obj, value, field_comparison='alias__iexact'):
         raise ValidationError(_('This alias is already in use. Please supply a different alias.'))
 
     return value
-
-
-def validate_dc_bound(request, obj, value, model_name):
-    from api.serializers import NoPermissionToModify  # circular imports
-
-    if not request.user.is_staff:
-        raise NoPermissionToModify
-
-    if value:
-        if isinstance(obj, Domain):
-            dcs = Dc.objects.filter(domaindc__domain_id=obj.id)
-        elif isinstance(obj, Role):
-            dcs = Dc.objects.filter(roles=obj)
-        else:
-            dcs = obj.dc.all()
-
-        dcs_len = len(dcs)
-
-        if dcs_len == 1:
-            return dcs[0]
-        else:
-            err = {'model': model_name}
-
-            if dcs_len > 1:
-                raise ValidationError(_('%(model)s is attached into more than one datacenter.') % err)
-            elif dcs_len == 0:
-                raise ValidationError(_('%(model)s is not attached into any datacenters.') % err)
-    else:
-        return None
 
 
 def validate_mdata(reserved_keys):

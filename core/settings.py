@@ -573,7 +573,6 @@ VMS_NODE_SSH_KEYS_SYNC = True
 VMS_NODE_SSH_KEYS_DEFAULT = []
 VMS_NET_DEFAULT = 'lan'
 VMS_NET_ADMIN = 'admin'
-VMS_NET_NIC_TAGS = ['admin', 'external', 'internal', 'storage']
 VMS_NET_VLAN_RESTRICT = True
 VMS_NET_VLAN_ALLOWED = []
 VMS_NET_LIMIT = None
