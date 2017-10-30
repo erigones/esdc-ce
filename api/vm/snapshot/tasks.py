@@ -49,6 +49,8 @@ def _vm_snapshot_cb_failed(result, task_id, snap, action, vm=None):
     elif action == 'PUT':
         if vm is None:
             vm = snap.vm
+        elif vm != snap.vm:
+            snap.vm.revert_notready()
         vm.revert_notready()
         snap.status = snap.OK
         snap.save_status()
@@ -193,6 +195,8 @@ def vm_snapshot_cb(result, task_id, vm_uuid=None, snap_id=None):
                 _delete_oldest(Snapshot, snap.define, vm_snapshot_list, 'snapnames', task_id, LOG_SNAPS_DELETE)
 
         elif action == 'PUT':
+            if vm != snap.vm:
+                snap.vm.revert_notready()
             vm.revert_notready()
             snap.status = snap.OK
             snap.save_status()

@@ -226,12 +226,16 @@ class VmSnapshot(APIView):
             if vm.node != target_vm.node:
                 cmd += ' -H %s' % target_vm.node.address
 
+            vm.set_notready()
+
         target_vm.set_notready()
         tid, err = execute(request, target_vm.owner.id, cmd, meta=snap_meta(target_vm, msg, apiview, detail), lock=lock,
                            callback=snap_callback(target_vm, snap), queue=vm.node.fast_queue)
 
         if err:
             target_vm.revert_notready()
+            if vm != target_vm:
+                vm.revert_notready()
             return FailureTaskResponse(request, err, vm=target_vm)
         else:
             snap.save_status(snap.ROLLBACK)
