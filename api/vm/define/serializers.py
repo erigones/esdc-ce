@@ -1399,7 +1399,7 @@ class VmDefineNicSerializer(s.Serializer):
         # These attributes cannot be specified (they need to be inherited from net)
         attrs['vlan_id'] = net.vlan_id
         if net.vxlan_id:
-            attrs['nic_tag'] = net.nic_tag + '/' + net.vxlan_id
+            attrs['nic_tag'] = '%s/%s' % (net.nic_tag, net.vxlan_id)
         else:
             attrs['nic_tag'] = net.nic_tag
 

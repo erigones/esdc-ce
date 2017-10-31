@@ -153,12 +153,18 @@ class NetworkSerializer(s.ConditionalDCBoundSerializer):
             attrs['vxlan_id'] = None
 
         # validate MTU for overlays and etherstubs, and physical nics
-        if nic_tag_type == 'overlay rule' and not mtu:
+        if nic_tag_type == 'overlay rule':
             # if MTU was not set for the overlay
-            attrs['mtu'] = 1400
+            if not mtu:
+                attrs['mtu'] = 1400
+
+            if mtu > 8900:
+                self._errors['mtu'] = s.ErrorList([s.IntegerField.default_error_messages['max_value']
+                                                   % {'limit_value': 8900}])
 
         if nic_tag_type in ('normal', 'aggr') and mtu and mtu < 1500:
-            self._errors['mtu'] = s.ErrorList([_('MTU must be from integer interval [1500, 9000].')])
+            self._errors['mtu'] = s.ErrorList([s.IntegerField.default_error_messages['min_value']
+                                               % {'limit_value': 1500}])
 
         if self._dc_bound:
             try:
