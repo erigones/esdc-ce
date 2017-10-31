@@ -8,6 +8,7 @@ Features
 --------
 
 - Added overlay/VXLAN support to net_manage - `#228 <https://github.com/erigones/esdc-ce/issues/228>`__
+- Updated default resolver for the admin network - `esdc-factory#57 <https://github.com/erigones/esdc-factory/issues/57>`__
 
 Bugs
 ----
