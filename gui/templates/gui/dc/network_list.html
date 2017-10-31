@@ -142,7 +142,6 @@
             </td>
             <td class="nowrap">{{ net.vlan_id }}</td>
             <td class="hidden-phone nowrap">{{ net.nic_tag }}{% if net.vxlan_id %}/{{ net.vxlan_id }}{% endif %}</td>
-            <td class="hidden-phone nowrap">{{ net.nic_tag }}{% if net.mtu %}/{{ net.mtu }}{% endif %}</td>
             <td class="hidden-phone">{{ net.ips_free }}</td>
             {% if all %}
             <td class="hidden-phone"><small class="vm_hostname">{{ net.dc.all|dcify }}</small></td>

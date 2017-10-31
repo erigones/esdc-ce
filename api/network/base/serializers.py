@@ -153,7 +153,7 @@ class NetworkSerializer(s.ConditionalDCBoundSerializer):
             attrs['vxlan_id'] = None
 
         # validate MTU for overlays and etherstubs, and physical nics
-        if nic_tag_type in ('overlay rule') and not mtu:
+        if nic_tag_type == 'overlay rule' and not mtu:
             # if MTU was not set for the overlay
             attrs['mtu'] = 1400
 
