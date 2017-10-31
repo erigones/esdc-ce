@@ -505,6 +505,15 @@ class VmDefineSerializer(VmBaseSerializer):
 
     def validate(self, attrs):
         vm = self.object
+        dc_settings = self.dc_settings
+
+        if self.request.method == 'POST':
+            limit = dc_settings.VMS_VM_DEFINE_LIMIT
+
+            if limit is not None:
+                total = self.request.dc.vm_set.count()
+                if int(limit) <= total:
+                    raise s.ValidationError(_('Maximum number of server definitions reached.'))
 
         try:
             ostype = attrs['ostype']
@@ -569,8 +578,6 @@ class VmDefineSerializer(VmBaseSerializer):
             self.validate_node_resources(attrs)
 
         # Disable monitored flag if monitoring module/sync disabled
-        dc_settings = self.dc_settings
-
         # noinspection PyProtectedMember
         if 'monitored_internal' in attrs and not (dc_settings.MON_ZABBIX_ENABLED and dc_settings._MON_ZABBIX_VM_SYNC):
             attrs['monitored_internal'] = False
