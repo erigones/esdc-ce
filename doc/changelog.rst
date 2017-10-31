@@ -1,6 +1,20 @@
 Changelog
 #########
 
+2.7.0 (unreleased)
+==================
+
+Features
+--------
+
+- Monitoring hostgroups are either datacenter-based or global - `#93 <https://github.com/erigones/esdc-ce/issues/93>`__
+- Monitoring hostgroups are automatically created on VM and Node update if they don't exist - `#93 <https://github.com/erigones/esdc-ce/issues/93>`__
+- DC settings implied monitoring hostgroups are shown near the VM, node monitoring_hostgroups setting- `#266 <https://github.com/erigones/esdc-ce/issues/266>`__
+
+Bugs
+----
+
+
 2.6.7 (unreleased)
 ==================
 

@@ -1,11 +1,13 @@
 from logging import getLogger
 
+from django.core.validators import RegexValidator
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from django.utils.six import iteritems
 from django.core import validators
 from django.conf import settings
 
+from api.mon import MonitoringBackend
 from gui.models import User
 from vms.models import VmTemplate, Vm, Node, Image, Subnet, IPAddress, NodeStorage
 from api import serializers as s
@@ -84,7 +86,9 @@ class VmDefineSerializer(VmBaseSerializer):
     tags = s.TagField(required=False, default=[])  # null value checked in TagField
     monitored_internal = s.BooleanField(default=settings.MON_ZABBIX_ENABLED)
     monitored = s.BooleanField(default=settings.VMS_VM_MONITORED_DEFAULT)
-    monitoring_hostgroups = s.ArrayField(max_items=16, default=[])
+    monitoring_hostgroups = s.ArrayField(max_items=16, default=[],
+                                         validators=(
+                                             RegexValidator(regex=MonitoringBackend.RE_MONITORING_HOSTGROUPS),))
     monitoring_templates = s.ArrayField(max_items=32, default=[])
     installed = s.BooleanField(default=False)
     snapshot_limit_manual = s.IntegerField(required=False)  # Removed from json if null, limits set below
