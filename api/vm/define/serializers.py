@@ -957,6 +957,7 @@ class VmDefineNicSerializer(s.Serializer):
     allowed_ips = s.IPAddressArrayField(default=list(), max_items=NIC_ALLOWED_IPS_MAX)
     monitoring = s.BooleanField(default=False)
     set_gateway = s.BooleanField(default=True)
+    mtu = s.IntegerField(read_only=True, required=False)
 
     def __init__(self, request, vm, *args, **kwargs):
         self.request = request
@@ -1037,6 +1038,10 @@ class VmDefineNicSerializer(s.Serializer):
         # default vlan ID is 0
         if 'vlan_id' not in data:
             data['vlan_id'] = 0
+
+        # default MTU is None
+        if 'mtu' not in data:
+            data['mtu'] = None
 
         # primary does not exist in json if False
         if 'primary' not in data:
@@ -1394,6 +1399,8 @@ class VmDefineNicSerializer(s.Serializer):
         # These attributes cannot be specified (they need to be inherited from net)
         attrs['nic_tag'] = net.nic_tag
         attrs['vlan_id'] = net.vlan_id
+        attrs['vxlan_id'] = net.vxlan_id
+        attrs['mtu'] = net.mtu
 
         if 'use_net_dns' in attrs:
             if attrs['use_net_dns']:

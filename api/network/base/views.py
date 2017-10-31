@@ -89,6 +89,8 @@ def net_manage(request, name, data=None):
         :type data.vlan_id: integer
         :arg data.vxlan_id: VXLAN ID required for overlay NIC tags (1 - 16777215, default: null)
         :type data.vxlan_id: integer
+        :arg data.mtu: MTU for the network vNIC (576 - 9000)
+        :type data.mtu: integer
         :arg data.resolvers: List of IPv4 addresses that can be used as resolvers
         :type data.resolvers: array
         :arg data.dns_domain: Existing domain name used for creating A records for VMs
@@ -141,6 +143,8 @@ def net_manage(request, name, data=None):
         :type data.vlan_id: integer
         :arg data.vxlan_id: VXLAN ID required for overlay NIC tags (1 - 16777215)
         :type data.vxlan_id: integer
+        :arg data.mtu: MTU for the network vNIC (576 - 9000)
+        :type data.mtu: integer
         :arg data.resolvers: List of IPv4 addresses that can be used as resolvers
         :type data.resolvers: array
         :arg data.dns_domain: Existing domain name used for creating A records for VMs

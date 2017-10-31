@@ -3,7 +3,7 @@ function DcNetworkList() {
   var self = this;
 
   function show_vxlan() {
-    if ($('#id_adm-nic_tag option:selected').text().match(/(overlay)/g)) {
+    if ($('#id_adm-nic_tag option:selected').text().match(/(overlay rule)/g)) {
       $('#id_adm-vxlan_id').parent().parent().show();
     }
     else {

@@ -82,6 +82,8 @@ class AdminNetworkForm(SerializerForm):
                                           help_text=_('When enabled, IP addresses for this network are managed by '
                                                       'an external DHCP service.'),
                                           widget=forms.CheckboxInput(attrs={'class': 'normal-check'}))
+    mtu = forms.IntegerField(label=_('MTU'), required=False, widget=forms.TextInput(attrs=TEXT_INPUT_ATTRS),
+                             help_text=_('MTU for the network vNIC (576 - 9000)'))
 
     def __init__(self, request, net, *args, **kwargs):
         super(AdminNetworkForm, self).__init__(request, net, *args, **kwargs)

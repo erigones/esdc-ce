@@ -16,7 +16,8 @@ class NetworkSerializer(s.ConditionalDCBoundSerializer):
     """
     _model_ = Subnet
     _update_fields_ = ('alias', 'owner', 'access', 'desc', 'network', 'netmask', 'gateway', 'resolvers',
-                       'dns_domain', 'ptr_domain', 'nic_tag', 'vlan_id', 'dc_bound', 'dhcp_passthrough', 'vxlan_id')
+                       'dns_domain', 'ptr_domain', 'nic_tag', 'vlan_id', 'dc_bound', 'dhcp_passthrough', 'vxlan_id',
+                       'mtu')
     _default_fields_ = ('name', 'alias', 'owner')
     _blank_fields_ = frozenset({'desc', 'dns_domain', 'ptr_domain'})
     _null_fields_ = frozenset({'gateway'})
@@ -35,6 +36,7 @@ class NetworkSerializer(s.ConditionalDCBoundSerializer):
     nic_tag_type = s.CharField(read_only=True)
     vlan_id = s.IntegerField(min_value=0, max_value=4096)
     vxlan_id = s.IntegerField(min_value=1, max_value=16777215, required=False)  # (2**24 - 1) based on RFC 7348
+    mtu = s.IntegerField(min_value=576, max_value=9000, required=False)  # values from man vmadm
     resolvers = s.IPAddressArrayField(source='resolvers_api', required=False, max_items=8)
     dns_domain = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\._-]*$', max_length=250, required=False)  # can be blank
     ptr_domain = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\._-]*$', max_length=250, required=False)  # can be blank
@@ -116,6 +118,11 @@ class NetworkSerializer(s.ConditionalDCBoundSerializer):
             vxlan_id = self.object.vxlan_id
 
         try:
+            mtu = attrs['mtu']
+        except KeyError:
+            mtu = self.object.mtu
+
+        try:
             nic_tag = attrs['nic_tag']
         except KeyError:
             nic_tag = self.object.nic_tag
@@ -135,14 +142,23 @@ class NetworkSerializer(s.ConditionalDCBoundSerializer):
                 if Subnet.objects.filter(dc_bound=self._dc_bound).count() >= int(limit):
                     raise s.ValidationError(_('Maximum number of networks reached.'))
 
+        nic_tag_type = Node.all_nictags()[nic_tag]
         # retrieve all available nictags and see what is the type of the current nic tag
         # if type is overlay then vxlan is mandatory argument
-        if Node.all_nictags()[nic_tag] == 'overlay':
+        if nic_tag_type == 'overlay rule':
             if not vxlan_id:
                 self._errors['vxlan_id'] = s.ErrorList([_('VXLAN ID is required when an '
                                                           'overlay NIC tag is selected.')])
         else:
             attrs['vxlan_id'] = None
+
+        # validate MTU for overlays and etherstubs, and physical nics
+        if nic_tag_type in ('overlay rule') and not mtu:
+            # if MTU was not set for the overlay
+            attrs['mtu'] = 1400
+
+        if nic_tag_type in ('normal', 'aggr') and mtu and mtu < 1500:
+            self._errors['mtu'] = s.ErrorList([_('MTU must be from integer interval [1500, 9000].')])
 
         if self._dc_bound:
             try:
@@ -157,7 +173,6 @@ class NetworkSerializer(s.ConditionalDCBoundSerializer):
 
             if dc_settings.VMS_NET_VXLAN_RESTRICT and vxlan_id not in dc_settings.VMS_NET_VXLAN_ALLOWED:
                 self._errors['vxlan_id'] = s.ErrorList([_('VXLAN ID is not available in datacenter.')])
-
 
         return super(NetworkSerializer, self).validate(attrs)
 
