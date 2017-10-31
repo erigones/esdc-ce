@@ -1397,9 +1397,12 @@ class VmDefineNicSerializer(s.Serializer):
             attrs['gateway'] = None
 
         # These attributes cannot be specified (they need to be inherited from net)
-        attrs['nic_tag'] = net.nic_tag
         attrs['vlan_id'] = net.vlan_id
-        attrs['vxlan_id'] = net.vxlan_id
+        if net.vxlan_id:
+            attrs['nic_tag'] = net.nic_tag + '/' + net.nic_tag
+        else:
+            attrs['nic_tag'] = net.nic_tag
+
         attrs['mtu'] = net.mtu
 
         if 'use_net_dns' in attrs:
