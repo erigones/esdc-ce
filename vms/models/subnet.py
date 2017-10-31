@@ -125,6 +125,8 @@ class Subnet(_VirtModel, _DcMixin, _UserTasksModel):
             'nic_tag': self.nic_tag,
             'nic_tag_type': self.nic_tag_type,
             'vlan_id': self.vlan_id,
+            'vxlan_id': self.vxlan_id,
+            'mtu': self.mtu,
             'resolvers': self.get_resolvers(),
             'dns_domain': self.dns_domain,
             'ptr_domain': self.ptr_domain,
