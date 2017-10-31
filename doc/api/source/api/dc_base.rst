@@ -183,6 +183,7 @@
                     "VMS_VM_BACKUP_ENABLED": true, 
                     "VMS_VM_BACKUP_LIMIT": null, 
                     "VMS_VM_CPU_SHARES_DEFAULT": 100, 
+                    "VMS_VM_DEFINE_LIMIT": null,
                     "VMS_VM_DOMAIN_DEFAULT": "lan", 
                     "VMS_VM_MDATA_DEFAULT": {},
                     "VMS_VM_MONITORED_DEFAULT": true, 
