@@ -7,6 +7,7 @@ Changelog
 Features
 --------
 
+- Updated default resolver for the admin network - `esdc-factory#57 <https://github.com/erigones/esdc-factory/issues/57>`__
 - Added limit for maximum number of VMs in a virtual datacenter - `#280 <https://github.com/erigones/esdc-ce/issues/280>`__
 - Added support for mounting snapshots in SunOS/LX zones - `#284 <https://github.com/erigones/esdc-ce/issues/284>`__
 
