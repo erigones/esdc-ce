@@ -429,16 +429,38 @@ _zfs_snap_vm_mount() {
 	local snapshot_name="$2"
 
 	local zone_check='{"type": "dir", "enoent_ok": true}'
-	local zone_root="/${zfs_filesystem}/root"
 	local zone_mountpath="/${SNAPSHOT_MOUNT_DIR}/${snapshot_name}"
-	local mountpoint="${zone_root}${zone_mountpath}"
-	local snapshot_zfs_dir="/${zfs_filesystem}/.zfs/snapshot/${snapshot_name}"
 
-	[[ "$(echo "${zfs_filesystem}" | ${AWK} -F"/" '{print NF-1}')" -eq 1 ]] && snapshot_zfs_dir="${snapshot_zfs_dir}/root"
+	local zone_root
+	local dataset_mountpoint
+	local snapshot_mountpoint
+	local snapshot_zfs_dir
+	local zpool
+	local uuid
+	local rest
 
-	if [[ -d "${snapshot_zfs_dir}" ]] && [[ ! -e "${mountpoint}" ]] && assert_safe_zone_path "${zone_root}" "${zone_mountpath}" "${zone_check}" 2>/dev/null; then 
-		${MKDIR} -m 0700 "${mountpoint}" && \
-		${MOUNT} -F lofs -o ro,setuid,nodevices "${snapshot_zfs_dir}" "${mountpoint}"
+	dataset_mountpoint=$(_zfs_dataset_property "${zfs_filesystem}" "mountpoint")
+
+	[[ -z "${dataset_mountpoint}" ]] && return 99
+
+	if [[ "$(echo "${zfs_filesystem}" | ${AWK} -F"/" '{print NF-1}')" -eq 1 ]]; then
+		# main zone dataset
+		zone_root="/${dataset_mountpoint}/root"
+		snapshot_zfs_dir="/${dataset_mountpoint}/.zfs/snapshot/${snapshot_name}/root"
+	else
+		# delegated dataset
+		zone_root=$(echo "${zfs_filesystem}" | tr "/" " " | { read -r zpool uuid rest
+			echo "/${zpool}/${uuid}/root"
+		})
+		snapshot_zfs_dir="${zone_root}/${dataset_mountpoint}/.zfs/snapshot/${snapshot_name}"
+	fi
+
+	snapshot_mountpoint="${zone_root}${zone_mountpath}"
+
+	if [[ -d "${snapshot_zfs_dir}" ]] && [[ ! -e "${snapshot_mountpoint}" ]] && \
+			assert_safe_zone_path "${zone_root}" "${zone_mountpath}" "${zone_check}" 2>/dev/null; then
+		${MKDIR} -m 0700 "${snapshot_mountpoint}" && \
+		${MOUNT} -F lofs -o ro,setuid,nodevices "${snapshot_zfs_dir}" "${snapshot_mountpoint}"
 		return $?
 	fi
 
@@ -449,10 +471,10 @@ _zfs_snap_vm_umount() {
 	local zfs_filesystem="$1"
 	local snapshot_name="$2"
 
-	local mountpoint="/${zfs_filesystem}/root/${SNAPSHOT_MOUNT_DIR}/${snapshot_name}"
+	local snapshot_mountpoint="/${zfs_filesystem}/root/${SNAPSHOT_MOUNT_DIR}/${snapshot_name}"
 
-	if ${MOUNT} | grep -q "${mountpoint}"; then
-		${UMOUNT} "${mountpoint}" && rmdir "${mountpoint}"
+	if ${MOUNT} | grep -q "${snapshot_mountpoint}"; then
+		${UMOUNT} "${snapshot_mountpoint}" && rmdir "${snapshot_mountpoint}"
 		return $?
 	fi
 
