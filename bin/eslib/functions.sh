@@ -430,31 +430,20 @@ _zfs_snap_vm_mount() {
 
 	local zone_check='{"type": "dir", "enoent_ok": true}'
 	local zone_mountpath="/${SNAPSHOT_MOUNT_DIR}/${snapshot_name}"
-
 	local zone_root
 	local dataset_mountpoint
 	local snapshot_mountpoint
 	local snapshot_zfs_dir
-	local zpool
-	local uuid
-	local rest
+
+	# delegated datasets are not supported
+	if [[ "$(echo "${zfs_filesystem}" | ${AWK} -F"/" '{print NF-1}')" -ne 1 ]] && return 32
 
 	dataset_mountpoint=$(_zfs_dataset_property "${zfs_filesystem}" "mountpoint")
 
-	[[ -z "${dataset_mountpoint}" ]] && return 99
+	[[ -z "${dataset_mountpoint}" ]] && return 96
 
-	if [[ "$(echo "${zfs_filesystem}" | ${AWK} -F"/" '{print NF-1}')" -eq 1 ]]; then
-		# main zone dataset
-		zone_root="/${dataset_mountpoint}/root"
-		snapshot_zfs_dir="/${dataset_mountpoint}/.zfs/snapshot/${snapshot_name}/root"
-	else
-		# delegated dataset
-		zone_root=$(echo "${zfs_filesystem}" | tr "/" " " | { read -r zpool uuid rest
-			echo "/${zpool}/${uuid}/root"
-		})
-		snapshot_zfs_dir="${zone_root}/${dataset_mountpoint}/.zfs/snapshot/${snapshot_name}"
-	fi
-
+	zone_root="/${dataset_mountpoint}/root"
+	snapshot_zfs_dir="/${dataset_mountpoint}/.zfs/snapshot/${snapshot_name}/root"
 	snapshot_mountpoint="${zone_root}${zone_mountpath}"
 
 	if [[ -d "${snapshot_zfs_dir}" ]] && [[ ! -e "${snapshot_mountpoint}" ]] && \
