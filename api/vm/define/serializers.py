@@ -1234,6 +1234,12 @@ class VmDefineNicSerializer(s.Serializer):
 
                     if self.object and self._net != _net:  # changing net is tricky, see validate() below
                         self._net_old = self._net
+
+                        if self.object.get('mtu', None) and self._net_old.mtu is None:
+                            raise s.ValidationError(_('This field cannot be changed because some inherited NIC '
+                                                      'attributes (MTU) cannot be updated. Please remove the NIC and '
+                                                      'add a new NIC.'))
+
                     self._net = _net
 
         return attrs
