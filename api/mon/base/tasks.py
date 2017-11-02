@@ -93,13 +93,13 @@ def mon_hostgroup_list(task_id, dc_id, **kwargs):
 # noinspection PyUnusedLocal
 @cq.task(name='api.mon.base.tasks.mon_alert_list', base=MgmtTask)
 @mgmt_task()
-def mon_alert_list(task_id, dc_id, dc_bound, *args, **kwargs):
+def mon_alert_list(task_id, dc_id, *args, **kwargs):
     """
     Return list of alerts available in Zabbix.
     """
     dc = Dc.objects.get_by_id(int(dc_id))
 
-    if dc_bound:
+    if is_task_dc_bound(task_id):
         # TODO: set hosts_or_groups to hosts in this DC.
         kwargs['prefix'] = dc.name
     else:
