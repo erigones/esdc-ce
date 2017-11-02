@@ -509,6 +509,15 @@ class VmDefineSerializer(VmBaseSerializer):
 
     def validate(self, attrs):
         vm = self.object
+        dc_settings = self.dc_settings
+
+        if self.request.method == 'POST':
+            limit = dc_settings.VMS_VM_DEFINE_LIMIT
+
+            if limit is not None:
+                total = self.request.dc.vm_set.count()
+                if int(limit) <= total:
+                    raise s.ValidationError(_('Maximum number of server definitions reached.'))
 
         try:
             ostype = attrs['ostype']
@@ -573,8 +582,6 @@ class VmDefineSerializer(VmBaseSerializer):
             self.validate_node_resources(attrs)
 
         # Disable monitored flag if monitoring module/sync disabled
-        dc_settings = self.dc_settings
-
         # noinspection PyProtectedMember
         if 'monitored_internal' in attrs and not (dc_settings.MON_ZABBIX_ENABLED and dc_settings._MON_ZABBIX_VM_SYNC):
             attrs['monitored_internal'] = False
@@ -961,6 +968,7 @@ class VmDefineNicSerializer(s.Serializer):
     allowed_ips = s.IPAddressArrayField(default=list(), max_items=NIC_ALLOWED_IPS_MAX)
     monitoring = s.BooleanField(default=False)
     set_gateway = s.BooleanField(default=True)
+    mtu = s.IntegerField(read_only=True, required=False)
 
     def __init__(self, request, vm, *args, **kwargs):
         self.request = request
@@ -1041,6 +1049,10 @@ class VmDefineNicSerializer(s.Serializer):
         # default vlan ID is 0
         if 'vlan_id' not in data:
             data['vlan_id'] = 0
+
+        # default MTU is None
+        if 'mtu' not in data:
+            data['mtu'] = None
 
         # primary does not exist in json if False
         if 'primary' not in data:
@@ -1226,6 +1238,14 @@ class VmDefineNicSerializer(s.Serializer):
 
                     if self.object and self._net != _net:  # changing net is tricky, see validate() below
                         self._net_old = self._net
+
+                        # If a MTU is set on an existing NIC then it cannot be removed
+                        # An overlay nic_tag cannot be set on an existing NIC
+                        if (self.object.get('mtu', None) and _net.mtu is None) or _net.vxlan_id:
+                            raise s.ValidationError(_('This field cannot be changed because some inherited NIC '
+                                                      'attributes (MTU, nic_tag) cannot be updated. '
+                                                      'Please remove the NIC and add a new NIC.'))
+
                     self._net = _net
 
         return attrs
@@ -1396,8 +1416,13 @@ class VmDefineNicSerializer(s.Serializer):
             attrs['gateway'] = None
 
         # These attributes cannot be specified (they need to be inherited from net)
-        attrs['nic_tag'] = net.nic_tag
         attrs['vlan_id'] = net.vlan_id
+        if net.vxlan_id:
+            attrs['nic_tag'] = '%s/%s' % (net.nic_tag, net.vxlan_id)
+        else:
+            attrs['nic_tag'] = net.nic_tag
+
+        attrs['mtu'] = net.mtu
 
         if 'use_net_dns' in attrs:
             if attrs['use_net_dns']:

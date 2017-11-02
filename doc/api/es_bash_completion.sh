@@ -627,11 +627,11 @@ _es() {
 			if [ ${COMP_CWORD} -eq 2 ]; then
 				COMPREPLY=( $(compgen -P "${cur%/*}" -W "/ip/" -- "/${cur##*/}" ) )
 			fi
-			[[ "${action}" == "create" ]] || [[ "${action}" == "set" ]] && params="-alias -access -owner -desc -network -netmask -gateway -nic_tag -vlan_id -resolvers"
+			[[ "${action}" == "create" ]] || [[ "${action}" == "set" ]] && params="-alias -access -owner -desc -network -netmask -gateway -nic_tag -vlan_id -vxlan_id -resolvers"
 		;;
 
 		/network/*)
-			[[ "${action}" == "create" ]] || [[ "${action}" == "set" ]] && params="-alias -access -owner -desc -network -netmask -gateway -nic_tag -vlan_id -resolvers -dc_bound"
+			[[ "${action}" == "create" ]] || [[ "${action}" == "set" ]] && params="-alias -access -owner -desc -network -netmask -gateway -nic_tag -vlan_id -vxlan_id -resolvers -dc_bound"
 			[[ "${action}" == "get" ]] && params="-full -extended"
 		;;
 

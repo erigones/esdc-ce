@@ -80,7 +80,8 @@ class NetworkView(APIView):
         data = ser.data
         dd = ser.detail_dict()
         # These fields cannot be updated when net is used by some VM
-        updated_ro_fields = {i for i in ('network', 'netmask', 'gateway', 'nic_tag', 'vlan_id', 'dhcp_passthrough')
+        updated_ro_fields = {i for i in ('network', 'netmask', 'gateway', 'nic_tag',
+                                         'vlan_id', 'vxlan_id', 'mtu', 'dhcp_passthrough')
                              if i in dd}
         # These fields cannot be updated when IP addresses exist
         updated_ro_fields2 = updated_ro_fields.intersection(('network', 'netmask'))

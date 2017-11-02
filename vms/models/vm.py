@@ -201,7 +201,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
     RESERVED_MDATA_KEYS = frozenset(['resize_needed'])  # Bug #chili-721
 
     _DISKS_REMOVE_EMPTY = ()
-    _NICS_REMOVE_EMPTY = (('gateway', ''), ('allowed_ips', ()))
+    _NICS_REMOVE_EMPTY = (('gateway', ''), ('allowed_ips', ()), ('mtu', None))
 
     _pk_key = 'vm_uuid'  # _UserTasksModel
     _log_name_attr = 'hostname'  # _UserTasksModel

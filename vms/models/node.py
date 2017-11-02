@@ -18,7 +18,7 @@ from gui.models import User
 NODES_ALL_KEY = 'nodes_list'
 NODES_ALL_EXPIRES = 300
 NICTAGS_ALL_KEY = 'nictag_list'
-NICTAGS_ALL_EXPIRES = 300
+NICTAGS_ALL_EXPIRES = None
 
 
 class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
