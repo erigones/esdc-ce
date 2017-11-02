@@ -1239,7 +1239,7 @@ class VmDefineNicSerializer(s.Serializer):
                         # An overlay nic_tag cannot be set on an existing NIC
                         if (self.object.get('mtu', None) and _net.mtu is None) or _net.vxlan_id:
                             raise s.ValidationError(_('This field cannot be changed because some inherited NIC '
-                                                      'attributes (MTU, nic_tag) cannot be updated.'
+                                                      'attributes (MTU, nic_tag) cannot be updated. '
                                                       'Please remove the NIC and add a new NIC.'))
 
                     self._net = _net
