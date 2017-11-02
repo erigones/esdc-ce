@@ -161,6 +161,8 @@
                     "VMS_NET_DEFAULT": "lan", 
                     "VMS_NET_VLAN_ALLOWED": [],
                     "VMS_NET_VLAN_RESTRICT": true,
+                    "VMS_NET_VXLAN_ALLOWED": [],
+                    "VMS_NET_VXLAN_RESTRICT": true,
                     "VMS_NET_LIMIT": null,
                     "VMS_ISO_LIMIT": null,
                     "VMS_IMAGE_LIMIT": null,

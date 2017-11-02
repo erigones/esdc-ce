@@ -964,6 +964,7 @@ class VmDefineNicSerializer(s.Serializer):
     allowed_ips = s.IPAddressArrayField(default=list(), max_items=NIC_ALLOWED_IPS_MAX)
     monitoring = s.BooleanField(default=False)
     set_gateway = s.BooleanField(default=True)
+    mtu = s.IntegerField(read_only=True, required=False)
 
     def __init__(self, request, vm, *args, **kwargs):
         self.request = request
@@ -1044,6 +1045,10 @@ class VmDefineNicSerializer(s.Serializer):
         # default vlan ID is 0
         if 'vlan_id' not in data:
             data['vlan_id'] = 0
+
+        # default MTU is None
+        if 'mtu' not in data:
+            data['mtu'] = None
 
         # primary does not exist in json if False
         if 'primary' not in data:
@@ -1229,6 +1234,14 @@ class VmDefineNicSerializer(s.Serializer):
 
                     if self.object and self._net != _net:  # changing net is tricky, see validate() below
                         self._net_old = self._net
+
+                        # If a MTU is set on an existing NIC then it cannot be removed
+                        # An overlay nic_tag cannot be set on an existing NIC
+                        if (self.object.get('mtu', None) and _net.mtu is None) or _net.vxlan_id:
+                            raise s.ValidationError(_('This field cannot be changed because some inherited NIC '
+                                                      'attributes (MTU, nic_tag) cannot be updated. '
+                                                      'Please remove the NIC and add a new NIC.'))
+
                     self._net = _net
 
         return attrs
@@ -1399,8 +1412,13 @@ class VmDefineNicSerializer(s.Serializer):
             attrs['gateway'] = None
 
         # These attributes cannot be specified (they need to be inherited from net)
-        attrs['nic_tag'] = net.nic_tag
         attrs['vlan_id'] = net.vlan_id
+        if net.vxlan_id:
+            attrs['nic_tag'] = '%s/%s' % (net.nic_tag, net.vxlan_id)
+        else:
+            attrs['nic_tag'] = net.nic_tag
+
+        attrs['mtu'] = net.mtu
 
         if 'use_net_dns' in attrs:
             if attrs['use_net_dns']:
