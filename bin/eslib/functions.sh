@@ -436,7 +436,7 @@ _zfs_snap_vm_mount() {
 	local snapshot_zfs_dir
 
 	# delegated datasets are not supported
-	if [[ "$(echo "${zfs_filesystem}" | ${AWK} -F"/" '{print NF-1}')" -ne 1 ]] && return 32
+	[[ "$(echo "${zfs_filesystem}" | ${AWK} -F"/" '{print NF-1}')" -ne 1 ]] && return 32
 
 	dataset_mountpoint=$(_zfs_dataset_property "${zfs_filesystem}" "mountpoint")
 
