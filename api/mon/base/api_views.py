@@ -1,12 +1,14 @@
 from api.api_views import APIView
-from api.mon.base.tasks import mon_template_list, mon_hostgroup_list
-from api.task.response import mgmt_task_response
+from api.mon.base.tasks import mon_template_list, mon_hostgroup_list, mon_alert_list
+from api.mon.base.serializers import AlertSerializer
+from api.task.response import mgmt_task_response, FailureTaskResponse
 from que import TG_DC_BOUND, TG_DC_UNBOUND
 
 
 class _MonBaseView(APIView):
     api_view_name = NotImplemented
     mgmt_task = NotImplemented
+    ser_class = NotImplemented
 
     def __init__(self, request, data, dc_bound=True):
         super(_MonBaseView, self).__init__(request)
@@ -24,8 +26,16 @@ class _MonBaseView(APIView):
         else:
             tg = TG_DC_UNBOUND
 
+        if self.ser_class:
+            ser = self.ser_class(data=self.data)
+
+            if not ser.is_valid():
+                return FailureTaskResponse(request, ser.errors)
+
+            self.data = ser.data
+
         ter = self.mgmt_task.call(request, None,
-                                  (request.dc.id,),
+                                  (request.dc.id,), kwargs=dict(self.data),
                                   meta={'apiview': _apiview_},
                                   tg=tg,
                                   tidlock=tidlock, cache_result=tidlock, cache_timeout=10)
@@ -42,3 +52,9 @@ class MonTemplateView(_MonBaseView):
 class MonHostgroupView(_MonBaseView):
     api_view_name = 'mon_hostgroup_list'
     mgmt_task = mon_hostgroup_list
+
+
+class MonAlertView(_MonBaseView):
+    api_view_name = 'mon_alert_list'
+    mgmt_task = mon_alert_list
+    ser_class = AlertSerializer

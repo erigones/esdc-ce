@@ -1,0 +1,50 @@
+{% load i18n tz gui_utils %}
+<table class="box table table-striped table-condensed table-responsive" id="tasklog-table">
+  <thead>
+  {% if alerts %}
+    <tr class="sortable" data-order_by="{{ order_by.0 }}">
+      <th data-field="time">{% trans "Last change" %}</th>
+      <th>{% trans "Severity" %}</th>
+      <th>{% trans "Hostname" %}</th>
+      <th>{% trans "Description" %}</th>
+      <th>{% trans "Ack" %}</th>
+      <th>{% trans "Events" %}</th>
+      <th>{% trans "Comments" %}</th>
+    </tr>
+  {% endif %}
+  </thead>
+
+  <tbody id="tasklog" class="nowrap">
+  {% for alert in alerts %}
+    <tr class="{{ alert.eventid }}" data-task_id="{{ alert.objectid }}">
+      <td><i class="icon-time"></i> <span>{{ alert.last_change|dtparse|date:"H:i:s" }}<br>{{ alert.last_change|dtparse|date:"SHORT_DATE_FORMAT" }}</span></td>
+      <td><strong>{{ alert.prio|upper }}</strong><br> <small class="hidden-phone tiny"><i class="icon-time"></i> {{ alert.age }}</small></td>
+      <td><i class="icon-vm"></i> {{ alert.hostname }}</td>
+      <td>{{ alert.desc }}</td>
+      <td>{{ alert.ack }}</td>
+      <td class="log-detail wrap">{% if alert.events %}<pre>{% for event in alert.events %}
+{{ event.0 }}{% if event.1 %}{% for acks in event.1 %}
+    <small class="hidden-phone tiny"><i class="icon-time"></i> {{ acks }}</small>{% endfor %}{% endif %}{% endfor %}</pre>{% endif %}
+      </td>
+      <td class="log-detail wrap">{% if alert.comments %}<pre>{% for comment in alert.comments %}{{ comment }}
+{% endfor %}</pre>{% endif %}</td>
+    </tr>
+  {% empty %}
+    <tr>
+      <td colspan="8"><p class="msg">{% trans "No alerts found." %}</p></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+
+  <tfoot>
+  {% if alerts %}
+    <tr>
+      <td colspan="8">
+        <div class="paginator dataTables_paginate center">
+          {% if paginator %}{% paginator %}{% endif %}
+        </div>
+      </td>
+    </tr>
+  {% endif %}
+  </tfoot>
+</table>

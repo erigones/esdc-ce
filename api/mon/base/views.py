@@ -1,6 +1,6 @@
 from api.decorators import api_view, request_data, request_data_defaultdc, setting_required
 from api.permissions import IsAdmin, IsSuperAdmin
-from api.mon.base.api_views import MonTemplateView, MonHostgroupView
+from api.mon.base.api_views import MonTemplateView, MonHostgroupView, MonAlertView
 
 __all__ = ('mon_template_list', 'mon_node_template_list', 'mon_hostgroup_list', 'mon_node_hostgroup_list')
 
@@ -62,6 +62,42 @@ def mon_hostgroup_list(request, data=None):
         :status 403: Forbidden
     """
     return MonHostgroupView(request, data).get()
+
+
+@api_view(('GET',))
+@request_data(permissions=(IsAdmin,))
+@setting_required('MON_ZABBIX_ENABLED')
+def mon_alert_list(request, data=None):
+    """
+    Get (:http:get:`GET </mon/alert>`) current active alert or filter monitoring alert history by various parameters.
+
+    .. http:get:: /mon/alert
+
+        :DC-bound?:
+            * |dc-yes|
+        :Permissions:
+            * |Admin|
+        :Asynchronous?:
+            * |async-yes| - List of all monitoring alerts is retrieved from monitoring server
+            * |async-no| - List of all monitoring alerts is retrieved from cache
+        :arg since: Filter by unix timestamp, start date of the alerts
+        :type since: timestamp
+        :arg until: Filter by unix timestamp, end date of the alerts
+        :type until: tmestamp
+        :arg last:
+        :type last: integer
+        :arg display_items: Display list of related Zabbix triggers
+        :type display_items: boolean
+        :arg display_notes: Display list of related Zabbix events and comments
+        :type display_notes: boolean
+        :arg hosts_or_groups: List of hostnames or host groups to be filtered by
+        :type hosts_or_groups: array
+        :status 200: SUCCESS
+        :status 201: PENDING
+        :status 400: FAILURE
+        :status 403: Forbidden
+    """
+    return MonAlertView(request, data).get()
 
 
 @api_view(('GET',))

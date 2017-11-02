@@ -461,6 +461,17 @@ class Zabbix(AbstractMonitoringBackend):
         """[EXTERNAL] Return list of available hostgroups"""
         return list(self._get_filtered_hostgroups(prefix=prefix))
 
+    def _get_filtered_alerts(self, *args, **kwargs):
+        """This is a generator function
+        """
+        for alert in self.ezx._show_alerts(*args, **kwargs):
+            yield alert
+
+    def alert_list(self, *args, **kwargs):
+        """[EXTERNAL] Return list of available alerts"""
+
+        return list(self._get_filtered_alerts(*args, **kwargs))
+
     def synchronize_user_group(self, group=None, dc_as_group=None):
         kwargs = {}
         # TODO create also a separate superadmin group for superadmins in every DC

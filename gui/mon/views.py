@@ -2,10 +2,12 @@ from logging import getLogger
 
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
-from gui.utils import collect_view_data
+from gui.utils import collect_view_data, get_pager
 
 from gui.decorators import profile_required, admin_required
 from api.decorators import setting_required
+from api.utils.views import call_api_view
+from api.mon.base.views import mon_alert_list
 
 logger = getLogger(__name__)
 
@@ -26,7 +28,16 @@ def monitoring_server(request):
 def actions_list(request):
     context = collect_view_data(request, 'mon_actions_list')
 
-    return render(request, 'gui/mon/actions_list.html', context)
+    method = 'GET'
+
+    logger.info('Calling API view %s mon_alert_list(%s, data=%s) by user %s in DC %s',
+                method, request, None, request.user, request.dc)
+    res = call_api_view(request, method, mon_alert_list, disable_throttling=True)
+
+    if res.status_code in (200, 201) and method == 'GET' and res.data['result'] is not None:
+        context['alerts'] = context['pager'] = get_pager(request, res.data['result'])
+
+    return render(request, 'gui/mon/alert_list.html', context)
 
 
 @login_required

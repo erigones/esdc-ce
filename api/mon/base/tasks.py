@@ -11,7 +11,7 @@ from que.internal import InternalTask
 from que.mgmt import MgmtTask
 from vms.models import Dc
 
-__all__ = ('mon_clear_zabbix_cache', 'mon_template_list', 'mon_hostgroup_list')
+__all__ = ('mon_clear_zabbix_cache', 'mon_template_list', 'mon_hostgroup_list', 'mon_alert_list')
 
 logger = get_task_logger(__name__)
 
@@ -87,4 +87,40 @@ def mon_hostgroup_list(task_id, dc_id, **kwargs):
             'id': t['groupid'],
         }
         for t in zabbix_hostgroups
+    ]
+
+
+# noinspection PyUnusedLocal
+@cq.task(name='api.mon.base.tasks.mon_alert_list', base=MgmtTask)
+@mgmt_task()
+def mon_alert_list(task_id, dc_id, dc_bound, *args, **kwargs):
+    """
+    Return list of alerts available in Zabbix.
+    """
+    dc = Dc.objects.get_by_id(int(dc_id))
+
+    if dc_bound:
+        # TODO: set hosts_or_groups to hosts in this DC.
+        kwargs['prefix'] = dc.name
+    else:
+        kwargs['prefix'] = ''
+
+    try:
+        zabbix_alerts = get_monitoring(dc).alert_list(*args, **kwargs)
+    except MonitoringError as exc:
+        raise MgmtTaskException(text_type(exc))
+    return [
+        {
+            'eventid': t['eventid'],
+            'prio': t['prio'],
+            'hostname': t['hostname'],
+            'desc': t['desc'],
+            'age': t['age'],
+            'ack': t['ack'],
+            'comments': t['comments'],
+            'latest_data': t['latest_data'],
+            'last_change': t['last_change'],
+            'events': t['events'],
+        }
+        for t in zabbix_alerts
     ]
