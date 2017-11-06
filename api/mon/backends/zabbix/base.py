@@ -3,6 +3,7 @@ from time import time
 from operator import itemgetter
 from datetime import datetime
 from subprocess import call
+import re
 
 from django.utils.six import iteritems
 from django.db.models import Q
@@ -339,7 +340,7 @@ class ZabbixBase(object):
             logger.exception(ex)
             raise ZabbixError('Cannot find zabbix proxy id for proxy "%s"' % proxy)
 
-    def _get_groups(self, obj_kwargs, hostgroup, hostgroups=(), log=None):
+    def _get_or_create_groups(self, obj_kwargs, hostgroup, dc_name, hostgroups=(), log=None):
         """Return set of zabbix hostgroup IDs for an object"""
         log = log or self.log
         gids = set()
@@ -357,14 +358,36 @@ class ZabbixBase(object):
         for name in hostgroups:
             name = self._id_or_name(name)
 
+            # If we already know the id of the hostgroup, we use it.
             if isinstance(name, int):
                 gids.add(name)
+                continue
+
+            # Otherwise, local hostgroup has to be checked first.
+            qualified_hostgroup_name = ZabbixHostGroupContainer.hostgroup_name_factory(
+                hostgroup_name=name.format(**obj_kwargs),
+                dc_name=dc_name
+            )
+
+            try:
+                gids.add(int(self._zabbix_get_groupid(qualified_hostgroup_name)))
+            except ZabbixError:
+                pass
             else:
-                try:
-                    gids.add(int(self._zabbix_get_groupid(name.format(**obj_kwargs))))
-                except ZabbixError:
-                    log(ERROR, 'Could not fetch zabbix hostgroup id for hostgroup "%s"', name)
-                    continue
+                continue
+
+            # If the ~local~ hostgroup (with dc_name prefix) doesn't exist,
+            # we look for a ~global~ hostgroup (without dc_name prefix).
+            try:
+                gids.add(int(self._zabbix_get_groupid(name.format(**obj_kwargs))))
+            except ZabbixError:
+                log(WARNING, 'Could not fetch zabbix hostgroup id for the hostgroup "%s". '
+                             'Creating a new hostgroup %s instead.', name, qualified_hostgroup_name)
+            else:
+                continue
+
+            #  If not even the ~global~ hostgroup exists, we are free to create a ~local~ hostgroup.
+            gids.add(ZabbixHostGroupContainer(qualified_hostgroup_name, zapi=self.zapi).create().zabbix_id)
 
         return gids
 
@@ -632,20 +655,17 @@ class ZabbixBase(object):
             logger.exception(e)
             raise ZabbixError(e)
 
-    def _diff_host(self, obj, host, interface, groups=(), templates=(), macros=None, status=HOST_MONITORED,
-                   proxy_id=NO_PROXY):
-        """Compare DB object and host (Zabbix) configuration and create an update dict; Issue #chili-331"""
-
-        # Empty params means no update is needed
+    @classmethod
+    def _diff_interfaces(cls, obj, host, interface):
         params = {}
 
         # There should be one zabbix agent interface
         hi = None
         try:
-            interfaces = self._parse_host_interfaces(host)
+            interfaces = cls._parse_host_interfaces(host)
 
             for i, iface in enumerate(interfaces):
-                if int(iface['type']) == self.HOSTINTERFACE_AGENT and int(iface['main']) == self.YES:
+                if int(iface['type']) == cls.HOSTINTERFACE_AGENT and int(iface['main']) == cls.YES:
                     if hi:
                         # noinspection PyProtectedMember
                         raise ZabbixAPIException('Zabbix host ID "%s" for %s %s has multiple Zabbix Agent '
@@ -654,10 +674,10 @@ class ZabbixBase(object):
                     # Zabbix host interface found, let's check it out
                     hi = iface
 
-                    if (iface['dns'] != interface['dns'] or
-                            iface['ip'] != interface['ip'] or
-                            str(iface['port']) != str(interface['port']) or
-                            str(iface['useip']) != str(interface['useip'])):
+                    if (iface['dns'] != interface['dns']
+                            or iface['ip'] != interface['ip']
+                            or str(iface['port']) != str(interface['port'])
+                            or str(iface['useip']) != str(interface['useip'])):
                         # Host ip or dns changed -> update host interface
                         interface['interfaceid'] = iface['interfaceid']
                         interfaces[i] = interface
@@ -670,22 +690,27 @@ class ZabbixBase(object):
             # noinspection PyProtectedMember
             raise ZabbixAPIException('Zabbix host ID "%s" for %s %s is missing a valid main '
                                      'Zabbix Agent configuration' % (host['hostid'], obj._meta.verbose_name_raw, obj))
+        return params
+
+    @classmethod
+    def _diff_basic_info(cls, obj, host, proxy_id, status):
+        params = {}
 
         # Check zabbix host ID (name)
-        host_id = self.host_id(obj)
+        host_id = cls.host_id(obj)
 
         if host['host'] != host_id:
             params['host'] = host_id
 
         # Check zabbix visible name
-        host_name = self.host_name(obj)
+        host_name = cls.host_name(obj)
 
         if host['name'] != host_name:
             # Hostname changed! -> update name
             params['name'] = host_name
 
         # Check zabbix proxy ID
-        proxy_hostid = int(host.get('proxy_hostid', self.NO_PROXY))
+        proxy_hostid = int(host.get('proxy_hostid', cls.NO_PROXY))
 
         if proxy_hostid != proxy_id:
             params['proxy_hostid'] = proxy_id
@@ -695,34 +720,64 @@ class ZabbixBase(object):
             # Status changed! -> update status
             params['status'] = status
 
+        return params
+
+    @classmethod
+    def _diff_templates(cls, host, templates):
+        params = {}
         # Always replace current zabbix templates with configured templates
-        zx_templates = self._parse_host_templates(host)
+        zx_templates = cls._parse_host_templates(host)
         new_templates = set(templates)
 
         if zx_templates != new_templates:
             # Templates configuration changed!
-            params['templates'] = self._gen_host_templates(new_templates)
+            params['templates'] = cls._gen_host_templates(new_templates)
             # Removed templates need to be cleared properly
             removed_templates = zx_templates - new_templates
 
             if removed_templates:
-                params['templates_clear'] = self._gen_host_templates(removed_templates)
+                params['templates_clear'] = cls._gen_host_templates(removed_templates)
 
+        return params
+
+    @classmethod
+    def _diff_host_groups(cls, host, groups):
+        params = {}
         # Always replace current zabbix groups with configured groups
-        zx_groups = self._parse_host_groups(host)
+        zx_groups = cls._parse_host_groups(host)
         new_groups = set(groups)
 
         if zx_groups != new_groups:
             # Groups configuration changed!
-            params['groups'] = self._gen_host_groups(new_groups)
+            params['groups'] = cls._gen_host_groups(new_groups)
 
+        return params
+
+    @classmethod
+    def _diff_macros(cls, host, macros):
+        params = {}
         # Replace macros only if specified
         if macros is not None:
-            zx_macros = self._parse_host_macros(host)
+            zx_macros = cls._parse_host_macros(host)
 
             if zx_macros != macros:
                 # Host macros changed!
-                params['macros'] = self._gen_host_macros(macros)
+                params['macros'] = cls._gen_host_macros(macros)
+
+        return params
+
+    def _diff_host(self, obj, host, interface, groups=(), templates=(), macros=None, status=HOST_MONITORED,
+                   proxy_id=NO_PROXY):
+        """Compare DB object and host (Zabbix) configuration and create an update dict; Issue #chili-331"""
+
+        # Empty params means no update is needed
+        params = {}
+
+        params.update(self._diff_interfaces(obj, host, interface))
+        params.update(self._diff_basic_info(obj, host, proxy_id, status))
+        params.update(self._diff_templates(host, templates))
+        params.update(self._diff_host_groups(host, groups))
+        params.update(self._diff_macros(host, macros))
 
         return params
 
@@ -1179,7 +1234,7 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
         container = cls(name=group_name, zapi=zapi)
         container.users = {ZabbixUserContainer.from_mgmt_data(zapi, user) for user in users}
         container.host_groups = {ZabbixHostGroupContainer.from_mgmt_data(zapi, hostgroup)
-                                 for hostgroup in accessible_hostgroups}  # self._get_groups
+                                 for hostgroup in accessible_hostgroups}  # self._get_or_create_groups
         container.superuser_group = superusers  # FIXME this information is not used anywhere by now
 
         return container
@@ -1352,18 +1407,22 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
             # TODO create also a faster way of removal for users that has also different groups
 
 
-class ZabbixHostGroupContainer(object):
+class ZabbixHostGroupContainer(ZabbixNamedContainer):
     """
     Container class for the Zabbix HostGroup object.
     Incomplete, TODO
     """
+    RE_NAME_WITH_DC_PREFIX = re.compile(r'^:(?P<dc>.*):(?P<hostgroup>.+):$')
     zabbix_id = None
 
+    def __init__(self, name, zapi=None):
+        super(ZabbixHostGroupContainer, self).__init__(name)
+        self._zapi = zapi
+
     @classmethod
-    def from_mgmt_data(cls, zapi, name):
-        container = cls()
+    def from_mgmt_data(cls, name, zapi):
+        container = cls(name, zapi)
         container._zapi = zapi
-        container.name = name  # TODO
         response = zapi.hostgroup.get({'filter': {'name': name}})
         if response:
             assert len(response) == 1, 'Hostgroup name => locally generated hostgroup name mapping should be injective'
@@ -1372,9 +1431,20 @@ class ZabbixHostGroupContainer(object):
         return container
 
     @staticmethod
-    def hostgroup_name_factory(dc_name, node_name='', vm_uuid='', tag=''):
-        name = ':{}:{}:{}:{}:'.format(dc_name, node_name, vm_uuid, tag)
+    def hostgroup_name_factory(hostgroup_name, dc_name):
+        if dc_name is not None:
+            name = ':{}:{}:'.format(dc_name, hostgroup_name)
+        else:
+            name = hostgroup_name
+
         return name
+
+    def create(self):
+        response = self._zapi.hostgroup.create({
+                'name': self.name,
+        })
+        self.zabbix_id = response['groupids'][0]
+        return self
 
 
 class ZabbixMediaContainer(object):

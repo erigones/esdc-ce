@@ -1,12 +1,15 @@
 from operator import and_
 from functools import reduce
 from django import forms
+from django.core.validators import RegexValidator
 from django.db.models import Q, Count
 from django.utils.translation import ugettext_lazy as _
 from django.template.defaultfilters import filesizeformat
 from django.http import Http404
 from django.utils.six import PY3
+from gui.node.utils import get_dc1_settings
 
+from api.mon import MonitoringBackend
 from api.vm.utils import get_owners
 from api.dc.utils import get_dcs
 from api.node.define.views import node_define
@@ -65,6 +68,8 @@ class NodeForm(SerializerForm):
                                                                 'data-tags-api-call': 'mon_node_template_list'}))
     monitoring_hostgroups = ArrayField(label=_('Monitoring hostgroups'), required=False, tags=True,
                                        help_text=_('Comma-separated list of custom monitoring hostgroups.'),
+                                       validators=[
+                                           RegexValidator(regex=MonitoringBackend.RE_MONITORING_HOSTGROUPS)],
                                        widget=ArrayWidget(tags=True, escape_space=False,
                                                           attrs={'class': 'tags-select2 narrow',
                                                                  'data-tags-type': 'mon_hostgroups',
@@ -73,6 +78,11 @@ class NodeForm(SerializerForm):
     def __init__(self, request, node, *args, **kwargs):
         super(NodeForm, self).__init__(request, node, *args, **kwargs)
         self.fields['owner'].choices = get_owners(request).values_list('username', 'username')
+        dc1_settings = get_dc1_settings(request)
+
+        if dc1_settings.MON_ZABBIX_HOSTGROUPS_NODE:
+            self.fields['monitoring_hostgroups'].help_text += _(' Automatically added hostgroups: ') \
+                                                              + ', '.join(dc1_settings.MON_ZABBIX_HOSTGROUPS_NODE)
 
         if node.is_unlicensed():
             self.fields['status'].choices = Node.STATUS_DB

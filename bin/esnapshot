@@ -47,11 +47,11 @@ main() {
 			exit $?
 			;;
 		create)
-			_zfs_snap "${1}" "${2:-}" "${3:-}"
+			_zfs_snap_vm "${1}" "${2:-}" "${3:-}"
 			exit $?
 			;;
 		destroy)
-			_zfs_destroy "${1}"
+			_zfs_destroy_snap_vm "${1}"
 			exit $?
 			;;
 		rollback)

@@ -57,6 +57,7 @@
 
 <tr><td colspan="2" class="row-header"><i class="icon-hdd"></i> {% trans "Servers" %}</td></tr>
 {% include "gui/table_form_field_checkbox.html" with field=form.VMS_ZONE_ENABLED %}
+{% include "gui/table_form_field.html" with field=form.VMS_VM_DEFINE_LIMIT %}
 {% include "gui/table_form_field.html" with field=form.VMS_VM_STOP_TIMEOUT_DEFAULT %}
 {% include "gui/table_form_field.html" with field=form.VMS_VM_STOP_WIN_TIMEOUT_DEFAULT %}
 {% include "gui/table_form_field.html" with field=form.VMS_VM_OSTYPE_DEFAULT %}
@@ -91,6 +92,8 @@
 {% include "gui/table_form_field.html" with field=form.VMS_NET_LIMIT %}
 {% include "gui/table_form_field_checkbox.html" with field=form.VMS_NET_VLAN_RESTRICT %}
 {% include "gui/table_form_field.html" with field=form.VMS_NET_VLAN_ALLOWED %}
+{% include "gui/table_form_field_checkbox.html" with field=form.VMS_NET_VXLAN_RESTRICT %}
+{% include "gui/table_form_field.html" with field=form.VMS_NET_VXLAN_ALLOWED %}
 
 <tr><td colspan="2" class="row-header"><i class="icon-save"></i> {% trans "Images" %}</td></tr>
 {% include "gui/table_form_field.html" with field=form.VMS_IMAGE_LIMIT %}

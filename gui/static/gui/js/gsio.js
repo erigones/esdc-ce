@@ -687,8 +687,10 @@ function message_callback(code, res, view, method, args, kwargs, apiview, apidat
         mon_templates_update(res.result);
         return; // do not update cached_tasklog
       case 'mon_hostgroup_list': // mon_hostgroup_list result from cache
-      case 'mon_node_hostgroup_list':
         mon_hostgroups_update(res.result);
+        return; // do not update cached_tasklog
+      case 'mon_node_hostgroup_list':
+        mon_node_hostgroups_update(res.result);
         return; // do not update cached_tasklog
     }
   }
@@ -1020,12 +1022,18 @@ function _task_status_callback(res, apiview) {
       }
       return false; // do not update cached_tasklog
     case 'mon_hostgroup_list':
-    case 'mon_node_hostgroup_list':
       if (res.status == 'SUCCESS') {
         mon_hostgroups_update(result);
+        mon_node_hostgroups_update(result);
+
       }
       return false; // do not update cached_tasklog
-
+    /*case 'mon_node_hostgroup_list':
+      if (res.status == 'SUCCESS') {
+        mon_node_hostgroups_update(result);
+      }
+      return false; // do not update cached_tasklog
+    */
 
     case 'node_image': // node_image finished
       var ns_status = 1;
