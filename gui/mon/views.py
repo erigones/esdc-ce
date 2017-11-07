@@ -25,8 +25,8 @@ def monitoring_server(request):
 
 @login_required
 @profile_required
-def actions_list(request):
-    context = collect_view_data(request, 'mon_actions_list')
+def alert_list(request):
+    context = collect_view_data(request, 'mon_alert_list')
 
     method = 'GET'
 
@@ -38,6 +38,14 @@ def actions_list(request):
         context['alerts'] = context['pager'] = get_pager(request, res.data['result'])
 
     return render(request, 'gui/mon/alert_list.html', context)
+
+
+@login_required
+@profile_required
+def actions_list(request):
+    context = collect_view_data(request, 'mon_actions_list')
+
+    return render(request, 'gui/mon/actions_list.html', context)
 
 
 @login_required
