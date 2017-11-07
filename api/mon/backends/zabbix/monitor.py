@@ -2,7 +2,8 @@ from logging import INFO, WARNING, ERROR, DEBUG, getLogger
 
 from api.decorators import catch_exception
 from api.mon.backends.abstract import AbstractMonitoringBackend, LOG
-from .base import ZabbixBase, ZabbixUserGroupContainer, ZabbixUserContainer, ZabbixHostGroupContainer
+from .base import ZabbixBase, ZabbixUserGroupContainer, ZabbixUserContainer, ZabbixHostGroupContainer, \
+    ZabbixActionContainer
 from .internal import InternalZabbix
 from .external import ExternalZabbix
 from gui.models import User, AdminPermission
@@ -498,3 +499,10 @@ class Zabbix(AbstractMonitoringBackend):
     def delete_user(self, name):
         for zapi in self._connections:
             ZabbixUserContainer.delete_by_name(zapi, name)
+
+    def action_list(self):
+        return list(self._actions())
+
+    def _actions(self):
+        for action in self.izx.get_action_list():
+            yield ZabbixActionContainer.from_zabbix_data(self.izx.zapi, action)

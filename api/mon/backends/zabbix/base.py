@@ -898,6 +898,20 @@ class ZabbixBase(object):
             logger.exception(e)
             raise ZabbixError(e)
 
+    def get_action_list(self):
+        """Query Zabbix API for hostgroups"""
+        res = self.zapi.action.get({'output': 'extend', 'selectOperations': 'extend', 'selectFilter': 'extend'})
+        # In case a more refined action list is needed
+        # {'output': ['name', 'actionid'],
+        #    'selectOperations': ['opmessage_grp'],
+        #    'selectFilter': ['conditions']} }
+
+        try:
+            return res
+        except (KeyError, IndexError) as e:
+            logger.exception(e)
+            raise ZabbixError(e)
+
 
 class ZabbixNamedContainer(object):
     """
@@ -1487,3 +1501,29 @@ class ZabbixMediaContainer(object):
             assert severity in cls.SEVERITIES
             result += 2 ** severity
         return result
+
+
+class ZabbixActionContainer(ZabbixNamedContainer):
+    """
+    Container for the Zabbix Action object
+    Initially it should contain only necessary elements for successfull creation of a Zabbix Action object,
+    but it should be easily extensible to accommodate all the customization possibilities of the Zabbix Action.
+
+    Should have:
+    - checking of all the fields undefined by us but changed (should warn and  discard action)
+      also in the operations
+    - conditiontypes should be checked whether they are implemented at our side (if not then discard action)
+    - support only evaltype And/Or, discard the others but make them implementable
+    - operation steps and durations - do some reasonable defaults and discard action if changed
+    - editable: hostgroups, usergroups, optional recovery message, default message, 
+    """
+    pass
+
+    @classmethod
+    def from_zabbix_data(cls, zapi, api_response_object):
+        assert api_response_object
+        container = cls(name=api_response_object['name'])
+        container._zapi = zapi
+        container._api_response = api_response_object
+        container.zabbix_id = api_response_object['actionid']
+        return container

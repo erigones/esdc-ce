@@ -102,7 +102,7 @@ class AbstractMonitoringBackend(object):
     def template_list(self):
         raise NotImplementedError
 
-    def hostgroup_list(self, prefix=False):
+    def hostgroup_list(self, prefix=''):
         raise NotImplementedError
 
     def synchronize_user_group(self, group=None, dc_as_group=None):
@@ -115,4 +115,13 @@ class AbstractMonitoringBackend(object):
         raise NotImplementedError
 
     def delete_user(self, name):
+        raise NotImplementedError
+
+    def action_list(self):
+        raise NotImplementedError
+
+    def synchronize_action(self, action):
+        raise NotImplementedError
+
+    def delete_action(self, name):
         raise NotImplementedError
