@@ -145,7 +145,22 @@ class TemplateSerializer(s.ConditionalDCBoundSerializer):
 
             if limit is not None:
                 if VmTemplate.objects.filter(dc_bound=self._dc_bound).count() >= int(limit):
-                    raise s.ValidationError(_('Maximum number of server templates reached'))
+                    raise s.ValidationError(_('Maximum number of server templates reached.'))
+
+        try:
+            ostype = attrs['ostype']
+        except KeyError:
+            ostype = self.object.ostype
+
+        try:
+            vm_define = attrs['vm_define']
+        except KeyError:
+            vm_define = self.object.vm_define
+
+        vm_define_ostype = vm_define.get('ostype', None)
+
+        if vm_define_ostype is not None and ostype != vm_define_ostype:
+            raise s.ValidationError('Mismatch between vm_define ostype and template ostype.')
 
         return super(TemplateSerializer, self).validate(attrs)
 
