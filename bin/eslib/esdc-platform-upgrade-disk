@@ -139,7 +139,7 @@ printmsg "Updating the new boot environment in the background"
 rsync -ac --delete --exclude=boot/loader.conf "${PLATFORM_MOUNT_DIR}/"{bin,boot,kernel,lib,platform,sbin,smartdc} "${DCOS_MNTDIR}"
 rsync -ac --delete "${USR_ARCHIVE_MOUNT_DIR}/"  "${DCOS_MNTDIR}/usr/"
 rsync -a --delete "${PLATFORM_DIR}/platform-${PLATFORM_VER}/i86pc/amd64" "${DCOS_MNTDIR}/platform/i86pc"
-# ???
+# update boot_archive checksum
 cksum -x sha1 "${DCOS_MNTDIR}/platform/i86pc/amd64/boot_archive" | cut -d' ' -f1 > "${DCOS_MNTDIR}/platform/i86pc/amd64/boot_archive.hash"
 chown -R root:root "${DCOS_MNTDIR}/platform/i86pc/amd64"
 if [[ "${KEEP_SMF_DB}" != "1" ]]; then
