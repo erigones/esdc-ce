@@ -1,0 +1,14 @@
+#!/bin/bash -e
+
+ESLIB="$(dirname $0)/eslib"
+
+# choose the right upgrade path for this node (disk, net, usb)
+if beadm list -H | grep -q dcos-; then
+    "${ESLIB}/esdc-platform-upgrade-disk" "$@"
+elif /bin/bootparams | grep -q "^netboot=true"; then
+    echo "This node is network booted. Nothing to do."
+    exit 0
+else
+    "${ESLIB}/esdc-platform-upgrade-usb" "$@"
+fi
+
