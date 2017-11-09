@@ -101,7 +101,8 @@ printmsg() {
 rm -rf "${UPG_DIR}"
 mkdir -p "${UPG_DIR}" "${PLATFORM_DIR}" "${PLATFORM_MOUNT_DIR}" "${USR_ARCHIVE_MOUNT_DIR}"
 
-# correct the dcos-1  (issue #...)
+# correct the dcos-1
+# (issue https://github.com/erigones/esdc-factory/issues/94)
 if [[ "$(zfs get -Ho value canmount zones/ROOT/dcos-1)" != "noauto" ]]; then
 	zfs set canmount=noauto zones/ROOT/dcos-1
 fi
