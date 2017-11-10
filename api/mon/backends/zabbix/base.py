@@ -1517,7 +1517,38 @@ class ZabbixActionContainer(ZabbixNamedContainer):
     - operation steps and durations - do some reasonable defaults and discard action if changed
     - editable: hostgroups, usergroups, optional recovery message, default message, 
     """
-    pass
+    _action_creation_attributes = ['name',
+                                   'def_longdata',
+                                   'def_shortdata',
+                                   'eventsource',
+                                   'filter',
+                                   'operations',
+                                   'esc_period',
+                                   ]
+
+    _filter_attributes = ['evaltype', 'conditions']
+    _condition_trigger_problem = {u'conditiontype': 5,
+                                  u'operator': 0,
+                                  u'value': u'1'}
+    _condition_status_not_in_maintenance = {u'conditiontype': 16,
+                                            u'operator': 7,
+                                            u'value': u''}
+    _hostgroups = []
+    _usergroups = []
+    def_shortdata = u'{TRIGGER.STATUS}: {TRIGGER.NAME}'
+    def_longdata = (u'Trigger: {TRIGGER.NAME}\r\n'
+                    u'Trigger status: {TRIGGER.STATUS}\r\n'
+                    u'Trigger severity: {TRIGGER.SEVERITY}\r\n'
+                    u'Trigger URL: {TRIGGER.URL}\r\n\r\n'
+                    u'Item values:\r\n\r\n'
+                    u'1. {ITEM.NAME1} ({HOST.NAME1}:{ITEM.KEY1}): {ITEM.VALUE1}\r\n'
+                    u'2. {ITEM.NAME2} ({HOST.NAME2}:{ITEM.KEY2}): {ITEM.VALUE2}\r\n'
+                    u'3. {ITEM.NAME3} ({HOST.NAME3}:{ITEM.KEY3}): {ITEM.VALUE3}\r\n\r\n'
+                    u'Original event ID: {EVENT.ID}')
+
+    esc_period = 3600
+    eventsource = 0
+    filter__evaltype = 0
 
     @classmethod
     def from_zabbix_data(cls, zapi, api_response_object):
@@ -1527,3 +1558,47 @@ class ZabbixActionContainer(ZabbixNamedContainer):
         container._api_response = api_response_object
         container.zabbix_id = api_response_object['actionid']
         return container
+
+    @classmethod
+    def from_mgmt_data(cls, name):
+        container = cls(name=name)
+        return container
+
+    @property
+    def filter(self):
+        return {attribute: getattr(self, 'filter__%s' % attribute)
+                for attribute in self._filter_attributes if hasattr(self, 'filter__%s' % attribute)}
+
+    @property
+    def filter__conditions(self):
+        return [self._condition_trigger_problem, self._condition_status_not_in_maintenance] + self.hostgroups
+
+    @property
+    def hostgroups(self):
+        return [{'conditiontype': 0, 'operator': 0, 'value': str(hostgroup.zabbix_id)
+                 } for hostgroup in self._hostgroups]
+
+    @property
+    def operations(self):
+        return [{u'operationtype': 0,
+                 u'opmessage': {u'mediatypeid': 0},
+                 u'opmessage_grp': [{u'usrgrpid': str(usergroup.zabbix_id)} for usergroup in self._usergroups]}]
+
+    def _generate_request_object(self):
+        return {attribute: getattr(self, attribute)
+                for attribute in self._action_creation_attributes if hasattr(self, attribute)}
+
+    def create_action(self, zapi):
+        request_object = self._generate_request_object()
+        try:
+            res = zapi.action.create(request_object)
+        except ZabbixAPIException as e:
+            # noinspection PyProtectedMember
+            logger.error('Zabbix API Error in create action(%s): %s', request_object['name'], e)
+            return False
+
+        try:
+            return res['actionids'][0]
+        except (KeyError, IndexError) as e:
+            logger.exception(e)
+            raise ZabbixError(e)
