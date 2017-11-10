@@ -157,7 +157,7 @@ in a virtual datacenter).
     .. http:delete:: /template/(name)
 
         .. note:: A server template cannot be deleted when it is used by even one virtual server. In order to disable \
-further use of such a server template the template can be marked as deleted by \
+further use of such a server template, the template can be marked as deleted by \
 :http:put:`changing its access property to deleted (4) </template/(name)>`.
 
         :DC-bound?:

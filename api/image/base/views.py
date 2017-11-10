@@ -160,7 +160,7 @@ image server support is disabled in the system
     .. http:delete:: /image/(name)
 
         .. note:: A server disk image cannot be deleted when it is used by even one virtual server. In order to \
-disable further use of such a disk image the image can be marked as deleted by \
+disable further use of such a disk image, the image can be marked as deleted by \
 :http:put:`changing its access property to deleted (4) </image/(name)>`.
 
         :DC-bound?:

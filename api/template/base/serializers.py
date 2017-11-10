@@ -159,6 +159,10 @@ class TemplateSerializer(s.ConditionalDCBoundSerializer):
 
         vm_define_ostype = vm_define.get('ostype', None)
 
+        # The template object itself has an ostype field, which is used to limit the use of a template on the DB level;
+        # However, also the template.vm_define property can have an ostype attribute, which will be used for a new VM
+        # (=> will be inherited from the template). A different ostype in both places will lead to strange situations
+        # (e.g. using a Windows template, which will create a Linux VM). Therefore we have to prevent such situations.
         if vm_define_ostype is not None and ostype != vm_define_ostype:
             raise s.ValidationError('Mismatch between vm_define ostype and template ostype.')
 
