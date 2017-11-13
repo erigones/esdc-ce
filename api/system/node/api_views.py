@@ -9,6 +9,7 @@ from api.exceptions import (NodeIsNotOperational, PreconditionRequired, TaskIsAl
 from api.node.utils import get_node, get_nodes
 from api.system.messages import LOG_SYSTEM_UPDATE
 from api.system.node.serializers import NodeVersionSerializer
+from api.system.node.events import NodeUpdateStarted, NodeUpdateFinished
 from api.system.service.control import NodeServiceControl
 from api.system.update.serializers import UpdateSerializer
 from api.system.update.utils import process_update_reply
@@ -101,6 +102,11 @@ class NodeUpdateView(APIView):
 
         return response
 
+    @classmethod
+    def get_task_lock(cls):
+        # Also used in socket.io namespace
+        return TaskLock(cls._lock_key, desc='System task')
+
     def put(self):
         assert self.request.dc.id == DefaultDc().id
 
@@ -123,15 +129,22 @@ class NodeUpdateView(APIView):
         if node.status != node.OFFLINE:
             raise NodeIsNotOperational('Unable to perform update on node that is not in maintenance state!')
 
-        lock = TaskLock(self._lock_key, desc='System task')
+        lock = self.get_task_lock()
 
         if not lock.acquire(self.task_id, timeout=7200, save_reverse=False):
             raise TaskIsAlreadyRunning
 
         try:
+            # Emit event into socket.io
+            NodeUpdateStarted(self.task_id, request=self.request).send()
+
             return self._update(version, key=ser.object.get('key'), cert=ser.object.get('cert'))
         finally:
             lock.delete(fail_silently=True, delete_reverse=False)
+            # Delete cached node version information (will be cached again during next node.system_version call)
+            del node.system_version
+            # Emit event into socket.io
+            NodeUpdateFinished(self.task_id, request=self.request).send()
 
 
 class NodeLogsView(APIView):
