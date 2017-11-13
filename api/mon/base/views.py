@@ -2,7 +2,8 @@ from api.decorators import api_view, request_data, request_data_defaultdc, setti
 from api.permissions import IsAdmin, IsSuperAdmin
 from api.mon.base.api_views import MonTemplateView, MonHostgroupView, MonAlertView
 
-__all__ = ('mon_template_list', 'mon_node_template_list', 'mon_hostgroup_list', 'mon_node_hostgroup_list')
+__all__ = ('mon_template_list', 'mon_node_template_list', 'mon_hostgroup_list', 'mon_node_hostgroup_list',
+           'mon_alert_list')
 
 
 @api_view(('GET',))

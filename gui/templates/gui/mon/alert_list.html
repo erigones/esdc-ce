@@ -2,6 +2,14 @@
 {% load i18n %}
 {% load gui_utils %}
 
+{% block javascript %}
+  <script type="text/javascript">
+    $(document).ready(function () {
+      alert_init('retrieve_alert_list');
+    });
+  </script>
+{% endblock %}
+
 {% block base_content %}
 
 <div class="container-fluid">
@@ -13,7 +21,9 @@
         </span>
         <i class="icon-tasks"></i> {% trans "Alert list" %}
       </div>
-      {% include "gui/mon/alert_table.html" %}
+      <div id="alert-list-table">
+        {% include "gui/mon/alert_table.html" %}
+      </div>
     </div>
   </div> <!-- end row-fluid -->
 </div> <!-- end container-fluid -->

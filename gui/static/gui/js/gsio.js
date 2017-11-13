@@ -218,6 +218,19 @@ function mon_get_history(obj_type, hostname, graph, data) {
   return null;
 }
 
+function mon_get_alerts(hostname, data) {
+  var args = [];
+  var kwargs = {'data': {}};
+  //if (typeof(data) !== 'undefined') {
+  //  kwargs['data'] = data;
+  //}
+  // This runs in background, so do not run if not connected
+  if (SOCKET.socket.connected) {
+    return esio('get', 'mon_alert_list', args, kwargs);
+  }
+  return null;
+}
+
 // Delete image from Node storage
 function node_delete_image(hostname, zpool, image_name) {
   return esio('delete', 'node_image', [hostname, zpool, image_name]);
@@ -521,6 +534,9 @@ function message_callback(code, res, view, method, args, kwargs, apiview, apidat
       case 'mon_node_sla':
         return; // do not update cached_tasklog
 
+      case 'mon_alert_list': // mon_vm_sla started
+        return; // do not update cached_tasklog
+
       case 'mon_vm_history': // mon_vm_history started
       case 'mon_node_history': // mon_node_history started
         return; // do not update cached_tasklog
@@ -562,6 +578,10 @@ function message_callback(code, res, view, method, args, kwargs, apiview, apidat
       case 'mon_vm_sla': // mon_vm_sla failed
       case 'mon_node_sla':
         sla_update(view, args[0], args[1], null);
+        return; // do not update cached_tasklog
+
+      case 'mon_alert_list': // mon_vm_sla failed
+        alert_update(view, args[0], args[1], null);
         return; // do not update cached_tasklog
 
       case 'mon_vm_history': // mon_vm_history failed
@@ -665,6 +685,10 @@ function message_callback(code, res, view, method, args, kwargs, apiview, apidat
       case 'mon_vm_sla': // mon_vm_sla result from cache
       case 'mon_node_sla':
         sla_update(view, args[0], args[1], res.result);
+        return; // do not update cached_tasklog
+
+      case 'mon_alert_list': // mon_vm_sla result from cache
+        alert_update(view, args[0], args[1], res.result);
         return; // do not update cached_tasklog
 
       case 'mon_vm_history': // mon_vm_history result from cache
@@ -978,6 +1002,13 @@ function _task_status_callback(res, apiview) {
         result = null;
       }
       sla_update(apiview.view, hostname, apiview.yyyymm, result);
+      return false; // do not update cached_tasklog
+
+   case 'mon_alert_list':
+      if (res.status != 'SUCCESS') {
+        result = null;
+      }
+      alert_update(apiview.view, hostname, apiview.yyyymm, result);
       return false; // do not update cached_tasklog
 
     case 'mon_vm_history':

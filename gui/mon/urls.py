@@ -4,6 +4,7 @@ urlpatterns = patterns(
     'gui.mon.views',
 
     url(r'^$', 'alert_list', name='mon_alert_list'),
+    url(r'^retrieve-alerts/$', 'get_alert_from_zabbix', name='retrieve_alert_list'),
     url(r'^redirect$', 'monitoring_server', name='monitoring_server_redirect'),
     url(r'^actions/$', 'actions_list', name='mon_actions_list'),
     url(r'^add-action/$', 'add_action', name='mon_action_add'),
