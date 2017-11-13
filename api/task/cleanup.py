@@ -10,12 +10,17 @@ def _task_cleanup(result, task_id, task_status, obj, **kwargs):
     view = apiview['view']
 
     if view == 'vm_snapshot':
-        from vms.models import Snapshot
+        from vms.models import Vm, Snapshot
         from api.vm.snapshot.tasks import _vm_snapshot_cb_failed
 
-        snap = Snapshot.objects.get(vm=obj, disk_id=Snapshot.get_disk_id(obj, apiview['disk_id']),
+        if apiview['method'] == 'PUT' and 'source_hostname' in apiview:
+            vm = Vm.objects.get(hostname=apiview['source_hostname'])
+        else:
+            vm = obj
+
+        snap = Snapshot.objects.get(vm=vm, disk_id=Snapshot.get_disk_id(vm, apiview['disk_id']),
                                     name=apiview['snapname'])
-        _vm_snapshot_cb_failed(result, task_id, snap, apiview['method'])
+        _vm_snapshot_cb_failed(result, task_id, snap, apiview['method'], vm=obj)
 
     elif view == 'vm_snapshot_list':
         from vms.models import Snapshot

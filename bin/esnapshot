@@ -58,6 +58,10 @@ main() {
 			_zfs_rollback "${1}"
 			exit $?
 			;;
+		restore)
+			echo "Use esbackup snap-restore" >&2
+			exit ${ERR_INPUT}
+			;;
         -h|--help)
 			usage
 			exit ${OK}
