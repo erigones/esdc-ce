@@ -22,6 +22,7 @@ declare -A LOCKS
 declare -i LOCK_MAX_WAIT=30
 declare -r SERVICE_DIR="/opt/custom/smf"
 declare -r SNAPSHOT_MOUNT_DIR="checkpoints"
+declare -r UPGRADE_DIR="/opt/upgrade"
 
 #
 # Binaries
@@ -52,6 +53,13 @@ BC=${BC:-"/usr/bin/bc"}
 QGA=${QGA:-"${ERIGONES_HOME}/bin/qga-client"}
 QGA_SNAPSHOT=${QGA_SNAPSHOT:-"${ERIGONES_HOME}/bin/qga-snapshot"}
 NODE=${NODE:-"/usr/node/bin/node"}
+BEADM=${BEADM:-"/usr/sbin/beadm"}
+RSYNC=${RSYNC:-"/usr/bin/rsync"}
+CURL=${CURL:-"/usr/bin/curl"}
+LOFIADM=${LOFIADM:-"/usr/sbin/lofiadm"}
+TAR=${TAR:-"/usr/bin/tar"}
+DD=${DD:-"/usr/bin/dd"}
+FSTYP=${FSTYP:-"/usr/sbin/fstyp"}
 
 ###############################################################
 # Arguments passed to ssh
@@ -77,6 +85,10 @@ die() {
 	[[ -z "${exit_code}" ]] && exit_code=${_ERR_UNKNOWN}
 
 	exit "${exit_code}"
+}
+
+printmsg() {
+	echo "*** $* ***"
 }
 
 get_hostname() {
@@ -161,6 +173,25 @@ round() {
 	local -i places="${2:-0}"
 
 	printf "%.${places}f" "${number}"
+}
+
+umount_path() {
+	if ${MOUNT} | grep -q "${1}"; then
+		${UMOUNT} "${1}"
+	fi
+}
+
+lofi_add() {
+	# loopmount file
+	# returns lofi device name
+	${LOFIADM} -a "${1}"
+}
+
+lofi_remove() {
+	# remove lofi device if exists
+	if [[ -a "${1}" ]]; then
+		${LOFIADM} -d "${1}"
+	fi
 }
 
 
@@ -816,3 +847,148 @@ _service_instance_delete() {
 
 	${SVCCFG} -s "${fmri}" delete "${name}" && _service_file_save "${fmri}"
 }
+
+###############################################################
+# Disk install helper functions
+###############################################################
+
+_beadm_get_current_be_name() {
+	${BEADM} list -H 2>/dev/null | "${AWK}" -F';' '{if($3 == "N" || $3 == "NR") {print $1}}'
+}
+
+_beadm_get_active_be_name() {
+	${BEADM} list -H 2>/dev/null | "${AWK}" -F';' '{if($3 == "R" || $3 == "NR") {print $1}}'
+}
+
+_beadm_check_be_exists() {
+	${BEADM} list -H 2>/dev/null | grep -q -- "^${1};"
+	return $?
+}
+
+_beadm_get_next_be_name() {
+	CURR_BE="$(_beadm_get_current_be_name)"
+	CURR_BE_NUMBER=
+	if [[ -z "$CURR_BE" ]]; then
+		die 5 "Cannot find current BE"
+	elif [[ "$CURR_BE" =~ -[0-9]+$ ]]; then
+		# the BE name ends with a number
+		CURR_BE_NUMBER="$(echo "${CURR_BE}" | cut -d- -f2)"
+		CURR_BE_BASENAME="${CURR_BE/-[0-9]*}"
+	else 
+		# the BE name does not end with a number
+		# (will add "-1" to the end)
+		CURR_BE_NUMBER=0
+		CURR_BE_BASENAME="${CURR_BE}"
+	fi
+
+	# Increment CURR_BE_NUMBER and see if it already exists.
+	# End when non-existent (=new) BE name is found.
+	NEXT_BE_NUMBER=$(expr ${CURR_BE_NUMBER} + 1)
+	while _beadm_check_be_exists "${CURR_BE_BASENAME}-${NEXT_BE_NUMBER}"; do
+		NEXT_BE_NUMBER=$(expr ${NEXT_BE_NUMBER} + 1)
+	done
+	
+	# return next BE name
+	echo "${CURR_BE_BASENAME}-${NEXT_BE_NUMBER}"
+}
+
+_beadm_umount_be() {
+	# umount if exists and is mounted
+	if [[ -n "$(${BEADM} list -H | grep "^${1};" | cut -d';' -f4)" ]]; then
+		${BEADM} umount "${1}"
+	fi
+}
+
+_beadm_destroy_be() {
+	if ${BEADM} list -H | grep -q "^${1};"; then
+		${BEADM} destroy -Ff "${1}"
+	else
+		die 5 "Cannot destroy BE '${1}'"
+	fi
+}
+
+_beadm_activate_be() {
+	if _beadm_check_be_exists "${1}"; then
+		${BEADM} activate "${1}"
+	else
+		die 5 "BE activate: cannot find current BE"
+	fi
+}
+
+dc_booted_from_hdd() {
+	awk '{if($2 == "/") {print $1}}' /etc/mnttab | grep -q '^zones/ROOT/'
+}
+
+dc_booted_from_usb() {
+	awk '{if($2 == "/") {print $1}}' /etc/mnttab | grep -q '^/devices/ramdisk'
+}
+
+
+###############################################################
+# USB helper functions
+###############################################################
+
+_usbkey_get_mountpoint() {
+	echo "/mnt/$(svcprop -p 'joyentfs/usb_mountpoint' svc:/system/filesystem/smartdc:default)"
+}
+
+mount_usb_key() {
+	if [[ -n "$(_usbkey_get_mounted_path)" ]]; then
+		# already mounted
+		return 0
+	fi
+
+	local ALLDISKS=`/usr/bin/disklist -a`
+	local USBMNT="$(_usbkey_get_mountpoint)"
+
+	mkdir -p "${USBMNT}"
+	for key in ${ALLDISKS}; do
+		if [[ "$(${FSTYP} /dev/dsk/${key}p1 2> /dev/null)" == 'pcfs' ]]; then
+			${MOUNT} -F pcfs -o foldcase,noatime /dev/dsk/${key}p1 ${USBMNT};
+			if [[ $? == "0" ]]; then
+				if [[ ! -f ${USBMNT}/.joyliveusb ]]; then
+					${UMOUNT} ${USBMNT};
+				else
+					break
+				fi
+			fi
+		fi
+	done
+
+	if [[ -z "$(_usbkey_get_mounted_path)" ]]; then
+		# nothing got mounted
+		return 1
+	else
+		return 0
+	fi
+}
+
+# return device name if mounted or nothing if not mounted
+_usbkey_get_mounted_path() {
+	local USBMNT="$(_usbkey_get_mountpoint)"
+	${AWK} '{if($2 == "'${USBMNT}'") {print $1}}' /etc/mnttab
+}
+
+_usbkey_get_device() {
+	local USB_DEV="$(_usbkey_get_mounted_path)"
+
+	if [[ -z "${USB_DEV}" ]]; then
+		# USB key is not mounted
+		# mount it and get the dev again
+		mount_usb_key
+		USB_DEV="$(_usbkey_get_mounted_path)"
+		umount "${USB_DEV}"
+	fi
+
+	echo "${USB_DEV}"
+}
+
+umount_usb_key() {
+	if [[ -z "$(_usbkey_get_mounted_path)" ]]; then
+		# not mounted
+		return 0
+	else
+		${UMOUNT} "$(_usbkey_get_mountpoint)"
+	fi
+}
+

@@ -1,14 +1,21 @@
-#!/bin/bash -e
+#!/bin/bash
+
+set -e
 
 ESLIB="$(dirname $0)/eslib"
 
+. "${ESLIB}/functions.sh"
+
 # choose the right upgrade path for this node (disk, net, usb)
-if beadm list -H | grep -q dcos-; then
-    "${ESLIB}/esdc-platform-upgrade-disk" "$@"
+if dc_booted_from_hdd && [[ -n "$(_beadm_get_current_be_name)" ]]; then
+	# a boot env exists, this is disk install
+    "${ESLIB}/esdc-platform-upgrade-disk.sh" "$@"
 elif /bin/bootparams | grep -q "^netboot=true"; then
     echo "This node is network booted. Nothing to do."
     exit 0
+elif dc_booted_from_usb; then
+    "${ESLIB}/esdc-platform-upgrade-usb.sh" "$@"
 else
-    "${ESLIB}/esdc-platform-upgrade-usb" "$@"
+	die 2 "Cannot determine platform boot type. Please contact support."
 fi
 
