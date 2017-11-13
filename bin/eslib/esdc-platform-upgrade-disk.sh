@@ -105,8 +105,8 @@ if _beadm_check_be_exists "dcos-1"; then
 	if [[ "$(${ZFS} get -Ho value canmount zones/ROOT/dcos-1)" != "noauto" ]]; then
 		${ZFS} set canmount=noauto zones/ROOT/dcos-1
 	fi
-	if [[ -z "$(${ZFS} get -Ho value org.opensolaris.libbe:uuid zones/ROOT/dcos-1)" ]]; then
-		# assing a BE identifier to dcos-1
+	if [[ "$(${ZFS} get -Ho value org.opensolaris.libbe:uuid zones/ROOT/dcos-1)" == "-" ]]; then
+		# assign a unique BE identifier to dcos-1
 		${ZFS} set "org.opensolaris.libbe:uuid=$(uuidgen)" zones/ROOT/dcos-1
 	fi
 fi
