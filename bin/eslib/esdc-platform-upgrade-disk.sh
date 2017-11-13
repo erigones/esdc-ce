@@ -75,6 +75,7 @@ post_cleanup() {
 cleanup() {
 	if [[ ${FINISHED_SUCCESSFULLY} -eq 1 ]]; then
 		post_cleanup
+		printmsg "Please reboot as soon as possible"
 	else
 		echo
 		printmsg "UPGRADE FAILED!"
@@ -145,6 +146,5 @@ printmsg "Activating the new boot environment at next reboot"
 _beadm_activate_be "${NEW_BE}"
 
 FINISHED_SUCCESSFULLY=1
-printmsg "Upgrade completed successfuly"
-printmsg "Please reboot as soon as possible"
 
+printmsg "Upgrade completed successfuly"
