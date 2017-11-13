@@ -83,6 +83,13 @@ def user_id_from_task_id(task_id):
     return user_owner_ids_from_task_id(task_id)[0]
 
 
+def tt_from_task_id(task_id):
+    """
+    Get task type from task ID.
+    """
+    return task_prefix_from_task_id(task_id)[1]
+
+
 def owner_id_from_task_id(task_id):
     """
     Get owner ID from task ID.
@@ -90,11 +97,11 @@ def owner_id_from_task_id(task_id):
     return task_prefix_from_task_id(task_id)[2]
 
 
-def tt_from_task_id(task_id):
+def tg_from_task_id(task_id):
     """
-    Get task type from task ID.
+    Get TG from task ID.
     """
-    return task_prefix_from_task_id(task_id)[1]
+    return task_prefix_from_task_id(task_id)[3]
 
 
 def dc_id_from_task_id(task_id):
@@ -159,6 +166,13 @@ def is_dummy_task(task_id):
         pass
 
     return False
+
+
+def is_task_dc_bound(task_id):
+    """
+    Get dc boundness from task ID.
+    """
+    return tg_from_task_id(task_id) == TG_DC_BOUND
 
 
 def _get_ar(ar_or_tid):

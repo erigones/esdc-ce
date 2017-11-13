@@ -83,11 +83,14 @@ def net_manage(request, name, data=None):
         :type data.netmask: string
         :arg data.gateway: **required** - IPv4 gateway in quad-dotted format
         :type data.gateway: string
-        :arg data.nic_tag: **required** - NIC tag or device name on compute node. \
-One of admin, internal, external and storage
+        :arg data.nic_tag: **required** - NIC tag or device name on compute node
         :type data.nic_tag: string
         :arg data.vlan_id: **required** - 802.1Q virtual LAN ID (0 - 4096; 0 = none)
         :type data.vlan_id: integer
+        :arg data.vxlan_id: VXLAN ID required for overlay NIC tags (1 - 16777215, default: null)
+        :type data.vxlan_id: integer
+        :arg data.mtu: MTU for the network vNIC (576 - 9000)
+        :type data.mtu: integer
         :arg data.resolvers: List of IPv4 addresses that can be used as resolvers
         :type data.resolvers: array
         :arg data.dns_domain: Existing domain name used for creating A records for VMs
@@ -134,10 +137,14 @@ One of admin, internal, external and storage
         :type data.netmask: string
         :arg data.gateway: IPv4 gateway in quad-dotted format
         :type data.gateway: string
-        :arg data.nic_tag: NIC tag or device name on compute node. One of admin, internal, external and storage
+        :arg data.nic_tag: NIC tag or device name on compute node
         :type data.nic_tag: string
         :arg data.vlan_id: 802.1Q virtual LAN ID (0 - 4096; 0 = none)
         :type data.vlan_id: integer
+        :arg data.vxlan_id: VXLAN ID required for overlay NIC tags (1 - 16777215)
+        :type data.vxlan_id: integer
+        :arg data.mtu: MTU for the network vNIC (576 - 9000)
+        :type data.mtu: integer
         :arg data.resolvers: List of IPv4 addresses that can be used as resolvers
         :type data.resolvers: array
         :arg data.dns_domain: Existing domain name used for creating A records for VMs
@@ -154,6 +161,10 @@ One of admin, internal, external and storage
         :status 404: Network not found
 
     .. http:delete:: /network/(name)
+
+        .. note:: A virtual network cannot be deleted when it is used by even one virtual server. In order to \
+disable further use of such a virtual network, the network can be marked as deleted by \
+:http:put:`changing its access property to deleted (4) </network/(name)>`.
 
         :DC-bound?:
             * |dc-yes| - ``dc_bound=true``

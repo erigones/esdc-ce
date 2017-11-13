@@ -4,7 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.six import iteritems
 
 from api import serializers as s
-from api.validators import validate_alias, validate_dc_bound
+from api.validators import validate_alias
 from api.vm.utils import get_owners
 from api.vm.define.serializers import VmDefineSerializer, KVmDefineDiskSerializer, VmDefineNicSerializer
 from api.vm.snapshot.serializers import SnapshotDefineSerializer
@@ -93,7 +93,7 @@ class VmDefineBackupField(_DefineArrayField):
     _serializer = create_dummy_serializer(BackupDefineSerializer, required_fields=('name',))
 
 
-class TemplateSerializer(s.InstanceSerializer):
+class TemplateSerializer(s.ConditionalDCBoundSerializer):
     """
     vms.models.Template
     """
@@ -110,7 +110,6 @@ class TemplateSerializer(s.InstanceSerializer):
     access = s.IntegerChoiceField(choices=VmTemplate.ACCESS, default=VmTemplate.PRIVATE)
     desc = s.SafeCharField(max_length=128, required=False)
     ostype = s.IntegerChoiceField(choices=VmTemplate.OSTYPE, required=False, default=None)
-    dc_bound = s.BooleanField(source='dc_bound_bool', default=True)
     vm_define = VmDefineField(default={}, required=False)
     vm_define_disk = VmDefineDiskField(default=[], required=False, max_items=2)
     vm_define_nic = VmDefineNicField(default=[], required=False, max_items=4)
@@ -130,17 +129,6 @@ class TemplateSerializer(s.InstanceSerializer):
         # noinspection PyProtectedMember
         return super(TemplateSerializer, self)._normalize(attr, value)
 
-    def validate_dc_bound(self, attrs, source):
-        try:
-            value = bool(attrs[source])
-        except KeyError:
-            pass
-        else:
-            if value != self.object.dc_bound_bool:
-                self._dc_bound = validate_dc_bound(self.request, self.object, value, _('Template'))
-
-        return attrs
-
     def validate_alias(self, attrs, source):
         try:
             value = attrs[source]
@@ -157,9 +145,28 @@ class TemplateSerializer(s.InstanceSerializer):
 
             if limit is not None:
                 if VmTemplate.objects.filter(dc_bound=self._dc_bound).count() >= int(limit):
-                    raise s.ValidationError(_('Maximum number of server templates reached'))
+                    raise s.ValidationError(_('Maximum number of server templates reached.'))
 
-        return attrs
+        try:
+            ostype = attrs['ostype']
+        except KeyError:
+            ostype = self.object.ostype
+
+        try:
+            vm_define = attrs['vm_define']
+        except KeyError:
+            vm_define = self.object.vm_define
+
+        vm_define_ostype = vm_define.get('ostype', None)
+
+        # The template object itself has an ostype field, which is used to limit the use of a template on the DB level;
+        # However, also the template.vm_define property can have an ostype attribute, which will be used for a new VM
+        # (=> will be inherited from the template). A different ostype in both places will lead to strange situations
+        # (e.g. using a Windows template, which will create a Linux VM). Therefore we have to prevent such situations.
+        if vm_define_ostype is not None and ostype != vm_define_ostype:
+            raise s.ValidationError('Mismatch between vm_define ostype and template ostype.')
+
+        return super(TemplateSerializer, self).validate(attrs)
 
 
 class ExtendedTemplateSerializer(TemplateSerializer):

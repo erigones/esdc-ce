@@ -14,11 +14,13 @@
 {% include "gui/form_field.html" with field=form.gateway %}
 {% include "gui/form_field.html" with field=form.vlan_id %}
 {% include "gui/form_field.html" with field=form.nic_tag %}
+{% include "gui/form_field.html" with field=form.vxlan_id %}
 {% include "gui/form_field.html" with field=form.desc %}
 
 <div class="advanced hide">
 {% include "gui/form_field.html" with field=form.resolvers %}
 {# {% include "gui/form_field.html" with field=form.dns_domain %} #}
 {% include "gui/form_field.html" with field=form.ptr_domain %}
+{% include "gui/form_field.html" with field=form.mtu %}
 {% include "gui/form_field_checkbox.html" with field=form.dhcp_passthrough %}
 </div>

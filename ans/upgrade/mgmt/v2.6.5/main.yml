@@ -1,0 +1,26 @@
+#
+# https://github.com/erigones/esdc-ce/wiki/Known-Issues#network-down-in-vms-after-update-of-cloud-init-or-centos
+#
+- name: Disable cloud-init network configuration
+  copy: src="{{ current_task_dir }}/files/cloud.cfg"
+        dest="/etc/cloud/cloud.cfg"
+        mode=0644
+
+# Preparation for system update
+- name: Disable redis package from remi
+  shell: yum-config-manager --setopt=remi.exclude=redis --save remi
+
+# https://github.com/erigones/esdc-factory/pull/73
+# https://github.com/erigones/esdc-factory/pull/79
+- name: Add items for monitoring HA of the mgmt DB
+  lineinfile:
+    dest=/etc/zabbix/zabbix_agentd.conf
+    state=present
+    line='{{ item }}'
+    insertafter='^UserParameter'
+  with_items:
+    - 'UserParameter=pgsql.ha.connected_slaves[*],/usr/bin/psql -h 127.0.0.1 -p 5432 -U stats -d postgres -At -c "SELECT count(*) FROM pg_stat_replication"'
+    - "UserParameter=pgsql.ha.is_slave[*],/usr/bin/psql -h 127.0.0.1 -p 5432 -U stats -d postgres -At -c \"SELECT CASE WHEN pg_is_in_recovery() = 't' THEN 1 ELSE 0 END AS in_recovery;\""
+    - 'UserParameter=pgsql.ha.master_exists[*],/usr/sbin/crm_resource --resource postgres-ha | grep -Ec "Masters: \[ [^ ]+ \]"'
+  notify: restart zabbix-agent
+

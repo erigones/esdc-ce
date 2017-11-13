@@ -2,7 +2,7 @@ from logging import INFO, WARNING, ERROR, DEBUG, getLogger
 
 from api.decorators import catch_exception
 from api.mon.backends.abstract import AbstractMonitoringBackend, LOG
-from .base import ZabbixBase, ZabbixUserGroupContainer, ZabbixUserContainer
+from .base import ZabbixBase, ZabbixUserGroupContainer, ZabbixUserContainer, ZabbixHostGroupContainer
 from .internal import InternalZabbix
 from .external import ExternalZabbix
 from gui.models import User, AdminPermission
@@ -441,9 +441,25 @@ class Zabbix(AbstractMonitoringBackend):
         """[EXTERNAL] Return list of available templates"""
         return self.ezx.get_template_list()
 
-    def hostgroup_list(self):
+    def _get_filtered_hostgroups(self, prefix):
+        """This is a generator function"""
+
+        for host_group in self.ezx.get_hostgroup_list():
+            match = ZabbixHostGroupContainer.RE_NAME_WITH_DC_PREFIX.match(host_group['name'])
+
+            if match:
+                # RE_NAME_WITH_DC_PREFIX results in exactly two (named) groups: dc name and hostgroup name:
+                dc_name, host_group_name = match.groups()
+                if dc_name == prefix:
+                    # This will remove the prefix from the hostgroup name as we don't want to show this to the user.
+                    host_group['name'] = host_group_name
+                    yield host_group
+            else:
+                yield host_group
+
+    def hostgroup_list(self, prefix=''):
         """[EXTERNAL] Return list of available hostgroups"""
-        return self.ezx.get_hostgroup_list()
+        return list(self._get_filtered_hostgroups(prefix=prefix))
 
     def synchronize_user_group(self, group=None, dc_as_group=None):
         kwargs = {}

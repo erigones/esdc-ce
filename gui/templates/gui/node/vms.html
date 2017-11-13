@@ -14,6 +14,8 @@
 {% block base_nav %}{% include "gui/node/navigation.html" with li_vms="active" %}{% endblock %}
 
 {% block base_content %}
+{% include "gui/vm/stop_or_reboot_modal.html" %}
+
 <div id="vms_control_modal" class="black-box modal hide fade vm_modal">
   <div class="modal-head tab-header">
     <button type="button" class="close" data-dismiss="modal">&times;</button>

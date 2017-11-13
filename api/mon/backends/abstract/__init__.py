@@ -1,4 +1,6 @@
 from frozendict import frozendict
+import re
+
 
 _VM_KWARGS = (
     ('ostype', 1),
@@ -44,6 +46,7 @@ class AbstractMonitoringBackend(object):
     AVERAGE = 3
     HIGH = 4
     DISASTER = 5
+    RE_MONITORING_HOSTGROUPS = re.compile(r'^[\w\s.\-,\"{\}]+$')
 
     def __init__(self, dc, **kwargs):
         self.dc = dc
@@ -99,7 +102,7 @@ class AbstractMonitoringBackend(object):
     def template_list(self):
         raise NotImplementedError
 
-    def hostgroup_list(self):
+    def hostgroup_list(self, prefix=False):
         raise NotImplementedError
 
     def synchronize_user_group(self, group=None, dc_as_group=None):

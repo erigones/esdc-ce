@@ -1,9 +1,11 @@
 from logging import getLogger
 
+from django.core.validators import RegexValidator
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
 from api import serializers as s
+from api.mon import MonitoringBackend
 from api.validators import validate_owner
 from api.vm.utils import get_owners
 from api.node.status.utils import node_ping
@@ -41,7 +43,9 @@ class NodeDefineSerializer(s.InstanceSerializer):
     ram_free = s.IntegerField(read_only=True)
     ram_kvm_overhead = s.IntegerField(read_only=True)
     sysinfo = s.Field(source='api_sysinfo')  # Field is read_only=True by default
-    monitoring_hostgroups = s.ArrayField(max_items=16, default=[])
+    monitoring_hostgroups = s.ArrayField(max_items=16, default=[],
+                                         validators=(
+                                             RegexValidator(regex=MonitoringBackend.RE_MONITORING_HOSTGROUPS),))
     monitoring_templates = s.ArrayField(max_items=32, default=[])
     created = s.DateTimeField(read_only=True, required=False)
 

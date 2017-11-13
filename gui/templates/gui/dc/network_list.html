@@ -99,9 +99,9 @@
             <th>{% trans "Access" %}</th>
             <th>{% trans "Owner" %}</th>
             <th class="hidden-phone">{% trans "DC bound?" %}</th>
-            <th>{% trans "Subnet" %}</th>
-            <th class="hidden-phone">{% trans "Gateway" %}</th>
+            <th>{% trans "Subnet" %}&nbsp;/&nbsp;{% trans "Gateway" %}</th>
             <th>{% trans "VLAN" %}</th>
+            <th class="hidden-phone">{% trans "NIC Tag" %}</th>
             <th class="hidden-phone">{% trans "Free IPs" %}</th>
             {% if all %}
             <th class="hidden-phone">{% trans "Datacenters" %}</th>
@@ -135,12 +135,13 @@
             <td class="hidden-phone"><i class="icon-{{ net.dc_bound_bool|yesno:"ok,remove" }}"></i></td>
             <td class="nowrap">
               <a href="{% url 'dc_network_ip_list' net.name %}?{{ qs }}" class="btn-link" title="{% trans "Show/edit network IP addresses" %}" data-toggle="tooltip" data-placement="bottom">{{ net.network|cidr:net.netmask }}</a>
+              {% if net.gateway %}<br><small>{% trans "via" %}&nbsp;{{ net.gateway }}</small>{% endif %}
               {% if net.dhcp_passthrough %}&nbsp;
                 <span title="{% trans "IP addresses for this network are managed by an external service" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-info-sign"></i></span>
               {% endif %}
             </td>
-            <td class="hidden-phone nowrap">{{ net.gateway }}</td>
             <td class="nowrap">{{ net.vlan_id }}</td>
+            <td class="hidden-phone nowrap">{{ net.nic_tag }}{% if net.vxlan_id %}/{{ net.vxlan_id }}{% endif %}</td>
             <td class="hidden-phone">{{ net.ips_free }}</td>
             {% if all %}
             <td class="hidden-phone"><small class="vm_hostname">{{ net.dc.all|dcify }}</small></td>
