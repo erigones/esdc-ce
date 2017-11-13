@@ -88,7 +88,6 @@ __all__ = (
     'ArrayField',
     'DictArrayField',
     'IntegerArrayField',
-    'URLArrayField',
     'IPAddressArrayField',
     'CronField',
     'CIDRField',
@@ -119,14 +118,14 @@ def is_simple_callable(obj):
     """
     True if the object is a callable that takes no arguments.
     """
-    function = inspect.isfunction(obj)
+    function_ = inspect.isfunction(obj)
     method = inspect.ismethod(obj)
 
-    if not (function or method):
+    if not (function_ or method):
         return False
 
     args, _, _, defaults = inspect.getargspec(obj)
-    len_args = len(args) if function else len(args) - 1
+    len_args = len(args) if function_ else len(args) - 1
     len_defaults = len(defaults) if defaults else 0
 
     return len_args <= len_defaults
@@ -1191,7 +1190,7 @@ class DictField(WritableField):
     def from_native(self, value):
         try:
             return dict(value)
-        except:
+        except Exception:
             raise ValidationError(self.error_messages['invalid'])
 
 
@@ -1231,7 +1230,7 @@ class BaseArrayField(CharField):
     """
     List - array.
     """
-    _field = NotImplemented
+    _field_class = NotImplemented
     type_name = 'ArrayField'
     type_label = 'list'
 
@@ -1239,7 +1238,10 @@ class BaseArrayField(CharField):
         self.max_items = kwargs.pop('max_items', None)
         self.min_items = kwargs.pop('min_items', None)
         self.exact_items = kwargs.pop('exact_items', None)
+        field_validators = kwargs.pop('validators', ())
         super(BaseArrayField, self).__init__(*args, **kwargs)
+        # We want to use custom validators on each used field, not on the array itself:
+        self._field = self._field_class(validators=field_validators)
 
     def to_native(self, value):
         if not value:
@@ -1295,7 +1297,7 @@ class ArrayField(BaseArrayField):
     """
     ArrayField without validation.
     """
-    _field = CharField()
+    _field_class = CharField
     type_name = 'ArrayField'
     type_label = 'list'
 
@@ -1304,7 +1306,7 @@ class DictArrayField(BaseArrayField):
     """
     ArrayField with dictionaries as items.
     """
-    _field = DictField()
+    _field_class = DictField
     type_name = 'DictArrayField'
     type_label = 'objects'
 
@@ -1313,25 +1315,16 @@ class IntegerArrayField(BaseArrayField):
     """
     ArrayField with number validation.
     """
-    _field = IntegerField()
+    _field_class = IntegerField
     type_name = 'IntegerArrayField'
     type_label = 'integers'
-
-
-class URLArrayField(BaseArrayField):
-    """
-    ArrayField with url validation.
-    """
-    _field = URLField()
-    type_name = 'URLArrayField'
-    type_label = 'urls'
 
 
 class IPAddressArrayField(BaseArrayField):
     """
     ArrayField with IPv4 validation.
     """
-    _field = IPAddressField()
+    _field_class = IPAddressField
     type_name = 'IPAddressArrayField'
     type_label = 'IP addresses'
 

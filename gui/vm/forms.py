@@ -1,4 +1,5 @@
 from django import forms
+from django.core.validators import RegexValidator
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.template.defaultfilters import filesizeformat
@@ -7,6 +8,7 @@ from datetime import datetime
 import pytz
 import re
 
+from api.mon import MonitoringBackend
 from pdns.models import Record
 from vms.models import Vm, Snapshot, Backup, BackupDefine
 from vms.utils import AttrDict
@@ -245,6 +247,8 @@ class AdminServerSettingsForm(ServerSettingsForm):
                                       widget=ArrayWidget(tags=True, escape_space=False,
                                                          attrs={'class': 'tags-select2 narrow'}))
     monitoring_hostgroups = ArrayField(label=_('Monitoring hostgroups'), required=False, tags=True,
+                                       validators=[
+                                           RegexValidator(regex=MonitoringBackend.RE_MONITORING_HOSTGROUPS)],
                                        help_text=_('Comma-separated list of custom monitoring hostgroups.'),
                                        widget=ArrayWidget(tags=True, escape_space=False,
                                                           attrs={'class': 'tags-select2 narrow'}))
@@ -278,6 +282,10 @@ class AdminServerSettingsForm(ServerSettingsForm):
 
         if dc_settings.MON_ZABBIX_HOSTGROUPS_VM_RESTRICT:
             self.fields['monitoring_hostgroups'].widget.tag_choices = dc_settings.MON_ZABBIX_HOSTGROUPS_VM_ALLOWED
+
+        if dc_settings.MON_ZABBIX_HOSTGROUPS_VM:
+            self.fields['monitoring_hostgroups'].help_text += _(' Automatically added hostgroups: ') \
+                                                              + ', '.join(dc_settings.MON_ZABBIX_HOSTGROUPS_VM)
 
         if vm:
             empty_template_data = {}

@@ -39,7 +39,10 @@ def template_manage(request, name, data=None):
     update (:http:put:`PUT </template/(name)>`) or delete (:http:delete:`DELETE </template/(name)>`)
     a server template.
 
-    .. warning:: EXPERIMENTAL API function.
+    .. note:: Server templates are only loosely validated during creation and updating. Whether a server template \
+will be correctly applied to a virtual server depends on various circumstances during server definition and deployment \
+(e.g. availability of compute nodes, storages, networks, server images, users and other resources \
+in a virtual datacenter).
 
     .. http:get:: /template/(name)
 
@@ -152,6 +155,10 @@ def template_manage(request, name, data=None):
         :status 404: Template not found
 
     .. http:delete:: /template/(name)
+
+        .. note:: A server template cannot be deleted when it is used by even one virtual server. In order to disable \
+further use of such a server template, the template can be marked as deleted by \
+:http:put:`changing its access property to deleted (4) </template/(name)>`.
 
         :DC-bound?:
             * |dc-yes| - ``dc_bound=true``

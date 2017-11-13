@@ -1,6 +1,8 @@
 from celery.utils.log import get_task_logger
 from django.utils.six import text_type
 
+from que.utils import is_task_dc_bound
+
 from api.mon import get_monitoring, del_monitoring, MonitoringError
 from api.task.utils import mgmt_lock, mgmt_task
 from que.erigonesd import cq
@@ -69,9 +71,13 @@ def mon_hostgroup_list(task_id, dc_id, **kwargs):
     Return list of hostgroups available in Zabbix.
     """
     dc = Dc.objects.get_by_id(int(dc_id))
+    if is_task_dc_bound(task_id):
+        prefix = dc.name
+    else:
+        prefix = ''
 
     try:
-        zabbix_hostgroups = get_monitoring(dc).hostgroup_list()
+        zabbix_hostgroups = get_monitoring(dc).hostgroup_list(prefix=prefix)
     except MonitoringError as exc:
         raise MgmtTaskException(text_type(exc))
 
