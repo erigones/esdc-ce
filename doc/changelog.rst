@@ -13,6 +13,7 @@ Features
 - Updated the VM templates API + removed *experimental* flag from the ``template_manage`` API call - `#256 <https://github.com/erigones/esdc-ce/issues/256>`__
 - DC settings implied monitoring hostgroups are shown near the VM, node monitoring_hostgroups setting - `#266 <https://github.com/erigones/esdc-ce/issues/266>`__
 - Added node version caching and internal update events - `#271 <https://github.com/erigones/esdc-ce/issues/271>`__
+- Added status update button to compute node list - `#291 <https://github.com/erigones/esdc-ce/issues/291>`__
 
 Bugs
 ----
