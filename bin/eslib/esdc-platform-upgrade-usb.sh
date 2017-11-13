@@ -93,14 +93,14 @@ ESDC_DOWNLOAD_URL="https://download.erigones.org/esdc/usb/stable/${ESDC_IMG}.gz"
 trap cleanup EXIT
 
 mkdir -p "${UPG_DIR}"
-${CURL} ${CURL_OPTS} ${CURL_DEFAULT_OPTS} "${ESDC_DOWNLOAD_URL}" > "${ESDC_IMG}.gz"
+${CURL} ${CURL_OPTS} ${CURL_DEFAULT_OPTS} -o "${ESDC_IMG_FULL}.gz" "${ESDC_DOWNLOAD_URL}"
 printmsg "Unpacking new platform"
-${GZIP} -d "${ESDC_IMG}.gz"
+${GZIP} -d "${ESDC_IMG_FULL}.gz"
 
 # start upgrade
 printmsg "Writing new platform image to the USB"
 # change trailing p1 for p0 (c1t1d0p1 -> c1t1d0p0)
-${DD} if="${ESDC_IMG}" of="${USB_DEV/p1*}p0" bs=16M
+${DD} if="${ESDC_IMG_FULL}" of="${USB_DEV/p1*}p0" bs=16M
 
 printmsg "Mounting newly written USB key into ${USBMNT}"
 # mount exactly the same dev that was written to
