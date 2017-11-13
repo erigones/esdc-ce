@@ -387,6 +387,9 @@ creating snapshot (requires QEMU Guest Agent) (default: false)
         .. warning:: A snapshot rollback will restore disk data from the snapshot; \
 All data created after the snapshot will be lost (including all newer snapshots)!
 
+        .. warning:: When restoring a snapshot into another server's disk all existing snapshots \
+on the target server will be lost!
+
         :DC-bound?:
             * |dc-yes|
         :Permissions:
@@ -401,6 +404,12 @@ All data created after the snapshot will be lost (including all newer snapshots)
         :type data.disk_id: integer
         :arg data.force: Force recursive rollback (default: true)
         :type data.force: boolean
+        :arg data.target_hostname_or_uuid: Target server hostname or uuid \
+(default: source and destination server are the same)
+        :type data.target_hostname_or_uuid: string
+        :arg data.target_disk_id: Target disk number/ID; Makes sense (and required) only when \
+``target_hostname_or_uuid`` is specified (default: not used, because the snapshot is restored on the same disk ID)
+        :type data.target_disk_id: integer
         :status 200: SUCCESS
         :status 201: PENDING
         :status 400: FAILURE
@@ -408,8 +417,10 @@ All data created after the snapshot will be lost (including all newer snapshots)
         :status 404: VM not found / Snapshot not found
         :status 409: VM has pending tasks
         :status 412: Invalid disk_id
-        :status 417: VM snapshot status is not OK / VM has more recent snapshots (force=false)
+        :status 417: VM snapshot status is not OK / VM has more recent snapshots (force=false) / \
+Target VM has snapshots (force=false and target_hostname_or_uuid is set)
         :status 423: Node is not operational / VM is not operational / VM is not stopped / VM is locked or has slave VMs
+        :status 428: VM is not installed/ VM brand mismatch / Disk size mismatch
 
     .. http:put:: /vm/(hostname_or_uuid)/snapshot/(snapname)
 

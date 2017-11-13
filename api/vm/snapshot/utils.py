@@ -24,9 +24,13 @@ def detail_dict(name, ser, data=None):
 
 
 # noinspection PyUnusedLocal
-def get_disk_id(request, vm, data, key='disk_id', default=1):
+def get_disk_id(request, vm, data=None, key='disk_id', default=1, disk_id=None):
     """Get disk_id from data and return additional disk information"""
-    disk_id = data.get(key, default)
+    assert data is not None or disk_id is not None
+
+    if disk_id is None:
+        disk_id = data.get(key, default)
+
     # noinspection PyBroadException
     try:
         disk_id = int(disk_id)
@@ -35,7 +39,7 @@ def get_disk_id(request, vm, data, key='disk_id', default=1):
         disk = vm.json_active_get_disks()[disk_id - 1]
         zfs_filesystem = disk['zfs_filesystem']
         real_disk_id = Snapshot.get_real_disk_id(disk)
-    except:
+    except Exception:
         raise InvalidInput('Invalid %s' % key)
 
     return disk_id, real_disk_id, zfs_filesystem
@@ -74,7 +78,7 @@ def filter_disk_id(vm, query_filter, data, default=None):
                 query_filter['disk_id'] = Snapshot.get_disk_id(vm, disk_id)
             else:
                 query_filter['vm_disk_id'] = disk_id - 1
-        except:
+        except Exception:
             raise InvalidInput('Invalid disk_id')
 
     return query_filter
@@ -91,7 +95,7 @@ def filter_snap_type(query_filter, data):
             if stype not in dict(Snapshot.TYPE):
                 raise ValueError
             query_filter['type'] = stype
-        except:
+        except Exception:
             raise InvalidInput('Invalid snapshot type')
 
     return query_filter
@@ -107,6 +111,7 @@ def filter_snap_define(query_filter, data):
     return query_filter
 
 
+# noinspection SqlDialectInspection,SqlNoDataSourceInspection
 def output_extended_snap_count(request, data):
     """Fetch extended boolean from GET request and prepare annotation dict"""
     if request.method == 'GET' and data and data.get('extended', False):
