@@ -141,6 +141,7 @@ class NodeUpdateView(APIView):
             return self._update(version, key=ser.object.get('key'), cert=ser.object.get('cert'))
         finally:
             lock.delete(fail_silently=True, delete_reverse=False)
+            # Delete cached node version information (will be cached again during next node.system_version call)
             del node.system_version
             # Emit event into socket.io
             NodeUpdateFinished(self.task_id, request=self.request).send()
