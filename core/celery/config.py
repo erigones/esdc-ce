@@ -54,6 +54,6 @@ CELERYBEAT_SCHEDULE = {}
 # machine, and also for security reasons not to store passwords in version
 # control.
 try:
-    from local_config import *
+    from local_config import *  # noqa: F401,F403
 except ImportError:
     pass

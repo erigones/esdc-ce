@@ -1,21 +1,21 @@
 from __future__ import absolute_import
 from django.db.models.signals import post_delete
 
-from vms.models.dc import Dc, DummyDc, DefaultDc, DomainDc
-from vms.models.storage import Storage, NodeStorage
-from vms.models.iso import Iso
-from vms.models.vmtemplate import VmTemplate
-from vms.models.image import Image, ImageVm
-from vms.models.imagestore import ImageStore
-from vms.models.node import Node, DcNode
-from vms.models.vm import TagVm, Vm
-from vms.models.slave_vm import SlaveVm
-from vms.models.snapshot import SnapshotDefine, Snapshot
-from vms.models.subnet import Subnet
-from vms.models.ipaddress import IPAddress
-from vms.models.tasklog import TaskLogEntry
-from vms.models.backup import BackupDefine, Backup
-from pdns.models import Domain
+from vms.models.dc import Dc, DummyDc, DefaultDc, DomainDc  # noqa: F401
+from vms.models.storage import Storage, NodeStorage  # noqa: F401
+from vms.models.iso import Iso  # noqa: F401
+from vms.models.vmtemplate import VmTemplate  # noqa: F401
+from vms.models.image import Image, ImageVm  # noqa: F401
+from vms.models.imagestore import ImageStore  # noqa: F401
+from vms.models.node import Node, DcNode  # noqa: F401
+from vms.models.vm import TagVm, Vm  # noqa: F401
+from vms.models.slave_vm import SlaveVm  # noqa: F401
+from vms.models.snapshot import SnapshotDefine, Snapshot  # noqa: F401
+from vms.models.subnet import Subnet  # noqa: F401
+from vms.models.ipaddress import IPAddress  # noqa: F401
+from vms.models.tasklog import TaskLogEntry  # noqa: F401
+from vms.models.backup import BackupDefine, Backup  # noqa: F401
+from pdns.models import Domain  # noqa: F401
 
 TASK_MODEL_KEYS = ('dc_id', 'image_uuid', 'vm_uuid', 'node_uuid', 'nodestorage_id')  # The order here is important!
 STATUS_MODELS = (Node, Vm, Snapshot, Backup)

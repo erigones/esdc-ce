@@ -665,7 +665,7 @@ INVALID_USERNAMES = frozenset(['profile', 'Admin', 'provisioner'])
 # version control system allowing for settings to be defined (overwritten) per
 # machine, and also for security reasons not to store passwords in the VCS.
 try:
-    from local_settings import *
+    from local_settings import *  # noqa: F401,F403
 except ImportError:
     pass
 
