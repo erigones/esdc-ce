@@ -42,6 +42,7 @@ for i in sorted(upg_subdirs, key=parse_version):
 ")
 
 
+# shellcheck disable=SC1117
 echo -e "Current node version: ${VERSION}\n"
 
 if [[ -z "${RUN_VERSIONS}" ]]; then
@@ -55,18 +56,22 @@ for version in ${RUN_VERSIONS}; do
 	update_script="${UPG_DIR}/${version}/main.sh"
 
 	if [[ ! -x "${update_script}" ]]; then
+		# shellcheck disable=SC1117
 		echo -e "* ${version}:\tSkipping node update\n"
 		continue
 	fi
 
+	# shellcheck disable=SC1117
 	echo -e "* ${version}:\tApplying node update"
 	"${update_script}"
 	ec=$?
 
 	if [[ "${ec}" -eq 0 ]]; then
+		# shellcheck disable=SC1117
 		echo -e "* ${version}:\tSUCCESS\n"
 		echo "${version}" > "${VERSIONFILE}"
 	else
+		# shellcheck disable=SC1117
 		echo -e "* ${version}:\tERROR\n"
 		exit ${ec}
 	fi

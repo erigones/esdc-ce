@@ -4,7 +4,7 @@ from argparse import ArgumentTypeError, FileType
 
 from . import PY3
 
-RE_ASCII = re.compile(r'^[a-zA-Z0-9:_\.-]+$')
+RE_ASCII = re.compile(r'^[a-zA-Z0-9:_.-]+$')
 RE_UUID = re.compile(r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$')
 
 
@@ -96,7 +96,7 @@ class JSONFileType(FileType):
             return json.loads(fp.read())
         except (IOError, OSError):
             msg = 'Could not read file'
-        except:
+        except Exception:
             msg = 'Invalid json'
 
         raise ArgumentTypeError(msg)

@@ -16,10 +16,10 @@ elif 'eventlet' in sys.argv:
     # Eventlet supports Psycopg out-of-the-box
 
 # noinspection PyPep8
-from celery import Celery
+from celery import Celery  # noqa: F402
 
 # noinspection PyPep8
-from que.bootsteps import ESDCDaemon, FastDaemon, MgmtDaemon
+from que.bootsteps import ESDCDaemon, FastDaemon, MgmtDaemon  # noqa: F402
 
 # Set default configuration module name
 os.environ.setdefault('CELERY_CONFIG_MODULE', 'core.celery.config')
