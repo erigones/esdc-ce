@@ -5,6 +5,7 @@ set -e
 ERIGONES_HOME=${ERIGONES_HOME:-"/opt/erigones"}
 ESLIB="${ESLIB:-"${ERIGONES_HOME}/bin/eslib"}"
 
+# shellcheck disable=SC1090
 . "${ESLIB}/functions.sh"
 
 ESDC_VER="${1}"
@@ -80,7 +81,9 @@ if ! [[ -f "${USB_VERSION_FILE}" ]]; then
 	die 3 "Invalid or unknown USB key format. Aborting upgrade."
 fi
 
+# shellcheck disable=SC2002
 CURR_USB_VER="$(cat "${USB_VERSION_FILE}" | sed -e 's/^esdc-.e-.n-//')"
+# shellcheck disable=SC2002
 WANTED_USB_IMG_VARIANT="$(cat "${USB_VERSION_FILE}" | sed -re 's/^(esdc-.e-.n-).*/\1/')"
 if [[ ${FORCE} -ne 1 ]] && [[ "${CURR_USB_VER}" == "${NEW_USB_VER}" ]]; then
 	die 0 "Requested ESDC version is already on the USB key. Nothing to do."
@@ -96,6 +99,7 @@ ESDC_DOWNLOAD_URL="https://download.erigones.org/esdc/usb/stable/${ESDC_IMG}.gz"
 trap cleanup EXIT
 
 mkdir -p "${UPG_DIR}"
+# shellcheck disable=SC2086
 ${CURL} ${CURL_OPTS} ${CURL_DEFAULT_OPTS} -o "${ESDC_IMG_FULL}.gz" "${ESDC_DOWNLOAD_URL}"
 printmsg "Unpacking new platform"
 ${GZIP} -d "${ESDC_IMG_FULL}.gz"
@@ -110,6 +114,7 @@ printmsg "Mounting newly written USB key into ${USBMNT}"
 ${MOUNT} -F pcfs -o foldcase,noatime "${USB_DEV}" "${USBMNT}"
 
 printmsg "Verifying newly written USB key"
+# shellcheck disable=SC2002
 CURR_USB_VER="$(cat "${USB_VERSION_FILE}" | sed -e 's/^esdc-.e-.n-//')"
 printmsg "ESDC version on USB: ${CURR_USB_VER}"
 

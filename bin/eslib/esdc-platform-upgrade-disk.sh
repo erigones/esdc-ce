@@ -5,6 +5,7 @@ set -e
 ERIGONES_HOME=${ERIGONES_HOME:-"/opt/erigones"}
 ESLIB="${ESLIB:-"${ERIGONES_HOME}/bin/eslib"}"
 
+# shellcheck disable=SC1090
 . "${ESLIB}/functions.sh"
 
 PLATFORM_VER="${1}"
@@ -117,6 +118,7 @@ fi
 
 # start download
 printmsg "Downloading the new platform"
+# shellcheck disable=SC2086
 ${CURL} ${CURL_OPTS} ${CURL_DEFAULT_OPTS} -o "${PLATFORM_FILE}" "${PLATFORM_DOWNLOAD_URL}"
 printmsg "Extracting the new platform"
 ${TAR} zxf "${PLATFORM_FILE}" -C "${PLATFORM_DIR}"
