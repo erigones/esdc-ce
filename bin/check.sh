@@ -18,11 +18,17 @@ JS_FOLDERS=("gui/static/gui/js")
 PY_FOLDERS=("ans" "core" "pdns" "que" "sio" "vms")
 RADON_MAX_CC="${RADON_MAX_CC:-27}"
 # Colors
+# shellcheck disable=SC1117
 NC="\033[0m"
+# shellcheck disable=SC1117
 WHITE="\033[1;37m"
+# shellcheck disable=SC1117
 CYAN="\033[1;36m"
+# shellcheck disable=SC1117
 MAGENTA="\033[1;35m"
+# shellcheck disable=SC1117
 GREEN="\033[1;32m"
+# shellcheck disable=SC1117
 RED="\033[1;31m"
 #######################################
 
@@ -70,6 +76,7 @@ lint_shell() {
 		rc=1
 	fi
 
+	# shellcheck disable=SC1117
 	if grep -qE "^\ \ *(echo|exit|return)" "${target}"; then
 		warning "${target}" "found spaces in shell script (use tabs)"
 		rc=1
@@ -134,6 +141,7 @@ check_shell() {
 		printmsg "Checking shell scripts in ${ERIGONES_HOME}/${folder}" "..."
 		echo
 		while IFS= read -r -d '' f; do
+			# shellcheck disable=SC1117
 			if file "${f}" | grep -qE "(shell\ script|bash\ script)" ; then
 				if ! lint_shell "${f}"; then
 					EC=1

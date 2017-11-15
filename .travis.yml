@@ -18,5 +18,6 @@ addons:
 before_script:
   - pip install flake8 radon
   - npm install -g jshint
+  - shellcheck --version
 
 script: ./bin/check.sh
