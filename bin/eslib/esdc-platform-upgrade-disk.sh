@@ -10,7 +10,8 @@ ESLIB="${ESLIB:-"${ERIGONES_HOME}/bin/eslib"}"
 
 PLATFORM_VER="${1}"
 if [[ -z "${PLATFORM_VER}" ]]; then
-	echo "Usage:   $0 <new_platform_version> [--keep-smf-db] [-v] [-f]"
+	echo "Usage:   $0 <new_dc_version|new_platform_version> [--keep-smf-db] [-v] [-f]"
+	echo "Example: $0 v2.6.7"
 	echo "Example: $0 20170624T192838Z"
 	echo "Args:"
 	echo "  --keep-smf-db       don't clear SMF database (useful if you don't want to loose"
@@ -21,16 +22,16 @@ if [[ -z "${PLATFORM_VER}" ]]; then
 	exit 1
 fi
 
-if ! [[ "${PLATFORM_VER}" =~ ^[0-9]+T[0-9]+Z$ ]]; then
-	die 2 "Unknown format of platform version: ${PLATFORM_VER}"
-fi
 
-# process additional arguments
+# default arguments
 # curl: 15s conn T/O; allow redirects; 1000s max duration
+PLATFORM_VERSION_MAP_URL="https://download.erigones.org/esdc/factory/platform/esdc-version-map.json"
 CURL_DEFAULT_OPTS="--connect-timeout 15 -L --max-time 1000"
 CURL_OPTS="-s"
 KEEP_SMF_DB=0
 FORCE="0"
+
+# process additional arguments
 shift
 while [[ ${#} -gt 0 ]]; do
 	case "${1}" in
@@ -50,6 +51,48 @@ while [[ ${#} -gt 0 ]]; do
 	shift
 done
 
+# check platform version format
+if [[ ! "${PLATFORM_VER}" =~ ^[0-9]+T[0-9]+Z$ ]] && [[ ! "${PLATFORM_VER}" =~ ^v[0-9]+\.[0-9]+ ]]; then
+	die 2 "Unknown format of platform version: ${PLATFORM_VER}"
+fi
+
+# query platform version from esdc version if needed
+if [[ "${PLATFORM_VER}" =~ ^v[0-9]+\.[0-9]+ ]]; then
+	printmsg "ESDC version given, translating to platform version"
+	# escape dots in version string and remove "v" from beginning
+	search_version="$(echo ${PLATFORM_VER#v} | ${SED} 's/\./\\./g')"
+	pi_version=""
+
+	printmsg "Downloading platform version list"
+	PLATFORM_MAP="$(${CURL} ${CURL_OPTS} ${CURL_DEFAULT_OPTS} "${PLATFORM_VERSION_MAP_URL}")"
+
+	if [[ -z "${PLATFORM_MAP}" ]] || ! echo "${PLATFORM_MAP}" | ${JSON} --validate; then
+		die 3 "Could not download a valid platform map from ${PLATFORM_VERSION_MAP_URL}"
+	fi
+
+	# query version number
+	# if not found, remove the minor number and try again
+	while [[ -n "${search_version}" ]]; do
+		pi_version="$(echo "${PLATFORM_MAP}" | ${JSON} "${search_version}")"
+
+		if [[ -z "${pi_version}" ]]; then
+			# remove minor number
+			search_version="${search_version%\\.*}"
+		else
+			break
+		fi
+	done
+
+	if [[ -z "${pi_version}"  ]]; then
+		die 3 "Could not find platform number for ESDC version ${PLATFORM_VER}"
+	else
+		PLATFORM_VER="${pi_version}"
+		printmsg "The platform version is ${PLATFORM_VER}"
+	fi
+fi
+
+
+# check what platform we currently run
 if [[ "${FORCE}" -ne 1 ]] && [[ "${PLATFORM_VER}" == "$(uname -v | sed 's/^[a-z]*_//')" ]]; then
 	die 0 "The requested platform version is already running. Aborting upgrade."
 fi
