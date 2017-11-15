@@ -162,6 +162,10 @@ def net_manage(request, name, data=None):
 
     .. http:delete:: /network/(name)
 
+        .. note:: A virtual network cannot be deleted when it is used by even one virtual server. In order to \
+disable further use of such a virtual network, the network can be marked as deleted by \
+:http:put:`changing its access property to deleted (4) </network/(name)>`.
+
         :DC-bound?:
             * |dc-yes| - ``dc_bound=true``
             * |dc-no| - ``dc_bound=false``

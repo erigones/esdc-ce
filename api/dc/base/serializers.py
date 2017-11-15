@@ -416,7 +416,7 @@ class DcSettingsSerializer(s.InstanceSerializer):
                                               help_text=_('Existing Zabbix host group, which will be used for all '
                                                           'monitored servers in this virtual datacenter.'))
     MON_ZABBIX_HOSTGROUPS_VM = s.ArrayField(label='MON_ZABBIX_HOSTGROUPS_VM', max_items=32, required=False,
-                                            help_text=_('List of other existing Zabbix host groups, which will be used '
+                                            help_text=_('List of Zabbix host groups, which will be used '
                                                         'for all monitored servers in this virtual datacenter. '
                                                         'Available placeholders are: {ostype}, {ostype_text}, '
                                                         '{disk_image}, {disk_image_abbr}, {dc_name}.'))

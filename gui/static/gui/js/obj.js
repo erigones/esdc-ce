@@ -64,6 +64,8 @@ function select_tags_enable(elements, options) {
   options = options || {};
   mon_templates_reset();
   mon_hostgroups_reset();
+  mon_node_hostgroups_reset();
+
 
   elements.each(function() {
     var input = $(this);
@@ -75,6 +77,9 @@ function select_tags_enable(elements, options) {
         break;
       case 'mon_hostgroups':
         mon_hostgroups_enable(input, options);
+        break;
+      case 'mon_node_hostgroups':
+        mon_node_hostgroups_enable(input, options);
         break;
       default:
         input.select2($.extend({tags: input.data('tags-choices') || [], dropdownCssClass: input.attr('class'), tokenSeparators: [',', ' ']}, options));

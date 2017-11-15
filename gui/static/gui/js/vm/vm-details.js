@@ -171,6 +171,20 @@ function vm_status_display_notready(hostname) {
   return 'notready';
 }
 
+function vm_status_display_revert_notready(hostname) {
+  var state = vm_status_display(hostname);
+
+  if (state) {
+    if (state == 'running-' || state == 'stopped-' || state == 'notcreated-' || state == 'frozen-') {
+      return state.slice(0, -1);  // trim the '-' char
+    } else {
+      return state;
+    }
+  }
+
+  return null;
+}
+
 function vm_flags_update(hostname, data) {
   var flags = $(jq('vm_flags_' + hostname));
 

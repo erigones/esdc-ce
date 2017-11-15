@@ -1,6 +1,7 @@
-#!/bin/sh
+#!/bin/bash
 
 ZKCLI=/usbkey/scripts/zookeepercli
+# shellcheck disable=SC2124
 QUERY_STRING="$@"
 
 if [ -z "${QUERY_STRING}" ]; then
@@ -14,9 +15,11 @@ if [ ! -x "${ZKCLI}" ]; then
 		exit 20
 fi
 
-# find and load config file (usually /usbkey/config
+# find and load config file (usually /usbkey/config)
+# shellcheck disable=SC1091
 . /lib/sdc/config.sh
 load_sdc_config
 
+# shellcheck disable=SC2154,SC2086
 "${ZKCLI}" -servers "${CONFIG_cfgdb_admin_ip}" -auth_usr "esdc" -auth_pwd "${CONFIG_esdc_install_password}" -c ${QUERY_STRING}
 exit $?
