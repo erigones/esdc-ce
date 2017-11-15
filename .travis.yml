@@ -6,13 +6,13 @@ python:
 sudo: false
 
 matrix:
-	fast_finish: true
+  fast_finish: true
 
 addons:
   apt:
     sources:
-    - debian-sid 
+      - debian-sid 
     packages:
-    - shellcheck
+      - shellcheck
 
 script: ./bin/check.sh
