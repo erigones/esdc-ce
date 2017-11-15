@@ -134,7 +134,7 @@ check_shell() {
 		printmsg "Checking shell scripts in ${ERIGONES_HOME}/${folder}" "..."
 		echo
 		while IFS= read -r -d '' f; do
-			if "$(file "${f}")" | grep -qE "(shell\ script|bash\ script)" ; then
+			if file "${f}" | grep -qE "(shell\ script|bash\ script)" ; then
 				if ! lint_shell "${f}"; then
 					EC=1
 				fi
