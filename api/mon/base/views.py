@@ -70,7 +70,7 @@ def mon_hostgroup_list(request, data=None):
 @setting_required('MON_ZABBIX_ENABLED')
 def mon_alert_list(request, data=None):
     """
-    Get (:http:get:`GET </mon/alert>`) current active alert or filter monitoring alert history by various parameters.
+    Get (:http:get:`GET </mon/alert>`) current active alerts or filter monitoring alert history by various parameters.
 
     .. http:get:: /mon/alert
 
@@ -81,18 +81,18 @@ def mon_alert_list(request, data=None):
         :Asynchronous?:
             * |async-yes| - List of all monitoring alerts is retrieved from monitoring server
             * |async-no| - List of all monitoring alerts is retrieved from cache
-        :arg since: Filter by unix timestamp, start date of the alerts
-        :type since: timestamp
-        :arg until: Filter by unix timestamp, end date of the alerts
-        :type until: tmestamp
-        :arg last:
-        :type last: integer
-        :arg display_items: Display list of related Zabbix triggers
-        :type display_items: boolean
-        :arg display_notes: Display list of related Zabbix events and comments
-        :type display_notes: boolean
-        :arg hosts_or_groups: List of hostnames or host groups to be filtered by
-        :type hosts_or_groups: array
+        :arg data.since: Filter by unix timestamp, start date of the alert history
+        :type data.since: timestamp
+        :arg data.until: Filter by unix timestamp, end date of the alert history
+        :type data.until: tmestamp
+        :arg data.last: The number of alerts from alert history to be displayed
+        :type data.last: integer
+        :arg data.display_items: Include list of related Zabbix triggers
+        :type data.display_items: boolean
+        :arg data.display_notes: Include list of related Zabbix events and comments
+        :type data.display_notes: boolean
+        :arg data.hosts_or_groups: List of hostnames or host groups to be filtered by
+        :type data.hosts_or_groups: array
         :status 200: SUCCESS
         :status 201: PENDING
         :status 400: FAILURE
