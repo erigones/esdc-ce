@@ -462,9 +462,8 @@ class Zabbix(AbstractMonitoringBackend):
         return list(self._get_filtered_hostgroups(prefix=prefix))
 
     def _get_filtered_alerts(self, *args, **kwargs):
-        """This is a generator function
-        """
-        for alert in self.ezx._show_alerts(*args, **kwargs):
+        """This is a generator function"""
+        for alert in self.ezx.show_alerts(*args, **kwargs):
             yield alert
 
     def alert_list(self, *args, **kwargs):

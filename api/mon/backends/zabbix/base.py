@@ -1,6 +1,6 @@
 from logging import getLogger, INFO, WARNING, CRITICAL, ERROR
 from time import time
-from datetime import datetime, timedelta
+from datetime import timedelta
 from operator import itemgetter
 from datetime import datetime
 from subprocess import call
@@ -719,9 +719,9 @@ class ZabbixBase(object):
                     hi = iface
 
                     if (iface['dns'] != interface['dns']
-                        or iface['ip'] != interface['ip']
-                        or str(iface['port']) != str(interface['port'])
-                        or str(iface['useip']) != str(interface['useip'])):
+                            or iface['ip'] != interface['ip']
+                            or str(iface['port']) != str(interface['port'])
+                            or str(iface['useip']) != str(interface['useip'])):
                         # Host ip or dns changed -> update host interface
                         interface['interfaceid'] = iface['interfaceid']
                         interfaces[i] = interface
@@ -1041,8 +1041,8 @@ class ZabbixBase(object):
         return (trigger for trigger in res if trigger['hosts'])
 
     # noinspection PyUnusedLocal
-    def _show_alerts(self, since=None, until=None, last=None, display_notes=True, display_items=True,
-                     hosts_or_groups=(), **kwargs):
+    def show_alerts(self, since=None, until=None, last=None, display_notes=True, display_items=True,
+                    hosts_or_groups=(), **kwargs):
         """Show current or historical events (alerts)"""
         out = []
         # Get triggers
