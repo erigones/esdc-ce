@@ -17,6 +17,7 @@ echo "||||"
 (cat /root/.ssh/id_rsa.pub)
 echo "||||"
 if [[ -n "$1" ]]; then
+	# shellcheck disable=SC2162
 	(imgadm list -H -o uuid,zpool | while read uuid zpool; do imgadm get -P "${zpool}" "${uuid}"; done | json -g)
 else
 	echo '[]'

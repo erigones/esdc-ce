@@ -10,7 +10,7 @@ fi
 MAINDIR="$(cd "$(dirname "$0")/.." ; pwd -P)"
 ERIGONES_HOME="${ERIGONES_HOME:-"${MAINDIR}"}"
 ANS_BASE="${ERIGONES_HOME}/ans"
-UPG_BASE="${ERIGONES_HOME}/ans/upgrade"
+UPG_BASE="${ANS_BASE}/upgrade"
 export ERIGONES_HOME UPG_BASE
 
 PYTHONPATH="${ERIGONES_HOME}:${PYTHONPATH}:${ERIGONES_HOME}/envs/lib/python2.7/site-packages"
@@ -29,8 +29,6 @@ if [[ -f "${VERSIONFILE}" ]]; then
 else
 	VERSION="v2.5.99"
 fi
-
-UPG_SUBDIRS="$(find "${UPG_DIR}" -maxdepth 1 -type d -name 'v*')"
 
 cd "${UPG_DIR}"
 
