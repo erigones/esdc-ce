@@ -5,6 +5,7 @@ set -e
 export ERIGONES_HOME=${ERIGONES_HOME:-"/opt/erigones"}
 export ESLIB="${ESLIB:-"${ERIGONES_HOME}/bin/eslib"}"
 
+# shellcheck disable=SC1090
 . "${ESLIB}/functions.sh"
 
 # choose the right upgrade path for this node (disk, net, usb)
