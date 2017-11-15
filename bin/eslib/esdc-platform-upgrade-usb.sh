@@ -2,7 +2,10 @@
 
 set -e
 
-. "$(dirname $0)/functions.sh"
+ERIGONES_HOME=${ERIGONES_HOME:-"/opt/erigones"}
+ESLIB="${ESLIB:-"${ERIGONES_HOME}/bin/eslib"}"
+
+. "${ESLIB}/functions.sh"
 
 ESDC_VER="${1}"
 if [[ -z "${ESDC_VER}" ]]; then
@@ -20,8 +23,8 @@ if ! [[ "${ESDC_VER}" =~ ^v[0-9]\.[0-9]\.[0-9]$ ]]; then
 fi
 
 # process additional arguments
-# curl: 15s conn T/O; allow redirects; 1000s max duration; cert noverify
-CURL_DEFAULT_OPTS="--connect-timeout 15 -L --max-time 3600 -k"
+# curl: 15s conn T/O; allow redirects; 1000s max duration
+CURL_DEFAULT_OPTS="--connect-timeout 15 -L --max-time 3600"
 CURL_OPTS="-s"
 FORCE="0"
 shift

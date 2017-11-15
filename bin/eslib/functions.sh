@@ -55,7 +55,7 @@ QGA_SNAPSHOT=${QGA_SNAPSHOT:-"${ERIGONES_HOME}/bin/qga-snapshot"}
 NODE=${NODE:-"/usr/node/bin/node"}
 BEADM=${BEADM:-"/usr/sbin/beadm"}
 RSYNC=${RSYNC:-"/usr/bin/rsync"}
-CURL=${CURL:-"/usr/bin/curl"}
+CURL=${CURL:-"/opt/local/bin/curl"}
 LOFIADM=${LOFIADM:-"/usr/sbin/lofiadm"}
 TAR=${TAR:-"/usr/bin/tar"}
 DD=${DD:-"/usr/bin/dd"}
@@ -176,21 +176,27 @@ round() {
 }
 
 umount_path() {
-	if ${MOUNT} | grep -q "${1}"; then
-		${UMOUNT} "${1}"
+	local _path="${1}"
+
+	if ${MOUNT} | grep -q "${_path} "; then
+		${UMOUNT} "${_path}"
 	fi
 }
 
 lofi_add() {
+	local file="${1}"
+
 	# loopmount file
 	# returns lofi device name
-	${LOFIADM} -a "${1}"
+	${LOFIADM} -a "${file}"
 }
 
 lofi_remove() {
+	local lofi_dev="${1}"
+
 	# remove lofi device if exists
-	if [[ -a "${1}" ]]; then
-		${LOFIADM} -d "${1}"
+	if [[ -a "${lofi_dev}" ]]; then
+		${LOFIADM} -d "${lofi_dev}"
 	fi
 }
 
@@ -866,7 +872,9 @@ _beadm_get_active_be_name() {
 }
 
 _beadm_check_be_exists() {
-	${BEADM} list -H 2>/dev/null | grep -q -- "^${1};"
+	local BE="${1}"
+
+	${BEADM} list -H 2>/dev/null | grep -q -- "^${BE};"
 	return $?
 }
 
@@ -898,23 +906,29 @@ _beadm_get_next_be_name() {
 }
 
 _beadm_umount_be() {
+	local BE="${1}"
+
 	# umount if exists and is mounted
 	if [[ -n "$(${BEADM} list -H | grep "^${1};" | cut -d';' -f4)" ]]; then
-		${BEADM} umount "${1}"
+		${BEADM} umount "${BE}"
 	fi
 }
 
 _beadm_destroy_be() {
-	if ${BEADM} list -H | grep -q "^${1};"; then
-		${BEADM} destroy -Ff "${1}"
+	local BE="${1}"
+
+	if ${BEADM} list -H | grep -q "^${BE};"; then
+		${BEADM} destroy -Ff "${BE}"
 	else
-		die 5 "Cannot destroy BE '${1}'"
+		die 5 "Cannot destroy BE '${BE}'"
 	fi
 }
 
 _beadm_activate_be() {
-	if _beadm_check_be_exists "${1}"; then
-		${BEADM} activate "${1}"
+	local BE="${1}"
+
+	if _beadm_check_be_exists "${BE}"; then
+		${BEADM} activate "${BE}"
 	else
 		die 5 "BE activate: cannot find current BE"
 	fi
