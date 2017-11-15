@@ -224,11 +224,7 @@ function mon_get_alerts(hostname, data) {
   //if (typeof(data) !== 'undefined') {
   //  kwargs['data'] = data;
   //}
-  // This runs in background, so do not run if not connected
-  if (SOCKET.socket.connected) {
-    return esio('get', 'mon_alert_list', args, kwargs);
-  }
-  return null;
+  return esio('get', 'mon_alert_list', args, kwargs);
 }
 
 // Delete image from Node storage
