@@ -2,9 +2,9 @@
  * Universal Zabbix functions (used by mon_alert_list)
  */
 
-var ZAPI = null;
+var MONITORING_ALERTS = null;
 
-function mon_ZAPI(view_name, hostname) {
+function mon_Alerts(view_name, hostname) {
   this.view_name = view_name;
   // TODO: add ability to filter by hostname (and other filters, eg. date)
   this.hostname = hostname;
@@ -42,13 +42,13 @@ function mon_ZAPI(view_name, hostname) {
       hide_loading_screen();
     }
   };
-} // mon_ZAPI: Zabbix alerts!
+} // mon_Alerts: Zabbix alerts!
 
 function alert_update(view_name, hostname, yyyymm, result) {
-  ZAPI.update(yyyymm, result);
+  MONITORING_ALERTS.update(yyyymm, result);
 }
 
 function alert_init(view_name, hostname, yyyymm) {
-  ZAPI = new mon_ZAPI(view_name, hostname);
-  ZAPI.update(yyyymm);
+  MONITORING_ALERTS = new mon_Alerts(view_name, hostname);
+  MONITORING_ALERTS.update(yyyymm);
 }
