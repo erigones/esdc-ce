@@ -8,16 +8,13 @@ sudo: false
 matrix:
   fast_finish: true
 
-addons:
-  apt:
-    sources:
-      - debian-sid 
-    packages:
-      - shellcheck
-
 before_script:
   - pip install flake8 radon
   - npm install -g jshint
+  - wget -O /tmp/shellcheck-latest.linux.x86_64.tar.xz https://storage.googleapis.com/shellcheck/shellcheck-latest.linux.x86_64.tar.xz
+  - tar -xvf /tmp/shellcheck-latest.linux.x86_64.tar.xz -C /tmp
+  - cp /tmp/shellcheck-latest/shellcheck /usr/local/bin/shellcheck
+  - chmod +x /usr/local/bin/shellcheck
   - shellcheck --version
 
 script: ./bin/check.sh
