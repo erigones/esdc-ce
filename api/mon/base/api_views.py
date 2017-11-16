@@ -1,5 +1,5 @@
 from api.api_views import APIView
-from api.mon.base.tasks import mon_template_list, mon_hostgroup_list, mon_action_list
+from api.mon.base.tasks import mon_template_list, mon_hostgroup_list
 from api.task.response import mgmt_task_response
 from que import TG_DC_BOUND, TG_DC_UNBOUND
 
@@ -43,8 +43,4 @@ class MonHostgroupView(_MonBaseView):
     api_view_name = 'mon_hostgroup_list'
     mgmt_task = mon_hostgroup_list
 
-
-class MonActionView(_MonBaseView):
-    api_view_name = 'mon_action_list'
-    mgmt_task = mon_action_list
 

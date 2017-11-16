@@ -6,5 +6,5 @@ from api.mon.vm.tasks import *
 from api.mon.node.tasks import *
 # noinspection PyUnresolvedReferences
 from api.mon.alerting.tasks import *
-
-
+# noinspection PyUnresolvedReferences
+from api.mon.alerting.action.tasks import *

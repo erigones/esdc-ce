@@ -73,10 +73,3 @@ def mon_node_hostgroup_list(request, data=None):
     to be a default DC. Used by the GUI to display a list of hostgroups suitable for a compute node.
     """
     return MonHostgroupView(request, data, dc_bound=False).get()
-
-
-@api_view(('GET',))
-@request_data(permissions=(IsAdmin,))
-@setting_required('MON_ZABBIX_ENABLED')
-def mon_action_list(request, data=None):
-    return MonActionView(request, data).get()

@@ -11,7 +11,7 @@ from que.internal import InternalTask
 from que.mgmt import MgmtTask
 from vms.models import Dc
 
-__all__ = ('mon_clear_zabbix_cache', 'mon_template_list', 'mon_hostgroup_list', 'mon_action_list')
+__all__ = ('mon_clear_zabbix_cache', 'mon_template_list', 'mon_hostgroup_list')
 
 logger = get_task_logger(__name__)
 
@@ -87,26 +87,4 @@ def mon_hostgroup_list(task_id, dc_id, **kwargs):
             'id': t['groupid'],
         }
         for t in zabbix_hostgroups
-    ]
-
-
-# noinspection PyUnusedLocal
-@cq.task(name='api.mon.base.tasks.mon_action_list', base=MgmtTask)
-@mgmt_task()
-def mon_action_list(task_id, dc_id, **kwargs):
-
-    dc = Dc.objects.get_by_id(int(dc_id))
-
-    try:
-        zabbix_actions = get_monitoring(dc).action_list()
-    except MonitoringError as exc:
-        raise MgmtTaskException(text_type(exc))
-
-    return [
-        {
-            'name': t.name,
-            'id': t.zabbix_id,
-            # ... TODO fill
-        }
-        for t in zabbix_actions
     ]
