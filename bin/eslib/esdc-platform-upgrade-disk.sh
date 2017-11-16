@@ -60,10 +60,11 @@ fi
 if [[ "${PLATFORM_VER}" =~ ^v[0-9]+\.[0-9]+ ]]; then
 	printmsg "ESDC version given, translating to platform version"
 	# escape dots in version string and remove "v" from beginning
-	search_version="$(echo ${PLATFORM_VER#v} | ${SED} 's/\./\\./g')"
+	search_version="$(echo "${PLATFORM_VER#v}" | ${SED} 's/\./\\./g')"
 	pi_version=""
 
 	printmsg "Downloading platform version list"
+	# shellcheck disable=SC2086
 	PLATFORM_MAP="$(${CURL} ${CURL_QUIET} ${CURL_DEFAULT_OPTS} "${PLATFORM_VERSION_MAP_URL}")"
 
 	if [[ -z "${PLATFORM_MAP}" ]] || ! echo "${PLATFORM_MAP}" | ${JSON} --validate; then

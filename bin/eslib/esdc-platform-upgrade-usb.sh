@@ -56,7 +56,7 @@ cleanup() {
 
 # *** GLOBALS ***
 
-NEW_USB_VER="${ESDC_VER/v}"
+NEW_USB_VER="${ESDC_VER#v}"
 UPG_DIR="${UPGRADE_DIR:-"/opt/upgrade"}"
 FINISHED_SUCCESSFULLY=0
 
