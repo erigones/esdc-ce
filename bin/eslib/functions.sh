@@ -502,7 +502,7 @@ _zfs_snap_vm_umount() {
 
 	local snapshot_mountpoint="/${zfs_filesystem}/root/${SNAPSHOT_MOUNT_DIR}/${snapshot_name}"
 
-	if ${MOUNT} | grep -q "${snapshot_mountpoint}"; then
+	if ${MOUNT} | grep -q "${snapshot_mountpoint} "; then
 		${UMOUNT} "${snapshot_mountpoint}" && rmdir "${snapshot_mountpoint}"
 		return $?
 	fi
