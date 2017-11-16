@@ -19,20 +19,20 @@ if [[ -z "${ESDC_VER}" ]]; then
 	exit 1
 fi
 
-if ! [[ "${ESDC_VER}" =~ ^v[0-9]\.[0-9]\.[0-9]$ ]]; then
+if ! [[ "${ESDC_VER}" =~ ^v[0-9]+\.[0-9]+ ]]; then
 	die 2 "Unknown format of Danube Cloud version: ${ESDC_VER}"
 fi
 
 # process additional arguments
-# curl: 15s conn T/O; allow redirects; 1000s max duration
-CURL_DEFAULT_OPTS="--connect-timeout 15 -L --max-time 3600"
-CURL_OPTS="-s"
+# curl: 15s conn T/O; allow redirects; 1000s max duration, fail on 404
+CURL_DEFAULT_OPTS="--connect-timeout 15 -L --max-time 3600 -f"
+CURL_QUIET="-s"
 FORCE="0"
 shift
 while [[ ${#} -gt 0 ]]; do
 	case "${1}" in
 		"-v")
-			CURL_OPTS=""
+			CURL_QUIET=""
 			;;
 		"-f")
 			FORCE="1"
@@ -91,21 +91,23 @@ fi
 
 umount_usb_key
 
-printmsg "Downloading new platform"
+printmsg "Downloading new USB image"
 ESDC_IMG="${WANTED_USB_IMG_VARIANT}${NEW_USB_VER}.img"
 ESDC_IMG_FULL="${UPG_DIR}/${ESDC_IMG}"
 ESDC_DOWNLOAD_URL="https://download.erigones.org/esdc/usb/stable/${ESDC_IMG}.gz"
 
 trap cleanup EXIT
 
+printmsg "Download link: ${ESDC_DOWNLOAD_URL}"
 mkdir -p "${UPG_DIR}"
 # shellcheck disable=SC2086
-${CURL} ${CURL_OPTS} ${CURL_DEFAULT_OPTS} -o "${ESDC_IMG_FULL}.gz" "${ESDC_DOWNLOAD_URL}"
-printmsg "Unpacking new platform"
+${CURL} ${CURL_QUIET} ${CURL_DEFAULT_OPTS} -o "${ESDC_IMG_FULL}.gz" "${ESDC_DOWNLOAD_URL}"
+
+printmsg "Unpacking new USB image"
 ${GZIP} -d "${ESDC_IMG_FULL}.gz"
 
 # start upgrade
-printmsg "Writing new platform image to the USB"
+printmsg "Writing new image to the USB"
 # change trailing p1 for p0 (c1t1d0p1 -> c1t1d0p0)
 ${DD} if="${ESDC_IMG_FULL}" of="${USB_DEV/p1*}p0" bs=16M
 

@@ -872,63 +872,65 @@ _beadm_get_active_be_name() {
 }
 
 _beadm_check_be_exists() {
-	local BE="${1}"
+	local be="${1}"
 
-	${BEADM} list -H 2>/dev/null | grep -q -- "^${BE};"
-	return $?
+	${BEADM} list -H 2>/dev/null | grep -q -- "^${be};"
 }
 
 _beadm_get_next_be_name() {
-	CURR_BE="$(_beadm_get_current_be_name)"
-	CURR_BE_NUMBER=
-	if [[ -z "$CURR_BE" ]]; then
+	local curr_be="$(_beadm_get_current_be_name)"
+	local curr_be_number=
+	local curr_be_basename=
+	local next_be_number=
+
+	if [[ -z "$curr_be" ]]; then
 		die 5 "Cannot find current BE"
-	elif [[ "$CURR_BE" =~ -[0-9]+$ ]]; then
+	elif [[ "$curr_be" =~ -[0-9]+$ ]]; then
 		# the BE name ends with a number
-		CURR_BE_NUMBER="$(echo "${CURR_BE}" | cut -d- -f2)"
-		CURR_BE_BASENAME="${CURR_BE/-[0-9]*}"
+		curr_be_number="$(echo "${curr_be}" | cut -d- -f2)"
+		curr_be_basename="${curr_be/-[0-9]*}"
 	else 
 		# the BE name does not end with a number
 		# (will add "-1" to the end)
-		CURR_BE_NUMBER=0
-		CURR_BE_BASENAME="${CURR_BE}"
+		curr_be_number=0
+		curr_be_basename="${curr_be}"
 	fi
 
-	# Increment CURR_BE_NUMBER and see if it already exists.
+	# Increment $curr_be_number and see if it already exists.
 	# End when non-existent (=new) BE name is found.
-	NEXT_BE_NUMBER=$(expr ${CURR_BE_NUMBER} + 1)
-	while _beadm_check_be_exists "${CURR_BE_BASENAME}-${NEXT_BE_NUMBER}"; do
-		NEXT_BE_NUMBER=$(expr ${NEXT_BE_NUMBER} + 1)
+	next_be_number=$(expr ${curr_be_number} + 1)
+	while _beadm_check_be_exists "${curr_be_basename}-${next_be_number}"; do
+		next_be_number=$(expr ${next_be_number} + 1)
 	done
 	
 	# return next BE name
-	echo "${CURR_BE_BASENAME}-${NEXT_BE_NUMBER}"
+	echo "${curr_be_basename}-${next_be_number}"
 }
 
 _beadm_umount_be() {
-	local BE="${1}"
+	local be="${1}"
 
 	# umount if exists and is mounted
 	if [[ -n "$(${BEADM} list -H | grep "^${1};" | cut -d';' -f4)" ]]; then
-		${BEADM} umount "${BE}"
+		${BEADM} umount "${be}"
 	fi
 }
 
 _beadm_destroy_be() {
-	local BE="${1}"
+	local be="${1}"
 
-	if ${BEADM} list -H | grep -q "^${BE};"; then
-		${BEADM} destroy -Ff "${BE}"
+	if ${BEADM} list -H | grep -q "^${be};"; then
+		${BEADM} destroy -Ff "${be}"
 	else
-		die 5 "Cannot destroy BE '${BE}'"
+		die 5 "Cannot destroy BE '${be}'"
 	fi
 }
 
 _beadm_activate_be() {
-	local BE="${1}"
+	local be="${1}"
 
-	if _beadm_check_be_exists "${BE}"; then
-		${BEADM} activate "${BE}"
+	if _beadm_check_be_exists "${be}"; then
+		${BEADM} activate "${be}"
 	else
 		die 5 "BE activate: cannot find current BE"
 	fi
@@ -957,16 +959,15 @@ mount_usb_key() {
 		return 0
 	fi
 
-	local ALLDISKS=`/usr/bin/disklist -a`
-	local USBMNT="$(_usbkey_get_mountpoint)"
+	local alldisks=`/usr/bin/disklist -a`
+	local usbmnt="$(_usbkey_get_mountpoint)"
 
-	mkdir -p "${USBMNT}"
-	for key in ${ALLDISKS}; do
+	mkdir -p "${usbmnt}"
+	for key in ${alldisks}; do
 		if [[ "$(${FSTYP} /dev/dsk/${key}p1 2> /dev/null)" == 'pcfs' ]]; then
-			${MOUNT} -F pcfs -o foldcase,noatime /dev/dsk/${key}p1 ${USBMNT};
-			if [[ $? == "0" ]]; then
-				if [[ ! -f ${USBMNT}/.joyliveusb ]]; then
-					${UMOUNT} ${USBMNT};
+			if ${MOUNT} -F pcfs -o foldcase,noatime /dev/dsk/${key}p1 ${usbmnt}; then
+				if [[ ! -f ${usbmnt}/.joyliveusb ]]; then
+					${UMOUNT} ${usbmnt}
 				else
 					break
 				fi
@@ -984,22 +985,22 @@ mount_usb_key() {
 
 # return device name if mounted or nothing if not mounted
 _usbkey_get_mounted_path() {
-	local USBMNT="$(_usbkey_get_mountpoint)"
-	${AWK} '{if($2 == "'${USBMNT}'") {print $1}}' /etc/mnttab
+	local usbmnt="$(_usbkey_get_mountpoint)"
+	${AWK} '{if($2 == "'${usbmnt}'") {print $1}}' /etc/mnttab
 }
 
 _usbkey_get_device() {
-	local USB_DEV="$(_usbkey_get_mounted_path)"
+	local usb_dev="$(_usbkey_get_mounted_path)"
 
-	if [[ -z "${USB_DEV}" ]]; then
+	if [[ -z "${usb_dev}" ]]; then
 		# USB key is not mounted
 		# mount it and get the dev again
 		mount_usb_key
-		USB_DEV="$(_usbkey_get_mounted_path)"
-		umount "${USB_DEV}"
+		usb_dev="$(_usbkey_get_mounted_path)"
+		umount "${usb_dev}"
 	fi
 
-	echo "${USB_DEV}"
+	echo "${usb_dev}"
 }
 
 umount_usb_key() {

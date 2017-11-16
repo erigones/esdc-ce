@@ -24,10 +24,10 @@ fi
 
 
 # default arguments
-# curl: 15s conn T/O; allow redirects; 1000s max duration
 PLATFORM_VERSION_MAP_URL="https://download.erigones.org/esdc/factory/platform/esdc-version-map.json"
-CURL_DEFAULT_OPTS="--connect-timeout 15 -L --max-time 1000"
-CURL_OPTS="-s"
+# curl: 15s conn T/O; allow redirects; 1000s max duration, fail on 404
+CURL_DEFAULT_OPTS="--connect-timeout 15 -L --max-time 1000 -f"
+CURL_QUIET="-s"
 KEEP_SMF_DB=0
 FORCE="0"
 
@@ -39,7 +39,7 @@ while [[ ${#} -gt 0 ]]; do
 			KEEP_SMF_DB=1
 			;;
 		"-v")
-			CURL_OPTS=""
+			CURL_QUIET=""
 			;;
 		"-f")
 			FORCE="1"
@@ -64,7 +64,7 @@ if [[ "${PLATFORM_VER}" =~ ^v[0-9]+\.[0-9]+ ]]; then
 	pi_version=""
 
 	printmsg "Downloading platform version list"
-	PLATFORM_MAP="$(${CURL} ${CURL_OPTS} ${CURL_DEFAULT_OPTS} "${PLATFORM_VERSION_MAP_URL}")"
+	PLATFORM_MAP="$(${CURL} ${CURL_QUIET} ${CURL_DEFAULT_OPTS} "${PLATFORM_VERSION_MAP_URL}")"
 
 	if [[ -z "${PLATFORM_MAP}" ]] || ! echo "${PLATFORM_MAP}" | ${JSON} --validate; then
 		die 3 "Could not download a valid platform map from ${PLATFORM_VERSION_MAP_URL}"
@@ -162,7 +162,7 @@ fi
 # start download
 printmsg "Downloading the new platform"
 # shellcheck disable=SC2086
-${CURL} ${CURL_OPTS} ${CURL_DEFAULT_OPTS} -o "${PLATFORM_FILE}" "${PLATFORM_DOWNLOAD_URL}"
+${CURL} ${CURL_QUIET} ${CURL_DEFAULT_OPTS} -o "${PLATFORM_FILE}" "${PLATFORM_DOWNLOAD_URL}"
 printmsg "Extracting the new platform"
 ${TAR} zxf "${PLATFORM_FILE}" -C "${PLATFORM_DIR}"
 
