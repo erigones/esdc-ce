@@ -1,6 +1,6 @@
 from api.decorators import api_view, request_data, request_data_defaultdc, setting_required
 from api.permissions import IsAdmin, IsSuperAdmin
-from api.mon.base.api_views import MonTemplateView, MonHostgroupView
+from api.mon.base.api_views import MonTemplateView, MonHostgroupView, MonActionView
 
 __all__ = ('mon_template_list', 'mon_node_template_list', 'mon_hostgroup_list', 'mon_node_hostgroup_list')
 
@@ -73,3 +73,10 @@ def mon_node_hostgroup_list(request, data=None):
     to be a default DC. Used by the GUI to display a list of hostgroups suitable for a compute node.
     """
     return MonHostgroupView(request, data, dc_bound=False).get()
+
+
+@api_view(('GET',))
+@request_data(permissions=(IsAdmin,))
+@setting_required('MON_ZABBIX_ENABLED')
+def mon_action_list(request, data=None):
+    return MonActionView(request, data).get()
