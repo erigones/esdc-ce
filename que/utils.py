@@ -162,7 +162,7 @@ def is_dummy_task(task_id):
     try:
         user_id = user_id_from_task_id(task_id)
         return task_id.split('-')[1] == md5(user_id).hexdigest()[-8:]
-    except:
+    except Exception:
         pass
 
     return False
@@ -196,7 +196,7 @@ def get_result(ar_or_tid):
     # noinspection PyBroadException
     try:
         result = ar.result
-    except:
+    except Exception:
         return 'Unknown error'
 
     if type(result).__name__.endswith('TaskException'):
@@ -204,7 +204,7 @@ def get_result(ar_or_tid):
         # noinspection PyBroadException
         try:
             result = literal_eval(result.args[0])
-        except:
+        except Exception:
             return 'Unknown failure'
 
     return result
@@ -218,7 +218,7 @@ def follow_callback(ar):
     # noinspection PyBroadException
     try:
         ar = follow_callback(get_result(ar)['meta']['callback'])
-    except:
+    except Exception:
         pass
     return ar
 
@@ -230,7 +230,7 @@ def get_callback(task_id):
     # noinspection PyBroadException
     try:
         return get_result(task_id)['meta']['callback']
-    except:
+    except Exception:
         return False
 
 
@@ -241,7 +241,7 @@ def is_callback(task_id):
     # noinspection PyBroadException
     try:
         return get_result(task_id)['meta']['caller']
-    except:
+    except Exception:
         return False
 
 
@@ -252,7 +252,7 @@ def is_logtask(task_id):
     # noinspection PyBroadException
     try:
         return get_result(task_id)['meta']['cb_name'] == LOGTASK
-    except:
+    except Exception:
         return False
 
 

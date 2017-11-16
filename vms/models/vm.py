@@ -867,7 +867,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
             if not kvm and 'model' in nic:
                 del nics[i]['model']
             # Remove if empty
-            for e, _ in self._NICS_REMOVE_EMPTY:
+            for e, __ in self._NICS_REMOVE_EMPTY:
                 if e in nic and not nic[e]:
                     del nics[i][e]
 

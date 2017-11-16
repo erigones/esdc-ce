@@ -292,6 +292,7 @@ update_manifest() {
 	local json_files="{\"files\": [${json_file}]}"
 	local -i ec
 
+	# shellcheck disable=SC1117
 	MANIFEST=$(echo -e "${MANIFEST}\n${json_files}" | json --merge)
 	ec=${?}
 
