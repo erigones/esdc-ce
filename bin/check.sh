@@ -227,6 +227,7 @@ check_python() {
 summary() {
 	local rc
 
+	# shellcheck disable=SC1117
 	echo -e "\n****************************************"
 	if [[ "${ERRORS}" -eq 0 ]]; then
 		rc=0
@@ -235,6 +236,7 @@ summary() {
 		rc=1
 		echo -e "*** Found ${RED}${ERRORS}${NC} errors in ${RED}${ERROR_FILES}${NC} file(s)"
 	fi
+	# shellcheck disable=SC1117
 	echo -e "****************************************\n"
 
 	return ${rc}
