@@ -1,10 +1,11 @@
 #!/bin/bash
 
 if [ -f /opt/rh/python27/enable ]; then
+	# shellcheck disable=SC1091
 	. /opt/rh/python27/enable
 fi
 
-MAINDIR="$(cd "$(dirname "$0")/.." ; pwd -P)"
+MAINDIR="$(cd "$(dirname "$0")/.." || exit 64 ; pwd -P)"
 ERIGONES_HOME=${ERIGONES_HOME:-"${MAINDIR}"}
 export ERIGONES_HOME
 ENVS="${ERIGONES_HOME}/envs"
@@ -14,7 +15,6 @@ ACTIVATE="${ENVS}/bin/activate"
 PYTHONPATH="${ERIGONES_HOME}:${ERIGONES_HOME}/bin:${ERIGONES_HOME}/envs/lib/python2.7/site-packages:${PYTHONPATH}"
 export PYTHONPATH
 MANAGEPY="${ERIGONES_HOME}/bin/manage.py"
-ARGS=()
 ACTION="$1"
 
 init_envs() {
@@ -33,6 +33,7 @@ activate_envs() {
 		echo "Perhaps, you have to initialize it first with \"${0} init_envs\"." >&2
 		exit 1
 	fi
+	# shellcheck disable=SC1090
 	source "${ACTIVATE}"
 }
 

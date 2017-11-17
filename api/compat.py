@@ -35,9 +35,9 @@ from django.utils.functional import Promise
 
 # urlparse compat import (Required because it changed in python 3.x)
 try:
-    from urllib import parse as urlparse
+    from urllib import parse as urlparse  # noqa: F401
 except ImportError:
-    import urlparse
+    import urlparse  # noqa: F401
 
 # Try to import PIL in either of the two ways it can end up installed.
 try:

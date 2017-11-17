@@ -10,7 +10,7 @@ from gui.dc.forms import DcSwitch
 
 # Required for urls.py
 # noinspection PyUnresolvedReferences
-from gui.dc.base.views import dc_list, dc_form
+from gui.dc.base.views import dc_list, dc_form  # noqa: F401
 # The main DC views are in the base folder
 # The other views here are mostly DC related helper views
 

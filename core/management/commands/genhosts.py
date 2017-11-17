@@ -52,4 +52,3 @@ class Command(DanubeCloudCommand):
                     'ansible_python_interpreter=/opt/local/bin/python'
                     ]
                 print(' '.join(line))
-

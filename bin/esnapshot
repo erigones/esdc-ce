@@ -10,6 +10,7 @@ ERIGONES_HOME=${ERIGONES_HOME:-"/opt/erigones"}
 #SELF="${ERIGONES_HOME}/bin/esnapshot"
 PROG="$(basename "$0")"
 
+# shellcheck disable=SC1090
 . "${ERIGONES_HOME}"/bin/eslib/functions.sh
 
 declare -ri OK=0
@@ -62,7 +63,7 @@ main() {
 			echo "Use esbackup snap-restore" >&2
 			exit ${ERR_INPUT}
 			;;
-        -h|--help)
+		-h|--help)
 			usage
 			exit ${OK}
 			;;

@@ -13,6 +13,7 @@ def get_services():
     """
     Returns list of SMS service providers which can be used as choices form field parameter.
     """
+    # noinspection PyShadowingBuiltins
     return [(service, module.PROVIDER_NAME) for service, module in SMS_SERVICES]
 
 

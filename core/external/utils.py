@@ -33,6 +33,7 @@ def collect_third_party_apps_and_settings(settings):
         for _, name, is_pkg in pkgutil.iter_modules([apps_dir]):
             if not is_pkg:
                 SETTINGS_THIRD_PARTY_APPS.append(name.replace('_', '.'))
+                # noinspection PyShadowingBuiltins
                 module = import_module('core.external.apps.' + name)
 
                 for setting in dir(module):
@@ -89,12 +90,14 @@ def collect_third_party_modules():
         DEFAULT_DC_MODULES_EXTENDED = []
 
         for third_party_app, app_dc_settings in get_third_party_apps_serializer_settings():
+            # noinspection PyShadowingBuiltins
             for module, field_type in getattr(app_dc_settings, 'DC_MODULES', ()):
                 DC_MODULES_EXTENDED.append((module, field_type))
                 DC_MODULES.append(module)
                 DEFAULT_DC_MODULES_EXTENDED.append((module, field_type))
                 DEFAULT_DC_MODULES.append(module)
 
+            # noinspection PyShadowingBuiltins
             for module, field_type in getattr(app_dc_settings, 'DEFAULT_DC_MODULES', ()):
                 DEFAULT_DC_MODULES_EXTENDED.append((module, field_type))
                 DEFAULT_DC_MODULES.append(module)

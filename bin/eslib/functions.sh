@@ -312,6 +312,7 @@ _zfs_set_dataset_property_children() {
 	local value="$3"
 	local ds
 
+	# shellcheck disable=SC2162
 	${ZFS} list -H -p -o name -t filesystem,volume -r "${dataset}" | while read ds; do
 		[[ "${ds}" == "${dataset}" ]] && continue
 
@@ -392,6 +393,7 @@ _zfs_rename_children() {
 	local ds
 	local ds_child
 
+	# shellcheck disable=SC2162
 	${ZFS} list -H -p -o name -t filesystem,volume -r "${src_dataset}" | while read ds; do
 		[[ "${ds}" == "${src_dataset}" ]] && continue
 
@@ -400,6 +402,7 @@ _zfs_rename_children() {
 		if [[ -n "${ds_child}" ]]; then
 			_zfs_dataset_rename "${ds}" "${dst_dataset}${ds_child}"
 
+			# shellcheck disable=SC2181
 			if [[ $? -eq 0 && "${set_zoned}" == "true" ]]; then
 				_zfs_set_dataset_property "${dst_dataset}${ds_child}" zoned on
 			fi
@@ -741,6 +744,7 @@ _parse_service_name() {
 
 _service_file_save() {
 	local fmri="$1"
+	# shellcheck disable=SC2155
 	local service="$(_parse_service_name "${fmri}")"
 
 	_service_export "${fmri}" > "${SERVICE_DIR}/${service}.xml"
@@ -748,6 +752,7 @@ _service_file_save() {
 
 _service_file_remove() {
 	local fmri="$1"
+	# shellcheck disable=SC2155
 	local service="$(_parse_service_name "${fmri}")"
 
 	rm -f "${SERVICE_DIR}/${service}.xml"

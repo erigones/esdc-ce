@@ -65,4 +65,3 @@ class GraphItems(dict):
         items_search['sortorder'] = item_id  # 0 - ASC, 1 - DESC
 
         return items_search
-

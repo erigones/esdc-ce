@@ -1,0 +1,19 @@
+language: python
+
+python:
+  - '2.7'
+
+sudo: false
+
+matrix:
+  fast_finish: true
+
+before_script:
+  - pip install flake8 radon
+  - npm install -g jshint
+  - wget -O /tmp/shellcheck-latest.linux.x86_64.tar.xz https://storage.googleapis.com/shellcheck/shellcheck-latest.linux.x86_64.tar.xz
+  - tar -xvf /tmp/shellcheck-latest.linux.x86_64.tar.xz -C /tmp
+  - export PATH=/tmp/shellcheck-latest:$PATH
+  - shellcheck --version
+
+script: ./bin/check.sh

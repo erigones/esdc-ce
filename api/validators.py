@@ -23,7 +23,7 @@ RE_PEM_KEY_BEGIN = re.compile(r'^-----BEGIN( | \w+ )PRIVATE KEY-----', re.MULTIL
 RE_PEM_KEY_END = re.compile(r'^-----END( | \w+ )PRIVATE KEY-----', re.MULTILINE)
 RE_PEM_CRT_BEGIN = re.compile(r'^-----BEGIN CERTIFICATE-----', re.MULTILINE)
 RE_PEM_CRT_END = re.compile(r'^-----END CERTIFICATE-----', re.MULTILINE)
-RE_PLACEHOLDER = re.compile(r'\{(.*?)\}+', re.MULTILINE)
+RE_PLACEHOLDER = re.compile(r'{(.*?)}+', re.MULTILINE)
 
 
 def validate_owner(obj, new_owner, model_name):
@@ -77,7 +77,7 @@ def validate_ssh_key(value):
             raise ValueError
 
         fingerprint = UserSSHKey.get_fingerprint(value)
-    except:
+    except Exception:
         raise ValidationError(_('Invalid SSH public key format.'))
 
     return fingerprint

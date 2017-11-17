@@ -1,10 +1,11 @@
 #!/bin/bash
 
 if [ -f /opt/rh/python27/enable ]; then
+	# shellcheck disable=SC1091
 	. /opt/rh/python27/enable
 fi
 
-MAINDIR="$(cd "$(dirname "$0")/.." ; pwd -P)"
+MAINDIR="$(cd "$(dirname "$0")/.." || exit 64; pwd -P)"
 ERIGONES_HOME=${ERIGONES_HOME:-"${MAINDIR}"}
 export ERIGONES_HOME
 ENVS="${ERIGONES_HOME}/envs"
@@ -15,8 +16,10 @@ APP="que.erigonesd:cq"
 NODENAME=$(hostname)
 
 if [ -d "${ENVS}" ]; then
+	# shellcheck disable=SC1090
 	. "${ENVS}/bin/activate"
 else
+	# shellcheck disable=SC1090
 	. "${ERIGONES_HOME}/envs/bin/activate"
 fi
 
@@ -47,12 +50,15 @@ CMD="${1}"
 case "${CMD}" in
 	"beat")
 		QTYPE="beat"
+		# shellcheck disable=SC2124
 		OPTS="${@} -A ${APP}"
 	;;
 	"worker"|"multi")
+		# shellcheck disable=SC2124
 		OPTS="${@} -A ${APP} -Q ${QUEUE}"
 	;;
 	*)
+		# shellcheck disable=SC2124
 		OPTS="${@}"
 esac
 
@@ -62,5 +68,6 @@ else
 	EXEC="${ERIGONES_HOME}/que/erigonesd.py"
 fi
 
-cd "${ERIGONES_HOME}"
+cd "${ERIGONES_HOME}" || exit 64
+# shellcheck disable=SC2086
 exec "${EXEC}" ${OPTS}

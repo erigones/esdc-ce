@@ -27,6 +27,7 @@ forwarded_allow_ips = '127.0.0.1'
 graceful_timeout = 10
 
 
+# noinspection PyAbstractClass
 class ESDCSocketIOServer(SocketIOServer):
     def __init__(self, *args, **kwargs):
         kwargs['transports'] = ['websocket', 'xhr-polling']

@@ -42,6 +42,7 @@ def get_backups(request, bkp_filter, data):
 def output_extended_backup_count(request, data):
     """Fetch extended boolean from GET request and prepare annotation dict"""
     if request.method == 'GET' and data and data.get('extended', False):
+        # noinspection SqlDialectInspection,SqlNoDataSourceInspection
         return {'backups': 'SELECT COUNT(*) FROM "vms_backup" WHERE '
                            '"vms_backup"."define_id" = "vms_backupdefine"."id"'}
     else:
@@ -53,7 +54,7 @@ def filter_backup_define(query_filter, data):
     return filter_snap_define(query_filter, data)
 
 
-def get_backup_cmd(action, bkp, bkps=None, define=None, zfs_filesystem=None, fsfreeze=None, vm=None):
+def get_backup_cmd(action, bkp, bkps=None, define=None, zfs_filesystem=None, fsfreeze=None, vm=None):  # noqa: R701
     """Return backup command suitable for execute()"""
     if bkp.type == Backup.DATASET:
         action_prefix = 'ds'
