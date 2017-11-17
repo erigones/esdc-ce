@@ -187,7 +187,7 @@ class TelPrefixInput(widgets.MultiWidget):
             # noinspection PyBroadException
             try:
                 num = phonenumbers.parse(value)
-            except:
+            except Exception:
                 return value.split(' ', 1)
             else:
                 return ['+' + str(num.country_code), str(num.national_number)]

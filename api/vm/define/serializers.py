@@ -430,7 +430,7 @@ class VmDefineSerializer(VmBaseSerializer):
 
         return attrs
 
-    def validate_node_resources(self, attrs):
+    def validate_node_resources(self, attrs):  # noqa: R701
         vm = self.object
         dc = self.request.dc
         node = None
@@ -507,7 +507,7 @@ class VmDefineSerializer(VmBaseSerializer):
             else:
                 self.update_node_resources = True
 
-    def validate(self, attrs):
+    def validate(self, attrs):  # noqa: R701
         vm = self.object
         dc_settings = self.dc_settings
 
@@ -719,7 +719,7 @@ class _VmDefineDiskSerializer(s.Serializer):
 
         return attrs
 
-    def validate_image(self, attrs, source):
+    def validate_image(self, attrs, source):  # noqa: R701
         try:
             value = attrs[source]
         except KeyError:
@@ -812,7 +812,7 @@ class _VmDefineDiskSerializer(s.Serializer):
             else:
                 self._errors['size'] = s.ErrorList([_('Not enough free disk space on node.')])
 
-    def validate(self, attrs):
+    def validate(self, attrs):  # noqa: R701
         try:
             size = attrs['size']
             size_change = True
@@ -1030,7 +1030,7 @@ class VmDefineNicSerializer(s.Serializer):
         else:
             del self.fields['model']
 
-    def fix_before(self, data):
+    def fix_before(self, data):  # noqa: R701
         """
         Rewrite nic data from json to serializer compatible object.
         """
@@ -1278,7 +1278,7 @@ class VmDefineNicSerializer(s.Serializer):
 
         return None
 
-    def validate(self, attrs):
+    def validate(self, attrs):  # noqa: R701
         net = self._net
         assert net
 
@@ -1567,7 +1567,7 @@ class VmDefineNicSerializer(s.Serializer):
         else:
             cls._create_vm_ip_association(vm, ip, many=many)
 
-    def save_ip(self, task_id, delete=False, update=False):
+    def save_ip(self, task_id, delete=False, update=False):  # noqa: R701
         vm = self.vm
         ip = self._ip
         ip_old = self._ip_old

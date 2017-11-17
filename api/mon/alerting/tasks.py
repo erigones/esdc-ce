@@ -14,7 +14,7 @@ __all__ = ('mon_user_group_changed', 'mon_user_changed')
 logger = get_task_logger(__name__)
 
 
-def _user_group_changed(group_name, dc_name):
+def _user_group_changed(group_name, dc_name):  # noqa: R701
     if dc_name and group_name:  # Particular group under dc changed
         dc = Dc.objects.get_by_name(dc_name)
         zabbix = get_monitoring(dc)

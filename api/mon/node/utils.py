@@ -32,7 +32,7 @@ def parse_yyyymm(yyyymm, min_value):
     try:
         yyyymm = str(yyyymm)
         since = datetime(year=int(yyyymm[:4]), month=int(yyyymm[4:]), day=1)
-    except:
+    except Exception:
         raise InvalidInput('Invalid yyyymm')
 
     now = datetime.now()

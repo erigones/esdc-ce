@@ -104,6 +104,7 @@ class GroupAdmin(admin.ModelAdmin):
     )
     inlines = (GroupUsersInline,)
 
+
 admin.site.register(Role, GroupAdmin)
 
 
@@ -116,6 +117,7 @@ class PermissionAdmin(admin.ModelAdmin):
     model = Permission
     verbose_name_plural = _('permission')
     inlines = (PermissionGroupsInline,)
+
 
 admin.site.register(Permission, PermissionAdmin)
 

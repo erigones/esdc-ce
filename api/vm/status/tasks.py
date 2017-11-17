@@ -183,7 +183,7 @@ def _save_vm_status(task_id, vm, new_state, old_state=None, **kwargs):
     vm_status_changed(task_id, vm, new_state, old_state=old_state, **kwargs)  # calls save()
 
 
-def _vm_status_check(task_id, node_uuid, uuid, state, state_cache=None, vm=None,
+def _vm_status_check(task_id, node_uuid, uuid, state, state_cache=None, vm=None,  # noqa: R701
                      change_time=None, force_change=False, **kwargs):
     """Helper function for checking VM's new/actual state used by following callbacks:
         - vm_status_all_cb

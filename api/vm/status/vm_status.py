@@ -172,7 +172,7 @@ class VmStatus(APIView):
             ser = VmStatusSerializer(vm)
             return SuccessTaskResponse(request, ser.data, vm=vm)
 
-    def put(self):
+    def put(self):  # noqa: R701
         request, vm, action = self.request, self.vm, self.action
 
         # Cannot change status unless the VM is created on node

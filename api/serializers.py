@@ -62,8 +62,8 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 #
 # This helps keep the separation between model fields, form fields, and
 # serializer fields more explicit.
-from api.relations import *
-from api.fields import *
+from api.relations import *  # noqa: F403
+from api.fields import *  # noqa: F403
 from api.fields import is_simple_callable, get_component
 
 
@@ -228,7 +228,7 @@ def _get_declared_fields(bases, attrs):
     """
     fields = [(field_name, attrs.pop(field_name))
               for field_name, obj in list(six.iteritems(attrs))
-              if isinstance(obj, Field)]
+              if isinstance(obj, Field)]  # noqa: F405
     fields.sort(key=lambda x: x[1].creation_counter)
 
     # If this class is subclassing another Serializer, add that Serializer's
@@ -257,7 +257,7 @@ class SerializerOptions(object):
         self.exclude = getattr(meta, 'exclude', ())
 
 
-class BaseSerializer(WritableField):
+class BaseSerializer(WritableField):  # noqa: F405
     """
     This is the Serializer implementation.
     We need to implement it as `BaseSerializer` due to metaclass magic.
@@ -763,30 +763,30 @@ class ModelSerializer(Serializer):
     _options_class = ModelSerializerOptions
 
     field_mapping = {
-        models.AutoField: IntegerField,
-        models.FloatField: FloatField,
-        models.IntegerField: IntegerField,
-        models.PositiveIntegerField: IntegerField,
-        models.SmallIntegerField: IntegerField,
-        models.PositiveSmallIntegerField: IntegerField,
-        models.DateTimeField: DateTimeField,
-        models.DateField: DateField,
-        models.TimeField: TimeField,
-        models.DecimalField: DecimalField,
-        models.EmailField: EmailField,
-        models.CharField: CharField,
-        models.URLField: URLField,
-        models.SlugField: SlugField,
-        models.TextField: CharField,
-        models.CommaSeparatedIntegerField: CharField,
-        models.BooleanField: BooleanField,
-        models.NullBooleanField: BooleanField,
-        models.FileField: FileField,
-        models.ImageField: ImageField,
+        models.AutoField: IntegerField,  # noqa: F405
+        models.FloatField: FloatField,  # noqa: F405
+        models.IntegerField: IntegerField,  # noqa: F405
+        models.PositiveIntegerField: IntegerField,  # noqa: F405
+        models.SmallIntegerField: IntegerField,  # noqa: F405
+        models.PositiveSmallIntegerField: IntegerField,  # noqa: F405
+        models.DateTimeField: DateTimeField,  # noqa: F405
+        models.DateField: DateField,  # noqa: F405
+        models.TimeField: TimeField,  # noqa: F405
+        models.DecimalField: DecimalField,  # noqa: F405
+        models.EmailField: EmailField,  # noqa: F405
+        models.CharField: CharField,  # noqa: F405
+        models.URLField: URLField,  # noqa: F405
+        models.SlugField: SlugField,  # noqa: F405
+        models.TextField: CharField,  # noqa: F405
+        models.CommaSeparatedIntegerField: CharField,  # noqa: F405
+        models.BooleanField: BooleanField,  # noqa: F405
+        models.NullBooleanField: BooleanField,  # noqa: F405
+        models.FileField: FileField,  # noqa: F405
+        models.ImageField: ImageField,  # noqa: F405
     }
 
     # noinspection PyProtectedMember,PyUnresolvedReferences
-    def get_default_fields(self):
+    def get_default_fields(self):  # noqa: R701
         """
         Return all the fields that should be serialized for the model.
         """
@@ -955,7 +955,7 @@ class ModelSerializer(Serializer):
             if model_field.help_text is not None:
                 kwargs['help_text'] = model_field.help_text
 
-        return PrimaryKeyRelatedField(**kwargs)
+        return PrimaryKeyRelatedField(**kwargs)  # noqa: F405
 
     def get_field(self, model_field):
         """
@@ -986,7 +986,7 @@ class ModelSerializer(Serializer):
             kwargs['choices'] = model_field.flatchoices
             if model_field.null:
                 kwargs['empty'] = None
-            return ChoiceField(**kwargs)
+            return ChoiceField(**kwargs)  # noqa: F405
 
         # put this below the ChoiceField because min_value isn't a valid initializer
         if issubclass(model_field.__class__, models.PositiveIntegerField) or\
@@ -1018,7 +1018,7 @@ class ModelSerializer(Serializer):
 
         if serializer_field_class:
             return serializer_field_class(**kwargs)
-        return ModelField(model_field=model_field, **kwargs)
+        return ModelField(model_field=model_field, **kwargs)  # noqa: F405
 
     def get_validation_exclusions(self, instance=None):
         """
@@ -1194,8 +1194,8 @@ class HyperlinkedModelSerializer(ModelSerializer):
     """
     _options_class = HyperlinkedModelSerializerOptions
     _default_view_name = '%(model_name)s-detail'
-    _hyperlink_field_class = HyperlinkedRelatedField
-    _hyperlink_identify_field_class = HyperlinkedIdentityField
+    _hyperlink_field_class = HyperlinkedRelatedField  # noqa: F405
+    _hyperlink_identify_field_class = HyperlinkedIdentityField  # noqa: F405
 
     def get_default_fields(self):
         fields = super(HyperlinkedModelSerializer, self).get_default_fields()
@@ -1296,7 +1296,7 @@ class ForceSerializer(Serializer):
         No force
 
     """
-    force = BooleanField(default=False)
+    force = BooleanField(default=False)  # noqa: F405
 
     def __init__(self, *args, **kwargs):
         self.default_force = bool(kwargs.pop('default', False))
@@ -1387,7 +1387,7 @@ class InstanceSerializer(Serializer):
             if source in attrs:
                 setattr_data = (instance, source, self._normalize(attr, attrs[source]))
 
-                if isinstance(field, RelatedField) and field.many:
+                if isinstance(field, RelatedField) and field.many:  # noqa: F405
                     # field is represents a M2N relation a we have to delay setting the attribute after save
                     # this is mainly because M2N attributes can be set only after the object exists in DB
                     self._delayed_data[attr] = setattr_data
@@ -1442,7 +1442,7 @@ class InstanceSerializer(Serializer):
 class ConditionalDCBoundSerializer(InstanceSerializer):
     """This serializer handles the common logic when a model is being bound to a datacenter."""
     _dc_bound = None
-    dc_bound = BooleanField(source='dc_bound_bool', default=True)
+    dc_bound = BooleanField(source='dc_bound_bool', default=True)  # noqa: F405
 
     def _validate_dc_bound(self, value):
         if value:
