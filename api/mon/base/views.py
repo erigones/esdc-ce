@@ -1,6 +1,6 @@
 from api.decorators import api_view, request_data, request_data_defaultdc, setting_required
 from api.permissions import IsAdmin, IsSuperAdmin
-from api.mon.base.api_views import MonTemplateView, MonHostgroupView, MonActionView
+from api.mon.base.api_views import MonTemplateView, MonHostgroupView
 
 __all__ = ('mon_template_list', 'mon_node_template_list', 'mon_hostgroup_list', 'mon_node_hostgroup_list')
 
