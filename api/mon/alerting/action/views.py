@@ -34,7 +34,7 @@ class ActionView(APIView):
         return
 
     def post(self):
-        ser = self.serializer(data=self.data)
+        ser = self.serializer(data=self.data, name=self.name)
         ser.request = self.request
         if ser.is_valid():
             # push

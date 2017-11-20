@@ -24,11 +24,11 @@ Original event ID: {EVENT.ID}
 class ActionSerializer(s.Serializer):
     hostgroups = s.ArrayField(max_items=16384, default=[], validators=(
                                              RegexValidator(regex=MonitoringBackend.RE_MONITORING_HOSTGROUPS),),
-                              required=True)
+                              )
 
     usergroups = s.ArrayField(max_items=16384, default=[], validators=(
                                              RegexValidator(regex=MonitoringBackend.RE_MONITORING_HOSTGROUPS),),
-                              required=True)
+                              )
 
     message_subject = s.SafeCharField(max_length=65536, default=DEFAULT_ACTION_MESSAGE_SUBJECT)  # TODO initial value zo zabbixu vykopirovat a dat do settings
     message_text = s.SafeCharField(max_length=65536, default=DEFAULT_ACTION_MESSAGE)  # TODO initial value zo zabbixu vykopirovat a dat do settings
