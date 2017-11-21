@@ -1,0 +1,32 @@
+
+This is firewall config directory.
+
+Files from this directory are used to generate
+these config files at boot:
+/etc/ipf/ipf.conf
+/etc/ipf/ipnat.conf
+/etc/ipf/ipf6.conf
+
+It is intended for two things:
+1. restore fw config from a permanent storage at boot
+2. allow splitting the fw config into multiple files
+
+# This directory is searched by the script
+/opt/custom/etc/rc-pre-network.d/010-ipf-restore.sh
+
+The script looks for files starting with the name
+of the respective conf file.
+
+E.g. for output file /etc/ipf/ipf.conf
+it matches either ipf.conf or
+ipf.conf-001, ipf.conf-002, ipf.conf-999, etc.
+(you can use here either a single file or split
+the config into multiple files)
+
+Examples: 
+ipf.conf-005 ipf.conf-010 ...
+ipnat.conf-005 ipnat.conf-010 ...
+ipf6.conf-005 ipf6.conf-010 ...
+
+If no respective matching files exist, the firewall
+config is not touched.

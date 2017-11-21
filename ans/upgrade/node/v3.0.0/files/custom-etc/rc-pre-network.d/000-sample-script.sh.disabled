@@ -1,0 +1,61 @@
+#!/bin/bash
+#
+# This is a sample RC script that can be used as
+# a template for creating custom postboot scripts.
+#
+# There are 3 SMF services for scripts:
+# pre-network: these scripts will be run before network starts
+# pre-vmadmd:  run scripts after network but before start of VMs/zones
+# post-vmadmd: these scripts will be run after all VMs are started
+#          (This does not guarantee that VMs have booted correctly.
+#          If you want to interact with a VM, you have to
+#          implement your own checks and retries for this.)
+#
+# You can find 3 RC directories here:
+# /opt/custom/etc/rc-*.d
+#
+#
+# This script's name must end with ".sh" and it must
+# implement start, stop and refresh methods
+# (at least the dummy ones).
+#
+# During stop command, the scripts are called in reverse order (ls -r).
+#
+
+set -e 
+
+. /lib/svc/share/smf_include.sh
+
+start() {
+    echo "Hello from start method!"
+}
+
+stop() {
+    echo "Hello from stop method!"
+}
+
+refresh() {
+    # an example of error exit
+    echo "I will error now!"
+    exit $SMF_EXIT_ERR_FATAL
+}
+
+
+case "$1" in
+	start)
+		start
+		;;
+	stop)
+		stop
+		;;
+	refresh)
+		#refresh
+		exit $SMF_EXIT_OK
+		;;
+	*)
+		echo "Usage: $0 {start|stop|refresh}"
+		exit $SMF_EXIT_ERR_CONFIG
+esac
+
+exit $SMF_EXIT_OK
+
