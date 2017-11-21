@@ -1,4 +1,4 @@
-from .tasks import mon_all_groups_sync
+from api.mon.alerting.tasks import mon_all_groups_sync
 
 ALERTING_RELATED_SETTINGS = (
     'MON_ZABBIX_MONITORING_ENABLED',
