@@ -1,0 +1,573 @@
+{
+    "zabbix_export": {
+        "date": "2015-12-03T21:45:31Z",
+        "templates": [
+            {
+                "templates": [],
+                "name": "t_svc-erigonesd-mgmt",
+                "macros": [],
+                "items": [
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "%",
+                        "value_type": "0",
+                        "key": "proc.cpu[erigonesd.py beat]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Beat mgmt CPU usage",
+                        "applications": [
+                            {
+                                "name": "Service - Erigonesd task scheduler"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "",
+                        "value_type": "3",
+                        "key": "proc.num[python,,,erigonesd.py beat]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Beat mgmt is running",
+                        "applications": [
+                            {
+                                "name": "Service - Erigonesd task scheduler"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "B",
+                        "value_type": "3",
+                        "key": "proc.rss[erigonesd.py beat]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Beat mgmt used memory",
+                        "applications": [
+                            {
+                                "name": "Service - Erigonesd task scheduler"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "7",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "",
+                        "value_type": "2",
+                        "key": "log[\"/opt/erigones/var/log/mgmt.log\",\"Traceback|CRITICAL|ERROR\"]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Error in $1",
+                        "applications": [
+                            {
+                                "name": "Service - Erigonesd mgmt worker"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "7",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "",
+                        "value_type": "2",
+                        "key": "log[\"/opt/erigones/var/log/erigonesd-beat.log\",\"Traceback|CRITICAL|ERROR\"]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Error in $1",
+                        "applications": [
+                            {
+                                "name": "Service - Erigonesd task scheduler"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "",
+                        "value_type": "3",
+                        "key": "queue.tasks.all",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Number of tasks in all queues on all nodes",
+                        "applications": [
+                            {
+                                "name": "Service - Erigonesd mgmt worker"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "%",
+                        "value_type": "0",
+                        "key": "proc.cpu[erigonesd.py worker]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Queue mgmt CPU usage",
+                        "applications": [
+                            {
+                                "name": "Service - Erigonesd mgmt worker"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "",
+                        "value_type": "3",
+                        "key": "proc.num[python,,,-Q mgmt]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Queue mgmt is running",
+                        "applications": [
+                            {
+                                "name": "Service - Erigonesd mgmt worker"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "B",
+                        "value_type": "3",
+                        "key": "proc.rss[erigonesd.py worker]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Queue mgmt used memory",
+                        "applications": [
+                            {
+                                "name": "Service - Erigonesd mgmt worker"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "120",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "",
+                        "value_type": "3",
+                        "key": "queue.ping[mgmt,{HOST.NAME}]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "Queue ping - $1",
+                        "applications": [
+                            {
+                                "name": "Service - Erigonesd mgmt worker"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    }
+                ],
+                "screens": [],
+                "applications": [
+                    {
+                        "name": "Service - Erigonesd mgmt worker"
+                    },
+                    {
+                        "name": "Service - Erigonesd task scheduler"
+                    }
+                ],
+                "discovery_rules": [],
+                "groups": [
+                    {
+                        "name": "Templates"
+                    }
+                ],
+                "template": "t_svc-erigonesd-mgmt"
+            }
+        ],
+        "version": "2.0",
+        "groups": [
+            {
+                "name": "Templates"
+            }
+        ],
+        "triggers": [
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "5",
+                "dependencies": [
+                    {
+                        "expression": "{t_zabbix-agent:agent.ping.nodata(3m)}=1",
+                        "name": "Zabbix agent on {HOST.NAME} is unreachable for 3 minutes"
+                    }
+                ],
+                "expression": "{t_svc-erigonesd-mgmt:proc.num[python,,,erigonesd.py beat].max(3m)}<1",
+                "name": "Beat mgmt is not running"
+            },
+            {
+                "status": "1",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "4",
+                "dependencies": [
+                    {
+                        "expression": "{t_zabbix-agent:agent.ping.nodata(3m)}=1",
+                        "name": "Zabbix agent on {HOST.NAME} is unreachable for 3 minutes"
+                    }
+                ],
+                "expression": "{t_svc-erigonesd-mgmt:log[\"/opt/erigones/var/log/erigonesd-beat.log\",\"Traceback|CRITICAL|ERROR\"].nodata(5m)}=0",
+                "name": "Error in /opt/erigones/var/log/erigonesd-beat.log"
+            },
+            {
+                "status": "1",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "4",
+                "dependencies": [
+                    {
+                        "expression": "{t_zabbix-agent:agent.ping.nodata(3m)}=1",
+                        "name": "Zabbix agent on {HOST.NAME} is unreachable for 3 minutes"
+                    }
+                ],
+                "expression": "{t_svc-erigonesd-mgmt:log[\"/opt/erigones/var/log/mgmt.log\",\"Traceback|CRITICAL|ERROR\"].nodata(5m)}=0",
+                "name": "Error in /opt/erigones/var/log/mgmt.log"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "4",
+                "dependencies": [
+                    {
+                        "expression": "{t_svc-erigonesd-mgmt:proc.num[python,,,-Q mgmt].max(3m)}<1",
+                        "name": "Queue mgmt is not running"
+                    }
+                ],
+                "expression": "({TRIGGER.VALUE}=0 & {t_svc-erigonesd-mgmt:queue.ping[mgmt,{HOST.NAME}].min(3m)}>0) | ({TRIGGER.VALUE}=1 & {t_svc-erigonesd-mgmt:queue.ping[mgmt,{HOST.NAME}].max(5m)}>0)",
+                "name": "Queue mgmt is not responding to ping"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "5",
+                "dependencies": [
+                    {
+                        "expression": "{t_zabbix-agent:agent.ping.nodata(3m)}=1",
+                        "name": "Zabbix agent on {HOST.NAME} is unreachable for 3 minutes"
+                    }
+                ],
+                "expression": "{t_svc-erigonesd-mgmt:proc.num[python,,,-Q mgmt].max(3m)}<1",
+                "name": "Queue mgmt is not running"
+            },
+            {
+                "status": "0",
+                "description": "Use the command \"rabbitmqctl list_queues -p erigones\" to find the problem queue/node.",
+                "url": "",
+                "type": "0",
+                "priority": "3",
+                "dependencies": [
+                    {
+                        "expression": "{t_zabbix-agent:agent.ping.nodata(3m)}=1",
+                        "name": "Zabbix agent on {HOST.NAME} is unreachable for 3 minutes"
+                    }
+                ],
+                "expression": "{t_svc-erigonesd-mgmt:queue.tasks.all.min(3m)}>3",
+                "name": "Total number of all tasks in all queues is too high"
+            },
+            {
+                "status": "0",
+                "description": "Use the command \"rabbitmqctl list_queues -p erigones\" to find the problem queue/node.",
+                "url": "",
+                "type": "0",
+                "priority": "5",
+                "dependencies": [
+                    {
+                        "expression": "{t_zabbix-agent:agent.ping.nodata(3m)}=1",
+                        "name": "Zabbix agent on {HOST.NAME} is unreachable for 3 minutes"
+                    }
+                ],
+                "expression": "{t_svc-erigonesd-mgmt:queue.tasks.all.min(3m)}>10",
+                "name": "Total number of all tasks in all queues is too high. Immediate intervention needed!"
+            }
+        ]
+    }
+}
