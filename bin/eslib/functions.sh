@@ -22,6 +22,8 @@ declare -A LOCKS
 declare -i LOCK_MAX_WAIT=30
 declare -r SERVICE_DIR="/opt/custom/smf"
 declare -r SNAPSHOT_MOUNT_DIR="checkpoints"
+# shellcheck disable=SC2034
+declare -r UPGRADE_DIR="/opt/upgrade"
 
 #
 # Binaries
@@ -52,6 +54,13 @@ BC=${BC:-"/usr/bin/bc"}
 QGA=${QGA:-"${ERIGONES_HOME}/bin/qga-client"}
 QGA_SNAPSHOT=${QGA_SNAPSHOT:-"${ERIGONES_HOME}/bin/qga-snapshot"}
 NODE=${NODE:-"/usr/node/bin/node"}
+BEADM=${BEADM:-"/usr/sbin/beadm"}
+RSYNC=${RSYNC:-"/usr/bin/rsync"}
+CURL=${CURL:-"/opt/local/bin/curl"}
+LOFIADM=${LOFIADM:-"/usr/sbin/lofiadm"}
+TAR=${TAR:-"/usr/bin/tar"}
+DD=${DD:-"/usr/bin/dd"}
+FSTYP=${FSTYP:-"/usr/sbin/fstyp"}
 
 ###############################################################
 # Arguments passed to ssh
@@ -77,6 +86,10 @@ die() {
 	[[ -z "${exit_code}" ]] && exit_code=${_ERR_UNKNOWN}
 
 	exit "${exit_code}"
+}
+
+printmsg() {
+	echo "*** $* ***"
 }
 
 get_hostname() {
@@ -161,6 +174,31 @@ round() {
 	local -i places="${2:-0}"
 
 	printf "%.${places}f" "${number}"
+}
+
+umount_path() {
+	local _path="${1}"
+
+	if ${MOUNT} | grep -q "${_path} "; then
+		${UMOUNT} "${_path}"
+	fi
+}
+
+lofi_add() {
+	local file="${1}"
+
+	# loopmount file
+	# returns lofi device name
+	${LOFIADM} -a "${file}"
+}
+
+lofi_remove() {
+	local lofi_dev="${1}"
+
+	# remove lofi device if exists
+	if [[ -a "${lofi_dev}" ]]; then
+		${LOFIADM} -d "${lofi_dev}"
+	fi
 }
 
 
@@ -465,7 +503,7 @@ _zfs_snap_vm_umount() {
 
 	local snapshot_mountpoint="/${zfs_filesystem}/root/${SNAPSHOT_MOUNT_DIR}/${snapshot_name}"
 
-	if ${MOUNT} | grep -q "${snapshot_mountpoint}"; then
+	if ${MOUNT} | grep -q "${snapshot_mountpoint} "; then
 		${UMOUNT} "${snapshot_mountpoint}" && rmdir "${snapshot_mountpoint}"
 		return $?
 	fi
@@ -821,3 +859,161 @@ _service_instance_delete() {
 
 	${SVCCFG} -s "${fmri}" delete "${name}" && _service_file_save "${fmri}"
 }
+
+###############################################################
+# Disk install helper functions
+###############################################################
+
+_beadm_get_current_be_name() {
+	# shellcheck disable=SC2016
+	${BEADM} list -H 2>/dev/null | "${AWK}" -F';' '{if($3 == "N" || $3 == "NR") {print $1}}'
+}
+
+_beadm_get_active_be_name() {
+	# shellcheck disable=SC2016
+	${BEADM} list -H 2>/dev/null | "${AWK}" -F';' '{if($3 == "R" || $3 == "NR") {print $1}}'
+}
+
+_beadm_check_be_exists() {
+	local be="${1}"
+
+	${BEADM} list -H 2>/dev/null | grep -q -- "^${be};"
+}
+
+_beadm_get_next_be_name() {
+	# shellcheck disable=SC2155
+	local curr_be="$(_beadm_get_current_be_name)"
+	local curr_be_number=
+	local curr_be_basename=
+	local next_be_number=
+
+	if [[ -z "$curr_be" ]]; then
+		# Cannot find current BE
+		return 1
+	elif [[ "$curr_be" =~ -[0-9]+$ ]]; then
+		# the BE name ends with a number
+		curr_be_number="$(echo "${curr_be}" | cut -d- -f2)"
+		curr_be_basename="${curr_be/-[0-9]*}"
+	else 
+		# the BE name does not end with a number
+		# (will add "-1" to the end)
+		curr_be_number=0
+		curr_be_basename="${curr_be}"
+	fi
+
+	# Increment $curr_be_number and see if it already exists.
+	# End when non-existent (=new) BE name is found.
+	next_be_number="$((++curr_be_number))"
+	while _beadm_check_be_exists "${curr_be_basename}-${next_be_number}"; do
+		next_be_number="$((++curr_be_number))"
+	done
+	
+	# return next BE name
+	echo "${curr_be_basename}-${next_be_number}"
+}
+
+_beadm_umount_be() {
+	local be="${1}"
+
+	# umount if exists and is mounted
+	if [[ -n "$(${BEADM} list -H | grep "^${1};" | cut -d';' -f4)" ]]; then
+		${BEADM} umount "${be}"
+	fi
+}
+
+_beadm_destroy_be() {
+	local be="${1}"
+
+	if ${BEADM} list -H | grep -q "^${be};"; then
+		${BEADM} destroy -Ff "${be}"
+	fi
+}
+
+_beadm_activate_be() {
+	local be="${1}"
+
+	${BEADM} activate "${be}"
+}
+
+dc_booted_from_hdd() {
+	awk '{if($2 == "/") {print $1}}' /etc/mnttab | grep -q '^zones/ROOT/'
+}
+
+dc_booted_from_usb() {
+	awk '{if($2 == "/") {print $1}}' /etc/mnttab | grep -q '^/devices/ramdisk'
+}
+
+
+###############################################################
+# USB helper functions
+###############################################################
+
+_usbkey_get_mountpoint() {
+	echo "/mnt/$(svcprop -p 'joyentfs/usb_mountpoint' svc:/system/filesystem/smartdc:default)"
+}
+
+mount_usb_key() {
+	if [[ -n "$(_usbkey_get_mounted_path)" ]]; then
+		# already mounted
+		return 0
+	fi
+
+	# shellcheck disable=SC2155
+	local alldisks="$(/usr/bin/disklist -a)"
+	# shellcheck disable=SC2155
+	local usbmnt="$(_usbkey_get_mountpoint)"
+
+	mkdir -p "${usbmnt}"
+	for key in ${alldisks}; do
+		if [[ "$(${FSTYP} "/dev/dsk/${key}p1" 2> /dev/null)" == 'pcfs' ]]; then
+			if ${MOUNT} -F pcfs -o foldcase,noatime "/dev/dsk/${key}p1" "${usbmnt}"; then
+				if [[ ! -f "${usbmnt}/.joyliveusb" ]]; then
+					${UMOUNT} "${usbmnt}"
+				else
+					break
+				fi
+			fi
+		fi
+	done
+
+	if [[ -z "$(_usbkey_get_mounted_path)" ]]; then
+		# nothing got mounted
+		return 1
+	else
+		return 0
+	fi
+}
+
+# return device name if mounted or nothing if not mounted
+_usbkey_get_mounted_path() {
+	# shellcheck disable=SC2155
+	local usbmnt="$(_usbkey_get_mountpoint)"
+
+	# shellcheck disable=SC2016,SC2086
+	${AWK} '{if($2 == "'${usbmnt}'") {print $1}}' /etc/mnttab
+}
+
+_usbkey_get_device() {
+	# shellcheck disable=SC2155
+	local usb_dev="$(_usbkey_get_mounted_path)"
+
+	if [[ -z "${usb_dev}" ]]; then
+		# USB key is not mounted
+		# mount it and get the dev again
+		mount_usb_key
+		usb_dev="$(_usbkey_get_mounted_path)"
+		umount "${usb_dev}"
+	fi
+
+	echo "${usb_dev}"
+}
+
+umount_usb_key() {
+	if [[ -z "$(_usbkey_get_mounted_path)" ]]; then
+		# not mounted
+		return 0
+	else
+		${UMOUNT} "$(_usbkey_get_mountpoint)"
+	fi
+}
+
