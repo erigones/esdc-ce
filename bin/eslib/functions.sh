@@ -888,7 +888,8 @@ _beadm_get_next_be_name() {
 	local next_be_number=
 
 	if [[ -z "$curr_be" ]]; then
-		die 5 "Cannot find current BE"
+		# Cannot find current BE
+		return 1
 	elif [[ "$curr_be" =~ -[0-9]+$ ]]; then
 		# the BE name ends with a number
 		curr_be_number="$(echo "${curr_be}" | cut -d- -f2)"
@@ -925,19 +926,13 @@ _beadm_destroy_be() {
 
 	if ${BEADM} list -H | grep -q "^${be};"; then
 		${BEADM} destroy -Ff "${be}"
-	else
-		die 5 "Cannot destroy BE '${be}'"
 	fi
 }
 
 _beadm_activate_be() {
 	local be="${1}"
 
-	if _beadm_check_be_exists "${be}"; then
-		${BEADM} activate "${be}"
-	else
-		die 5 "BE activate: cannot find current BE"
-	fi
+	${BEADM} activate "${be}"
 }
 
 dc_booted_from_hdd() {

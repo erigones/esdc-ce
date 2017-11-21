@@ -175,6 +175,9 @@ ${MOUNT} -r -F ufs "${USR_LOOPDEV}" "${USR_ARCHIVE_MOUNT_DIR}"
 
 printmsg "Creating a new boot environment"
 NEW_BE="$(_beadm_get_next_be_name)"
+if [[ -z "${NEW_BE}" ]]; then
+	die 5 "Cannot determine name of new boot environment"
+fi
 ${BEADM} create "${NEW_BE}"
 ${BEADM} mount "${NEW_BE}" "${DCOS_MNTDIR}"
 
