@@ -1040,6 +1040,59 @@ class ZabbixBase(object):
         # If trigger is lost (broken expression) we skip it
         return (trigger for trigger in res if trigger['hosts'])
 
+    @staticmethod
+    def _collect_event_id_ack(last_event):
+        # Event
+        if last_event:
+            eventid = last_event['eventid']
+
+            # Ack
+            if int(last_event['acknowledged']):
+                ack = 'Yes'
+            else:
+                ack = 'No'
+        else:
+            # WTF?
+            eventid = '????'
+            ack = ''
+
+        return eventid, ack
+
+    @staticmethod
+    def _collect_trigger_latest_data(trigger, display_items):
+        comments = []
+        latest_data = []
+
+        if trigger['error']:
+            comments.append('Error: %s' % trigger['error'])
+
+        if trigger['comments']:
+            comments.append('Note: %s' % trigger['comments'].strip())
+
+        if trigger['url']:
+            comments.append('URL: %s' % trigger['url'].strip())
+
+        if display_items:
+            # Link to latest data graph
+            latest_data.append(['[[%s|%s]]' % (i['itemid'], i['name']) for i in trigger['items']])
+
+        return latest_data, comments
+
+    def _collect_trigger_events(self, related_events, display_notes):
+        trigger_events = []
+
+        if display_notes:
+            for e in related_events:
+                e_result = '%s: %s' % (self.event_status(e['value']), self.zapi.get_datetime(e['clock']))
+                e_acks = []
+
+                for a in e['acknowledges']:
+                    e_acks.append('%s: %s' % (self.zapi.get_datetime(a['clock']), a['message']))
+
+                trigger_events.append((e_result, e_acks))
+
+        return trigger_events
+
     # noinspection PyUnusedLocal
     def show_alerts(self, since=None, until=None, last=None, display_notes=True, display_items=True,
                     hosts_or_groups=(), **kwargs):
@@ -1083,28 +1136,13 @@ class ZabbixBase(object):
 
         # Fetch triggers
         triggers = list(self._get_alerts(**t_options))
-        triggers_hidden = 0
 
         # Get notes (dict) = related events + acknowledges
         events = self._get_alert_events(triggers, since=since, until=until)
 
         for trigger in triggers:
             related_events = events.get(trigger['triggerid'], ())
-
-            # Event
-            last_event = trigger['lastEvent']
-            if last_event:
-                eventid = last_event['eventid']
-
-                # Ack
-                if int(last_event['acknowledged']):
-                    ack = 'Yes'
-                else:
-                    ack = 'No'
-            else:
-                # WTF?
-                eventid = '????'
-                ack = ''
+            eventid, ack = self._collect_event_id_ack(trigger['lastEvent'])
 
             # Host and hostname
             host = trigger['hosts'][0]
@@ -1120,33 +1158,8 @@ class ZabbixBase(object):
             dt = self.zapi.get_datetime(trigger['lastchange'])
             age = self.zapi.get_age(dt)
 
-            comments = []
-            if trigger['error']:
-                comments.append('Error: %s' % trigger['error'])
-
-            if trigger['comments']:
-                comments.append('Note: %s' % trigger['comments'].strip())
-
-            if trigger['url']:
-                comments.append('URL: %s' % trigger['url'].strip())
-
-            latest_data = []
-
-            if display_items:
-                # Link to latest data graph
-                latest_data.append(['[[%s|%s]]' % (i['itemid'], i['name']) for i in trigger['items']])
-
-            trigger_events = []
-
-            if display_notes:
-                for e in related_events:
-                    e_result = '%s: %s' % (self.event_status(e['value']), self.zapi.get_datetime(e['clock']))
-                    e_acks = []
-
-                    for a in e['acknowledges']:
-                        e_acks.append('%s: %s' % (self.zapi.get_datetime(a['clock']), a['message']))
-
-                    trigger_events.append((e_result, e_acks))
+            latest_data, comments = self._collect_trigger_latest_data(trigger, display_items)
+            trigger_events = self._collect_trigger_events(related_events, display_notes)
 
             out.append({
                 'eventid': eventid,
