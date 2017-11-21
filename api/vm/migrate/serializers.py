@@ -199,7 +199,7 @@ class VmDcSerializer(s.Serializer):
         super(VmDcSerializer, self).__init__(*args, **kwargs)
         self.fields['target_dc'].queryset = get_dcs(request)
 
-    def validate_target_dc(self, attrs, source):
+    def validate_target_dc(self, attrs, source):  # noqa: R701
         new_dc = attrs.get(source, None)
 
         if not new_dc:

@@ -14,7 +14,7 @@ set -o pipefail
 ERIGONES_HOME=${ERIGONES_HOME:-"/opt/erigones"}
 SELF="${ERIGONES_HOME}/bin/esimg"
 PROG="$(basename "$0")"
-
+# shellcheck disable=SC1090
 . "${ERIGONES_HOME}"/bin/eslib/functions.sh
 
 
@@ -33,6 +33,7 @@ declare IMG_URL								# string: image file URL
 declare HOST								# string: IP address
 declare SIZE								# long: total transfer size in bytes
 declare SIZE_REQUIRED						# long: approximate size of saved data (bytes)
+# shellcheck disable=SC2155
 declare -i TIME_STARTED=$(get_timestamp)	# int: timestamp
 declare -ri SHIPMENT_UID=10000				# int: image server user ID
 declare -ri SHIPMENT_GID=10000				# int: image server group ID
@@ -138,6 +139,7 @@ validate_manifest() {
 
 	validate_uuid "${IMG_UUID}"
 
+	# shellcheck disable=SC2181
 	[[ ${?} -ne 0 || -z "${IMG_UUID}" ]] && die ${ERR_MANIFEST_CHECK} "Invalid image manifest"
 }
 
@@ -185,6 +187,7 @@ validate_dataset_snapshot() {
 
 	SIZE="$(_host_cmd _zfs_send_size "${DSNAP}")"
 
+	# shellcheck disable=SC2181
 	[[ ${?} -ne 0 || -z "${SIZE}" ]] && die ${ERR_DSNAP_CHECK} "Invalid source dataset"
 
 	SIZE_REQUIRED=$(round "$(calculate "${SIZE}*0.8")")  # Calculate only 80% of zfs stream size, because of compression
@@ -199,12 +202,14 @@ validate_url() {
 
 	SIZE=$(echo "${MANIFEST}" | json "files.0.size")
 
+	# shellcheck disable=SC2181
 	[[ ${?} -ne 0 || -z "${SIZE}" ]] && die ${ERR_MANIFEST_CHECK} "Invalid file in image manifest"
 
 	SIZE_REQUIRED=$(round "$(calculate "${SIZE}+512*1024")")  # Add some kB for the manifest
 }
 
 validate_image_size() {
+	# shellcheck disable=SC2155
 	local free_space="$(_zfs_dataset_property "${DATASETS}" "available" 2> /dev/null)"
 
 	[[ ${SIZE_REQUIRED} -gt ${free_space} ]] && die ${ERR_IMG_SIZE} "Not enough free space on image server"
@@ -269,6 +274,7 @@ send_recv_file() {
 		_host_cmd _send_recv_dataset "${DSNAP}" | run_mbuffer -f -o "${IMG_FILE}"
 	fi
 
+	# shellcheck disable=SC2181
 	if [[ ${?} -eq 0 && -f "${IMG_FILE}" ]]; then
 		chmod 644 "${IMG_FILE}"
 		techo "Successfully send/received image file: ${IMG_FILE}"
@@ -278,12 +284,15 @@ send_recv_file() {
 }
 
 update_manifest() {
+	# shellcheck disable=SC2155
 	local size=$(get_file_size "${IMG_FILE}")
+	# shellcheck disable=SC2155
 	local sha1=$(checksum "${IMG_FILE}")
 	local json_file="{\"sha1\": \"${sha1}\", \"size\": ${size}, \"compression\": \"gzip\"}"
 	local json_files="{\"files\": [${json_file}]}"
 	local -i ec
 
+	# shellcheck disable=SC1117
 	MANIFEST=$(echo -e "${MANIFEST}\n${json_files}" | json --merge)
 	ec=${?}
 
@@ -319,10 +328,12 @@ download_file() {
 }
 
 validate_file() {
+	# shellcheck disable=SC2155
 	local manifest_sha1=$(echo "${MANIFEST}" | json "files.0.sha1")
 
 	techo "Checking downloaded image file checksum against manifest checksum: ${manifest_sha1}"
 
+	# shellcheck disable=SC2155
 	local current_sha1=$(checksum "${IMG_FILE}")
 
 	if [[ "${manifest_sha1}" == "${current_sha1}" ]]; then
@@ -367,6 +378,7 @@ success() {
 	local msg="Successfully ${MODE%e}ed image ${IMG_UUID}"
 
 	if [[ "${MODE}" == "create" || "${MODE}" == "import" ]]; then
+		# shellcheck disable=SC2155
 		local time_ended=$(get_timestamp)
 		local time_elapsed=$((time_ended - TIME_STARTED))
 
@@ -384,7 +396,7 @@ cleanup() {
 }
 
 list_datasets() {
-	cd "${DATASETS}"
+	cd "${DATASETS}" || exit 64
 
 	if [[ -n "${VERBOSE}" ]]; then
 		ls -ltr

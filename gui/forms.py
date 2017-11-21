@@ -226,7 +226,7 @@ class SerializerForm(forms.Form):
         # noinspection PyBroadException
         try:
             self.task_id = data['task_id']
-        except:
+        except Exception:
             pass
 
     def _set_custom_api_errors(self, errors):

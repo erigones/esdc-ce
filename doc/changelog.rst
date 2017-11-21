@@ -9,14 +9,17 @@ Features
 
 - Monitoring hostgroups are either datacenter-based or global - `#93 <https://github.com/erigones/esdc-ce/issues/93>`__
 - Monitoring hostgroups are automatically created on VM and Node update if they don't exist - `#93 <https://github.com/erigones/esdc-ce/issues/93>`__
-- DC settings implied monitoring hostgroups are shown near the VM, node monitoring_hostgroups setting- `#266 <https://github.com/erigones/esdc-ce/issues/266>`__
+- Added ability to restore snapshot into another VM - `#236 <https://github.com/erigones/esdc-ce/issues/236>`__
+- Updated the VM templates API + removed *experimental* flag from the ``template_manage`` API call - `#256 <https://github.com/erigones/esdc-ce/issues/256>`__
+- DC settings implied monitoring hostgroups are shown near the VM, node monitoring_hostgroups setting - `#266 <https://github.com/erigones/esdc-ce/issues/266>`__
+- Added node version caching and internal update events - `#271 <https://github.com/erigones/esdc-ce/issues/271>`__
 
 Bugs
 ----
 
 
-2.6.7 (unreleased)
-==================
+2.6.7 (released on 2017-11-06)
+==============================
 
 Features
 --------

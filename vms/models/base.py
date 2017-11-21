@@ -44,6 +44,7 @@ class _DummyModel(with_metaclass(_DummyModelBase)):
         pass
 
     def __new__(cls, *args, **kwargs):
+        # noinspection PyArgumentList
         obj = super(_DummyModel, cls).__new__(cls, *args, **kwargs)
         obj._data = {}
         return obj
@@ -54,6 +55,7 @@ class _DummyModel(with_metaclass(_DummyModelBase)):
 
     def __getattr__(self, key):
         if key.startswith('_'):
+            # noinspection PyUnresolvedReferences
             return super(_DummyModel, self).__getattr__(key)
         else:
             return self._data[key]

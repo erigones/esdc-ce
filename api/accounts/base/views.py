@@ -97,7 +97,7 @@ def api_logout(request):
         user = request.user
         request.user = None
         request.auth.delete()
-    except:
+    except Exception:
         pass
 
     auth_logger.info('User %s successfully logged out from %s (%s)',

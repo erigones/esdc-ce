@@ -14,7 +14,7 @@ set -o pipefail
 ERIGONES_HOME=${ERIGONES_HOME:-"/opt/erigones"}
 SELF="${ERIGONES_HOME}/bin/esmigrate"
 PROG="$(basename "$0")"
-
+# shellcheck disable=SC1090
 . "${ERIGONES_HOME}"/bin/eslib/functions.sh
 
 
@@ -39,6 +39,7 @@ declare SNAP1			# string: snapshot name
 declare SNAP2			# string: snapshot name
 declare -a DS_RECV=()	# array: migrated datasets
 declare -ri VM_MAX_DISKS=8										# int: maximum number of supported disks
+# shellcheck disable=SC2155
 declare -i TIME_STARTED=$(get_timestamp)						# int: timestamp
 declare -i DOWNTIME_STARTED										# int: timestamp set shortly before vmadm stop
 declare -i DOWNTIME=0											# int: downtime in seconds
@@ -129,12 +130,15 @@ verbose_stage1() {
 	echo "Going to transfer following datasets ${remote}:"
 
 	if [[ -n "${DS_ROOT}" ]]; then
+		# shellcheck disable=SC2206
 		a_ds_root=(${DS_ROOT})
 		echo " * ${a_ds_root[0]} -> ${a_ds_root[1]}"
 	fi
 
+	# shellcheck disable=SC2199
 	if [[ -n "${DS_DATA[@]:-}" ]]; then
 		for a_ds_data in "${DS_DATA[@]}"; do
+			# shellcheck disable=SC2206
 			a_ds_data=(${a_ds_data})
 			echo " * ${a_ds_data[0]} -> ${a_ds_data[1]}"
 		done
@@ -203,6 +207,7 @@ get_dataset_property() {
 _switch_ds_pool() {
 	local ds="$1"
 	local pool="$2"
+	# shellcheck disable=SC2206
 	local a_ds=(${ds//// })
 
 	a_ds[0]="${pool}"
@@ -224,6 +229,7 @@ _add_ds_change() {
 }
 
 _set_ds_root_migrate() {
+	# shellcheck disable=SC2155
 	local src=$(_vm_zfs_filesystem "${JSON_SRC}")
 	local dst
 	local img
@@ -246,6 +252,7 @@ _set_ds_root_migrate() {
 }
 
 _set_ds_data_zone_migrate() {
+	# shellcheck disable=SC2155
 	local src=$(_vm_property "${JSON_SRC}" "datasets.0")
 	local dst
 
@@ -331,8 +338,10 @@ _validate_images() {
 	local dst_img
 	local a_dst_img
 
+	# shellcheck disable=SC2199
 	if [[ -n "${DEST_IMAGES[@]:-}" ]]; then
 		for dst_img in "${DEST_IMAGES[@]}"; do
+			# shellcheck disable=SC2206
 			a_dst_img=(${dst_img})
 			_check_image "${a_dst_img[1]}" "${a_dst_img[0]%%/*}"
 		done
@@ -351,6 +360,7 @@ validate_dest_host_migrate() {
 
 _get_core_dataset() {
 	local root_ds="$1"
+	# shellcheck disable=SC2206
 	local a_ds=(${root_ds//// })
 
 	echo "${a_ds[0]}/cores/${a_ds[1]}"
@@ -361,6 +371,7 @@ zone_detach() {
 	[[ -z "${DEST_HOST}" || "${VM_STATUS_SRC}" == "running" ]] && return 0
 	[[ -z "${DS_ROOT}" ]] && die ${ERR_VM_DETACH} "Root dataset is not set: ${UUID_SRC}"
 
+	# shellcheck disable=SC2155
 	local core_ds="$(_get_core_dataset "${DS_ROOT%% *}")"
 
 	_zone_detach "${UUID_SRC}" || die ${ERR_VM_DETACH} "Failed to detach source VM: ${UUID_SRC}"
@@ -411,6 +422,7 @@ _get_snapshot_size() {
 
 	size=$(_zfs_send_size "${snapshot}" "${snapshot_previous}")
 
+	# shellcheck disable=SC2181
 	[[ ${?} -ne 0 || -z "${size}" ]] && die2 ${ERR_DS_SNAP} "Could not determine ${target} snapshot size"
 
 	echo "${size}"
@@ -431,6 +443,7 @@ _create_snapshots() {
 		((SIZE+=size))
 	fi
 
+	# shellcheck disable=SC2199
 	if [[ -n "${DS_DATA[@]:-}" ]]; then
 		for ds_data in "${DS_DATA[@]}"; do
 			dsnap="${ds_data%% *}@${snapshot}"
@@ -462,6 +475,7 @@ _destroy_snapshots() {
 		_destroy_snapshot "${DS_ROOT%% *}@${snapshot}"
 	fi
 
+	# shellcheck disable=SC2199
 	if [[ -n "${DS_DATA[@]:-}" ]]; then
 		for ds_data in "${DS_DATA[@]}"; do
 			_destroy_snapshot "${ds_data%% *}@${snapshot}"
@@ -531,6 +545,7 @@ _send_recv_dataset() {
 		${ZFS} send ${params} | run_mbuffer | run_ssh "root@${DEST_HOST}" "${SELF} agent _recv_dataset_remote ${dst} ${force}"
 	fi
 
+	# shellcheck disable=SC2181
 	if [[ $? -eq 0 ]]; then
 		[[ -z "${src2}" ]] && DS_RECV+=("${dst}")  # Save copied dataset name (useful for emergency cleanup)
 
@@ -545,12 +560,15 @@ send_recv_datasets1() {
 	local a_ds_data
 
 	if [[ -n "${DS_ROOT}" ]]; then
+		# shellcheck disable=SC2206
 		a_ds_root=(${DS_ROOT})
 		_send_recv_dataset "${a_ds_root[1]}" "${a_ds_root[0]}@${SNAP1}"
 	fi
 
+	# shellcheck disable=SC2199
 	if [[ -n "${DS_DATA[@]:-}" ]]; then
 		for a_ds_data in "${DS_DATA[@]}"; do
+			# shellcheck disable=SC2206
 			a_ds_data=(${a_ds_data})
 
 			# The OS zone delegated dataset is a child and send together with the DS_ROOT
@@ -568,15 +586,18 @@ send_recv_datasets2() {
 	local a_ds_data
 
 	if [[ -n "${DS_ROOT}" ]]; then
+		# shellcheck disable=SC2206
 		a_ds_root=(${DS_ROOT})
 		_send_recv_dataset "${a_ds_root[1]}" "${a_ds_root[0]}@${SNAP1}" "${a_ds_root[0]}@${SNAP2}"
 	fi
 
+	# shellcheck disable=SC2199
 	if [[ -n "${DS_DATA[@]:-}" ]]; then
 		# The OS zone delegated dataset is a child and send together with the DS_ROOT
 		[[ "${MODE}" == "migrate" && "${VM_BRAND_SRC}" != "kvm" ]] && return 0
 
 		for a_ds_data in "${DS_DATA[@]}"; do
+			# shellcheck disable=SC2206
 			a_ds_data=(${a_ds_data})
 			_send_recv_dataset "${a_ds_data[1]}" "${a_ds_data[0]}@${SNAP1}" "${a_ds_data[0]}@${SNAP2}"
 		done
@@ -597,6 +618,7 @@ stop_vm() {
 	DOWNTIME_STARTED=$(get_timestamp)
 	msg=$(_vm_stop "${UUID_SRC}")
 
+	# shellcheck disable=SC2181
 	[[ $? -ne 0 ]] && die ${ERR_VM_STOP} "VM ${UUID_SRC} shutdown failed"
 
 	sleep 10  # Give vmadm some breathe time to change the status to stopped state
@@ -650,6 +672,7 @@ update_zone_xml_err() {
 	# Emergency rollback of changed zone xml files (opposite of update_zone_xml)
 	[[ "${MODE}" != "migrate" ]] && return 0  # Only useful for migration
 	[[ -n "${DEST_HOST}" ]] && return 0  # Makes sense only for local migration
+	# shellcheck disable=SC2199
 	[[ -z "${CFG_CHANGED[@]:-}" ]] && return 0  # Skip emergency removal when allright was run
 
 	local xml
@@ -690,6 +713,7 @@ zone_delete_err() {
 	[[ -z "${DEST_HOST}" ]] && return 0  # Makes sense only for remote migration
 	[[ -z "${VM_ATTACHED}" ]] && return 0  # Skip emergency removal when allright was run
 
+	# shellcheck disable=SC2155
 	local core_ds="$(_get_core_dataset "${DS_ROOT#* }")"
 
 	if _dest_host_cmd _zone_delete "${UUID_SRC}"; then  # This should also remove the entry from zone index file
@@ -739,6 +763,7 @@ create_core_dataset() {
 	[[ -z "${DS_ROOT}" || -n "${DEST_HOST}" ]] && return 0
 
 	local dst="${DS_ROOT#* }"
+	# shellcheck disable=SC2155
 	local core_ds="$(_get_core_dataset "${dst}")"
 
 	_dest_host_cmd _create_core_dataset "${core_ds}" "/${dst}/cores" || \
@@ -763,6 +788,7 @@ destroy_datasets_dst_err() {
 	local dst
 
 	[[ "${MODE}" != "migrate" ]] && return 0  # Only useful for migration
+	# shellcheck disable=SC2199
 	[[ -z "${DS_RECV[@]:-}" ]] && return 0  # Skip emergency cleanup when allright was run
 
 	for dst in "${DS_RECV[@]}"; do
@@ -779,8 +805,10 @@ destroy_datasets_dst_err() {
 
 _check_vm() {
 	local uuid="$1"
+	# shellcheck disable=SC2155
 	local out=$(_dest_host_cmd _vm_start "${uuid}" && _dest_host_cmd _vm_stop_force "${uuid}")
 
+	# shellcheck disable=SC2181
 	[[ $? -ne 0 || "${out}" != *"Successfully started"* ]] && \
 		die ${ERR_VM_AFTER_CHECK} "Transferred VM could not be started!"
 	techo "VM is able to start: ${uuid}"
@@ -797,6 +825,7 @@ check_vm_migrate() {
 
 destroy_snapshots_dst() {
 	# Remove migration snapshots on destination datasets
+	# shellcheck disable=SC2199
 	if [[ -n "${DS_RECV[@]:-}" ]]; then
 		for dst in "${DS_RECV[@]}"; do
 			[[ -n "${SNAP1:-}" ]] && _dest_host_cmd _destroy_snapshot "${dst}@${SNAP1}" "destination"
@@ -814,6 +843,7 @@ _delete_vm() {
 
 	_vm_destroy "${uuid}" > /dev/null
 
+	# shellcheck disable=SC2181
 	if [[ $? -eq 0 ]]; then
 		techo "Destroyed source VM: ${uuid}"
 	else
@@ -837,6 +867,7 @@ destroy_datasets_src() {
 		fi
 
 		# The OS zone delegated dataset is a child and destroyed together with the DS_ROOT
+		# shellcheck disable=SC2199
 		if [[ -n "${DS_DATA[@]:-}" && "${VM_BRAND_SRC}" == "kvm" ]]; then
 			for ds_data in "${DS_DATA[@]}"; do
 				_destroy_dataset "${ds_data%% *}"
@@ -909,6 +940,7 @@ allright() {
 print_json() {
 	[[ -z "${PRINT_JSON}" ]] && return 0
 
+	# shellcheck disable=SC2155
 	local j=$(_dest_host_cmd _vm_json "${UUID_SRC}")
 
 	echo "${j}"
@@ -917,6 +949,7 @@ print_json() {
 success() {
 	[[ -n "${VERBOSE}" ]] && echo
 
+	# shellcheck disable=SC2155
 	local -i time_ended=$(get_timestamp)
 	local -i time_elapsed=$((time_ended - TIME_STARTED))
 	local rate="sent ${SIZE} bytes in ${time_elapsed} seconds"

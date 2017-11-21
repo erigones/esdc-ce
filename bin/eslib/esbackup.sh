@@ -16,10 +16,10 @@ set -o pipefail
 ERIGONES_HOME=${ERIGONES_HOME:-"/opt/erigones"}
 SELF="${ERIGONES_HOME}/bin/eslib/esbackup.sh"
 #PROG="$(basename "$0")"
-
+# shellcheck disable=SC1090
 . "${ERIGONES_HOME}"/bin/eslib/functions.sh
 
-declare MODE
+# shellcheck disable=SC2034
 declare -ri OK=0
 declare -ri ERR_INPUT=1
 declare -ri ERR_SNAPSHOT=2

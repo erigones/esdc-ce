@@ -23,7 +23,7 @@ class JsonAdminForm(forms.ModelForm):
     def clean_json(self):
         try:
             data = PickleDict.load(self.cleaned_data['json'])
-        except:
+        except Exception:
             raise forms.ValidationError(_('Invalid JSON format.'))
 
         return data

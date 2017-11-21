@@ -84,7 +84,7 @@ def parse_esysinfo(stdout):
     # noinspection PyBroadException
     try:
         img_initial = json.loads(x[8].strip())
-    except:
+    except Exception:
         img_initial = None
 
     for i in x[2].strip().splitlines():

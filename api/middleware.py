@@ -96,7 +96,7 @@ class APISyncMiddleware(object):
         # noinspection PyBroadException
         try:
             task_id = response.data['task_id']
-        except:
+        except Exception:
             return response
 
         # This should never happen (Dummy task has it's own Response class)

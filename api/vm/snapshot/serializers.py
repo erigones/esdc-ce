@@ -5,7 +5,10 @@ from django.core import validators
 
 from vms.models import SnapshotDefine, Snapshot
 from api import serializers as s
+from api.exceptions import ObjectNotFound, InvalidInput
+from api.vm.utils import get_vm
 from api.vm.define.vm_define_disk import DISK_ID_MIN, DISK_ID_MAX
+from api.vm.snapshot.utils import get_disk_id
 
 DISK_ID_MIN += 1
 DISK_ID_MAX += 1
@@ -133,3 +136,45 @@ class SnapshotSerializer(s.InstanceSerializer):
     status = s.IntegerChoiceField(choices=Snapshot.STATUS, read_only=True, required=False)
     size = s.IntegerField(read_only=True)
     id = s.SafeCharField(read_only=True)
+
+
+class SnapshotRestoreSerializer(s.Serializer):
+    target_hostname_or_uuid = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\._-]*$', required=False)
+    target_disk_id = s.IntegerField(max_value=DISK_ID_MAX, min_value=DISK_ID_MIN, required=False)
+    force = s.BooleanField(default=True)
+
+    def __init__(self, request, vm, *args, **kwargs):
+        self.request = request
+        self.vm = vm
+        self.target_vm = vm
+        self.target_vm_disk_id = None
+        self.target_vm_real_disk_id = None
+        self.target_vm_disk_zfs_filesystem = None
+        super(SnapshotRestoreSerializer, self).__init__(*args, **kwargs)
+
+    def validate(self, attrs):
+        target_hostname_or_uuid = attrs.get('target_hostname_or_uuid', None)
+        target_disk_id = attrs.get('target_disk_id', None)
+
+        if target_hostname_or_uuid and not target_disk_id:
+            err_msg = _('This field is required when target_hostname_or_uuid is specified.')
+            self._errors['target_disk_id'] = s.ErrorList([err_msg])
+            return attrs
+        elif not target_hostname_or_uuid and target_disk_id:
+            err_msg = _('This field is required when target_disk_id is specified.')
+            self._errors['target_hostname_or_uuid'] = s.ErrorList([err_msg])
+            return attrs
+        elif target_hostname_or_uuid and target_disk_id:
+            try:
+                self.target_vm = get_vm(self.request, target_hostname_or_uuid, exists_ok=True, noexists_fail=True,
+                                        check_node_status=None)
+            except ObjectNotFound as exc:
+                self._errors['target_hostname_or_uuid'] = s.ErrorList([exc.detail])
+            else:
+                try:
+                    self.target_vm_disk_id, self.target_vm_real_disk_id, self.target_vm_disk_zfs_filesystem = \
+                        get_disk_id(self.request, self.target_vm, disk_id=target_disk_id)
+                except InvalidInput as exc:
+                    self._errors['target_disk_id'] = s.ErrorList([exc.detail])
+
+        return attrs

@@ -155,7 +155,7 @@ def get_task_status(task_id=None, method=get_task_result):
             # noinspection PyBroadException
             try:
                 c = t.result['meta'].pop('status', None)
-            except:
+            except Exception:
                 c = None
             try:
                 s = get_task_status_code(t, c)
@@ -176,13 +176,13 @@ def get_task_error_message(task_result):
     """
     try:
         res = task_result['result']
-    except:
+    except Exception:
         res = task_result
 
     for key in ('detail', 'message'):
         try:
             return res[key]
-        except:
+        except Exception:
             continue
 
     return str(res)
@@ -373,7 +373,7 @@ def mgmt_task(update_user_tasks=True):
 
 
 # noinspection PyUnusedLocal,PyUnboundLocalVariable
-@catch_exception
+@catch_exception  # noqa: R701
 def task_log(task_id, msg, vm=None, obj=None, user=None, api_view=None, task_status=None, task_result=None,
              owner=None, time=None, detail=None, update_user_tasks=True, dc_id=None, **kwargs):
     """
@@ -456,11 +456,11 @@ def task_log(task_id, msg, vm=None, obj=None, user=None, api_view=None, task_sta
             # noinspection PyBroadException
             try:
                 detail = task_result['detail']
-            except:
+            except Exception:
                 # noinspection PyBroadException
                 try:
                     detail = task_result['message']
-                except:
+                except Exception:
                     detail = ''
         if detail is None:
             detail = ''
@@ -471,7 +471,7 @@ def task_log(task_id, msg, vm=None, obj=None, user=None, api_view=None, task_sta
             # noinspection PyBroadException
             try:
                 owner = obj.owner
-            except:
+            except Exception:
                 owner = user
         elif user:
             owner = user
@@ -479,7 +479,7 @@ def task_log(task_id, msg, vm=None, obj=None, user=None, api_view=None, task_sta
     # noinspection PyBroadException
     try:
         owner_id = owner.id
-    except:
+    except Exception:
         owner_id = int(task_prefix[2])
 
     if task_status == states.STARTED:
