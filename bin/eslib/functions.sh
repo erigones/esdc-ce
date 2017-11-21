@@ -22,6 +22,7 @@ declare -A LOCKS
 declare -i LOCK_MAX_WAIT=30
 declare -r SERVICE_DIR="/opt/custom/smf"
 declare -r SNAPSHOT_MOUNT_DIR="checkpoints"
+# shellcheck disable=SC2034
 declare -r UPGRADE_DIR="/opt/upgrade"
 
 #
@@ -962,6 +963,7 @@ mount_usb_key() {
 		return 0
 	fi
 
+	# shellcheck disable=SC2155
 	local alldisks="$(/usr/bin/disklist -a)"
 	# shellcheck disable=SC2155
 	local usbmnt="$(_usbkey_get_mountpoint)"
