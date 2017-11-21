@@ -78,12 +78,12 @@ class BaseTaskResponse(Response):
             # noinspection PyBroadException
             try:
                 t_s = result['status']
-            except:
+            except Exception:
                 t_s = None
             # noinspection PyBroadException
             try:
                 t_r = result['result']
-            except:
+            except Exception:
                 t_r = None
 
             if msg:  # msg => update task log & save pending user task

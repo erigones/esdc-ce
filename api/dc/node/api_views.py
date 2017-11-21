@@ -47,7 +47,9 @@ class DcNodeView(APIView):
                 res = list(self.dcnode.values_list('node__hostname', flat=True))
         else:
             if self.extended:
+                # noinspection PyUnresolvedReferences
                 self.dcnode.vms = self.node.vm_set.filter(dc=self.request.dc).count()
+                # noinspection PyUnresolvedReferences
                 self.dcnode.real_vms = self.node.vm_set.filter(dc=self.request.dc, slavevm__isnull=True).count()
             res = self.serializer(self.request, self.dcnode).data
 

@@ -101,7 +101,7 @@ class NetworkSerializer(s.ConditionalDCBoundSerializer):
 
         return attrs
 
-    def validate(self, attrs):
+    def validate(self, attrs):  # noqa: R701
         try:
             network = attrs['network']
         except KeyError:
@@ -194,11 +194,13 @@ class ExtendedNetworkSerializer(NetworkSerializer):
     _free_ip_subquery = '"vms_ipaddress"."vm_id" IS NULL AND "vms_ipaddress"."usage" = %d '\
                         'AND "vms_ipaddress_vms"."vm_id" IS NULL' % IPAddress.VM
 
+    # noinspection SqlDialectInspection,SqlNoDataSourceInspection
     ips_free_query = 'SELECT COUNT(*) FROM "vms_ipaddress" LEFT OUTER JOIN '\
                      '"vms_ipaddress_vms" ON ("vms_ipaddress"."id" = "vms_ipaddress_vms"."ipaddress_id") ' \
                      'WHERE "vms_subnet"."uuid" = "vms_ipaddress"."subnet_id" '\
                      'AND %s' % _free_ip_subquery
 
+    # noinspection SqlDialectInspection,SqlNoDataSourceInspection
     ips_used_query = 'SELECT COUNT(*) FROM "vms_ipaddress" LEFT OUTER JOIN '\
                      '"vms_ipaddress_vms" ON ("vms_ipaddress"."id" = "vms_ipaddress_vms"."ipaddress_id") ' \
                      'WHERE "vms_subnet"."uuid" = "vms_ipaddress"."subnet_id" '\

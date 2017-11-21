@@ -41,7 +41,7 @@ Signal that is to restrict user profile to be company only.
 allow_switch_company_profile = Signal(providing_args=['user'])
 
 """
-These signals are called after relationship changes among Dc, User and Role models. 
+These signals are called after relationship changes among Dc, User and Role models.
 """
 # (sender, dc_name)
 dc_relationship_changed = signal('dc_relationship_changed', doc='DC relationship changed.')

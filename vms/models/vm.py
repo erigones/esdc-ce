@@ -580,7 +580,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
         self._set_cloud_init(_json, 'user-data', ['chpasswd:', ' expire: false', ' list: |', '   root:%s' % passwd])
         self.json = _json
 
-    def fix_json(self, deploy=False, resize=False, recreate=False):
+    def fix_json(self, deploy=False, resize=False, recreate=False):  # noqa: R701
         """So just before any vmadm create command we have to clean some stuff from the json.
         Currently we remove:
             - disks.*.path if media is 'disk'

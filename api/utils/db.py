@@ -85,7 +85,7 @@ def get_item(request, obj, attr, default=None, name=None):
                     raise ItemOutOfRange(object_name=name)
             else:
                 val = default
-    except:
+    except Exception:
         raise BadRequest
     else:
         if request.method == 'POST':

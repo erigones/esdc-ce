@@ -152,7 +152,7 @@ def admin_image_form(request):
 @permission_required(ImageAdminPermission)
 @permission_required(ImageImportAdminPermission)
 def imagestore_list(request, repo=None):
-    user, dc = request.user, request.dc
+    user = request.user
     context = collect_view_data(request, 'dc_image_list')
     context['image_vm'] = ImageVm.get_uuid()
     context['is_staff'] = is_staff = user.is_staff

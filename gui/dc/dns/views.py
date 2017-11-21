@@ -24,7 +24,7 @@ def dc_domain_list(request):
     """
     DNS Domain/Record <-> Dc management.
     """
-    user, dc = request.user, request.dc
+    user = request.user
     domains = Domain.objects.order_by('name')
     dc_domain_ids = list(request.dc.domaindc_set.values_list('domain_id', flat=True))
     context = collect_view_data(request, 'dc_domain_list')

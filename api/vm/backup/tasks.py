@@ -156,7 +156,7 @@ def _vm_backup_cb_alert(result, task_id, bkp_id=None, task_exception=None, **kwa
             bkp.name, vm.hostname, bkp.array_disk_id, action_msg))
 
 
-@cq.task(name='api.vm.backup.tasks.vm_backup_cb', base=MgmtCallbackTask, bind=True)
+@cq.task(name='api.vm.backup.tasks.vm_backup_cb', base=MgmtCallbackTask, bind=True)  # noqa: R701
 @callback(error_fun=_vm_backup_cb_alert)
 def vm_backup_cb(result, task_id, vm_uuid=None, node_uuid=None, bkp_id=None):
     """

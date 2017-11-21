@@ -8,7 +8,7 @@ from django.shortcuts import resolve_url, redirect as _redirect
 from django.utils.six import iteritems
 
 # noinspection PyUnresolvedReferences
-from api.fields import get_boolean_value  # Leave it here - used by gui.views
+from api.fields import get_boolean_value  # noqa: F401 (Leave it here - used by gui.views)
 from api.api_views import APIView
 from api.exceptions import InvalidInput
 from api.task.log import get_tasklog_cached

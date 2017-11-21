@@ -130,6 +130,7 @@ def _init_images(node, images, default_dc, admin_dc):
             logger.info('Associated image %s with node storage %s', img, ns)
 
 
+# noinspection PyArgumentList
 def init_mgmt(head_node, images=None):
     """
     Initialize the system and create the "admin" datacenter.

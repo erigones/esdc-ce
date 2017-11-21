@@ -108,8 +108,10 @@ def get_virt_objects(request, model, order_by, dc=None, include=(), **kwargs):
     qs = model.objects.filter(dc=dc)
 
     if request.user.is_admin(request, dc=dc):
+        # noinspection PyUnresolvedReferences
         qf = ~Q(access__in=model.INVISIBLE)
     else:
+        # noinspection PyUnresolvedReferences
         qf = (Q(access__in=(model.PUBLIC, model.DISABLED))) | (Q(owner=request.user.pk) & Q(access=model.PRIVATE))
 
     if include:

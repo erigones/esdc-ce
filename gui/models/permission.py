@@ -7,10 +7,11 @@ __all__ = (
     'AdminPermission',
     'NetworkAdminPermission',
     'ImageAdminPermission',
-    'ImageImportAdminPermission'
+    'ImageImportAdminPermission',
     'TemplateAdminPermission',
     'IsoAdminPermission',
     'UserAdminPermission',
+    'DnsAdminPermission',
 )
 
 

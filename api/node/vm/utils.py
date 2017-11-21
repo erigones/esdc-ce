@@ -47,7 +47,7 @@ def _vm_save_ip_from_json(vm, net, ipaddress, allowed_ips=False):
     return ip, None
 
 
-def vm_from_json(request, task_id, json, dc, owner=settings.ADMIN_USER, template=True, save=False,
+def vm_from_json(request, task_id, json, dc, owner=settings.ADMIN_USER, template=True, save=False,  # noqa: R701
                  update_ips=True, update_dns=True):
     """Parse json a create new Vm object
 

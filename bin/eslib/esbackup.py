@@ -281,6 +281,7 @@ class Backup(ZFSCmd):
             except CmdError:
                 response['last_snapshot_name'] = get_snap_name(self.last_snapshot)
 
+    # noinspection PyShadowingNames
     @cmd_output
     def ds_create(self, snapshot, destination, name, metadata=None, json=None, fsfreeze=None):
         """Create snapshot on remote host and send it here"""
@@ -449,6 +450,7 @@ class Backup(ZFSCmd):
 
         return {}
 
+    # noinspection PyShadowingNames
     @cmd_output
     def file_create(self, source, filename, metadata=None, json=None, fsfreeze=None):
         backup_dir = os.path.abspath(os.path.join(os.path.dirname(filename), '..', '..'))

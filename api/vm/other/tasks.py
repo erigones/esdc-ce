@@ -48,7 +48,7 @@ def vm_screenshot_cb(result, task_id, vm_uuid=None):
             # noinspection PyBroadException
             try:
                 del result['image']
-            except:
+            except Exception:
                 pass
             raise TaskException(result, 'Could not parse or save screenshot image')
     else:
@@ -57,7 +57,7 @@ def vm_screenshot_cb(result, task_id, vm_uuid=None):
         # noinspection PyBroadException
         try:
             del result['image']
-        except:
+        except Exception:
             pass
         raise TaskException(result, 'Did not receive a proper screenshot image')
 
