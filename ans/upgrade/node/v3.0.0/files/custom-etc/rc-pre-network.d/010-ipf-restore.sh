@@ -20,7 +20,7 @@
 # config is not touched.
 #
 
-RULES_DIR="$(realpath "$(dirname $0)/../../etc/ipf.d")"
+RULES_DIR="/opt/custom/etc/ipf.d"
 GENERATE_FILES="ipf.conf ipnat.conf ipf6.conf"
 OUTPUT_DIR="/etc/ipf"
 IPF_SERVICE="svc:/network/ipfilter:default"
