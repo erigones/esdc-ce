@@ -19,6 +19,7 @@ Bugs
 ----
 
 - Added missing DNS record for ns1.local after install - `#301 <https://github.com/erigones/esdc-ce/issues/301>`__
+- Fixed race condition in Zabbix host group manipulation - `#309 <https://github.com/erigones/esdc-ce/issues/309>`__
 
 
 2.6.7 (released on 2017-11-06)
