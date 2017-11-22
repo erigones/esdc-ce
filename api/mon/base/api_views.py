@@ -27,7 +27,7 @@ class _MonBaseView(APIView):
             tg = TG_DC_UNBOUND
 
         if self.ser_class:
-            ser = self.ser_class(data=self.data)
+            ser = self.ser_class(request, data=self.data)
 
             if not ser.is_valid():
                 return FailureTaskResponse(request, ser.errors)
@@ -58,3 +58,9 @@ class MonAlertView(_MonBaseView):
     api_view_name = 'mon_alert_list'
     mgmt_task = mon_alert_list
     ser_class = AlertSerializer
+
+    def get(self):
+        if 'show_all' in self.data and self.data['show_all']:
+            self.dc_bound = False
+
+        return super(MonAlertView, self).get()

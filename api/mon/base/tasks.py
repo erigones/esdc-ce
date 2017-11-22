@@ -9,7 +9,7 @@ from que.erigonesd import cq
 from que.exceptions import MgmtTaskException
 from que.internal import InternalTask
 from que.mgmt import MgmtTask
-from vms.models import Dc
+from vms.models import Dc, Vm
 
 __all__ = ('mon_clear_zabbix_cache', 'mon_template_list', 'mon_hostgroup_list', 'mon_alert_list')
 
@@ -100,8 +100,11 @@ def mon_alert_list(task_id, dc_id, *args, **kwargs):
     dc = Dc.objects.get_by_id(int(dc_id))
 
     if is_task_dc_bound(task_id):
-        # TODO: set hosts_or_groups to hosts in this DC.
         kwargs['prefix'] = dc.name
+
+        # set hosts_or_groups to hosts in this DC.
+        vms = Vm.objects.filter(dc=dc)
+        kwargs['hosts_or_groups'] = [vm.hostname for vm in vms]
     else:
         kwargs['prefix'] = ''
 
