@@ -7,7 +7,6 @@ from api.task.utils import TaskID
 from api.dc.utils import get_dc_or_404
 from api.dc.base.serializers import DcSettingsSerializer, DefaultDcSettingsSerializer
 from api.dc.messages import LOG_DC_SETTINGS_UPDATE
-from api.mon.base.tasks import mon_clear_zabbix_cache
 
 logger = getLogger(__name__)
 
@@ -45,18 +44,7 @@ class DcSettingsView(APIView):
         dc.custom_settings = dcs
         dc.save()
         data = ser.data
-        dd = ser.detail_dict()
-        res = SuccessTaskResponse(self.request, data, obj=dc, detail_dict=dd, msg=LOG_DC_SETTINGS_UPDATE)
-
-        # Check if monitoring settings have been changed
-        if any(['MON_ZABBIX' in i for i in dd]):
-            logger.info('Monitoring settings have been changed in DC %s. Running task for clearing zabbix cache', dc)
-            try:
-                mon_clear_zabbix_cache.call(dc.id, full=True)
-            except Exception as e:
-                logger.exception(e)
-
-        # Check if compute node SSH key was added to VMS_NODE_SSH_KEYS_DEFAULT
+        res = SuccessTaskResponse(self.request, data, obj=dc, detail_dict=ser.detail_dict(), msg=LOG_DC_SETTINGS_UPDATE)
         task_id = TaskID(res.data.get('task_id'), request=self.request)
 
         if old_settings != new_settings:
