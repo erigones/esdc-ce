@@ -60,7 +60,9 @@ class NetworkIPSerializer(s.Serializer):
                                     {'ip': value, 'net': net.name})
 
         # Check if IP does not exist in another network with same VLAN ID
-        if IPAddress.objects.exclude(subnet=net).filter(ip=value, subnet__vlan_id=net.vlan_id).exists():
+        if IPAddress.objects.exclude(subnet=net).filter(ip=value,
+                                                        subnet__vlan_id=net.vlan_id,
+                                                        subnet__vxlan_id=net.vxlan_id).exists():
             raise s.ValidationError(_('IP address "%(ip)s" already exists in another network with the same VLAN ID.') %
                                     {'ip': value})
 
