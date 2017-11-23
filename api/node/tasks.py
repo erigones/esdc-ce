@@ -10,3 +10,5 @@ from api.node.image.tasks import *  # noqa: F401,F403
 from api.node.sshkey.tasks import *  # noqa: F401,F403
 # noinspection PyUnresolvedReferences
 from api.node.vm.tasks import *  # noqa: F401,F403
+# noinspection PyUnresolvedReferences
+from api.node.network.tasks import *  # noqa: F401,F403

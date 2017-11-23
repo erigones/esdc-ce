@@ -25,7 +25,7 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
     """
     Node (host) object.
     """
-    _esysinfo = ('sysinfo', 'diskinfo', 'zpools', 'nictags')
+    _esysinfo = ('sysinfo', 'diskinfo', 'zpools', 'nictags', 'overlays')
     _vlan_id = None
 
     ZPOOL = 'zones'
@@ -327,6 +327,10 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
         return self.json.get('nictags', [])
 
     @property
+    def overlays(self):
+        return self.json.get('overlays', [])
+
+    @property
     def lifetime(self):
         return int(timezone.now().strftime('%s')) - int(self.created.strftime('%s'))
 
@@ -438,6 +442,58 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
     def all_nictags_choices(cls):
         """Return set of tuples that are used as choices in nictag field in NetworkSerializer"""
         return sorted([(name, '%s (%s)' % (name, typ)) for name, typ in six.iteritems(cls.all_nictags())])
+
+    def get_overlay_port(self, overlay_name):
+        """Return port associated with overlay or empty string if overlay_name was not found"""
+        default_overlay_port = '4789'
+        for net in self.overlays:
+            if net['name'] == overlay_name:
+                port = net.get('port')
+                if port:
+                    return port
+                else:
+                    return default_overlay_port
+
+        return None
+
+    def get_overlay_ip(self, overlay_name):
+        """Return ip associated with overlay or empty string if overlay_name was not found"""
+        used_nics = self.used_nics
+
+        ip = None
+        overlay_found = False
+        for net in self.overlays:
+            # search for the overlay based on name
+            if net['name'] == overlay_name:
+                overlay_found = True
+                ip = net.get('ip')
+                # the 0.0.0.0 is special case and requires all available IPs to be retrieved
+                if ip and ip != '0.0.0.0':
+                    return ip
+
+        # if overlay was not found based on name raise error
+        if not overlay_found:
+            raise ValueError('The overlay %s was not found on node: %s' % (overlay_name, self.name))
+
+        if not ip:
+            raise ValueError('IP was not defined for the overlay: %s' % overlay_name)
+
+        if ip == '0.0.0.0':
+            if 'external0' in used_nics:
+                return used_nics['external0']['ip4addr']
+
+            for iface, prop in six.iteritems(self.used_nics):
+                if 'external' in prop.get('NIC Names'):
+                    return prop['ip4addr']
+
+            if 'admin0' in used_nics:
+                return used_nics['admin0']['ip4addr']
+
+            for iface, prop in six.iteritems(self.used_nics):
+                if 'admin' in prop.get('NIC Names'):
+                    return prop['ip4addr']
+
+        raise ValueError('Overlay IP was not found!')
 
     @property
     def _initializing_key(self):

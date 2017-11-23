@@ -2,13 +2,17 @@ import re
 import json
 
 from django.utils.datastructures import OrderedDict
-from django.utils.six import PY3
+from django.utils.six import PY3, iteritems
 
 
 if PY3:
     t_long = int
 else:
     t_long = long
+
+RE_PORT = re.compile(r'vxlan/listen_port=[0-9]{1,5}')
+RE_IP = re.compile(r'vxlan/listen_ip=\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}')
+RE_ARP_FILE = re.compile(r'files/config=.*\.json')
 
 
 def __get_indentation(line):
@@ -80,6 +84,7 @@ def parse_esysinfo(stdout):
     config = x[6].strip()
     sshkey = x[7].strip()
     nictags = []
+    overlays = []
 
     # noinspection PyBroadException
     try:
@@ -111,6 +116,32 @@ def parse_esysinfo(stdout):
             name, mac, link, typ = map(lambda c: None if c == '-' else c, map(str.strip, str(i).split('|')))
             nictags.append({'name': name, 'mac': mac, 'link': link, 'type': typ})
 
+    if num_items >= 11:
+        overlay_rules = x[10].strip()
+        if overlay_rules:
+            rules = json.loads(overlay_rules)
+
+        for name, definition in iteritems(rules):
+            port = RE_PORT.findall(definition)
+            if not port or len(port) > 1:
+                port = None
+            else:
+                port = port[0].split('=')[1]
+
+            ip = RE_IP.findall(definition)
+            if not ip or len(ip) > 1:
+                ip = None
+            else:
+                ip = ip[0].split('=')[1]
+
+            arp_file = RE_ARP_FILE.findall(definition)
+            if not arp_file or len(arp_file) > 1:
+                arp_file = None
+            else:
+                arp_file = arp_file[0].split('=')[1]
+
+            overlays.append({'name': name, 'ip': ip, 'port': port, 'arp_file': arp_file})
+
     return {
         'sysinfo': sysinfo,
         'diskinfo': diskinfo,
@@ -120,4 +151,5 @@ def parse_esysinfo(stdout):
         'img_sources': img_sources,
         'img_initial': img_initial,
         'nictags': nictags,
+        'overlays': overlays,
     }
