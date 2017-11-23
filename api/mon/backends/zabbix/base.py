@@ -948,7 +948,7 @@ class ZabbixNamedContainer(object):
             return zapi.call(zapi_method, params=params)
         except ZabbixAPIError as exc:
             data = exc.error.get('data')
-            if data and 'already exists' in data:
+            if data and ('already exists' in data or 'SQL statement execution has failed "INSERT INTO' in data):
                 exc = RemoteObjectAlreadyExists(**exc.error)
             raise exc
 
