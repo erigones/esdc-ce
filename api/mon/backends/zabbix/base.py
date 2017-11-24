@@ -1450,8 +1450,12 @@ class ZabbixHostGroupContainer(ZabbixNamedContainer):
         container.zabbix_id = container._zabbix_response['groupid']
         return container
 
+    @classmethod
+    def from_zabbix_name(cls, zapi, name):
+        return cls.from_mgmt_data(name, zapi)  # FIXME ORDER is not consistent!!!!
+
     @staticmethod
-    def hostgroup_name_factory(hostgroup_name, dc_name):
+    def hostgroup_name_factory(hostgroup_name, dc_name):  #FIXME ORDER is not consistent against usergroup!!!!
         if dc_name is not None:
             name = ':{}:{}:'.format(dc_name, hostgroup_name)
         else:
@@ -1569,9 +1573,32 @@ class ZabbixActionContainer(ZabbixNamedContainer):
         return container
 
     @classmethod
-    def from_mgmt_data(cls, zapi, name):
+    def from_mgmt_data(cls, zapi, name, **creation_attributes):
         container = cls(name=name, zapi=zapi)
+        for attr in creation_attributes:
+            setattr(container, attr, creation_attributes[attr])
         return container
+
+    @property
+    def hostgroups(self):
+        return [{'conditiontype': 0, 'operator': 0, 'value': str(hostgroup.zabbix_id)
+                 } for hostgroup in self._hostgroups]
+
+    @hostgroups.setter
+    def hostgroups(self, hostgroup_names):
+        self._hostgroups = [ZabbixHostGroupContainer.from_zabbix_name(self._zapi, hostgroup_name)
+                            for hostgroup_name in hostgroup_names]
+
+
+    @property
+    def usergroups(self):
+        return self._usergroups
+
+    @usergroups.setter
+    def usergroups(self, usergroup_names):
+
+        self._usergroups = [ZabbixUserGroupContainer.from_zabbix_name(self._zapi, usergroup_name, resolve_users=False)
+                            for usergroup_name in usergroup_names]
 
     @property
     def filter(self):
@@ -1582,16 +1609,13 @@ class ZabbixActionContainer(ZabbixNamedContainer):
     def filter__conditions(self):
         return [self._condition_trigger_problem, self._condition_status_not_in_maintenance] + self.hostgroups
 
-    @property
-    def hostgroups(self):
-        return [{'conditiontype': 0, 'operator': 0, 'value': str(hostgroup.zabbix_id)
-                 } for hostgroup in self._hostgroups]
+
 
     @property
     def operations(self):
         return [{u'operationtype': 0,
                  u'opmessage': {u'mediatypeid': 0},
-                 u'opmessage_grp': [{u'usrgrpid': str(usergroup.zabbix_id)} for usergroup in self._usergroups]}]
+                 u'opmessage_grp': [{u'usrgrpid': str(usergroup.zabbix_id)} for usergroup in self.usergroups]}]
 
     def _generate_request_object(self):
         return {attribute: getattr(self, attribute)

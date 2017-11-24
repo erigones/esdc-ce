@@ -63,3 +63,5 @@ LOG_MIGRATE_DC = _('Migrate server to datacenter')
 
 
 LOG_QGA_COMMAND = _('Run QGA command')
+
+LOG_ACTION_CREATE = _('Create alerting action rule')

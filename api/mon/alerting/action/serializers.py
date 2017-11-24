@@ -22,6 +22,9 @@ Original event ID: {EVENT.ID}
 
 
 class ActionSerializer(s.Serializer):
+    # TODO change to as in user groups in user creation
+    name = s.SafeCharField(max_length=65536, required=True)
+
     hostgroups = s.ArrayField(max_items=16384, default=[], validators=(
                                              RegexValidator(regex=MonitoringBackend.RE_MONITORING_HOSTGROUPS),),
                               )
@@ -32,11 +35,13 @@ class ActionSerializer(s.Serializer):
 
     message_subject = s.SafeCharField(max_length=65536, default=DEFAULT_ACTION_MESSAGE_SUBJECT)  # TODO initial value zo zabbixu vykopirovat a dat do settings
     message_text = s.SafeCharField(max_length=65536, default=DEFAULT_ACTION_MESSAGE)  # TODO initial value zo zabbixu vykopirovat a dat do settings
-    recovery_message_enabled = s.BooleanField(default=False, required=False)
     recovery_message_text = s.SafeCharField(max_length=65536, required=False)  # TODO initial value zo zabbixu vykopirovat, conditional validation
 
     def validate_hostgroups(self, attrs, source):
         # Allow to use only available hostgroups
+        from api.mon.backends.zabbix.base import ZabbixHostGroupContainer
+
+        attrs[source]=[ZabbixHostGroupContainer.hostgroup_name_factory(name, self.context.dc.name) for name in attrs[source]]
         return attrs
         raise NotImplementedError
         try:
@@ -54,6 +59,10 @@ class ActionSerializer(s.Serializer):
 
     def validate_usergroups(self, attrs, source):
         # Allow to use only available hostgroups
+        from api.mon.backends.zabbix.base import ZabbixUserGroupContainer
+
+        attrs[source] = [ZabbixUserGroupContainer.user_group_name_factory(self.context.dc.name, name)
+                         for name in attrs[source]]
         return attrs
 
         raise NotImplementedError
