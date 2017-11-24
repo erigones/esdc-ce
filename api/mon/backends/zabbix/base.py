@@ -1059,7 +1059,7 @@ class ZabbixBase(object):
         return eventid, ack
 
     @staticmethod
-    def _collect_trigger_latest_data(trigger, display_items):
+    def _collect_trigger_latest_data(trigger):
         comments = []
         latest_data = []
 
@@ -1072,30 +1072,24 @@ class ZabbixBase(object):
         if trigger['url']:
             comments.append('URL: %s' % trigger['url'].strip())
 
-        if display_items:
-            # Link to latest data graph
-            latest_data.append(['[[%s|%s]]' % (i['itemid'], i['name']) for i in trigger['items']])
-
         return latest_data, comments
 
-    def _collect_trigger_events(self, related_events, display_notes):
+    def _collect_trigger_events(self, related_events):
         trigger_events = []
 
-        if display_notes:
-            for e in related_events:
-                e_result = '%s: %s' % (self.event_status(e['value']), self.zapi.get_datetime(e['clock']))
-                e_acks = []
+        for e in related_events:
+            e_result = '%s: %s' % (self.event_status(e['value']), self.zapi.get_datetime(e['clock']))
+            e_acks = []
 
-                for a in e['acknowledges']:
-                    e_acks.append('%s: %s' % (self.zapi.get_datetime(a['clock']), a['message']))
+            for a in e['acknowledges']:
+                e_acks.append('%s: %s' % (self.zapi.get_datetime(a['clock']), a['message']))
 
-                trigger_events.append((e_result, e_acks))
+            trigger_events.append((e_result, e_acks))
 
         return trigger_events
 
     # noinspection PyUnusedLocal
-    def show_alerts(self, since=None, until=None, last=None, display_notes=True, display_items=True,
-                    hosts_or_groups=(), **kwargs):
+    def show_alerts(self, since=None, until=None, last=None, show_events=True, hosts=(), groups=(), **kwargs):
         """Show current or historical events (alerts)"""
         out = []
         # Get triggers
@@ -1104,16 +1098,13 @@ class ZabbixBase(object):
         t_hosts = ('hostid', 'name', 'maintenance_status', 'maintenance_type', 'maintenanceid')
         t_options = {'expand_description': True, 'output': t_output, 'select_hosts': t_hosts}
 
-        if display_items:
-            t_options['selectItems'] = ('itemid', 'name')
-
-        if hosts_or_groups:
-            hosts = self.search_hosts(*hosts_or_groups)
+        if hosts or groups:
+            hosts = self.search_hosts(*hosts)
 
             if hosts:
                 t_options['hostids'] = list(hosts.keys())
             else:
-                groups = self.search_groups(*hosts_or_groups)
+                groups = self.search_groups(*groups)
 
                 if groups:
                     t_options['groupids'] = list(groups.keys())
@@ -1158,8 +1149,11 @@ class ZabbixBase(object):
             dt = self.zapi.get_datetime(trigger['lastchange'])
             age = self.zapi.get_age(dt)
 
-            latest_data, comments = self._collect_trigger_latest_data(trigger, display_items)
-            trigger_events = self._collect_trigger_events(related_events, display_notes)
+            latest_data, comments = self._collect_trigger_latest_data(trigger)
+            trigger_events = []
+
+            if show_events:
+                trigger_events = self._collect_trigger_events(related_events)
 
             out.append({
                 'eventid': eventid,

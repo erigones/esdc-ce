@@ -4,13 +4,13 @@ from api.task.response import mgmt_task_response, FailureTaskResponse
 from que import TG_DC_BOUND, TG_DC_UNBOUND
 
 
-class _MonBaseView(APIView):
+class MonBaseView(APIView):
     api_view_name = NotImplemented
     mgmt_task = NotImplemented
     ser_class = NotImplemented
 
     def __init__(self, request, data, dc_bound=True):
-        super(_MonBaseView, self).__init__(request)
+        super(MonBaseView, self).__init__(request)
         self.request = request
         self.data = data
         self.dc_bound = dc_bound
@@ -43,11 +43,11 @@ class _MonBaseView(APIView):
                                   data=self.data)
 
 
-class MonTemplateView(_MonBaseView):
+class MonTemplateView(MonBaseView):
     api_view_name = 'mon_template_list'
     mgmt_task = mon_template_list
 
 
-class MonHostgroupView(_MonBaseView):
+class MonHostgroupView(MonBaseView):
     api_view_name = 'mon_hostgroup_list'
     mgmt_task = mon_hostgroup_list

@@ -31,7 +31,7 @@ def get_alert_from_zabbix(request):
     method = 'GET'
     logger.info('Calling API view %s mon_alert_list(%s, data=%s) by user %s in DC %s',
                 method, request, None, request.user, request.dc)
-    res = call_api_view(request, method, mon_alert_list, disable_throttling=True)
+    res = call_api_view(request, method, mon_alert_list)
 
     if res.status_code in (200, 201) and method == 'GET' and res.data['result'] is not None:
         context['alerts'] = context['pager'] = get_pager(request, res.data['result'])

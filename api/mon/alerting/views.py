@@ -27,14 +27,15 @@ def mon_alert_list(request, data=None):
         :type data.until: tmestamp
         :arg data.last: The number of alerts from alert history to be displayed
         :type data.last: integer
-        :arg data.display_items: Include list of related Zabbix triggers
-        :type data.display_items: boolean
-        :arg data.display_notes: Include list of related Zabbix events and comments
-        :type data.display_notes: boolean
-        :arg data.hosts_or_groups: List of hostnames or host groups to be filtered by
-        :type data.hosts_or_groups: array
-        :arg data.show_all: Execute as DC unbound (available for SuperAdmin only)
-        :type data.show_all: boolean
+        :arg data.show_events: Include list of related Zabbix events and comments (deafult: true)
+        :type data.show_events: boolean
+        :arg data.hosts: List of hostnames to be filtered by (default: [])
+        :type data.hosts: array
+        :arg data.groups: List of host groups to be filtered by. Available only when dc_unbound is true, can not be
+         combined with hosts parameter (default: [])
+        :type data.groups: array
+        :arg data.dc_unbound: Execute as DC unbound, eg. display all alerts (available for SuperAdmin only)
+        :type data.dc_unbound: boolean
         :status 200: SUCCESS
         :status 201: PENDING
         :status 400: FAILURE

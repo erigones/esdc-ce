@@ -543,7 +543,7 @@ _es() {
 
 		/mon/alert)
 			[ ${COMP_CWORD} -eq 2 ] && COMPREPLY=( "${cur} " )
-			[[ "${action}" == "get" ]] && params="-since -until -last -display_items -display_notes -hosts_or_groups"
+			[[ "${action}" == "get" ]] && params="-since -until -last -show_events -hosts -groups -dc_unbound"
 		;;
 
 		/node/*/storage)

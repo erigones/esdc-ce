@@ -1,15 +1,20 @@
 # -*- coding: UTF-8 -*-
+from django.utils.six import text_type
 from celery.utils.log import get_task_logger
 from zabbix_api import ZabbixAPIException
 
+from api.task.utils import mgmt_task
+from api.mon import get_monitoring, MonitoringError
 from api.mon.utils import MonInternalTask
 from que.erigonesd import cq
-from api.mon import get_monitoring, MonitoringError
+from que.utils import is_task_dc_bound
+from que.exceptions import MgmtTaskException
+from que.mgmt import MgmtTask
 
-from vms.models import Dc
+from vms.models import Dc, Vm
 from gui.models import Role, User
 
-__all__ = ('mon_user_group_changed', 'mon_user_changed')
+__all__ = ('mon_user_group_changed', 'mon_user_changed', 'mon_alert_list')
 
 logger = get_task_logger(__name__)
 
@@ -217,3 +222,38 @@ def mon_all_groups_sync(task_id, sender, dc_name=None, *args, **kwargs):
             mon_user_group_changed.call(sender='mon_all_groups_sync', group_name=group.name)
         for dc in Dc.objects.all():  # owner groups
             mon_user_group_changed.call(sender='mon_all_groups_sync', dc_name=dc.name)
+
+
+# noinspection PyUnusedLocal
+@cq.task(name='api.mon.alerting.tasks.mon_alert_list', base=MgmtTask)
+@mgmt_task()
+def mon_alert_list(task_id, dc_id, *args, **kwargs):
+    """
+    Return list of alerts available in Zabbix.
+    """
+    dc = Dc.objects.get_by_id(int(dc_id))
+
+    if is_task_dc_bound(task_id):
+        kwargs['prefix'] = dc.name
+    else:
+        kwargs['prefix'] = ''
+
+    try:
+        zabbix_alerts = get_monitoring(dc).alert_list(*args, **kwargs)
+    except MonitoringError as exc:
+        raise MgmtTaskException(text_type(exc))
+    return [
+        {
+            'eventid': t['eventid'],
+            'prio': t['prio'],
+            'hostname': t['hostname'],
+            'desc': t['desc'],
+            'age': t['age'],
+            'ack': t['ack'],
+            'comments': t['comments'],
+            'latest_data': t['latest_data'],
+            'last_change': t['last_change'],
+            'events': t['events'],
+        }
+        for t in zabbix_alerts
+    ]
