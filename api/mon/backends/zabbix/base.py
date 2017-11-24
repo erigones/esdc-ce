@@ -905,9 +905,15 @@ class ZabbixBase(object):
         # {'output': ['name', 'actionid'],
         #    'selectOperations': ['opmessage_grp'],
         #    'selectFilter': ['conditions']} }
+        return res
+
+    def get_action(self, name):
+        """Query Zabbix API for hostgroups"""
+        res = self.zapi.action.get({'output': 'extend', 'selectOperations': 'extend', 'selectFilter': 'extend',
+                                    'filter': {'name': name}})
 
         try:
-            return res
+            return res[0]
         except (KeyError, IndexError) as e:
             logger.exception(e)
             raise ZabbixError(e)
@@ -1550,18 +1556,21 @@ class ZabbixActionContainer(ZabbixNamedContainer):
     eventsource = 0
     filter__evaltype = 0
 
+    def __init__(self, name, zapi):
+        super(ZabbixActionContainer, self).__init__(name)
+        self._zapi = zapi
+
     @classmethod
     def from_zabbix_data(cls, zapi, api_response_object):
         assert api_response_object
-        container = cls(name=api_response_object['name'])
-        container._zapi = zapi
+        container = cls(name=api_response_object['name'], zapi=zapi)
         container._api_response = api_response_object
         container.zabbix_id = api_response_object['actionid']
         return container
 
     @classmethod
-    def from_mgmt_data(cls, name):
-        container = cls(name=name)
+    def from_mgmt_data(cls, zapi, name):
+        container = cls(name=name, zapi=zapi)
         return container
 
     @property
@@ -1588,10 +1597,10 @@ class ZabbixActionContainer(ZabbixNamedContainer):
         return {attribute: getattr(self, attribute)
                 for attribute in self._action_creation_attributes if hasattr(self, attribute)}
 
-    def create_action(self, zapi):
+    def create(self):
         request_object = self._generate_request_object()
         try:
-            res = zapi.action.create(request_object)
+            res = self._zapi.action.create(request_object)
         except ZabbixAPIException as e:
             # noinspection PyProtectedMember
             logger.error('Zabbix API Error in create action(%s): %s', request_object['name'], e)
@@ -1602,3 +1611,23 @@ class ZabbixActionContainer(ZabbixNamedContainer):
         except (KeyError, IndexError) as e:
             logger.exception(e)
             raise ZabbixError(e)
+
+    def refresh(self):
+        response = self._zapi.action.get({'filter': {'name': self.name}})
+        if len(response) > 0:
+            self.zabbix_id = response[0]['actionid']
+        else:
+            self.zabbix_id = None
+
+    def update(self):
+        raise NotImplementedError
+
+    def exists(self):
+        self.refresh()
+        return bool(self.zabbix_id)
+
+    def synchronize(self):
+        if self.exists():
+            self.update()
+        else:
+            self.create()

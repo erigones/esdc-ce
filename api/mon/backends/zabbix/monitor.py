@@ -513,5 +513,6 @@ class Zabbix(AbstractMonitoringBackend):
         zac = ZabbixActionContainer.from_mgmt_data(self.ezx.zapi, **action)
         zac.synchronize()
 
-
-
+    def action_detail(self, name):
+        """[EXTERNAL]"""
+        return ZabbixActionContainer.from_zabbix_data(self.ezx.zapi, self.ezx.get_action(name))

@@ -8,7 +8,7 @@ from que.exceptions import MgmtTaskException
 from que.mgmt import MgmtTask
 from vms.models import Dc
 
-__all__ = ('mon_action_list', )
+__all__ = ('mon_action_list', 'mon_action_create', 'mon_action_delete', 'mon_action_get')
 
 logger = get_task_logger(__name__)
 
@@ -33,3 +33,24 @@ def mon_action_list(task_id, dc_id, **kwargs):
         }
         for t in zabbix_actions
     ]
+
+
+@cq.task(name='api.mon.alerting.action.tasks.mon_action_create', base=MgmtTask)
+@mgmt_task()
+def mon_action_create(task_id, dc_id, action, **kwargs):
+    dc = Dc.objects.get_by_id(int(dc_id))
+    get_monitoring(dc).synchronize_action(action)
+
+
+@cq.task(name='api.mon.alerting.action.tasks.mon_action_get', base=MgmtTask)
+@mgmt_task()
+def mon_action_get():
+    pass
+
+
+@cq.task(name='api.mon.alerting.action.tasks.mon_action_delete', base=MgmtTask)
+@mgmt_task()
+def mon_action_delete():
+    pass
+
+# todo dont forget to update the task log after task is complete
