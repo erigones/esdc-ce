@@ -11,6 +11,7 @@ from frozendict import frozendict
 from zabbix_api import ZabbixAPI, ZabbixAPIException, ZabbixAPIError
 
 from vms.models import Dc
+from api.decorators import lock
 from api.mon.backends.abstract import VM_KWARGS_KEYS, NODE_KWARGS_KEYS, MonitoringError
 
 logger = getLogger(__name__)
@@ -348,6 +349,18 @@ class ZabbixBase(object):
             logger.exception(ex)
             raise RemoteObjectDoesNotExist('Cannot find zabbix proxy id for proxy "%s"' % proxy)
 
+    @lock(key_args=(0,), wait_for_release=True, bound=True)
+    def _create_hostgroup(self, name):
+        """Create new hostgroup in Zabbix and return ZabbixHostGroupContainer object"""
+        new_hostgroup = ZabbixHostGroupContainer(name, zapi=self.zapi)
+
+        try:
+            new_hostgroup.create()
+        except RemoteObjectAlreadyExists:
+            new_hostgroup.get()
+
+        return new_hostgroup
+
     def _get_or_create_hostgroups(self, obj_kwargs, hostgroup, dc_name, hostgroups=(), log=None):
         """Return set of zabbix hostgroup IDs for an object"""
         log = log or self.log
@@ -395,14 +408,8 @@ class ZabbixBase(object):
                 continue
 
             #  If not even the ~global~ hostgroup exists, we are free to create a ~local~ hostgroup.
-            new_hostgroup = ZabbixHostGroupContainer(qualified_hostgroup_name, zapi=self.zapi)
-
-            try:
-                new_hostgroup_id = new_hostgroup.create().zabbix_id
-            except RemoteObjectAlreadyExists:
-                new_hostgroup_id = new_hostgroup.get().zabbix_id
-
-            gids.add(new_hostgroup_id)
+            new_hostgroup = self._create_hostgroup(qualified_hostgroup_name)
+            gids.add(new_hostgroup.zabbix_id)
 
         return gids
 
