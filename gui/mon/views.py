@@ -7,7 +7,7 @@ from gui.utils import collect_view_data, get_pager
 from gui.decorators import ajax_required, profile_required, admin_required
 from api.decorators import setting_required
 from api.utils.views import call_api_view
-from api.mon.base.views import mon_alert_list
+from api.mon.alerting.views import mon_alert_list
 
 logger = getLogger(__name__)
 

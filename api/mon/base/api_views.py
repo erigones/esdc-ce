@@ -1,6 +1,5 @@
 from api.api_views import APIView
-from api.mon.base.tasks import mon_template_list, mon_hostgroup_list, mon_alert_list
-from api.mon.base.serializers import AlertSerializer
+from api.mon.base.tasks import mon_template_list, mon_hostgroup_list
 from api.task.response import mgmt_task_response, FailureTaskResponse
 from que import TG_DC_BOUND, TG_DC_UNBOUND
 
@@ -52,15 +51,3 @@ class MonTemplateView(_MonBaseView):
 class MonHostgroupView(_MonBaseView):
     api_view_name = 'mon_hostgroup_list'
     mgmt_task = mon_hostgroup_list
-
-
-class MonAlertView(_MonBaseView):
-    api_view_name = 'mon_alert_list'
-    mgmt_task = mon_alert_list
-    ser_class = AlertSerializer
-
-    def get(self):
-        if 'show_all' in self.data and self.data['show_all']:
-            self.dc_bound = False
-
-        return super(MonAlertView, self).get()

@@ -8,7 +8,4 @@ urlpatterns = patterns(
 
     # /mon/hostgroup - get
     url(r'^hostgroup/', 'mon_hostgroup_list', name='api_mon_hostgroup_list'),
-
-    # /mon/alert - get
-    url(r'^alert/', 'mon_alert_list', name='api_mon_alert_list')
 )
