@@ -11,7 +11,7 @@ from que.utils import is_task_dc_bound
 from que.exceptions import MgmtTaskException
 from que.mgmt import MgmtTask
 
-from vms.models import Dc, Vm
+from vms.models import Dc
 from gui.models import Role, User
 
 __all__ = ('mon_user_group_changed', 'mon_user_changed', 'mon_alert_list')
