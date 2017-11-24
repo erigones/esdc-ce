@@ -19,21 +19,17 @@ class AlertSerializer(s.Serializer):
     def __init__(self, request, obj=None, instance=None, data=None, **kwargs):
         self.obj = obj
         self.request = request
-
-        # We cannot set a function as a default argument of TimeStampField
-        if data is None:
-            data = {}
-        else:
-            data = data.copy()
-
-        if 'since' in data and 'until' not in data:
-            data['until'] = s.TimeStampField.now()
-
         super(AlertSerializer, self).__init__(instance=instance, data=data, **kwargs)
 
     def validate(self, attrs):
-        dc_unbound = attrs.get('dc_unbound')
+        since = attrs.get('since')
+        until = attrs.get('until')
+
+        if since and not until:
+            attrs['until'] = s.TimeStampField.now()
+
         hosts = attrs.get('hosts')
+        dc_unbound = attrs.get('dc_unbound')
 
         if dc_unbound:
             if self.request.user.is_super_admin(self.request):
