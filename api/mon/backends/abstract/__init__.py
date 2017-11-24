@@ -125,3 +125,6 @@ class AbstractMonitoringBackend(object):
 
     def delete_action(self, name):
         raise NotImplementedError
+
+    def action_detail(self, name):
+        raise NotImplementedError

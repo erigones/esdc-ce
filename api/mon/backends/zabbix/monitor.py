@@ -463,6 +463,7 @@ class Zabbix(AbstractMonitoringBackend):
         return list(self._get_filtered_hostgroups(prefix=prefix))
 
     def synchronize_user_group(self, group=None, dc_as_group=None):
+        """[EXTERNAL]"""
         kwargs = {}
         # TODO create also a separate superadmin group for superadmins in every DC
 
@@ -481,28 +482,36 @@ class Zabbix(AbstractMonitoringBackend):
             kwargs['accessible_hostgroups'] = ()  # TODO
             kwargs['superusers'] = group.permissions.filter(name=AdminPermission.name).exists()
 
-        for zapi in self._connections:
-            ZabbixUserGroupContainer.synchronize(zapi, **kwargs)
+        ZabbixUserGroupContainer.synchronize(self.ezx.zapi, **kwargs)
 
     def synchronize_user(self, user):
-        for zapi in self._connections:
-            ZabbixUserContainer.synchronize(zapi, user)
+        """[EXTERNAL]"""
+        ZabbixUserContainer.synchronize(self.ezx.zapi, user)
 
     def delete_user_group(self, name):
+        """[EXTERNAL]"""
         group_name = ZabbixUserGroupContainer.user_group_name_factory(
             local_group_name=name,
             dc_name=self.dc.name)
 
-        for zapi in self._connections:
-            ZabbixUserGroupContainer.delete_by_name(zapi, group_name)
+        ZabbixUserGroupContainer.delete_by_name(self.ezx.zapi, group_name)
 
     def delete_user(self, name):
-        for zapi in self._connections:
-            ZabbixUserContainer.delete_by_name(zapi, name)
+        """[EXTERNAL]"""
+        ZabbixUserContainer.delete_by_name(self.ezx.zapi, name)
 
     def action_list(self):
         return list(self._actions())
 
     def _actions(self):
-        for action in self.izx.get_action_list():
-            yield ZabbixActionContainer.from_zabbix_data(self.izx.zapi, action)
+        """[EXTERNAL]"""
+        for action in self.ezx.get_action_list():
+            yield ZabbixActionContainer.from_zabbix_data(self.ezx.zapi, action)
+
+    def synchronize_action(self, action):
+        """[EXTERNAL]"""
+        zac = ZabbixActionContainer.from_mgmt_data(self.ezx.zapi, **action)
+        zac.synchronize()
+
+
+
