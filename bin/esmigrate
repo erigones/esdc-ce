@@ -24,6 +24,7 @@ declare VM_STATUS_SRC	# string: "running" or "stopped"
 declare VM_BRAND_SRC	# string: "kvm" or "..."
 declare VM_STOP="true"	# bool: whether to stop the VM before final send/recv
 declare VM_START=""		# bool: whether to start the VM after successful finish
+declare VM_CORES_RM=""	# bool: VM's cores dataset was removed if non-empty
 declare VM_DETACHED=""	# bool: source zone was detached if non-empty
 declare VM_ATTACHED=""	# bool: destination zone was attached if non-empty
 declare PRINT_JSON=""	# bool: print VM json to stdout after successful migration
@@ -358,6 +359,13 @@ validate_dest_host_migrate() {
 # stage 2: zone detach/attach, snapshots and send/recv
 ###############################################################
 
+_create_core_dataset() {
+	local dataset="$1"
+	local mountpoint="$2"
+
+	${ZFS} create -p -o mountpoint="${mountpoint}" "${dataset}"
+}
+
 _get_core_dataset() {
 	local root_ds="$1"
 	# shellcheck disable=SC2206
@@ -366,16 +374,48 @@ _get_core_dataset() {
 	echo "${a_ds[0]}/cores/${a_ds[1]}"
 }
 
-zone_detach() {
+destroy_core_dataset() {
 	# Makes sense only for remote migration and stopped VM
 	[[ -z "${DEST_HOST}" || "${VM_STATUS_SRC}" == "running" ]] && return 0
-	[[ -z "${DS_ROOT}" ]] && die ${ERR_VM_DETACH} "Root dataset is not set: ${UUID_SRC}"
+	[[ -z "${DS_ROOT}" ]] && die ${ERR_DS_CORE} "Root dataset is not set: ${UUID_SRC}"
 
 	# shellcheck disable=SC2155
 	local core_ds="$(_get_core_dataset "${DS_ROOT%% *}")"
 
+	if _zfs_dataset_exists "${core_ds}"; then
+		${ZFS} destroy "${core_ds}" || die ${ERR_DS_CORE} "Failed to destroy source VM's cores dataset: ${core_ds}"
+		techo "Destroyed source VM's cores dataset: ${core_ds}"
+		VM_CORES_RM="true"
+	fi
+}
+
+create_core_dataset_err() {
+	# Emergency re-creation of VM's cores dataset on source host (opposite of destroy_core_dataset)
+	# Makes sense only for remote migration
+	[[ -z "${DEST_HOST}" ]] && return 0
+	[[ -z "${VM_CORES_RM}" ]] && return 0  # Skip emergency zfs create when allright was run
+
+	# shellcheck disable=SC2155
+	local core_ds="$(_get_core_dataset "${DS_ROOT%% *}")"
+
+	if zfs_dataset_exists "${core_ds}"; then
+		VM_CORES_RM=""
+		techo "Source VM's cores dataset exists: ${core_ds}"
+	else
+		if _create_core_dataset "${core_ds}" "/${DS_ROOT%% *}/cores"; then
+			VM_CORES_RM=""
+			techo "Re-created VM's cores dataset: ${core_ds}"
+		else
+			echo "Failed to create source VM's cores dataset: ${core_ds}" 1>&2
+		fi
+	fi
+}
+
+zone_detach() {
+	# Makes sense only for remote migration and stopped VM
+	[[ -z "${DEST_HOST}" || "${VM_STATUS_SRC}" == "running" ]] && return 0
+
 	_zone_detach "${UUID_SRC}" || die ${ERR_VM_DETACH} "Failed to detach source VM: ${UUID_SRC}"
-	${ZFS} destroy "${core_ds}"  # Also silently remove cores dataset
 	VM_DETACHED="true"
 	techo "Detached source VM: ${UUID_SRC}"
 }
@@ -725,13 +765,6 @@ zone_delete_err() {
 	fi
 }
 
-_create_core_dataset() {
-	local dataset="$1"
-	local mountpoint="$2"
-
-	${ZFS} create -p -o mountpoint="${mountpoint}" "${dataset}"
-}
-
 _init_core_dataset() {
 	local dataset="$1"
 	local mountpoint="$2"
@@ -748,27 +781,33 @@ init_core_dataset() {
 	local dataset="${pool}/cores"
 	local mountpoint="/${pool}/global/cores"
 
-	if ! _dest_host_cmd _zfs_dataset_exists "${dataset}" &> /dev/null; then
+	if _dest_host_cmd _zfs_dataset_exists "${dataset}" &> /dev/null; then
+		techo "Global cores dataset exists: ${dataset}"
+	else
 		_dest_host_cmd _init_core_dataset "${dataset}" "${mountpoint}" || \
 			die ${ERR_DS_CORE} "Could not initialize global cores dataset: ${dataset}"
 		techo "Initialized global cores dataset: ${dataset}"
-	else
-		techo "Global cores dataset exists: ${dataset}"
 	fi
 }
 
 create_core_dataset() {
-	# Makes sense only for local migration and when root pool has changed
-	# In remote migration the core dataset is created by zone_attach
-	[[ -z "${DS_ROOT}" || -n "${DEST_HOST}" ]] && return 0
+	# Makes sense for local migration and when root pool has changed
+	# In remote migration the cores dataset is created by zone_attach,
+	# except for LX zones -> we need to create the cores dataset manually
+	[[ -z "${DS_ROOT}" ]] && return 0
+	[[ -n "${DEST_HOST}" && -z "${VM_CORES_RM}" ]] && return 0
 
 	local dst="${DS_ROOT#* }"
 	# shellcheck disable=SC2155
 	local core_ds="$(_get_core_dataset "${dst}")"
 
-	_dest_host_cmd _create_core_dataset "${core_ds}" "/${dst}/cores" || \
-		die ${ERR_DS_CORE} "Could not create cores dataset: ${core_ds}"
-	techo "Created cores dataset: ${core_ds}"
+	if _dest_host_cmd _zfs_dataset_exists "${core_ds}" &> /dev/null; then
+		techo "Cores dataset exists: ${core_ds}"
+	else
+		_dest_host_cmd _create_core_dataset "${core_ds}" "/${dst}/cores" || \
+			die ${ERR_DS_CORE} "Could not create cores dataset: ${core_ds}"
+		techo "Created cores dataset: ${core_ds}"
+	fi
 }
 
 _destroy_dataset() {
@@ -935,6 +974,7 @@ allright() {
 	CFG_CHANGED=()	# Clear the need for emergency config file restore
 	VM_ATTACHED=""	# Clear the need for emergency destination VM removal
 	VM_DETACHED=""	# Clear the need for emergency source VM attach
+	VM_CORES_RM=""	# Clear the need for emergency re-creation of source VM's cores dataset
 }
 
 print_json() {
@@ -965,6 +1005,7 @@ cleanup() {
 	# Emergency stuff (will run only if allright was not run)
 	update_zone_xml_err
 	zone_attach_err
+	create_core_dataset_err
 	zone_delete_err
 	destroy_datasets_dst_err
 	start_vm_err
@@ -1065,12 +1106,14 @@ migrate() {
 
 	# stage 2
 	set_vm_status_src			# Set ${VM_STATUS_SRC} ("double check")
+	destroy_core_dataset		# Destroy cores dataset when doing remote migration and VM is stopped
 	zone_detach					# Detach zone when doing remote migration and VM is stopped
 	create_snapshots1			# Snapshot for next send/recv (+ aggregate snapshot size)
 	send_recv_datasets1			# Full zfs send/recv
 
 	# stage 2.5
 	if stop_vm; then			# Stop VM if running, or keep running if requested by user
+		destroy_core_dataset	# Destroy cores dataset when doing remote migration and VM is stopped
 		zone_detach				# Detach zone when doing remote migration and VM is stopped
 		create_snapshots2		# Snapshot for next send/recv (+ aggregate snapshot size)
 		send_recv_datasets2		# Final incremental zfs send/recv
@@ -1080,7 +1123,7 @@ migrate() {
 	update_zone_xml				# Update zone configuration file
 	init_core_dataset			# Ensure that global cores dataset exists
 	zone_attach					# Attach zone on remote host when doing remote migration
-	create_core_dataset			# Create cores dataset when changing root pool locally
+	create_core_dataset			# Create cores dataset when changing root pool locally or doing remote migration
 
 	# stage 4
 	check_vm_migrate			# Check if migrated destination VM can be started
