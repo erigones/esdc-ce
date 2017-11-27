@@ -1647,8 +1647,9 @@ class ZabbixActionContainer(ZabbixNamedContainer):
     def update(self):
         raise NotImplementedError
 
-    def exists(self):
-        self.refresh()
+    def exists(self, refresh=True):
+        if refresh:
+            self.refresh()
         return bool(self.zabbix_id)
 
     def synchronize(self):
@@ -1665,10 +1666,7 @@ class ZabbixActionContainer(ZabbixNamedContainer):
         # for optimization: z.zapi.usergroup.get({'search': {'name': ":dc_name:*"}, 'searchWildcardsEnabled': True})
         action = cls.from_mgmt_data(zapi, name)
 
-        try:
-            action.refresh()
-        except RemoteObjectDoesNotExist:
-            return
-        else:
-            return action.delete()
+        if not action.exists():
+            raise RemoteObjectDoesNotExist
+        action.delete()
 
