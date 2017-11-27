@@ -516,3 +516,6 @@ class Zabbix(AbstractMonitoringBackend):
     def action_detail(self, name):
         """[EXTERNAL]"""
         return ZabbixActionContainer.from_zabbix_data(self.ezx.zapi, self.ezx.get_action(name))
+
+    def action_delete(self, name):
+        ZabbixActionContainer.delete_by_name(self.ezx.zapi, name)

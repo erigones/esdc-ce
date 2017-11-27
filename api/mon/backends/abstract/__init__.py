@@ -128,3 +128,5 @@ class AbstractMonitoringBackend(object):
 
     def action_detail(self, name):
         raise NotImplementedError
+
+# TODO rename usergroups, users, actions to pattern (name)_(action)

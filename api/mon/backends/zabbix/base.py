@@ -1452,7 +1452,8 @@ class ZabbixHostGroupContainer(ZabbixNamedContainer):
 
     @classmethod
     def from_zabbix_name(cls, zapi, name):
-        return cls.from_mgmt_data(name, zapi)  # FIXME ORDER is not consistent!!!!
+        container =  cls.from_mgmt_data(name, zapi)  # FIXME ORDER is not consistent!!!!
+        container.refresh_id()
 
     @staticmethod
     def hostgroup_name_factory(hostgroup_name, dc_name):  #FIXME ORDER is not consistent against usergroup!!!!
@@ -1637,7 +1638,7 @@ class ZabbixActionContainer(ZabbixNamedContainer):
             raise ZabbixError(e)
 
     def refresh(self):
-        response = self._zapi.action.get({'filter': {'name': self.name}})
+        response = self._zapi.action.get({'filter': {'name': self.name}})  # todo sanitize the error types
         if len(response) > 0:
             self.zabbix_id = response[0]['actionid']
         else:
@@ -1655,3 +1656,19 @@ class ZabbixActionContainer(ZabbixNamedContainer):
             self.update()
         else:
             self.create()
+
+    def delete(self):
+        return self._zapi.action.delete([self.zabbix_id])  # todo sanitize the error types
+
+    @classmethod
+    def delete_by_name(cls, zapi, name):
+        # for optimization: z.zapi.usergroup.get({'search': {'name': ":dc_name:*"}, 'searchWildcardsEnabled': True})
+        action = cls.from_mgmt_data(zapi, name)
+
+        try:
+            action.refresh()
+        except RemoteObjectDoesNotExist:
+            return
+        else:
+            return action.delete()
+
