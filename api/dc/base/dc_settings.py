@@ -43,7 +43,7 @@ class DcSettingsView(APIView):
         old_settings = dc.custom_settings
         dc.custom_settings = dcs
         dc.save()
-        data = ser.data
+        data = ser.data  # Prepare ser._data for ser.detail_dict() to work
         res = SuccessTaskResponse(self.request, data, obj=dc, detail_dict=ser.detail_dict(), msg=LOG_DC_SETTINGS_UPDATE)
         task_id = TaskID(res.data.get('task_id'), request=self.request)
 
