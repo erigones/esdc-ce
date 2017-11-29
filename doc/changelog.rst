@@ -20,6 +20,7 @@ Bugs
 
 - Added missing DNS record for ns1.local after install - `#301 <https://github.com/erigones/esdc-ce/issues/301>`__
 - Fixed migration of LX zones - `#294 <https://github.com/erigones/esdc-ce/issues/294>`__
+- Removed reference to non-existing ``VMS_NET_NIC_TAGS`` setting in GUI - `#310 <https://github.com/erigones/esdc-ce/issues/310>`__
 
 
 2.6.7 (released on 2017-11-06)
