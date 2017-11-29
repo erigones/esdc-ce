@@ -19,14 +19,20 @@ PROG="$(basename "$0")"
 
 
 declare MODE			# string: "migrate" or "agent/agent-verbose"
-declare VERBOSE=""		# bool: print info messages if non-empty
+declare VERBOSE=""		# string: print info messages if non-empty
 declare VM_STATUS_SRC	# string: "running" or "stopped"
 declare VM_BRAND_SRC	# string: "kvm" or "..."
+declare VM_QEMU_OPTS_SRC	# string: vmadm's qemu_extra_opts
+declare VM_TMP_MEM_FILE	# string: path to store contents of VM's memory on target host (live migration)
 declare VM_STOP="true"	# bool: whether to stop the VM before final send/recv
 declare VM_START=""		# bool: whether to start the VM after successful finish
+declare VM_READY=""		# bool: whether destination VM was started during live migration
+declare VM_RESUME=""	# bool: whether to resume the VM after successful finish
 declare VM_CORES_RM=""	# bool: VM's cores dataset was removed if non-empty
 declare VM_DETACHED=""	# bool: source zone was detached if non-empty
+declare VM_DETACHED_FAKE=""	# bool: if not-empty, source zone was not detach, however SUNWdetached.xml was created (live migration)
 declare VM_ATTACHED=""	# bool: destination zone was attached if non-empty
+declare VM_MEM_DUMP=""	# bool: VM memory dump was create if non-empty
 declare PRINT_JSON=""	# bool: print VM json to stdout after successful migration
 declare UUID_SRC		# string: "<uuid>"
 declare JSON_SRC		# string: "{...}"
@@ -36,9 +42,9 @@ declare -a DEST_DISK	# array: target pools or target IDs
 declare DS_ROOT			# string: "<src-pool>/<uuid> <dest-pool>/<uuid>"
 declare -a DS_DATA		# array: ["<src-pool>/<uuid>-disk1 <dest-pool>/<uuid>-disk1", "<src-pool>/<uuid>-disk2 <dest-pool>/<uuid>-disk2"]
 declare SIZE=0			# long: total transfer size in bytes
-declare SNAP1			# string: snapshot name
-declare SNAP2			# string: snapshot name
 declare -a DS_RECV=()	# array: migrated datasets
+declare -a SNAPSHOTS=()	# array: names of existing snapshots
+declare -ri CORE_QUOTA=102400									# int: maximum size in MB of VM's cores dataset
 declare -ri VM_MAX_DISKS=8										# int: maximum number of supported disks
 # shellcheck disable=SC2155
 declare -i TIME_STARTED=$(get_timestamp)						# int: timestamp
@@ -49,6 +55,15 @@ declare -a DS_CHANGE=("${SED}" -i "${CFG_BACKUP_EXT}")			# array: sed commands f
 declare -a DS_ROOT_CHANGE=("${SED}" -i "${CFG_BACKUP_EXT}")		# array: sed command for updating index
 declare -a CFG_CHANGED=()										# array: changed config files
 declare -a DEST_IMAGES=()										# array: list of "dest-dataset image_uuid" used by source VM
+declare -r TMP_DIR="/var/tmp"									# string: existing directory for temporary files
+declare -r VM_QMP_SOCK="/tmp/vm.qmp"							# string: path to QMP socket (inside zone root) -> VMS_VM_QEMU_GUEST_AGENT_SOCKET
+declare -r VM_MIGRATION_SOCK="/tmp/vm.migration"				# string: path to migration file socket (inside zone root)
+declare -r VM_QEMU_OPTS_DST_APPEND="-incoming unix:${VM_MIGRATION_SOCK}"
+declare -r VM_MEM_FILE_SUFFIX="ram"								# string: suffix for memory dumps in TMP_DIR
+declare -ri VM_MIGRATION_SOCK_MAX_WAIT=30						# int: how long to wait for migration socket to appear
+declare -r PROG_PID=$$											# int: PID of main
+declare VM_MEM_TRANSFER_PID=""									# int: PID of _transfer_kvm_ram (socat) background process
+declare VM_DISK_TRANSFER_PID=""									# int: PID of _transfer_kvm_disk (send/recv) background process
 
 ###############################################################
 # exit codes
@@ -63,18 +78,19 @@ declare -ri ERR_DS_CHECK=5
 declare -ri ERR_DS_SNAP=6
 declare -ri ERR_DS_SENDRECV=7
 declare -ri ERR_VM_STOP=8
+declare -ri ERR_VM_START=8
 declare -ri ERR_VM_DETACH=9
 declare -ri ERR_VM_ATTACH=10
 declare -ri ERR_DS_CORE=11
 declare -ri ERR_VM_XML=12
 declare -ri ERR_VM_AFTER_CHECK=13
+declare -ri ERR_VM_MEM_SENDRECV=14
+declare -ri ERR_ASSERT=99
 
 
 ###############################################################
 # helpers
 ###############################################################
-
-CORE_QUOTA=102400
 
 function techo() {
 	local msg=$*
@@ -94,20 +110,42 @@ Usage: ${PROG} migrate [parameters]
     -p <dest-pool>          is the destination pool for the root zone [KVM] or all datasets [OS]
     -[n] <dest-disk-pool>   specifies another destination pool for disk id [n], 
                             where [n] is the disk id in the disks array starting with 0 [KVM]
+    -L                      perform live migration [KVM, EXPERIMENTAL]
     -v                      print information about each step of the migration process
     -j                      print final guest json to stderr after successful migration
 
   Migrate mode examples (guest must be stopped or running):
-    Migrate one guest disk into another pool (local) [KVM]:
-    # ${PROG} migrate <uuid> -[n] <dest-disk-pool>
-    Migrate guest root zone into another pool (including delegated datasets of an OS zone) (local) [KVM, OS]:
-    # ${PROG} migrate <uuid> -p <dest-pool>
-    Migrate whole OS zone on to another host (remote) [OS]:
-    # ${PROG} migrate <uuid> -H <dest-host> [-p <dest-pool>]
-    Migrate whole guest on to another host (remote) [KVM]:
-    # ${PROG} migrate <uuid> -H <dest-host> [-p <dest-pool>] [-[n] <dest-disk-pool>]
+    - Migrate one guest disk into another pool (local) [KVM]:
+      # ${PROG} migrate <uuid> -[n] <dest-disk-pool>
+    - Migrate guest root zone into another pool (including delegated datasets of an OS zone) (local) [KVM, OS]:
+      # ${PROG} migrate <uuid> -p <dest-pool>
+    - Migrate whole OS zone on to another host (remote) [OS]:
+      # ${PROG} migrate <uuid> -H <dest-host> [-p <dest-pool>]
+    - Migrate whole guest on to another host (remote) [KVM]:
+      # ${PROG} migrate <uuid> -H <dest-host> [-L] [-p <dest-pool>] [-[n] <dest-disk-pool>]
 
 EOF
+}
+
+start_downtime() {
+	DOWNTIME_STARTED=$(get_timestamp)
+}
+
+stop_downtime() {
+	local -i downtime_ended
+
+	downtime_ended=$(get_timestamp)
+	DOWNTIME=$((downtime_ended - DOWNTIME_STARTED))
+}
+
+check_pid() {
+	local checkpid="${1}"
+
+	kill -0 "${checkpid}" &> /dev/null
+}
+
+is_kvm() {
+	[[ "${VM_BRAND_SRC}" == "kvm" ]]
 }
 
 
@@ -136,8 +174,7 @@ verbose_stage1() {
 		echo " * ${a_ds_root[0]} -> ${a_ds_root[1]}"
 	fi
 
-	# shellcheck disable=SC2199
-	if [[ -n "${DS_DATA[@]:-}" ]]; then
+	if [[ "${#DS_DATA[@]}" -ne 0 ]]; then
 		for a_ds_data in "${DS_DATA[@]}"; do
 			# shellcheck disable=SC2206
 			a_ds_data=(${a_ds_data})
@@ -155,7 +192,7 @@ validate_dest_host_ssh() {
 }
 
 _dest_host_cmd() {
-	local -a cmd=("$@")
+	local -a cmd=("${@}")
 	local agent
 
 	if [[ -n "${VERBOSE}" ]]; then
@@ -165,7 +202,7 @@ _dest_host_cmd() {
 	fi
 
 	if [[ -n "${DEST_HOST}" ]]; then
-		run_ssh "root@${DEST_HOST}" "${SELF} ${agent} ${cmd[*]}"
+		run_ssh "root@${DEST_HOST}" -- "${SELF}" "${agent}" "$(printf '%q ' "${cmd[@]}")"
 	else
 		"${cmd[@]}"
 	fi
@@ -190,6 +227,18 @@ set_vm_json_src() {
 
 set_vm_brand_src() {
 	VM_BRAND_SRC=$(_vm_brand "${JSON_SRC}")
+}
+
+set_vm_properties_src() {
+	if is_kvm; then
+		if [[ -z "${VM_STOP}" ]]; then  # live migration
+			VM_TMP_MEM_FILE="${TMP_DIR}/${UUID_SRC}.${VM_MEM_FILE_SUFFIX}.${PROG_PID}"
+			VM_QEMU_OPTS_SRC=$(_vm_property "${JSON_SRC}" "qemu_extra_opts")
+			# qemu_extra_opts must be defined (else update_zone_xml would fail)
+			[[ -z "${VM_QEMU_OPTS_SRC}" ]] && \
+				die ${ERR_VM_CHECK} "Source VM configuration is missing the \"qemu_extra_opts\" property"
+		fi
+	fi
 }
 
 validate_dataset() {
@@ -317,12 +366,12 @@ set_datasets_migrate() {
 	if [[ -n "${DEST_HOST}" || -n "${DEST_POOL}" ]]; then  # remote or root pool change
 		_set_ds_root_migrate
 
-		if [[ "${VM_BRAND_SRC}" != "kvm" ]]; then  # add OS zone delegate dataset only when root pool is migrated
+		if ! is_kvm; then  # add OS zone delegate dataset only when root pool is migrated
 			_set_ds_data_zone_migrate
 		fi
 	fi
 
-	if [[ "${VM_BRAND_SRC}" == "kvm" ]]; then
+	if is_kvm; then
 		_set_ds_data_kvm_migrate  # more remote and local migration checks inside function
 	fi
 }
@@ -339,8 +388,7 @@ _validate_images() {
 	local dst_img
 	local a_dst_img
 
-	# shellcheck disable=SC2199
-	if [[ -n "${DEST_IMAGES[@]:-}" ]]; then
+	if [[ "${#DEST_IMAGES[@]}" -ne 0 ]]; then
 		for dst_img in "${DEST_IMAGES[@]}"; do
 			# shellcheck disable=SC2206
 			a_dst_img=(${dst_img})
@@ -349,9 +397,42 @@ _validate_images() {
 	fi
 }
 
+_validate_kvm_live_migration() {
+	local vm_ram_reserve=2097152
+	local vm_ram_size
+	local tmp_dir_free
+
+	vm_ram_size=$(_vm_property "${JSON_SRC}" "ram")  # MB
+	tmp_dir_free=$(_dest_host_cmd _zfs_dataset_property "${TMP_DIR}" "available")  # bytes
+
+	[[ -z "${vm_ram_size}" || -z "${tmp_dir_free}" ]] && \
+		die ${ERR_VM_CHECK} "Unexpected error when checking temporary free space on target host"
+
+	[[ "$((vm_ram_size*1024*1024+vm_ram_reserve))" -ge "${tmp_dir_free}" ]] && \
+		die ${ERR_VM_CHECK} "Not enough free space in temp folder \"${TMP_DIR}\" on target host"
+}
+
 validate_dest_host_migrate() {
 	# TODO: Check pools, nic_tags, images, free space and if the same uuid is not defined, datasets should not exist
 	_validate_images
+
+	if is_kvm; then
+		# KVM-only validators
+		if [[ -z "${VM_STOP}" ]]; then
+			_validate_kvm_live_migration
+		fi
+	fi
+}
+
+validate_kvm_qmp() {
+	# Makes sense only for live migration of KVM to remote host
+	[[ -z "${DEST_HOST}" || -n "${VM_STOP}" ]] && return 0
+
+	local qmp_socket="/${DS_ROOT%% *}/root${VM_QMP_SOCK}"
+
+	[[ -S "${qmp_socket}" ]] || die ${ERR_VM_CHECK} "Source VM QMP socket doest not exist"
+
+	_vm_qmp_cmd "${qmp_socket}" "is-running" &> /dev/null || die ${ERR_VM_CHECK} "Source VM QMP status check failed"
 }
 
 
@@ -382,7 +463,7 @@ destroy_core_dataset() {
 	# shellcheck disable=SC2155
 	local core_ds="$(_get_core_dataset "${DS_ROOT%% *}")"
 
-	if _zfs_dataset_exists "${core_ds}"; then
+	if _zfs_dataset_exists "${core_ds}" &> /dev/null; then
 		${ZFS} destroy "${core_ds}" || die ${ERR_DS_CORE} "Failed to destroy source VM's cores dataset: ${core_ds}"
 		techo "Destroyed source VM's cores dataset: ${core_ds}"
 		VM_CORES_RM="true"
@@ -411,9 +492,40 @@ create_core_dataset_err() {
 	fi
 }
 
+_fake_zone_detach() {
+	# Called from zone_detach
+
+	[[ -n "${VM_DETACHED_FAKE}" ]] && return 0
+
+	cp "/etc/zones/${UUID_SRC}.xml" "/${DS_ROOT%% *}/SUNWdetached.xml" || \
+		die ${ERR_VM_DETACH} "Failed to fake-detach source VM: ${UUID_SRC}"
+	VM_DETACHED_FAKE="true"
+	techo "Fake-detached source VM: ${UUID_SRC}"
+}
+
+_fake_zone_attach_err() {
+	# Emergency zone attach on source host (opposite of _fake_zone_detach)
+	# Called from zone_attach_err
+
+	[[ -z "${VM_DETACHED_FAKE}" ]] && return 0
+
+	if rm -f "/${DS_ROOT%% *}/SUNWdetached.xml"; then
+		VM_DETACHED_FAKE=""
+	fi
+}
+
 zone_detach() {
-	# Makes sense only for remote migration and stopped VM
-	[[ -z "${DEST_HOST}" || "${VM_STATUS_SRC}" == "running" ]] && return 0
+	# Makes sense only for remote migration
+	[[ -z "${DEST_HOST}" ]] && return 0
+
+	# Live migration -> fake detach
+	if [[ -z "${VM_STOP}" ]]; then
+		_fake_zone_detach
+		return 0
+	fi
+
+	# Otherwise it makes sense only for stopped VM
+	[[ "${VM_STATUS_SRC}" == "running" ]] && return 0
 
 	_zone_detach "${UUID_SRC}" || die ${ERR_VM_DETACH} "Failed to detach source VM: ${UUID_SRC}"
 	VM_DETACHED="true"
@@ -424,6 +536,13 @@ zone_attach_err() {
 	# Emergency zone attach on source host (opposite of zone_detach)
 	# Makes sense only for remote migration
 	[[ -z "${DEST_HOST}" ]] && return 0
+
+	# Live migration -> fake detach was run
+	if [[ -z "${VM_STOP}" ]]; then
+		_fake_zone_attach_err
+		return 0
+	fi
+
 	[[ -z "${VM_DETACHED}" ]] && return 0  # Skip emergency attaching when allright was run
 
 	if _zone_attach "${UUID_SRC}"; then
@@ -463,7 +582,7 @@ _get_snapshot_size() {
 	size=$(_zfs_send_size "${snapshot}" "${snapshot_previous}")
 
 	# shellcheck disable=SC2181
-	[[ ${?} -ne 0 || -z "${size}" ]] && die2 ${ERR_DS_SNAP} "Could not determine ${target} snapshot size"
+	[[ ${?} -ne 0 || -z "${size}" ]] && die ${ERR_DS_SNAP} "Could not determine ${target} snapshot size"
 
 	echo "${size}"
 }
@@ -471,11 +590,12 @@ _get_snapshot_size() {
 _create_snapshots() {
 	local snapshot="$1"
 	local snapshot_previous="${2:-}"
+	local zvols_only="${3:-}"
 	local ds_data
 	local dsnap
 	local size
 
-	if [[ -n "${DS_ROOT}" ]]; then
+	if [[ -n "${DS_ROOT}" && -z "${zvols_only}" ]]; then
 		dsnap="${DS_ROOT%% *}@${snapshot}"
 		_create_snapshot "${dsnap}"
 
@@ -483,8 +603,7 @@ _create_snapshots() {
 		((SIZE+=size))
 	fi
 
-	# shellcheck disable=SC2199
-	if [[ -n "${DS_DATA[@]:-}" ]]; then
+	if [[ "${#DS_DATA[@]}" -ne 0 ]]; then
 		for ds_data in "${DS_DATA[@]}"; do
 			dsnap="${ds_data%% *}@${snapshot}"
 			_create_snapshot "${dsnap}"
@@ -495,44 +614,52 @@ _create_snapshots() {
 	fi
 }
 
-create_snapshots1() {
-	SNAP1="esmigrate-1-$(get_timestamp)"
+create_snapshots() {
+	local zvols_only="${1:-}"
+	local -i count="${#SNAPSHOTS[@]}"
+	local -i id="$((count+1))"
+	# shellcheck disable=SC2155
+	local snapname="esmigrate-${id}-$(get_timestamp_ns)"
+	local snapname_previous=""
 
-	_create_snapshots "${SNAP1}"
-}
+	SNAPSHOTS+=("${snapname}")
 
-create_snapshots2() {
-	SNAP2="esmigrate-2-$(get_timestamp)"
+	if [[ "${count}" -ge 1 ]]; then
+		snapname_previous="${SNAPSHOTS[${count}-1]}"
+	fi
 
-	_create_snapshots "${SNAP2}" "${SNAP1}"
+	if [[ -n "${zvols_only}" ]]; then
+		[[ -z "${snapname_previous}" ]] && die ${ERR_ASSERT} "Unexpected situation in create_snapshots()"
+	fi
+
+	_create_snapshots "${snapname}" "${snapname_previous}" "${zvols_only}"
 }
 
 _destroy_snapshots() {
 	local snapshot="$1"
 	local ds_data
 
+	if [[ -z "${snapshot}" && "${snapshot}" == "%" ]]; then
+		die ${ERR_ASSERT} "Missing or invalid snapshot name in _destroy_snapshots()"
+	fi
+
 	if [[ -n "${DS_ROOT}" ]]; then
 		_destroy_snapshot "${DS_ROOT%% *}@${snapshot}"
 	fi
 
-	# shellcheck disable=SC2199
-	if [[ -n "${DS_DATA[@]:-}" ]]; then
+	if [[ "${#DS_DATA[@]}" -ne 0 ]]; then
 		for ds_data in "${DS_DATA[@]}"; do
 			_destroy_snapshot "${ds_data%% *}@${snapshot}"
 		done
 	fi
 }
 
-destroy_snapshots1() {
-	[[ -n "${SNAP1:-}" ]] && _destroy_snapshots "${SNAP1}"
-
-	unset SNAP1
-}
-
-destroy_snapshots2() {
-	[[ -n "${SNAP2:-}" ]] && _destroy_snapshots "${SNAP2}"
-
-	unset SNAP2
+destroy_snapshots() {
+	if [[ "${#SNAPSHOTS[@]}" -ne 0 ]]; then
+		# Destroy all snapshots created after first esmigrate snapshot!
+		_destroy_snapshots "${SNAPSHOTS[0]}%"
+		SNAPSHOTS=()
+	fi
 }
 
 _recv_dataset_remote() {
@@ -578,11 +705,12 @@ _send_recv_dataset() {
 	techo "${msg}"
 
 	if [[ -z "${DEST_HOST}" ]]; then
+		[[ -n "${force}" ]] && force="-F"
 		# shellcheck disable=SC2086
-		${ZFS} send ${params} | ${ZFS} recv${force} ${dst}
+		${ZFS} send ${params} | ${ZFS} recv ${force} ${dst}
 	else
 		# shellcheck disable=SC2086
-		${ZFS} send ${params} | run_mbuffer | run_ssh "root@${DEST_HOST}" "${SELF} agent _recv_dataset_remote ${dst} ${force}"
+		${ZFS} send ${params} | run_mbuffer | run_ssh "root@${DEST_HOST}" -- "${SELF} agent _recv_dataset_remote ${dst} ${force}"
 	fi
 
 	# shellcheck disable=SC2181
@@ -595,53 +723,73 @@ _send_recv_dataset() {
 	fi
 }
 
-send_recv_datasets1() {
+_send_recv_datasets_init() {
+	local snap0="${1}"
 	local a_ds_root
 	local a_ds_data
 
 	if [[ -n "${DS_ROOT}" ]]; then
 		# shellcheck disable=SC2206
 		a_ds_root=(${DS_ROOT})
-		_send_recv_dataset "${a_ds_root[1]}" "${a_ds_root[0]}@${SNAP1}"
+		_send_recv_dataset "${a_ds_root[1]}" "${a_ds_root[0]}@${snap0}"
 	fi
 
-	# shellcheck disable=SC2199
-	if [[ -n "${DS_DATA[@]:-}" ]]; then
+	if [[ "${#DS_DATA[@]}" -ne 0 ]]; then
 		for a_ds_data in "${DS_DATA[@]}"; do
 			# shellcheck disable=SC2206
 			a_ds_data=(${a_ds_data})
 
 			# The OS zone delegated dataset is a child and send together with the DS_ROOT
-			if [[ "${MODE}" == "migrate" && "${VM_BRAND_SRC}" != "kvm" ]]; then
+			if [[ "${MODE}" == "migrate" ]] && ! is_kvm; then
 				DS_RECV+=("${a_ds_data[1]}")  # but we still want to mark it as received
 			else
-				_send_recv_dataset "${a_ds_data[1]}" "${a_ds_data[0]}@${SNAP1}"
+				_send_recv_dataset "${a_ds_data[1]}" "${a_ds_data[0]}@${snap0}"
 			fi
 		done
 	fi
 }
 
-send_recv_datasets2() {
+send_recv_datasets_init() {
+	create_snapshots  # Appends new snapshot name to SNAPSHOTS array
+	_send_recv_datasets_init "${SNAPSHOTS[0]}"
+}
+
+_send_recv_datasets_incr() {
+	local snap1="${1}"
+	local snap2="${2}"
+	local zvols_only="${3:-}"
 	local a_ds_root
 	local a_ds_data
 
-	if [[ -n "${DS_ROOT}" ]]; then
+	if [[ -n "${DS_ROOT}" && -z "${zvols_only}" ]]; then
 		# shellcheck disable=SC2206
 		a_ds_root=(${DS_ROOT})
-		_send_recv_dataset "${a_ds_root[1]}" "${a_ds_root[0]}@${SNAP1}" "${a_ds_root[0]}@${SNAP2}"
+		_send_recv_dataset "${a_ds_root[1]}" "${a_ds_root[0]}@${snap1}" "${a_ds_root[0]}@${snap2}"
 	fi
 
-	# shellcheck disable=SC2199
-	if [[ -n "${DS_DATA[@]:-}" ]]; then
+	if [[ "${#DS_DATA[@]}" -ne 0 ]]; then
 		# The OS zone delegated dataset is a child and send together with the DS_ROOT
-		[[ "${MODE}" == "migrate" && "${VM_BRAND_SRC}" != "kvm" ]] && return 0
+		[[ "${MODE}" == "migrate" ]] && ! is_kvm && return 0
 
 		for a_ds_data in "${DS_DATA[@]}"; do
 			# shellcheck disable=SC2206
 			a_ds_data=(${a_ds_data})
-			_send_recv_dataset "${a_ds_data[1]}" "${a_ds_data[0]}@${SNAP1}" "${a_ds_data[0]}@${SNAP2}"
+			_send_recv_dataset "${a_ds_data[1]}" "${a_ds_data[0]}@${snap1}" "${a_ds_data[0]}@${snap2}"
 		done
 	fi
+}
+
+send_recv_datasets_incr() {
+	local zvols_only="${1:-}"
+	local -i count
+
+	create_snapshots "${zvols_only}"  # Appends new snapshot name to SNAPSHOTS array
+	count=${#SNAPSHOTS[@]}
+	_send_recv_datasets_incr "${SNAPSHOTS[${count}-2]}" "${SNAPSHOTS[${count}-1]}" "${zvols_only}"
+}
+
+send_recv_zvols_incr() {
+	send_recv_datasets_incr "zvols_only"
 }
 
 stop_vm() {
@@ -655,7 +803,7 @@ stop_vm() {
 	fi
 
 	techo "Stopping VM ${UUID_SRC} ..."
-	DOWNTIME_STARTED=$(get_timestamp)
+	start_downtime
 	msg=$(_vm_stop "${UUID_SRC}")
 
 	# shellcheck disable=SC2181
@@ -679,30 +827,50 @@ stop_vm() {
 
 update_zone_xml() {
 	local zonecfg
-	local index
+	local index="/etc/zones/index"
+	local -a update_cmd=("${DS_CHANGE[@]}")
+	local qemu_extra_opts
 
 	if [[ -n "${DEST_HOST}" ]]; then  # remote migration -> zone was detached and we update SUNWdetached.xml on target host
 		zonecfg="/${DS_ROOT#* }/SUNWdetached.xml"
-		# The local index file should be updated after removing VM
+
+		# Disable auto boot
+		if is_kvm; then
+			update_cmd+=("-e")
+			# shellcheck disable=SC1117
+			update_cmd+=("s#\(<attr .*name=\"vm-autoboot\" .*value=\)\"true\"#\1\"false\"#")
+
+			if [[ -z "${VM_STOP}" ]]; then
+				# Add live migration socket to qemu_extra_opts
+				qemu_extra_opts="$(base64_encode "${VM_QEMU_OPTS_SRC} ${VM_QEMU_OPTS_DST_APPEND}" | tr -d '\n')"
+				update_cmd+=("-e")
+				# shellcheck disable=SC1117
+				update_cmd+=("s#\(attr name=\"qemu-extra-opts\" .*value=\)\"[^\"]*\"#\1\"${qemu_extra_opts}\"#")
+			fi
+		else
+			update_cmd+=("-e")
+			# shellcheck disable=SC1117
+			update_cmd+=("s#\(<zone .*autoboot=\)\"true\"#\1\"false\"#")
+		fi
 	else  # local migration (no zone detach/attach) -> update /etc/zones/<uuid>.xml
 		zonecfg="/etc/zones/${UUID_SRC}.xml"
-		index="/etc/zones/index"  # Update local index
 	fi
 
-	if [[ -n "${DS_CHANGE[3]:-}" ]]; then
-		DS_CHANGE+=("${zonecfg}")
+	# First three commands are sed defaults
+	if [[ "${#update_cmd[@]}" -gt 3 ]]; then
+		update_cmd+=("${zonecfg}")
 
-		# shellcheck disable=SC2086
-		_dest_host_cmd ${DS_CHANGE[*]} || die ${ERR_VM_XML} "Could not update zone configuration: ${zonecfg}"
+		_dest_host_cmd "${update_cmd[@]}" || die ${ERR_VM_XML} "Could not update zone configuration: ${zonecfg}"
 		techo "Updated zone configuration: ${zonecfg}"
 		# Save changed zone configuration xml (makes sense only for local migration)
 		[[ -z "${DEST_HOST}" ]] && CFG_CHANGED+=("${zonecfg}")
 	fi
 
-	if [[ -n "${index:-}" && -n "${DS_ROOT_CHANGE[3]:-}" ]]; then
+	if [[ -z "${DEST_HOST}" && "${#DS_ROOT_CHANGE[@]}" -gt 3 ]]; then
+		# local migration (no zone detach/attach) + zone root change -> update zone root in /etc/zones/<uuid>.xml
 		DS_ROOT_CHANGE+=("${index}")
 
-		${DS_ROOT_CHANGE[*]} || die ${ERR_VM_XML} "Could not update zone index: ${index}"
+		"${DS_ROOT_CHANGE[@]}" || die ${ERR_VM_XML} "Could not update zone index: ${index}"
 		techo "Updated zone index: ${index}"
 		CFG_CHANGED+=("${index}")
 	fi
@@ -712,8 +880,7 @@ update_zone_xml_err() {
 	# Emergency rollback of changed zone xml files (opposite of update_zone_xml)
 	[[ "${MODE}" != "migrate" ]] && return 0  # Only useful for migration
 	[[ -n "${DEST_HOST}" ]] && return 0  # Makes sense only for local migration
-	# shellcheck disable=SC2199
-	[[ -z "${CFG_CHANGED[@]:-}" ]] && return 0  # Skip emergency removal when allright was run
+	[[ "${#CFG_CHANGED[@]}" -eq 0 ]] && return 0  # Skip emergency removal when allright was run
 
 	local xml
 
@@ -731,8 +898,7 @@ _fix_zone_index() {
 	local fix="s#/${UUID_SRC}:.*#/${UUID_SRC}:${UUID_SRC}#"
 	local -a sed_cmd=("${SED}" -i ".fix-${TIME_STARTED}" -e "${fix}" "${index}")
 
-	# shellcheck disable=SC2086
-	_dest_host_cmd ${sed_cmd[*]} || die ${ERR_VM_XML} "Couldn't fix VM uuid in zone index: ${index}"
+	_dest_host_cmd "${sed_cmd[@]}" || die ${ERR_VM_XML} "Couldn't fix VM uuid in zone index: ${index}"
 	techo "Fixed VM uuid in zone index: ${index}"
 }
 
@@ -755,6 +921,16 @@ zone_delete_err() {
 
 	# shellcheck disable=SC2155
 	local core_ds="$(_get_core_dataset "${DS_ROOT#* }")"
+
+	if [[ -n "${VM_READY}" ]]; then
+		# Live migration -> VM was started on destination host
+		if _dest_host_cmd "_vm_stop_force" "${UUID_SRC}"; then
+			VM_READY=""
+			techo "Stopped destination VM: ${UUID_SRC}"
+		else
+			echo "Failed to stop destination VM: ${UUID_SRC}" 1>&2
+		fi
+	fi
 
 	if _dest_host_cmd _zone_delete "${UUID_SRC}"; then  # This should also remove the entry from zone index file
 		_dest_host_cmd "${ZFS}" destroy "${core_ds}"  # Also silently remove cores dataset
@@ -827,14 +1003,255 @@ destroy_datasets_dst_err() {
 	local dst
 
 	[[ "${MODE}" != "migrate" ]] && return 0  # Only useful for migration
-	# shellcheck disable=SC2199
-	[[ -z "${DS_RECV[@]:-}" ]] && return 0  # Skip emergency cleanup when allright was run
+	[[ "${#DS_RECV[@]}" -eq 0 ]] && return 0  # Skip emergency cleanup when allright was run
 
 	for dst in "${DS_RECV[@]}"; do
 		_dest_host_cmd _destroy_dataset "${dst}" "destination"
 	done
 
 	DS_RECV=()
+}
+
+
+###############################################################
+# stage 3.5: live migration
+###############################################################
+
+live_migration() {
+	[[ -z "${VM_STOP}" && "${VM_STATUS_SRC}" == "running" ]]
+}
+
+remove_kvm_mem_dump() {
+	[[ -z "${VM_MEM_DUMP}" ]] && return 0
+
+	if _dest_host_cmd rm -f "${VM_TMP_MEM_FILE}"; then
+		techo "Removed memory dump ${VM_TMP_MEM_FILE} on ${DEST_HOST}"
+		VM_MEM_DUMP=""
+	else
+		echo "Failed to remove memory dump ${VM_TMP_MEM_FILE} on ${DEST_HOST}" 1>&2
+	fi
+
+	# We will also clean other memory dumps /var/tmp from older failed migrations
+	# (on both, source and destination host)
+	techo "Removing old memory dumps in ${TMP_DIR} on localhost"
+	find "${TMP_DIR}" -type f -name "*.${VM_MEM_FILE_SUFFIX}.*" -mmin +120 -exec rm -f "{}" \;
+	techo "Removing old memory dumps in ${TMP_DIR} on ${DEST_HOST}"
+	_dest_host_cmd find "${TMP_DIR}" -type f -name "*.${VM_MEM_FILE_SUFFIX}.*" -mmin +120 -exec rm -f "{}" \;
+}
+
+resume_vm_err() {
+	# Emergency resume of source VM (called from cleanup)
+	[[ -z "${VM_RESUME}" ]] && return 0
+
+	local zone_root_src="${DS_ROOT%% *}"
+	local qmp_socket="/${zone_root_src}/root${VM_QMP_SOCK}"
+
+	echo "Uh-oh, live migration has failed; resuming source VM: ${UUID_SRC} ..." 1>&2
+
+	if _vm_qmp_cmd "${qmp_socket}" "migrate-cancel" > /dev/null; then
+		techo "Cancel live migration on source VM: ${UUID_SRC}"
+	else
+		echo "Failed to cancel live migration on source VM: ${UUID_SRC}" 1>&2
+	fi
+
+	if _vm_qmp_cmd "${qmp_socket}" "cont" > /dev/null; then
+		VM_RESUME=""
+		techo "Resumed source VM: ${UUID_SRC}"
+	else
+		echo "Failed to resume source VM: ${UUID_SRC}" 1>&2
+	fi
+}
+
+# This is a background process identified by VM_DISK_TRANSFER_PID
+_transfer_kvm_disk() {
+	local running="true"
+	local -i rc=0
+	local stdout
+
+	trap "running=''" USR1
+
+	while [[ -n "${running}" ]]; do
+		stdout="$(send_recv_zvols_incr)"
+		rc=$?
+
+		if [[ -n "${stdout}" && -n "${VERBOSE}" ]]; then
+			if [[ "${VERBOSE}" -eq 1 ]]; then
+				echo -ne "."
+			else
+				echo "${stdout}"
+			fi
+		fi
+
+		sleep 0.5
+	done
+
+	return ${rc}
+}
+
+# This should never happen, because _transfer_kvm_disk will be interrupted by _wait_send_recv_kvm_ram_and_disk
+transfer_kvm_disk_err() {
+	[[ -z "${VM_DISK_TRANSFER_PID}" ]] && return 0
+
+	echo "Killing disk transfer background process" 1>&2
+	kill "${VM_DISK_TRANSFER_PID}"
+}
+
+# This is a background process identified by VM_MEM_TRANSFER_PID
+_transfer_kvm_ram() {
+	local migration_socket="${1}"
+
+	"${SOCAT}" -u UNIX-LISTEN:"${migration_socket}" - | run_ssh "root@${DEST_HOST}" -- "${CAT}" \> "${VM_TMP_MEM_FILE}"
+}
+
+transfer_kvm_ram_err() {
+	[[ -z "${VM_MEM_TRANSFER_PID}" ]] && return 0
+
+	echo "Killing memory transfer background process" 1>&2
+	kill "${VM_MEM_TRANSFER_PID}"
+}
+
+# This loop waits for socat process to exit (meaning end of RAM transfer)
+_wait_send_recv_kvm_ram_and_disk() {
+	local -i socat_rc=0
+	local -i sendrecv_rc=0
+
+	while [[ -n ${VM_MEM_TRANSFER_PID} ]] && check_pid "${VM_MEM_TRANSFER_PID}"; do
+		techo "Waiting for memory transfer to finish ..."
+		wait "${VM_MEM_TRANSFER_PID}"
+		socat_rc=$?
+		break
+	done
+
+	VM_MEM_TRANSFER_PID=""
+
+	while [[ -n ${VM_DISK_TRANSFER_PID} ]] && check_pid "${VM_DISK_TRANSFER_PID}"; do
+		techo "Waiting for disk transfer to finish ..."
+		kill -USR1 "${VM_DISK_TRANSFER_PID}"
+		wait "${VM_DISK_TRANSFER_PID}"
+		sendrecv_rc=$?
+		break
+	done
+
+	VM_DISK_TRANSFER_PID=""
+
+	[[ "${socat_rc}" -eq 0 && "${sendrecv_rc}" -eq 0 ]]
+}
+
+send_kvm_ram() {
+	local zone_root_src="${DS_ROOT%% *}"
+	local qmp_socket="/${zone_root_src}/root${VM_QMP_SOCK}"
+	local migration_socket="/${zone_root_src}/root${VM_MIGRATION_SOCK}"
+	local migration_status
+
+	techo "Creating and sending memory dump to ${VM_TMP_MEM_FILE} on ${DEST_HOST} ..."
+
+	# Transfer socat must be running before we issue the migrate command to QMP
+	_transfer_kvm_ram "${migration_socket}" &
+	VM_MEM_TRANSFER_PID=$!
+
+	if check_pid "${VM_MEM_TRANSFER_PID}"; then
+		VM_MEM_DUMP="true"
+	else
+		die ${ERR_VM_MEM_SENDRECV} "Memory transfer did not start"
+	fi
+
+	# Start live migration
+	if _vm_qmp_cmd "${qmp_socket}" "migrate" "unix:${VM_MIGRATION_SOCK}" > /dev/null; then
+		VM_RESUME="true"
+	else
+		die ${ERR_VM_MEM_SENDRECV} "Memory dump failed"
+	fi
+
+	# Run send_recv_zvols_incr in an never-ending loop
+	_transfer_kvm_disk &
+	VM_DISK_TRANSFER_PID=$!
+
+	# Wait for migration to finish + stop _transfer_kvm_disk background process
+	if _wait_send_recv_kvm_ram_and_disk; then
+		techo "Memory transfer finished -> source VM is paused now"
+	else
+		die ${ERR_VM_MEM_SENDRECV} "Memory or disk transfer failed"
+	fi
+
+	# Migration has finished -> VM is paused now
+	start_downtime
+	migration_status="$(_vm_qmp_cmd "${qmp_socket}" "query-migrate")"
+
+	# shellcheck disable=SC2181
+	if [[ $? -eq 0 && "${migration_status}" == "completed" ]]; then
+		techo "Memory transfer finished correctly -> source VM is paused now"
+	else
+		die ${ERR_VM_MEM_SENDRECV} "Bad migration status on source VM: ${migration_status}"
+	fi
+}
+
+_wait_kvm_migration_socket() {
+	local migration_socket="${1}"
+	local -i waited=0
+
+	while [[ "${waited}" -lt "${VM_MIGRATION_SOCK_MAX_WAIT}" ]]; do
+		sleep 0.5
+		((waited++))
+		_dest_host_cmd test -S "${migration_socket}" && return 0
+	done
+
+	return 1
+}
+
+recv_kvm_ram() {
+	local zone_root_dst="${DS_ROOT#* }"
+	local qmp_socket="/${zone_root_dst}/root${VM_QMP_SOCK}"
+	local migration_socket="/${zone_root_dst}/root${VM_MIGRATION_SOCK}"
+
+	techo "Starting destination VM: ${UUID_SRC} ..."
+
+	if _dest_host_cmd "_vm_start" "${UUID_SRC}" > /dev/null; then
+		VM_READY="true"
+		techo "Started destination VM: ${UUID_SRC}"
+	else
+		die ${ERR_VM_START} "Failed to start destination VM: ${UUID_SRC}"
+	fi
+
+	techo "Waiting for migration socket ..."
+
+	if ! _wait_kvm_migration_socket "${migration_socket}"; then
+		die ${ERR_VM_MEM_SENDRECV} "Migration socket did not appear on destination host"
+	fi
+
+	techo "Loading memory dump to VM ${UUID_SRC} from ${VM_TMP_MEM_FILE} on ${DEST_HOST} ..."
+
+	if _dest_host_cmd "${SOCAT}" -u "OPEN:${VM_TMP_MEM_FILE}" "UNIX-CONNECT:${migration_socket}"; then
+		techo "Memory dump successfully loaded"
+	else
+		die ${ERR_VM_MEM_SENDRECV} "Failed to load memory dump"
+	fi
+
+	techo "Checking destination VM: ${UUID_SRC}"
+
+	if _dest_host_cmd _vm_qmp_cmd "${qmp_socket}" "is-running" > /dev/null; then
+		VM_RESUME=""  # We are good here -> info for emergency cleanup
+		stop_downtime
+		techo "Successfully resumed destination VM: ${UUID_SRC}"
+	else
+		die ${ERR_VM_MEM_SENDRECV} "Failed to resume destination VM: ${UUID_SRC}"
+	fi
+}
+
+fix_vm_properties_dst() {
+    local zone_root_dst="${DS_ROOT#* }"
+	local migration_socket="/${zone_root_dst}/root${VM_MIGRATION_SOCK}"
+
+	if _dest_host_cmd _vm_update "${UUID_SRC}" qemu_extra_opts="${VM_QEMU_OPTS_SRC}" &> /dev/null; then
+		techo "Restored configuration of destination VM: ${UUID_SRC}"
+	else
+		die ${ERR_VM_XML} "Failed to restore configuration of destination VM: ${UUID_SRC}"
+	fi
+
+	# Although we have removed the QEMU migration parameter, the migration socket still exits
+	# -> this would break next live migration
+	if _dest_host_cmd rm -f "${migration_socket}"; then
+		techo "Removed migration socket of destination VM: ${UUID_SRC}"
+	fi
 }
 
 
@@ -864,11 +1281,10 @@ check_vm_migrate() {
 
 destroy_snapshots_dst() {
 	# Remove migration snapshots on destination datasets
-	# shellcheck disable=SC2199
-	if [[ -n "${DS_RECV[@]:-}" ]]; then
+	if [[ "${#DS_RECV[@]}" -ne 0 && "${#SNAPSHOTS[@]}" -ne 0 ]]; then
 		for dst in "${DS_RECV[@]}"; do
-			[[ -n "${SNAP1:-}" ]] && _dest_host_cmd _destroy_snapshot "${dst}@${SNAP1}" "destination"
-			[[ -n "${SNAP2:-}" ]] && _dest_host_cmd _destroy_snapshot "${dst}@${SNAP2}" "destination"
+			# Destroy all snapshots created after first esmigrate snapshot!
+			_dest_host_cmd _destroy_snapshot "${dst}@${SNAPSHOTS[0]}%" "destination"
 		done
 	fi
 }
@@ -906,8 +1322,7 @@ destroy_datasets_src() {
 		fi
 
 		# The OS zone delegated dataset is a child and destroyed together with the DS_ROOT
-		# shellcheck disable=SC2199
-		if [[ -n "${DS_DATA[@]:-}" && "${VM_BRAND_SRC}" == "kvm" ]]; then
+		if [[ "${#DS_DATA[@]}" -ne 0 ]] && is_kvm; then
 			for ds_data in "${DS_DATA[@]}"; do
 				_destroy_dataset "${ds_data%% *}"
 			done
@@ -915,13 +1330,14 @@ destroy_datasets_src() {
 
 	else  # remote migration -> remove source VM, which will remove all source datasets
 		_delete_vm "${UUID_SRC}"
-		_destroy_dataset "${DS_ROOT%% *}"  # We have to destroy the root zone manually, because vmadm won't do it for detached zone
+		if [[ -z "${VM_DETACHED_FAKE}" ]]; then
+			_destroy_dataset "${DS_ROOT%% *}"  # We have to destroy the root zone manually, because vmadm won't do it for detached zone
+		fi
 	fi
 
 	DS_RECV=()
-	# This will disable destroy_snapshots1 and destroy_snapshots2 in cleanup
-	unset SNAP1
-	unset SNAP2
+	# This will disable destroy_snapshots in cleanup
+	SNAPSHOTS=()
 }
 
 vmadmd_restart() {
@@ -937,7 +1353,6 @@ _start_vm() {
 
 	local uuid="$1"
 	local target="${2:-"source"}"
-	local -i downtime_ended
 	local -a cmd
 
 	if [[ "${target}" == "destination" ]]; then
@@ -946,10 +1361,9 @@ _start_vm() {
 		cmd=("_vm_start" "${uuid}")
 	fi
 
-	if ${cmd[*]} > /dev/null; then
+	if "${cmd[@]}" > /dev/null; then
 		VM_START=""
-		downtime_ended=$(get_timestamp)
-		DOWNTIME=$((downtime_ended - DOWNTIME_STARTED))
+		stop_downtime
 		techo "Started ${target} VM: ${uuid}"
 	else
 		echo "Failed to start ${target} VM: ${uuid}" 1>&2
@@ -974,7 +1388,11 @@ allright() {
 	CFG_CHANGED=()	# Clear the need for emergency config file restore
 	VM_ATTACHED=""	# Clear the need for emergency destination VM removal
 	VM_DETACHED=""	# Clear the need for emergency source VM attach
+	VM_DETACHED_FAKE=""	# Clear the need for emergency source VM fake-attach
 	VM_CORES_RM=""	# Clear the need for emergency re-creation of source VM's cores dataset
+	VM_RESUME=""	# Clear the need for emergency resume of source VM
+	VM_MEM_TRANSFER_PID=""	# Clear the need for killing a running _transfer_kvm_ram background process
+	VM_DISK_TRANSFER_PID=""	# Clear the need for killing a running _transfer_kvm_disk background process
 }
 
 print_json() {
@@ -1003,16 +1421,19 @@ success() {
 
 cleanup() {
 	# Emergency stuff (will run only if allright was not run)
+	transfer_kvm_disk_err
+	transfer_kvm_ram_err
 	update_zone_xml_err
 	zone_attach_err
 	create_core_dataset_err
 	zone_delete_err
 	destroy_datasets_dst_err
 	start_vm_err
+	resume_vm_err
 
 	# General cleanup (will always run)
-	destroy_snapshots1
-	destroy_snapshots2
+	remove_kvm_mem_dump
+	destroy_snapshots
 }
 
 
@@ -1022,27 +1443,28 @@ cleanup() {
 
 validate_input_migrate() {
 	if [[ -z "${DEST_HOST}" ]]; then  # local
-		if [[ "${VM_BRAND_SRC}" == "kvm" ]]; then
+		if is_kvm; then
 			# local migration of KVM machine's disk(s) into another pool
 			# and/or local migration of KVM machine's root pool into another pool
 			[[ ${#DEST_DISK[@]} -eq 0 && -z "${DEST_POOL}" ]] && \
 				die ${ERR_INPUT} "Missing target disk pool parameter and/or target zone pool parameter"
+			[[ -z "${VM_STOP}" ]] && die ${ERR_INPUT} "Live migration cannot be performed locally"
 		else
 			# local migration of OS zone into another pool
 			[[ ${#DEST_DISK[@]} -ne 0 ]] && die ${ERR_INPUT} "Redundant target disk pool parameter"
 			[[ -z "${DEST_POOL}" ]] && die ${ERR_INPUT} "Missing target zone pool parameter"
+			[[ -z "${VM_STOP}" ]] && die ${ERR_INPUT} "Live migration is currently available only for KVM"
 		fi
 	else  # remote
-		if [[ "${VM_BRAND_SRC}" == "kvm" ]]; then
+		if is_kvm; then
 			# migrate KVM machine on to another host (all or none parameters can be used)
-			:
+			[[ -z "${VM_STOP}" && "${VM_STATUS_SRC}" != "running" ]] && \
+				die ${ERR_INPUT} "Live migration is possible only when source VM is in running state"
 		else
 			# migrate whole OS zone on to another host (only target pool can be used)
 			[[ ${#DEST_DISK[@]} -ne 0 ]] && die ${ERR_INPUT} "Redundant target disk pool parameter"
+			[[ -z "${VM_STOP}" ]] && die ${ERR_INPUT} "Live migration is currently available only for KVM"
 		fi
-
-		[[ -z "${VM_STOP}" && "${VM_STATUS_SRC}" == "running" ]] && \
-			die ${ERR_INPUT} "Migration is not possible without stopping VM"
 	fi
 }
 
@@ -1058,12 +1480,16 @@ set_opts() {
 	DEST_POOL=""
 	DEST_DISK=()
 
-	while getopts "vxjH:p:0:1:2:3:4:5:6:7:" opt; do
+	while getopts "vLjH:p:0:1:2:3:4:5:6:7:" opt; do
 		case "${opt}" in
 			v)
-				VERBOSE="true"
+				if [[ -z "${VERBOSE}" ]]; then
+					VERBOSE=1
+				else
+					((VERBOSE++))
+				fi
 				;;
-			x)
+			L)
 				VM_STOP=""
 				;;
 			j)
@@ -1079,7 +1505,7 @@ set_opts() {
 				;;
 			[0-8])
 				validate_ascii "${OPTARG}" "Invalid target disk pool or disk ID"
-				DEST_DISK[$opt]="${OPTARG}"
+				DEST_DISK[${opt}]="${OPTARG}"
 				;;
 			*)
 				die ${ERR_INPUT}
@@ -1098,25 +1524,26 @@ migrate() {
 	set_vm_status_src			# Set ${VM_STATUS_SRC}
 	set_vm_json_src				# Set ${JSON_SRC}
 	set_vm_brand_src			# Set ${VM_BRAND_SRC}
+	set_vm_properties_src		# Set ${VM_QEMU_OPTS_SRC} (required for live migration)
 	validate_dest_host_ssh		# Check if remote host is reachable
 	validate_input_migrate		# Advanced input validation
 	set_datasets_migrate		# Prepare ${DS_ROOT} and ${DS_DATA}
 	validate_dest_host_migrate	# Check remote host free space, pools, nic_tags, ...
+	validate_kvm_qmp			# Check if QMP socket is alive (required for live migration)
 	verbose_stage1				# Print ${DS_ROOT} and ${DS_DATA}
 
 	# stage 2
 	set_vm_status_src			# Set ${VM_STATUS_SRC} ("double check")
 	destroy_core_dataset		# Destroy cores dataset when doing remote migration and VM is stopped
 	zone_detach					# Detach zone when doing remote migration and VM is stopped
-	create_snapshots1			# Snapshot for next send/recv (+ aggregate snapshot size)
-	send_recv_datasets1			# Full zfs send/recv
+	send_recv_datasets_init		# Create snapshots (+ aggregate snapshot size) + Full zfs send/recv
+	send_recv_datasets_incr		# Create snapshots (+ aggregate snapshot size) + First incremental zfs send/recv
 
-	# stage 2.5
+	# stage 2.5 (skipped when doing live migration)
 	if stop_vm; then			# Stop VM if running, or keep running if requested by user
 		destroy_core_dataset	# Destroy cores dataset when doing remote migration and VM is stopped
 		zone_detach				# Detach zone when doing remote migration and VM is stopped
-		create_snapshots2		# Snapshot for next send/recv (+ aggregate snapshot size)
-		send_recv_datasets2		# Final incremental zfs send/recv
+		send_recv_datasets_incr	# Create snapshots (+ aggregate snapshot size) + Final incremental zfs send/recv
 	fi
 
 	# stage 3
@@ -1125,15 +1552,24 @@ migrate() {
 	zone_attach					# Attach zone on remote host when doing remote migration
 	create_core_dataset			# Create cores dataset when changing root pool locally or doing remote migration
 
-	# stage 4
+	# stage 4 (live migration + checks)
 	check_vm_migrate			# Check if migrated destination VM can be started
-	# TODO: add more checks
+
+	if live_migration; then
+		send_kvm_ram			# Start memory transfer + pause VM
+		send_recv_zvols_incr	# Create snapshots (+ aggregate snapshot size) + Final incremental zfs send/recv
+		recv_kvm_ram			# Start destination VM + load transferred memory + resume destination VM
+		fix_vm_properties_dst	# Restore destination VM configuration to normal (qemu_extra_opts)
+	fi
 
 	# stage 5
 	vmadmd_restart				# Restart vmadmd to ensure detection of transferred VM's presence
 	destroy_snapshots_dst		# Remove migration snapshots on target host
 	destroy_datasets_src		# Remove source datasets which are not needed anymore
-	start_vm_migrate			# Start destination VM if the source VM was shutdown during migration
+
+	if ! live_migration; then
+		start_vm_migrate		# Start destination VM if the source VM was shutdown during migration
+	fi
 
 	# stage 6
 	allright					# Turn off emergency cleanup stuff
@@ -1153,7 +1589,7 @@ main() {
 			exit ${OK}
 			;;
 		agent|agent-verbose)
-			[[ "${MODE}" == *"verbose" ]] && VERBOSE="true"
+			[[ "${MODE}" == *"verbose" ]] && VERBOSE=1
 			shift
 			"${@-}"
 			exit $?
@@ -1169,4 +1605,4 @@ main() {
 	esac
 }
 
-main "$@"
+main "${@}"

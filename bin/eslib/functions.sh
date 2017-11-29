@@ -51,6 +51,8 @@ IMGADM=${IMGADM:-"/usr/sbin/imgadm"}
 MOUNT="${MOUNT:-"/usr/sbin/mount"}"
 UMOUNT="${UMOUNT:-"/usr/sbin/umount"}"
 BC=${BC:-"/usr/bin/bc"}
+SOCAT=${SOCAT:-"/usr/bin/socat"}
+QMP=${QMP:-"${ERIGONES_HOME}/bin/qmp-client"}
 QGA=${QGA:-"${ERIGONES_HOME}/bin/qga-client"}
 QGA_SNAPSHOT=${QGA_SNAPSHOT:-"${ERIGONES_HOME}/bin/qga-snapshot"}
 NODE=${NODE:-"/usr/node/bin/node"}
@@ -65,7 +67,16 @@ FSTYP=${FSTYP:-"/usr/sbin/fstyp"}
 ###############################################################
 # Arguments passed to ssh
 ###############################################################
-SSH_ARGS=${SSH_ARGS:-"-c chacha20-poly1305@openssh.com -o BatchMode=yes -o StrictHostKeyChecking=no -o GSSAPIKeyExchange=no -o GSSAPIAuthentication=no "}
+SSH_ARGS=${SSH_ARGS:-"\
+-c chacha20-poly1305@openssh.com \
+-o BatchMode=yes \
+-o StrictHostKeyChecking=no \
+-o GSSAPIKeyExchange=no \
+-o GSSAPIAuthentication=no \
+-o ControlMaster=auto \
+-o ControlPath=~/.ssh/master-%r@%h:%p \
+-o ControlPersist=1m \
+"}
 
 ###############################################################
 # Arguments passed to mbuffer
@@ -100,6 +111,10 @@ get_timestamp() {
 	${DATE} '+%s'
 }
 
+get_timestamp_ns() {
+	${DATE} '+%s%N'
+}
+
 checksum() {
 	local filename="$1"
 
@@ -131,7 +146,7 @@ trim() {
 join() {
 	local separator="$1"
 	shift
-	local array=("$@")
+	local -a array=("$@")
 
 	regex="$(printf "${separator}%s" "${array[@]}")"
 	regex="${regex:${#separator}}" # remove leading separator
@@ -199,6 +214,18 @@ lofi_remove() {
 	if [[ -a "${lofi_dev}" ]]; then
 		${LOFIADM} -d "${lofi_dev}"
 	fi
+}
+
+base64_encode() {
+	local str="${1}"
+
+	printf "%s" "${str}" | python -m base64 -e -
+}
+
+base64_decode() {
+	local str="${1}"
+
+	printf "%s" "${str}" | python -m base64 -d -
 }
 
 
@@ -609,6 +636,13 @@ _vm_delete() {
 	${VMADM} delete "${uuid}"
 }
 
+_vm_update() {
+	local uuid="$1"
+	shift
+
+	${VMADM} update "${uuid}" "${@}"
+}
+
 _vm_remove_indestructible_property() {
 	local uuid="$1"
 
@@ -676,6 +710,13 @@ _image_exists() {
 	${IMGADM} get -P "${pool}" "${image_uuid}" &> /dev/null
 }
 
+_vm_qmp_cmd() {
+	local qmp_sock="$1"
+	shift
+
+	${QMP} "${qmp_sock}" "${@}"
+}
+
 _vm_qga_lock() {
 	local qga_sock="$1"
 	local lockfile="${qga_sock}.lock"
@@ -714,7 +755,7 @@ _vm_qga_cmd() {
 	local qga_sock="$1"
 	shift
 
-	${QGA} "${qga_sock}" "$@"
+	${QGA} "${qga_sock}" "${@}"
 }
 
 _vm_qga_fsfreeze_freeze() {

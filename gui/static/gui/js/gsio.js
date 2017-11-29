@@ -178,8 +178,12 @@ function vm_delete(hostname) {
 }
 
 // Migrate VM to another compute node
-function vm_migrate(hostname, node) {
-  return esio('set', 'vm_migrate', [hostname], {'data': {'node': node}});
+function vm_migrate(hostname, node, live) {
+  var kwargs = {'data': {'node': node}};
+  if (typeof(live) !== 'undefined') {
+    kwargs['data']['live'] = live;
+  }
+  return esio('set', 'vm_migrate', [hostname], kwargs);
 }
 
 // Fail over VM to its replica
