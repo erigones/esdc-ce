@@ -1221,6 +1221,9 @@ recv_kvm_ram() {
 		stop_downtime
 		techo "Successfully resumed destination VM: ${UUID_SRC}"
 	else
+		echo "ERROR: Unexpected problem with destination VM: ${UUID_SRC}" 1>&2
+		# Debug info
+		_dest_host_cmd "${SED}" -ne '/^=== OUTPUT/,//p' "${zone_root_dst}/root/tmp/vm.log" 1>&2
 		die ${ERR_VM_MEM_SENDRECV} "Failed to resume destination VM: ${UUID_SRC}"
 	fi
 }
