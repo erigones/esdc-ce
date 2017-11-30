@@ -30,7 +30,7 @@ declare VM_READY=""		# bool: whether destination VM was started during live migr
 declare VM_RESUME=""	# bool: whether to resume the VM after successful finish
 declare VM_CORES_RM=""	# bool: VM's cores dataset was removed if non-empty
 declare VM_DETACHED=""	# bool: source zone was detached if non-empty
-declare VM_DETACHED_FAKE=""	# bool: if not-empty, source zone was not detach, however SUNWdetached.xml was created (live migration)
+declare VM_DETACHED_FAKE=""	# bool: if not-empty, source zone was not detached, however SUNWdetached.xml was created (live migration)
 declare VM_ATTACHED=""	# bool: destination zone was attached if non-empty
 declare VM_MEM_DUMP=""	# bool: VM memory dump was create if non-empty
 declare PRINT_JSON=""	# bool: print VM json to stdout after successful migration
@@ -59,8 +59,7 @@ declare -r TMP_DIR="/var/tmp"									# string: existing directory for temporary
 declare -r VM_QMP_SOCK="/tmp/vm.qmp"							# string: path to QMP socket (inside zone root) -> VMS_VM_QEMU_GUEST_AGENT_SOCKET
 declare -r VM_MIGRATION_SOCK="/tmp/vm.migration"				# string: path to migration file socket (inside zone root)
 declare -r VM_QEMU_OPTS_DST_APPEND="-incoming unix:${VM_MIGRATION_SOCK}"
-declare -r VM_MEM_FILE_SUFFIX="ram"								# string: suffix for memory dumps in TMP_DIR
-declare -ri VM_MIGRATION_SOCK_MAX_WAIT=30						# int: how long to wait for migration socket to appear
+declare -r VM_MEM_FILE_SUFFIX="ramdump"							# string: suffix for memory dumps in TMP_DIR
 declare -r PROG_PID=$$											# int: PID of main
 declare VM_MEM_TRANSFER_PID=""									# int: PID of _transfer_kvm_ram (socat) background process
 declare VM_DISK_TRANSFER_PID=""									# int: PID of _transfer_kvm_disk (send/recv) background process
@@ -102,7 +101,7 @@ function techo() {
 
 function usage() {
 	${CAT} << EOF
-Usage: ${PROG} migrate [parameters]
+Usage: ${PROG} {migrate} [parameters]
 
   Migrate mode parameters:
     <uuid>                  source guest uuid
@@ -115,12 +114,16 @@ Usage: ${PROG} migrate [parameters]
     -j                      print final guest json to stderr after successful migration
 
   Migrate mode examples (guest must be stopped or running):
+
     - Migrate one guest disk into another pool (local) [KVM]:
       # ${PROG} migrate <uuid> -[n] <dest-disk-pool>
+
     - Migrate guest root zone into another pool (including delegated datasets of an OS zone) (local) [KVM, OS]:
       # ${PROG} migrate <uuid> -p <dest-pool>
+
     - Migrate whole OS zone on to another host (remote) [OS]:
       # ${PROG} migrate <uuid> -H <dest-host> [-p <dest-pool>]
+
     - Migrate whole guest on to another host (remote) [KVM]:
       # ${PROG} migrate <uuid> -H <dest-host> [-L] [-p <dest-pool>] [-[n] <dest-disk-pool>]
 
@@ -398,6 +401,9 @@ _validate_images() {
 }
 
 _validate_kvm_live_migration() {
+	# We need to make sure that there is enough free space in /var/tmp on destination host;
+	# The memory dump can be larger than the actual RAM size of the VM and we don't want to 
+	# max out the disk space in /var/tmp.
 	local vm_ram_reserve=2097152
 	local vm_ram_size
 	local tmp_dir_free
@@ -1014,7 +1020,7 @@ destroy_datasets_dst_err() {
 
 
 ###############################################################
-# stage 3.5: live migration
+# stage 4: live migration
 ###############################################################
 
 live_migration() {
@@ -1100,7 +1106,7 @@ transfer_kvm_disk_err() {
 _transfer_kvm_ram() {
 	local migration_socket="${1}"
 
-	"${SOCAT}" -u UNIX-LISTEN:"${migration_socket}" - | run_ssh "root@${DEST_HOST}" -- "${CAT}" \> "${VM_TMP_MEM_FILE}"
+	"${SOCAT}" -u UNIX-LISTEN:"${migration_socket}" - | run_ssh "root@${DEST_HOST}" -- "umask 0277; ${CAT} > ${VM_TMP_MEM_FILE}"
 }
 
 transfer_kvm_ram_err() {
@@ -1123,6 +1129,8 @@ _wait_send_recv_kvm_ram_and_disk() {
 	done
 
 	VM_MEM_TRANSFER_PID=""
+
+	start_downtime
 
 	while [[ -n ${VM_DISK_TRANSFER_PID} ]] && check_pid "${VM_DISK_TRANSFER_PID}"; do
 		techo "Waiting for disk transfer to finish ..."
@@ -1174,7 +1182,6 @@ send_kvm_ram() {
 	fi
 
 	# Migration has finished -> VM is paused now
-	start_downtime
 	migration_status="$(_vm_qmp_cmd "${qmp_socket}" "query-migrate")"
 
 	# shellcheck disable=SC2181
@@ -1183,19 +1190,6 @@ send_kvm_ram() {
 	else
 		die ${ERR_VM_MEM_SENDRECV} "Bad migration status on source VM: ${migration_status}"
 	fi
-}
-
-_wait_kvm_migration_socket() {
-	local migration_socket="${1}"
-	local -i waited=0
-
-	while [[ "${waited}" -lt "${VM_MIGRATION_SOCK_MAX_WAIT}" ]]; do
-		sleep 0.5
-		((waited++))
-		_dest_host_cmd test -S "${migration_socket}" && return 0
-	done
-
-	return 1
 }
 
 recv_kvm_ram() {
@@ -1212,15 +1206,9 @@ recv_kvm_ram() {
 		die ${ERR_VM_START} "Failed to start destination VM: ${UUID_SRC}"
 	fi
 
-	techo "Waiting for migration socket ..."
-
-	if ! _wait_kvm_migration_socket "${migration_socket}"; then
-		die ${ERR_VM_MEM_SENDRECV} "Migration socket did not appear on destination host"
-	fi
-
 	techo "Loading memory dump to VM ${UUID_SRC} from ${VM_TMP_MEM_FILE} on ${DEST_HOST} ..."
 
-	if _dest_host_cmd "${SOCAT}" -u "OPEN:${VM_TMP_MEM_FILE}" "UNIX-CONNECT:${migration_socket}"; then
+	if _dest_host_cmd "${SOCAT}" -u "OPEN:${VM_TMP_MEM_FILE}" "UNIX-CONNECT:${migration_socket},retry=30,interval=0.5"; then
 		techo "Memory dump successfully loaded"
 	else
 		die ${ERR_VM_MEM_SENDRECV} "Failed to load memory dump"
