@@ -123,7 +123,7 @@ class AbstractMonitoringBackend(object):
     def synchronize_action(self, action):
         raise NotImplementedError
 
-    def delete_action(self, name):
+    def action_delete(self, name):
         raise NotImplementedError
 
     def action_detail(self, name):

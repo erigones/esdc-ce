@@ -52,7 +52,7 @@ def mon_action_get():
 @mgmt_task()
 def mon_action_delete(task_id, dc_id, action_name, **kwargs):
     dc = Dc.objects.get_by_id(int(dc_id))
-    get_monitoring(dc).delete_action(action_name)  # Fail loudly if doesnt exist
+    get_monitoring(dc).action_delete(action_name)  # Fail loudly if doesnt exist
 
 
 # todo dont forget to update the task log after task is complete

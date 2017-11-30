@@ -37,7 +37,7 @@ class ActionView(APIView):
         return
 
     def post(self):
-        tidlock = '%s:%s:%s' % ('mon_action_create', self.request.dc.id, self.dc_bound)
+        # tidlock = '%s:%s:%s' % ('mon_action_create', self.request.dc.id, self.dc_bound)
 
         ser = self.serializer(data=self.data, name=self.name, context=self.request)
         ser.request = self.request
@@ -56,7 +56,14 @@ class ActionView(APIView):
         return
 
     def delete(self):
-        return
+        result = mon_action_delete.call(self.request,
+                                        None,
+                                        (self.request.dc.id, self.name),
+                                        tg=TG_DC_BOUND,
+                                        )
+        return TaskResponse(self.request, task_id=result[0], msg=LOG_ACTION_CREATE,
+                            obj=self.request.dc)
+
 
 
 @api_view(('GET', 'POST', 'PUT', 'DELETE'))
