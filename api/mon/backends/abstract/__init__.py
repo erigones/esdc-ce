@@ -120,7 +120,10 @@ class AbstractMonitoringBackend(object):
     def action_list(self):
         raise NotImplementedError
 
-    def synchronize_action(self, action):
+    def action_update(self, action):
+        raise NotImplementedError
+
+    def action_create(self, action):
         raise NotImplementedError
 
     def action_delete(self, name):

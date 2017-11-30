@@ -7,7 +7,7 @@ from api.mon.base.api_views import _MonBaseView
 
 from api.api_views import APIView
 from api.decorators import api_view, request_data, setting_required
-from api.mon.alerting.action.tasks import mon_action_list, mon_action_get, mon_action_delete, mon_action_create
+from api.mon.alerting.action.tasks import mon_action_list, mon_action_delete, mon_action_update, mon_action_create
 from api.permissions import IsAdmin
 from api.task.response import FailureTaskResponse, TaskResponse
 
@@ -53,7 +53,18 @@ class ActionView(APIView):
             return FailureTaskResponse(self.request, ser.errors)
 
     def put(self):
-        return
+        ser = self.serializer(data=self.data, name=self.name, context=self.request)
+        ser.request = self.request
+        if ser.is_valid():
+            result = mon_action_update.call(self.request,
+                                            None,
+                                            (self.request.dc.id, ser.data),
+                                            tg=TG_DC_BOUND,
+                                            )
+            return TaskResponse(self.request, task_id=result[0], msg=LOG_ACTION_CREATE, detail_dict=ser.data,
+                                obj=self.request.dc)
+        else:
+            return FailureTaskResponse(self.request, ser.errors)
 
     def delete(self):
         result = mon_action_delete.call(self.request,

@@ -912,11 +912,10 @@ class ZabbixBase(object):
         res = self.zapi.action.get({'output': 'extend', 'selectOperations': 'extend', 'selectFilter': 'extend',
                                     'filter': {'name': name}})
 
-        try:
+        if len(res) == 1:
             return res[0]
-        except (KeyError, IndexError) as e:
-            logger.exception(e)
-            raise ZabbixError(e)
+        else:
+            return None
 
 
 class ZabbixNamedContainer(object):
@@ -1434,6 +1433,7 @@ class ZabbixHostGroupContainer(ZabbixNamedContainer):
     """
     RE_NAME_WITH_DC_PREFIX = re.compile(r'^:(?P<dc>.*):(?P<hostgroup>.+):$')
     zabbix_id = None
+    _api_response = None
 
     def __init__(self, name, zapi=None):
         super(ZabbixHostGroupContainer, self).__init__(name)
@@ -1443,17 +1443,15 @@ class ZabbixHostGroupContainer(ZabbixNamedContainer):
     def from_mgmt_data(cls, name, zapi):
         container = cls(name, zapi)
         container._zapi = zapi
-        response = zapi.hostgroup.get({'filter': {'name': name}})
-        if response:
-            assert len(response) == 1, 'Hostgroup name => locally generated hostgroup name mapping should be injective'
-            container._zabbix_response = response[0]
-        container.zabbix_id = container._zabbix_response['groupid']
+        container.refresh_id()
         return container
+
 
     @classmethod
     def from_zabbix_name(cls, zapi, name):
-        container =  cls.from_mgmt_data(name, zapi)  # FIXME ORDER is not consistent!!!!
+        container = cls.from_mgmt_data(name, zapi)  # FIXME ORDER is not consistent!!!!
         container.refresh_id()
+        return container
 
     @staticmethod
     def hostgroup_name_factory(hostgroup_name, dc_name):  #FIXME ORDER is not consistent against usergroup!!!!
@@ -1463,6 +1461,15 @@ class ZabbixHostGroupContainer(ZabbixNamedContainer):
             name = hostgroup_name
 
         return name
+
+    def refresh_id(self):
+        response = self._zapi.hostgroup.get({'filter': {'name': self.name}})
+        if response:
+            assert len(response) == 1, 'Hostgroup name => locally generated hostgroup name mapping should be injective'
+            self._api_response = response[0]
+            self.zabbix_id = self._api_response['groupid']
+        else:
+            raise RemoteObjectDoesNotExist()
 
     def create(self):
         response = self._zapi.hostgroup.create({
@@ -1610,8 +1617,6 @@ class ZabbixActionContainer(ZabbixNamedContainer):
     def filter__conditions(self):
         return [self._condition_trigger_problem, self._condition_status_not_in_maintenance] + self.hostgroups
 
-
-
     @property
     def operations(self):
         return [{u'operationtype': 0,
@@ -1639,6 +1644,7 @@ class ZabbixActionContainer(ZabbixNamedContainer):
 
     def refresh(self):
         response = self._zapi.action.get({'filter': {'name': self.name}})  # todo sanitize the error types
+
         if len(response) > 0:
             self.zabbix_id = response[0]['actionid']
         else:

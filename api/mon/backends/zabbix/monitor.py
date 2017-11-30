@@ -508,14 +508,28 @@ class Zabbix(AbstractMonitoringBackend):
         for action in self.ezx.get_action_list():
             yield ZabbixActionContainer.from_zabbix_data(self.ezx.zapi, action)
 
-    def synchronize_action(self, action):
+    def _action_synchronize(self, action):
         """[EXTERNAL]"""
         zac = ZabbixActionContainer.from_mgmt_data(self.ezx.zapi, **action)
         zac.synchronize()
 
+    def action_create(self, action):
+        """[EXTERNAL]"""
+        assert not self.ezx.get_action(action['name']), 'Action should not exist before creation'
+        self._action_synchronize(action)
+
+    def action_update(self, action):
+        """[EXTERNAL]"""
+        assert self.ezx.get_action(action['name']), 'Action should exist before update'
+        self._action_synchronize(action)
+
     def action_detail(self, name):
         """[EXTERNAL]"""
-        return ZabbixActionContainer.from_zabbix_data(self.ezx.zapi, self.ezx.get_action(name))
+        action_data = self.ezx.get_action(name)
+        if action_data:
+            return ZabbixActionContainer.from_zabbix_data(self.ezx.zapi, action_data)
+        else:
+            raise Exception("does not exist")  # TODO bad layer
 
     def action_delete(self, name):
         ZabbixActionContainer.delete_by_name(self.ezx.zapi, name)
