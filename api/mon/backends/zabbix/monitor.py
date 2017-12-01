@@ -508,20 +508,17 @@ class Zabbix(AbstractMonitoringBackend):
         for action in self.ezx.get_action_list():
             yield ZabbixActionContainer.from_zabbix_data(self.ezx.zapi, action)
 
-    def _action_synchronize(self, action):
-        """[EXTERNAL]"""
-        zac = ZabbixActionContainer.from_mgmt_data(self.ezx.zapi, **action)
-        zac.synchronize()
-
     def action_create(self, action):
         """[EXTERNAL]"""
         assert not self.ezx.get_action(action['name']), 'Action should not exist before creation'
-        self._action_synchronize(action)
+        zac = ZabbixActionContainer.from_mgmt_data(self.ezx.zapi, **action)
+        zac.create()
 
     def action_update(self, action):
         """[EXTERNAL]"""
         assert self.ezx.get_action(action['name']), 'Action should exist before update'
-        self._action_synchronize(action)
+        zac = ZabbixActionContainer.from_mgmt_data(self.ezx.zapi, **action)
+        zac.update()
 
     def action_detail(self, name):
         """[EXTERNAL]"""

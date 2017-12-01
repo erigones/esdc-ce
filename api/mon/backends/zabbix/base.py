@@ -1658,12 +1658,6 @@ class ZabbixActionContainer(ZabbixNamedContainer):
             self.refresh()
         return bool(self.zabbix_id)
 
-    def synchronize(self):
-        if self.exists():
-            self.update()
-        else:
-            self.create()
-
     def delete(self):
         return self._zapi.action.delete([self.zabbix_id])  # todo sanitize the error types
 
