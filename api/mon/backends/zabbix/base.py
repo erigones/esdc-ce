@@ -1020,7 +1020,6 @@ class ZabbixBase(object):
 
         # Fetch triggers
         triggers = list(self._get_alerts(**t_options))
-        logger.critical('AAAA %s', hostids)
 
         # Get notes (dict) = related events + acknowledges
         if show_events:
