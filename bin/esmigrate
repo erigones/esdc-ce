@@ -1481,7 +1481,7 @@ set_opts() {
 	DEST_POOL=""
 	DEST_DISK=()
 
-	while getopts "vCLjH:p:0:1:2:3:4:5:6:7:" opt; do
+	while getopts "vLjC:H:p:0:1:2:3:4:5:6:7:" opt; do
 		case "${opt}" in
 			v)
 				if [[ -z "${VERBOSE}" ]]; then
