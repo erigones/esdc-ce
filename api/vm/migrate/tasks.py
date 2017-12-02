@@ -33,10 +33,11 @@ def vm_migrate_cb(result, task_id, vm_uuid=None, slave_vm_uuid=None):
     if result['returncode'] == 0 and msg and 'Successfully migrated' in msg:
         # Save node and delete placeholder VM first
         node = ghost_vm.vm.node
-        nss = set(ghost_vm.vm.get_node_storages())
+        nss = set(ghost_vm.vm.get_node_storages())  # New node storages
         ghost_vm.delete()  # post_delete signal will update node and storage resources
         # Fetch VM after ghost_vm is deleted, because it updates vm.slave_vms array
         vm = Vm.objects.select_related('node', 'dc').get(uuid=vm_uuid)
+        nss.update(list(vm.get_node_storages()))  # Old node storages
         changing_node = vm.node != ghost_vm.vm.node
         json = result.pop('json', None)
 
@@ -49,7 +50,6 @@ def vm_migrate_cb(result, task_id, vm_uuid=None, slave_vm_uuid=None):
             logger.error('Could not parse json output from vm_migrate(%s). Error: %s', vm_uuid, e)
             raise TaskException(result, 'Could not parse json output')
 
-        nss.update(list(vm.get_node_storages()))
         # Revert status and set new node (should trigger node resource update)
         vm.revert_notready(save=False)
         keep_vnc_port = False
