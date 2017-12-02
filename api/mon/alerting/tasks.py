@@ -7,11 +7,10 @@ from api.task.utils import mgmt_task
 from api.mon import get_monitoring, MonitoringError
 from api.mon.utils import MonInternalTask
 from que.erigonesd import cq
-from que.utils import is_task_dc_bound
 from que.exceptions import MgmtTaskException
 from que.mgmt import MgmtTask
 
-from vms.models import Dc
+from vms.models import Dc, Vm, Node
 from gui.models import Role, User
 
 __all__ = ('mon_user_group_changed', 'mon_user_changed', 'mon_alert_list')
@@ -227,33 +226,29 @@ def mon_all_groups_sync(task_id, sender, dc_name=None, *args, **kwargs):
 # noinspection PyUnusedLocal
 @cq.task(name='api.mon.alerting.tasks.mon_alert_list', base=MgmtTask)
 @mgmt_task()
-def mon_alert_list(task_id, dc_id, *args, **kwargs):
+def mon_alert_list(task_id, dc_id, dc_bound=True, node_uuids=None, vm_uuids=None, since=None, until=None, last=None,
+                   show_events=True, **kwargs):
     """
     Return list of alerts available in Zabbix.
     """
     dc = Dc.objects.get_by_id(int(dc_id))
 
-    if is_task_dc_bound(task_id):
-        kwargs['prefix'] = dc.name
+    if vm_uuids:
+        vms = Vm.objects.filter(uuid__in=vm_uuids)
+    elif dc_bound:
+        vms = Vm.objects.filter(dc=dc, slavevm__isnull=True).exclude(status=Vm.NOTCREATED)
     else:
-        kwargs['prefix'] = ''
+        vms = None
+
+    if node_uuids:
+        nodes = Node.objects.filter(uuid__in=node_uuids)
+    elif dc_bound:
+        nodes = ()
+    else:
+        nodes = None
 
     try:
-        zabbix_alerts = get_monitoring(dc).alert_list(*args, **kwargs)
+        return get_monitoring(dc).alert_list(vms=vms, nodes=nodes, since=since, until=until, last=last,
+                                             show_events=show_events)
     except MonitoringError as exc:
         raise MgmtTaskException(text_type(exc))
-    return [
-        {
-            'eventid': t['eventid'],
-            'prio': t['prio'],
-            'hostname': t['hostname'],
-            'desc': t['desc'],
-            'age': t['age'],
-            'ack': t['ack'],
-            'comments': t['comments'],
-            'latest_data': t['latest_data'],
-            'last_change': t['last_change'],
-            'events': t['events'],
-        }
-        for t in zabbix_alerts
-    ]

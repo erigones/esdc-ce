@@ -443,7 +443,6 @@ class Zabbix(AbstractMonitoringBackend):
 
     def _get_filtered_hostgroups(self, prefix):
         """This is a generator function"""
-
         for host_group in self.ezx.get_hostgroup_list():
             match = ZabbixHostGroupContainer.RE_NAME_WITH_DC_PREFIX.match(host_group['name'])
 
@@ -461,14 +460,19 @@ class Zabbix(AbstractMonitoringBackend):
         """[EXTERNAL] Return list of available hostgroups"""
         return list(self._get_filtered_hostgroups(prefix=prefix))
 
-    def _get_filtered_alerts(self, *args, **kwargs):
+    def _get_filtered_alerts(self, vms=None, nodes=None, **kwargs):
         """This is a generator function"""
-        for alert in self.ezx.show_alerts(*args, **kwargs):
-            yield alert
+        if vms is None and nodes is None:
+            host_ids = None
+        else:
+            vm_host_ids = (ExternalZabbix.get_cached_hostid(vm) for vm in vms or ())
+            node_host_ids = (InternalZabbix.get_cached_hostid(node) for node in nodes or ())
+            host_ids = [hostid for hostid in vm_host_ids if hostid] + [hostid for hostid in node_host_ids if hostid]
+
+        return self.ezx.show_alerts(hostids=host_ids, **kwargs)
 
     def alert_list(self, *args, **kwargs):
         """[EXTERNAL] Return list of available alerts"""
-
         return list(self._get_filtered_alerts(*args, **kwargs))
 
     def synchronize_user_group(self, group=None, dc_as_group=None):

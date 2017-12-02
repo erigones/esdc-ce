@@ -6,7 +6,7 @@ from datetime import datetime
 from subprocess import call
 import re
 
-from django.utils.six import iteritems
+from django.utils.six import iteritems, text_type
 from django.db.models import Q
 from frozendict import frozendict
 from zabbix_api import ZabbixAPI, ZabbixAPIException, ZabbixAPIError
@@ -185,6 +185,13 @@ class ZabbixBase(object):
     @classmethod
     def host_save(cls, obj, host):
         return getattr(obj, cls._obj_host_save_method)(host)
+
+    @classmethod
+    def get_cached_hostid(cls, obj, default=None):
+        try:
+            return cls.host_info(obj)['hostid']
+        except KeyError:
+            return default
 
     @staticmethod
     def _get_kwargs(obj, wanted):
@@ -523,48 +530,6 @@ class ZabbixBase(object):
             return res[0]
         except IndexError:
             return {}
-
-    def search_hosts(self, *host_strings):
-        """Search Zabbix hosts by multiple host search strings. Return dict mapping of host IDs to host names"""
-        res = {}
-        params = {
-            'output': ['hostid', 'name'],
-            'searchWildcardsEnabled': True,
-            'searchByAny': True,
-        }
-
-        for host_str in host_strings:
-            params['search'] = {'name': host_str}
-
-            try:
-                for host in self.zapi.host.get(params):
-                    res[host['hostid']] = host['name']
-            except ZabbixAPIException as e:
-                self.log(ERROR, 'Zabbix API Error in search_hosts in host %s: %s', host_str, e)
-                raise e
-
-        return res
-
-    def search_groups(self, *group_strings):
-        """Search zabbix host groups by multiple group search strings. Return dict mapping group IDs to group names"""
-        res = {}
-        params = {
-            'output': ['groupid', 'name'],
-            'searchWildcardsEnabled': True,
-            'searchByAny': True,
-        }
-
-        for group_str in group_strings:
-            params['search'] = {'name': group_str}
-
-            try:
-                for host in self.zapi.hostgroup.get(params):
-                    res[host['groupid']] = host['name']
-            except ZabbixAPIException as e:
-                self.log(ERROR, 'Zabbix API Error in search_groups in host %s: %s', group_str, e)
-                raise e
-
-        return res
 
     def has_host_info(self, obj):
         """Return True if host info is saved in obj"""
@@ -953,7 +918,7 @@ class ZabbixBase(object):
         else:
             return 'UNKNOWN'
 
-    def _get_alert_events(self, triggers, since=None, until=None):
+    def _get_alert_events(self, triggers, since=None, until=None, max_days=7):
         """Get all events related to triggers"""
         triggerids = [t['triggerid'] for t in triggers]
         events = {}
@@ -971,35 +936,20 @@ class ZabbixBase(object):
         if since and until:
             params['time_from'] = since
             params['time_till'] = until
-        else:  # Max 15 days
-            since = datetime.now() - timedelta(days=30)
+        else:
+            since = datetime.now() - timedelta(days=max_days)
             params['time_from'] = since.strftime('%s')
 
-        res = self.zapi.event.get(params)
-
-        try:
-            for e in res:
-                events.setdefault(e['objectid'], []).append(e)
-        except (KeyError, IndexError) as e:
-            logger.exception(e)
-            raise ZabbixError(e)
+        for e in self.zapi.event.get(params):
+            events.setdefault(e['objectid'], []).append(e)
 
         # Because of time limits, there may be some missing events for some trigger IDs
         missing_eventids = [t['lastEvent']['eventid'] for t in triggers if
                             t['lastEvent'] and t['triggerid'] not in events]
 
         if missing_eventids:
-            res = self.zapi.event.get({'eventids': missing_eventids, 'source': 0, 'output': 'extend',
-                                       'select_acknowledges': 'extend', 'nodeids': 0})
-
-            try:
-                for e in res:
-                    events.setdefault(e['objectid'], []).append(e)
-            except (KeyError, IndexError) as e:
-                logger.exception(e)
-                raise ZabbixError(e)
-
-            for e in res:
+            for e in self.zapi.event.get({'eventids': missing_eventids, 'source': 0, 'output': 'extend',
+                                          'select_acknowledges': 'extend', 'nodeids': 0}):
                 events.setdefault(e['objectid'], []).append(e)
 
         return events
@@ -1028,88 +978,36 @@ class ZabbixBase(object):
 
         params.update(kwargs)
 
-        res = self.zapi.trigger.get(params)
-        logger.exception(res)
-
-        try:
-            return res
-        except (KeyError, IndexError) as e:
-            logger.exception(e)
-            raise ZabbixError(e)
-
         # If trigger is lost (broken expression) we skip it
-        return (trigger for trigger in res if trigger['hosts'])
+        return (trigger for trigger in self.zapi.trigger.get(params) if trigger['hosts'])
 
-    @staticmethod
-    def _collect_event_id_ack(last_event):
-        # Event
-        if last_event:
-            eventid = last_event['eventid']
-
-            # Ack
-            if int(last_event['acknowledged']):
-                ack = 'Yes'
-            else:
-                ack = 'No'
-        else:
-            # WTF?
-            eventid = '????'
-            ack = ''
-
-        return eventid, ack
-
-    @staticmethod
-    def _collect_trigger_latest_data(trigger):
-        comments = []
-        latest_data = []
-
-        if trigger['error']:
-            comments.append('Error: %s' % trigger['error'])
-
-        if trigger['comments']:
-            comments.append('Note: %s' % trigger['comments'].strip())
-
-        if trigger['url']:
-            comments.append('URL: %s' % trigger['url'].strip())
-
-        return latest_data, comments
-
-    def _collect_trigger_events(self, related_events):
-        trigger_events = []
-
-        for e in related_events:
-            e_result = '%s: %s' % (self.event_status(e['value']), self.zapi.get_datetime(e['clock']))
-            e_acks = []
-
-            for a in e['acknowledges']:
-                e_acks.append('%s: %s' % (self.zapi.get_datetime(a['clock']), a['message']))
-
-            trigger_events.append((e_result, e_acks))
-
-        return trigger_events
+    @classmethod
+    def _collect_trigger_events(cls, related_events):
+        for event in related_events:
+            yield {
+                'eventid': event['eventid'],
+                'clock': event['clock'],
+                'value': event['value'],
+                'status': cls.event_status(event['value']),
+                'acknowledged': bool(int(event['acknowledged'])),
+                'acknowledges': [{
+                    'acknowledgeid': ack['acknowledgeid'],
+                    'clock': ack['clock'],
+                    'message': ack['message'],
+                    'user': ack['alias'],
+                } for ack in event['acknowledges']]
+            }
 
     # noinspection PyUnusedLocal
-    def show_alerts(self, since=None, until=None, last=None, show_events=True, hosts=(), groups=(), **kwargs):
+    def show_alerts(self, hostids=None, since=None, until=None, last=None, show_events=True):
         """Show current or historical events (alerts)"""
-        out = []
-        # Get triggers
         t_output = ('triggerid', 'state', 'error', 'url', 'expression', 'description', 'priority', 'type', 'comments',
                     'lastchange')
         t_hosts = ('hostid', 'name', 'maintenance_status', 'maintenance_type', 'maintenanceid')
         t_options = {'expand_description': True, 'output': t_output, 'select_hosts': t_hosts}
 
-        if hosts or groups:
-            hosts = self.search_hosts(*hosts)
-
-            if hosts:
-                t_options['hostids'] = list(hosts.keys())
-            else:
-                groups = self.search_groups(*groups)
-
-                if groups:
-                    t_options['groupids'] = list(groups.keys())
-                else:
-                    raise ZabbixError('Invalid parameter: host/group. Existing host/group required!')
+        if hostids is not None:
+            t_options['hostids'] = hostids
 
         if since and until:
             t_options['lastChangeSince'] = since
@@ -1117,58 +1015,46 @@ class ZabbixBase(object):
             t_options['active_only'] = False
 
         if last is not None:
-            try:
-                last = int(last)
-            except ValueError:
-                raise ZabbixError('Invalid parameter: last. Integer required!')
-            else:
-                t_options['limit'] = last
-                t_options['active_only'] = False
+            t_options['limit'] = last
+            t_options['active_only'] = False
 
         # Fetch triggers
         triggers = list(self._get_alerts(**t_options))
+        logger.critical('AAAA %s', hostids)
 
         # Get notes (dict) = related events + acknowledges
-        events = self._get_alert_events(triggers, since=since, until=until)
+        if show_events:
+            events = self._get_alert_events(triggers, since=since, until=until)
+        else:
+            events = {}
 
         for trigger in triggers:
-            related_events = events.get(trigger['triggerid'], ())
-            eventid, ack = self._collect_event_id_ack(trigger['lastEvent'])
-
-            # Host and hostname
             host = trigger['hosts'][0]
             hostname = host['name']
+            related_events = events.get(trigger['triggerid'], ())
+            trigger_events = self._collect_trigger_events(related_events)
+            last_event = trigger['lastEvent']
 
-            # Trigger description
-            desc = str(trigger['description'])
+            if last_event:
+                eventid = int(last_event['eventid'])
+                ack = bool(int(last_event['acknowledged']))
+            else:
+                # WTF?
+                eventid = '????'
+                ack = None
 
-            # Priority
-            prio = self.zapi.get_severity(trigger['priority']).ljust(12)
-
-            # Last change and age
-            dt = self.zapi.get_datetime(trigger['lastchange'])
-            age = self.zapi.get_age(dt)
-
-            latest_data, comments = self._collect_trigger_latest_data(trigger)
-            trigger_events = []
-
-            if show_events:
-                trigger_events = self._collect_trigger_events(related_events)
-
-            out.append({
+            yield {
                 'eventid': eventid,
-                'prio': prio,
+                'priority': int(trigger['priority']),
                 'hostname': hostname,
-                'desc': desc,
-                'age': age,
-                'ack': ack,
-                'comments': comments,
-                'latest_data': latest_data,
-                'last_change': ('%s' % dt),
-                'events': trigger_events
-            })
-
-        return out
+                'desc': text_type(trigger['description']),
+                'acknowledged': ack,
+                'last_change': int(trigger['lastchange']),
+                'events': list(trigger_events),
+                'error': trigger['error'],
+                'comments': trigger['comments'],
+                'url': trigger['url'],
+            }
 
 
 class ZabbixNamedContainer(object):
