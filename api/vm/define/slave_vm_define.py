@@ -98,25 +98,27 @@ class SlaveVmDefine(object):
         vm = self.vm
         json = vm.json
         disks = vm.json_get_disks()
+        new_disks = []
 
         for i, disk in enumerate(disks, start=1):
             if not save_same_zpool and i not in disk_zpools:
-                del disks[i - 1]  # Local migration and disk pool has not changed
-                continue
+                continue  # Local migration and disk pool has not changed
 
             zpool = disk_zpools.get(i, self.get_zpool(disk))
             ns = self.validate_zpool(zpool)
-            disks[i - 1]['zfs_filesystem'], new_disk_zpool = self._change_zfs_filesystem(ns, disk, save_same_zpool)
+            disk['zfs_filesystem'], new_disk_zpool = self._change_zfs_filesystem(ns, disk, save_same_zpool)
 
             if new_disk_zpool:
-                disks[i - 1]['zpool'] = zpool
+                disk['zpool'] = zpool
             else:
                 disk_zpools.pop(i, None)
                 if not save_same_zpool:
-                    del disks[i - 1]
+                    continue
+
+            new_disks.append(disk)
 
         # Save disks into json
-        json['disks'] = disks
+        json['disks'] = new_disks
         vm.json = json
 
         return disk_zpools
