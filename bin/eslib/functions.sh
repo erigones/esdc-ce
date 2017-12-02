@@ -250,6 +250,14 @@ validate_ascii() {
 	[[ -n "${str}" && "${str}" =~ ${re_ascii} ]] || die ${_ERR_INPUT} "${err}"
 }
 
+validate_int() {
+	local val="$1"
+	local err="$2"
+	local re_int='^[0-9]+$'
+
+	[[ -n "${val}" && "${val}" =~ ${re_int} ]] || die ${_ERR_INPUT} "${err}"
+}
+
 assert_safe_zone_path() {
 	local zoneroot="$1"
 	local target="$2"

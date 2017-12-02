@@ -52,9 +52,16 @@ def vm_migrate_cb(result, task_id, vm_uuid=None, slave_vm_uuid=None):
         nss.update(list(vm.get_node_storages()))
         # Revert status and set new node (should trigger node resource update)
         vm.revert_notready(save=False)
+
         if changing_node:
             vm.set_node(node)
-        vm.save(update_node_resources=True, update_storage_resources=nss)
+
+            if vm.is_kvm():
+                # The VNC port was changed during migration
+                vm.vnc_port = json_active['vnc_port']
+                assert ghost_vm.vm.vnc_port == vm.vnc_port
+
+        vm.save(update_node_resources=True, update_storage_resources=nss, keep_vnc_port=True)
         SlaveVm.switch_vm_snapshots_node_storages(vm, nss=nss)
         vm_node_changed.send(task_id, vm=vm, force_update=True)  # Signal!
 

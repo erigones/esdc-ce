@@ -34,6 +34,7 @@ declare VM_DETACHED_FAKE=""	# bool: if not-empty, source zone was not detached, 
 declare VM_ATTACHED=""	# bool: destination zone was attached if non-empty
 declare VM_MEM_DUMP=""	# bool: VM memory dump was create if non-empty
 declare PRINT_JSON=""	# bool: print VM json to stdout after successful migration
+declare VM_VNC_PORT=""	# int: change the VNC port property on VM migrated to another host (KVM)
 declare UUID_SRC		# string: "<uuid>"
 declare JSON_SRC		# string: "{...}"
 declare DEST_HOST		# string: IP address
@@ -109,6 +110,7 @@ Usage: ${PROG} {migrate} [parameters]
     -p <dest-pool>          is the destination pool for the root zone [KVM] or all datasets [OS]
     -[n] <dest-disk-pool>   specifies another destination pool for disk id [n], 
                             where [n] is the disk id in the disks array starting with 0 [KVM]
+    -C <vnc-port>           change VNC port for VM migrated to remote host [KVM]
     -L                      perform live migration [KVM, EXPERIMENTAL]
     -v                      print information about each step of the migration process
     -j                      print final guest json to stderr after successful migration
@@ -125,7 +127,7 @@ Usage: ${PROG} {migrate} [parameters]
       # ${PROG} migrate <uuid> -H <dest-host> [-p <dest-pool>]
 
     - Migrate whole guest on to another host (remote) [KVM]:
-      # ${PROG} migrate <uuid> -H <dest-host> [-L] [-p <dest-pool>] [-[n] <dest-disk-pool>]
+      # ${PROG} migrate <uuid> -H <dest-host> [-L] [-C <vnc-port>] [-p <dest-pool>] [-[n] <dest-disk-pool>]
 
 EOF
 }
@@ -846,6 +848,13 @@ update_zone_xml() {
 			# shellcheck disable=SC1117
 			update_cmd+=("s#\(<attr .*name=\"vm-autoboot\" .*value=\)\"true\"#\1\"false\"#")
 
+			if [[ -n "${VM_VNC_PORT}" ]]; then
+				# Change VNC port
+				update_cmd+=("-e")
+				# shellcheck disable=SC1117
+				update_cmd+=("s#\(attr name=\"vnc-port\" .*value=\)\"[^\"]*\"#\1\"${VM_VNC_PORT}\"#")
+			fi
+
 			if [[ -z "${VM_STOP}" ]]; then
 				# Add live migration socket to qemu_extra_opts
 				qemu_extra_opts="$(base64_encode "${VM_QEMU_OPTS_SRC} ${VM_QEMU_OPTS_DST_APPEND}" | tr -d '\n')"
@@ -1106,6 +1115,7 @@ transfer_kvm_disk_err() {
 _transfer_kvm_ram() {
 	local migration_socket="${1}"
 
+	rm -f "${migration_socket}"
 	"${SOCAT}" -u UNIX-LISTEN:"${migration_socket}" - | run_ssh "root@${DEST_HOST}" -- "umask 0277; ${CAT} > ${VM_TMP_MEM_FILE}"
 }
 
@@ -1471,7 +1481,7 @@ set_opts() {
 	DEST_POOL=""
 	DEST_DISK=()
 
-	while getopts "vLjH:p:0:1:2:3:4:5:6:7:" opt; do
+	while getopts "vCLjH:p:0:1:2:3:4:5:6:7:" opt; do
 		case "${opt}" in
 			v)
 				if [[ -z "${VERBOSE}" ]]; then
@@ -1479,6 +1489,11 @@ set_opts() {
 				else
 					((VERBOSE++))
 				fi
+				;;
+			C)
+				validate_int "${OPTARG}" "Invalid VNC port"
+				[[ "${OPTARG}" -le 1024 || "${OPTARG}" -ge 65535 ]] && die ${ERR_INPUT} "Invalid VNC port"
+				VM_VNC_PORT="${OPTARG}"
 				;;
 			L)
 				VM_STOP=""

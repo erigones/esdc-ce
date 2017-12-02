@@ -188,6 +188,9 @@ class VmMigrateSerializer(s.Serializer):
                   '-o GSSAPIKeyExchange=no -o GSSAPIAuthentication=no -o LogLevel=QUIET -l root'
             get_json = '%s %s "%s"' % (ssh, node.address, get_json)
 
+            if vm.is_kvm():
+                params.append('-C %s' % self.ghost_vm_define.vm.vnc_port)
+
         if self._live:
             params.append('-L')
 
