@@ -7,7 +7,8 @@ from api.mon.base.api_views import _MonBaseView
 
 from api.api_views import APIView
 from api.decorators import api_view, request_data, setting_required
-from api.mon.alerting.action.tasks import mon_action_list, mon_action_delete, mon_action_update, mon_action_create
+from api.mon.alerting.action.tasks import mon_action_list, mon_action_delete, mon_action_update, mon_action_create, \
+    mon_action_get
 from api.permissions import IsAdmin
 from api.task.response import FailureTaskResponse, TaskResponse
 
@@ -30,14 +31,20 @@ class ActionView(APIView):
         super(ActionView, self).__init__(request)
         self.data = data
         self.name = name
-        self.data['name'] = name
 
     def get(self):
-        return
+        result = mon_action_get.call(self.request,
+                                        None,
+                                        (self.request.dc.id, self.name),
+                                        tg=TG_DC_BOUND,
+                                        )
+        return TaskResponse(self.request, task_id=result[0], msg=LOG_ACTION_CREATE, detail_dict={'name':self.name},
+                            obj=self.request.dc)
 
     def post(self):
         # tidlock = '%s:%s:%s' % ('mon_action_create', self.request.dc.id, self.dc_bound)
         # add _apiview_
+        self.data['name'] = self.name
         ser = ActionSerializer(data=self.data, name=self.name, context=self.request)
         ser.request = self.request
         if ser.is_valid():

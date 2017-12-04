@@ -525,7 +525,7 @@ class Zabbix(AbstractMonitoringBackend):
         """[EXTERNAL]"""
         action_data = self.ezx.get_action(name)
         if action_data:
-            return ZabbixActionContainer.from_zabbix_data(self.ezx.zapi, action_data)
+            return ZabbixActionContainer.from_zabbix_data(self.ezx.zapi, action_data).to_dict()
         else:
             raise Exception("does not exist")  # TODO bad layer
 

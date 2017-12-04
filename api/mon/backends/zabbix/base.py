@@ -1585,6 +1585,8 @@ class ZabbixActionContainer(ZabbixNamedContainer):
         container = cls(name=api_response_object['name'], zapi=zapi)
         container._api_response = api_response_object
         container.zabbix_id = api_response_object['actionid']
+        # TODO make sure all fields from the API response are filled into the object
+
         return container
 
     @classmethod
@@ -1674,6 +1676,7 @@ class ZabbixActionContainer(ZabbixNamedContainer):
             self.zabbix_id = response[0]['actionid']
         else:
             self.zabbix_id = None
+        # TODO refresh also all other fields that we get from the query
 
     def update(self, update_fields):
         self.set_fields(update_fields)
@@ -1710,3 +1713,6 @@ class ZabbixActionContainer(ZabbixNamedContainer):
             raise RemoteObjectDoesNotExist
         action.delete()
 
+    def to_dict(self):
+        # TODO reuse _updatable_fields_mapping to reverse the process
+        return {attribute: getattr(self, attribute) for attribute in self._action_creation_attributes}

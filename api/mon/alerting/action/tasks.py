@@ -51,8 +51,9 @@ def mon_action_update(task_id, dc_id, action, **kwargs):
 
 @cq.task(name='api.mon.alerting.action.tasks.mon_action_get', base=MgmtTask)
 @mgmt_task()
-def mon_action_get():
-    pass  # Fail loudly if Does not exist
+def mon_action_get(task_id, dc_id, action_name, **kwargs):
+    dc = Dc.objects.get_by_id(int(dc_id))
+    return get_monitoring(dc).action_detail(action_name)
 
 
 @cq.task(name='api.mon.alerting.action.tasks.mon_action_delete', base=MgmtTask)
