@@ -35,6 +35,7 @@ used to annotate methods on viewsets that should be included by routers.
 from __future__ import unicode_literals
 
 import types
+from time import time, sleep
 from logging import getLogger
 from functools import wraps, partial
 
@@ -47,6 +48,7 @@ from django.core.exceptions import PermissionDenied
 from api.views import View
 from api.utils.request import is_request
 from api.dc.utils import get_dc
+from que.lock import TaskLock
 from vms.models import Dc, DefaultDc, DummyDc
 
 logger = getLogger(__name__)
@@ -296,4 +298,55 @@ def catch_api_exception(fun):
             else:
                 logger.warning('API exception could not be logged into task log')
 
+    return wrap
+
+
+def lock(timeout=settings.API_LOCK_TIMEOUT, key_args=(), key_kwargs=(), wait_for_release=False, bound=False):
+    """
+    Ensure that the decorated function does not run in parallel with the same function and arguments.
+    """
+    def wrap(fun):
+        @wraps(fun, assigned=available_attrs(fun))
+        def inner(*args, **kwargs):
+            if bound:
+                params = args[1:]  # The first parameter is a "self" object
+            else:
+                params = args
+
+            fun_name = fun.__name__
+            lock_keys = [fun_name]
+            lock_keys.extend(str(params[i]) for i in key_args)
+            lock_keys.extend(str(kwargs[i]) for i in key_kwargs)
+            task_lock = TaskLock(':'.join(lock_keys), desc='Function %s' % fun_name)
+
+            def acquire_lock():
+                return task_lock.acquire(time(), timeout=timeout, save_reverse=False)
+
+            if not acquire_lock():
+                if wait_for_release:
+                    logger.warn('Function %s(%s, %s) must wait (%s), because another function is already running',
+                                fun_name, args, kwargs, timeout or 'forever')
+                    wait = 0
+
+                    while wait < timeout:
+                        sleep(1)
+                        wait += 1
+
+                        if acquire_lock():
+                            break
+                    else:
+                        logger.warn('Function %s(%s, %s) will not run, because another function is still running and '
+                                    'we have waited for too long (%s)', fun_name, args, kwargs, wait)
+                        return
+                else:
+                    logger.warn('Function %s(%s, %s) will not run, because another function is already running',
+                                fun_name, args, kwargs)
+                    return
+
+            try:
+                return fun(*args, **kwargs)
+            finally:
+                task_lock.delete(fail_silently=True, delete_reverse=False)
+
+        return inner
     return wrap
