@@ -2,6 +2,7 @@ from logging import getLogger
 
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q
+from django.http import Http404
 
 from api import serializers as s
 from vms.models import DefaultDc, Node, Vm
@@ -73,9 +74,13 @@ class AlertSerializer(s.Serializer):
             if vms_qs:
                 vms_qs = vms_qs.filter(dc=request.dc)
         else:
-            request.dc = DefaultDc()  # Warning: Changing request.dc
-            logger.debug('"%s %s" user="%s" _changed_ dc="%s" permissions=%s', request.method, request.path,
-                         request.user.username, request.dc.name, request.dc_user_permissions)
+            if not request.dc.is_default():
+                request.dc = DefaultDc()  # Warning: Changing request.dc
+                logger.debug('"%s %s" user="%s" _changed_ dc="%s" permissions=%s', request.method, request.path,
+                             request.user.username, request.dc.name, request.dc_user_permissions)
+
+                if not request.dc.settings.MON_ZABBIX_ENABLED:  # dc1_settings
+                    raise Http404
 
             if node_hostnames is not None or node_uuids is not None:
                 qs = Node.objects.filter(Q(hostname__in=node_hostnames or ()) | Q(uuid__in=node_uuids or ()))

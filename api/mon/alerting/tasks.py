@@ -233,55 +233,49 @@ def mon_alert_list(task_id, dc_id, dc_bound=True, node_uuids=None, vm_uuids=None
     """
     dc = Dc.objects.get_by_id(int(dc_id))
     alerts = []
+    empty = ()
 
     if dc_bound:
-        nodes = ()
-        _vms = Vm.objects.filter(dc=dc, slavevm__isnull=True).exclude(status=Vm.NOTCREATED)
+        _nodes = empty
+        vms_qs = Vm.objects.filter(dc=dc, slavevm__isnull=True).exclude(status=Vm.NOTCREATED)
 
         if vm_uuids is not None:
-            _vms = _vms.filter(uuid__in=vm_uuids)
+            vms_qs = vms_qs.filter(uuid__in=vm_uuids)
 
-        mon_dcs_vms_map = {dc.id: _vms}
+        mon_vms_nodes_map = {get_monitoring(dc): (vms_qs, _nodes)}
+
     else:
         assert dc.is_default()
-        mon_dcs_vms_map = {dc.id: []}
-        vms_qs = ()
 
         if vm_uuids is None and node_uuids is None:
-            nodes = Node.objects.all()
+            _nodes = Node.objects.all()
             vms_qs = Vm.objects.select_related('dc').filter(slavevm__isnull=True).exclude(status=Vm.NOTCREATED)  # All
         elif vm_uuids is not None and node_uuids is None:
-            nodes = ()
+            _nodes = empty
             vms_qs = Vm.objects.select_related('dc').filter(uuid__in=vm_uuids).exclude(status=Vm.NOTCREATED)  # Filtered
         elif vm_uuids is None and node_uuids is not None:
-            nodes = Node.objects.filter(uuid__in=node_uuids)
-            vms_qs = ()
+            _nodes = Node.objects.filter(uuid__in=node_uuids)
+            vms_qs = empty
         elif vm_uuids is not None and node_uuids is not None:
-            nodes = Node.objects.filter(uuid__in=node_uuids)
+            _nodes = Node.objects.filter(uuid__in=node_uuids)
             vms_qs = Vm.objects.select_related('dc').filter(uuid__in=vm_uuids).exclude(status=Vm.NOTCREATED)  # Filtered
         else:
-            raise AssertionError
+            raise AssertionError('Unexpected condition in mon_alert_list')
+
+        mon_vms_nodes_map = {get_monitoring(dc): ([], _nodes)}
 
         for vm in vms_qs:
             mon = get_monitoring(vm.dc)
 
-            if mon.is_default_dc_connection_reused():  # ezx == izx (default)
-                dcid = dc.id  # default DC
-            else:
-                # TODO: Same External Zabbix servers are queried multiple times per each vDC
-                dcid = vm.dc.id
+            if mon.enabled:
+                if mon not in mon_vms_nodes_map:
+                    mon_vms_nodes_map[mon] = ([], empty)
 
-            mon_dcs_vms_map.setdefault(dcid, []).append(vm)
+                mon_vms_nodes_map[mon][0].append(vm)
 
-    for dc_id_, vms in mon_dcs_vms_map.items():
-        dc = Dc.objects.get_by_id(dc_id_)
-        mon = get_monitoring(dc)
-
-        if not dc.is_default():
-            nodes = ()
-
+    for mon, vms_nodes in mon_vms_nodes_map.items():
         try:
-            alerts.extend(mon.alert_list(vms=vms, nodes=nodes, since=since, until=until, last=last,
+            alerts.extend(mon.alert_list(vms=vms_nodes[0], nodes=vms_nodes[1], since=since, until=until, last=last,
                                          show_events=show_events))
         except MonitoringError as exc:
             raise MgmtTaskException(text_type(exc))

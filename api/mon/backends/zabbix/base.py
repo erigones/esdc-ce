@@ -108,9 +108,19 @@ class ZabbixBase(object):
             self.enabled = True
             self.sender = settings.MON_ZABBIX_SENDER
             self.server = settings.MON_ZABBIX_SERVER.split('/')[2]  # https://<server>
+            self.username = settings.MON_ZABBIX_USERNAME
 
             if api_login:
                 self.init()
+
+    @property
+    def connection_id(self):
+        if not self.enabled:
+            raise RuntimeError('%r is not enabled' % self)
+        return '%s@%s' % (self.username, self.server)
+
+    def __hash__(self):
+        return hash(self.connection_id)
 
     def log(self, level, msg, *args):
         logger.log(level, self._log_prefix + msg, *args)

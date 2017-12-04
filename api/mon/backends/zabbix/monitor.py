@@ -72,6 +72,14 @@ class Zabbix(AbstractMonitoringBackend):
         if not reuse_zapi:
             self._connections.add(self.ezx.zapi)
 
+    def __hash__(self):
+        return hash((self.izx, self.ezx))
+
+    @property
+    def enabled(self):
+        """Same as dc.settings.MON_ZABBIX_ENABLED == True"""
+        return self.izx.enabled and self.ezx.enabled
+
     @property
     def connected(self):
         """We are connected only if both zabbix objects are connected"""
