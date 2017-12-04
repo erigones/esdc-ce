@@ -330,7 +330,7 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
 
     @property
     def overlay_rules(self):
-        return self.json.get('overlay_rules', [])
+        return self.json.get('overlay_rules', {})
 
     @property
     def lifetime(self):
