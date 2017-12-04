@@ -57,7 +57,7 @@ class AlertSerializer(s.Serializer):
 
         if vm_hostnames is not None or vm_uuids is not None:
             vms_qs = Vm.objects.exclude(status=Vm.NOTCREATED).filter(slavevm__isnull=True)\
-                       .filter(Q(hostname__in=vm_hostnames or ()) | Q(uuid__in=vm_uuids or ()))
+                       .filter(Q(hostname__in=vm_hostnames or ()) | Q(uuid__in=vm_uuids or ())).order_by('uuid')
         else:
             vms_qs = None
 
@@ -79,11 +79,11 @@ class AlertSerializer(s.Serializer):
 
             if node_hostnames is not None or node_uuids is not None:
                 qs = Node.objects.filter(Q(hostname__in=node_hostnames or ()) | Q(uuid__in=node_uuids or ()))
-                self.nodes = qs.values_list('hostname', flat=True)
+                self.nodes = qs.order_by('uuid').values_list('hostname', flat=True)
 
             if vms_qs:
                 default_dc_zabbix_server = request.dc.settings.MON_ZABBIX_SERVER
-                self.vms = [vm.uuid for vm in vms_qs.select_related('dc').only('uuid', 'dc')
+                self.vms = [vm.uuid for vm in vms_qs.select_related('dc').only('uuid', 'dc').order_by('uuid')
                             if vm.dc.settings.MON_ZABBIX_SERVER == default_dc_zabbix_server]
 
         return attrs
