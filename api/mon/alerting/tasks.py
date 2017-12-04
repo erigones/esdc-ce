@@ -232,23 +232,58 @@ def mon_alert_list(task_id, dc_id, dc_bound=True, node_uuids=None, vm_uuids=None
     Return list of alerts available in Zabbix.
     """
     dc = Dc.objects.get_by_id(int(dc_id))
+    alerts = []
 
-    if vm_uuids:
-        vms = Vm.objects.filter(uuid__in=vm_uuids)
-    elif dc_bound:
-        vms = Vm.objects.filter(dc=dc, slavevm__isnull=True).exclude(status=Vm.NOTCREATED)
-    else:
-        vms = None
-
-    if node_uuids:
-        nodes = Node.objects.filter(uuid__in=node_uuids)
-    elif dc_bound:
+    if dc_bound:
         nodes = ()
-    else:
-        nodes = None
+        _vms = Vm.objects.filter(dc=dc, slavevm__isnull=True).exclude(status=Vm.NOTCREATED)
 
-    try:
-        return get_monitoring(dc).alert_list(vms=vms, nodes=nodes, since=since, until=until, last=last,
-                                             show_events=show_events)
-    except MonitoringError as exc:
-        raise MgmtTaskException(text_type(exc))
+        if vm_uuids is not None:
+            _vms = _vms.filter(uuid__in=vm_uuids)
+
+        mon_dcs_vms_map = {dc.id: _vms}
+    else:
+        assert dc.is_default()
+        mon_dcs_vms_map = {dc.id: []}
+        vms_qs = ()
+
+        if vm_uuids is None and node_uuids is None:
+            nodes = Node.objects.all()
+            vms_qs = Vm.objects.select_related('dc').filter(slavevm__isnull=True).exclude(status=Vm.NOTCREATED)  # All
+        elif vm_uuids is not None and node_uuids is None:
+            nodes = ()
+            vms_qs = Vm.objects.select_related('dc').filter(uuid__in=vm_uuids).exclude(status=Vm.NOTCREATED)  # Filtered
+        elif vm_uuids is None and node_uuids is not None:
+            nodes = Node.objects.filter(uuid__in=node_uuids)
+            vms_qs = ()
+        elif vm_uuids is not None and node_uuids is not None:
+            nodes = Node.objects.filter(uuid__in=node_uuids)
+            vms_qs = Vm.objects.select_related('dc').filter(uuid__in=vm_uuids).exclude(status=Vm.NOTCREATED)  # Filtered
+        else:
+            raise AssertionError
+
+        for vm in vms_qs:
+            mon = get_monitoring(vm.dc)
+
+            if mon.is_default_dc_connection_reused():  # ezx == izx (default)
+                dcid = dc.id  # default DC
+            else:
+                # TODO: Same External Zabbix servers are queried multiple times per each vDC
+                dcid = vm.dc.id
+
+            mon_dcs_vms_map.setdefault(dcid, []).append(vm)
+
+    for dc_id_, vms in mon_dcs_vms_map.items():
+        dc = Dc.objects.get_by_id(dc_id_)
+        mon = get_monitoring(dc)
+
+        if not dc.is_default():
+            nodes = ()
+
+        try:
+            alerts.extend(mon.alert_list(vms=vms, nodes=nodes, since=since, until=until, last=last,
+                                         show_events=show_events))
+        except MonitoringError as exc:
+            raise MgmtTaskException(text_type(exc))
+
+    return alerts

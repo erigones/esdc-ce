@@ -77,6 +77,11 @@ class Zabbix(AbstractMonitoringBackend):
         """We are connected only if both zabbix objects are connected"""
         return self.izx.connected and self.ezx.connected
 
+    def is_default_dc_connection_reused(self):
+        """Are we using the same zabbix connection for internal and external zabbix server?
+        We assume that the internal Zabbix server is always the same as in the default DC"""
+        return len(self._connections) == 1
+
     def reset_cache(self):
         """Clear cache for both zabbix objects"""
         self.izx.reset_cache()
