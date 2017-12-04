@@ -41,7 +41,7 @@ class ActionSerializer(s.Serializer):
         # Allow to use only available hostgroups
         from api.mon.backends.zabbix.base import ZabbixHostGroupContainer
 
-        attrs[source]=[ZabbixHostGroupContainer.hostgroup_name_factory(name, self.context.dc.name) for name in attrs[source]]
+        attrs[source] = [ZabbixHostGroupContainer.hostgroup_name_factory(name, self.context.dc.name) for name in attrs[source]]
         return attrs
         raise NotImplementedError
         try:
@@ -78,3 +78,17 @@ class ActionSerializer(s.Serializer):
                 raise s.ValidationError(_('Selected monitoring hostgroups are not available.'))
 
         return attrs
+
+
+class ActionUpdateSerializer(s.Serializer):
+    hostgroups = s.ArrayField(max_items=16384, validators=(
+        RegexValidator(regex=MonitoringBackend.RE_MONITORING_HOSTGROUPS),), required=False)
+
+    usergroups = s.ArrayField(max_items=16384, validators=(
+        RegexValidator(regex=MonitoringBackend.RE_MONITORING_HOSTGROUPS),), required=False)
+
+    message_subject = s.SafeCharField(max_length=65536, required=False)
+
+    message_text = s.SafeCharField(max_length=65536, required=False)
+
+    recovery_message_text = s.SafeCharField(max_length=65536, required=False)

@@ -517,8 +517,9 @@ class Zabbix(AbstractMonitoringBackend):
     def action_update(self, action):
         """[EXTERNAL]"""
         assert self.ezx.get_action(action['name']), 'Action should exist before update'
-        zac = ZabbixActionContainer.from_mgmt_data(self.ezx.zapi, **action)
-        zac.update()
+        name = action.pop('name')
+        zac = ZabbixActionContainer.from_zabbix_name(self.ezx.zapi, name)
+        zac.update(action)
 
     def action_detail(self, name):
         """[EXTERNAL]"""

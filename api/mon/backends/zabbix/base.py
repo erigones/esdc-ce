@@ -1544,6 +1544,13 @@ class ZabbixActionContainer(ZabbixNamedContainer):
                                    'esc_period',
                                    ]
 
+    _updatable_fields_mapping = {'usergroups': 'operations',   # TODO perhaps reuse for create
+                                 'hostgroups': 'filter',
+                                 'message_subject': 'def_shortdata',
+                                 'message_text': 'def_longdata',
+                                 # TODO 'recovery_message_text':'' ...
+                                 }
+
     _filter_attributes = ['evaltype', 'conditions']
     _condition_trigger_problem = {u'conditiontype': 5,
                                   u'operator': 0,
@@ -1583,9 +1590,18 @@ class ZabbixActionContainer(ZabbixNamedContainer):
     @classmethod
     def from_mgmt_data(cls, zapi, name, **creation_attributes):
         container = cls(name=name, zapi=zapi)
-        for attr in creation_attributes:
-            setattr(container, attr, creation_attributes[attr])
+        container.set_fields(creation_attributes)
         return container
+
+    def set_fields(self, fields):
+        for attr in fields:
+            setattr(self, attr, fields[attr])
+
+    @classmethod
+    def from_zabbix_name(cls, zapi, name):
+        container = cls(name=name, zapi=zapi)
+        container.refresh()
+        return  container
 
     @property
     def hostgroups(self):
@@ -1623,12 +1639,21 @@ class ZabbixActionContainer(ZabbixNamedContainer):
                  u'opmessage': {u'mediatypeid': 0},
                  u'opmessage_grp': [{u'usrgrpid': str(usergroup.zabbix_id)} for usergroup in self.usergroups]}]
 
-    def _generate_request_object(self):
+    def _generate_create_request_object(self):
         return {attribute: getattr(self, attribute)
                 for attribute in self._action_creation_attributes if hasattr(self, attribute)}
 
+    def _generate_update_request_object(self, update_fields):
+        assert self.zabbix_id, 'Cannot update Action without actionid'
+        request_object = {
+            self._updatable_fields_mapping[attribute]:
+                getattr(self, self._updatable_fields_mapping[attribute]) for attribute in update_fields if attribute in self._updatable_fields_mapping}
+        request_object['actionid'] = self.zabbix_id
+        request_object['status'] = 0  # Somewhy this has to be added to the request
+        return request_object
+
     def create(self):
-        request_object = self._generate_request_object()
+        request_object = self._generate_create_request_object()
         try:
             res = self._zapi.action.create(request_object)
         except ZabbixAPIException as e:
@@ -1650,8 +1675,23 @@ class ZabbixActionContainer(ZabbixNamedContainer):
         else:
             self.zabbix_id = None
 
-    def update(self):
-        raise NotImplementedError
+    def update(self, update_fields):
+        self.set_fields(update_fields)
+
+        request_object = self._generate_update_request_object(update_fields)
+
+        try:
+            res = self._zapi.action.update(request_object)
+        except ZabbixAPIException as e:
+            # noinspection PyProtectedMember
+            logger.error('Zabbix API Error in update action(%s): %s', request_object['name'], e)
+            return False
+
+        try:
+            return res['actionids'][0]
+        except (KeyError, IndexError) as e:
+            logger.exception(e)
+            raise ZabbixError(e)
 
     def exists(self, refresh=True):
         if refresh:
