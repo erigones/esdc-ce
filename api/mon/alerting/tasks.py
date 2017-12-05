@@ -236,33 +236,33 @@ def mon_alert_list(task_id, dc_id, dc_bound=True, node_uuids=None, vm_uuids=None
     empty = ()
 
     if dc_bound:
-        _nodes = empty
+        nodes_qs = empty
         vms_qs = Vm.objects.filter(dc=dc, slavevm__isnull=True).exclude(status=Vm.NOTCREATED)
 
         if vm_uuids is not None:
             vms_qs = vms_qs.filter(uuid__in=vm_uuids)
 
-        mon_vms_nodes_map = {get_monitoring(dc): (vms_qs, _nodes)}
+        mon_vms_nodes_map = {get_monitoring(dc): (vms_qs, nodes_qs)}
 
     else:
         assert dc.is_default()
 
         if vm_uuids is None and node_uuids is None:
-            _nodes = Node.objects.all()
+            nodes_qs = Node.objects.all()
             vms_qs = Vm.objects.select_related('dc').filter(slavevm__isnull=True).exclude(status=Vm.NOTCREATED)  # All
         elif vm_uuids is not None and node_uuids is None:
-            _nodes = empty
+            nodes_qs = empty
             vms_qs = Vm.objects.select_related('dc').filter(uuid__in=vm_uuids).exclude(status=Vm.NOTCREATED)  # Filtered
         elif vm_uuids is None and node_uuids is not None:
-            _nodes = Node.objects.filter(uuid__in=node_uuids)
+            nodes_qs = Node.objects.filter(uuid__in=node_uuids)
             vms_qs = empty
         elif vm_uuids is not None and node_uuids is not None:
-            _nodes = Node.objects.filter(uuid__in=node_uuids)
+            nodes_qs = Node.objects.filter(uuid__in=node_uuids)
             vms_qs = Vm.objects.select_related('dc').filter(uuid__in=vm_uuids).exclude(status=Vm.NOTCREATED)  # Filtered
         else:
             raise AssertionError('Unexpected condition in mon_alert_list')
 
-        mon_vms_nodes_map = {get_monitoring(dc): ([], _nodes)}
+        mon_vms_nodes_map = {get_monitoring(dc): ([], nodes_qs)}
 
         for vm in vms_qs:
             mon = get_monitoring(vm.dc)
