@@ -242,7 +242,8 @@ def mon_alert_list(task_id, dc_id, dc_bound=True, node_uuids=None, vm_uuids=None
         if vm_uuids is not None:
             vms_qs = vms_qs.filter(uuid__in=vm_uuids)
 
-        mon_vms_nodes_map = {get_monitoring(dc): (vms_qs, nodes_qs)}
+        mon = get_monitoring(dc)
+        mon_vms_nodes_map = {mon.ezx.connection_id: (mon, vms_qs, nodes_qs)}
 
     else:
         assert dc.is_default()
@@ -262,20 +263,23 @@ def mon_alert_list(task_id, dc_id, dc_bound=True, node_uuids=None, vm_uuids=None
         else:
             raise AssertionError('Unexpected condition in mon_alert_list')
 
-        mon_vms_nodes_map = {get_monitoring(dc): ([], nodes_qs)}
+        mon_default_dc = get_monitoring(dc)
+        mon_vms_nodes_map = {mon_default_dc.ezx.connection_id: (mon_default_dc, [], nodes_qs)}
 
         for vm in vms_qs:
             mon = get_monitoring(vm.dc)
 
             if mon.enabled:
-                if mon not in mon_vms_nodes_map:
-                    mon_vms_nodes_map[mon] = ([], empty)
+                connection_id = mon.ezx.connection_id
 
-                mon_vms_nodes_map[mon][0].append(vm)
+                if connection_id not in mon_vms_nodes_map:
+                    mon_vms_nodes_map[connection_id] = (mon, [], empty)
 
-    for mon, vms_nodes in mon_vms_nodes_map.items():
+                mon_vms_nodes_map[connection_id][1].append(vm)
+
+    for mon, vms, nodes in mon_vms_nodes_map.values():
         try:
-            alerts.extend(mon.alert_list(vms=vms_nodes[0], nodes=vms_nodes[1], since=since, until=until, last=last,
+            alerts.extend(mon.alert_list(vms=vms, nodes=nodes, since=since, until=until, last=last,
                                          show_events=show_events))
         except MonitoringError as exc:
             raise MgmtTaskException(text_type(exc))
