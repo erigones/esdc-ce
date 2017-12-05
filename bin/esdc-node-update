@@ -10,7 +10,7 @@ fi
 MAINDIR="$(cd "$(dirname "$0")/.." ; pwd -P)"
 ERIGONES_HOME="${ERIGONES_HOME:-"${MAINDIR}"}"
 ANS_BASE="${ERIGONES_HOME}/ans"
-UPG_BASE="${ERIGONES_HOME}/ans/upgrade"
+UPG_BASE="${ANS_BASE}/upgrade"
 export ERIGONES_HOME UPG_BASE
 
 PYTHONPATH="${ERIGONES_HOME}:${PYTHONPATH}:${ERIGONES_HOME}/envs/lib/python2.7/site-packages"
@@ -30,8 +30,6 @@ else
 	VERSION="v2.5.99"
 fi
 
-UPG_SUBDIRS="$(find "${UPG_DIR}" -maxdepth 1 -type d -name 'v*')"
-
 cd "${UPG_DIR}"
 
 RUN_VERSIONS=$(python -c "from pkg_resources import parse_version
@@ -44,6 +42,7 @@ for i in sorted(upg_subdirs, key=parse_version):
 ")
 
 
+# shellcheck disable=SC1117
 echo -e "Current node version: ${VERSION}\n"
 
 if [[ -z "${RUN_VERSIONS}" ]]; then
@@ -57,18 +56,22 @@ for version in ${RUN_VERSIONS}; do
 	update_script="${UPG_DIR}/${version}/main.sh"
 
 	if [[ ! -x "${update_script}" ]]; then
+		# shellcheck disable=SC1117
 		echo -e "* ${version}:\tSkipping node update\n"
 		continue
 	fi
 
+	# shellcheck disable=SC1117
 	echo -e "* ${version}:\tApplying node update"
 	"${update_script}"
 	ec=$?
 
 	if [[ "${ec}" -eq 0 ]]; then
+		# shellcheck disable=SC1117
 		echo -e "* ${version}:\tSUCCESS\n"
 		echo "${version}" > "${VERSIONFILE}"
 	else
+		# shellcheck disable=SC1117
 		echo -e "* ${version}:\tERROR\n"
 		exit ${ec}
 	fi

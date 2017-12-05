@@ -3,7 +3,7 @@ from que import TG_DC_BOUND
 
 from api.mon.alerting.action.serializers import ActionSerializer, ActionUpdateSerializer
 
-from api.mon.base.api_views import _MonBaseView
+from api.mon.base.api_views import MonBaseView
 
 from api.api_views import APIView
 from api.decorators import api_view, request_data, setting_required
@@ -13,7 +13,7 @@ from api.permissions import IsAdmin
 from api.task.response import FailureTaskResponse, TaskResponse
 
 
-class MonActionView(_MonBaseView):
+class MonActionView(MonBaseView):
     api_view_name = 'action_list'
     mgmt_task = mon_action_list
 

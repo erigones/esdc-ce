@@ -10,6 +10,7 @@ ERIGONES_HOME=${ERIGONES_HOME:-"/opt/erigones"}
 #SELF="${ERIGONES_HOME}/bin/esnapshot"
 PROG="$(basename "$0")"
 
+# shellcheck disable=SC1090
 . "${ERIGONES_HOME}"/bin/eslib/functions.sh
 
 declare -ri OK=0
@@ -47,18 +48,22 @@ main() {
 			exit $?
 			;;
 		create)
-			_zfs_snap "${1}" "${2:-}" "${3:-}"
+			_zfs_snap_vm "${1}" "${2:-}" "${3:-}"
 			exit $?
 			;;
 		destroy)
-			_zfs_destroy "${1}"
+			_zfs_destroy_snap_vm "${1}"
 			exit $?
 			;;
 		rollback)
 			_zfs_rollback "${1}"
 			exit $?
 			;;
-        -h|--help)
+		restore)
+			echo "Use esbackup snap-restore" >&2
+			exit ${ERR_INPUT}
+			;;
+		-h|--help)
 			usage
 			exit ${OK}
 			;;

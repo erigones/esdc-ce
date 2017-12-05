@@ -8,6 +8,7 @@ logger = getLogger(__name__)
 def _update_serializer_modules(third_party_app, dc_modules, serializer, default_dc=False):
     logger.info('Updating app %s modules (default_dc: %s).', third_party_app, default_dc)
 
+    # noinspection PyShadowingBuiltins
     for module, field_type in dc_modules:
         serializer.base_fields.update({module: field_type})
         logger.debug('%s has been updated with attribute %s (%s)', serializer.__name__, module,

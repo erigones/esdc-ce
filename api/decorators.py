@@ -217,6 +217,7 @@ def request_data(catch_dc=True, force_dc=None, permissions=()):
         return wrap
     return request_data_decorator
 
+
 request_data_nodc = partial(request_data, catch_dc=False)
 request_data_defaultdc = partial(request_data, catch_dc=False, force_dc=settings.VMS_DC_DEFAULT)
 

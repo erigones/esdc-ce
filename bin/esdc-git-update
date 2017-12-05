@@ -34,7 +34,7 @@ CERT_PATH=${3:-}
 # #################
 # Global variables
 # #################
-MAINDIR="$(cd "$(dirname "$0")/.." ; pwd -P)"
+MAINDIR="$(cd "$(dirname "$0")/.." || exit 64; pwd -P)"
 ERIGONES_HOME=${ERIGONES_HOME:-"${MAINDIR}"}
 CTLSH="${ERIGONES_HOME}/bin/ctl.sh"
 DEPLOY_CMD="${CTLSH} deploy --update"
@@ -62,7 +62,7 @@ function usage() {
 }
 
 # Change working directory to ERIGONES_HOME
-cd "${ERIGONES_HOME}"
+cd "${ERIGONES_HOME}" || exit 64
 
 if [[ -z "${ESDC_GIT_UPDATE_2ND_RUN}" ]]; then
 	# Retrieve current Git settings
@@ -150,6 +150,7 @@ if [[ "$(uname -s)" == "SunOS" ]] && [[ -f /usr/bin/zonename ]] && [[ "$(/usr/bi
 		echo "Upgrading compute node software (please wait) ..."
 		node_update_output=$("${NODE_UPDATE_CMD}" 2>&1)
 
+		# shellcheck disable=SC2181
 		if [[ ${?} -eq 0 ]]; then
 			echo "Compute node upgrade was successful"
 		else
@@ -163,6 +164,7 @@ else
 		echo "Upgrading appliances (please wait) ..."
 		appliance_update_output=$("${APPLIANCE_UPDATE_CMD}" 2>&1)
 
+		# shellcheck disable=SC2181
 		if [[ ${?} -eq 0 ]]; then
 			echo "Appliance upgrade was successful"
 		else
@@ -175,6 +177,7 @@ fi
 # Running ctl.sh deploy --update
 deploy_cmd_res=$(${DEPLOY_CMD} 2>&1)
 
+# shellcheck disable=SC2181
 if [[ ${?} -eq 0 ]]; then
 	echo "Post deploy command was successful"
 	echo "${deploy_cmd_res}" | tail -n 7

@@ -574,7 +574,9 @@ VMS_NODE_SSH_KEYS_DEFAULT = []
 VMS_NET_DEFAULT = 'lan'
 VMS_NET_ADMIN = 'admin'
 VMS_NET_VLAN_RESTRICT = True
+VMS_NET_VXLAN_RESTRICT = True
 VMS_NET_VLAN_ALLOWED = []
+VMS_NET_VXLAN_ALLOWED = []
 VMS_NET_LIMIT = None
 VMS_IMAGE_VM = VMS_VM_IMG01
 VMS_IMAGE_VM_DATASETS_DIR = '/{zfs_filesystem}/root/datasets'  # Image upload directory on ImageVm's compute node
@@ -593,6 +595,7 @@ VMS_ISO_DIR = '/iso'
 VMS_ISO_RESCUECD = 'rescuecd.iso'
 VMS_ISO_LIMIT = None
 VMS_TEMPLATE_LIMIT = None
+VMS_VM_DEFINE_LIMIT = None
 VMS_VM_DOMAIN_DEFAULT = 'lan'
 VMS_VM_OSTYPE_DEFAULT = 1
 VMS_VM_CPU_TYPE_DEFAULT = 'qemu64'
@@ -662,7 +665,7 @@ INVALID_USERNAMES = frozenset(['profile', 'Admin', 'provisioner'])
 # version control system allowing for settings to be defined (overwritten) per
 # machine, and also for security reasons not to store passwords in the VCS.
 try:
-    from local_settings import *
+    from local_settings import *  # noqa: F401,F403
 except ImportError:
     pass
 

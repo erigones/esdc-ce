@@ -254,7 +254,7 @@ class APINamespace(BaseNamespace):
         # noinspection PyBroadException
         try:
             apiview = cache.get('sio-' + task_id)
-        except:
+        except Exception:
             pass
         if not apiview:
             apiview = {}

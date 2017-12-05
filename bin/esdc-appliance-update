@@ -24,7 +24,7 @@ VIRTUAL_ENV="${ERIGONES_HOME}/envs"
 export PYTHONPATH VIRTUAL_ENV
 
 # Update ansible inventory
-${ERIGONES_HOME}/bin/ctl.sh genhosts > "${ANS_BASE}/hosts.cfg"
+"${ERIGONES_HOME}"/bin/ctl.sh genhosts > "${ANS_BASE}/hosts.cfg"
 
 # pre-v2.3.1 check
 if [[ ! -f "/root/.ssh/id_rsa" ]]; then
@@ -36,7 +36,7 @@ if [[ ! -f "/root/.ssh/id_rsa" ]]; then
 	echo "Please copy manually the public key /root/.ssh/id_rsa.pub from this server"
 	echo "to other servers (mon01, img01, dns01, cfg01) and press ENTER to continue."
 	echo "*********  !!! WARNING !!!  **********"
-	read
+	read -r
 fi
 
 # upgrade only instances of the same number (so we can perform rolling upgrades if there are more of them)

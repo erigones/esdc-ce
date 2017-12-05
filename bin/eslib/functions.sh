@@ -21,6 +21,7 @@ declare -ri _ERR_UNKNOWN=99
 declare -A LOCKS
 declare -i LOCK_MAX_WAIT=30
 declare -r SERVICE_DIR="/opt/custom/smf"
+declare -r SNAPSHOT_MOUNT_DIR="checkpoints"
 
 #
 # Binaries
@@ -45,9 +46,12 @@ ZONEADM=${ZONEADM:-"/usr/sbin/zoneadm"}
 ZONECFG=${ZONECFG:-"/usr/sbin/zonecfg"}
 VMADM=${VMADM:-"/usr/sbin/vmadm"}
 IMGADM=${IMGADM:-"/usr/sbin/imgadm"}
+MOUNT="${MOUNT:-"/usr/sbin/mount"}"
+UMOUNT="${UMOUNT:-"/usr/sbin/umount"}"
 BC=${BC:-"/usr/bin/bc"}
 QGA=${QGA:-"${ERIGONES_HOME}/bin/qga-client"}
 QGA_SNAPSHOT=${QGA_SNAPSHOT:-"${ERIGONES_HOME}/bin/qga-snapshot"}
+NODE=${NODE:-"/usr/node/bin/node"}
 
 ###############################################################
 # Arguments passed to ssh
@@ -181,6 +185,14 @@ validate_ascii() {
 	[[ -n "${str}" && "${str}" =~ ${re_ascii} ]] || die ${_ERR_INPUT} "${err}"
 }
 
+assert_safe_zone_path() {
+	local zoneroot="$1"
+	local target="$2"
+	local options="${3:-"{}"}"
+
+	${NODE} -e "require('/usr/vm/node_modules/utils.js').assertSafeZonePath('${zoneroot}', '${target}', ${options})"
+}
+
 
 ###############################################################
 # ZFS helper functions
@@ -300,6 +312,7 @@ _zfs_set_dataset_property_children() {
 	local value="$3"
 	local ds
 
+	# shellcheck disable=SC2162
 	${ZFS} list -H -p -o name -t filesystem,volume -r "${dataset}" | while read ds; do
 		[[ "${ds}" == "${dataset}" ]] && continue
 
@@ -380,6 +393,7 @@ _zfs_rename_children() {
 	local ds
 	local ds_child
 
+	# shellcheck disable=SC2162
 	${ZFS} list -H -p -o name -t filesystem,volume -r "${src_dataset}" | while read ds; do
 		[[ "${ds}" == "${src_dataset}" ]] && continue
 
@@ -388,6 +402,7 @@ _zfs_rename_children() {
 		if [[ -n "${ds_child}" ]]; then
 			_zfs_dataset_rename "${ds}" "${dst_dataset}${ds_child}"
 
+			# shellcheck disable=SC2181
 			if [[ $? -eq 0 && "${set_zoned}" == "true" ]]; then
 				_zfs_set_dataset_property "${dst_dataset}${ds_child}" zoned on
 			fi
@@ -410,6 +425,97 @@ _zfs_unmount() {
 	else
 		${ZFS} unmount "${dataset}"
 	fi
+}
+
+_zfs_snap_vm_mount() {
+	local zfs_filesystem="$1"
+	local snapshot_name="$2"
+
+	local zone_check='{"type": "dir", "enoent_ok": true}'
+	local zone_mountpath="/${SNAPSHOT_MOUNT_DIR}/${snapshot_name}"
+	local zone_root
+	local dataset_mountpoint
+	local snapshot_mountpoint
+	local snapshot_zfs_dir
+
+	# delegated datasets are not supported
+	[[ "$(echo "${zfs_filesystem}" | ${AWK} -F"/" '{print NF-1}')" -ne 1 ]] && return 32
+
+	dataset_mountpoint=$(_zfs_dataset_property "${zfs_filesystem}" "mountpoint")
+
+	[[ -z "${dataset_mountpoint}" ]] && return 96
+
+	zone_root="/${dataset_mountpoint}/root"
+	snapshot_zfs_dir="/${dataset_mountpoint}/.zfs/snapshot/${snapshot_name}/root"
+	snapshot_mountpoint="${zone_root}${zone_mountpath}"
+
+	if [[ -d "${snapshot_zfs_dir}" ]] && [[ ! -e "${snapshot_mountpoint}" ]] && \
+			assert_safe_zone_path "${zone_root}" "${zone_mountpath}" "${zone_check}" 2>/dev/null; then
+		${MKDIR} -m 0700 "${snapshot_mountpoint}" && \
+		${MOUNT} -F lofs -o ro,setuid,nodevices "${snapshot_zfs_dir}" "${snapshot_mountpoint}"
+		return $?
+	fi
+
+	return 64
+}
+
+_zfs_snap_vm_umount() {
+	local zfs_filesystem="$1"
+	local snapshot_name="$2"
+
+	local snapshot_mountpoint="/${zfs_filesystem}/root/${SNAPSHOT_MOUNT_DIR}/${snapshot_name}"
+
+	if ${MOUNT} | grep -q "${snapshot_mountpoint}"; then
+		${UMOUNT} "${snapshot_mountpoint}" && rmdir "${snapshot_mountpoint}"
+		return $?
+	fi
+
+	return 64
+}
+
+# used by esnapshot (parameters are compatible with _zfs_snap())
+_zfs_snap_vm() {
+	local snapshot="$1"
+	shift
+	local zfs_filesystem="${snapshot%@*}"
+	local snapshot_name="${snapshot#*@}"
+	local uuid
+	local ec
+
+	_zfs_snap "${snapshot}" "${@}"
+	ec=$?
+	uuid="$(echo "${zfs_filesystem}" | cut -d "/" -f 2)"
+
+	if [[ "${ec}" -eq 0 && \
+		  "${uuid}" != *"-disk"* && \
+		  "$(_vm_brand "${uuid}" 2>/dev/null)" != "kvm" && \
+		  "$(_vm_status "${uuid}" 2>/dev/null)" == "running" ]]; then
+
+		_zfs_snap_vm_mount "${zfs_filesystem}" "${snapshot_name}" || true
+	fi
+
+	return ${ec}
+}
+
+# used by esnapshot (parameters are compatible with _zfs_destroy())
+_zfs_destroy_snap_vm() {
+	local snapshot="$1"
+	local zfs_filesystem="${snapshot%@*}"
+	local snapshot_name="${snapshot#*@}"
+	local uuid
+
+	uuid="$(echo "${zfs_filesystem}" | cut -d "/" -f 2)"
+
+	if [[ "${uuid}" != *"-disk"* && \
+		  "$(_vm_brand "${uuid}" 2>/dev/null)" != "kvm" && \
+		  "$(_vm_status "${uuid}" 2>/dev/null)" == "running" ]]; then
+
+		_zfs_snap_vm_umount "${zfs_filesystem}" "${snapshot_name}" || true
+	fi
+
+	_zfs_destroy "${snapshot}"
+
+	return $?
 }
 
 
@@ -638,6 +744,7 @@ _parse_service_name() {
 
 _service_file_save() {
 	local fmri="$1"
+	# shellcheck disable=SC2155
 	local service="$(_parse_service_name "${fmri}")"
 
 	_service_export "${fmri}" > "${SERVICE_DIR}/${service}.xml"
@@ -645,6 +752,7 @@ _service_file_save() {
 
 _service_file_remove() {
 	local fmri="$1"
+	# shellcheck disable=SC2155
 	local service="$(_parse_service_name "${fmri}")"
 
 	rm -f "${SERVICE_DIR}/${service}.xml"

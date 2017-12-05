@@ -348,7 +348,7 @@ def ptr_form(request, hostname, nic_id):
         ptr = RecordView.Record.get_record_PTR(nic_ip)
         if not ptr:
             raise Exception('PTR Record not found')
-    except:
+    except Exception:
         raise Http404
 
     ptrform = PTRForm(request.POST, prefix='ptr')

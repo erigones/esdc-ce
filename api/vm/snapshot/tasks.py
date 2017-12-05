@@ -1,3 +1,5 @@
+import json
+from django.utils.six import iteritems
 from django.db.utils import DatabaseError
 
 from vms.models import Vm, Snapshot, SnapshotDefine
@@ -24,6 +26,13 @@ try:
 except NameError:
     t_long = int
 
+SNAPSHOT_LOG_DETAIL = frozenset(['msg', 'rc', 'time_elapsed', 'size', 'backup_snapshot_size'])
+
+
+def _vm_snapshot_cb_detail(data):
+    """Create tasklog detail - used by vm_snapshot_cb in case of a restore from other VM"""
+    return ', '.join(['%s=%s' % (k, to_string(v)) for k, v in iteritems(data) if k in SNAPSHOT_LOG_DETAIL])
+
 
 # noinspection PyUnusedLocal
 def _vm_snapshot_list_cb_failed(result, task_id, snaps, action):
@@ -33,14 +42,18 @@ def _vm_snapshot_list_cb_failed(result, task_id, snaps, action):
 
 
 # noinspection PyUnusedLocal
-def _vm_snapshot_cb_failed(result, task_id, snap, action):
+def _vm_snapshot_cb_failed(result, task_id, snap, action, vm=None):
     """Callback helper for failed task - revert snapshot status"""
     if action == 'POST':
         snap.delete()
     elif action == 'PUT':
+        if vm is None:
+            vm = snap.vm
+        elif vm != snap.vm:
+            snap.vm.revert_notready()
+        vm.revert_notready()
         snap.status = snap.OK
         snap.save_status()
-        snap.vm.revert_notready()
     elif action == 'DELETE':
         snap.status = snap.OK
         snap.save_status()
@@ -55,6 +68,7 @@ def _delete_oldest(model, define, view_function, view_item, task_id, msg):
     """
     vm = define.vm
     # TODO: check indexes
+    # noinspection PyUnresolvedReferences
     total = model.objects.filter(vm=vm, disk_id=define.disk_id, define=define, status=model.OK).count()
     to_delete = total - define.retention
 
@@ -62,6 +76,7 @@ def _delete_oldest(model, define, view_function, view_item, task_id, msg):
         return None
 
     # List of snapshot or backup names to delete TODO: check indexes
+    # noinspection PyUnresolvedReferences
     oldest = model.objects.filter(vm=vm, disk_id=define.disk_id, define=define, status=model.OK)\
         .values_list('name', flat=True).order_by('id')[:to_delete]
     view_name = view_function.__name__
@@ -143,17 +158,22 @@ def vm_snapshot_cb(result, task_id, vm_uuid=None, snap_id=None):
     A callback function for api.vm.snapshot.views.vm_snapshot.
     """
     snap = Snapshot.objects.select_related('vm').get(id=snap_id)
-    vm = snap.vm
+    vm = Vm.objects.get(uuid=vm_uuid)
     action = result['meta']['apiview']['method']
     msg = result.get('message', '')
 
     if result['returncode'] == 0:
         if msg:
-            result['detail'] = 'msg=' + to_string(msg)
+            # noinspection PyBroadException
+            try:
+                result['detail'] = _vm_snapshot_cb_detail(json.loads(msg))
+            except Exception:
+                result['detail'] = 'msg=' + to_string(msg)
         else:
             result['detail'] = ''
 
         if action == 'POST':
+            assert vm == snap.vm
             snap.status = snap.OK
             result['message'] = 'Snapshot successfully created'
 
@@ -175,20 +195,31 @@ def vm_snapshot_cb(result, task_id, vm_uuid=None, snap_id=None):
                 _delete_oldest(Snapshot, snap.define, vm_snapshot_list, 'snapnames', task_id, LOG_SNAPS_DELETE)
 
         elif action == 'PUT':
+            if vm != snap.vm:
+                snap.vm.revert_notready()
+            vm.revert_notready()
             snap.status = snap.OK
             snap.save_status()
+
             if result['meta']['apiview']['force']:
-                # TODO: check indexes
-                Snapshot.objects.filter(vm=vm, disk_id=snap.disk_id, id__gt=snap.id).delete()
-            vm.revert_notready()
+                if snap.vm == vm:
+                    # TODO: check indexes
+                    Snapshot.objects.filter(vm=vm, disk_id=snap.disk_id, id__gt=snap.id).delete()
+                else:
+                    disk = vm.json_active_get_disks()[result['meta']['apiview']['target_disk_id'] - 1]
+                    real_disk_id = Snapshot.get_real_disk_id(disk)
+                    # TODO: check indexes
+                    Snapshot.objects.filter(vm=vm, disk_id=real_disk_id).delete()
+
             result['message'] = 'Snapshot successfully restored'
 
         elif action == 'DELETE':
+            assert vm == snap.vm
             snap.delete()
             result['message'] = 'Snapshot successfully deleted'
 
     else:
-        _vm_snapshot_cb_failed(result, task_id, snap, action)  # Delete snapshot or update snapshot status
+        _vm_snapshot_cb_failed(result, task_id, snap, action, vm=vm)  # Delete snapshot or update snapshot status
         logger.error('Found nonzero returncode in result from %s vm_snapshot(%s, %s). Error: %s',
                      action, vm_uuid, snap, msg)
         raise TaskException(result, 'Got bad return code (%s). Error: %s' % (result['returncode'], msg), snap=snap)

@@ -20,7 +20,7 @@ __all__ = ('node_sysinfo_cb',)
 logger = get_task_logger(__name__)
 
 
-@cq.task(name='api.node.sysinfo.tasks.node_sysinfo_cb', base=MgmtCallbackTask, bind=True, ignore_result=False)
+@cq.task(name='api.node.sysinfo.tasks.node_sysinfo_cb', base=MgmtCallbackTask, bind=True, ignore_result=False)  # noqa: R701,E501
 @mgmt_lock(wait_for_release=True, bound_task=True)
 @callback(log_exception=True, update_user_tasks=True)
 def node_sysinfo_cb(result, task_id, node_uuid=None):

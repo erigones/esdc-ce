@@ -201,7 +201,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
     RESERVED_MDATA_KEYS = frozenset(['resize_needed'])  # Bug #chili-721
 
     _DISKS_REMOVE_EMPTY = ()
-    _NICS_REMOVE_EMPTY = (('gateway', ''), ('allowed_ips', ()))
+    _NICS_REMOVE_EMPTY = (('gateway', ''), ('allowed_ips', ()), ('mtu', None))
 
     _pk_key = 'vm_uuid'  # _UserTasksModel
     _log_name_attr = 'hostname'  # _UserTasksModel
@@ -580,7 +580,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
         self._set_cloud_init(_json, 'user-data', ['chpasswd:', ' expire: false', ' list: |', '   root:%s' % passwd])
         self.json = _json
 
-    def fix_json(self, deploy=False, resize=False, recreate=False):
+    def fix_json(self, deploy=False, resize=False, recreate=False):  # noqa: R701
         """So just before any vmadm create command we have to clean some stuff from the json.
         Currently we remove:
             - disks.*.path if media is 'disk'
@@ -867,7 +867,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
             if not kvm and 'model' in nic:
                 del nics[i]['model']
             # Remove if empty
-            for e, _ in self._NICS_REMOVE_EMPTY:
+            for e, __ in self._NICS_REMOVE_EMPTY:
                 if e in nic and not nic[e]:
                     del nics[i][e]
 

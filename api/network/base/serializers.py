@@ -16,7 +16,8 @@ class NetworkSerializer(s.ConditionalDCBoundSerializer):
     """
     _model_ = Subnet
     _update_fields_ = ('alias', 'owner', 'access', 'desc', 'network', 'netmask', 'gateway', 'resolvers',
-                       'dns_domain', 'ptr_domain', 'nic_tag', 'vlan_id', 'dc_bound', 'dhcp_passthrough')
+                       'dns_domain', 'ptr_domain', 'nic_tag', 'vlan_id', 'dc_bound', 'dhcp_passthrough', 'vxlan_id',
+                       'mtu')
     _default_fields_ = ('name', 'alias', 'owner')
     _blank_fields_ = frozenset({'desc', 'dns_domain', 'ptr_domain'})
     _null_fields_ = frozenset({'gateway'})
@@ -34,6 +35,8 @@ class NetworkSerializer(s.ConditionalDCBoundSerializer):
     nic_tag = s.ChoiceField()
     nic_tag_type = s.CharField(read_only=True)
     vlan_id = s.IntegerField(min_value=0, max_value=4096)
+    vxlan_id = s.IntegerField(min_value=1, max_value=16777215, required=False)  # (2**24 - 1) based on RFC 7348
+    mtu = s.IntegerField(min_value=576, max_value=9000, required=False)  # values from man vmadm
     resolvers = s.IPAddressArrayField(source='resolvers_api', required=False, max_items=8)
     dns_domain = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\._-]*$', max_length=250, required=False)  # can be blank
     ptr_domain = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\._-]*$', max_length=250, required=False)  # can be blank
@@ -98,7 +101,7 @@ class NetworkSerializer(s.ConditionalDCBoundSerializer):
 
         return attrs
 
-    def validate(self, attrs):
+    def validate(self, attrs):  # noqa: R701
         try:
             network = attrs['network']
         except KeyError:
@@ -108,6 +111,21 @@ class NetworkSerializer(s.ConditionalDCBoundSerializer):
             netmask = attrs['netmask']
         except KeyError:
             netmask = self.object.netmask
+
+        try:
+            vxlan_id = attrs['vxlan_id']
+        except KeyError:
+            vxlan_id = self.object.vxlan_id
+
+        try:
+            mtu = attrs['mtu']
+        except KeyError:
+            mtu = self.object.mtu
+
+        try:
+            nic_tag = attrs['nic_tag']
+        except KeyError:
+            nic_tag = self.object.nic_tag
 
         try:
             ip_network = Subnet.get_ip_network(network, netmask)
@@ -122,7 +140,31 @@ class NetworkSerializer(s.ConditionalDCBoundSerializer):
 
             if limit is not None:
                 if Subnet.objects.filter(dc_bound=self._dc_bound).count() >= int(limit):
-                    raise s.ValidationError(_('Maximum number of networks reached'))
+                    raise s.ValidationError(_('Maximum number of networks reached.'))
+
+        nic_tag_type = Node.all_nictags()[nic_tag]
+        # retrieve all available nictags and see what is the type of the current nic tag
+        # if type is overlay then vxlan is mandatory argument
+        if nic_tag_type == 'overlay rule':
+            if not vxlan_id:
+                self._errors['vxlan_id'] = s.ErrorList([_('VXLAN ID is required when an '
+                                                          'overlay NIC tag is selected.')])
+        else:
+            attrs['vxlan_id'] = None
+
+        # validate MTU for overlays and etherstubs, and physical nics
+        if nic_tag_type == 'overlay rule':
+            # if MTU was not set for the overlay
+            if not mtu:
+                attrs['mtu'] = 1400
+
+            if mtu > 8900:
+                self._errors['mtu'] = s.ErrorList([s.IntegerField.default_error_messages['max_value']
+                                                   % {'limit_value': 8900}])
+
+        if nic_tag_type in ('normal', 'aggr') and mtu and mtu < 1500:
+            self._errors['mtu'] = s.ErrorList([s.IntegerField.default_error_messages['min_value']
+                                               % {'limit_value': 1500}])
 
         if self._dc_bound:
             try:
@@ -134,6 +176,9 @@ class NetworkSerializer(s.ConditionalDCBoundSerializer):
 
             if dc_settings.VMS_NET_VLAN_RESTRICT and vlan_id not in dc_settings.VMS_NET_VLAN_ALLOWED:
                 self._errors['vlan_id'] = s.ErrorList([_('VLAN ID is not available in datacenter.')])
+
+            if dc_settings.VMS_NET_VXLAN_RESTRICT and vxlan_id not in dc_settings.VMS_NET_VXLAN_ALLOWED:
+                self._errors['vxlan_id'] = s.ErrorList([_('VXLAN ID is not available in datacenter.')])
 
         return super(NetworkSerializer, self).validate(attrs)
 
@@ -149,11 +194,13 @@ class ExtendedNetworkSerializer(NetworkSerializer):
     _free_ip_subquery = '"vms_ipaddress"."vm_id" IS NULL AND "vms_ipaddress"."usage" = %d '\
                         'AND "vms_ipaddress_vms"."vm_id" IS NULL' % IPAddress.VM
 
+    # noinspection SqlDialectInspection,SqlNoDataSourceInspection
     ips_free_query = 'SELECT COUNT(*) FROM "vms_ipaddress" LEFT OUTER JOIN '\
                      '"vms_ipaddress_vms" ON ("vms_ipaddress"."id" = "vms_ipaddress_vms"."ipaddress_id") ' \
                      'WHERE "vms_subnet"."uuid" = "vms_ipaddress"."subnet_id" '\
                      'AND %s' % _free_ip_subquery
 
+    # noinspection SqlDialectInspection,SqlNoDataSourceInspection
     ips_used_query = 'SELECT COUNT(*) FROM "vms_ipaddress" LEFT OUTER JOIN '\
                      '"vms_ipaddress_vms" ON ("vms_ipaddress"."id" = "vms_ipaddress_vms"."ipaddress_id") ' \
                      'WHERE "vms_subnet"."uuid" = "vms_ipaddress"."subnet_id" '\

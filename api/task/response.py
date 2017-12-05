@@ -78,12 +78,12 @@ class BaseTaskResponse(Response):
             # noinspection PyBroadException
             try:
                 t_s = result['status']
-            except:
+            except Exception:
                 t_s = None
             # noinspection PyBroadException
             try:
                 t_r = result['result']
-            except:
+            except Exception:
                 t_r = None
 
             if msg:  # msg => update task log & save pending user task
@@ -318,11 +318,11 @@ def mgmt_task_response(request, task_id, error, result, data=None, **kwargs):
     """
     Response class factory for mgmt task calls. Called by some api views.
     """
-    if result:
-        return SuccessTaskResponse(request, result, **kwargs)
-    elif error:
+    if error:
         return FailureTaskResponse(request, error, **kwargs)
     elif task_id:
         return TaskResponse(request, task_id, data=data, **kwargs)
+    elif result is not None:
+        return SuccessTaskResponse(request, result, **kwargs)
     else:
         return BadRequestResponse(request)

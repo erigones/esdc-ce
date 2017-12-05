@@ -1,20 +1,24 @@
 # -*- coding: UTF-8 -*-
+from django.utils.six import text_type
 from celery.utils.log import get_task_logger
 from zabbix_api import ZabbixAPIException
 
+from api.task.utils import mgmt_task
+from api.mon import get_monitoring, MonitoringError
 from api.mon.utils import MonInternalTask
 from que.erigonesd import cq
-from api.mon import get_monitoring, MonitoringError
+from que.exceptions import MgmtTaskException
+from que.mgmt import MgmtTask
 
-from vms.models import Dc
+from vms.models import Dc, Vm, Node
 from gui.models import Role, User
 
-__all__ = ('mon_user_group_changed', 'mon_user_changed')
+__all__ = ('mon_user_group_changed', 'mon_user_changed', 'mon_alert_list')
 
 logger = get_task_logger(__name__)
 
 
-def _user_group_changed(group_name, dc_name):
+def _user_group_changed(group_name, dc_name):  # noqa: R701
     if dc_name and group_name:  # Particular group under dc changed
         dc = Dc.objects.get_by_name(dc_name)
         zabbix = get_monitoring(dc)
@@ -217,3 +221,63 @@ def mon_all_groups_sync(task_id, sender, dc_name=None, *args, **kwargs):
             mon_user_group_changed.call(sender='mon_all_groups_sync', group_name=group.name)
         for dc in Dc.objects.all():  # owner groups
             mon_user_group_changed.call(sender='mon_all_groups_sync', dc_name=dc.name)
+
+
+# noinspection PyUnusedLocal
+@cq.task(name='api.mon.alerting.tasks.mon_alert_list', base=MgmtTask)
+@mgmt_task()
+def mon_alert_list(task_id, dc_id, dc_bound=True, node_uuids=None, vm_uuids=None, since=None, until=None, last=None,
+                   show_events=True, **kwargs):
+    """
+    Return list of alerts available in Zabbix.
+    """
+    dc = Dc.objects.get_by_id(int(dc_id))
+    alerts = []
+    empty = ()
+
+    if dc_bound:
+        nodes_qs = empty
+        vms_qs = Vm.objects.filter(dc=dc, slavevm__isnull=True).exclude(status=Vm.NOTCREATED)
+
+        if vm_uuids is not None:
+            vms_qs = vms_qs.filter(uuid__in=vm_uuids)
+
+        mon_vms_nodes_map = {get_monitoring(dc): (vms_qs, nodes_qs)}
+
+    else:
+        assert dc.is_default()
+
+        if vm_uuids is None and node_uuids is None:
+            nodes_qs = Node.objects.all()
+            vms_qs = Vm.objects.select_related('dc').filter(slavevm__isnull=True).exclude(status=Vm.NOTCREATED)  # All
+        elif vm_uuids is not None and node_uuids is None:
+            nodes_qs = empty
+            vms_qs = Vm.objects.select_related('dc').filter(uuid__in=vm_uuids).exclude(status=Vm.NOTCREATED)  # Filtered
+        elif vm_uuids is None and node_uuids is not None:
+            nodes_qs = Node.objects.filter(uuid__in=node_uuids)
+            vms_qs = empty
+        elif vm_uuids is not None and node_uuids is not None:
+            nodes_qs = Node.objects.filter(uuid__in=node_uuids)
+            vms_qs = Vm.objects.select_related('dc').filter(uuid__in=vm_uuids).exclude(status=Vm.NOTCREATED)  # Filtered
+        else:
+            raise AssertionError('Unexpected condition in mon_alert_list')
+
+        mon_vms_nodes_map = {get_monitoring(dc): ([], nodes_qs)}
+
+        for vm in vms_qs:
+            mon = get_monitoring(vm.dc)
+
+            if mon.enabled:
+                if mon not in mon_vms_nodes_map:
+                    mon_vms_nodes_map[mon] = ([], empty)
+
+                mon_vms_nodes_map[mon][0].append(vm)
+
+    for mon, vms_nodes in mon_vms_nodes_map.items():
+        try:
+            alerts.extend(mon.alert_list(vms=vms_nodes[0], nodes=vms_nodes[1], since=since, until=until, last=last,
+                                         show_events=show_events))
+        except MonitoringError as exc:
+            raise MgmtTaskException(text_type(exc))
+
+    return alerts

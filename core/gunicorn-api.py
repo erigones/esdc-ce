@@ -15,7 +15,9 @@ worker_connections = 500
 debug = False
 daemon = False
 loglevel = 'info'
+# noinspection PyUnresolvedReferences
 accesslog = os.path.join(PROJECT_DIR, 'var', 'log', 'gunicorn-api.access_log')
+# noinspection PyUnresolvedReferences
 errorlog = os.path.join(PROJECT_DIR, 'var', 'log', 'gunicorn-api.error_log')
 access_log_format = '"%(h)s %({X-FORWARDED-FOR}i)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"'
 x_forwarded_for_header = 'X-FORWARDED-FOR'

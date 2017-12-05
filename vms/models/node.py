@@ -18,7 +18,7 @@ from gui.models import User
 NODES_ALL_KEY = 'nodes_list'
 NODES_ALL_EXPIRES = 300
 NICTAGS_ALL_KEY = 'nictag_list'
-NICTAGS_ALL_EXPIRES = 300
+NICTAGS_ALL_EXPIRES = None
 
 
 class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
@@ -725,11 +725,27 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
         return self._get_queue(queue).replace('.', '@', 1)
 
     @property
+    def _system_version_key(self):
+        return 'node:%s:system-version' % self.uuid
+
+    @property
     def system_version(self):
         from que.utils import worker_command
-        worker = self.worker('fast')
 
-        return worker_command('system_version', worker, timeout=0.3) or ''
+        version = cache.get(self._system_version_key)
+
+        if not version:
+            worker = self.worker('fast')
+            version = worker_command('system_version', worker, timeout=0.5) or ''
+
+            if version:
+                cache.set(self._system_version_key, version)
+
+        return version
+
+    @system_version.deleter
+    def system_version(self):
+        cache.delete(self._system_version_key)
 
     def has_related_tasks(self):
         """Return True if at least one of node related objects (Vm, Image, NodeStorage) has pending tasks"""

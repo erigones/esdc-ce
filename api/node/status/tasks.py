@@ -18,7 +18,7 @@ logger = get_task_logger(__name__)
 
 
 # noinspection PyUnusedLocal
-@cq.task(name='api.node.status.tasks.node_worker_status_update', base=InternalTask)
+@cq.task(name='api.node.status.tasks.node_worker_status_update', base=InternalTask)  # noqa: R701
 @mgmt_lock(timeout=3600, key_args=(1,), wait_for_release=True)
 def node_worker_status_update(task_id, hostname, queue=None, status=None, **kwargs):
     """Check (ping) and update compute node status (called by MgmtDaemon)"""

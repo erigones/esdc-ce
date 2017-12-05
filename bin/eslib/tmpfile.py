@@ -16,7 +16,7 @@ class TmpFile(object):
         try:
             os.write(fd, content)
             os.close(fd)
-        except:
+        except Exception:
             self.delete()
             raise
 

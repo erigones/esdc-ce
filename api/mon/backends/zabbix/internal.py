@@ -4,7 +4,6 @@ from django.conf import settings as django_settings
 from zabbix_api import ZabbixAPIException
 
 from api.decorators import catch_exception
-from vms.models import DefaultDc
 from .base import ZabbixError, ZabbixBase, logger
 
 

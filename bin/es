@@ -27,10 +27,10 @@ __email__ = 'info@erigones.com'
 
 ################################################################################
 
-import os
-import sys
-from functools import partial
-from tempfile import gettempdir
+import os  # noqa: E402
+import sys  # noqa: E402
+from functools import partial  # noqa: E402
+from tempfile import gettempdir  # noqa: E402
 
 PY3 = sys.version_info[0] > 2
 ENCODING = 'UTF-8'
@@ -113,7 +113,7 @@ def output_json(response, status, txt):
         # noinspection PyBroadException
         try:
             txt = txt['description']
-        except:
+        except Exception:
             pass
         else:
             print(txt)
@@ -166,7 +166,7 @@ def output_tabulate(response, status, txt, tablefmt='simple'):
                 txt = txt['results']
             except KeyError:
                 pass
-        except:
+        except Exception:
             pass
 
     headers = ()
@@ -441,7 +441,7 @@ else:
     # noinspection PyBroadException
     try:
         text = json.loads(text)
-    except:
+    except Exception:
         pass
 
     if status_code < 400:
@@ -465,7 +465,7 @@ if action == 'logout' and r and r.status_code == 200:
     # noinspection PyBroadException
     try:
         os.remove(TOKEN_STORE)
-    except:
+    except Exception:
         pass
 
 

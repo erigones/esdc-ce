@@ -107,6 +107,7 @@ class MetaTask(Task):
             if 'meta' not in result:
                 result['meta'] = meta
 
+            # noinspection PyUnresolvedReferences
             result['meta']['cb_name'] = LOGTASK
             meta['task_status'] = status
             meta['cleanup'] = True
@@ -125,7 +126,7 @@ def _exc_signal(exc):
     return sig
 
 
-@cq.task(name='que.tasks.execute', base=MetaTask, bind=True)
+@cq.task(name='que.tasks.execute', base=MetaTask, bind=True)  # noqa: R701
 def _execute(self, cmd, stdin, meta=None, callback=None):
     """
     The "real" execute function.

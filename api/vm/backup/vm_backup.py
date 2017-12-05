@@ -232,9 +232,9 @@ class VmBackup(TaskAPIView):
         self.obj = vm
         # Cache apiview and detail
         # noinspection PyUnusedLocal
-        apiview = self.apiview
+        apiview = self.apiview  # noqa: F841
         # noinspection PyUnusedLocal
-        detail = self.detail
+        detail = self.detail  # noqa: F841
         self._detail_ += ", target_hostname='%s', target_disk_id=%s" % (vm.hostname, disk_id)
         self._apiview_['target_hostname'] = vm.hostname
         self._apiview_['target_disk_id'] = disk_id

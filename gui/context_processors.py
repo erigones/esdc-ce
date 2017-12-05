@@ -38,8 +38,6 @@ def common_stuff(request):
     """
     Make common settings and variables available in templates.
     """
-    dc_settings = request.dc.settings
-
     return {
         'settings': settings,
         'dc_settings': request.dc.settings,
