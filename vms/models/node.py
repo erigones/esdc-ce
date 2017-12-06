@@ -29,7 +29,7 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
     _vlan_id = None
 
     ZPOOL = 'zones'
-    DEFAULT_OVERLAY_PORT = '4789'
+    DEFAULT_OVERLAY_PORT = 4789
     DEFAULT_OVERLAY_IP = '0.0.0.0'
     # Used in NodeStorage.size_vms
     VMS_SIZE_TOTAL_KEY = 'vms-size-total:%s'  # %s = zpool.id (NodeStorage)

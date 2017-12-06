@@ -76,29 +76,33 @@ def _parse_imgadm_sources(imgadm_sources):
         return imgadm_sources
 
 
+def _parse_overlay_rule(definition):
+    port = RE_OVERLAY_PORT.findall(definition)
+    if not port or len(port) > 1:
+        port = None
+    else:
+        port = int(port[0])
+
+    ip = RE_OVERLAY_IP.findall(definition)
+    if not ip or len(ip) > 1:
+        ip = None
+    else:
+        ip = ip[0]
+
+    arp_file = RE_OVERLAY_ARP_FILE.findall(definition)
+    if not arp_file or len(arp_file) > 1:
+        arp_file = None
+    else:
+        arp_file = arp_file[0]
+
+    return {'ip': ip, 'port': port, 'arp_file': arp_file}
+
+
 def _parse_overlay_rules(overlay_rules):
     result = {}
 
     for name, definition in iteritems(overlay_rules):
-        port = RE_OVERLAY_PORT.findall(definition)
-        if not port or len(port) > 1:
-            port = None
-        else:
-            port = port[0]
-
-        ip = RE_OVERLAY_IP.findall(definition)
-        if not ip or len(ip) > 1:
-            ip = None
-        else:
-            ip = ip[0]
-
-        arp_file = RE_OVERLAY_ARP_FILE.findall(definition)
-        if not arp_file or len(arp_file) > 1:
-            arp_file = None
-        else:
-            arp_file = arp_file[0]
-
-        result[name] = {'ip': ip, 'port': port, 'arp_file': arp_file}
+        result[name] = _parse_overlay_rule(definition)
 
     return result
 
