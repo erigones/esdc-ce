@@ -1002,14 +1002,14 @@ class ZabbixBase(object):
     def _collect_trigger_events(cls, related_events):
         for event in related_events:
             yield {
-                'eventid': event['eventid'],
-                'clock': event['clock'],
-                'value': event['value'],
+                'eventid': int(event['eventid']),
+                'clock': int(event['clock']),
+                'value': int(event['value']),
                 'status': cls.event_status(event['value']),
                 'acknowledged': bool(int(event['acknowledged'])),
                 'acknowledges': [{
-                    'acknowledgeid': ack['acknowledgeid'],
-                    'clock': ack['clock'],
+                    'acknowledgeid': int(ack['acknowledgeid']),
+                    'clock': int(ack['clock']),
                     'message': ack['message'],
                     'user': ack['alias'],
                 } for ack in event['acknowledges']]
