@@ -11,11 +11,13 @@ from django.db.models import Q
 from frozendict import frozendict
 from zabbix_api import ZabbixAPI, ZabbixAPIException, ZabbixAPIError
 
+from que.tasks import get_task_logger
 from vms.models import Dc
 from api.decorators import lock
 from api.mon.backends.abstract import VM_KWARGS_KEYS, NODE_KWARGS_KEYS, MonitoringError
 
 logger = getLogger(__name__)
+task_logger = get_task_logger(__name__)
 
 RESULT_CACHE_TIMEOUT = 3600
 
@@ -1238,14 +1240,14 @@ class ZabbixUserContainer(ZabbixNamedContainer):
         self._attach_group_membership(user_update_request_content)
         self._attach_basic_info(user_update_request_content)
 
-        logger.debug('Updating user %s with group info and identity: %s', self.zabbix_id,
-                     user_update_request_content)
+        task_logger.debug('Updating user %s with group info and identity: %s', self.zabbix_id,
+                          user_update_request_content)
         self._api_response = self._call_zapi('user.update', params=user_update_request_content)
 
         user_media_update_request_content = {'users': {'userid': self.zabbix_id}}
         self._attach_media_for_update_call(user_media_update_request_content)
 
-        logger.debug('Updating user %s with media: %s', self.zabbix_id, user_media_update_request_content)
+        task_logger.debug('Updating user %s with media: %s', self.zabbix_id, user_media_update_request_content)
         self._api_response = self._call_zapi('user.updatemedia', params=user_media_update_request_content)
 
     def create(self):
@@ -1261,7 +1263,7 @@ class ZabbixUserContainer(ZabbixNamedContainer):
         user_object['alias'] = self._user.username
         user_object['passwd'] = self._user.__class__.objects.make_random_password(20)  # TODO let the user set it
 
-        logger.debug('Creating user: %s', user_object)
+        task_logger.debug('Creating user: %s', user_object)
 
         try:
             self._api_response = self._call_zapi('user.create', params=user_object)
@@ -1325,7 +1327,7 @@ class ZabbixUserContainer(ZabbixNamedContainer):
         assert self.zabbix_id, 'A user in zabbix should be first created, then updated. %s has no zabbix_id.' % self
         user_object = self._get_api_request_object_stub()
         self._attach_group_membership(user_object)
-        logger.debug('Updating user: %s', user_object)
+        task_logger.debug('Updating user: %s', user_object)
         self._api_response = self._call_zapi('user.update', user_object)
 
     def _attach_group_membership(self, api_request_object):
@@ -1477,11 +1479,11 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
             group.delete()
 
     def delete(self):
-        logger.debug('Going to delete group %s', self.name)
-        logger.debug('Group.users before: %s', self.users)
+        task_logger.debug('Going to delete group %s', self.name)
+        task_logger.debug('Group.users before: %s', self.users)
         users_to_remove = self.users.copy()  # We have to copy it because group.users will get messed up
         self.remove_users(users_to_remove, delete_users_if_last=True)  # remove all users
-        logger.debug('Group.users after: %s', self.users)
+        task_logger.debug('Group.users after: %s', self.users)
         self._call_zapi('usergroup.delete', params=[self.zabbix_id])
         self.zabbix_id = None
 
@@ -1509,7 +1511,7 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
             user_group_object['rights'].append({'permission': hostgroups_access_permission,
                                                 'id': host_group.zabbix_id})
 
-        logger.debug('Creating usergroup: %s', user_group_object)
+        task_logger.debug('Creating usergroup: %s', user_group_object)
         self._api_response = self._call_zapi('usergroup.create', params=user_group_object)
         self.zabbix_id = self._api_response['usrgrpids'][0]
 
@@ -1538,17 +1540,17 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
             self.update_hostgroup_info()  # There is some hostgroup information depending on the superuser status
 
     def update_hostgroup_info(self):
-        logger.debug('TODO host group update %s', self.name)
+        task_logger.debug('TODO host group update %s', self.name)
         # TODO
 
     def update_users(self, user_group):
-        logger.debug('synchronizing %s', self)
-        logger.debug('remote_user_group.users %s', self.users)
-        logger.debug('source_user_group.users %s', user_group.users)
+        task_logger.debug('synchronizing %s', self)
+        task_logger.debug('remote_user_group.users %s', self.users)
+        task_logger.debug('source_user_group.users %s', user_group.users)
         redundant_users = self.users - user_group.users
-        logger.debug('redundant_users: %s', redundant_users)
+        task_logger.debug('redundant_users: %s', redundant_users)
         missing_users = user_group.users - self.users
-        logger.debug('missing users: %s', missing_users)
+        task_logger.debug('missing users: %s', missing_users)
         self.remove_users(redundant_users, delete_users_if_last=True)
         self.add_users(missing_users)
 
@@ -1558,7 +1560,7 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
     def update_from(self, user_group):
         self.update_users(user_group)
         self.update_basic_information(user_group)
-        logger.debug('todo hostgroups')
+        task_logger.debug('todo hostgroups')
 
     def _refetch_users(self):
         for user in self.users:
@@ -1585,7 +1587,7 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
         user.refresh()
 
         if self not in user.groups:
-            logger.warn('User is not in the group: %s %s (possible race condition)', self, user.groups)
+            task_logger.warn('User is not in the group: %s %s (possible race condition)', self, user.groups)
 
         if not user.groups - {self} and not delete_user_if_last:
             raise ObjectManipulationError('Cannot remove the last group (%s) '
