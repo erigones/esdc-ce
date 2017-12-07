@@ -278,6 +278,7 @@ def mon_alert_list(task_id, dc_id, dc_bound=True, node_uuids=None, vm_uuids=None
                 mon_vms_nodes_map[connection_id][1].append(vm)
 
     for mon, vms, nodes in mon_vms_nodes_map.values():
+        logger.info('Fetching monitoring alerts from Zabbix server: %s', mon.ezx.server)
         try:
             alerts.extend(mon.alert_list(vms=vms, nodes=nodes, since=since, until=until, last=last,
                                          show_events=show_events))

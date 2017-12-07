@@ -101,6 +101,7 @@ class ZabbixBase(object):
 
     _log_prefix = ''
     zapi = None
+    server = None
     enabled = False
     connected = False
     connection_id = None
