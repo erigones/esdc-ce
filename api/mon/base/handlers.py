@@ -7,6 +7,7 @@ logger = getLogger(__name__)
 
 
 MON_SERVER_RELATED_SETTINGS = (
+    'MON_ZABBIX_ENABLED',
     'MON_ZABBIX_MONITORING_ENABLED',
     'MON_ZABBIX_SERVER',
     'MON_ZABBIX_SERVER_SSL_VERIFY',
@@ -17,6 +18,7 @@ MON_SERVER_RELATED_SETTINGS = (
 )
 
 MON_NODE_RELATED_SETTINGS = (
+    'MON_ZABBIX_ENABLED',
     'MON_ZABBIX_NODE_SYNC',
     'MON_ZABBIX_HOSTGROUP_NODE',
     'MON_ZABBIX_HOSTGROUPS_NODE',
@@ -24,6 +26,7 @@ MON_NODE_RELATED_SETTINGS = (
 )
 
 MON_VM_RELATED_SETTINGS = (
+    'MON_ZABBIX_ENABLED',
     'MON_ZABBIX_VM_SYNC',
     'MON_ZABBIX_HOSTGROUP_VM',
     'MON_ZABBIX_HOSTGROUPS_VM',
@@ -41,7 +44,13 @@ def mon_settings_changed_handler(task_id, dc, old_settings, new_settings):
     """
     Handle changes in MON_* DC settings; triggered by dc_settings_changed signal.
     """
-    changed_mon_settings = {opt for opt in old_settings if (opt.startswith('MON_ZABBIX') and
+    mon_zabbix_enabled = new_settings.get('MON_ZABBIX_ENABLED', None)
+
+    if mon_zabbix_enabled is False:
+        logger.warning('Monitoring got disabled in DC %s', dc)
+        return
+
+    changed_mon_settings = {opt for opt in new_settings if (opt.startswith('MON_ZABBIX') and
                                                             old_settings.get(opt) != new_settings.get(opt))}
 
     if changed_mon_settings:
