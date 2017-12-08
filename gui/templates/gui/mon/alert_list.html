@@ -5,13 +5,17 @@
 {% block javascript %}
   <script type="text/javascript">
     $(document).ready(function () {
-      alert_init('{% url 'retrieve_alert_list' %}');
+      var URL = '{% url 'retrieve_alert_list' %}';
+      var FILTER = {% autoescape off %}{{ alert_filter }}{% endautoescape %};
+
+      alert_init(URL, FILTER);
+      filter_links();
     });
   </script>
 {% endblock %}
 
 {% block base_content %}
-
+  {{ alert_filter }}
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span12">

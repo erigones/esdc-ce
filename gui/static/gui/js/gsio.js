@@ -1027,7 +1027,7 @@ function _task_status_callback(res, apiview) {
         result = null;
       }
       // data is irrelevant here! and we dont have it, do we need it?
-      alert_update(null, res);
+      alert_update(apiview, res);
       return false; // do not update cached_tasklog
 
     case 'mon_vm_history':
