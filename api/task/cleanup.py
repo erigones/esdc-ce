@@ -68,7 +68,8 @@ def _task_cleanup(result, task_id, task_status, obj, **kwargs):
         from vms.models import SlaveVm
         from api.vm.migrate.tasks import _vm_migrate_cb_failed
 
-        ghost_vm = SlaveVm.get_by_uuid(apiview['slave_vm_uuid'])
+        ghost_vm = SlaveVm.get_by_uuid(obj.slave_vms[0])
+        assert ghost_vm.is_used_for_migration()
         _vm_migrate_cb_failed(result, task_id, obj, ghost_vm)
 
     elif view == 'image_manage' or view == 'image_snapshot':
