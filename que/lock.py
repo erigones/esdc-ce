@@ -44,11 +44,11 @@ class TaskLock(object):
     __slots__ = ('key', 'reverse_key', 'desc', 'log')
 
     # noinspection PyShadowingNames
-    def __init__(self, name, desc='Task', logger=logger):
+    def __init__(self, name, desc='Task', reverse_key=None, logger=logger):
         # Lock name - the cache key must come with the prefix already set
         self.key = name
         # We don't know if are going to need the reverse_key yet
-        self.reverse_key = None
+        self.reverse_key = reverse_key
         # Description for logging purposes
         self.desc = desc
         # Set logger
@@ -168,6 +168,8 @@ class TaskLock(object):
             redis.persist(self.key)
 
             if self.reverse_key:
+                self.log.info('%s has reverse lock: "%s" -> removing reverse lock expiration!',
+                              self.desc, self.reverse_key)
                 redis.persist(self.reverse_key)
         else:
             self.log.error('%s did not acquire lock: "%s"', self.desc, self.key)
