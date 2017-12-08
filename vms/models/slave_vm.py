@@ -194,6 +194,10 @@ class SlaveVm(_JsonPickleModel):
         """Set ghost VM hostname"""
         self.hostname = self.get_migration_hostname(self.master_vm.hostname)
 
+    def is_used_for_migration(self):
+        """Is this slave VM used for migration purposes?"""
+        return self.hostname.startswith(self.MIGRATION_PREFIX)
+
     @staticmethod
     def get_zpool(disk):
         """Return zpool part from zfs_filesystem attribute"""
