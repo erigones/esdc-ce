@@ -47,8 +47,13 @@ class TaskLock(object):
     def __init__(self, name, desc='Task', reverse_key=None, logger=logger):
         # Lock name - the cache key must come with the prefix already set
         self.key = name
-        # We don't know if are going to need the reverse_key yet
-        self.reverse_key = reverse_key
+
+        if reverse_key:
+            self.reverse_key = self._get_reverse_key(reverse_key)
+        else:
+            # We don't know if are going to need the reverse_key yet
+            self.reverse_key = None
+
         # Description for logging purposes
         self.desc = desc
         # Set logger
