@@ -26,19 +26,19 @@ def action_list(request, data=None):
 
 
 class ActionView(APIView):
+    """
+    TODO use mgmt_task_response instead of TaskResponse
+    #
 
+    """
     def __init__(self, request, name, data):
         super(ActionView, self).__init__(request)
         self.data = data
         self.name = name
 
     def get(self):
-        result = mon_action_get.call(self.request,
-                                        None,
-                                        (self.request.dc.id, self.name),
-                                        tg=TG_DC_BOUND,
-                                        )
-        return TaskResponse(self.request, task_id=result[0], msg=LOG_ACTION_CREATE, detail_dict={'name':self.name},
+        result = mon_action_get.call(self.request, None, (self.request.dc.id, self.name), tg=TG_DC_BOUND)
+        return TaskResponse(self.request, task_id=result[0], msg=LOG_ACTION_CREATE, detail_dict={'name': self.name},
                             obj=self.request.dc)
 
     def post(self):
@@ -48,12 +48,13 @@ class ActionView(APIView):
         ser = ActionSerializer(data=self.data, name=self.name, context=self.request)
         ser.request = self.request
         if ser.is_valid():
-            result = mon_action_create.call(self.request,
-                                            None,
-                                            (self.request.dc.id, ser.data),
-                                            tg=TG_DC_BOUND,
-                                            )
-            return TaskResponse(self.request, task_id=result[0], msg=LOG_ACTION_CREATE, detail_dict=ser.data,
+            result = mon_action_create.call(
+                self.request,
+                None,
+                (self.request.dc.id, ser.data),
+                tg=TG_DC_BOUND,
+            )
+            return TaskResponse(self.request, task_id=result[0], msg=LOG_ACTION_CREATE, detail_dict=ser.detail_dict(),
                                 obj=self.request.dc)
         else:
             return FailureTaskResponse(self.request, ser.errors)

@@ -1370,6 +1370,7 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
     QUERY_WITHOUT_USERS = {'limit': 1}
     OWNERS_GROUP = '#owner'
     USER_GROUP_NAME_MAX_LENGTH = 64
+    RE_NAME_WITH_DC_PREFIX = re.compile(r'^:(?P<dc>.*):(?P<name>.+):$')
 
     def __init__(self, name, zapi=None):
         super(ZabbixUserGroupContainer, self).__init__(name)
@@ -1393,12 +1394,17 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
 
     @classmethod
     def from_zabbix_id(cls, zapi, zabbix_id):
-        response = zapi.usergroup.get(dict(usrgrpids=[zabbix_id], **cls.QUERY_BASE))
 
-        if response:
-            return cls.from_zabbix_data(zapi, response[0])
+        container_list = cls.from_zabbix_ids(zapi, [zabbix_id])
+        if container_list:
+            return container_list[0]
         else:
             raise RemoteObjectDoesNotExist
+
+    @classmethod
+    def from_zabbix_ids(cls, zapi, zabbix_ids):
+        response = zapi.usergroup.get(dict(usrgrpids=zabbix_ids, **cls.QUERY_BASE))
+        return [cls.from_zabbix_data(zapi, item) for item in response]
 
     @classmethod
     def from_zabbix_name(cls, zapi, name, resolve_users=True):
@@ -1592,13 +1598,21 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
             self.remove_user(user, delete_user_if_last=delete_users_if_last)
             # TODO create also a faster way of removal for users that has also different groups
 
+    @property
+    def name_without_dc_prefix(self):
+        return self.RE_NAME_WITH_DC_PREFIX.match(self.name).group('name')
+
+    @property
+    def as_mgmt_data(self):
+        return {'id': self.zabbix_id, 'name': self.name_without_dc_prefix}
+
 
 class ZabbixHostGroupContainer(ZabbixNamedContainer):
     """
     Container class for the Zabbix HostGroup object.
     Incomplete, TODO
     """
-    RE_NAME_WITH_DC_PREFIX = re.compile(r'^:(?P<dc>.*):(?P<hostgroup>.+):$')
+    RE_NAME_WITH_DC_PREFIX = re.compile(r'^:(?P<dc>.*):(?P<name>.+):$')
     zabbix_id = None
     _api_response = None
 
@@ -1613,15 +1627,25 @@ class ZabbixHostGroupContainer(ZabbixNamedContainer):
         container.refresh_id()
         return container
 
-
     @classmethod
     def from_zabbix_name(cls, zapi, name):
         container = cls.from_mgmt_data(name, zapi)  # FIXME ORDER is not consistent!!!!
         container.refresh_id()
         return container
 
+    @classmethod
+    def from_zabbix_ids(cls, zapi, zabbix_ids):
+        response = zapi.hostgroup.get(dict(groupids=zabbix_ids))
+        return [cls.from_zabbix_data(zapi, item) for item in response]
+
+    @classmethod
+    def from_zabbix_data(cls, zapi, zabbix_object):
+        container = cls(name=zabbix_object['name'], zapi=zapi)
+        container.zabbix_id = zabbix_object['groupid']
+        return container
+
     @staticmethod
-    def hostgroup_name_factory(hostgroup_name, dc_name):  #FIXME ORDER is not consistent against usergroup!!!!
+    def hostgroup_name_factory(hostgroup_name, dc_name):  # FIXME ORDER is not consistent against usergroup!!!!
         if dc_name is not None:
             name = ':{}:{}:'.format(dc_name, hostgroup_name)
         else:
@@ -1644,6 +1668,14 @@ class ZabbixHostGroupContainer(ZabbixNamedContainer):
         })
         self.zabbix_id = response['groupids'][0]
         return self
+
+    @property
+    def name_without_dc_prefix(self):
+        return self.RE_NAME_WITH_DC_PREFIX.match(self.name).group('name')
+
+    @property
+    def as_mgmt_data(self):
+        return {'id': self.zabbix_id, 'name': self.name_without_dc_prefix}
 
 
 class ZabbixMediaContainer(object):
@@ -1737,10 +1769,13 @@ class ZabbixActionContainer(ZabbixNamedContainer):
                     u'2. {ITEM.NAME2} ({HOST.NAME2}:{ITEM.KEY2}): {ITEM.VALUE2}\r\n'
                     u'3. {ITEM.NAME3} ({HOST.NAME3}:{ITEM.KEY3}): {ITEM.VALUE3}\r\n\r\n'
                     u'Original event ID: {EVENT.ID}')
-
+    r_shortdata = ''
+    r_longdata = ''
+    recovery_msg = 0
     esc_period = 3600
     eventsource = 0
     filter__evaltype = 0
+    status = 1
 
     def __init__(self, name, zapi):
         super(ZabbixActionContainer, self).__init__(name)
@@ -1749,10 +1784,15 @@ class ZabbixActionContainer(ZabbixNamedContainer):
     @classmethod
     def from_zabbix_data(cls, zapi, api_response_object):
         assert api_response_object
-        container = cls(name=api_response_object['name'], zapi=zapi)
+        container = cls(name=api_response_object.pop('name'), zapi=zapi)
+        container.zabbix_id = api_response_object.pop('actionid')
+        parsing_attributes = list(container._action_creation_attributes)
+        parsing_attributes.extend(('r_shortdata', 'r_longdata', 'recovery_msg', 'status'))
         container._api_response = api_response_object
-        container.zabbix_id = api_response_object['actionid']
-        # TODO make sure all fields from the API response are filled into the object
+        for attr in api_response_object.keys():
+            assert attr in parsing_attributes, \
+                "Unexpected attribute in the action.get response: %s" % attr
+            setattr(container, attr, api_response_object[attr])
 
         return container
 
@@ -1770,7 +1810,7 @@ class ZabbixActionContainer(ZabbixNamedContainer):
     def from_zabbix_name(cls, zapi, name):
         container = cls(name=name, zapi=zapi)
         container.refresh()
-        return  container
+        return container
 
     @property
     def hostgroups(self):
@@ -1781,7 +1821,6 @@ class ZabbixActionContainer(ZabbixNamedContainer):
     def hostgroups(self, hostgroup_names):
         self._hostgroups = [ZabbixHostGroupContainer.from_zabbix_name(self._zapi, hostgroup_name)
                             for hostgroup_name in hostgroup_names]
-
 
     @property
     def usergroups(self):
@@ -1798,6 +1837,15 @@ class ZabbixActionContainer(ZabbixNamedContainer):
         return {attribute: getattr(self, 'filter__%s' % attribute)
                 for attribute in self._filter_attributes if hasattr(self, 'filter__%s' % attribute)}
 
+    @filter.setter
+    def filter(self, value):
+        assert int(value['evaltype']) == self.filter__evaltype, \
+            'Incoming evaltype was not expected: %s' % value['evaltype']
+        self._hostgroups = ZabbixHostGroupContainer.from_zabbix_ids(
+            self._zapi,
+            [condition['value'] for condition in value['conditions'] if condition['conditiontype'] == '0']
+        )
+
     @property
     def filter__conditions(self):
         return [self._condition_trigger_problem, self._condition_status_not_in_maintenance] + self.hostgroups
@@ -1808,6 +1856,30 @@ class ZabbixActionContainer(ZabbixNamedContainer):
                  u'opmessage': {u'mediatypeid': 0},
                  u'opmessage_grp': [{u'usrgrpid': str(usergroup.zabbix_id)} for usergroup in self.usergroups]}]
 
+    @operations.setter
+    def operations(self, value):
+        assert len(value) == 1, "1 and only 1 operation is implemented at the moment, but %d were found" % len(value)
+        self._usergroups = ZabbixUserGroupContainer.from_zabbix_ids(
+            self._zapi,
+            [group['usrgrpid'] for group in value[0]['opmessage_grp']]
+        )
+
+    @property
+    def hostgroups_as_mgmt_data(self):
+        return [hostgroup.as_mgmt_data for hostgroup in self._hostgroups]
+
+    @property
+    def usergroups_as_mgmt_data(self):
+        return [usergroup.as_mgmt_data for usergroup in self._usergroups]
+
+    @property
+    def message_subject_as_mgmt_data(self):
+        return self.def_shortdata
+
+    @property
+    def message_text_as_mgmt_data(self):
+        return self.def_longdata
+
     def _generate_create_request_object(self):
         return {attribute: getattr(self, attribute)
                 for attribute in self._action_creation_attributes if hasattr(self, attribute)}
@@ -1815,8 +1887,9 @@ class ZabbixActionContainer(ZabbixNamedContainer):
     def _generate_update_request_object(self, update_fields):
         assert self.zabbix_id, 'Cannot update Action without actionid'
         request_object = {
-            self._updatable_fields_mapping[attribute]:
-                getattr(self, self._updatable_fields_mapping[attribute]) for attribute in update_fields if attribute in self._updatable_fields_mapping}
+            self._updatable_fields_mapping[attribute]: getattr(self, self._updatable_fields_mapping[attribute]) for
+            attribute in update_fields if attribute in self._updatable_fields_mapping
+        }
         request_object['actionid'] = self.zabbix_id
         request_object['status'] = 0  # Somewhy this has to be added to the request
         return request_object
@@ -1880,6 +1953,9 @@ class ZabbixActionContainer(ZabbixNamedContainer):
             raise RemoteObjectDoesNotExist
         action.delete()
 
-    def to_dict(self):
+    @property
+    def as_mgmt_data(self):
         # TODO reuse _updatable_fields_mapping to reverse the process
-        return {attribute: getattr(self, attribute) for attribute in self._action_creation_attributes}
+        return {
+            mgmt_key: getattr(self, "%s_as_mgmt_data" % mgmt_key) for mgmt_key in self._updatable_fields_mapping.keys()
+        }

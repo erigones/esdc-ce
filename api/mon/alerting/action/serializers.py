@@ -33,12 +33,15 @@ class ActionSerializer(s.Serializer):
                                              RegexValidator(regex=MonitoringBackend.RE_MONITORING_HOSTGROUPS),),
                               )
 
-    message_subject = s.SafeCharField(max_length=65536, default=DEFAULT_ACTION_MESSAGE_SUBJECT)  # TODO initial value zo zabbixu vykopirovat a dat do settings
-    message_text = s.SafeCharField(max_length=65536, default=DEFAULT_ACTION_MESSAGE)  # TODO initial value zo zabbixu vykopirovat a dat do settings
-    recovery_message_text = s.SafeCharField(max_length=65536, required=False)  # TODO initial value zo zabbixu vykopirovat, conditional validation
+    message_subject = s.SafeCharField(max_length=65536, default=DEFAULT_ACTION_MESSAGE_SUBJECT)
+    message_text = s.SafeCharField(max_length=65536, default=DEFAULT_ACTION_MESSAGE)
+    # TODO recovery message boolean to turn on/off
+    recovery_message_text = s.SafeCharField(max_length=65536, required=False)
+    # TODO add also status enabled/disabled
 
     def validate_hostgroups(self, attrs, source):
-        # Allow to use only available hostgroups
+        # As we implmement everywhere dynamic hostgroup creation, we will not validate whether any hostgroup exist.
+        # Also we don't have to have any hostgroup defined while we create the Action as it is not a required field.
         from api.mon.backends.zabbix.base import ZabbixHostGroupContainer
 
         attrs[source] = [ZabbixHostGroupContainer.hostgroup_name_factory(name, self.context.dc.name) for name in attrs[source]]
@@ -58,7 +61,8 @@ class ActionSerializer(s.Serializer):
         return attrs
 
     def validate_usergroups(self, attrs, source):
-        # Allow to use only available hostgroups
+        # TODO take the usergroup validation from api/dc/base/serializers
+
         from api.mon.backends.zabbix.base import ZabbixUserGroupContainer
 
         attrs[source] = [ZabbixUserGroupContainer.user_group_name_factory(self.context.dc.name, name)

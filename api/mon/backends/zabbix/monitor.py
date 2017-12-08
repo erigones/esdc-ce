@@ -540,6 +540,7 @@ class Zabbix(AbstractMonitoringBackend):
         assert not self.ezx.get_action(action['name']), 'Action should not exist before creation'
         zac = ZabbixActionContainer.from_mgmt_data(self.ezx.zapi, **action)
         zac.create()
+        # Return the same as from action_detail
 
     def action_update(self, action):
         """[EXTERNAL]"""
@@ -547,12 +548,13 @@ class Zabbix(AbstractMonitoringBackend):
         name = action.pop('name')
         zac = ZabbixActionContainer.from_zabbix_name(self.ezx.zapi, name)
         zac.update(action)
+        # Return the same as from action_detail
 
     def action_detail(self, name):
         """[EXTERNAL]"""
         action_data = self.ezx.get_action(name)
         if action_data:
-            return ZabbixActionContainer.from_zabbix_data(self.ezx.zapi, action_data).to_dict()
+            return ZabbixActionContainer.from_zabbix_data(self.ezx.zapi, action_data).as_mgmt_data
         else:
             raise Exception("does not exist")  # TODO bad layer
 
