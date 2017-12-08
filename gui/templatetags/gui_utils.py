@@ -13,6 +13,7 @@ import pytz
 import ipaddress
 import markdown
 
+from api.mon.backends.zabbix.base import ZabbixMediaContainer
 from api.utils.encoders import JSONEncoder
 from pdns.models import Record
 
@@ -56,6 +57,29 @@ def keyvalue_zero(dictionary, key):
 @register.filter
 def dtparse(s):
     return parse_datetime(s)
+
+
+@register.filter
+def dttimestamp(s):
+    return datetime.fromtimestamp(s)
+
+
+@register.filter
+def mon_get_age(s):
+    delta = datetime.now() - datetime.fromtimestamp(s)
+    days = delta.days
+    hours, rem = divmod(delta.seconds, 3600)
+    minutes, seconds = divmod(rem, 60)
+
+    if days:
+        return '%dd %dh %dm' % (days, hours, minutes)
+    else:
+        return '%dh %dm %ds' % (hours, minutes, seconds)
+
+
+@register.filter
+def mon_severity(s):
+    return ZabbixMediaContainer.get_severity(s)
 
 
 @register.filter

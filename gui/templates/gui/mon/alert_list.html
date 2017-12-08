@@ -5,7 +5,7 @@
 {% block javascript %}
   <script type="text/javascript">
     $(document).ready(function () {
-      alert_init('retrieve_alert_list');
+      alert_init('{% url 'retrieve_alert_list' %}');
     });
   </script>
 {% endblock %}

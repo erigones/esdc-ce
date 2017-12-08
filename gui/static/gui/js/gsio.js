@@ -218,12 +218,13 @@ function mon_get_history(obj_type, hostname, graph, data) {
   return null;
 }
 
-function mon_get_alerts(hostname, data) {
+function mon_get_alerts(data) {
   var args = [];
   var kwargs = {'data': {}};
-  //if (typeof(data) !== 'undefined') {
-  //  kwargs['data'] = data;
-  //}
+
+  if (typeof(data) !== 'undefined') {
+   kwargs['data'] = data;
+  }
   return esio('get', 'mon_alert_list', args, kwargs);
 }
 
@@ -540,7 +541,7 @@ function message_callback(code, res, view, method, args, kwargs, apiview, apidat
       case 'mon_node_sla':
         return; // do not update cached_tasklog
 
-      case 'mon_alert_list': // mon_vm_sla started
+      case 'mon_alert_list': // mon_alert_list started
         return; // do not update cached_tasklog
 
       case 'mon_vm_history': // mon_vm_history started
@@ -586,8 +587,8 @@ function message_callback(code, res, view, method, args, kwargs, apiview, apidat
         sla_update(view, args[0], args[1], null);
         return; // do not update cached_tasklog
 
-      case 'mon_alert_list': // mon_vm_sla failed
-        alert_update(view, args[0], args[1], null);
+      case 'mon_alert_list': // mon_alert_list failed
+        alert_update(data, res);
         return; // do not update cached_tasklog
 
       case 'mon_vm_history': // mon_vm_history failed
@@ -693,8 +694,8 @@ function message_callback(code, res, view, method, args, kwargs, apiview, apidat
         sla_update(view, args[0], args[1], res.result);
         return; // do not update cached_tasklog
 
-      case 'mon_alert_list': // mon_vm_sla result from cache
-        alert_update(view, args[0], args[1], res.result);
+      case 'mon_alert_list': // mon_alert_list result from cache
+        alert_update(data, res);
         return; // do not update cached_tasklog
 
       case 'mon_vm_history': // mon_vm_history result from cache
@@ -1021,11 +1022,12 @@ function _task_status_callback(res, apiview) {
       sla_update(apiview.view, hostname, apiview.yyyymm, result);
       return false; // do not update cached_tasklog
 
-   case 'mon_alert_list':
+    case 'mon_alert_list':
       if (res.status != 'SUCCESS') {
         result = null;
       }
-      alert_update(apiview.view, hostname, apiview.yyyymm, result);
+      // data is irrelevant here! and we dont have it, do we need it?
+      alert_update(null, res);
       return false; // do not update cached_tasklog
 
     case 'mon_vm_history':

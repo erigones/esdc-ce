@@ -1680,3 +1680,7 @@ class ZabbixMediaContainer(object):
             assert severity in cls.SEVERITIES
             result += 2 ** severity
         return result
+
+    @staticmethod
+    def get_severity(s):
+        return ZabbixAPI.get_severity(s)
