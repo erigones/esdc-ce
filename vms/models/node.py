@@ -177,13 +177,25 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
         return self._sysinfo.get('Link Aggregations', {})
 
     @property
+    def overlays(self):
+        """Return overlays (dladm show-overlay)"""
+        return self._sysinfo.get('Overlays', {})
+
+    @property
+    def etherstubs(self):
+        """Return etherstubs (dladm show-etherstub)"""
+        return self._sysinfo.get('Etherstubs', {})
+
+    @property
     def networking(self):
         """Complete network information"""
         return {
             'Network Interfaces': self.network_interfaces,
             'Virtual Network Interfaces': self.virtual_network_interfaces,
             'Link Aggregations': self.network_aggregations,
-            'NIC Tags': self.nictags
+            'NIC Tags': self.nictags,
+            'Overlays': self.overlays,
+            'Etherstubs': self.etherstubs,
         }
 
     @property

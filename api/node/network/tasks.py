@@ -16,17 +16,32 @@ ERIGONES_TASK_USER = cq.conf.ERIGONES_TASK_USER
 VNIC = namedtuple('VNIC', ('node', 'mac', 'ip'))
 
 
-def _get_overlay_vnics(overlay_name, overlay_vms):
+def _get_overlay_vm_vnics(overlay_name, overlay_vms):
     for vm in overlay_vms:
         for vm_nic in vm.json_active_get_nics():
             vm_nic_tag = vm_nic.get('nic_tag', '').split('/')
 
             if len(vm_nic_tag) == 2 and vm_nic_tag[0] == overlay_name:
-                vm_nic_mac = vm_nic.get('mac', '')
-                vm_nic_ip = vm_nic.get('ip', '')
+                vm_nic_mac = vm_nic.get('mac', None)
+                vm_nic_ip = vm_nic.get('ip', None)
 
                 if vm_nic_mac and vm_nic_ip:
                     yield VNIC(vm.node, vm_nic_mac, vm_nic_ip)
+
+
+def _get_overlay_node_vnics(overlay_name, overlay_nodes):
+    for node in overlay_nodes:
+        node_overlays = node.overlays
+
+        for node_nic in node.virtual_network_interfaces.values():
+            node_nic_over = node_nic.get('Host Interface', '')
+
+            if node_nic_over.startswith(overlay_name) and node_nic_over in node_overlays:
+                node_nic_mac = node_nic.get('MAC Address', None)
+                node_nic_ip = node_nic.get('ip4addr', None)
+
+                if node_nic_ip and node_nic_mac:
+                    yield VNIC(node, node_nic_mac, node_nic_ip)
 
 
 def _get_overlay_arp_table(node, overlay_name, overlay_vnics):
@@ -47,13 +62,16 @@ def _get_overlay_arp_table(node, overlay_name, overlay_vnics):
 def node_overlay_arp_file(task_id, overlay_name, **kwargs):
     """
     Task for generating ARP files for VMs connected to overlays.
+    The ``overlay_name`` parameter is an overlay rule identifier.
     """
     # list of nodes where the overlay rule is defined and uses the files search plugin
     overlay_nodes = [node for node in Node.objects.all() if node.overlay_rules.get(overlay_name, {}).get('arp_file')]
     # list of VM NICs (see VNIC namedtuple above) defined over the overlay
-    overlay_vnics = list(_get_overlay_vnics(overlay_name, Vm.objects.select_related('node')
-                                                            .filter(slavevm__isnull=True, node__in=overlay_nodes)
-                                                            .exclude(status=Vm.NOTCREATED)))
+    overlay_vnics = list(_get_overlay_vm_vnics(overlay_name, Vm.objects.select_related('node')
+                                                               .filter(slavevm__isnull=True, node__in=overlay_nodes)
+                                                               .exclude(status=Vm.NOTCREATED)))
+    # Add list of Node VNICs which are defined over the overlay
+    overlay_vnics += list(_get_overlay_node_vnics(overlay_name, overlay_nodes))
 
     for node in overlay_nodes:
         overlay_arp_file = node.overlay_rules[overlay_name]['arp_file']
