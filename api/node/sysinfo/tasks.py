@@ -107,18 +107,17 @@ def node_sysinfo_cb(result, task_id, node_uuid=None):
 
     else:
         sshkey_changed = node.sshkey_changed(esysinfo)
+        sysinfo_changed = node.sysinfo_changed(esysinfo)
 
-        if node.sysinfo_changed(esysinfo) or sshkey_changed:
+        if sysinfo_changed or sshkey_changed:
             logger.warn('Updating node %s json with sysinfo output from %s', node, node_uuid)
             node.update_from_sysinfo(esysinfo)  # Will save public SSH key too
             node_json_changed.send(task_id, node=node)  # Signal!
             result['message'] = 'Successfully updated compute node %s' % node.hostname
-            task_log_success(task_id, msg=LOG_NODE_UPDATE, obj=node, task_result=result,
-                             update_user_tasks=True)
         else:
             result['message'] = 'No changes detected on compute node %s' % node.hostname
-            task_log_success(task_id, msg=LOG_NODE_UPDATE, obj=node, task_result=result,
-                             update_user_tasks=True)
+
+        task_log_success(task_id, msg=LOG_NODE_UPDATE, obj=node, task_result=result, update_user_tasks=True)
 
     if sshkey_changed:
         logger.warn('SSH key has changed on node %s - creating authorized_keys synchronization tasks', node)

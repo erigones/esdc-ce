@@ -37,4 +37,7 @@ dc_relationship_changed.connect(mon_user_group_changed.call)
 group_relationship_changed.connect(mon_user_group_changed.call)
 user_relationship_changed.connect(mon_user_changed.call)
 
-# Note: Other signals are connected in api.mon.vm.tasks and api.mon.node.tasks
+# NOTE: Other signals are connected in:
+# - api.node.network.tasks
+# - api.mon.vm.tasks
+# - api.mon.node.tasks
