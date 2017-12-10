@@ -11,8 +11,7 @@ from api.exceptions import VmIsNotOperational, ExpectationFailed, VmHasPendingTa
 from api.utils.request import set_request_method
 from api.task.utils import TaskID
 from api.task.response import SuccessTaskResponse, FailureTaskResponse, to_string
-from api.signals import vm_defined, vm_undefined
-from api.mon.vm.tasks import vm_json_active_changed
+from api.signals import vm_defined, vm_undefined, vm_define_reverted
 from api.vm.base.utils import vm_update_ipaddress_usage
 from api.vm.define.utils import is_vm_operational
 from api.vm.define.api_views import VmDefineBaseView
@@ -292,7 +291,7 @@ class VmDefineRevertView(APIView):
             - alias     - handled by revert_active()
             - owner     - handled by revert_active()
             - template  - handled by revert_active()
-            - monitored - handled by revert_active(), but mon_vm_sync task must be run via vm_json_active_changed signal
+            - monitored - handled by revert_active(), but mon_vm_sync task must be run via vm_define_reverted signal
             - tags      - wont be reverted (not saved in json)
             - nics.*.ip - ip reservation is fixed via vm_update_ipaddress_usage()
             - nics.*.dns + ptr - known bug - wont be reverted
@@ -328,7 +327,7 @@ class VmDefineRevertView(APIView):
         # Post-save stuff
         task_id = TaskID(res.data.get('task_id'), request=self.request)
         vm_update_ipaddress_usage(vm)
-        vm_json_active_changed.send(task_id, vm=vm)  # Signal!
+        vm_define_reverted.send(task_id, vm=vm)  # Signal!
 
         if hostname_changed:
             VmDefineHostnameChanged(self.request, vm, hostname).send()  # Task event for GUI

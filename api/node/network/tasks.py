@@ -1,5 +1,4 @@
 import json
-from functools import partial
 from collections import namedtuple
 
 from api.task.internal import InternalTask
@@ -26,7 +25,7 @@ def _is_vm_nic_over_overlay(vm_nic, overlay_name=None):
         if overlay_name:
             return vm_nic_tag[0] == overlay_name
         else:
-            return True
+            return vm_nic_tag[0]
 
     return False
 
@@ -112,33 +111,54 @@ def node_overlay_arp_file(task_id, overlay_name, **kwargs):
 
 
 # noinspection PyUnusedLocal
-def node_overlays_sync(sender, node=None, vm=None, only_if_vm_uses_overlays=False, **kwargs):
+def node_overlays_sync(sender, node=None, overlay_rules=None, **kwargs):
     """
-    Create tasks for updating arp files for all overlay rules on all affected compute nodes.
+    Signal handler: create tasks for updating arp files for all overlay rules on all affected compute nodes.
     Called by node_created and node_json_changed signals with node parameter.
-    Called by vm_created, vm_node_changed, vm_json_active_changed, vm_notcreated with vm parameter.
+    Called by vm_node_overlays_sync() with node and vm_overlay_rules parameters.
     """
-    if vm:
-        if only_if_vm_uses_overlays and not any(_is_vm_nic_over_overlay(vnic) for vnic in vm.json_active_get_nics()):
-            logger.info('Skipping node overlay sync signaled by "%s" because VM %s does not have nics on overlays',
-                        sender, vm)
-            return
+    assert node
 
-        node = vm.node
+    node_overlay_rules = {name for name, rule in node.overlay_rules.items() if rule.get('arp_file')}
 
-    for overlay_rule in node.overlay_rules.keys():
+    if overlay_rules is not None:
+        node_overlay_rules = node_overlay_rules.intersection(overlay_rules)
+
+    logger.info('Sender "%s" (node=%s) initiated sync of overlay arp files for: %s', sender, node, node_overlay_rules)
+
+    for overlay_rule in node_overlay_rules:
         task_id = node_overlay_arp_file.call(overlay_rule)
         logger.info('Sender "%s" created task node_overlay_arp_file(%s) with task_id: %s',
                     sender, overlay_rule, task_id)
 
 
-vm_node_overlay_sync = partial(node_overlays_sync, only_if_vm_uses_overlays=True)
+def vm_node_overlays_sync(sender, vm=None, old_json_active=None, **kwargs):
+    """
+    Signal handler: create tasks for updating arp files for all overlay rules on all affected compute nodes.
+    Called by vm_created, vm_node_changed, vm_json_active_changed, vm_notcreated with vm parameter.
+    """
+    assert vm
+
+    vm_nics = vm.json_active_get_nics()
+
+    if old_json_active:
+        vm_nics += vm.get_nics(old_json_active)
+
+    # List of VM related overlay rules
+    vm_overlay_rules = filter(None, {_is_vm_nic_over_overlay(vm_nic) for vm_nic in vm_nics})
+
+    if not vm_overlay_rules:
+        logger.info('Skipping node overlay sync signaled by "%s" because VM %s does not have nics on overlays',
+                    sender, vm)
+        return
+
+    return node_overlays_sync(sender, node=vm.node, overlay_rules=vm_overlay_rules, **kwargs)
 
 
 # erigonesd context signals:
 node_created.connect(node_overlays_sync)
 node_json_changed.connect(node_overlays_sync)
-vm_created.connect(vm_node_overlay_sync)
-vm_notcreated.connect(node_overlays_sync)  # TODO: cannot check for overlays, because we don't know if VM used overlays
-vm_node_changed.connect(vm_node_overlay_sync)
-vm_json_active_changed.connect(node_overlays_sync)  # TODO: cannot check for overlays, because -||-
+vm_created.connect(vm_node_overlays_sync)
+vm_notcreated.connect(vm_node_overlays_sync)
+vm_node_changed.connect(vm_node_overlays_sync)
+vm_json_active_changed.connect(vm_node_overlays_sync)
