@@ -96,9 +96,11 @@ def node_overlay_arp_file(task_id, overlay_name, **kwargs):
 
         overlay_arp_file = node.overlay_rules[overlay_name]['arp_file']
         arp_table = json.dumps(_get_overlay_arp_table(node, overlay_name, overlay_vnics))
-        cmd = 'cat /dev/stdin > %s && chmod 0400 %s && svcadm restart network/varpd' % (overlay_arp_file,
-                                                                                        overlay_arp_file)
-        lock = 'node:%s overlay:%s' % (node.uuid, overlay_name)
+        cmd = ('cat /dev/stdin > {arp_file} && '
+               'chmod 0400 {arp_file} && '
+               'chown netadm:netadm {arp_file} && '
+               'svcadm restart network/varpd').format(arp_file=overlay_arp_file)
+        lock = 'node:{node_uuid} overlay:{overlay_name}'.format(node_uuid=node.uuid, overlay_name=overlay_name)
         queue = node.fast_queue
 
         tid, err = execute(ERIGONES_TASK_USER, None, cmd, stdin=arp_table, callback=None, lock=lock, queue=queue,
