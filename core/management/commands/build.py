@@ -22,9 +22,9 @@ class Command(DanubeCloudCommand):
 
         ctlsh(*pip_install)
         ctlsh(*compile_cmd)
+        ctlsh('patch_envs')
 
         if not que_only:
-            ctlsh('patch_envs')
             ctlsh('gendoc')
             ctlsh('collectstatic', '--noinput', '--clear')
             self.local('git checkout var/www/static/.gitignore', raise_on_error=False)
