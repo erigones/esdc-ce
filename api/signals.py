@@ -21,7 +21,7 @@ def noop(*args, **kwargs):
 vm_defined.connect(noop)
 vm_undefined.connect(mon_vm_delete.call)
 vm_updated.connect(mon_vm_sync.call)
-vm_define_reverted(mon_vm_sync.call)
+vm_define_reverted.connect(mon_vm_sync.call)
 node_status_changed.connect(mon_node_status_sync.call)
 node_status_changed.connect(node_status_changed_event)
 node_online.connect(node_authorized_keys_sync.call)
