@@ -10,6 +10,7 @@ from gui.decorators import ajax_required, profile_required, admin_required
 from api.decorators import setting_required
 from api.utils.views import call_api_view
 from api.mon.alerting.views import mon_alert_list
+from api.task.utils import get_task_status
 
 logger = getLogger(__name__)
 
@@ -25,38 +26,18 @@ def monitoring_server(request):
     return redirect(request.dc.settings.MON_ZABBIX_SERVER)
 
 
-def parse_filter(request):
-    data = {}
-
-    if 'since' in request.GET:
-        data['since'] = request.GET['since']  # TODO: convert to unix epoch
-
-    if 'until' in request.GET:
-        data['until'] = request.GET['until']  # TODO: convert to unix epoch
-
-    if 'last' in request.GET:
-        data['last'] = request.GET['last']
-
-    if 'vm_hostnames' in request.GET:
-        data['vm_hostnames'] = request.GET['vm_hostnames']
-
-    return data
-
-
 @login_required
 @ajax_required
 @profile_required
-def get_alert_from_zabbix(request):
+def alert_list_table(request):
     context = collect_view_data(request, 'mon_alert_list')
-    method = 'GET'
-    logger.info('Calling API view %s mon_alert_list(%s, data=%s) by user %s in DC %s',
-                method, request, None, request.user, request.dc)
+    result, status = get_task_status(request.GET['task_id'])
 
-    alert_filter = parse_filter(request)
-    res = call_api_view(request, method, mon_alert_list, data=alert_filter)
+    context['alerts'] = result['result']
+    # context['alerts'] = context['pager'] = get_pager(request, result['result'])
 
-    if res.status_code in (200, 201) and method == 'GET' and res.data['result'] is not None:
-        context['alerts'] = context['pager'] = get_pager(request, res.data['result'])
+    if request.GET['show_events'] in (1, 'on', 'true', 'True'):
+        context['show_events'] = True
 
     return render(request, 'gui/mon/alert_table.html', context)
 
@@ -65,8 +46,12 @@ def get_alert_from_zabbix(request):
 @profile_required
 def alert_list(request):
     context = collect_view_data(request, 'mon_alert_list')
-    context['filters'] = BaseAlertFilterForm(request.GET.copy())
-    context['alert_filter'] = json.dumps(parse_filter(request))
+    # context['pager'] = get_pager(request, ())
+    context['filters'] = alert_form = BaseAlertFilterForm(request, request.GET.copy())
+    clean_data = alert_form.clean()
+
+    context['alert_filter'] = json.dumps(clean_data)
+    context['show_events'] = clean_data['show_events']
 
     return render(request, 'gui/mon/alert_list.html', context)
 

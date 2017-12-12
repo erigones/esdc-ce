@@ -8,7 +8,7 @@
       <th>{% trans "Hostname" %}</th>
       <th>{% trans "Description" %}</th>
       <th>{% trans "Ack" %}</th>
-      <th>{% trans "Events" %}</th>
+      {% if show_events %}<th>{% trans "Events" %}</th>{% endif %}
     </tr>
   {% endif %}
   </thead>
@@ -21,6 +21,8 @@
       <td><i class="icon-vm"></i> {{ alert.hostname }}</td>
       <td>{{ alert.desc }}{% if alert.comments %} <span title="{{ alert.comments }}" data-toggle="tooltip" data-placement="right"><i class="icon-info-sign"></i></span>{% endif %}</td>
       <td><i class="icon-{{ alert.acknowledged|yesno:"ok,remove" }}"></i></td>
+
+      {% if show_events %}
       <td class="log-detail wrap">
         {% if alert.events %}{% for event in alert.events %}
             <small class="hidden-phone tiny">
@@ -31,6 +33,7 @@
             </small><br />
         {% endfor %}{% endif %}
       </td>
+      {% endif %}
     </tr>
   {% empty %}
     <tr>
@@ -42,9 +45,9 @@
   <tfoot>
   {% if alerts %}
     <tr>
-      <td colspan="7">
+      <td colspan="{% if show_events %}7{% else %}6{% endif %}">
         <div class="paginator dataTables_paginate center">
-          {% if paginator %}{% paginator %}{% endif %}
+{#          {% paginator %}#}
         </div>
       </td>
     </tr>
