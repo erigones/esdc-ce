@@ -478,11 +478,22 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
 
         return None
 
-    def get_admin_ip(self):
+    @property
+    def address_admin(self):
         """Return internal (admin) IP address"""
         used_nics = self.used_nics
 
         return (self.get_node_ip_by_iface('admin0', node_nics=used_nics) or
+                self.get_node_ip_by_nictag('admin', node_nics=used_nics))
+
+    @property
+    def address_external(self):
+        """Return external IP address"""
+        used_nics = self.used_nics
+
+        return (self.get_node_ip_by_iface('external0', node_nics=used_nics) or
+                self.get_node_ip_by_nictag('external', node_nics=used_nics) or
+                self.get_node_ip_by_iface('admin0', node_nics=used_nics) or
                 self.get_node_ip_by_nictag('admin', node_nics=used_nics))
 
     def get_overlay_port(self, overlay_name):
@@ -498,16 +509,10 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
 
         # the 0.0.0.0 is a special case and requires to select a node IP from all available IPs on compute node
         if not overlay_ip or overlay_ip == self.DEFAULT_OVERLAY_IP:
-            used_nics = self.used_nics
-
             if remote:
-                overlay_ip = (self.get_node_ip_by_iface('external0', node_nics=used_nics) or
-                              self.get_node_ip_by_nictag('external', node_nics=used_nics) or
-                              self.get_node_ip_by_iface('admin0', node_nics=used_nics) or
-                              self.get_node_ip_by_nictag('admin', node_nics=used_nics))
+                overlay_ip = self.address_external
             else:
-                overlay_ip = (self.get_node_ip_by_iface('admin0', node_nics=used_nics) or
-                              self.get_node_ip_by_nictag('admin', node_nics=used_nics))
+                overlay_ip = self.address_admin
 
         assert overlay_ip, 'IP address was not defined for overlay "%s" on compute node "%s"' % (overlay_name, self)
 
