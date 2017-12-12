@@ -73,15 +73,15 @@ def _get_overlay_arp_table(node, overlay_rule_name, overlay_vnics):
 # noinspection PyUnusedLocal
 @cq.task(name='api.node.network.tasks.node_overlay_arp_file', base=InternalTask)
 @mgmt_lock(timeout=3600, key_args=(1,), wait_for_release=True)
-def node_overlay_arp_file(task_id, overlay_rule_name, node=None, **kwargs):
+def node_overlay_arp_file(task_id, overlay_rule_name, node_exclusive=None, **kwargs):
     """
     Task for generating ARP files for VMs and nodes connected to specific overlay.
     It is called by various signals (see below).
     """
-    if node:
+    if node_exclusive:
         # update rules only on a specific compute node
-        if node.overlay_rules.get(overlay_rule_name, {}).get('arp_file'):
-            overlay_nodes = [node]
+        if node_exclusive.overlay_rules.get(overlay_rule_name, {}).get('arp_file'):
+            overlay_nodes = [node_exclusive]
         else:
             return
     else:
@@ -147,7 +147,7 @@ def node_overlays_sync(sender, node=None, overlay_rules=None, skip_other_nodes=F
         only_this_node = None
 
     for overlay_rule in node_overlay_rules:
-        task_id = node_overlay_arp_file.call(overlay_rule, node=only_this_node)
+        task_id = node_overlay_arp_file.call(overlay_rule, node_exclusive=only_this_node)
         logger.info('Sender "%s" created task node_overlay_arp_file(%s) with task_id: %s',
                     sender, overlay_rule, task_id)
 
