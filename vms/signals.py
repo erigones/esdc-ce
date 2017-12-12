@@ -51,6 +51,8 @@ node_created = signal('node_created', doc='Node was created.')
 node_deleted = signal('node_deleted', doc='Node was deleted.')
 # (task_id, node=node)
 node_json_changed = signal('node_json_changed', doc='Node json was updated.')
+# (task_id, node=node)
+node_json_unchanged = signal('node_json_changed', doc='Node json was not changed during sysinfo refresh.')
 # (sender, node=node)
 node_check = signal('node_check', doc='Node check called every minute by node_status_all().')
 
