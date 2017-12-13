@@ -1,5 +1,6 @@
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ObjectDoesNotExist
+from frozendict import frozendict
 
 from api import serializers as s
 from api.serializers import APIValidationError
@@ -14,8 +15,10 @@ from pdns.models import Domain
 
 
 class DiskPoolDictField(s.BaseDictField):
-    _key_field = s.IntegerField(min_value=DISK_ID_MIN + 1, max_value=DISK_ID_MAX + 1)
-    _val_field = s.CharField(max_length=64)
+    _key_field_class = s.IntegerField
+    _key_field_params = frozendict(min_value=DISK_ID_MIN + 1, max_value=DISK_ID_MAX + 1)
+    _val_field_class = s.CharField
+    _val_field_params = frozendict(max_length=64)
 
 
 class VmMigrateSerializer(s.Serializer):
