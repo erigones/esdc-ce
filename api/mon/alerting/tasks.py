@@ -32,7 +32,8 @@ def _user_group_changed(group_name, dc_name):  # noqa: R701
         try:
             dc = Dc.objects.get_by_name(dc_name)
         except Dc.DoesNotExist:
-            raise NotImplementedError('TODO DC deletion hook is not implemented')
+            # TODO: to be implemented
+            logger.warning('DC deletion hook is not implemented -> manual cleanup in Zabbix is required')
             # When DC is deleted, we lose the access to the zabbix and therefore we don't know what to do
             # We have to provide information about zabbix connection so that we can delete related information in zabbix
         else:
