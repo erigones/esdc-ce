@@ -15,6 +15,7 @@ Features
 - Added node version caching and internal update events - `#271 <https://github.com/erigones/esdc-ce/issues/271>`__
 - Added automatic synchronization of overlay ARP files - `#286 <https://github.com/erigones/esdc-ce/issues/286>`__
 - Added script for automating platform upgrade - `#289 <https://github.com/erigones/esdc-ce/issues/289>`__
+- Made compute node IP address changeable - `#305 <https://github.com/erigones/esdc-ce/issues/305>`__
 
 Bugs
 ----

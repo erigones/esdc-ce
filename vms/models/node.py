@@ -15,12 +15,6 @@ from vms.models.storage import Storage, NodeStorage
 from gui.models import User
 
 
-NODES_ALL_KEY = 'nodes_list'
-NODES_ALL_EXPIRES = 300
-NICTAGS_ALL_KEY = 'nictag_list'
-NICTAGS_ALL_EXPIRES = None
-
-
 class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
     """
     Node (host) object.
@@ -34,6 +28,11 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
     # Used in NodeStorage.size_vms
     VMS_SIZE_TOTAL_KEY = 'vms-size-total:%s'  # %s = zpool.id (NodeStorage)
     VMS_SIZE_DC_KEY = 'vms-size-dc:%s:%s'  # %s = dc.id:zpool.id (NodeStorage)
+
+    NODES_ALL_KEY = 'nodes_list'
+    NODES_ALL_EXPIRES = 300
+    NICTAGS_ALL_KEY = 'nictag_list'
+    NICTAGS_ALL_EXPIRES = None
 
     OFFLINE = 1
     ONLINE = 2
@@ -105,6 +104,7 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
             'is_compute': self.is_compute,
             'is_backup': self.is_backup,
             'note': self.note,
+            'address': self.address,
             'cpu_coef': self.cpu_coef,
             'ram_coef': self.ram_coef,
             'monitoring_templates': self.monitoring_templates,
@@ -210,6 +210,10 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
         return {iface: prop for iface, prop in six.iteritems(all_nics) if prop.get('ip4addr')}
 
     @property
+    def ips(self):
+        return [nic['ip4addr'] for nic in self.used_nics.values()]
+
+    @property
     def api_sysinfo(self):
         """Complete compute node OS info"""
         sysinfo = self.sysinfo
@@ -287,17 +291,22 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
         from vms.models.ipaddress import IPAddress, Subnet  # Circular imports
 
         if self._ip is None:
-            self._ip = IPAddress.objects.get(subnet=Subnet.objects.get(name=settings.VMS_NET_ADMIN),
-                                             ip=self.address, usage=IPAddress.NODE)
+            admin_subnets = Subnet.objects.filter(name__in=(settings.VMS_NET_ADMIN, settings.VMS_NET_ADMIN_OVERLAY))
+            self._ip = IPAddress.objects.get(subnet__in=admin_subnets, ip=self.address, usage=IPAddress.NODE)
+
         return self._ip
 
-    @ip_address.setter
-    def ip_address(self, address):
+    def create_ip_address(self):
         from vms.models.ipaddress import IPAddress, Subnet  # Circular imports
 
-        self._ip = IPAddress(subnet=Subnet.objects.get(name=settings.VMS_NET_ADMIN),
-                             ip=address, usage=IPAddress.NODE, note=self.hostname)
-        self.address = address
+        ipaddr = IPAddress.get_ip_address(self.address)
+
+        for subnet in Subnet.objects.filter(name__in=(settings.VMS_NET_ADMIN, settings.VMS_NET_ADMIN_OVERLAY)):
+            if ipaddr in subnet.ip_network:
+                self._ip = IPAddress(subnet=subnet, ip=self.address, usage=IPAddress.NODE, note=self.hostname)
+                return self._ip
+
+        raise IPAddress.DoesNotExist('IP address "%s" does not belong to any admin network' % self.address)
 
     @property
     def vlan_id(self):
@@ -415,14 +424,14 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
     def all(cls, clear_cache=False):
         """Return list of all nodes from cache"""
         if clear_cache:
-            return cache.delete(NODES_ALL_KEY)
+            return cache.delete(cls.NODES_ALL_KEY)
 
-        nodes = cache.get(NODES_ALL_KEY)
+        nodes = cache.get(cls.NODES_ALL_KEY)
 
         if not nodes:
             nodes = cls.objects.only('uuid', 'hostname', 'status', 'address', 'is_compute', 'is_backup', 'is_head')\
                                .order_by('hostname')
-            cache.set(NODES_ALL_KEY, nodes, NODES_ALL_EXPIRES)
+            cache.set(cls.NODES_ALL_KEY, nodes, cls.NODES_ALL_EXPIRES)
 
         return nodes
 
@@ -430,9 +439,9 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
     def all_nictags(cls, clear_cache=False):
         """Return dictionary with of nictags {name:type}"""
         if clear_cache:
-            cache.delete(NICTAGS_ALL_KEY)
+            cache.delete(cls.NICTAGS_ALL_KEY)
 
-        nictags = cache.get(NICTAGS_ALL_KEY)
+        nictags = cache.get(cls.NICTAGS_ALL_KEY)
 
         if not nictags:
             nodes = cls.objects.all()
@@ -448,7 +457,7 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
 
                     nictags[nic_name] = nic_type
 
-            cache.set(NICTAGS_ALL_KEY, nictags, NICTAGS_ALL_EXPIRES)
+            cache.set(cls.NICTAGS_ALL_KEY, nictags, cls.NICTAGS_ALL_EXPIRES)
 
         return nictags
 
@@ -484,6 +493,7 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
         used_nics = self.used_nics
 
         return (self.get_node_ip_by_iface('admin0', node_nics=used_nics) or
+                self.get_node_ip_by_iface('admin_0', node_nics=used_nics) or
                 self.get_node_ip_by_nictag('admin', node_nics=used_nics))
 
     @property
@@ -492,8 +502,10 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
         used_nics = self.used_nics
 
         return (self.get_node_ip_by_iface('external0', node_nics=used_nics) or
+                self.get_node_ip_by_iface('external_0', node_nics=used_nics) or
                 self.get_node_ip_by_nictag('external', node_nics=used_nics) or
                 self.get_node_ip_by_iface('admin0', node_nics=used_nics) or
+                self.get_node_ip_by_iface('admin_0', node_nics=used_nics) or
                 self.get_node_ip_by_nictag('admin', node_nics=used_nics))
 
     def get_overlay_port(self, overlay_name):
@@ -532,31 +544,43 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
     def del_initializing(self):
         cache.delete(self._initializing_key)
 
+    def _init_address(self):
+        """Set node address when new node is detected in sysinfo_cb"""
+        sysinfo = self._sysinfo
+        ip, admin_iface = None, None
+        # First, try the 'admin0' VNIC (or alternatives)
+        vnics = sysinfo.get('Virtual Network Interfaces', {})
+
+        for vnic_name in ('admin0', 'admin_0'):
+            admin_iface = vnics.get(vnic_name, {})
+            ip = admin_iface.get('ip4addr', None)
+
+            if ip:
+                break
+
+        # Then, walk through all NICs and search for the 'admin' NIC tag
+        if not ip:
+            for iface, iface_info in sysinfo['Network Interfaces'].items():
+                if 'admin' in iface_info.get('NIC Names', ()):
+                    admin_iface = iface_info
+                    ip = admin_iface.get('ip4addr', None)
+                    break
+
+        if not ip:
+            raise RuntimeError('Node IP Address not found in sysinfo output')
+
+        self._vlan_id = int(admin_iface.get('VLAN', 0))  # Used by api.system.init.init_mgmt()
+        self.address = ip
+
     def parse_sysinfo(self, esysinfo, update_ip=False):
-        """Get useful information from sysinfo"""
+        """Get useful information from sysinfo. update_ip is True only when creating new node."""
         self.config = esysinfo.pop('config', '')
         self.sshkey = esysinfo.pop('sshkey', '')
         self.esysinfo = esysinfo
-        sysinfo = self._sysinfo
-        self.hostname = sysinfo['Hostname']
+        self.hostname = self._sysinfo['Hostname']
 
         if update_ip:
-            # First, try the 'admin0' VNIC
-            admin_iface = sysinfo.get('Virtual Network Interfaces', {}).get('admin0', {})
-            ip = admin_iface.get('ip4addr', None)
-
-            # Then, walk through all NICs and search for the 'admin' NIC tag
-            if not ip:
-                for iface, iface_info in sysinfo['Network Interfaces'].items():
-                    if 'admin' in iface_info.get('NIC Names', ()):
-                        admin_iface = iface_info
-                        ip = admin_iface.get('ip4addr', None)
-                        break
-
-            assert ip, 'Node IP Address not found in sysinfo output'
-
-            self._vlan_id = admin_iface.get('VLAN', 0)  # Used by api.system.init.init_mgmt()
-            self.ip_address = ip
+            self._init_address()
 
     def sysinfo_changed(self, esysinfo):
         """Return True if sysinfo changed"""

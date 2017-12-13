@@ -24,7 +24,7 @@ VIRTUAL_ENV="${ERIGONES_HOME}/envs"
 export PYTHONPATH VIRTUAL_ENV
 
 # Update ansible inventory
-"${ERIGONES_HOME}"/bin/ctl.sh genhosts > "${ANS_BASE}/hosts.cfg"
+"${ERIGONES_HOME}"/bin/ctl.sh genhosts --vms > "${ANS_BASE}/hosts.cfg"
 
 # pre-v2.3.1 check
 if [[ ! -f "/root/.ssh/id_rsa" ]]; then

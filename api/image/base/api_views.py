@@ -68,7 +68,7 @@ class ImageView(TaskAPIView):
             if self.img_server:
                 img_vm = self.img_server.vm
 
-                if img_vm.status not in (img_vm.RUNNING, img_vm.STOPPED):
+                if img_vm.status not in (img_vm.RUNNING, img_vm.STOPPED) or not img_vm.has_ip():
                     raise ObjectDoesNotExist
             elif must_exist:
                 raise ObjectDoesNotExist

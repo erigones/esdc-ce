@@ -1752,6 +1752,26 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
     def ips(self):
         return self.json_get_ips()
 
+    @property
+    def ips_active(self):
+        return self.json_active_get_ips()
+
+    @property
+    def primary_ip(self):
+        for nic in self.json_get_nics():
+            if is_ip(nic) and nic.get('primary', False):
+                return nic['ip']
+
+        raise LookupError('Primary IP not found')
+
+    @property
+    def primary_ip_active(self):
+        for nic in self.json_active_get_nics():
+            if is_ip(nic) and nic.get('primary', False):
+                return nic['ip']
+
+        raise LookupError('Primary IP not found')
+
     @property  # Return installed boolean
     def installed(self):
         return self.internal_metadata.get('installed', None)

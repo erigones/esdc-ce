@@ -2,6 +2,7 @@ from __future__ import absolute_import
 
 from django.db import models
 from django.db.models import Q
+from django.utils.six import text_type
 from django.utils.translation import ugettext_lazy as _
 from uuid import uuid4
 # noinspection PyCompatibility
@@ -60,7 +61,7 @@ class Subnet(_VirtModel, _DcMixin, _UserTasksModel):
 
     @staticmethod
     def get_ip_network(netaddr, netmask):
-        return ipaddress.ip_network(u'%s/%s' % (netaddr, netmask))
+        return ipaddress.ip_network(text_type('%s/%s' % (netaddr, netmask)))
 
     @staticmethod
     def get_ip_network_hostinfo(net):

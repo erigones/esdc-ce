@@ -473,6 +473,19 @@ class ImageVm(object):
             return None
 
     @property
+    def ip(self):
+        try:
+            return self.vm.primary_ip_active
+        except LookupError:
+            return self.vm.ips_active[0]
+
+    def has_ip(self):
+        try:
+            return self.vm and self.ip
+        except LookupError:
+            return False
+
+    @property
     def datasets_dir(self):
         return settings.VMS_IMAGE_VM_DATASETS_DIR.format(zfs_filesystem=self.vm.json_active['zfs_filesystem'])
 
@@ -485,7 +498,7 @@ class ImageVm(object):
     @property
     def repo_url(self):
         assert self, 'Image VM does not exist'
-        return 'http://%s' % self.vm.ips[0]
+        return 'http://%s' % self.ip
 
     @property
     def sources(self):
@@ -494,7 +507,7 @@ class ImageVm(object):
         if self:
             try:
                 src = [self.repo_url]
-            except IndexError:
+            except LookupError:
                 pass
 
         src.extend(self.get_additional_sources())
