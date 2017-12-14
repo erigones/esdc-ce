@@ -7,19 +7,20 @@ from api.mon.alerting.serializers import AlertSerializer
 
 class BaseAlertFilterForm(SerializerForm):
     since = forms.DateField(label=_('Since'), required=False, input_formats=('%Y-%m-%d', ''),
-                                widget=forms.DateInput(format='%Y-%m-%d',
-                                                       attrs={'placeholder': _('Since'),
-                                                              'class': 'fill-up input-navigation input-transparent '
-                                                                       'input-date'}))
+                            widget=forms.DateInput(format='%Y-%m-%d',
+                                                   attrs={'placeholder': _('Since'),
+                                                          'class': 'fill-up input-navigation input-transparent '
+                                                                   'input-date'}))
+
     until = forms.DateField(label=_('Until'), required=False, input_formats=('%Y-%m-%d',),
-                              widget=forms.DateInput(format='%Y-%m-%d',
-                                                     attrs={'placeholder': _('Until'),
-                                                            'class': 'fill-up input-navigation input-transparent '
-                                                                     'input-date'}))
+                            widget=forms.DateInput(format='%Y-%m-%d',
+                                                   attrs={'placeholder': _('Until'),
+                                                          'class': 'fill-up input-navigation input-transparent '
+                                                                   'input-date'}))
+
     last = forms.CharField(label=_('Limit alerts to fetch'), required=False, max_length=2048,
-                                   widget=forms.TextInput(attrs={
-                                        'placeholder': _('Limit alerts to fetch'),
-                                        'class': 'fill-up input-navigation input-transparent'}))
+                           widget=forms.TextInput(attrs={'placeholder': _('Limit alerts to fetch'),
+                                                         'class': 'fill-up input-navigation input-transparent'}))
 
     vm_hostnames = forms.CharField(label=_('Hostnames'), required=False, max_length=2048,
                                    widget=forms.TextInput(attrs={
@@ -35,8 +36,7 @@ class BaseAlertFilterForm(SerializerForm):
                                   widget=forms.CheckboxInput(attrs={'class': 'checkbox fill-up input-navigation'}))
 
     show_events = forms.BooleanField(label=_('Show Events'), required=False,
-                                        widget=forms.CheckboxInput(
-                                            attrs={'class': 'checkbox fill-up input-navigation'}))
+                                     widget=forms.CheckboxInput(attrs={'class': 'checkbox fill-up input-navigation'}))
 
     def __init__(self, request, *args, **kwargs):
         super(BaseAlertFilterForm, self).__init__(request, None, *args, **kwargs)
