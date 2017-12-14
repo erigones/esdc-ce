@@ -1245,6 +1245,9 @@ class BaseArrayField(CharField):
 
     def to_native(self, value):
         if not value:
+            if value is None and self.allow_none:
+                return None
+
             value = []
 
         if isinstance(value, six.string_types):
