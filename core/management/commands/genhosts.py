@@ -6,8 +6,6 @@ DC_ADMIN = DanubeCloudCommand.settings.VMS_DC_ADMIN
 class Command(DanubeCloudCommand):
     help = 'Generate ansible host inventory.'
     options = (
-        CommandOption('--dc', dest='dc', default=DC_ADMIN,
-                      help='List hosts from a specific virtual datacenter. Defaults to "%s".' % DC_ADMIN),
         CommandOption('--vms', action='store_true', dest='vms', default=False,
                       help='List first IP address of all virtual machines in a specific virtual datacenter.'),
         CommandOption('--vms-primary', action='store_true', dest='vms_primary', default=False,
@@ -16,17 +14,30 @@ class Command(DanubeCloudCommand):
                       help='List admin IP address of all compute nodes.'),
         CommandOption('--nodes-external', action='store_true', dest='nodes_external', default=False,
                       help='List external IP address of all compute nodes.'),
+        CommandOption('--vdc', dest='virtual_dc', default=DC_ADMIN,
+                      help='List hosts from a specific virtual datacenter (vDC). Requires --vms. '
+                           'Defaults to "%s".' % DC_ADMIN),
+        CommandOption('--pdc', dest='physical_dc', default=None,
+                      help='List compute node IP addresses depending on their physical location. '
+                           'Nodes located in this datacenter will use admin network IP addresses; '
+                           'Other nodes will use external IP addresses. Requires --nodes.'),
     )
 
     @staticmethod
-    def _list_node_hosts(external=False):
+    def _list_node_hosts(external=False, dc_name=None):
         from vms.models import Node
 
         for node in Node.objects.all().order_by('created'):
-            if external:
-                ip = node.address_external
+            if dc_name is None:
+                if external:
+                    ip = node.address_external
+                else:
+                    ip = node.address_admin
             else:
-                ip = node.address_admin
+                if node.dc_name == dc_name:
+                    ip = node.address_admin
+                else:
+                    ip = node.address_external
 
             yield '%s ansible_ssh_host=%s ansible_python_interpreter=/opt/local/bin/python dc_name=%s' % \
                   (node.hostname, ip, node.dc_name)
@@ -58,19 +69,20 @@ class Command(DanubeCloudCommand):
 
             yield ' '.join(line)
 
-    def handle(self, dc=None, vms=False, vms_primary=False, nodes=False, nodes_external=False, **options):
+    def handle(self, vms=False, vms_primary=False, nodes=False, nodes_external=False, virtual_dc=None, physical_dc=None,
+               **options):
         if nodes or nodes_external:
             print('[nodes]')
 
-            for host_line in self._list_node_hosts(external=nodes_external):
+            for host_line in self._list_node_hosts(external=nodes_external, dc_name=physical_dc):
                 print(host_line)
 
             print('')
 
         if vms or vms_primary:
             # print VMs in a specific DC
-            if dc:
-                print('[%s]' % dc)
+            if virtual_dc:
+                print('[%s]' % virtual_dc)
 
-            for host_line in self._list_vm_hosts(dc, primary=vms_primary):
+            for host_line in self._list_vm_hosts(virtual_dc, primary=vms_primary):
                 print(host_line)
