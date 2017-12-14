@@ -5,11 +5,10 @@
 {% block javascript %}
   <script type="text/javascript">
     $(document).ready(function () {
-      var URL = '{% url 'alert_list_table' %}';
-      var FILTER = {% autoescape off %}{{ alert_filter }}{% endautoescape %};
-
-      alert_init(URL, FILTER);
       filter_links();
+      {% if alert_filter %}
+        alert_init('{% url 'alert_list_table' %}', {{ alert_filter|json|safe }});
+      {% endif %}
     });
   </script>
 {% endblock %}
