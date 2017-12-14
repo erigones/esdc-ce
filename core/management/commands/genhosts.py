@@ -28,7 +28,8 @@ class Command(DanubeCloudCommand):
             else:
                 ip = node.address_admin
 
-            yield '%s ansible_ssh_host=%s ansible_python_interpreter=/opt/local/bin/python' % (node.hostname, ip)
+            yield '%s ansible_ssh_host=%s ansible_python_interpreter=/opt/local/bin/python dc_name=%s' % \
+                  (node.hostname, ip, node.dc_name)
 
     @staticmethod
     def _list_vm_hosts(dc, primary=False):
