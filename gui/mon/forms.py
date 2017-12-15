@@ -2,6 +2,7 @@ from django import forms
 from django.utils.translation import ugettext_lazy as _
 
 from gui.forms import SerializerForm
+from gui.fields import ArrayField
 from api.mon.alerting.serializers import AlertSerializer
 
 
@@ -22,12 +23,12 @@ class BaseAlertFilterForm(SerializerForm):
                            widget=forms.TextInput(attrs={'placeholder': _('Limit alerts to fetch'),
                                                          'class': 'fill-up input-navigation input-transparent'}))
 
-    vm_hostnames = forms.CharField(label=_('Hostnames'), required=False, max_length=2048,
+    vm_hostnames = ArrayField(label=_('Hostnames'), required=False, max_length=2048,
                                    widget=forms.TextInput(attrs={
                                        'placeholder': _('Hostnames'),
                                        'class': 'fill-up input-navigation input-transparent'}))
 
-    node_hostnames = forms.CharField(label=_('Node hostnames'), required=False, max_length=2048,
+    node_hostnames = ArrayField(label=_('Node hostnames'), required=False, max_length=2048,
                                      widget=forms.TextInput(attrs={
                                          'placeholder': _('Node hostname'),
                                          'class': 'fill-up input-navigation input-transparent'}))

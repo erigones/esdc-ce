@@ -4,8 +4,12 @@
 
 var MONITORING_ALERTS = null;
 
-function mon_Alerts(view_url) {
+function MonitoringAlerts(view_url) {
   this.view_url = view_url;
+
+  this.is_displayed = function() {
+    return Boolean($('#alert_list').length);
+  };
 
   this.update = function(filter, result) {
 
@@ -13,9 +17,9 @@ function mon_Alerts(view_url) {
       // NO result, we dont have task yet!
       // Create task and wait for callback with result.
       if (SOCKET.socket.connected) {
-        show_loading_screen('Getting data from Zabbix', true);
+        show_loading_screen(gettext('Getting data from Zabbix'), true);
       } else {
-        $(".msg").html(
+        $(".alert-list-table-msg").html(
           'Socket IO needs to be connected in order to get the alert list.<br />Please do not force refresh otherwise this page won\'t work, rather click on ALERTS in menu.'
         );
       }
@@ -29,20 +33,13 @@ function mon_Alerts(view_url) {
           if (jqXHR.status == 200) {
             $("#alert-list-table").html(data);
           } else {
-            $(".msg").html(textStatus);
+            $(".alert-list-table-msg").html(textStatus);
           }
         }, filter);
 
       } else {
-        // Something is not alright, loop throught result and alert messages!
-        // This is called on esio FAILED (API error)
-        for (var key in result.result) {
-          if (result.result.hasOwnProperty(key)) {
-            for(var i=0; i < result.result[key].length; ++i){
-              notify('error', result.result[key][i]);
-            }
-          }
-        }
+        // Something is not alright, this is called on esio FAILED (API error)
+        notify('error', _sererror_from_result(result.result))
       }
       hide_loading_screen();
     }
@@ -50,10 +47,12 @@ function mon_Alerts(view_url) {
 } // mon_Alerts: Zabbix alerts!
 
 function alert_update(filter, result) {
-  MONITORING_ALERTS.update(filter, result);
+  if(MONITORING_ALERTS && MONITORING_ALERTS.is_displayed()) {
+    MONITORING_ALERTS.update(filter, result);
+  }
 }
 
-function alert_init(view_name, filter) {
-  MONITORING_ALERTS = new mon_Alerts(view_name);
+function alert_init(view_url, filter) {
+  MONITORING_ALERTS = new MonitoringAlerts(view_url);
   MONITORING_ALERTS.update(filter);
 }

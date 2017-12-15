@@ -33,7 +33,7 @@ def alert_list_table(request):
     context['show_events'] = False
 
     if request.GET['show_events'] in ('true', 'on'):
-        context['show_events'] = request.GET['show_events']
+        context['show_events'] = True
 
     method = 'GET'
     logger.info('Calling API view %s mon_alert_list(%s, data=%s) by user %s in DC %s',
@@ -41,7 +41,7 @@ def alert_list_table(request):
 
     res = call_api_view(request, method, mon_alert_list, data=BaseAlertFilterForm.format_data(request.GET))
 
-    if res.status_code in (200, 201) and method == 'GET' and res.data['result'] is not None:
+    if res.status_code in (200, 201) and res.data['result'] is not None:
         context['alerts'] = res.data['result']
 
     return render(request, 'gui/mon/alert_table.html', context)
