@@ -24,14 +24,12 @@ class BaseAlertFilterForm(SerializerForm):
                                                          'class': 'fill-up input-navigation input-transparent'}))
 
     vm_hostnames = ArrayField(label=_('Hostnames'), required=False, max_length=2048,
-                                   widget=forms.TextInput(attrs={
-                                       'placeholder': _('Hostnames'),
-                                       'class': 'fill-up input-navigation input-transparent'}))
+                              widget=forms.TextInput(attrs={'placeholder': _('Hostnames'),
+                                                            'class': 'fill-up input-navigation input-transparent'}))
 
     node_hostnames = ArrayField(label=_('Node hostnames'), required=False, max_length=2048,
-                                     widget=forms.TextInput(attrs={
-                                         'placeholder': _('Node hostname'),
-                                         'class': 'fill-up input-navigation input-transparent'}))
+                                widget=forms.TextInput(attrs={'placeholder': _('Node hostname'),
+                                                              'class': 'fill-up input-navigation input-transparent'}))
 
     dc_bound = forms.BooleanField(label=_('Filter as DC bound'), required=False,
                                   widget=forms.CheckboxInput(attrs={'class': 'checkbox fill-up input-navigation'}))
