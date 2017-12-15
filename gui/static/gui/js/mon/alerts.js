@@ -39,7 +39,7 @@ function MonitoringAlerts(view_url) {
 
       } else {
         // Something is not alright, this is called on esio FAILED (API error)
-        notify('error', _sererror_from_result(result.result))
+        notify('error', _sererror_from_result(result.result));
       }
       hide_loading_screen();
     }
