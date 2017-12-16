@@ -1459,7 +1459,7 @@ class MetadataField(BaseDictField):
     _key_field_class = RegexField
     _key_field_params = frozendict(regex=r'^[A-Za-z0-9\.\-_:]+$', max_length=128)
     _val_field_class = CharField
-    _default_max_size = 1024 * 1024 * 8  # 8 MB (mentioned in user guide)
+    _default_max_size = 1024 * 1024 * 2  # 2 MB (mentioned in user guide)
 
 
 class URLDictField(BaseDictField):
