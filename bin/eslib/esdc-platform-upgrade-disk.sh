@@ -94,7 +94,8 @@ fi
 
 
 # check what platform we currently run
-if [[ "${FORCE}" -ne 1 ]] && [[ "${PLATFORM_VER}" == "$(uname -v | sed 's/^[a-z]*_//')" ]]; then
+OLD_PLATFORM_VER="$(uname -v | ${SED} 's/^[a-z]*_//')"
+if [[ "${FORCE}" -ne 1 ]] && [[ "${PLATFORM_VER}" == "${OLD_PLATFORM_VER}" ]]; then
 	die 0 "The requested platform version is already running. Aborting upgrade."
 fi
 
@@ -192,6 +193,12 @@ chown -R root:root "${DCOS_MNTDIR}/platform/i86pc/amd64"
 if [[ ${KEEP_SMF_DB} -ne 1 ]]; then
 	printmsg "Clear SMF database so it can be recreated at reboot"
 	rm -f "${DCOS_MNTDIR}/etc/svc/repository.db"
+fi
+
+if [[ -f "${DCOS_MNTDIR}/etc/issue" ]]; then
+	printmsg "Update version in /etc/issue"
+	${SED} -e "s/${OLD_PLATFORM_VER}/${PLATFORM_VER}/g" "${DCOS_MNTDIR}/etc/issue" > "${DCOS_MNTDIR}/etc/issue.new"
+	mv -f "${DCOS_MNTDIR}/etc/issue.new" "${DCOS_MNTDIR}/etc/issue"
 fi
 
 printmsg "Activating the new boot environment at next reboot"
