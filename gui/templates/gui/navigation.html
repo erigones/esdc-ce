@@ -118,7 +118,7 @@
     <li class="filler"></li>
     {% for item in navi.second_nav %}
     <li{% if navi.view_name == item.url %} class="active"{% endif %}>
-      <a href="{% url item.url %}{% if all %}?all=1{% endif %}"><i class="icon-{{ item.icon }}"></i> {{ item.title }}</a>
+      <a href="{% url item.url %}{% if all %}?all=1{% endif %}" class="{{ item.a_class }}"><i class="icon-{{ item.icon }}"></i> {{ item.title }}</a>
     </li>
     {% endfor %}
 

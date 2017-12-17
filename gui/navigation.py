@@ -113,10 +113,26 @@ SERVERS = {
 MONITORING = {
     'title': _('Monitoring'),
     'icon': 'bar-chart',
-    'url': 'monitoring_server_redirect',
-    'active_views': {'monitoring'},
-    'a_class': 'no-ajax',
-    'a_target': '_blank',
+    'url': 'mon_alert_list',
+    'active_views': {'mon_alert_list', 'mon_action_list'},
+    'children': [
+        {
+            'title': _('Alerts'),
+            'icon': 'bell',
+            'url': 'mon_alert_list',
+        },
+        # {
+        #     'title': _('Actions'),
+        #     'icon': 'bolt',
+        #     'url': 'mon_action_list',
+        # },
+        {
+            'title': _('Zabbix'),
+            'icon': 'external-link',
+            'url': 'mon_server_redirect',
+            'a_class': 'no-ajax',
+        },
+    ]
 }
 
 TASKLOG = {

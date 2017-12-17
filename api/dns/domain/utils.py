@@ -29,6 +29,7 @@ def get_domain(request, name, attrs=None, fetch_dc=False, data=None, count_recor
             dom_filter = dom_filter | Q(dc_bound__in=[dc.id for dc in request.dcs])
 
     if count_records:
+        # noinspection SqlDialectInspection,SqlNoDataSourceInspection
         kwargs['extra'] = {
             'select': {'records': 'SELECT COUNT(*) FROM "records" WHERE "records"."domain_id" = "domains"."id"'}
         }
@@ -51,8 +52,8 @@ def get_domain(request, name, attrs=None, fetch_dc=False, data=None, count_recor
             if not user.is_staff:
                 request.dc_user_permissions = request.dc.get_user_permissions(user)
 
-            logger.debug('"%s %s" user="%s" _changed_ dc="%s" permissions=%s', request.method, request.path,
-                         user.username, request.dc.name, request.dc_user_permissions)
+            logger.info('"%s %s" user="%s" _changed_ dc="%s" permissions=%s', request.method, request.path,
+                        user.username, request.dc.name, request.dc_user_permissions)
 
     if fetch_dc:
         if domain.id:
@@ -108,6 +109,7 @@ def get_domains(request, prefetch_owner=False, prefetch_dc=False, count_records=
         qs = qs.filter(**kwargs)
 
     if count_records:
+        # noinspection SqlDialectInspection,SqlNoDataSourceInspection
         qs = qs.extra({'records': 'SELECT COUNT(*) FROM "records" WHERE "records"."domain_id" = "domains"."id"'})
 
     if prefetch_dc:
