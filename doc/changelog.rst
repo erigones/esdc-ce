@@ -24,6 +24,7 @@ Bugs
 - Removed reference to non-existing ``VMS_NET_NIC_TAGS`` setting in GUI - `#310 <https://github.com/erigones/esdc-ce/issues/310>`__
 - Fixed reverse lock persistence - `#317 <https://github.com/erigones/esdc-ce/issues/317>`__
 - Fixed emergency cleanup for cancelled or deleted VM migration task - `#318 <https://github.com/erigones/esdc-ce/issues/318>`__
+- Fixed SSL cert update (restart haproxy after SSL cert change) - `#322 <https://github.com/erigones/esdc-ce/issues/322>`__
 
 
 2.6.7 (released on 2017-11-06)
