@@ -62,6 +62,11 @@ update_fw() {
 		elif [[ "$(/usr/bin/svcs -Ho state ${IPF_SERVICE})" == "maintenance" ]]; then
 			/usr/sbin/svcadm clear "${IPF_SERVICE}"
 		fi
+	else
+		# clear maintenance if necessary
+		if [[ "$(/usr/bin/svcs -Ho state ${IPF_SERVICE})" == "maintenance" ]]; then
+			/usr/sbin/svcadm clear "${IPF_SERVICE}"
+		fi
 	fi
 }
 
