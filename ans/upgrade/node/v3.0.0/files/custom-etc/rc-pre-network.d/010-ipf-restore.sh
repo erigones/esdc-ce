@@ -55,18 +55,14 @@ update_fw() {
 		FW_MODIFIED=1
 	done
 
-	if [[ ${FW_MODIFIED} -eq 1 ]]; then
-		# refresh firewall if applicable
-		if [[ "$(/usr/bin/svcs -Ho state ${IPF_SERVICE})" == "online" ]]; then
-			/usr/sbin/svcadm refresh "${IPF_SERVICE}"
-		elif [[ "$(/usr/bin/svcs -Ho state ${IPF_SERVICE})" == "maintenance" ]]; then
-			/usr/sbin/svcadm clear "${IPF_SERVICE}"
-		fi
-	else
-		# clear maintenance if necessary
-		if [[ "$(/usr/bin/svcs -Ho state ${IPF_SERVICE})" == "maintenance" ]]; then
-			/usr/sbin/svcadm clear "${IPF_SERVICE}"
-		fi
+	# refresh firewall if applicable
+	if [[ ${FW_MODIFIED} -eq 1 && "$(/usr/bin/svcs -Ho state ${IPF_SERVICE})" == "online" ]]; then
+		/usr/sbin/svcadm refresh "${IPF_SERVICE}"
+	fi
+
+	# clear maintenance if necessary
+	if [[ "$(/usr/bin/svcs -Ho state ${IPF_SERVICE})" == "maintenance" ]]; then
+		/usr/sbin/svcadm clear "${IPF_SERVICE}"
 	fi
 }
 
