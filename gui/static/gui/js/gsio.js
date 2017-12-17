@@ -588,7 +588,8 @@ function message_callback(code, res, view, method, args, kwargs, apiview, apidat
         return; // do not update cached_tasklog
 
       case 'mon_alert_list': // mon_alert_list failed
-        alert_update(data, res);
+        alert_message(code, _message_from_result(res));
+        alert_update(null);
         return; // do not update cached_tasklog
 
       case 'mon_vm_history': // mon_vm_history failed
@@ -695,7 +696,7 @@ function message_callback(code, res, view, method, args, kwargs, apiview, apidat
         return; // do not update cached_tasklog
 
       case 'mon_alert_list': // mon_alert_list result from cache
-        alert_update(data, res);
+        alert_update(res);
         return; // do not update cached_tasklog
 
       case 'mon_vm_history': // mon_vm_history result from cache
@@ -781,6 +782,7 @@ function task_event_callback(result) {
 // task_status_callback for classic task events
 function _task_status_callback(res, apiview) {
   var result = res.result || {};
+  var error = null;
   var hostname = apiview.hostname || null;
   var msg = '';
   var task_prefix = '';
@@ -1025,15 +1027,15 @@ function _task_status_callback(res, apiview) {
     case 'mon_alert_list':
       if (res.status != 'SUCCESS') {
         result = null;
+        error = _message_from_result(res);
       }
-      // data is irrelevant here! and we dont have it, do we need it?
-      alert_update(apiview, res);
+      // data (filters) are irrelevant here and we don't have it
+      alert_update(result, error);
       return false; // do not update cached_tasklog
 
     case 'mon_vm_history':
     case 'mon_node_history':
       var obj_type = apiview.view.split('_', 2)[1];
-      var error = null;
 
       if (res.status != 'SUCCESS') {
         result = null;

@@ -14,7 +14,7 @@ from que.tasks import cq, get_task_logger
 from que.lock import TaskLock
 from que.utils import (is_dummy_task, task_prefix_from_task_id, task_id_from_request, dc_id_from_task_id,
                        follow_callback, get_result, cancel_task as _cancel_task, delete_task as _delete_task)
-from que.exceptions import TaskException
+from que.exceptions import TaskException, MgmtTaskException
 from que.user_tasks import UserTasks
 from api import status
 from api.exceptions import OPERATIONAL_ERRORS
@@ -359,6 +359,10 @@ def mgmt_task(update_user_tasks=True):
             except Exception as e:
                 task_logger.exception(e)
                 task_logger.error('Mgmt Task %s failed', task_id)
+
+                if not isinstance(e, TaskException):
+                    e = MgmtTaskException(str(e))
+
                 raise e
             finally:
                 if update_user_tasks:
@@ -610,6 +614,7 @@ class TaskID(str):
     """
     # noinspection PyInitNewSignature
     def __new__(cls, value, request=None):
+        # noinspection PyArgumentList
         obj = str.__new__(cls, value)
 
         if request:

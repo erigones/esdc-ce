@@ -60,13 +60,20 @@ def dtparse(s):
 
 
 @register.filter
-def dttimestamp(s):
-    return datetime.fromtimestamp(s)
+def dttimestamp(utc_timestamp, local_tz_name='UTC'):
+    dt_utc = datetime.utcfromtimestamp(utc_timestamp).replace(tzinfo=pytz.utc)
+
+    try:
+        tz = pytz.timezone(local_tz_name)
+    except pytz.UnknownTimeZoneError:
+        return dt_utc
+
+    return tz.normalize(dt_utc)
 
 
 @register.filter
-def mon_get_age(s):
-    delta = datetime.now() - datetime.fromtimestamp(s)
+def mon_get_age(dt):
+    delta = datetime.utcnow().replace(tzinfo=pytz.utc) - dt
     days = delta.days
     hours, rem = divmod(delta.seconds, 3600)
     minutes, seconds = divmod(rem, 60)

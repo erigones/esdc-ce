@@ -1,0 +1,27 @@
+/********************
+ * Alert severities *
+ ********************/
+/* line 6, ../scss/monitoring.scss */
+.label-alert.severity0 {
+  background-color: #97AAB3;
+}
+/* line 7, ../scss/monitoring.scss */
+.label-alert.severity1 {
+  background-color: #7499FF;
+}
+/* line 8, ../scss/monitoring.scss */
+.label-alert.severity2 {
+  background-color: #FFC859;
+}
+/* line 9, ../scss/monitoring.scss */
+.label-alert.severity3 {
+  background-color: #FFA059;
+}
+/* line 10, ../scss/monitoring.scss */
+.label-alert.severity4 {
+  background-color: #E97659;
+}
+/* line 11, ../scss/monitoring.scss */
+.label-alert.severity5 {
+  background-color: #E45959;
+}
