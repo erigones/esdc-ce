@@ -72,5 +72,5 @@ if ! haproxy -c -f /etc/haproxy/haproxy.cfg > /dev/null; then
 	die 99 "Invalid SSL certificate"
 fi
 
-systemctl reload haproxy
+systemctl restart haproxy
 exit 0

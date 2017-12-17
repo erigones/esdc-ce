@@ -13,9 +13,18 @@ Features
 - Updated the VM templates API + removed *experimental* flag from the ``template_manage`` API call - `#256 <https://github.com/erigones/esdc-ce/issues/256>`__
 - DC settings implied monitoring hostgroups are shown near the VM, node monitoring_hostgroups setting - `#266 <https://github.com/erigones/esdc-ce/issues/266>`__
 - Added node version caching and internal update events - `#271 <https://github.com/erigones/esdc-ce/issues/271>`__
+- Added script for automating platform upgrade - `#289 <https://github.com/erigones/esdc-ce/issues/289>`__
 
 Bugs
 ----
+
+- Added missing DNS record for ns1.local after install - `#301 <https://github.com/erigones/esdc-ce/issues/301>`__
+- Added automatic synchronization of Zabbix hosts after changing DC settings - `#210 <https://github.com/erigones/esdc-ce/issues/210>`__
+- Fixed race condition in Zabbix host group manipulation - `#309 <https://github.com/erigones/esdc-ce/issues/309>`__
+- Removed reference to non-existing ``VMS_NET_NIC_TAGS`` setting in GUI - `#310 <https://github.com/erigones/esdc-ce/issues/310>`__
+- Fixed reverse lock persistence - `#317 <https://github.com/erigones/esdc-ce/issues/317>`__
+- Fixed emergency cleanup for cancelled or deleted VM migration task - `#318 <https://github.com/erigones/esdc-ce/issues/318>`__
+- Fixed SSL cert update (restart haproxy after SSL cert change) - `#322 <https://github.com/erigones/esdc-ce/issues/322>`__
 
 
 2.6.7 (released on 2017-11-06)

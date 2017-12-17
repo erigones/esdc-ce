@@ -1,0 +1,23 @@
+#!/bin/bash
+
+set -e
+
+export ERIGONES_HOME=${ERIGONES_HOME:-"/opt/erigones"}
+export ESLIB="${ESLIB:-"${ERIGONES_HOME}/bin/eslib"}"
+
+# shellcheck disable=SC1090
+. "${ESLIB}/functions.sh"
+
+# choose the right upgrade path for this node (disk, net, usb)
+if dc_booted_from_hdd && [[ -n "$(_beadm_get_current_be_name)" ]]; then
+	# a boot env exists, this is disk install
+	"${ESLIB}/esdc-platform-upgrade-disk.sh" "$@"
+elif /bin/bootparams | grep -q "^netboot=true"; then
+	echo "This node is network booted. Nothing to do."
+	exit 0
+elif dc_booted_from_usb; then
+	"${ESLIB}/esdc-platform-upgrade-usb.sh" "$@"
+else
+	die 2 "Cannot determine platform boot type. Upgrade cannot continue."
+fi
+

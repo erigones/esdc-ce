@@ -15,7 +15,10 @@ class Command(BuildCommand):
 
         if que_only:
             if update:
-                self.display('You can now restart the erigonesd service (svcadm restart svc:/application/erigonesd:*)')
+                self.display(
+                    'You can now restart the erigonesd service:\n'
+                    '\tsvcadm restart svc:/application/erigonesd:*\n'
+                )
             else:
                 self.display('You can now import the erigonesd SMF manifest (doc/init.d/erigonesd.xml)')
         else:
