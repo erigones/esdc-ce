@@ -46,7 +46,7 @@ def mon_action_create(task_id, dc_id, action, **kwargs):
 @mgmt_task()
 def mon_action_update(task_id, dc_id, action, **kwargs):
     dc = Dc.objects.get_by_id(int(dc_id))
-    get_monitoring(dc).action_update(action)
+    return get_monitoring(dc).action_update(action)
 
 
 @cq.task(name='api.mon.alerting.action.tasks.mon_action_get', base=MgmtTask)

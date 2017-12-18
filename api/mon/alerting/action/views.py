@@ -80,14 +80,16 @@ class ActionView(APIView):
         ser = ActionUpdateSerializer(data=self.data, context=self.request)
         ser.request = self.request
         if ser.is_valid():
-            ser.data['name'] = self.name
+            # Send only those items that were changed in the request
+            data = {key: value for key, value in ser.data.items() if key in self.data}
+            data['name'] = self.name
 
             result = mon_action_update.call(self.request,
                                             None,
-                                            (self.request.dc.id, ser.data),
+                                            (self.request.dc.id, data),
                                             tg=TG_DC_BOUND,
                                             )
-            return mgmt_task_response(self.request, *result, msg=LOG_ACTION_CREATE, detail_dict=ser.data,
+            return mgmt_task_response(self.request, *result, msg=LOG_ACTION_CREATE, detail_dict=data,
                                       obj=self.request.dc)
         else:
             return FailureTaskResponse(self.request, ser.errors)

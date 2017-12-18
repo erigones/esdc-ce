@@ -1422,18 +1422,9 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
         return name
 
     @classmethod
-    def from_zabbix_id(cls, zapi, zabbix_id):
-        params = dict(usrgrpids=[zabbix_id], **cls.QUERY_BASE)
-        response = cls.call_zapi(zapi, 'usergroup.get', params=params)
-        # TODO refactor to reuse from_zabbix_ids
-        if response:
-            return response[0]
-        else:
-            raise RemoteObjectDoesNotExist
-
-    @classmethod
     def from_zabbix_ids(cls, zapi, zabbix_ids):
-        response = zapi.usergroup.get(dict(usrgrpids=zabbix_ids, **cls.QUERY_BASE))
+        params = dict(usrgrpids=zabbix_ids, **cls.QUERY_BASE)
+        response = cls.call_zapi(zapi, 'usergroup.get', params=params)
         return [cls.from_zabbix_data(zapi, item) for item in response]
 
     @classmethod
@@ -1690,8 +1681,6 @@ class ZabbixHostGroupContainer(ZabbixNamedContainer):
         self._api_response = self._call_zapi('hostgroup.get', params={'filter': {'name': self.name}})
         self.zabbix_id = parse_zabbix_result(self._api_response, 'groupid')
         assert len(self._api_response) == 1, 'Locally generated hostgroup name mapping should be injective'
-
-    refresh_id = refresh  # FIXME merge
 
     def create(self):
         self._api_response = self._call_zapi('hostgroup.create', params={'name': self.name})
