@@ -462,6 +462,10 @@ class ImageVm(object):
         return DefaultDc().settings.VMS_IMAGE_VM  # dc1_settings
 
     @staticmethod
+    def get_nic_id():
+        return DefaultDc().settings.VMS_IMAGE_VM_NIC  # dc1_settings
+
+    @staticmethod
     def get_additional_sources():
         return DefaultDc().settings.VMS_IMAGE_SOURCES  # dc1_settings
 
@@ -474,10 +478,15 @@ class ImageVm(object):
 
     @property
     def ip(self):
+        vm_ips_active = self.vm.json_active_get_ips(allowed_ips=False)
+
         try:
-            return self.vm.primary_ip_active
+            return vm_ips_active[self.get_nic_id() - 1]
         except LookupError:
-            return self.vm.ips_active[0]
+            try:
+                return self.vm.primary_ip_active
+            except LookupError:
+                return vm_ips_active[0]
 
     def has_ip(self):
         try:

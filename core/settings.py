@@ -581,6 +581,7 @@ VMS_NET_VLAN_ALLOWED = []
 VMS_NET_VXLAN_ALLOWED = []
 VMS_NET_LIMIT = None
 VMS_IMAGE_VM = VMS_VM_IMG01
+VMS_IMAGE_VM_NIC = 1
 VMS_IMAGE_VM_DATASETS_DIR = '/{zfs_filesystem}/root/datasets'  # Image upload directory on ImageVm's compute node
 VMS_IMAGE_IMGADM_CONF = {
     'dockerImportSkipUuids': True,
