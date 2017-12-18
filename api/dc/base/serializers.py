@@ -303,7 +303,7 @@ class DcSettingsSerializer(s.InstanceSerializer):
     VMS_VM_SSH_KEYS_DEFAULT = s.ArrayField(label='VMS_VM_SSH_KEYS_DEFAULT', max_items=32, required=False,
                                            help_text=_('List of public SSH keys added to every virtual machine '
                                                        'in this virtual datacenter.'))
-    VMS_VM_MDATA_DEFAULT = s.MetadataField(label='VMS_VM_MDATA_DEFAULT', max_items=32, required=False,
+    VMS_VM_MDATA_DEFAULT = s.MetadataField(label='VMS_VM_MDATA_DEFAULT', required=False,
                                            validators=(validate_mdata(Vm.RESERVED_MDATA_KEYS),),
                                            help_text=_('Default VM metadata (key=value string pairs).'))
     VMS_DISK_MODEL_DEFAULT = s.ChoiceField(label='VMS_DISK_MODEL_DEFAULT', choices=Vm.DISK_MODEL,
