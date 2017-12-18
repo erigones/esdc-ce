@@ -4,3 +4,15 @@
 # https://github.com/erigones/esdc-factory/issues/98
 - name: Update fixed templates
   include: "{{ upg_base }}/lib/zabbix_import_templates.yml"
+
+- name: Get current system timezone
+  shell: date +"%Z"
+  register: date_cmd
+
+- name: Set UTC timezone in /etc/php.ini
+  ini_file: dest=/etc/php.ini
+            section="Date"
+            option="date.timezone"
+            value="UTC"
+  when: "'UTC' == date_cmd.stdout_lines.0"
+  notify: reload httpd

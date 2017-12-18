@@ -72,10 +72,23 @@ class Zabbix(AbstractMonitoringBackend):
         if not reuse_zapi:
             self._connections.add(self.ezx.zapi)
 
+    def __hash__(self):
+        return hash((self.izx, self.ezx))
+
+    @property
+    def enabled(self):
+        """Same as dc.settings.MON_ZABBIX_ENABLED == True"""
+        return self.izx.enabled and self.ezx.enabled
+
     @property
     def connected(self):
         """We are connected only if both zabbix objects are connected"""
         return self.izx.connected and self.ezx.connected
+
+    def is_default_dc_connection_reused(self):
+        """Are we using the same zabbix connection for internal and external zabbix server?
+        We assume that the internal Zabbix server is always the same as in the default DC"""
+        return len(self._connections) == 1
 
     def reset_cache(self):
         """Clear cache for both zabbix objects"""
@@ -443,7 +456,6 @@ class Zabbix(AbstractMonitoringBackend):
 
     def _get_filtered_hostgroups(self, prefix):
         """This is a generator function"""
-
         for host_group in self.ezx.get_hostgroup_list():
             match = ZabbixHostGroupContainer.RE_NAME_WITH_DC_PREFIX.match(host_group['name'])
 
@@ -460,6 +472,21 @@ class Zabbix(AbstractMonitoringBackend):
     def hostgroup_list(self, prefix=''):
         """[EXTERNAL] Return list of available hostgroups"""
         return list(self._get_filtered_hostgroups(prefix=prefix))
+
+    def _get_filtered_alerts(self, vms=None, nodes=None, **kwargs):
+        """This is a generator function"""
+        if vms is None and nodes is None:
+            host_ids = None
+        else:
+            vm_host_ids = (ExternalZabbix.get_cached_hostid(vm) for vm in vms or ())
+            node_host_ids = (InternalZabbix.get_cached_hostid(node) for node in nodes or ())
+            host_ids = [hostid for hostid in vm_host_ids if hostid] + [hostid for hostid in node_host_ids if hostid]
+
+        return self.ezx.show_alerts(hostids=host_ids, **kwargs)
+
+    def alert_list(self, *args, **kwargs):
+        """[EXTERNAL] Return list of available alerts"""
+        return list(self._get_filtered_alerts(*args, **kwargs))
 
     def synchronize_user_group(self, group=None, dc_as_group=None):
         kwargs = {}

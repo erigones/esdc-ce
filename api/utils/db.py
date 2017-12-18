@@ -153,7 +153,7 @@ def get_virt_object(request, model, sr=('owner', 'dc_bound'), pr=(), order_by=('
                 if not user.is_staff:
                     request.dc_user_permissions = request.dc.get_user_permissions(user)
 
-                logger.debug('"%s %s" user="%s" _changed_ dc="%s" permissions=%s', request.method, request.path,
-                             user.username, request.dc.name, request.dc_user_permissions)
+                logger.info('"%s %s" user="%s" _changed_ dc="%s" permissions=%s', request.method, request.path,
+                            user.username, request.dc.name, request.dc_user_permissions)
 
         return obj

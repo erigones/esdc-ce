@@ -1,0 +1,10 @@
+{% load i18n %}{% load gui_utils %}
+<div class="row-fluid">
+  <div class="span12 tabbable black-box">
+    <ul class="nav nav-tabs vm_control vm_control_nohide">
+      <li><a href="{% url 'mon_alert_list' %}" data-toggle="tab" title="{% trans "Show alert list" %}"><i class="icon-bell"></i> {% trans "Alerts" %}</a></li>
+      <li><a href="{% url 'mon_action_list' %}" data-toggle="tab" title="{% trans "Show actions list" %}"><i class="icon-bar-chart"></i> {% trans "Actions" %}</a></li>
+      <li><a class="no-ajax" href="{% url 'mon_server_redirect' %}" data-toggle="tab" target="_blank" title="{% trans "Open Zabbix monitoring in a new window" %}"><i class="icon-external-link"></i> {% trans "Zabbix" %}</i></a></li>
+    </ul>
+  </div>
+</div>
