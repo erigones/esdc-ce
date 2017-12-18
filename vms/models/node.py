@@ -129,6 +129,14 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
     def platform_version(self):
         return self._sysinfo.get('Live Image', None)
 
+    def platform_version_short(self):
+        version = self.platform_version
+
+        if not version:
+            return 0
+
+        return int(version[:6])
+
     @property
     def dc_name(self):
         return self._sysinfo.get('Datacenter Name', '')
