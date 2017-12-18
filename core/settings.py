@@ -405,6 +405,7 @@ SYSTEM_USER = 7
 SYSTEM_USERNAME = '_system'
 
 API_SYNC_TIMEOUT = 3600
+API_LOCK_TIMEOUT = 300
 
 SHADOW_EMAIL = ''  # bcc for every outgoing email
 

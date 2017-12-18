@@ -1,16 +1,18 @@
 from logging import getLogger
+from django.http import Http404
 
 from api.api_views import APIView
 from api.task.response import to_string, mgmt_task_response, FailureTaskResponse
 from api.mon.alerting.serializers import AlertSerializer
 from api.mon.alerting.tasks import mon_alert_list
+from vms.models import DefaultDc
 from que import TG_DC_BOUND, TG_DC_UNBOUND
 
 logger = getLogger(__name__)
 
 
 class MonAlertView(APIView):
-    cache_timeout = 10
+    cache_timeout = 30
 
     def get(self):
         request = self.request
@@ -25,6 +27,14 @@ class MonAlertView(APIView):
             tg = TG_DC_BOUND
         else:
             tg = TG_DC_UNBOUND
+
+            if not request.dc.is_default():
+                request.dc = DefaultDc()  # Warning: Changing request.dc
+                logger.info('"%s %s" user="%s" _changed_ dc="%s" permissions=%s', request.method, request.path,
+                            request.user.username, request.dc.name, request.dc_user_permissions)
+
+                if not request.dc.settings.MON_ZABBIX_ENABLED:  # dc1_settings
+                    raise Http404
 
         _apiview_ = {
             'view': 'mon_alert_list',

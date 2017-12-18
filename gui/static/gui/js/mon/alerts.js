@@ -1,48 +1,76 @@
-/*
- * Universal Zabbix functions (used by mon_alert_list)
- */
-
 var MONITORING_ALERTS = null;
 
-function mon_Alerts(view_name, hostname) {
-  this.view_name = view_name;
-  // TODO: add ability to filter by hostname (and other filters, eg. date)
-  this.hostname = hostname;
+/*
+ * Monitoring alerts (used by mon_alert_list)
+ */
+function MonitoringAlerts(filter, csrf_token) {
+  var alert_table = $('#alert-list-table');
+  var initialized = false;
+  var nosort = [3];
 
-  var self = this;
+  if (filter.show_events) {
+    nosort.push(-1);
+  }
 
-  this.update = function(yyyymm, result) {
-    if (typeof(result) === 'undefined') {
-      // NO result, we dont have task yet!
-      // Create task and wait for callback with result.
-      if (SOCKET.socket.connected) {
-        show_loading_screen('Getting data from Zabbix', true);
-      } else {
-        $(".msg").html(
-          'Socket IO needs to be connected in order to get the alert list.<br />Please do not force refresh otherwise this page won\'t work, rather click on ALERTS in menu.'
-        );
+  this.is_displayed = function() {
+    return initialized && Boolean($(alert_table.selector).length);
+  };
+
+  this.init = function() {
+    // Initial call -> create task and wait for callback with result
+    initialized = true;
+    return mon_get_alerts(filter);
+  };
+
+  this.update = function(result, error) {
+    initialized = false;
+
+    if (result === null) {
+      // result is null when something has failed
+      if (error) {
+        alert_table.find('#alert-msg').addClass('alert alert-error');
+        alert_table.find('#alert-msg p').text(error);
       }
-      mon_get_alerts(view_name, hostname, yyyymm);
     } else {
-      // result contain actual alerts data, but we don't care!
-      // We render them via Django and call AJAX to load the table content.
-      ajax('GET', '/monitoring/retrieve-alerts/', ATIMEOUT, function(data, textStatus, jqXHR) {
-        if (jqXHR.status == 200) {
-          $("#alert-list-table").html(data);
-        } else {
-          $(".msg").html(list_table_html(textStatus));
-        }
-      });
-      hide_loading_screen();
+      // result contains actual alerts data, but we don't care
+      // We render them via Django and call AJAX to load the table contents
+      ajax('POST', alert_table.data('source'), ATIMEOUT, function(data) {
+        alert_table.html(data);
+        obj_list_sort_js(alert_table.find('table'), nosort, {'sort-tag': [0, 1], 'icon-tag': [4]});
+      }, {'alert_filter': JSON.stringify(filter), 'csrfmiddlewaretoken': csrf_token});
     }
   };
-} // mon_Alerts: Zabbix alerts!
+}  // MonitoringAlerts
 
-function alert_update(view_name, hostname, yyyymm, result) {
-  MONITORING_ALERTS.update(yyyymm, result);
+
+function alert_update(result, error) {
+  if (MONITORING_ALERTS && MONITORING_ALERTS.is_displayed()) {
+    hide_loading_screen();
+    MONITORING_ALERTS.update(result, error);
+  }
 }
 
-function alert_init(view_name, hostname, yyyymm) {
-  MONITORING_ALERTS = new mon_Alerts(view_name, hostname);
-  MONITORING_ALERTS.update(yyyymm);
+function alert_init(filter, csrf_token) {
+  MONITORING_ALERTS = new MonitoringAlerts(filter, csrf_token);
+
+  var i = 0;
+  var wait_for_socketio = null;
+
+  $(window).one('statechange', function() {
+    if (wait_for_socketio) {
+      clearInterval(wait_for_socketio);
+    }
+  });
+
+  show_loading_screen(gettext('Getting data from monitoring server...'));
+
+  wait_for_socketio = setInterval(function() {
+    i++;
+    if (SOCKET.socket.connected || i > 20) {
+      clearInterval(wait_for_socketio);
+      if (!MONITORING_ALERTS.init()) {
+        hide_loading_screen();
+      }
+    }
+  }, 500);
 }

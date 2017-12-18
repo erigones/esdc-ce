@@ -4,28 +4,31 @@
 
 {% block javascript %}
   <script type="text/javascript">
-    $(document).ready(function () {
-      alert_init('retrieve_alert_list');
+    $(document).ready(function() {
+      filter_links();
+      {% if alert_filter_ok %}
+      alert_init({{ alert_filter|json|safe }}, '{{ csrf_token }}');
+      {% endif %}
     });
   </script>
 {% endblock %}
 
 {% block base_content %}
-
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span12">
       <div class="tab-header">
+        {% if alert_filter.dc_bound %}
         <span class="options window-control pull-right">
           <i class="icon-cloud"></i> {{ request.dc.alias }}
         </span>
-        <i class="icon-tasks"></i> {% trans "Alert list" %}
+        {% endif %}
+        <i class="icon-bell"></i> {% trans "Alerts" %}
       </div>
-      <div id="alert-list-table">
+      <div id="alert-list-table" data-source="{% url 'alert_list_table' %}">
         {% include "gui/mon/alert_table.html" %}
       </div>
     </div>
   </div> <!-- end row-fluid -->
 </div> <!-- end container-fluid -->
-
 {% endblock %}

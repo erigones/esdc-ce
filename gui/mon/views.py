@@ -1,22 +1,22 @@
-from logging import getLogger
+import json
 
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 from django.shortcuts import redirect, render
-from gui.utils import collect_view_data, get_pager
 
+from gui.mon.forms import BaseAlertFilterForm
+from gui.utils import collect_view_data
 from gui.decorators import ajax_required, profile_required, admin_required
 from api.decorators import setting_required
 from api.utils.views import call_api_view
 from api.mon.alerting.views import mon_alert_list
-
-logger = getLogger(__name__)
 
 
 @login_required
 @admin_required
 @profile_required
 @setting_required('MON_ZABBIX_ENABLED')
-def monitoring_server(request):
+def mon_server_redirect(request):
     """
     Monitoring management.
     """
@@ -24,47 +24,53 @@ def monitoring_server(request):
 
 
 @login_required
+@admin_required
 @ajax_required
-@profile_required
-def get_alert_from_zabbix(request):
+@require_POST
+def alert_list_table(request):
     context = collect_view_data(request, 'mon_alert_list')
-    method = 'GET'
-    logger.info('Calling API view %s mon_alert_list(%s, data=%s) by user %s in DC %s',
-                method, request, None, request.user, request.dc)
-    res = call_api_view(request, method, mon_alert_list)
 
-    if res.status_code in (200, 201) and method == 'GET' and res.data['result'] is not None:
-        context['alerts'] = context['pager'] = get_pager(request, res.data['result'])
+    try:
+        api_data = json.loads(request.POST.get('alert_filter', None))
+    except (ValueError, TypeError):
+        context['error'] = 'Unexpected error: could not parse alert filter.'
+    else:
+        context['alert_filter'] = api_data
+        res = call_api_view(request, 'GET', mon_alert_list, data=api_data)
+
+        if res.status_code == 200:
+            context['alerts'] = res.data['result']
+        elif res.status_code == 201:
+            context['error'] = 'Unexpected error: got into an API loop.'
+        else:
+            context['error'] = res.data.get('result', {}).get('error', res.data)
 
     return render(request, 'gui/mon/alert_table.html', context)
 
 
 @login_required
+@admin_required
 @profile_required
+@setting_required('MON_ZABBIX_ENABLED')
 def alert_list(request):
     context = collect_view_data(request, 'mon_alert_list')
+    context['filters'] = form = BaseAlertFilterForm(request, request.GET.copy())
+    context['init'] = True
+
+    if form.is_valid() and form.api_data is not None:  # new visit, or form submission
+        context['alert_filter'] = form.api_data
+        context['alert_filter_ok'] = True
+    else:
+        context['alert_filter_ok'] = False  # Do not run javascript API TASKs!
+
     return render(request, 'gui/mon/alert_list.html', context)
 
 
 @login_required
+@admin_required
 @profile_required
-def actions_list(request):
-    context = collect_view_data(request, 'mon_actions_list')
+@setting_required('MON_ZABBIX_ENABLED')
+def action_list(request):
+    context = collect_view_data(request, 'mon_action_list')
 
-    return render(request, 'gui/mon/actions_list.html', context)
-
-
-@login_required
-@profile_required
-def add_action(request):
-    context = collect_view_data(request, 'add_action')
-
-    return render(request, 'gui/mon/add_action_modal.html', context)
-
-
-@login_required
-@profile_required
-def action_detail(request, action_id):
-    context = collect_view_data(request, 'action_detail')
-
-    return render(request, 'gui/mon/action_detail.html', context)
+    return render(request, 'gui/mon/action_list.html', context)

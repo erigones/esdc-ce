@@ -69,7 +69,7 @@ class MgmtTask(Task):
         tid = self.request.id
 
         if tidlock:
-            task_lock = TaskLock(tidlock, desc=task, logger=self.logger)
+            task_lock = TaskLock(tidlock, desc=task, reverse_key=tid, logger=self.logger)
         else:
             task_lock = NoLock()
 

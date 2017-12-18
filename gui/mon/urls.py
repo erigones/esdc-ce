@@ -3,11 +3,8 @@ from django.conf.urls import patterns, url
 urlpatterns = patterns(
     'gui.mon.views',
 
-    url(r'^$', 'alert_list', name='mon_alert_list'),
-    url(r'^retrieve-alerts/$', 'get_alert_from_zabbix', name='retrieve_alert_list'),
-    url(r'^redirect$', 'monitoring_server', name='monitoring_server_redirect'),
-    url(r'^actions/$', 'actions_list', name='mon_actions_list'),
-    url(r'^add-action/$', 'add_action', name='mon_action_add'),
-    url(r'^action-(?P<action_id>[0-9]+)/$', 'action_detail', name='mon_action_detail'),
-
+    url(r'^alerts/$', 'alert_list', name='mon_alert_list'),
+    url(r'^alert/list/$', 'alert_list_table', name='alert_list_table'),
+    url(r'^actions/$', 'action_list', name='mon_action_list'),
+    url(r'^zabbix/$', 'mon_server_redirect', name='mon_server_redirect'),
 )

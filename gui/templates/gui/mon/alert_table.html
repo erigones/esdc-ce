@@ -1,50 +1,76 @@
-{% load i18n tz gui_utils %}
-<table class="box table table-striped table-condensed table-responsive" id="tasklog-table">
+{% load i18n tz %}
+{% load gui_utils %}
+{% get_current_timezone as TZ %}
+{% with show_events=alert_filter.show_events dc_bound=alert_filter.dc_bound %}
+<table class="box table table-striped table-condensed table-responsive">
   <thead>
-  {% if alerts %}
-    <tr class="sortable" data-order_by="{{ order_by.0 }}">
+    {% if alerts %}
+    <tr class="datatable_head" data-order_by_default="[[0,&quot;desc&quot;]]">
       <th data-field="time">{% trans "Last change" %}</th>
       <th>{% trans "Severity" %}</th>
       <th>{% trans "Hostname" %}</th>
       <th>{% trans "Description" %}</th>
       <th>{% trans "Ack" %}</th>
-      <th>{% trans "Events" %}</th>
-      <th>{% trans "Comments" %}</th>
+      {% if show_events %}<th>{% trans "Events" %}</th>{% endif %}
     </tr>
-  {% endif %}
+    {% endif %}
   </thead>
 
-  <tbody id="tasklog" class="nowrap">
-  {% for alert in alerts %}
-    <tr class="{{ alert.eventid }}" data-task_id="{{ alert.objectid }}">
-      <td><i class="icon-time"></i> <span>{{ alert.last_change|dtparse|date:"H:i:s" }}<br>{{ alert.last_change|dtparse|date:"SHORT_DATE_FORMAT" }}</span></td>
-      <td><strong>{{ alert.prio|upper }}</strong><br> <small class="hidden-phone tiny"><i class="icon-time"></i> {{ alert.age }}</small></td>
-      <td><i class="icon-vm"></i> {{ alert.hostname }}</td>
-      <td>{{ alert.desc }}</td>
-      <td>{{ alert.ack }}</td>
-      <td class="log-detail wrap">{% if alert.events %}<pre>{% for event in alert.events %}
-{{ event.0 }}{% if event.1 %}{% for acks in event.1 %}
-    <small class="hidden-phone tiny"><i class="icon-time"></i> {{ acks }}</small>{% endfor %}{% endif %}{% endfor %}</pre>{% endif %}
-      </td>
-      <td class="log-detail wrap">{% if alert.comments %}<pre>{% for comment in alert.comments %}{{ comment }}
-{% endfor %}</pre>{% endif %}</td>
-    </tr>
-  {% empty %}
+  <tbody class="nowrap">
+    {% for alert in alerts %}
     <tr>
-      <td colspan="8"><p class="msg">{% trans "No alerts found." %}</p></td>
+      {% with last_change=alert.last_change|dttimestamp:TZ %}
+      <td>
+        <i class="icon-time"></i> <span data-sort="{{ alert.last_change }}">{{ last_change|date:"H:i:s" }}<br>{{ last_change|date:"SHORT_DATE_FORMAT" }}</span>
+      </td>
+      <td>
+        <span class="label label-alert severity{{ alert.priority }}" data-sort="{{ alert.priority }}">{{ alert.priority|mon_severity|title }}</span><br> <small class="hidden-phone tiny"><i class="icon-time"></i> {{ last_change|mon_get_age }}</small>
+      </td>
+      <td>
+        {% if dc_bound %}<i class="icon-vm"></i>&nbsp;{% endif %}{{ alert.hostname }}
+      </td>
+      <td>
+        {{ alert.desc }}{% if alert.comments %}&nbsp;<span title="{{ alert.comments }}" data-toggle="tooltip" data-placement="right"><i class="icon-info-sign"></i></span>{% endif %}{% if alert.url %}&nbsp;<a href="{{ alert.url }}" target="_blank" class="btn-icon-external-link btn-text btn-link no-ajax"></a>{% endif %}
+      </td>
+      <td>
+        <i class="icon-{{ alert.acknowledged|yesno:"ok,remove" }}"></i>
+      </td>
+      {% if show_events %}
+      <td class="log-detail wrap">
+        {% if alert.events %}{% for event in alert.events %}
+        <small class="hidden-phone tiny">
+          <i class="icon-time"></i> {{ event.clock|dttimestamp:TZ|date:"LONG_DATETIME_FORMAT"  }} - {{ event.status }} - {% trans "Ack" %}:
+          <span{% if event.acknowledges %} title="{% for ack in event.acknowledges %}{{ ack.user }}: {{ ack.message }}
+{% endfor %}" data-toggle="tooltip" data-placement="top"{% endif %}>
+            <i class="icon-{{ event.acknowledged|yesno:"ok,remove" }}"></i>
+          </span>
+        </small><br>
+        {% endfor %}{% endif %}
+      </td>
+      {% endif %}
+      {% endwith %}
     </tr>
-  {% endfor %}
+    {% empty %}
+    <tr>
+      <td colspan="{{ show_events|yesno:"7,6" }}">
+        {% if error %}
+        <div class="alert alert-error"><p class="msg">{{ error }}</p></div>
+        {% else %}
+        <div id="alert-msg"><p class="msg">{% if not init %}{% trans "No alerts found." %}{% endif %}</p></div>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
   </tbody>
 
   <tfoot>
-  {% if alerts %}
+    {% if not init %}
     <tr>
-      <td colspan="8">
-        <div class="paginator dataTables_paginate center">
-          {% if paginator %}{% paginator %}{% endif %}
-        </div>
+      <td colspan="{{ show_events|yesno:"7,6" }}">
+        <span class="pull-right">{% trans "Total" %}: {{ alerts|length }}&nbsp;</span>
       </td>
     </tr>
-  {% endif %}
+    {% endif %}
   </tfoot>
 </table>
+{% endwith %}

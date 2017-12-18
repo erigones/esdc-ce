@@ -36,7 +36,8 @@ def _user_group_changed(group_name, dc_name):  # noqa: R701
         try:
             dc = Dc.objects.get_by_name(dc_name)
         except Dc.DoesNotExist:
-            raise NotImplementedError('TODO DC deletion hook is not implemented')
+            # TODO: to be implemented
+            logger.warning('DC deletion hook is not implemented -> manual cleanup in Zabbix is required')
             # When DC is deleted, we lose the access to the zabbix and therefore we don't know what to do
             # We have to provide information about zabbix connection so that we can delete related information in zabbix
         else:
@@ -55,10 +56,11 @@ def _user_group_changed(group_name, dc_name):  # noqa: R701
                 zabbix = get_monitoring(dc)
                 try:
                     zabbix.delete_user_group(name=group_name)
-                except (ZabbixAPIException, MonitoringError):
+                except (ZabbixAPIException, MonitoringError) as exc:
+                    logger.exception(exc)
                     # we will let it try again in a separate task and not crash this one
-                    logger.exception("Creating a separate task for dc %s and group %s because it crashed.",
-                                     dc.name, group_name)
+                    logger.error('Creating a separate task for dc %s and group %s because it crashed.',
+                                 dc.name, group_name)
                     mon_user_group_changed.call(sender='parent mon_user_group_changed',
                                                 group_name=group_name,
                                                 dc_name=dc.name)
@@ -72,10 +74,11 @@ def _user_group_changed(group_name, dc_name):  # noqa: R701
                 zabbix = get_monitoring(dc)
                 try:
                     zabbix.synchronize_user_group(group=group)
-                except (ZabbixAPIException, MonitoringError):
+                except (ZabbixAPIException, MonitoringError) as exc:
+                    logger.exception(exc)
                     # we will let it try again in a separate task and not crash this one
-                    logger.exception("Creating a separate task for dc %s and group %s because it crashed.",
-                                     dc.name, group_name)
+                    logger.error('Creating a separate task for dc %s and group %s because it crashed.',
+                                 dc.name, group_name)
                     mon_user_group_changed.call(sender='parent mon_user_group_changed',
                                                 group_name=group_name,
                                                 dc_name=dc.name)
@@ -85,10 +88,11 @@ def _user_group_changed(group_name, dc_name):  # noqa: R701
                 zabbix = get_monitoring(dc)
                 try:
                     zabbix.delete_user_group(name=group_name)
-                except (ZabbixAPIException, MonitoringError):
+                except (ZabbixAPIException, MonitoringError) as exc:
+                    logger.exception(exc)
                     # we will let it try again in a separate task and not crash this one
-                    logger.exception("Creating a separate task for dc %s and group %s because it crashed.",
-                                     dc.name, group_name)
+                    logger.error('Creating a separate task for dc %s and group %s because it crashed.',
+                                 dc.name, group_name)
                     mon_user_group_changed.call(sender='parent mon_user_group_changed',
                                                 group_name=group_name,
                                                 dc_name=dc.name)
@@ -104,12 +108,13 @@ def _user_group_changed(group_name, dc_name):  # noqa: R701
          default_retry_delay=5,  # it's shorter so that we don't lose context
          bind=True)
 def mon_user_group_changed(self, task_id, sender, group_name=None, dc_name=None, *args, **kwargs):
-    logger.info("mon_user_group_changed task has started with dc_name %s, and group_name %s",
+    logger.info('mon_user_group_changed task has started with dc_name %s, and group_name %s',
                 dc_name, group_name)
     try:
         _user_group_changed(group_name, dc_name)
     except (ZabbixAPIException, MonitoringError) as exc:
-        logger.exception("mon_user_group_changed task crashed, it's going to be retried")
+        logger.exception(exc)
+        logger.error('mon_user_group_changed task crashed, it\'s going to be retried')
         self.retry(exc=exc)
 
 
@@ -130,10 +135,11 @@ def _user_changed(user_name, dc_name, affected_groups):
                 zabbix = get_monitoring(dc)
                 try:
                     zabbix.delete_user(name=user_name)
-                except (ZabbixAPIException, MonitoringError):
+                except (ZabbixAPIException, MonitoringError) as exc:
+                    logger.exception(exc)
                     # we will let it try again in a separate task and not crash this one
-                    logger.exception("Creating a separate task for dc %s and user %s because it crashed.",
-                                     dc.name, user_name)
+                    logger.error('Creating a separate task for dc %s and user %s because it crashed.',
+                                 dc.name, user_name)
                     mon_user_changed.call(sender='parent mon_user_changed',
                                           user_name=user_name,
                                           dc_name=dc.name)
@@ -145,10 +151,11 @@ def _user_changed(user_name, dc_name, affected_groups):
                 zabbix = get_monitoring(dc)
                 try:
                     zabbix.delete_user(name=user_name)
-                except (ZabbixAPIException, MonitoringError):
+                except (ZabbixAPIException, MonitoringError) as exc:
+                    logger.exception(exc)
                     # we will let it try again in a separate task and not crash this one
-                    logger.exception("Creating a separate task for dc %s and user %s because it crashed.",
-                                     dc.name, user_name)
+                    logger.error('Creating a separate task for dc %s and user %s because it crashed.',
+                                 dc.name, user_name)
                     mon_user_changed.call(sender='parent mon_user_changed',
                                           user_name=user_name,
                                           dc_name=dc.name)
@@ -166,10 +173,11 @@ def _user_changed(user_name, dc_name, affected_groups):
                 zabbix = get_monitoring(dc)
                 try:
                     zabbix.synchronize_user(user=user)
-                except (ZabbixAPIException, MonitoringError):
+                except (ZabbixAPIException, MonitoringError) as exc:
+                    logger.exception(exc)
                     # we will let it try again in a separate task and not crash this one
-                    logger.exception("Creating a separate task for dc %s and user %s because it crashed.",
-                                     dc.name, user_name)
+                    logger.error('Creating a separate task for dc %s and user %s because it crashed.',
+                                 dc.name, user_name)
                     mon_user_changed.call(sender='parent mon_user_changed', user_name=user_name, dc_name=dc.name)
 
         else:
@@ -180,10 +188,11 @@ def _user_changed(user_name, dc_name, affected_groups):
                 zabbix = get_monitoring(dc)
                 try:
                     zabbix.synchronize_user(user=user)
-                except (ZabbixAPIException, MonitoringError):
+                except (ZabbixAPIException, MonitoringError) as exc:
+                    logger.exception(exc)
                     # we will let it try again in a separate task and not crash this one
-                    logger.exception("Creating a separate task for dc %s and user %s because it crashed.",
-                                     dc.name, user_name)
+                    logger.error('Creating a separate task for dc %s and user %s because it crashed.',
+                                 dc.name, user_name)
                     mon_user_changed.call(sender='parent mon_user_changed', user_name=user_name, dc_name=dc.name)
 
 
@@ -199,12 +208,13 @@ def mon_user_changed(self, task_id, sender, user_name, dc_name=None, affected_gr
     We have to get all groups to which the user belongs to, get their respective zabbix apis
     and remove the complement(difference) of the sets of all relevant mgmt groups and the zabbix user groups
     """
-    logger.info("mon_user_changed task has started with dc_name %s, user_name %s and affected_groups %s",
+    logger.info('mon_user_changed task has started with dc_name %s, user_name %s and affected_groups %s',
                 dc_name, user_name, affected_groups)
     try:
         _user_changed(user_name, dc_name, affected_groups)
     except (ZabbixAPIException, MonitoringError) as exc:
-        logger.exception("mon_user_changed task crashed, it's going to be retried")
+        logger.exception(exc)
+        logger.error('mon_user_changed task crashed, it\'s going to be retried')
         self.retry(exc=exc)
 
 
@@ -242,7 +252,8 @@ def mon_alert_list(task_id, dc_id, dc_bound=True, node_uuids=None, vm_uuids=None
         if vm_uuids is not None:
             vms_qs = vms_qs.filter(uuid__in=vm_uuids)
 
-        mon_vms_nodes_map = {get_monitoring(dc): (vms_qs, nodes_qs)}
+        mon = get_monitoring(dc)
+        mon_vms_nodes_map = {mon.ezx.connection_id: (mon, vms_qs, nodes_qs)}
 
     else:
         assert dc.is_default()
@@ -262,20 +273,24 @@ def mon_alert_list(task_id, dc_id, dc_bound=True, node_uuids=None, vm_uuids=None
         else:
             raise AssertionError('Unexpected condition in mon_alert_list')
 
-        mon_vms_nodes_map = {get_monitoring(dc): ([], nodes_qs)}
+        mon_default_dc = get_monitoring(dc)
+        mon_vms_nodes_map = {mon_default_dc.ezx.connection_id: (mon_default_dc, [], nodes_qs)}
 
         for vm in vms_qs:
             mon = get_monitoring(vm.dc)
 
             if mon.enabled:
-                if mon not in mon_vms_nodes_map:
-                    mon_vms_nodes_map[mon] = ([], empty)
+                connection_id = mon.ezx.connection_id
 
-                mon_vms_nodes_map[mon][0].append(vm)
+                if connection_id not in mon_vms_nodes_map:
+                    mon_vms_nodes_map[connection_id] = (mon, [], empty)
 
-    for mon, vms_nodes in mon_vms_nodes_map.items():
+                mon_vms_nodes_map[connection_id][1].append(vm)
+
+    for mon, vms, nodes in mon_vms_nodes_map.values():
+        logger.info('Fetching monitoring alerts from Zabbix server: %s', mon.ezx.server)
         try:
-            alerts.extend(mon.alert_list(vms=vms_nodes[0], nodes=vms_nodes[1], since=since, until=until, last=last,
+            alerts.extend(mon.alert_list(vms=vms, nodes=nodes, since=since, until=until, last=last,
                                          show_events=show_events))
         except MonitoringError as exc:
             raise MgmtTaskException(text_type(exc))

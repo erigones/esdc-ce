@@ -13,6 +13,7 @@ import pytz
 import ipaddress
 import markdown
 
+from api.mon.backends.zabbix.base import ZabbixMediaContainer
 from api.utils.encoders import JSONEncoder
 from pdns.models import Record
 
@@ -56,6 +57,36 @@ def keyvalue_zero(dictionary, key):
 @register.filter
 def dtparse(s):
     return parse_datetime(s)
+
+
+@register.filter
+def dttimestamp(utc_timestamp, local_tz_name='UTC'):
+    dt_utc = datetime.utcfromtimestamp(utc_timestamp).replace(tzinfo=pytz.utc)
+
+    try:
+        tz = pytz.timezone(local_tz_name)
+    except pytz.UnknownTimeZoneError:
+        return dt_utc
+
+    return tz.normalize(dt_utc)
+
+
+@register.filter
+def mon_get_age(dt):
+    delta = datetime.utcnow().replace(tzinfo=pytz.utc) - dt
+    days = delta.days
+    hours, rem = divmod(delta.seconds, 3600)
+    minutes, seconds = divmod(rem, 60)
+
+    if days:
+        return '%dd %dh %dm' % (days, hours, minutes)
+    else:
+        return '%dh %dm %ds' % (hours, minutes, seconds)
+
+
+@register.filter
+def mon_severity(s):
+    return ZabbixMediaContainer.get_severity(s)
 
 
 @register.filter
