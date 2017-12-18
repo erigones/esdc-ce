@@ -33,6 +33,8 @@ resources on target compute node in server's datacenter.
         :type data.root_zpool: string
         :arg data.disk_zpools: New zpools for VM's disks (``{disk_id: zpool}``)
         :type data.disk_zpools: object
+        :arg data.live: Whether to perform live migration [KVM only, EXPERIMENTAL] (default: false)
+        :type data.live: boolean
         :status 200: SUCCESS
         :status 201: PENDING
         :status 400: FAILURE

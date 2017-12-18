@@ -8,5 +8,4 @@ urlpatterns = patterns(
     url(r'^alert/', include('api.mon.alerting.urls')),
     url(r'^action/', include('api.mon.alerting.action.urls')),
     url(r'^', include('api.mon.base.urls')),
-
 )

@@ -29,6 +29,9 @@ class MonInternalTask(InternalTask):
         if not settings.MON_ZABBIX_ENABLED:
             return None
 
+        # Remove unused/useless parameters
+        kwargs.pop('old_json_active', None)
+
         return super(MonInternalTask, self).call(*args, **kwargs)
 
 

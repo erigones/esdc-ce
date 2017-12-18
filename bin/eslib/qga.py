@@ -1,8 +1,8 @@
-import json
 import socket
 import random
 
 from . import PY3
+from .qmp import QMPError, QMP
 
 COMMANDS = (
     'fsfreeze',
@@ -21,74 +21,8 @@ else:
     x_range = xrange
 
 
-class QMPError(Exception):
-    pass
-
-
 class QGAError(Exception):
     pass
-
-
-class QMP(object):
-    """
-    QEMU Machine Protocol.
-    """
-    _socket = None
-    _socket_file = None
-    TIMEOUT = 30
-
-    def __init__(self, address):
-        self._socket_address = address
-
-    def _json_cmd(self, request, timeout=TIMEOUT):
-        try:
-            req = json.dumps(request)
-        except Exception:
-            raise QMPError('Failed to create JSON payload: %s' % request)
-
-        self._socket.settimeout(timeout)
-        self._socket.sendall(req)
-        res = self._socket_file.readline().strip()
-
-        if not res:
-            return None
-
-        try:
-            response = json.loads(res)
-        except Exception:
-            raise QMPError('Failed to parse JSON message: %s' % res)
-
-        if response:
-            if 'error' in response:
-                raise QMPError(response['error'].get('desc', response['error']))
-
-            return response['return']
-        else:
-            return None
-
-    def connect(self, timeout=TIMEOUT):
-        if isinstance(self._socket_address, tuple):
-            family = socket.AF_INET
-        else:
-            family = socket.AF_UNIX
-
-        # noinspection PyArgumentEqualDefault
-        self._socket = socket.socket(family=family, type=socket.SOCK_STREAM)
-        self._socket.settimeout(timeout)
-        self._socket.connect(self._socket_address)
-        self._socket_file = self._socket.makefile()
-
-    def close(self):
-        self._socket_file.close()
-        self._socket.close()
-
-    def execute(self, cmd, arguments=None, **kwargs):
-        execmd = {'execute': cmd}
-
-        if arguments is not None:
-            execmd['arguments'] = arguments
-
-        return self._json_cmd(execmd, **kwargs)
 
 
 class QGAClient(object):

@@ -108,6 +108,9 @@ class AbstractMonitoringBackend(object):
     def alert_list(self, prefix=False):
         raise NotImplementedError
 
+    def alert_list(self, prefix=False):
+        raise NotImplementedError
+
     def synchronize_user_group(self, group=None, dc_as_group=None):
         raise NotImplementedError
 

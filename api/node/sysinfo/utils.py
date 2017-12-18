@@ -2,13 +2,20 @@ import re
 import json
 
 from django.utils.datastructures import OrderedDict
-from django.utils.six import PY3
+from django.utils.six import PY3, iteritems
+from celery.utils.log import get_task_logger
 
 
 if PY3:
     t_long = int
 else:
     t_long = long
+
+RE_OVERLAY_PORT = re.compile(r'vxlan/listen_port=([0-9]{1,5})')
+RE_OVERLAY_IP = re.compile(r'vxlan/listen_ip=(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})')
+RE_OVERLAY_ARP_FILE = re.compile(r'files/config=([^\s]*)')
+
+logger = get_task_logger(__name__)
 
 
 def __get_indentation(line):
@@ -69,6 +76,37 @@ def _parse_imgadm_sources(imgadm_sources):
         return imgadm_sources
 
 
+def _parse_overlay_rule(definition):
+    port = RE_OVERLAY_PORT.findall(definition)
+    if not port or len(port) > 1:
+        port = None
+    else:
+        port = int(port[0])
+
+    ip = RE_OVERLAY_IP.findall(definition)
+    if not ip or len(ip) > 1:
+        ip = None
+    else:
+        ip = ip[0]
+
+    arp_file = RE_OVERLAY_ARP_FILE.findall(definition)
+    if not arp_file or len(arp_file) > 1:
+        arp_file = None
+    else:
+        arp_file = arp_file[0]
+
+    return {'ip': ip, 'port': port, 'arp_file': arp_file}
+
+
+def _parse_overlay_rules(overlay_rules):
+    result = {}
+
+    for name, definition in iteritems(overlay_rules):
+        result[name] = _parse_overlay_rule(definition)
+
+    return result
+
+
 def parse_esysinfo(stdout):
     """Return dict of parsed esysinfo elements {sysinfo, diskinfo, zpools, config}"""
     x = stdout.split('||||')
@@ -80,11 +118,12 @@ def parse_esysinfo(stdout):
     config = x[6].strip()
     sshkey = x[7].strip()
     nictags = []
+    overlay_rules = {}
 
-    # noinspection PyBroadException
     try:
         img_initial = json.loads(x[8].strip())
-    except Exception:
+    except ValueError as exc:
+        logger.exception(exc)
         img_initial = None
 
     for i in x[2].strip().splitlines():
@@ -111,6 +150,16 @@ def parse_esysinfo(stdout):
             name, mac, link, typ = map(lambda c: None if c == '-' else c, map(str.strip, str(i).split('|')))
             nictags.append({'name': name, 'mac': mac, 'link': link, 'type': typ})
 
+    if num_items >= 11:
+        overlay_rules_raw = x[10].strip()
+        if overlay_rules_raw:
+            try:
+                rules = json.loads(overlay_rules_raw)
+            except ValueError as exc:
+                logger.exception(exc)
+            else:
+                overlay_rules = _parse_overlay_rules(rules)
+
     return {
         'sysinfo': sysinfo,
         'diskinfo': diskinfo,
@@ -120,4 +169,5 @@ def parse_esysinfo(stdout):
         'img_sources': img_sources,
         'img_initial': img_initial,
         'nictags': nictags,
+        'overlay_rules': overlay_rules,
     }

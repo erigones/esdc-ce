@@ -10,7 +10,7 @@ from api.node.snapshot.api_views import NodeVmSnapshotList
 from api.vm.status.tasks import vm_status_all
 from api.dns.record.api_views import RecordView
 from vms.models import Node, DefaultDc
-from vms.signals import node_created, node_json_changed
+from vms.signals import node_created, node_json_changed, node_json_unchanged
 from que.tasks import cq, get_task_logger
 from que.mgmt import MgmtCallbackTask
 from que.exceptions import TaskException
@@ -107,18 +107,18 @@ def node_sysinfo_cb(result, task_id, node_uuid=None):
 
     else:
         sshkey_changed = node.sshkey_changed(esysinfo)
+        sysinfo_changed = node.sysinfo_changed(esysinfo)
 
-        if node.sysinfo_changed(esysinfo) or sshkey_changed:
+        if sysinfo_changed or sshkey_changed:
             logger.warn('Updating node %s json with sysinfo output from %s', node, node_uuid)
             node.update_from_sysinfo(esysinfo)  # Will save public SSH key too
             node_json_changed.send(task_id, node=node)  # Signal!
             result['message'] = 'Successfully updated compute node %s' % node.hostname
-            task_log_success(task_id, msg=LOG_NODE_UPDATE, obj=node, task_result=result,
-                             update_user_tasks=True)
         else:
+            node_json_unchanged.send(task_id, node=node)  # Signal!
             result['message'] = 'No changes detected on compute node %s' % node.hostname
-            task_log_success(task_id, msg=LOG_NODE_UPDATE, obj=node, task_result=result,
-                             update_user_tasks=True)
+
+        task_log_success(task_id, msg=LOG_NODE_UPDATE, obj=node, task_result=result, update_user_tasks=True)
 
     if sshkey_changed:
         logger.warn('SSH key has changed on node %s - creating authorized_keys synchronization tasks', node)
