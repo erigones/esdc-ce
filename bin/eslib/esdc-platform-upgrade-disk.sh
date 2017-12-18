@@ -196,9 +196,10 @@ if [[ ${KEEP_SMF_DB} -ne 1 ]]; then
 fi
 
 if [[ -f "${DCOS_MNTDIR}/etc/issue" ]]; then
+	set +e
 	printmsg "Update version in /etc/issue"
-	${SED} -e "s/${OLD_PLATFORM_VER}/${PLATFORM_VER}/g" "${DCOS_MNTDIR}/etc/issue" > "${DCOS_MNTDIR}/etc/issue.new"
-	mv -f "${DCOS_MNTDIR}/etc/issue.new" "${DCOS_MNTDIR}/etc/issue"
+	${SED} -i '' -e "s/${OLD_PLATFORM_VER}/${PLATFORM_VER}/g" "${DCOS_MNTDIR}/etc/issue"
+	set -e
 fi
 
 printmsg "Activating the new boot environment at next reboot"
