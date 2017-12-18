@@ -1108,18 +1108,18 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
         return self.disk_image.split('-')[0]
 
     @staticmethod
-    def _get_nics(json):
+    def get_nics(json):
         """Return list of nice nics."""
         nics = json.get('nics', [])
         return nics
 
     def json_get_nics(self):
         """Get nics from json."""
-        return self._get_nics(self.json)
+        return self.get_nics(self.json)
 
     def json_active_get_nics(self):
         """Get nics from json_active."""
-        return self._get_nics(self.json_active)
+        return self.get_nics(self.json_active)
 
     @staticmethod
     def _get_ips(nics, primary_ips=True, allowed_ips=True):

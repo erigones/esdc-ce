@@ -25,10 +25,12 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
     """
     Node (host) object.
     """
-    _esysinfo = ('sysinfo', 'diskinfo', 'zpools', 'nictags')
+    _esysinfo = ('sysinfo', 'diskinfo', 'zpools', 'nictags', 'overlay_rules')
     _vlan_id = None
 
     ZPOOL = 'zones'
+    DEFAULT_OVERLAY_PORT = 4789
+    DEFAULT_OVERLAY_IP = '0.0.0.0'
     # Used in NodeStorage.size_vms
     VMS_SIZE_TOTAL_KEY = 'vms-size-total:%s'  # %s = zpool.id (NodeStorage)
     VMS_SIZE_DC_KEY = 'vms-size-dc:%s:%s'  # %s = dc.id:zpool.id (NodeStorage)
@@ -175,13 +177,25 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
         return self._sysinfo.get('Link Aggregations', {})
 
     @property
+    def overlays(self):
+        """Return overlays (dladm show-overlay)"""
+        return self._sysinfo.get('Overlays', {})
+
+    @property
+    def etherstubs(self):
+        """Return etherstubs (dladm show-etherstub)"""
+        return self._sysinfo.get('Etherstubs', {})
+
+    @property
     def networking(self):
         """Complete network information"""
         return {
             'Network Interfaces': self.network_interfaces,
             'Virtual Network Interfaces': self.virtual_network_interfaces,
             'Link Aggregations': self.network_aggregations,
-            'NIC Tags': self.nictags
+            'NIC Tags': self.nictags,
+            'Overlays': self.overlays,
+            'Etherstubs': self.etherstubs,
         }
 
     @property
@@ -327,6 +341,10 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
         return self.json.get('nictags', [])
 
     @property
+    def overlay_rules(self):
+        return self.json.get('overlay_rules', {})
+
+    @property
     def lifetime(self):
         return int(timezone.now().strftime('%s')) - int(self.created.strftime('%s'))
 
@@ -438,6 +456,67 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
     def all_nictags_choices(cls):
         """Return set of tuples that are used as choices in nictag field in NetworkSerializer"""
         return sorted([(name, '%s (%s)' % (name, typ)) for name, typ in six.iteritems(cls.all_nictags())])
+
+    def get_node_ip_by_iface(self, iface, node_nics=None):
+        """Return node IP address according to node interface name"""
+        if node_nics is None:
+            node_nics = self.used_nics
+
+        if iface in node_nics:
+            return node_nics[iface]['ip4addr']
+
+        return None
+
+    def get_node_ip_by_nictag(self, nictag, node_nics=None):
+        """Return node IP address according to NIC name (nictag)"""
+        if node_nics is None:
+            node_nics = self.used_nics
+
+        for nic in six.itervalues(node_nics):
+            if nictag in nic.get('NIC Names', ()):
+                return nic['ip4addr']
+
+        return None
+
+    @property
+    def address_admin(self):
+        """Return internal (admin) IP address"""
+        used_nics = self.used_nics
+
+        return (self.get_node_ip_by_iface('admin0', node_nics=used_nics) or
+                self.get_node_ip_by_nictag('admin', node_nics=used_nics))
+
+    @property
+    def address_external(self):
+        """Return external IP address"""
+        used_nics = self.used_nics
+
+        return (self.get_node_ip_by_iface('external0', node_nics=used_nics) or
+                self.get_node_ip_by_nictag('external', node_nics=used_nics) or
+                self.get_node_ip_by_iface('admin0', node_nics=used_nics) or
+                self.get_node_ip_by_nictag('admin', node_nics=used_nics))
+
+    def get_overlay_port(self, overlay_name):
+        """Return port associated with overlay"""
+        overlay_rule = self.overlay_rules[overlay_name]
+
+        return overlay_rule['port'] or self.DEFAULT_OVERLAY_PORT
+
+    def get_overlay_ip(self, overlay_name, remote=True):
+        """Return IP address associated with overlay"""
+        overlay_rule = self.overlay_rules[overlay_name]
+        overlay_ip = overlay_rule['ip']
+
+        # the 0.0.0.0 is a special case and requires to select a node IP from all available IPs on compute node
+        if not overlay_ip or overlay_ip == self.DEFAULT_OVERLAY_IP:
+            if remote:
+                overlay_ip = self.address_external
+            else:
+                overlay_ip = self.address_admin
+
+        assert overlay_ip, 'IP address was not defined for overlay "%s" on compute node "%s"' % (overlay_name, self)
+
+        return overlay_ip
 
     @property
     def _initializing_key(self):
