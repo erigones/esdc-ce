@@ -1,0 +1,76 @@
+{% load i18n tz %}
+{% load gui_utils %}
+{% get_current_timezone as TZ %}
+{% with show_events=alert_filter.show_events dc_bound=alert_filter.dc_bound %}
+<table class="box table table-striped table-condensed table-responsive">
+  <thead>
+    {% if alerts %}
+    <tr class="datatable_head" data-order_by_default="[[0,&quot;desc&quot;]]">
+      <th data-field="time">{% trans "Last change" %}</th>
+      <th>{% trans "Severity" %}</th>
+      <th>{% trans "Hostname" %}</th>
+      <th>{% trans "Description" %}</th>
+      <th>{% trans "Ack" %}</th>
+      {% if show_events %}<th>{% trans "Events" %}</th>{% endif %}
+    </tr>
+    {% endif %}
+  </thead>
+
+  <tbody class="nowrap">
+    {% for alert in alerts %}
+    <tr>
+      {% with last_change=alert.last_change|dttimestamp:TZ %}
+      <td>
+        <i class="icon-time"></i> <span data-sort="{{ alert.last_change }}">{{ last_change|date:"H:i:s" }}<br>{{ last_change|date:"SHORT_DATE_FORMAT" }}</span>
+      </td>
+      <td>
+        <span class="label label-alert severity{{ alert.priority }}" data-sort="{{ alert.priority }}">{{ alert.priority|mon_severity|title }}</span><br> <small class="hidden-phone tiny"><i class="icon-time"></i> {{ last_change|mon_get_age }}</small>
+      </td>
+      <td>
+        {% if dc_bound %}<i class="icon-vm"></i>&nbsp;{% endif %}{{ alert.hostname }}
+      </td>
+      <td>
+        {{ alert.desc }}{% if alert.comments %}&nbsp;<span title="{{ alert.comments }}" data-toggle="tooltip" data-placement="right"><i class="icon-info-sign"></i></span>{% endif %}{% if alert.url %}&nbsp;<a href="{{ alert.url }}" target="_blank" class="btn-icon-external-link btn-text btn-link no-ajax"></a>{% endif %}
+      </td>
+      <td>
+        <i class="icon-{{ alert.acknowledged|yesno:"ok,remove" }}"></i>
+      </td>
+      {% if show_events %}
+      <td class="log-detail wrap">
+        {% if alert.events %}{% for event in alert.events %}
+        <small class="hidden-phone tiny">
+          <i class="icon-time"></i> {{ event.clock|dttimestamp:TZ|date:"LONG_DATETIME_FORMAT"  }} - {{ event.status }} - {% trans "Ack" %}:
+          <span{% if event.acknowledges %} title="{% for ack in event.acknowledges %}{{ ack.user }}: {{ ack.message }}
+{% endfor %}" data-toggle="tooltip" data-placement="top"{% endif %}>
+            <i class="icon-{{ event.acknowledged|yesno:"ok,remove" }}"></i>
+          </span>
+        </small><br>
+        {% endfor %}{% endif %}
+      </td>
+      {% endif %}
+      {% endwith %}
+    </tr>
+    {% empty %}
+    <tr>
+      <td colspan="{{ show_events|yesno:"7,6" }}">
+        {% if error %}
+        <div class="alert alert-error"><p class="msg">{{ error }}</p></div>
+        {% else %}
+        <div id="alert-msg"><p class="msg">{% if not init %}{% trans "No alerts found." %}{% endif %}</p></div>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+
+  <tfoot>
+    {% if not init %}
+    <tr>
+      <td colspan="{{ show_events|yesno:"7,6" }}">
+        <span class="pull-right">{% trans "Total" %}: {{ alerts|length }}&nbsp;</span>
+      </td>
+    </tr>
+    {% endif %}
+  </tfoot>
+</table>
+{% endwith %}

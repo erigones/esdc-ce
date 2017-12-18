@@ -1,6 +1,6 @@
 from gui.signals import dc_relationship_changed, group_relationship_changed, user_relationship_changed
-from vms.signals import (vm_defined, vm_undefined, vm_updated, node_status_changed, node_online, node_offline,
-                         node_unlicensed, node_unreachable, node_deleted, dc_settings_changed)
+from vms.signals import (vm_defined, vm_undefined, vm_updated, vm_define_reverted, node_status_changed, node_online,
+                         node_offline, node_unlicensed, node_unreachable, node_deleted, dc_settings_changed)
 from api.node.sshkey.tasks import node_authorized_keys_sync
 from api.node.handlers import dc_node_settings_changed_handler
 from api.node.sysinfo.handlers import node_startup
@@ -21,6 +21,7 @@ def noop(*args, **kwargs):
 vm_defined.connect(noop)
 vm_undefined.connect(mon_vm_delete.call)
 vm_updated.connect(mon_vm_sync.call)
+vm_define_reverted.connect(mon_vm_sync.call)
 node_status_changed.connect(mon_node_status_sync.call)
 node_status_changed.connect(node_status_changed_event)
 node_online.connect(node_authorized_keys_sync.call)
@@ -37,4 +38,7 @@ dc_relationship_changed.connect(mon_user_group_changed.call)
 group_relationship_changed.connect(mon_user_group_changed.call)
 user_relationship_changed.connect(mon_user_changed.call)
 
-# Note: Other signals are connected in api.mon.vm.tasks and api.mon.node.tasks
+# NOTE: Other signals are connected in:
+# - api.node.network.tasks
+# - api.mon.vm.tasks
+# - api.mon.node.tasks

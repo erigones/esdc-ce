@@ -40,6 +40,8 @@
     service: name=zabbix-server state=restarted
   - name: restart zabbix-agent
     service: name=zabbix-agent state=restarted
+  - name: reload httpd
+    service: name=httpd state=reloaded
   # can't use service module because SmartOS svcadm doesn't have "-s" switch
   - name: restart pdns
     shell: /usr/sbin/svcadm disable -s svc:/pkgsrc/pdns:default && /usr/sbin/svcadm enable -s svc:/pkgsrc/pdns:default

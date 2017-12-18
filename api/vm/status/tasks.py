@@ -446,6 +446,8 @@ def vm_status_cb(result, task_id, vm_uuid=None):
     if result['returncode'] == 0 and msg and msg.find('Successfully') == 0:
         # json was updated
         if result['meta']['apiview']['update'] and msg.find('Successfully updated') != -1:
+            old_json_active = vm.json_active
+
             try:  # save json from smartos
                 json_active = vm.json.load(json)
                 vm_delete_snapshots_of_removed_disks(vm)  # Do this before updating json and json_active
@@ -459,7 +461,7 @@ def vm_status_cb(result, task_id, vm_uuid=None):
                     vm.save(update_node_resources=True, update_storage_resources=True,
                             update_fields=('enc_json', 'enc_json_active', 'changed'))
                     vm_update_ipaddress_usage(vm)
-                    vm_json_active_changed.send(task_id, vm=vm)  # Signal!
+                    vm_json_active_changed.send(task_id, vm=vm, old_json_active=old_json_active)  # Signal!
 
         change_time = _get_task_time(result, 'exec_time')
 

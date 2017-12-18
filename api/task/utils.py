@@ -10,11 +10,11 @@ from django.utils.six import string_types
 from gevent import sleep
 
 from que import TT_ERROR
-from que.tasks import cq
+from que.tasks import cq, get_task_logger
 from que.lock import TaskLock
 from que.utils import (is_dummy_task, task_prefix_from_task_id, task_id_from_request, dc_id_from_task_id,
                        follow_callback, get_result, cancel_task as _cancel_task, delete_task as _delete_task)
-from que.exceptions import TaskException
+from que.exceptions import TaskException, MgmtTaskException
 from que.user_tasks import UserTasks
 from api import status
 from api.exceptions import OPERATIONAL_ERRORS
@@ -28,6 +28,7 @@ from vms.models.base import _UserTasksModel
 from gui.models import User
 
 logger = getLogger(__name__)
+task_logger = get_task_logger(__name__)
 
 TASK_STATE = {
     states.PENDING: status.HTTP_201_CREATED,
@@ -225,30 +226,30 @@ def callback(log_exception=True, update_user_tasks=True, check_parent_status=Tru
             # + skipping checking of parent task status when task is being retried
             if check_parent_status and not task_obj.request.retries:
                 cb_name = fun.__name__
-                logger.debug('Waiting for parent task %s status, before running %s', task_id, cb_name)
+                task_logger.debug('Waiting for parent task %s status, before running %s', task_id, cb_name)
                 timer = 0
 
                 while timer < TASK_PARENT_STATUS_MAXWAIT:
                     ar = cq.AsyncResult(task_id)
                     if ar.ready():
-                        logger.info('Parent task %s has finished with status=%s. Running %s',
-                                    task_id, ar.status, cb_name)
+                        task_logger.info('Parent task %s has finished with status=%s. Running %s',
+                                         task_id, ar.status, cb_name)
                         break
 
                     timer += 1
-                    logger.warning('Whoa! Parent task %s has not finished yet with status=%s. Waiting 1 second (%d), '
-                                   'before running %s', task_id, ar.status, timer, cb_name)
+                    task_logger.warning('Whoa! Parent task %s has not finished yet with status=%s. Waiting 1 second '
+                                        '(%d), before running %s', task_id, ar.status, timer, cb_name)
                     sleep(1.0)
                 else:
-                    logger.error('Task %s is not ready. Running %s anyway :(', task_id, cb_name)
+                    task_logger.error('Task %s is not ready. Running %s anyway :(', task_id, cb_name)
 
             try:
                 return fun(result, task_id, *args, **kwargs)
             except OPERATIONAL_ERRORS as exc:
                 raise exc  # Caught by que.mgmt.MgmtCallbackTask
             except Exception as e:
-                logger.exception(e)
-                logger.error('Task %s failed', task_id)
+                task_logger.exception(e)
+                task_logger.error('Task %s failed', task_id)
 
                 if not isinstance(e, TaskException):
                     e = TaskException(result, str(e))
@@ -275,7 +276,7 @@ def callback(log_exception=True, update_user_tasks=True, check_parent_status=Tru
                     try:
                         error_fun(result, task_id, task_exception=e, *args, **kwargs)
                     except Exception as ex:
-                        logger.exception(ex)
+                        task_logger.exception(ex)
 
                 raise e
 
@@ -283,7 +284,7 @@ def callback(log_exception=True, update_user_tasks=True, check_parent_status=Tru
                 cb = UserCallback(task_id).load()
 
                 if cb:
-                    logger.debug('Creating task for UserCallback[%s]: %s', task_id, cb)
+                    task_logger.debug('Creating task for UserCallback[%s]: %s', task_id, cb)
                     from api.task.tasks import task_user_callback_cb  # Circular import
                     task_user_callback_cb.call(task_id, cb, **kwargs)
 
@@ -318,8 +319,8 @@ def mgmt_lock(timeout=MGMT_LOCK_TIMEOUT, key_args=(), key_kwargs=(), wait_for_re
                 existing_lock = task_lock.get()
 
                 if wait_for_release:
-                    logger.warn('Task %s(%s, %s) must wait (%s), because another task %s is already running',
-                                task_name, args, kwargs, timeout or 'forever', existing_lock)
+                    task_logger.warn('Task %s(%s, %s) must wait (%s), because another task %s is already running',
+                                     task_name, args, kwargs, timeout or 'forever', existing_lock)
                     wait = 0
 
                     while wait < timeout:
@@ -329,12 +330,12 @@ def mgmt_lock(timeout=MGMT_LOCK_TIMEOUT, key_args=(), key_kwargs=(), wait_for_re
                         if acquire_lock():
                             break
                     else:
-                        logger.warn('Task %s(%s, %s) will not run, because another task %s is still running and we have'
-                                    ' waited for too long (%s)', task_name, args, kwargs, existing_lock, wait)
+                        task_logger.warn('Task %s(%s, %s) will not run, because another task %s is still running and we'
+                                         ' have waited for too long (%s)', task_name, args, kwargs, existing_lock, wait)
                         return
                 else:
-                    logger.warn('Task %s(%s, %s) will not run, because another task %s is already running',
-                                task_name, args, kwargs, existing_lock)
+                    task_logger.warn('Task %s(%s, %s) will not run, because another task %s is already running',
+                                     task_name, args, kwargs, existing_lock)
                     return
 
             try:
@@ -356,8 +357,12 @@ def mgmt_task(update_user_tasks=True):
             try:
                 return fun(task_id, *args, **kwargs)
             except Exception as e:
-                logger.exception(e)
-                logger.error('Mgmt Task %s failed', task_id)
+                task_logger.exception(e)
+                task_logger.error('Mgmt Task %s failed', task_id)
+
+                if not isinstance(e, TaskException):
+                    e = MgmtTaskException(str(e))
+
                 raise e
             finally:
                 if update_user_tasks:
@@ -609,6 +614,7 @@ class TaskID(str):
     """
     # noinspection PyInitNewSignature
     def __new__(cls, value, request=None):
+        # noinspection PyArgumentList
         obj = str.__new__(cls, value)
 
         if request:

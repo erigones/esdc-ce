@@ -49,8 +49,12 @@ class VmMigrate(APIView):
             # Possible node_image import task which will block this task on node worker
             block_key = ser.node_image_import()
 
+            # We have a custom detail dict with all necessary api view parameters
+            detail_dict = ser.detail_dict()
+
             # Prepare task data
             apiview = {'view': 'vm_migrate', 'method': request.method, 'hostname': vm.hostname}
+            apiview.update(detail_dict)
             lock = 'vm_migrate vm:%s' % vm.uuid
             meta = {
                 'output': {'returncode': 'returncode', 'stderr': 'message', 'stdout': 'json'},
@@ -70,7 +74,7 @@ class VmMigrate(APIView):
                 return FailureTaskResponse(request, err, vm=vm)
             else:  # Success, task is running
                 return TaskResponse(request, tid, msg=LOG_MIGRATE, vm=vm, api_view=apiview,
-                                    detail_dict=ser.detail_dict(), data=self.data)
+                                    detail_dict=detail_dict, data=self.data)
         finally:
             if err:
                 vm.revert_notready()

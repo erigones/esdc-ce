@@ -338,6 +338,12 @@ class DcSettingsSerializer(s.InstanceSerializer):
     VMS_NET_VLAN_ALLOWED = s.IntegerArrayField(label='VMS_NET_VLAN_ALLOWED', required=False,
                                                help_text=_('List of VLAN IDs available for newly created DC-bound '
                                                            'networks in this virtual datacenter.'))
+    VMS_NET_VXLAN_RESTRICT = s.BooleanField(label='VMS_NET_VXLAN_RESTRICT',
+                                            help_text=_('Whether to restrict VXLAN IDs to the '
+                                                        'VMS_NET_VXLAN_ALLOWED list.'))
+    VMS_NET_VXLAN_ALLOWED = s.IntegerArrayField(label='VMS_NET_VXLAN_ALLOWED', required=False,
+                                                help_text=_('List of VXLAN IDs available for newly created DC-bound '
+                                                            'networks in this virtual datacenter.'))
     VMS_IMAGE_LIMIT = s.IntegerField(label='VMS_IMAGE_LIMIT', required=False,
                                      help_text=_('Maximum number of DC-bound server images that can be created in '
                                                  'this virtual datacenter.'))
