@@ -1,8 +1,4 @@
-# noinspection PyCompatibility
-import ipaddress
-
 from django.utils.translation import ugettext_lazy as _
-from django.utils.six import text_type
 
 from api import serializers as s
 from vms.models import IPAddress
@@ -52,7 +48,7 @@ class NetworkIPSerializer(s.Serializer):
 
         net = self.net
         # Was already validated by IPAddressField
-        ipaddr = ipaddress.ip_address(text_type(value))
+        ipaddr = IPAddress.get_ip_address(value)
         network = net.ip_network
 
         if ipaddr not in network:

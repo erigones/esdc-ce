@@ -171,6 +171,7 @@
                     },
                     "VMS_IMAGE_SOURCES": [],
                     "VMS_IMAGE_VM": "15bc0839-c49d-4489-a01b-4570d518fc9f",
+                    "VMS_IMAGE_VM_NIC": 1,
                     "VMS_NIC_MONITORING_DEFAULT": 1,
                     "VMS_NIC_MODEL_DEFAULT": "virtio", 
                     "VMS_NODE_SSH_KEYS_SYNC": true,

@@ -10,6 +10,7 @@ from api import serializers as s
 from api.exceptions import ObjectNotFound
 from api.validators import validate_owner, validate_alias, validate_mdata, validate_ssh_key, placeholder_validator
 from api.vm.utils import get_vm, get_owners
+from api.vm.define.vm_define_nic import NIC_ID_MIN, NIC_ID_MAX
 from api.sms.utils import get_services
 from api.mon.backends.abstract import VM_KWARGS, VM_KWARGS_NIC, VM_KWARGS_DISK
 from gui.models import User, UserProfile, Role
@@ -17,6 +18,8 @@ from vms.models import Dc, DefaultDc, Vm, BackupDefine
 from vms.utils import DefAttrDict
 from pdns.models import Domain
 
+NIC_ID_MIN += 1
+NIC_ID_MAX += 1
 
 SENSITIVE_FIELD_NAMES = ('PASSWORD', 'PRIVATE_KEY')
 SENSITIVE_FIELD_VALUE = '***'
@@ -324,7 +327,8 @@ class DcSettingsSerializer(s.InstanceSerializer):
     VMS_NIC_MODEL_DEFAULT = s.ChoiceField(label='VMS_NIC_MODEL_DEFAULT', choices=Vm.NIC_MODEL,
                                           help_text=_('Default virtual NIC model of newly created server NICs. '
                                                       'One of: virtio, e1000, rtl8139.'))
-    VMS_NIC_MONITORING_DEFAULT = s.IntegerField(label='VMS_NIC_MONITORING_DEFAULT', min_value=1, max_value=8,
+    VMS_NIC_MONITORING_DEFAULT = s.IntegerField(label='VMS_NIC_MONITORING_DEFAULT', min_value=NIC_ID_MIN,
+                                                max_value=NIC_ID_MAX,
                                                 help_text=_('Default NIC ID, which will be used for '
                                                             'external monitoring.'))
     VMS_NET_DEFAULT = s.CharField(label='VMS_NET_DEFAULT', max_length=64, required=False,
@@ -622,6 +626,10 @@ class DefaultDcSettingsSerializer(DcSettingsSerializer):
                                    help_text=_('Global image server (hostname or uuid) - primary IMGAPI source on all '
                                                'compute nodes. Empty value means that most of the image-related '
                                                'operations will be performed only in the DB.'))
+    VMS_IMAGE_VM_NIC = s.IntegerField(label='VMS_IMAGE_VM_NIC', min_value=NIC_ID_MIN, max_value=NIC_ID_MAX,
+                                      help_text=_('Image server\'s NIC ID, which will be used to determine the IP '
+                                                  'address for constructing the IMGAPI source set on all compute '
+                                                  'nodes.'))
     VMS_IMAGE_SOURCES = s.ArrayField(label='VMS_IMAGE_SOURCES', required=False, max_items=16,
                                      help_text=_('List of additional IMGAPI sources that will be set on all '
                                                  'compute nodes.'))

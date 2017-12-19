@@ -1,4 +1,4 @@
-from hashlib import md5
+import hashlib
 from operator import itemgetter
 from frozendict import frozendict
 from collections import OrderedDict
@@ -106,7 +106,7 @@ class ImageStore(_DummyModel):
         repos = OrderedDict(sorted(iteritems(DefaultDc().settings.VMS_IMAGE_REPOSITORIES)))
         image_vm = ImageVm()
 
-        if include_image_vm and image_vm:
+        if include_image_vm and image_vm and image_vm.has_ip():
             repos[image_vm.repo_name] = image_vm.repo_url
 
         return repos
@@ -182,7 +182,7 @@ class ImageStore(_DummyModel):
     @property
     def pk(self):  # Required by task_log
         assert self.url
-        return md5(self.url).hexdigest()
+        return hashlib.md5(self.url).hexdigest()
 
     @property
     def log_name(self):  # Required by task_log

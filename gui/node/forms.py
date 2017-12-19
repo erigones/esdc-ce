@@ -50,6 +50,12 @@ class NodeForm(SerializerForm):
                                'class': 'input-transparent small',
                                'rows': 5})
                            )
+
+    address = forms.ChoiceField(label=_('IP address'),
+                                help_text=_('IP address used for communication between compute nodes '
+                                            '(e.g., VM backups, VM replication, internal VM and node monitoring).'),
+                                widget=forms.Select(attrs={'class': 'narrow input-select2'}))
+
     cpu_coef = forms.DecimalField(label=_('CPUs coefficient'), max_digits=4, decimal_places=2,
                                   help_text=_('Coefficient for calculating the the total number of virtual CPUs.'),
                                   widget=forms.TextInput(attrs={'class': 'input-transparent narrow',
@@ -78,6 +84,7 @@ class NodeForm(SerializerForm):
     def __init__(self, request, node, *args, **kwargs):
         super(NodeForm, self).__init__(request, node, *args, **kwargs)
         self.fields['owner'].choices = get_owners(request).values_list('username', 'username')
+        self.fields['address'].choices = [(ip, ip) for ip in node.ips]
         dc1_settings = get_dc1_settings(request)
 
         if dc1_settings.MON_ZABBIX_HOSTGROUPS_NODE:

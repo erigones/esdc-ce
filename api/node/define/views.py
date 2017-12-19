@@ -75,6 +75,15 @@ def node_define(request, hostname, data=None):
         :type data.note: string
         :arg data.owner: Node owner
         :type data.owner: string
+        :arg data.address: Node IP address used for communication between compute nodes, in particular for: \
+VM VNC console, \
+VM backups, \
+VM migration, \
+VM replication, \
+VM snapshot restore and image creation, \
+internal VM and compute node monitoring. \
+**WARNING**: Changing this IP address may lead to unexpected behaviour.
+        :type data.address: string
         :arg data.cpu_coef: Coefficient for calculating the total number of virtual CPUs
         :type data.cpu_coef: float
         :arg data.ram_coef: Coefficient for calculating the maximum amount of memory available for virtual machines
