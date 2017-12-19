@@ -1,0 +1,188 @@
+
+- name: "Configuring overlays on compute nodes"
+  hosts: "{{ nodelist if nodelist is defined else 'nodes' }}"
+  gather_facts: true
+  vars:
+    erigones_home: "{{ lookup('env','ERIGONES_HOME')|default('/opt/erigones', true) }}"
+    templates_dir: "{{ erigones_home }}/ans/overlays/files"
+    usbconfig: '/usbkey/config'
+    ipfconfig: '/opt/custom/etc/ipf.d/ipf.conf-010-overlays'
+    ikeconfig: '/etc/inet/ike/config'
+    ikepreshared: '/etc/inet/secret/ike.preshared'
+    ipsecinitcfg: '/etc/inet/ipsecinit.conf'
+    overlay_rules: "{{ lookup('env','OVERLAY_RULES')| from_json }}"
+    ipsec_keys: "{{ lookup('env','IPSEC_KEYS')| from_json }}"
+    fw_administrator_IPs: "{{ lookup('env','FIREWALL_CFG')| from_json }}"
+    # list of all known nodes in Danube Cloud
+    all_nodes: "{{ hostvars[ansible_fqdn]['groups']['nodes'] }}"
+    # this variable is evaluated on each host separately
+    my_datacenter: "{{ hostvars[ansible_fqdn]['dc_name'] }}"
+
+
+  tasks:
+
+  # this will fail loudly if overlay_rules were not parsed correctly
+  - name: fail if config inconsistent
+    fail:
+      msg: "Incorrectly defined input variables! Aborting"
+    run_once: true
+    when:   overlay_rules is undefined or
+            ipsec_keys is undefined
+
+  - name: get node uuid
+    shell: sysinfo -p| grep ^UUID= | cut -d= -f2 | tr -d "'"
+    register: _node_uuid
+    changed_when: 0
+
+  - name: save node uuid
+    set_fact:
+      node_uuid: "{{ _node_uuid.stdout }}"
+
+  - name: get external IP
+    set_fact:
+      external_ip: "{{
+                hostvars[ansible_fqdn]['ansible_external0']['ipv4'][0]['address'] 
+            if  hostvars[ansible_fqdn]['ansible_external0'] is defined and
+                hostvars[ansible_fqdn]['ansible_external0']['ipv4'][0] is defined and
+                hostvars[ansible_fqdn]['ansible_external0']['ipv4'][0]['address'] is defined
+            else 0 }}"
+
+  - name: discover admin interface
+    shell: /usr/bin/sysinfo -p | grep NIC_admin= | cut -d= -f 2 | tr -d "'"
+    register: admin_interface
+    changed_when: 0
+
+  - name: Get admin IP
+    set_fact:
+      admin_ip: "{{
+                hostvars[ansible_fqdn]['ansible_admin0']['ipv4'][0]['address'] 
+            if  hostvars[ansible_fqdn]['ansible_admin0'] is defined
+            else 
+                hostvars[ansible_fqdn]['ansible_'~admin_interface.stdout]['ipv4'][0]['address']
+            }}"
+
+  - name: Get admin netmask
+    set_fact:
+      admin_netmask: "{{
+                hostvars[ansible_fqdn]['ansible_admin0']['ipv4'][0]['netmask'] 
+            if  hostvars[ansible_fqdn]['ansible_admin0'] is defined
+            else 
+                hostvars[ansible_fqdn]['ansible_'~admin_interface.stdout]['ipv4'][0]['netmask']
+            }}"
+
+  # Multiple datacenter names imply that there are remote nodes present.
+  # The concept of overlays requires that each node can see each other node.
+  # Remote nodes do not share common admin subnet with other nodes and therefor
+  # they are only reachable by external (=internet) network.
+  # That's why external IP is needed - for interconnecting multiple datacenters.
+  # If there's only one datacenter, nodes can communicate using admin network
+  # and do not necessarily need an external public IP address.
+  - name: "Check if external IP is needed"
+    fail: msg="Multiple datacenter names detected and this node does not have an external IP address!"
+    when:   hostvars[item]['dc_name'] != my_datacenter and
+            external_ip == 0
+    with_items: "{{ ansible_play_batch }}"
+
+  - name: "add overlay rules into {{ usbconfig }} if necessary"
+    lineinfile: 
+      dest: "{{ usbconfig }}"
+      state: present
+      regexp: '^overlay_rule_{{ item }}='
+      line:    'overlay_rule_{{ item }}="{{ overlay_rules[item]["rule"] }}"'
+    with_items: "{{ overlay_rules }}"
+    # add rule only if defined for this node and rule is not marked as to be deleted
+    when:   (overlay_rules[item]['nodelist']|issuperset([ansible_fqdn]) or
+                overlay_rules[item]['nodelist'] == 'all') and
+            (del_orule is undefined or
+                (del_orule is defined and
+                    del_orule != item))
+    notify: reload overlays config
+
+  - name: "remove overlay rules if requested"
+    lineinfile: 
+      dest: "{{ usbconfig }}"
+      state: absent
+      regexp: '^overlay_rule_{{ del_orule }}='
+    when: del_orule is defined
+
+  - name: create overlay arp file if necessary
+    shell: /bin/bash -c "if [[ ! -f {{ overlay_rules[item]['arp_json_path'] }} ]]; then mkdir -p {{ overlay_rules[item]['arp_json_path'] | dirname }}; echo '{}' > {{ overlay_rules[item]['arp_json_path'] }}; fi"
+    args:
+      creates: "{{ overlay_rules[item]['arp_json_path'] }}"
+    with_items: "{{ overlay_rules }}"
+    when:   (overlay_rules[item]['nodelist']|issuperset([ansible_fqdn]) or
+                overlay_rules[item]['nodelist'] == 'all') and
+            (overlay_rules[item]['arp_json_path'] and not
+            (del_orule is defined and del_orule == item))
+
+  - name: remove overlay arp file if necessary
+    file:
+      state: absent
+      dest: "{{ overlay_rules[del_orule]['arp_json_path'] }}"
+    when:   del_orule is defined and
+            overlay_rules[del_orule] is defined and
+            overlay_rules[del_orule]['arp_json_path']
+
+  - name: configure IPSec ike config
+    template:
+    args:
+      src: '{{ templates_dir }}/ike-config.j2'
+      dest: '/opt/custom/etc/ipsec/config'
+      mode: 0640
+      owner: root
+      group: root
+    notify: refresh IPSec
+
+  - name: configure IPSec init
+    template:
+    args:
+      src: '{{ templates_dir }}/ipsecinit.j2'
+      dest: '/opt/custom/etc/ipsec/ipsecinit.conf'
+      mode: 0640
+      owner: root
+      group: root
+    notify: refresh IPSec
+
+  - name: configure IPSec pre-shared keys
+    template:
+    args:
+      src: '{{ templates_dir }}/ike.preshared.j2'
+      dest: '/opt/custom/etc/ipsec/ike.preshared'
+      mode: 0400
+      owner: root
+      group: root
+    notify: refresh IPSec
+
+  - name: update firewall for overlays
+    template:
+    args:
+      src: '{{ templates_dir }}/ipf.conf-overlays.j2'
+      dest: '/opt/custom/etc/ipf.d/ipf.conf-020-overlays'
+      mode: 0640
+      owner: root
+      group: root
+    notify: reload firewall
+
+  - name: update firewall for administrator IPs
+    template:
+    args:
+      src: '{{ templates_dir }}/ipf.conf-administration.j2'
+      dest: '/opt/custom/etc/ipf.d/ipf.conf-090-administration'
+      mode: 0640
+      owner: root
+      group: root
+    notify: reload firewall
+
+  - meta: end_play
+
+
+  handlers:
+  - name: reload firewall
+    shell: /opt/custom/etc/rc-pre-network.d/010-ipf-restore.sh refresh
+
+  - name: reload overlays config
+    shell: /lib/svc/method/net-virtual refresh
+
+  - name: refresh IPSec
+    shell: /opt/custom/etc/rc-pre-network.d/020-ipsec-restore.sh refresh
+ 

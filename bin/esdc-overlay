@@ -1,0 +1,665 @@
+#!/usr/bin/env bash
+
+# binaries
+SED=/usr/bin/sed
+PRINTF=/usr/bin/printf
+BASE64=/opt/local/bin/base64
+JSON=/usr/bin/json
+OSSL=/usr/bin/openssl
+TR=/usr/bin/tr
+CUT=/usr/bin/cut
+GREP=/usr/bin/grep
+SSH="/usr/bin/ssh -o StrictHostKeyChecking=no -o GSSAPIKeyExchange=no -o GSSAPIAuthentication=no"
+
+
+CMD="${1}"
+ORULE_NAME="${2}"
+NODE_LIST="$(echo "${3}" | ${SED} -e 's/[[:space:]]//g')"	# remove whitespaces
+ORULE_STRING="${4}"
+
+MAINDIR="$(cd "$(dirname "$0")/.." ; pwd -P)"
+ERIGONES_HOME="${ERIGONES_HOME:-"${MAINDIR}"}"
+export ERIGONES_HOME
+
+# ansible vars
+ANS_BASE="${ERIGONES_HOME}/ans"
+PLAYBOOK="${ANS_BASE}/overlays/esdc-overlay.yml"
+HOSTS_FILE="${ANS_BASE}/hosts.cfg"
+HOSTS_TMP_FILE="${ANS_BASE}/.hosts.cfg.tmp"
+
+# cfgdb vars
+QUERY_CFGDB_BIN="${ERIGONES_HOME}/bin/query_cfgdb"
+CFGDB_FIREWALL_PATH="/esdc/settings/firewall"
+CFGDB_IPSEC_PATH="/esdc/settings/ipsec"
+
+# overlay vars
+OVERLAY_ARP_JSON_DIR="/opt/custom/networking"
+ORULE_TEMPLATE="-e vxlan -p vxlan/listen_ip=0.0.0.0 -p vxlan/listen_port=%%%OVERLAY_RULE_PORT%%% -s files -p files/config=${OVERLAY_ARP_JSON_DIR}/%%%OVERLAY_RULE_NAME%%%_overlay.json -p mtu=1400"
+CFGDB_ORULES_PATH="/esdc/settings/overlay_rules"
+ORULE_DEFAULT_PORT=4789
+
+# misc global vars
+CFGDB_ORULE_LIST=
+MGMT_IP=
+DEBUG=0
+# current list of compute nodes from mgmt
+declare -A NODE_DC_LIST		# nodelist: ${!NODE_DC_LIST[@]} ; dc list: ${NODE_DC_LIST[@]}|sort|uniq
+# final overlay config
+ORULES_JSON=
+# final IPSec config
+
+usage() {
+	echo
+	echo "Usage:"
+	echo "$0 create <overlay_rule_name> [node_list|all] [raw_overlay_rule_string]"
+	echo "$0 update [overlay_rule_name] [node_list|all] [raw_overlay_rule_string]"
+	echo "$0 delete <overlay_rule_name>"
+	echo "$0 list"
+	echo
+	echo "Examples:"
+	echo "$0 create <overlay_rule_name>"
+	echo "$0 create <overlay_rule_name> cn01.local,cn02.local,cn03.local"
+	echo "$0 create customers all \"-e vxlan -p vxlan/listen_ip=0.0.0.0,vxlan/listen_port=4790 -s files -p files/config=${OVERLAY_ARP_JSON_DIR}/customers_overlay.json -p mtu=1400\""
+	echo "$0 update"
+	echo "$0 update customers"
+	echo "$0 delete customers"
+	echo "$0 list"
+	echo
+	echo "To enable debug output, append \"-debug\" to a subcommand, e.g:"
+	echo "$0 create-debug <overlay_rule_name>"
+	echo
+	exit 1
+}
+
+if [ ! -x "${QUERY_CFGDB_BIN}" ]; then
+	echo "Binary ${QUERY_CFGDB_BIN} not found. Aborting."
+	exit 1
+fi
+
+query_cfgdb() {
+	local zcmd="$@"
+
+	[[ "${DEBUG}" -eq 1 ]] && echo running command: ${QUERY_CFGDB_BIN} ${zcmd} >> /dev/stderr
+	"${QUERY_CFGDB_BIN}" ${zcmd} 2> /dev/null
+}
+
+test_cfgdb_connect() {
+	if [[ -z "$(query_cfgdb get /esdc/settings/dc/datacenter_name)" ]]; then
+		echo "Connect to cfgdb failed! Aborting."
+		exit 11
+	fi
+}
+
+check_orule_name() {
+
+	if [[ ! "${ORULE_NAME}" =~ ^[a-zA-Z0-9_]+[a-zA-Z_]$ ]]; then
+		echo "Invalid overlay rule name: '${ORULE_NAME}'"
+		exit 7
+	fi
+}
+
+update_ans_hosts() {
+	echo "Updating nodelist from DC management"
+	[[ -z "${MGMT_IP}" ]] && MGMT_IP="$(query_cfgdb get /esdc/vms/esdc-mgmt/master/ip)"
+	[[ -z "${MGMT_IP}" ]] && MGMT_IP="$(query_cfgdb get /esdc/vms/esdc-mgmt/hosts/1/ip)"
+
+	if [ -z "${MGMT_IP}" ]; then
+		echo "Unable to get IP address of mgmt VM."
+		exit 1
+	fi
+
+	dc_name="$(${GREP} '^SDC_DATACENTER_NAME=' /.dcinfo | ${CUT} -d= -f2 | tr -d "'")"
+	if [[ -z "${dc_name}" ]]; then
+		echo "ERROR: Failed to retrieve datacenter name of this compute node"
+		exit 4
+	fi
+
+	# Update ansible inventory
+	${SSH} "root@${MGMT_IP}" "${ERIGONES_HOME}/bin/ctl.sh" genhosts --nodes --pdc "${dc_name}" > "${HOSTS_TMP_FILE}"
+	if [[ $? -eq 0 ]]; then
+		# update succeeded
+		mv -f "${HOSTS_TMP_FILE}" "${HOSTS_FILE}"
+	else
+		echo "ERROR: Unable to update ansible hosts file."
+		rm -f "${HOSTS_TMP_FILE}"
+		exit 2
+	fi
+}
+
+list_overlay_rules() {
+	printf "%-12s %-9s %-9s\n" "NAME" "PORT" "NODELIST"
+	while read -r orule; do
+		printf "%-12s %-9s %-9s\n" "${orule}" "$(query_cfgdb get "${CFGDB_ORULES_PATH}/${orule}/port")" "$(query_cfgdb get "${CFGDB_ORULES_PATH}/${orule}/nodelist")"
+	done <<< "$(query_cfgdb ls "${CFGDB_ORULES_PATH}")"
+}
+
+check_orule_name_missing() {
+	if [[ -z "${ORULE_NAME}" ]]; then
+		echo "Missing overlay_rule_name"
+		usage
+	fi
+}
+
+create_overlay_rules() {
+	echo
+
+}
+
+get_cfgdb_orules() {
+	[[ -z "${CFGDB_ORULE_LIST}" ]] && CFGDB_ORULE_LIST="$(query_cfgdb ls "${CFGDB_ORULES_PATH}")"
+	echo "${CFGDB_ORULE_LIST}"
+}
+
+get_highest_orule_port() {
+	while read -r orule; do
+		# if there are no orules, end loop
+		[[ -z "${orule}" ]] && break
+		# get used port number
+		query_cfgdb get "${CFGDB_ORULES_PATH}/${orule}/port"
+	done <<< "$(get_cfgdb_orules)" | sort -n | tail -1
+}
+
+get_next_orule_port() {
+	local highest_port
+	local new_port
+
+	highest_port="$(get_highest_orule_port)"
+	if [[ "${highest_port}" =~ ^[0-9]+$ ]]; then
+		new_port="$(( ++highest_port ))"
+	else
+		# Port is not a number.
+		# Probably no overlay is defined.
+		# Return default overlay number + 1
+		# (to make sure we won't collide with a default).
+		new_port="$(( ${ORULE_DEFAULT_PORT} + 1 ))"
+	fi
+	echo "${new_port}"
+}
+
+check_orule_port_unique() {
+	local oport="${1}"
+
+	while read -r orule; do
+		# if there are no orules, end loop
+		[[ -z "${orule}" ]] && return 0
+
+		# get port number of current orule
+		oport_real="$(query_cfgdb get "${CFGDB_ORULES_PATH}/${orule}/port")"
+		if [[ "${oport}" -eq "${oport_real}" ]]; then
+			# port already exists!
+			return 1
+		fi
+	done <<< "$(get_cfgdb_orules)"
+	# port not found in cfgdb
+	return 0
+}
+
+parse_orule_port() {
+	local orule="${1}"
+	local orule_port
+
+	orule_port="$(echo "${ORULE_STRING}" | ${SED} -re 's|^.*vxlan/listen_port=([0-9]+).*$|\1|')"
+	if [[ -z "${orule_port}" ]]; then
+		# port not found, return a default port
+		echo "${ORULE_DEFAULT_PORT}"
+	else
+		echo "${orule_port}"
+	fi
+}
+
+cfgdb_orule_exists() {
+	local orule="${1}"
+
+	if [[ "$(query_cfgdb exists "${CFGDB_ORULES_PATH}/${orule}")" == "true" ]]; then
+		return 0
+	else
+		# overlay rule doesn't exist
+		return 1
+	fi
+}
+
+cfgdb_get_orule() {
+	local orule_name="${1}"
+
+	# encode rule string to remove whitespaces
+	query_cfgdb get "${CFGDB_ORULES_PATH}/${orule_name}/rule" | ${BASE64} -d
+}
+
+escape_json_string() {
+	${SED} 's/["\]/\\&/g'
+}
+print_full_overlay_json() {
+	local first_run=1
+	local nodelist
+
+	# open json
+	echo '{'
+	while read -r orule_name; do
+		if [[ -z "${orule_name}" ]]; then
+			# no orules are defined, return empty json
+			echo '}'
+			return 0
+		fi
+
+		if [[ "${first_run}" -eq 1 ]]; then
+			first_run=0
+		else
+			# close orule block
+			echo '  },'
+		fi
+
+		# open orule block
+		echo "    \"${orule_name}\": {"
+		echo "      \"port\": \"$(query_cfgdb get "${CFGDB_ORULES_PATH}/${orule_name}/port" | escape_json_string)\","
+
+		nodelist="$(query_cfgdb get "${CFGDB_ORULES_PATH}/${orule_name}/nodelist")"
+		if echo "${nodelist}" | ${GREP} -q ','; then
+			# there are multiple nodes
+			# transform them to json list
+			nodelist="$(echo "${nodelist}" | ${SED} -re 's/([^,]+)/"\1"/g;s/^/[/;s/$/]/')"
+		else
+			# there's only one string (either a node name or "all")
+			nodelist="\"${nodelist}\""
+		fi
+
+		echo "      \"nodelist\": ${nodelist},"
+		orule="$(cfgdb_get_orule "${orule_name}")"
+		echo "      \"rule\": \"$(echo "${orule}" | escape_json_string)\","
+		arp_json_path="$(echo "${orule}" | \
+			${GREP} 'files/config=' | \
+			${SED} -re 's|^.*files/config=([^ ]+).*$|\1|')"
+		echo "      \"arp_json_path\": \"${arp_json_path}\""
+	done <<< "$(get_cfgdb_orules)"
+		# close orule block
+		echo '  }'
+		# close json
+		echo '}'
+
+}
+
+print_full_ipsec_json() {
+	local first_run=1
+
+	# open json
+	echo '{'
+	while read -r ipsec_pair; do
+		if [[ -z "${ipsec_pair}" ]]; then
+			# no orules are defined, return empty json
+			echo '}'
+			return 0
+		fi
+
+		if [[ "${first_run}" -eq 1 ]]; then
+			first_run=0
+		else
+			# adding next element
+			echo ','
+		fi
+
+		# open orule block
+		echo "  \"${ipsec_pair}\": \"$(query_cfgdb get "${CFGDB_IPSEC_PATH}/psk/${ipsec_pair}")\""
+
+	done <<< "$(query_cfgdb ls "${CFGDB_IPSEC_PATH}/psk")"
+		# close json
+		echo '}'
+
+}
+
+print_full_firewall_json() {
+	local fw_enabled="$(query_cfgdb get "${CFGDB_FIREWALL_PATH}/globally_enabled")"
+	if [[ "${fw_enabled}" == "true" ]]; then
+		echo "$(query_cfgdb get "${CFGDB_FIREWALL_PATH}/administrator_sources")" \
+			| ${SED} -re 's/([^,]+)/"\1"/g;s/^/[/;s/$/]/'
+	else
+		# firewall is disabled, return empty list
+		echo '[]'
+	fi
+}
+
+verify_json() {
+	local json="${1}"
+	echo "${json}" | $JSON > /dev/null
+	if [[ "${?}" -ne 0 ]]; then
+		echo "Internal error: invalid json generated"
+		exit 9
+	fi
+}
+
+parse_node_dc_list() {
+	# read hosts.cfg and get node list and their respective dc names
+	while read -r line; do
+		nodename="$(echo "${line}" | ${SED} -re 's/^([^ \t]+).*$/\1/g')"
+		dc="$(echo "${line}" | ${SED} -re 's/^.*dc_name="?([^"]+)"?.*$/\1/g')"
+		NODE_DC_LIST["${nodename}"]="${dc}"
+	done <<< "$(${SED} -ne "/^\[nodes\]$/,/^\[/p" "${HOSTS_FILE}" | ${GREP} -v '^\[' | ${GREP} -v '^$')"
+	if [[ "${DEBUG}" -eq 1 ]]; then
+		echo "All nodes: ${!NODE_DC_LIST[@]}"
+		echo "Node DCs:  ${NODE_DC_LIST[@]}"
+	fi
+}
+
+generate_ipsec_keys() {
+	# iterate over every pair of nodes and if the nodes are not in the same datacenter,
+	# make sure the IPSec pre-shared keys are present for their interconnection
+	for local_node in ${!NODE_DC_LIST[@]}; do
+		for remote_node in ${!NODE_DC_LIST[@]}; do
+			# skip same node (no reason to connect with itself)
+			[[ "${local_node}" == "${remote_node}" ]] && continue
+			# skip nodes in the same DC
+			[[ "${NODE_DC_LIST["${local_node}"]}" == "${NODE_DC_LIST["${remote_node}"]}" ]] && continue
+
+			# create sorted node pair
+			if [[ "${local_node}" < "${remote_node}" ]]; then
+				node_pair="${local_node}-${remote_node}"
+			else
+				node_pair="${remote_node}-${local_node}"
+			fi
+
+			# check if IPSec key for this pair is already generated
+			if [[ "$(query_cfgdb exists "${CFGDB_IPSEC_PATH}/psk/${node_pair}")" == "true" ]]; then
+				# already exists
+				continue
+			else
+				# generate a new pair
+				key="$(${OSSL} rand -hex 128)"
+				echo "generated key: $key"
+				query_cfgdb creater "${CFGDB_IPSEC_PATH}/psk/${node_pair}" "${key}"
+			fi
+		done
+	done
+
+}
+
+run_ansible() {
+	local nodelist="${1}"
+	local custom_vars="${2}"
+	local extra_vars
+
+	if [[ -n "${custom_vars}" ]]; then
+		extra_vars="${custom_vars}"
+	fi
+	# pass nodelist only if we're runnig on subset of nodes (the ansible default is to run on all nodes)
+	if [[ -n "${nodelist}" && "${nodelist}" != "all" ]]; then
+		extra_vars="${extra_vars} nodelist='${nodelist}'"
+	fi
+
+	# export configuration for ansible
+	OVERLAY_RULES="$(print_full_overlay_json)"
+	verify_json "${OVERLAY_RULES}"
+	export OVERLAY_RULES
+	generate_ipsec_keys
+
+	IPSEC_KEYS="$(print_full_ipsec_json)"
+	verify_json "${IPSEC_KEYS}"
+	export IPSEC_KEYS
+
+	FIREWALL_CFG="$(print_full_firewall_json)"
+	verify_json "${FIREWALL_CFG}"
+	export FIREWALL_CFG
+
+	cd "${ANS_BASE}"
+	. "${ERIGONES_HOME}/envs/bin/activate"
+
+	if [[ "${DEBUG}" -eq 1 ]]; then
+		echo "OVERLAY_RULES="
+		echo "${OVERLAY_RULES}"
+		echo "IPSEC_KEYS="
+		echo "${IPSEC_KEYS}"
+		echo "FIREWALL_CFG="
+		echo "${FIREWALL_CFG}"
+		echo
+		verbose="-v"
+		echo Running: "${ERIGONES_HOME}/envs/bin/ansible-playbook" "${PLAYBOOK}" --extra-vars="${extra_vars}" "${verbose}"
+	fi
+
+	"${ERIGONES_HOME}/envs/bin/ansible-playbook" "${PLAYBOOK}" ${args} --extra-vars="${extra_vars}" ${verbose}
+	if [[ "${?}" -ne 0 ]]; then
+		echo
+		echo "Ansible run failed. CFGDB was already altered, so you don't need to modify parameters again."
+		echo "Just correct the source of the error and run this script again:"
+		echo
+		echo "$0 update ${ORULE_NAME} ${nodelist}"
+		exit 10
+	else
+		echo
+		echo "Ansible finished sucessfully"
+		echo "You should now refresh compute nodes info in GUI/API"
+		echo "(click 'Refresh' on all affected compute nodes)."
+		echo
+	fi
+}
+
+##### BEGIN #####
+
+if [[ -z "${CMD}" ]]; then
+	usage
+fi
+
+# turn on debug
+if [[ "${CMD}" =~ -debug$ ]]; then
+	DEBUG=1
+	CMD="$(echo "${CMD}" | ${SED} -e 's/-debug$//')"
+fi
+
+test_cfgdb_connect
+#update_ans_hosts
+parse_node_dc_list
+
+
+case ${CMD,,} in
+	create)
+		check_orule_name_missing
+		check_orule_name
+
+		if cfgdb_orule_exists "${ORULE_NAME}"; then
+			echo "ERROR: overlay rule '${ORULE_NAME}' already exists."
+			echo "You probably want to run this command instead:"
+			[[ -n "${ORULE_STRING}" ]] && buf="\"${ORULE_STRING}\""
+			echo "$0 update ${ORULE_NAME} ${NODE_LIST} ${buf}"
+			exit 5
+		fi
+
+		# if no nodelist is provided, assume all nodes
+		[[ -z "${NODE_LIST}" ]] && NODE_LIST="all"
+
+		# if no overlay string is provided, generate a default one
+		if [[ -z "${ORULE_STRING}" ]]; then
+			# get first unused overlay udp port
+			orule_port="$(get_next_orule_port)"
+
+			ORULE_STRING="$(echo "${ORULE_TEMPLATE}" | \
+				${SED} -e "s/%%%OVERLAY_RULE_PORT%%%/${orule_port}/" -e "s/%%%OVERLAY_RULE_NAME%%%/${ORULE_NAME}/g")"
+		else
+			# parse orule port from provided string
+			orule_port="$(parse_orule_port "${ORULE_STRING}")"
+			if ! check_orule_port_unique "${orule_port}"; then
+				echo "Error: overlay port ${orule_port} is already used"
+				exit 3
+			fi
+		fi
+		
+		if [[ -z "${NODE_LIST}" || -z "${orule_port}" || -z "${ORULE_STRING}" ]]; then
+			echo "nodelist=${NODE_LIST}"
+			echo "orule_port=${orule_port}"
+			echo "orule=${ORULE_STRING}"
+			echo "Config error. Aborting."
+			exit 11
+		fi
+
+		echo "Writing new overlay parameters into cfgdb"
+		query_cfgdb creater "${CFGDB_ORULES_PATH}/${ORULE_NAME}/port" "${orule_port}"
+		query_cfgdb creater "${CFGDB_ORULES_PATH}/${ORULE_NAME}/nodelist" "${NODE_LIST}"
+		# encode rule string to remove whitespaces
+		query_cfgdb creater "${CFGDB_ORULES_PATH}/${ORULE_NAME}/rule" "$(echo "${ORULE_STRING}" | ${BASE64} | ${TR} -d ' \n\t')"
+
+		# run ansible tasks
+		run_ansible "${NODE_LIST}"
+		echo "Overlay rule was configured successfully on nodes: ${NODE_LIST}"
+		;;
+
+	update)
+		# if ORULE_NAME is not specified, we'll update all overlays on all nodes
+
+		if [[ -n "${ORULE_NAME}" ]] && ! cfgdb_orule_exists "${ORULE_NAME}"; then
+			echo "Error: overlay rule '${ORULE_NAME}' does not exist. Exiting."
+			exit 5
+		fi
+
+		if [[ -n "${ORULE_NAME}" && -n "${NODE_LIST}" ]]; then
+			# get orule config from cfgdb
+			if [[ -n "${ORULE_STRING}" ]]; then
+				# rule provided from cmd line
+				orule="${ORULE_STRING}"
+				# check if rule needs to be updated
+				orule_saved="$(cfgdb_get_orule "${ORULE_NAME}")"
+				if [[ "${orule}" != "${orule_saved}" ]]; then
+					orule_port="$(parse_orule_port "${orule}")"
+					cfgdb_orule_port="$(query_cfgdb get "${CFGDB_ORULES_PATH}/${ORULE_NAME}/port")"
+					if [[ "${orule_port}" -ne "${cfgdb_orule_port}" ]]; then
+						if ! check_orule_port_unique "${orule_port}"; then
+							echo "Error: overlay port ${orule_port} is already used"
+							exit 3
+						fi
+						# update port
+						query_cfgdb set "${CFGDB_ORULES_PATH}/${ORULE_NAME}/port" "${orule_port}"
+					fi
+					# encode rule string to remove whitespaces
+					query_cfgdb set "${CFGDB_ORULES_PATH}/${ORULE_NAME}/rule" "$(echo "${orule}" | ${BASE64} | ${TR} -d ' \n\t')"
+					echo "Overlay rule '${ORULE_NAME}' updated in cfgdb"
+				fi
+			fi
+
+			# update nodelist
+			nodelist="${NODE_LIST}"
+			nodelist_saved="$(query_cfgdb get "${CFGDB_ORULES_PATH}/${ORULE_NAME}/nodelist")"
+			if [[ "${nodelist}" != "${nodelist_saved}" ]]; then
+				echo "XXXX: ${nodelist} != ${nodelist_saved}"
+				query_cfgdb set "${CFGDB_ORULES_PATH}/${ORULE_NAME}/nodelist" "${nodelist}"
+				echo "Node list for '${ORULE_NAME}' updated in cfgdb"
+			fi
+
+		fi
+
+		echo "Updating configuration on nodes"
+
+		# run ansible tasks
+		run_ansible "${NODE_LIST}"
+		;;
+
+	delete)
+		check_orule_name_missing
+
+		if ! cfgdb_orule_exists "${ORULE_NAME}"; then
+			echo "Warning: overlay rule '${ORULE_NAME}' does not exist in cfgdb."
+			${PRINTF} "Run ansible to make sure it's removed also from all compute nodes? (Y/n) "
+			read reply
+			if [[ "${reply,,}" != "y" && -n "${reply}" ]]; then
+				echo "Exitting.."
+				exit 0
+			fi
+			nodelist="all"
+		else
+			nodelist="$(query_cfgdb get "${CFGDB_ORULES_PATH}/${ORULE_NAME}/nodelist")"
+		fi
+
+		# run ansible tasks
+		run_ansible "${nodelist}" "del_orule=\"${ORULE_NAME}\""
+
+		# delete orule from cfgdb (manual-recursive for safety reasons)
+		query_cfgdb delete "${CFGDB_ORULES_PATH}/${ORULE_NAME}/port"
+		query_cfgdb delete "${CFGDB_ORULES_PATH}/${ORULE_NAME}/nodelist"
+		query_cfgdb delete "${CFGDB_ORULES_PATH}/${ORULE_NAME}/rule"
+		query_cfgdb delete "${CFGDB_ORULES_PATH}/${ORULE_NAME}"
+
+		echo "Overlay rule ${ORULE_NAME} was successfully deleted from cfgdb and from nodes: ${nodelist}"
+		;;
+
+	init-admin)
+
+		;;
+	apply)
+		run_ansible
+
+		;;
+	list)
+		list_overlay_rules
+		;;
+
+	globally-enable-firewall)
+		# remove whitespaces and add trailing /32 to single IPs
+		# parse second cmd line argument as a comma-separated IP/subnet list
+		administrator_sources_list="$(echo "${2}" | tr -d ' \t' )"
+
+		cfgdb_administrator_sources="$(query_cfgdb get "${CFGDB_FIREWALL_PATH}/administrator_sources")"
+		if [[ -z "${administrator_sources_list}" && -z "${cfgdb_administrator_sources}" ]]; then
+			# no sources specified and no sources in cfgdb
+			echo "Error: administrator_sources_list cannot be empty"
+			echo "You would cut yourself from external interfaces on all compute nodes!"
+			exit 1
+		elif [[ -z "${administrator_sources_list}" ]]; then
+			# no sources specified but there are sources in cfgdb
+			administrator_sources_list="${cfgdb_administrator_sources}"
+		fi
+
+
+		if [[ -z "${cfgdb_administrator_sources}" ]]; then
+			query_cfgdb creater "${CFGDB_FIREWALL_PATH}/administrator_sources" "${administrator_sources_list}"
+		elif [[ "${cfgdb_administrator_sources}" != "${administrator_sources_list}" ]]; then
+			echo "Updating administrator_sources_list in cfgdb"
+			query_cfgdb set "${CFGDB_FIREWALL_PATH}/administrator_sources" "${administrator_sources_list}"
+		fi
+
+		echo "#### Read carefully ####"
+		echo "You are about to to enable firewall on all existing external0 interfaces on all compute nodes in the cluster. This means that all Danube Cloud hypervisors will block all incoming traffic except from compute nodes within this Danube Cloud installation and from these IPs: ${administrator_sources_list}"
+		echo "This action will not affect virtual machines."
+		echo "You should have a fallback plan - create a virtual machine that is on the admin subnet and that is also reachable from the internet (e.g. it has one NIC on the admin network and the second (primary) NIC pointing to the internet)."
+		echo "You are responsible for providing correct IP addresses/subnets."
+		echo
+		echo "These rules will be added to each node's ipfilter config:"
+		echo "${administrator_sources_list}" | tr ',' '\n' \
+			| ${SED} -re 's/^(.*)$/pass in quick on external0 from \1 to <external_node_ip> keep state/'
+		echo "block in quick on external0 all"
+		echo 
+		${PRINTF} "Do you really want to enable a firewall? (Y/n) "
+		read reply
+		if [[ "${reply,,}" != "y" && -n "${reply}" ]]; then
+			echo "Exitting.."
+			exit 0
+		fi
+
+		# enable fw in cfgdb
+		fw_enabled="$(query_cfgdb get "${CFGDB_FIREWALL_PATH}/globally_enabled")"
+		if [[ -z "${fw_enabled}" ]]; then
+			query_cfgdb creater "${CFGDB_FIREWALL_PATH}/globally_enabled" "true"
+		elif [[ "${fw_enabled}" != "true" ]]; then
+			query_cfgdb set "${CFGDB_FIREWALL_PATH}/globally_enabled" "true"
+		fi
+		echo "Firewall enabled in cfgdb"
+
+		run_ansible
+
+		echo "Firewall enabled on all nodes"
+		;;
+	globally-disable-firewall)
+		# disable fw in cfgdb
+		fw_enabled="$(query_cfgdb get "${CFGDB_FIREWALL_PATH}/globally_enabled")"
+		if [[ -z "${fw_enabled}" ]]; then
+			query_cfgdb creater "${CFGDB_FIREWALL_PATH}/globally_enabled" "false"
+		elif [[ "${fw_enabled}" != "false" ]]; then
+			query_cfgdb set "${CFGDB_FIREWALL_PATH}/globally_enabled" "false"
+		fi
+		echo "Firewall disabled in cfgdb"
+
+		run_ansible
+
+		echo "Firewall disabled on all nodes"
+		;;
+
+	update-firewall)
+		run_ansible
+		;;
+	*)
+		echo "Unknown command: $CMD"
+		usage
+esac
+

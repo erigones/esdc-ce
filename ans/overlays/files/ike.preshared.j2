@@ -1,0 +1,45 @@
+# CDDL HEADER START
+#
+# The contents of this file are subject to the terms of the
+# Common Development and Distribution License, Version 1.0 only
+# (the "License").  You may not use this file except in compliance
+# with the License.
+#
+# You can obtain a copy of the license at usr/src/OPENSOLARIS.LICENSE
+# or http://www.opensolaris.org/os/licensing.
+# See the License for the specific language governing permissions
+# and limitations under the License.
+#
+# When distributing Covered Code, include this CDDL HEADER in each
+# file and include the License file at usr/src/OPENSOLARIS.LICENSE.
+# If applicable, add the following below this CDDL HEADER, with the
+# fields enclosed by brackets "[]" replaced with your own identifying
+# information: Portions Copyright [yyyy] [name of copyright owner]
+#
+# CDDL HEADER END
+#
+
+# ike.preshared - Pre-shared secrets for IKE authentication.
+#
+# Entries are of the form:
+#
+# {
+#   <attribute> <value>
+#   ...
+# }
+#
+# Consult the man page for ike.preshared(4) for details.
+{% for node in all_nodes %}
+{% set node_pair = [ ansible_fqdn, '-', node ]|join if ansible_fqdn < node else [ node, '-', ansible_fqdn ]|join %}
+{% if hostvars[node]['dc_name'] != my_datacenter and ipsec_keys[node_pair] is defined %}
+
+# {{ ansible_fqdn }} <-> {{ node }}
+{
+    localidtype IP
+    localid {{ external_ip }}
+    remoteidtype IP
+    remoteid {{ hostvars[node]['ansible_ssh_host'] }}
+    key "{{ ipsec_keys[node_pair] }}"
+}
+{% endif %}
+{% endfor %}
