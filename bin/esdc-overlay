@@ -442,7 +442,7 @@ if [[ "${CMD}" =~ -debug$ ]]; then
 fi
 
 test_cfgdb_connect
-#update_ans_hosts
+update_ans_hosts
 parse_node_dc_list
 
 
