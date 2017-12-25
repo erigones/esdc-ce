@@ -20,6 +20,7 @@ TemplateAdmin      template_admin     |yes|    The user must have the TemplateAd
 IsoAdmin           iso_admin          |yes|    The user must have the IsoAdmin and Admin permissions or be a SuperAdmin.
 UserAdmin          user_admin         |yes|    The user must have the UserAdmin and Admin permissions or be a SuperAdmin.
 DnsAdmin           dns_admin          |yes|    The user must have the DnsAdmin and Admin permissions or be a SuperAdmin.
+MonitoringAdmin    monitoring_admin   |yes|    The user must have the MonitoringAdmin and Admin permissions or be a SuperAdmin.
 ProfileOwner                          |no|     The user must be the owner of the Profile or SuperAdmin.
 VmOwner                               |no|     The user must be the owner of the Virtual Machine or have the Admin or SuperAdmin permission.
 TaskCreator                           |no|     The user must be the one who created the task or have the Admin or SuperAdmin permission.

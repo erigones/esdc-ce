@@ -7,3 +7,5 @@
     mon_base
     mon_node
     mon_vm
+    mon_alert
+    mon_action

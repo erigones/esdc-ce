@@ -18,9 +18,10 @@ class TaskException(Exception):
 
 class MgmtTaskException(Exception):
     """Custom exception for nice dictionary output"""
-    def __init__(self, msg):
+    def __init__(self, msg, **kwargs):
         self.result = {'detail': msg}
         self.msg = msg
+        self.__dict__.update(kwargs)
         super(MgmtTaskException, self).__init__(self.result)
 
 

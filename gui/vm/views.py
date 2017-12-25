@@ -4,7 +4,6 @@ from itertools import chain
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.http import Http404, HttpResponse
@@ -303,7 +302,7 @@ def tasklog(request, hostname):
     context['vms'] = (vm,)
     context['submenu_auto'] = ''
     context['vms_tag_filter_disabled'] = True
-    log_query = Q(content_type=ContentType.objects.get_for_model(vm)) & Q(object_pk=vm.pk)
+    log_query = Q(content_type=vm.get_content_type()) & Q(object_pk=vm.pk)
     log = get_tasklog(request, context, base_query=log_query)
     context['tasklog'] = context['pager'] = get_pager(request, log, per_page=100)
     context['can_edit'] = request.user.is_admin(request)

@@ -1,7 +1,9 @@
 from django.core.validators import RegexValidator
+from django.utils.translation import ugettext_lazy as _
 
 from api import serializers as s
 from api.mon import MonitoringBackend
+from gui.models import Role
 
 
 DEFAULT_ACTION_MESSAGE_SUBJECT = "{TRIGGER.STATUS}: {TRIGGER.NAME}"
@@ -17,100 +19,58 @@ Item values:
 2. {ITEM.NAME2} ({HOST.NAME2}:{ITEM.KEY2}): {ITEM.VALUE2}
 3. {ITEM.NAME3} ({HOST.NAME3}:{ITEM.KEY3}): {ITEM.VALUE3}
 
-Original event ID: {EVENT.ID}
-"""
+Original event ID: {EVENT.ID}"""
 
 
 class ActionSerializer(s.Serializer):
-    # TODO change to as in user groups in user creation
-    name = s.SafeCharField(max_length=65536, required=True)
+    name = s.SafeCharField(max_length=200)  # The name in Zabbix will be prefixed with DC name
+    enabled = s.BooleanField(default=True)
+    hostgroups = s.ArrayField(max_items=1024, default=[],
+                              validators=(RegexValidator(regex=MonitoringBackend.RE_MONITORING_HOSTGROUPS),))
+    usergroups = s.ArrayField(max_items=1024,
+                              validators=(RegexValidator(regex=MonitoringBackend.RE_MONITORING_HOSTGROUPS),))
+    message_subject = s.CharField(max_length=255, default=DEFAULT_ACTION_MESSAGE_SUBJECT)
+    message_text = s.CharField(default=DEFAULT_ACTION_MESSAGE)
+    recovery_message_enabled = s.BooleanField(default=False)
+    recovery_message_subject = s.CharField(max_length=255, default=DEFAULT_ACTION_MESSAGE_SUBJECT)
+    recovery_message_text = s.CharField(default=DEFAULT_ACTION_MESSAGE)
 
-    hostgroups = s.ArrayField(max_items=16384, default=[], validators=(
-                                             RegexValidator(regex=MonitoringBackend.RE_MONITORING_HOSTGROUPS),),
-                              )
+    def __init__(self, request, *args, **kwargs):
+        super(ActionSerializer, self).__init__(*args, **kwargs)
+        self.request = request
+        self.dc_settings = request.dc.settings
 
-    usergroups = s.ArrayField(max_items=16384, default=[], validators=(
-                                             RegexValidator(regex=MonitoringBackend.RE_MONITORING_HOSTGROUPS),),
-                              )
-
-    message_subject = s.SafeCharField(max_length=65536, default=DEFAULT_ACTION_MESSAGE_SUBJECT)
-    message_text = s.SafeCharField(max_length=65536, default=DEFAULT_ACTION_MESSAGE)
-    # TODO recovery message boolean to turn on/off
-    recovery_message_text = s.SafeCharField(max_length=65536, required=False)
-    # TODO add also status enabled/disabled
+        if request.method == 'POST':
+            self.fields['usergroups'].required = True
+        else:
+            self.fields['usergroups'].default = []
+            self.fields['usergroups'].required = False
 
     def validate_hostgroups(self, attrs, source):
-        # As we implmement everywhere dynamic hostgroup creation, we will not validate whether any hostgroup exist.
+        # As we implement dynamic hostgroup creation everywhere, we will not validate whether any hostgroup exists.
         # Also we don't have to have any hostgroup defined while we create the Action as it is not a required field.
-        from api.mon.backends.zabbix.base import ZabbixHostGroupContainer
+        value = attrs.get(source, None)
 
-        attrs[source] = [ZabbixHostGroupContainer.hostgroup_name_factory(name, self.context.dc.name) for name in attrs[source]]
-        return attrs
-        raise NotImplementedError
-        try:
-            value = attrs[source]
-        except KeyError:
-            pass
-        else:
-            if self.object and self.object.monitoring_hostgroups == value:
-                return attrs
-            elif self.dc_settings.MON_ZABBIX_HOSTGROUPS_VM_RESTRICT and not \
-                    set(value).issubset(set(self.dc_settings.MON_ZABBIX_HOSTGROUPS_VM_ALLOWED)):
-                raise s.ValidationError(_('Selected monitoring hostgroups are not available.'))
+        if (value and self.dc_settings.MON_ZABBIX_HOSTGROUPS_VM_RESTRICT and
+                not set(value).issubset(set(self.dc_settings.MON_ZABBIX_HOSTGROUPS_VM_ALLOWED))):
+            raise s.ValidationError(_('Selected monitoring hostgroups are not available.'))
 
         return attrs
 
     def validate_usergroups(self, attrs, source):
-        # TODO take the usergroup validation from api/dc/base/serializers
-
-        from api.mon.backends.zabbix.base import ZabbixUserGroupContainer
-
-        attrs[source] = [ZabbixUserGroupContainer.user_group_name_factory(self.context.dc.name, name)
-                         for name in attrs[source]]
-        return attrs
-
-        raise NotImplementedError
+        # User groups are created in the monitoring system according to groups in the DB. We should validate this array
+        # against groups available in the current DC.
         try:
-            value = attrs[source]
+            groups_requested = set(attrs[source])
         except KeyError:
             pass
         else:
-            if self.object and self.object.monitoring_hostgroups == value:
-                return attrs
-            elif self.dc_settings.MON_ZABBIX_HOSTGROUPS_VM_RESTRICT and not \
-                    set(value).issubset(set(self.dc_settings.MON_ZABBIX_HOSTGROUPS_VM_ALLOWED)):
-                raise s.ValidationError(_('Selected monitoring hostgroups are not available.'))
+            groups_available = set(Role.objects.filter(dc=self.request.dc, name__in=groups_requested)
+                                               .values_list('name', flat=True))
+            groups_unavailable = groups_requested - groups_available
 
-        return attrs
+            if groups_unavailable:
+                raise s.ValidationError([_('User group with name=%s does not exist.') % group
+                                         for group in groups_unavailable])
 
-
-class ActionUpdateSerializer(s.Serializer):
-    hostgroups = s.ArrayField(max_items=16384, validators=(
-        RegexValidator(regex=MonitoringBackend.RE_MONITORING_HOSTGROUPS),), required=False)
-
-    usergroups = s.ArrayField(max_items=16384, validators=(
-        RegexValidator(regex=MonitoringBackend.RE_MONITORING_HOSTGROUPS),), required=False)
-
-    message_subject = s.SafeCharField(max_length=65536, required=False)
-
-    message_text = s.SafeCharField(max_length=65536, required=False)
-
-    recovery_message_text = s.SafeCharField(max_length=65536, required=False)
-
-    def validate_hostgroups(self, attrs, source):
-        # As we implmement everywhere dynamic hostgroup creation, we will not validate whether any hostgroup exist.
-        # Also we don't have to have any hostgroup defined while we create the Action as it is not a required field.
-        from api.mon.backends.zabbix.base import ZabbixHostGroupContainer
-        if source in attrs:
-            attrs[source] = [ZabbixHostGroupContainer.hostgroup_name_factory(name, self.context.dc.name)
-                             for name in attrs[source]]
-        return attrs
-
-    def validate_usergroups(self, attrs, source):
-        # TODO take the usergroup validation from api/dc/base/serializers
-
-        from api.mon.backends.zabbix.base import ZabbixUserGroupContainer
-        if source in attrs:
-            attrs[source] = [ZabbixUserGroupContainer.user_group_name_factory(self.context.dc.name, name)
-                             for name in attrs[source]]
         return attrs

@@ -1,7 +1,6 @@
 from itertools import chain
 
 from django.contrib.auth.decorators import login_required
-from django.contrib.contenttypes.models import ContentType
 from django.views.decorators.http import require_POST
 from django.shortcuts import render, redirect
 from django.db.models import Count, Q
@@ -463,8 +462,8 @@ def tasklog(request, hostname):
     context['nodes'] = (node,)
     context['submenu_auto'] = ''
     nss = node.nodestorage_set.all().extra(select={'strid': 'CAST(id AS text)'}).values_list('strid', flat=True)
-    log_query = ((Q(content_type=ContentType.objects.get_for_model(node)) & Q(object_pk=node.pk)) |
-                 (Q(content_type=ContentType.objects.get_for_model(NodeStorage)) & Q(object_pk__in=nss)))
+    log_query = ((Q(content_type=node.get_content_type()) & Q(object_pk=node.pk)) |
+                 (Q(content_type=NodeStorage.get_content_type()) & Q(object_pk__in=nss)))
     log = get_tasklog(request, context=context, base_query=log_query, filter_by_permissions=False)
     context['tasklog'] = context['pager'] = tasklog_items = get_pager(request, log, per_page=100)
     TaskLogEntry.prepare_queryset(tasklog_items)

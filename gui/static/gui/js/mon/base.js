@@ -1,4 +1,33 @@
 /*
+ * This is a helper for initializing MONITORING_* objects
+ * It checks whether we are connected to socket.io and waits for a while if not
+ */
+function mon_initialize(mon_object_init) {
+  var i = 0;
+  var max_checks = 20;  // will wait for max_checks * 0.5 seconds
+  var wait_for_socketio = null;
+
+  $(window).one('statechange', function() {
+    if (wait_for_socketio) {
+      clearInterval(wait_for_socketio);
+    }
+  });
+
+  show_loading_screen(gettext('Contacting monitoring server...'));
+
+  wait_for_socketio = setInterval(function() {
+    i++;
+    if (SOCKET.socket.connected || i > max_checks) {
+      clearInterval(wait_for_socketio);
+      if (!mon_object_init()) {
+        hide_loading_screen();
+      }
+    }
+  }, 500);
+}
+
+
+/*
  * Monitoring templates and hostgroups select2 helpers
  */
 
@@ -58,7 +87,7 @@ function mon_templates_enable(elements, options) {
 function mon_templates_update(result) {
   if ($.isArray(MONITORING_TEMPLATES) && MONITORING_TEMPLATES.length === 0 && $.isArray(result)) {
     // MONITORING_TEMPLATES.extend()
-    MONITORING_TEMPLATES.push.apply(MONITORING_TEMPLATES, _.pluck(result, 'name'));
+    MONITORING_TEMPLATES.push.apply(MONITORING_TEMPLATES, result);
 
     if (MONITORING_TEMPLATES_ELEMENTS) {
       $.each(MONITORING_TEMPLATES_ELEMENTS, function() {
@@ -107,7 +136,7 @@ function mon_node_hostgroups_enable(elements,options){
 function mon_hostgroups_update(result) {
   if ($.isArray(MONITORING_HOSTGROUPS) && MONITORING_HOSTGROUPS.length === 0 && $.isArray(result)) {
     // MONITORING_HOSTGROUPS.extend()
-    MONITORING_HOSTGROUPS.push.apply(MONITORING_HOSTGROUPS, _.pluck(result, 'name'));
+    MONITORING_HOSTGROUPS.push.apply(MONITORING_HOSTGROUPS, result);
 
     if (MONITORING_HOSTGROUPS_ELEMENTS) {
       $.each(MONITORING_HOSTGROUPS_ELEMENTS, function() {
@@ -120,7 +149,7 @@ function mon_hostgroups_update(result) {
 function mon_node_hostgroups_update(result) {
   if ($.isArray(MONITORING_NODE_HOSTGROUPS) && MONITORING_NODE_HOSTGROUPS.length === 0 && $.isArray(result)) {
     // MONITORING_HOSTGROUPS.extend()
-    MONITORING_NODE_HOSTGROUPS.push.apply(MONITORING_NODE_HOSTGROUPS, _.pluck(result, 'name'));
+    MONITORING_NODE_HOSTGROUPS.push.apply(MONITORING_NODE_HOSTGROUPS, result);
 
     if (MONITORING_NODE_HOSTGROUPS_ELEMENTS) {
       $.each(MONITORING_NODE_HOSTGROUPS_ELEMENTS, function () {

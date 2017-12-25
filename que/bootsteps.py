@@ -208,6 +208,7 @@ class MgmtDaemon(_PeriodicTaskDaemon):
         if self.enabled:
             self.app = parent.app
 
+            # noinspection PyProtectedMember
             from api.node.status.tasks import node_status_all
             self._periodic_tasks.append(node_status_all)
 
@@ -222,6 +223,7 @@ class MgmtDaemon(_PeriodicTaskDaemon):
         gossip.on_node_lost = self._node_lost
 
     def __worker_status_monitor(self):
+        # noinspection PyProtectedMember
         from api.node.status.tasks import node_worker_status_change
 
         def _worker_state(hostname, status, event):

@@ -1,10 +1,14 @@
-from logging import ERROR, WARNING, INFO
+from logging import getLogger, ERROR, WARNING, INFO
 
 from django.conf import settings as django_settings
 from zabbix_api import ZabbixAPIException
 
 from api.decorators import catch_exception
-from .base import ZabbixError, ZabbixBase, logger
+from api.mon.backends.zabbix.base import ZabbixBase
+from api.mon.backends.zabbix.utils import parse_zabbix_result
+from api.mon.backends.zabbix.exceptions import MonitoringError
+
+logger = getLogger(__name__)
 
 
 class InternalZabbix(ZabbixBase):
@@ -118,11 +122,11 @@ class InternalZabbix(ZabbixBase):
         except ZabbixAPIException as exc:
             err = 'Zabbix API Error when retrieving SLA (%s)' % exc
             self.log(ERROR, err)
-            raise ZabbixError(err)
-        except ZabbixError as exc:
+            raise MonitoringError(err)
+        except MonitoringError as exc:
             err = 'Could not parse Zabbix API output when retrieving SLA (%s)' % exc
             self.log(ERROR, err)
-            raise ZabbixError(err)
+            raise MonitoringError(err)
 
         return sla
 
@@ -137,11 +141,11 @@ class InternalZabbix(ZabbixBase):
             except ZabbixAPIException as exc:
                 err = 'Zabbix API Error when retrieving SLA (%s)' % exc
                 self.log(ERROR, err)
-                raise ZabbixError(err)
-            except ZabbixError as exc:
+                raise MonitoringError(err)
+            except MonitoringError as exc:
                 err = 'Could not parse Zabbix API output when retrieving SLA (%s)' % exc
                 self.log(ERROR, err)
-                raise ZabbixError(err)
+                raise MonitoringError(err)
             else:
                 sla += float(node_sla) * i['weight']
 
@@ -210,7 +214,8 @@ class InternalZabbix(ZabbixBase):
         # Finally delete the node IT service
         try:
             res = self.zapi.service.delete([serviceid])
-            return res['serviceids'][0]
-        except (ZabbixAPIException, KeyError, IndexError) as e:
+        except ZabbixAPIException as e:
             logger.exception(e)
-            raise ZabbixError(e)
+            raise MonitoringError(e)
+
+        return parse_zabbix_result(res, 'serviceids', from_get_request=False)

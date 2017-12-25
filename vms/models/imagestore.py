@@ -1,4 +1,4 @@
-from hashlib import md5
+import hashlib
 from operator import itemgetter
 from frozendict import frozendict
 from collections import OrderedDict
@@ -11,7 +11,7 @@ from django.utils.six import iteritems
 from django.utils.six.moves.urllib.parse import urljoin
 
 # noinspection PyProtectedMember
-from vms.models.base import _DummyModel
+from vms.models.base import _DummyDataModel
 from vms.models.dc import DefaultDc
 from vms.models.image import Image
 
@@ -64,7 +64,7 @@ class ImageStoreObject(dict):
         }
 
 
-class ImageStore(_DummyModel):
+class ImageStore(_DummyDataModel):
     """
     Dummy model for representing a specific instance of a image repository (a.k.a. imagestore).
     """
@@ -179,10 +179,19 @@ class ImageStore(_DummyModel):
     def get_image_manifest_url(self, uuid):
         return urljoin(self.url, self.IMAGE_URI % uuid)
 
+    @classmethod
+    def get_content_type(cls):  # Required by task_log
+        return None
+
+    # noinspection PyUnusedLocal
+    @classmethod
+    def get_object_type(cls, content_type=None):  # Required by task_log
+        return 'imagestore'
+
     @property
     def pk(self):  # Required by task_log
         assert self.url
-        return md5(self.url).hexdigest()
+        return hashlib.md5(self.url).hexdigest()
 
     @property
     def log_name(self):  # Required by task_log

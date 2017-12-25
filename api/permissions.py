@@ -41,7 +41,8 @@ from gui.models.permission import (
     TemplateAdminPermission,
     IsoAdminPermission,
     DnsAdminPermission,
-    UserAdminPermission
+    UserAdminPermission,
+    MonitoringAdminPermission,
 )
 
 __all__ = (
@@ -49,10 +50,25 @@ __all__ = (
     'IsAuthenticated',
     'IsAuthenticatedOrReadOnly',
     'HasAPIAccessPermission',
+
     'IsSuperAdmin',
     'IsAdmin',
     'IsSuperAdminOrReadOnly',
     'IsAdminOrReadOnly',
+
+    'IsImageAdmin',
+    'IsMonitoringAdmin',
+
+    'IsAnyDcImageAdmin',
+    'IsAnyDcImageImportAdmin',
+    'IsAnyDcNetworkAdmin',
+    'IsAnyDcTemplateAdmin',
+    'IsAnyDcIsoAdmin',
+    'IsAnyDcDnsAdmin',
+    'IsAnyDcUserAdmin',
+
+    'IsProfileOwner',
+    'IsAnyDcUserAdminOrProfileOwner',
 )
 
 logger = getLogger(__name__)
@@ -271,6 +287,14 @@ class AnyDcPermission(DcBasePermission):
             return True
 
         return bool(request.dcs)
+
+
+class IsMonitoringAdmin(DcPermission):
+    """
+    Allows access only to SuperAdmins or users with monitoring_admin permission in a specific DC.
+    """
+    admin_required = True
+    permission = MonitoringAdminPermission
 
 
 class IsImageAdmin(DcPermission):

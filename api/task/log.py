@@ -35,7 +35,7 @@ def log(msgdict):
     """
     Save msgdict into DB and cache.
     """
-    # This dictionary can be store more than once
+    # This dictionary can be stored more than once
     dct = msgdict.copy()
 
     # DB

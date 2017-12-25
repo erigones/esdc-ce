@@ -7,7 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q
 from django.contrib.contenttypes.models import ContentType
 from celery import states
-from pytz import UTC
+from pytz import utc
 
 from vms.models import Dc, Vm, Node, NodeStorage, Subnet, Image, VmTemplate, Iso, TaskLogEntry
 from pdns.models import Domain
@@ -26,6 +26,8 @@ TASK_STATES = (
     (states.REVOKED, _(states.REVOKED)),
 )
 
+# TODO: Switch to filtering based on object_type => add index(content_type_model) + remove content_type field
+# TODO: That means that in the meantime we don't have filters on logs for dummy task models
 # noinspection PyProtectedMember,PyUnresolvedReferences
 TASK_OBJECT_TYPES = [('', _('Object type (all)'))] + \
                     [(m._meta.model_name, m._meta.verbose_name) for m in TASK_LOG_MODELS]
@@ -38,7 +40,7 @@ class TaskLogEntrySerializer(s.ModelSerializer):
     username = s.Field(source='get_username')
     object_name = s.Field(source='get_object_name')
     object_alias = s.Field(source='get_object_alias')
-    object_type = s.Field(source='content_type.model')
+    object_type = s.Field(source='object_type')
 
     class Meta:
         model = TaskLogEntry
@@ -92,12 +94,12 @@ class TaskLogFilterSerializer(s.Serializer):
         date_from = data.get('date_from')
         if date_from:
             date_from = datetime.combine(date_from, datetime.min.time())
-            query.append(Q(time__gte=date_from.replace(tzinfo=UTC).astimezone(tz)))
+            query.append(Q(time__gte=date_from.replace(tzinfo=utc).astimezone(tz)))
 
         date_to = data.get('date_to')
         if date_to:
             date_to = datetime.combine(date_to, datetime.min.time())
-            query.append(Q(time__lte=date_to.replace(tzinfo=UTC).astimezone(tz)))
+            query.append(Q(time__lte=date_to.replace(tzinfo=utc).astimezone(tz)))
 
         if self._object_pks:
             query.append(Q(object_pk__in=self._object_pks))

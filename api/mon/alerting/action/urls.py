@@ -5,8 +5,8 @@ urlpatterns = patterns(
 
     # base
     # /action - get
-    url(r'^$', 'action_list', name='api_mon_action_list'),
+    url(r'^$', 'mon_action_list', name='api_mon_action_list'),
 
-    # /action/<name> - get, create, set, delete
-    url(r'^(?P<name>[A-Za-z0-9\._-]+)/$', 'action_manage', name='api_action_manage'),
+    # /action/<action_name> - get, create, set, delete
+    url(r'^(?P<action_name>[A-Za-z0-9._-]+)/$', 'mon_action_manage', name='api_mon_action_manage'),
 )

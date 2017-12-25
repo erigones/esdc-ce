@@ -12,6 +12,7 @@ __all__ = (
     'IsoAdminPermission',
     'UserAdminPermission',
     'DnsAdminPermission',
+    'MonitoringAdminPermission',
 )
 
 
@@ -50,7 +51,16 @@ TemplateAdminPermission = SimpleLazyObject(lambda: Permission.objects.get(name='
 IsoAdminPermission = SimpleLazyObject(lambda: Permission.objects.get(name='iso_admin'))
 UserAdminPermission = SimpleLazyObject(lambda: Permission.objects.get(name='user_admin'))
 DnsAdminPermission = SimpleLazyObject(lambda: Permission.objects.get(name='dns_admin'))
+MonitoringAdminPermission = SimpleLazyObject(lambda: Permission.objects.get(name='monitoring_admin'))
 
 # Set of strange DC-mixed permission names
-AnyDcPermissionSet = frozenset(['network_admin', 'image_admin', 'template_admin', 'iso_admin',
-                                'user_admin', 'dns_admin', 'image_import_admin'])
+AnyDcPermissionSet = frozenset([
+    'network_admin',
+    'image_admin',
+    'image_import_admin'
+    'template_admin',
+    'iso_admin',
+    'user_admin',
+    'dns_admin',
+    'monitoring_admin',
+])
