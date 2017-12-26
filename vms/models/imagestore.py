@@ -106,7 +106,7 @@ class ImageStore(_DummyDataModel):
         repos = OrderedDict(sorted(iteritems(DefaultDc().settings.VMS_IMAGE_REPOSITORIES)))
         image_vm = ImageVm()
 
-        if include_image_vm and image_vm:
+        if include_image_vm and image_vm and image_vm.has_ip():
             repos[image_vm.repo_name] = image_vm.repo_url
 
         return repos

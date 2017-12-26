@@ -35,27 +35,6 @@ var ERIGONES_SUPPORTED_BROWSER = (function() {
   );
 })();
 
-function repr(str) {
-  var x = JSON.stringify(str);
-
-  if (x.substring(0, 1) === '"' && x.substring(x.length-1) === '"') {
-    return x.slice(1, -1);
-  } else {
-    return x;
-  }
-}
-
-function load_repr(str) {
-  try {
-    if (!(str.substring(0, 1) === '"' && str.substring(str.length-1) === '"')) {
-      str = '"' + str + '"';
-    }
-    return JSON.parse(str);
-  } catch (e) {
-    return str;
-  }
-}
-
 function is_value_in_field(field, value) {
   return Boolean(field.find('option[value="'+ value +'"]').length);
 }
@@ -754,7 +733,7 @@ function mdata_display(input_field) {
     }
 
     $.each(value, function(key, val) {
-      row = $(row_template({'key': key, 'value': repr(val), 'sign': 'minus icon-link-enabled'}));
+      row = $(row_template({'key': key, 'value': val, 'sign': 'minus icon-link-enabled'}));
       input_group.append(row);
       input = row.children().get(1);
       input.scrollLeft = input.scrollWidth;
@@ -804,7 +783,7 @@ function mdata_handler(input_field) {
     $.each(rows, function() {
       var children = this.children;
       if (children[0].value || children[1].value) {
-        result[children[0].value] = load_repr(children[1].value);
+        result[children[0].value] = children[1].value;
       }
     });
 
@@ -867,7 +846,7 @@ function array_display(input_field) {
     }
 
     $.each(value, function(i, val) {
-      row = $(row_template({'value': repr(val), 'sign': 'minus icon-link-enabled'}));
+      row = $(row_template({'value': val, 'sign': 'minus icon-link-enabled'}));
       input_group.append(row);
       input = row.children().get(0);
       input.scrollLeft = input.scrollWidth;
@@ -912,7 +891,7 @@ function array_handler(input_field) {
     $.each(rows, function() {
       var children = this.children;
       if (children[0].value) {
-        result.push(load_repr(children[0].value));
+        result.push(children[0].value);
       }
     });
 

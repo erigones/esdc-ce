@@ -1,12 +1,12 @@
 from logging import getLogger
 
-from django.db import IntegrityError, transaction
 from django.db.models.signals import post_delete
 from django.core.exceptions import ObjectDoesNotExist
 
 from vms.models import Node, Vm
 from api.api_views import APIView
 from api.exceptions import NodeHasPendingTasks
+from api.decorators import catch_exception
 from api.serializers import ForceSerializer
 from api.signals import node_status_changed, node_online, node_offline, node_deleted, vm_undefined
 from api.task.utils import TaskID
@@ -27,26 +27,55 @@ class NodeDefineView(APIView):
         super(NodeDefineView, self).__init__(request, **kwargs)
         self.node = node
 
-    @staticmethod
-    def _delete_ip_address(ip_address):
-        if ip_address and ip_address.usage == ip_address.NODE:
+    @catch_exception
+    def _delete_ip_address(self, ip_address):
+        if ip_address.usage == ip_address.NODE:
+            logger.info('Deleting IP address %s associated with node %s', ip_address, self.node)
             ip_address.delete()
 
-    @staticmethod
-    def _delete_dns_records(request, task_id, node, hostname, ip_address):
-        if ip_address:
-            admin_net = ip_address.subnet
-            record_cls = RecordView.Record
+    @catch_exception
+    def _create_ip_address(self):
+        try:
+            ip_address = self.node.create_ip_address()
+        except ObjectDoesNotExist:
+            return None
 
-            if admin_net.dns_domain:
-                logger.info('Deleting forward A DNS record for node %s', hostname)
-                RecordView.delete_record(request, record_cls.A, admin_net.dns_domain, hostname,
-                                         task_id=task_id, related_obj=node)
+        logger.info('Creating IP address %s associated with node %s', ip_address, self.node)
+        ip_address.save()
 
-            if admin_net.ptr_domain:
-                logger.info('Deleting reverse PTR DNS record for node %s', hostname)
-                RecordView.delete_record(request, record_cls.PTR, admin_net.ptr_domain,
-                                         record_cls.get_reverse(ip_address.ip), task_id=task_id, related_obj=node)
+        return ip_address
+
+    @catch_exception
+    def _delete_dns_records(self, task_id, node, hostname, ip_address):
+        admin_net = ip_address.subnet
+        record_cls = RecordView.Record
+
+        if admin_net.dns_domain:
+            logger.info('Deleting forward A DNS record for node %s', hostname)
+            RecordView.delete_record(self.request, record_cls.A, admin_net.dns_domain, hostname,
+                                     task_id=task_id, related_obj=node)
+
+        if admin_net.ptr_domain:
+            logger.info('Deleting reverse PTR DNS record for node %s', hostname)
+            RecordView.delete_record(self.request, record_cls.PTR, admin_net.ptr_domain,
+                                     record_cls.get_reverse(ip_address.ip), task_id=task_id, related_obj=node)
+
+    @catch_exception
+    def _add_or_update_dns_records(self, task_id, ip_address):
+        hostname = self.node.hostname
+        admin_net = ip_address.subnet
+        record_cls = RecordView.Record
+
+        if admin_net.dns_domain:
+            logger.info('Adding or updating forward A DNS record for node %s', hostname)
+            RecordView.add_or_update_record(self.request, record_cls.A, admin_net.dns_domain, hostname,
+                                            task_id=task_id, related_obj=self.node)
+
+        if admin_net.ptr_domain:
+            logger.info('Adding or updating reverse PTR DNS record for node %s', hostname)
+            RecordView.add_or_update_record(self.request, record_cls.PTR, admin_net.ptr_domain,
+                                            record_cls.get_reverse(ip_address.ip),
+                                            task_id=task_id, related_obj=self.node)
 
     @staticmethod
     def _delete_queue(channel, queue, fail_silently=False):
@@ -63,6 +92,7 @@ class NodeDefineView(APIView):
             return count
 
     @classmethod
+    @catch_exception
     def _delete_queues(cls, queues, fail_silently=False):
         """Delete all amqp queues"""
         from que.erigonesd import cq
@@ -85,6 +115,22 @@ class NodeDefineView(APIView):
 
         return SuccessTaskResponse(self.request, res, dc_bound=False)
 
+    def _post_update(self, task_id, ser):
+        """Called after put() saves updated node properties"""
+        if ser.address_changed:
+            if ser.old_ip_address:
+                # Delete DNS records associated with node; fail silently
+                self._delete_dns_records(task_id, self.node, self.node.hostname, ser.old_ip_address)
+                # Delete IP address associated with node; fail silently
+                self._delete_ip_address(ser.old_ip_address)
+
+            # Create IP address object associated with node; fail silently
+            ip_address = self._create_ip_address()
+
+            if ip_address:
+                # Create DNS records associated with node; fail silently
+                self._add_or_update_dns_records(task_id, ip_address)
+
     def put(self):
         """Update node definition"""
         node = self.node
@@ -99,42 +145,21 @@ class NodeDefineView(APIView):
         if ser.status_changed == Node.OFFLINE and node.has_related_tasks():
             raise NodeHasPendingTasks('Node has related objects with pending tasks')
 
-        # Changing cpu or disk coefficients can lead to negative numbers in node.cpu/ram_free or dc_node.cpu/ram_free
-        update_node_resources = ser.update_node_resources
+        # Changing cpu or disk coefficients can lead to negative numbers in node.cpu/ram_free or dc_node.cpu/ram_free;
+        # This is solved by running the DB update inside a transaction and checking for negative values (=> rollback)
+        errors = ser.save()
 
-        try:
-            with transaction.atomic():
-                ser.object.save(update_resources=update_node_resources, clear_cache=ser.clear_cache)
-
-                if update_node_resources:
-                    if node.cpu_free < 0 or node.dcnode_set.filter(cpu_free__lt=0).exists():
-                        raise IntegrityError('cpu_check')
-
-                    if node.ram_free < 0 or node.dcnode_set.filter(ram_free__lt=0).exists():
-                        raise IntegrityError('ram_check')
-
-        except IntegrityError as exc:
-            errors = {}
-            exc_error = str(exc)
-            # ram or cpu constraint was violated on vms_dcnode (can happen when DcNode strategy is set to RESERVED)
-            # OR a an exception was raised above
-            if 'ram_check' in exc_error:
-                errors['ram_coef'] = ser.error_negative_resources
-            if 'cpu_check' in exc_error:
-                errors['cpu_coef'] = ser.error_negative_resources
-
-            if not errors:
-                raise exc
-
+        if errors:
             return FailureTaskResponse(self.request, errors, obj=node, dc_bound=False)
-
-        if update_node_resources:  # cpu_free or ram_free changed
-            ser.reload()
 
         res = SuccessTaskResponse(self.request, ser.data, obj=node, detail_dict=ser.detail_dict(), dc_bound=False,
                                   msg=LOG_DEF_UPDATE)
         task_id = TaskID(res.data.get('task_id'), request=self.request)
 
+        # Delete obsolete IP address and DNS records and create new ones if possible
+        self._post_update(task_id, ser)
+
+        # Signals section (should go last)
         if ser.status_changed:
             node_status_changed.send(task_id, node=node, automatic=False)  # Signal!
 
@@ -143,10 +168,21 @@ class NodeDefineView(APIView):
             elif node.is_offline():
                 node_offline.send(task_id, node=node)  # Signal!
 
-        if ser.monitoring_changed:
+        if ser.monitoring_changed or ser.address_changed:
             node_json_changed.send(task_id, node=node)  # Signal!
 
         return res
+
+    def _post_delete(self, task_id, node, hostname, ip_address, queues):
+        """The parameter are passed directly because the node may not exist anymore"""
+        if ip_address:
+            # Delete DNS records associated with node; fail silently
+            self._delete_dns_records(task_id, node, hostname, ip_address)
+            # Delete IP address associated with node; fail silently
+            self._delete_ip_address(ip_address)
+
+        # Delete celery (amqp) task queues (named after node hostname); fail silently
+        self._delete_queues(queues, fail_silently=True)
 
     def delete(self):
         """Delete node definition"""
@@ -197,22 +233,18 @@ class NodeDefineView(APIView):
         res = SuccessTaskResponse(self.request, None, obj=obj, owner=owner, detail_dict={'force': force},
                                   msg=LOG_DEF_DELETE, dc_bound=False)
         task_id = TaskID(res.data.get('task_id'), request=self.request)
-        node_deleted.send(task_id, node_uuid=uuid, node_hostname=hostname)  # Signal!
 
         # Force deletion will delete all node related objects (VMs, backups...)
         for vm in vms:
-            vm_undefined.send(task_id, **vm)  # Signal! for every vm on deleted node
+            try:
+                vm_undefined.send(task_id, **vm)  # Signal! for every vm on deleted node
+            except Exception as exc:
+                logger.exception(exc)
 
-        try:
-            # Delete DNS records associated with node
-            self._delete_dns_records(self.request, task_id, node, hostname, ip_address)
+        # Post delete cleanup (IP address, DNS records, message queues)
+        self._post_delete(task_id, node, hostname, ip_address, queues)
 
-            # Delete celery (amqp) task queues (named after node hostname); fail silently
-            self._delete_queues(queues, fail_silently=True)
-
-            # Delete IP address associated with node
-            self._delete_ip_address(ip_address)
-        except Exception as exc:
-            logger.exception(exc)
+        # Signals should be called last
+        node_deleted.send(task_id, node_uuid=uuid, node_hostname=hostname)  # Signal!
 
         return res
