@@ -10,6 +10,7 @@ from api.mon.backends.zabbix.containers.user_group import ZabbixUserGroupContain
 trans_name = ZabbixBaseContainer.trans_dc_qualified_name
 trans_noop = ZabbixBaseContainer.trans_noop
 trans_bool = ZabbixBaseContainer.trans_bool
+trans_bool_inverted = ZabbixBaseContainer.trans_bool_inverted
 
 
 class ZabbixActionContainer(ZabbixBaseContainer):
@@ -33,9 +34,10 @@ class ZabbixActionContainer(ZabbixBaseContainer):
 
     _BASE_PARAMS_MAPPING = (
         ('name', 'name', trans_name),
-        ('status', 'enabled', trans_bool),
+        ('status', 'enabled', trans_bool_inverted),
         ('def_shortdata', 'message_subject', trans_noop),
         ('def_longdata', 'message_text', trans_noop),
+        ('recovery_msg', 'recovery_message_enabled', trans_bool),
         ('r_shortdata', 'recovery_message_subject', trans_noop),
         ('r_longdata', 'recovery_message_text', trans_noop),
     )
@@ -137,7 +139,7 @@ class ZabbixActionContainer(ZabbixBaseContainer):
         check_operations = (
             len(operations) == 1 and
             'opmessage_grp' in operations[0] and
-            int(operations[0]['operationtype'] == cls._MESSAGE_OPERATION_PARAMS_DEFAULTS['operationtype'])
+            int(operations[0]['operationtype']) == cls._MESSAGE_OPERATION_PARAMS_DEFAULTS['operationtype']
         )
 
         # Check filter base setup
@@ -149,14 +151,14 @@ class ZabbixActionContainer(ZabbixBaseContainer):
         # Check filter conditions
         check_conditions = (
             (int(condition.get('conditiontype')) == cls._CONDITION_HOST_GROUP_DEFAULTS['conditiontype'] and
-             int(condition.get('operator') == cls._CONDITION_HOST_GROUP_DEFAULTS['operator']))
+             int(condition.get('operator')) == cls._CONDITION_HOST_GROUP_DEFAULTS['operator'])
             or
             (int(condition.get('conditiontype')) == cls._CONDITION_TRIGGER_PROBLEM['conditiontype'] and
-             int(condition.get('operator') == cls._CONDITION_TRIGGER_PROBLEM['operator']) and
+             int(condition.get('operator')) == cls._CONDITION_TRIGGER_PROBLEM['operator'] and
              text_type(condition.get('value')) == text_type(cls._CONDITION_TRIGGER_PROBLEM['value']))
             or
             (int(condition.get('conditiontype')) == cls._CONDITION_STATUS_NOT_IN_MAINTENANCE['conditiontype'] and
-             int(condition.get('operator') == cls._CONDITION_STATUS_NOT_IN_MAINTENANCE['operator']) and
+             int(condition.get('operator')) == cls._CONDITION_STATUS_NOT_IN_MAINTENANCE['operator'] and
              text_type(condition.get('value')) == text_type(cls._CONDITION_STATUS_NOT_IN_MAINTENANCE['value']))
             for condition in conditions
         )
@@ -200,6 +202,8 @@ class ZabbixActionContainer(ZabbixBaseContainer):
     def _generate_hostgroup_condition(cls, hostgroup_id):
         condition = dict(cls._CONDITION_HOST_GROUP_DEFAULTS)
         condition['value'] = hostgroup_id
+
+        return condition
 
     def _generate_conditions(self):
         conditions = [dict(self._CONDITION_TRIGGER_PROBLEM), dict(self._CONDITION_STATUS_NOT_IN_MAINTENANCE)]
@@ -266,7 +270,7 @@ class ZabbixActionContainer(ZabbixBaseContainer):
         opmessage_groups = (op['opmessage_grp'] for op in operations
                             if ('opmessage_grp' in op and
                                 int(op['operationtype']) == self._MESSAGE_OPERATION_PARAMS_DEFAULTS['operationtype']))
-        usergroup_ids = set(int(opmessage_grp['usrgrpid']) for opmessage_grp in opmessage_groups)
+        usergroup_ids = set(int(grp['usrgrpid']) for opmessage_grp in opmessage_groups for grp in opmessage_grp)
 
         self.usergroups = ZabbixUserGroupContainer.from_zabbix_ids(self._zapi, list(usergroup_ids), resolve_users=False)
 

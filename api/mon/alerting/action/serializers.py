@@ -25,10 +25,11 @@ Original event ID: {EVENT.ID}"""
 class ActionSerializer(s.Serializer):
     name = s.SafeCharField(max_length=200)  # The name in Zabbix will be prefixed with DC name
     enabled = s.BooleanField(default=True)
+    # As we implement dynamic hostgroup creation everywhere, we will not validate whether any hostgroup exists.
+    # Also we don't have to have any hostgroup defined while we create the Action as it is not a required field.
     hostgroups = s.ArrayField(max_items=1024, default=[],
                               validators=(RegexValidator(regex=MonitoringBackend.RE_MONITORING_HOSTGROUPS),))
-    usergroups = s.ArrayField(max_items=1024,
-                              validators=(RegexValidator(regex=MonitoringBackend.RE_MONITORING_HOSTGROUPS),))
+    usergroups = s.ArrayField(max_items=1024)
     message_subject = s.CharField(max_length=255, default=DEFAULT_ACTION_MESSAGE_SUBJECT)
     message_text = s.CharField(default=DEFAULT_ACTION_MESSAGE)
     recovery_message_enabled = s.BooleanField(default=False)
@@ -45,17 +46,6 @@ class ActionSerializer(s.Serializer):
         else:
             self.fields['usergroups'].default = []
             self.fields['usergroups'].required = False
-
-    def validate_hostgroups(self, attrs, source):
-        # As we implement dynamic hostgroup creation everywhere, we will not validate whether any hostgroup exists.
-        # Also we don't have to have any hostgroup defined while we create the Action as it is not a required field.
-        value = attrs.get(source, None)
-
-        if (value and self.dc_settings.MON_ZABBIX_HOSTGROUPS_VM_RESTRICT and
-                not set(value).issubset(set(self.dc_settings.MON_ZABBIX_HOSTGROUPS_VM_ALLOWED))):
-            raise s.ValidationError(_('Selected monitoring hostgroups are not available.'))
-
-        return attrs
 
     def validate_usergroups(self, attrs, source):
         # User groups are created in the monitoring system according to groups in the DB. We should validate this array

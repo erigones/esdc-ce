@@ -109,6 +109,14 @@ class ZabbixBaseContainer(object):
             return int(value)  # True -> 1, False -> 0
 
     # noinspection PyUnusedLocal
+    @staticmethod
+    def trans_bool_inverted(value, from_zabbix=False, **kwargs):
+        if from_zabbix:
+            return not bool(int(value))  # '0' -> True, '1' -> False
+        else:
+            return int(not value)  # True -> 0, False -> 1
+
+    # noinspection PyUnusedLocal
     @classmethod
     def trans_dc_qualified_name(cls, name, dc_name=None, from_zabbix=False, **kwargs):
         if from_zabbix:
