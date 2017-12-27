@@ -32,7 +32,7 @@ class AlertSerializer(s.Serializer):
         self.nodes = None  # This will be a list of node uuids if node_* filters are set
 
     def validate_dc_bound(self, attrs, source):
-        if not attrs.get(source) and not self.request.user.is_super_admin(self.request):
+        if not attrs.get(source) and not self.request.user.is_staff:
             raise s.ValidationError(PERMISSION_DENIED)
 
         return attrs

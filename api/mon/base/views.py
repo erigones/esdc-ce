@@ -58,20 +58,27 @@ def mon_hostgroup_list(request, data=None):
     .. http:get:: /mon/hostgroup
 
         :DC-bound?:
-            * |dc-yes|
+            * |dc-yes| - ``dc_bound=true``
+            * |dc-no| - ``dc_bound=false``
         :Permissions:
-            * |Admin|
+            * |Admin| - ``dc_bound=true``
+            * |SuperAdmin| - ``dc_bound=false``
         :Asynchronous?:
             * |async-yes| - List of monitoring hostgroups is retrieved from monitoring server
             * |async-no| - List of monitoring hostgroups is retrieved from cache
         :arg data.full: Return list of objects with all monitoring hostgroup details (default: false)
         :type data.full: boolean
+        :arg data.dc_bound: If false, include information about "global" monitoring hostgroups that are not bound to a \
+datacenter (requires |SuperAdmin| permission) (default: true)
+        :type data.dc_bound: boolean
         :status 200: SUCCESS
         :status 201: PENDING
         :status 400: FAILURE
         :status 403: Forbidden
     """
-    return MonHostgroupView(request, None, data).get(many=True)
+    dc_bound = MonHostgroupView.get_dc_bound(request, data)  # This may switch request.dc
+
+    return MonHostgroupView(request, None, data, dc_bound=dc_bound).get(many=True)
 
 
 @api_view(('GET',))
@@ -98,13 +105,18 @@ def mon_hostgroup_manage(request, hostgroup_name, data=None):
     .. http:get:: /mon/hostgroup/(hostgroup_name)
 
         :DC-bound?:
-            * |dc-yes|
+            * |dc-yes| - ``dc_bound=true``
+            * |dc-no| - ``dc_bound=false``
         :Permissions:
-            * |Admin|
+            * |Admin| - ``dc_bound=true``
+            * |SuperAdmin| - ``dc_bound=false``
         :Asynchronous?:
             * |async-yes|
         :arg hostgroup_name: **required** - Monitoring hostgroup name
         :type hostgroup_name: string
+        :arg data.dc_bound: If false, display a "global" monitoring hostgroup that is not bound to a \
+datacenter (requires |SuperAdmin| permission) (default: true)
+        :type data.dc_bound: boolean
         :status 200: SUCCESS
         :status 201: PENDING
         :status 400: FAILURE
@@ -113,13 +125,18 @@ def mon_hostgroup_manage(request, hostgroup_name, data=None):
     .. http:post:: /mon/hostgroup/(hostgroup_name)
 
         :DC-bound?:
-            * |dc-yes|
+            * |dc-yes| - ``dc_bound=true``
+            * |dc-no| - ``dc_bound=false``
         :Permissions:
-            * |Admin|
+            * |Admin| - ``dc_bound=true``
+            * |SuperAdmin| - ``dc_bound=false``
         :Asynchronous?:
             * |async-yes|
         :arg hostgroup_name: **required** - Monitoring hostgroup name
         :type hostgroup_name: string
+        :arg data.dc_bound: If false, create a "global" monitoring hostgroup that is not bound to a \
+datacenter (requires |SuperAdmin| permission) (default: true)
+        :type data.dc_bound: boolean
         :status 200: SUCCESS
         :status 201: PENDING
         :status 400: FAILURE
@@ -128,17 +145,24 @@ def mon_hostgroup_manage(request, hostgroup_name, data=None):
     .. http:delete:: /mon/hostgroup/(hostgroup_name)
 
         :DC-bound?:
-            * |dc-yes|
+            * |dc-yes| - ``dc_bound=true``
+            * |dc-no| - ``dc_bound=false``
         :Permissions:
-            * |Admin|
+            * |Admin| - ``dc_bound=true``
+            * |SuperAdmin| - ``dc_bound=false``
         :Asynchronous?:
             * |async-yes|
         :arg hostgroup_name: **required** - Monitoring hostgroup name
         :type hostgroup_name: string
+        :arg data.dc_bound: If false, delete a "global" monitoring hostgroup that is not bound to a \
+datacenter (requires |SuperAdmin| permission) (default: true)
+        :type data.dc_bound: boolean
         :status 200: SUCCESS
         :status 201: PENDING
         :status 400: FAILURE
         :status 403: Forbidden
 
     """
-    return MonHostgroupView(request, hostgroup_name, data).response()
+    dc_bound = MonHostgroupView.get_dc_bound(request, data)  # This may switch request.dc
+
+    return MonHostgroupView(request, hostgroup_name, data, dc_bound=dc_bound).response()

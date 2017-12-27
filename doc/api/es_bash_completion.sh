@@ -549,11 +549,11 @@ _es() {
 			if [ ${COMP_CWORD} -eq 2 ]; then
 				COMPREPLY=( $(compgen -P "${cur%/*}" -W "/ /(hostgroup_name)" -- "/${cur##*/}" ) )
 			fi
-			[[ "${action}" == "get" ]] && params="-full -extended -cb_method -cb_url"
+			[[ "${action}" == "get" ]] && params="-dc_bound -full -extended -cb_method -cb_url"
 		;;
 
 		/mon/hostgroup/*)
-			params="-cb_method -cb_url"
+			params="-dc_bound -cb_method -cb_url"
 		;;
 
 		/mon/template|/mon/template/)

@@ -47,7 +47,7 @@ class AlertingAPIAdapterTests(TestCase):
         user.last_name = get_random_string(10)
         user.api_access = True
         user.is_active = True
-        user.is_super_admin = False
+        user.is_staff = False
         user.callback_key = '***'
         user.password = get_random_string(10)
         user.email = get_random_string(10) + '@' + get_random_string(10) + '.com'

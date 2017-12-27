@@ -9,11 +9,19 @@ from api.mon.backends.zabbix.containers.base import ZabbixBaseContainer
 class ZabbixHostGroupContainer(ZabbixBaseContainer):
     """
     Container class for the Zabbix HostGroup object.
+
+    There are two types of hostgroups:
+        - dc-bound (local): with a DC prefix; visible and usable from a specific DC
+        - dc-unbound (global): without a DC prefix; visible from everywhere and by everyone; editable only by SuperAdmin
     """
     ZABBIX_ID_ATTR = 'groupid'
     NAME_MAX_LENGTH = 64
     QUERY_BASE = frozendict({'output': ['name', 'groupid'], 'selectHosts': 'count'})
-    new = False
+
+    def __init__(self, name, dc_bound=False, **kwargs):
+        self.new = False  # Used by actions
+        self.dc_bound = dc_bound
+        super(ZabbixHostGroupContainer, self).__init__(name, **kwargs)
 
     @classmethod
     def hostgroup_name_factory(cls, dc_name, hostgroup_name):
@@ -29,19 +37,19 @@ class ZabbixHostGroupContainer(ZabbixBaseContainer):
         return name
 
     @classmethod
-    def from_mgmt_data(cls, zapi, name):
-        return cls(name, zapi=zapi)
+    def from_mgmt_data(cls, zapi, name, **kwargs):
+        return cls(name, zapi=zapi, **kwargs)
 
     @classmethod
-    def from_zabbix_name(cls, zapi, name):
-        container = cls(name, zapi=zapi)
+    def from_zabbix_name(cls, zapi, name, **kwargs):
+        container = cls(name, zapi=zapi, **kwargs)
         container.refresh()
 
         return container
 
     @classmethod
-    def from_zabbix_data(cls, zapi, zabbix_object):
-        return cls(zabbix_object['name'], zapi=zapi, zabbix_object=zabbix_object)
+    def from_zabbix_data(cls, zapi, zabbix_object, **kwargs):
+        return cls(zabbix_object['name'], zapi=zapi, zabbix_object=zabbix_object, **kwargs)
 
     @classmethod
     def from_zabbix_ids(cls, zapi, zabbix_ids):
@@ -61,13 +69,13 @@ class ZabbixHostGroupContainer(ZabbixBaseContainer):
             return True
 
     @classmethod
-    def all(cls, zapi, dc_name=None):
+    def all(cls, zapi, dc_name, **kwargs):
         response = cls.call_zapi(zapi, 'hostgroup.get', params=dict(cls.QUERY_BASE))
 
         if dc_name is not None:
             response = (hostgroup for hostgroup in response if cls._is_visible_from_dc(hostgroup, dc_name))
 
-        return [cls.from_zabbix_data(zapi, item) for item in response]
+        return [cls.from_zabbix_data(zapi, item, **kwargs) for item in response]
 
     @classmethod
     def _clear_hostgroup_list_cache(cls, name):
@@ -140,18 +148,19 @@ class ZabbixHostGroupContainer(ZabbixBaseContainer):
     @property
     def as_mgmt_data(self):
         match = self.RE_NAME_WITH_DC_PREFIX.match(self.name)
+        hosts = int(self.zabbix_object.get('hosts', 0))
 
         if match:
             name = match.group('name')
-            hosts = int(self.zabbix_object.get('hosts', 0))
         else:
-            # Hide host count for non-local hostgroup
             name = self.name
-            hosts = None
+            # Hide host count for non-local hostgroup
+            if self.dc_bound:
+                hosts = None
 
         return {
             'id': self.zabbix_id,
             'name': name,
             'hosts': hosts,
-            'global': not bool(match),
+            'dc_bound': bool(match),
         }

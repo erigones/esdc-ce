@@ -92,7 +92,7 @@ def mon_template_list(task_id, dc_id, full=False, extended=False, **kwargs):
 # noinspection PyUnusedLocal
 @cq.task(name='api.mon.base.tasks.mon_hostgroup_list', base=MgmtTask)
 @mgmt_task(log_exception=False)
-def mon_hostgroup_list(task_id, dc_id, full=False, extended=False, **kwargs):
+def mon_hostgroup_list(task_id, dc_id, dc_bound=True, full=False, extended=False, **kwargs):
     """
     Return list of hostgroups available in Zabbix.
     """
@@ -103,18 +103,18 @@ def mon_hostgroup_list(task_id, dc_id, full=False, extended=False, **kwargs):
     else:
         dc_name = None
 
-    return get_monitoring(dc).hostgroup_list(dc_name=dc_name, full=full, extended=extended)
+    return get_monitoring(dc).hostgroup_list(dc_bound=dc_bound, full=full, extended=extended)
 
 
 # noinspection PyUnusedLocal
 @cq.task(name='api.mon.base.tasks.mon_hostgroup_get', base=MgmtTask)
 @mgmt_task(log_exception=False)
-def mon_hostgroup_get(task_id, dc_id, hostgroup_name, **kwargs):
+def mon_hostgroup_get(task_id, dc_id, hostgroup_name, dc_bound=True, **kwargs):
     dc = Dc.objects.get_by_id(int(dc_id))
     mon = get_monitoring(dc)
 
     try:
-        return mon.hostgroup_detail(hostgroup_name)
+        return mon.hostgroup_detail(hostgroup_name, dc_bound=dc_bound)
     except RemoteObjectDoesNotExist:
         raise MgmtTaskException(HOSTGROUP_NOT_FOUND % hostgroup_name)
 
@@ -122,12 +122,12 @@ def mon_hostgroup_get(task_id, dc_id, hostgroup_name, **kwargs):
 # noinspection PyUnusedLocal
 @cq.task(name='api.mon.base.tasks.mon_hostgroup_create', base=MgmtTask)
 @mgmt_task(log_exception=True)
-def mon_hostgroup_create(task_id, dc_id, hostgroup_name, **kwargs):
+def mon_hostgroup_create(task_id, dc_id, hostgroup_name, dc_bound=True, **kwargs):
     dc = Dc.objects.get_by_id(int(dc_id))
     mon = get_monitoring(dc)
 
     try:
-        result = mon.hostgroup_create(hostgroup_name)
+        result = mon.hostgroup_create(hostgroup_name, dc_bound=dc_bound)
     except RemoteObjectAlreadyExists:
         raise MgmtTaskException(HOSTGROUP_ALREADY_EXISTS % hostgroup_name)
 
@@ -140,12 +140,12 @@ def mon_hostgroup_create(task_id, dc_id, hostgroup_name, **kwargs):
 # noinspection PyUnusedLocal
 @cq.task(name='api.mon.base.tasks.mon_hostgroup_delete', base=MgmtTask)
 @mgmt_task(log_exception=True)
-def mon_hostgroup_delete(task_id, dc_id, hostgroup_name, **kwargs):
+def mon_hostgroup_delete(task_id, dc_id, hostgroup_name, dc_bound=True, **kwargs):
     dc = Dc.objects.get_by_id(int(dc_id))
     mon = get_monitoring(dc)
 
     try:
-        result = mon.hostgroup_delete(hostgroup_name)  # Fail loudly if doesnt exist
+        result = mon.hostgroup_delete(hostgroup_name, dc_bound=dc_bound)  # Fail loudly if doesnt exist
     except RemoteObjectDoesNotExist:
         raise MgmtTaskException(HOSTGROUP_NOT_FOUND % hostgroup_name)
 

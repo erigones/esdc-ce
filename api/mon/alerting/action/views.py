@@ -1,10 +1,10 @@
 from api.decorators import api_view, request_data, setting_required
-from api.permissions import IsAdmin, IsMonitoringAdmin
+from api.permissions import IsMonitoringAdmin
 from api.mon.alerting.action.api_views import MonActionView
 
 
 @api_view(('GET',))
-@request_data(permissions=(IsAdmin,))
+@request_data(permissions=(IsMonitoringAdmin,))
 @setting_required('MON_ZABBIX_ENABLED')
 def mon_action_list(request, data=None):
     """
@@ -15,7 +15,7 @@ def mon_action_list(request, data=None):
         :DC-bound?:
             * |dc-yes|
         :Permissions:
-            * |IsAdmin|
+            * |MonitoringAdmin|
         :Asynchronous?:
             * |async-yes|
         :arg data.full: Return list of objects with all monitoring action details (default: false)

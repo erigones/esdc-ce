@@ -479,34 +479,50 @@ class Zabbix(AbstractMonitoringBackend):
 
         return [getattr(ztc, display_attr) for ztc in ZabbixTemplateContainer.all(self.ezx.zapi)]
 
-    def hostgroup_list(self, dc_name=None, full=False, extended=False):
+    def hostgroup_list(self, dc_bound=True, full=False, extended=False):
         """[EXTERNAL] Return list of available hostgroups"""
         if full or extended:
             display_attr = 'as_mgmt_data'
         else:
             display_attr = 'name_without_dc_prefix'
 
-        return [getattr(zgc, display_attr) for zgc in ZabbixHostGroupContainer.all(self.ezx.zapi, dc_name=dc_name)]
+        return [getattr(zgc, display_attr) for zgc in ZabbixHostGroupContainer.all(self.ezx.zapi, self.dc.name,
+                                                                                   dc_bound=dc_bound)]
 
-    def hostgroup_detail(self, name):
+    def hostgroup_detail(self, name, dc_bound=True):
         """[EXTERNAL]"""
-        zbx_name = ZabbixHostGroupContainer.hostgroup_name_factory(self.dc.name, name)
-        zgc = ZabbixHostGroupContainer.from_zabbix_name(self.ezx.zapi, zbx_name)
+        if dc_bound:
+            dc_name = self.dc.name
+        else:
+            dc_name = None
+
+        zbx_name = ZabbixHostGroupContainer.hostgroup_name_factory(dc_name, name)
+        zgc = ZabbixHostGroupContainer.from_zabbix_name(self.ezx.zapi, zbx_name, dc_bound=dc_bound)
 
         return zgc.as_mgmt_data
 
-    def hostgroup_create(self, name):
+    def hostgroup_create(self, name, dc_bound=True):
         """[EXTERNAL]"""
-        zbx_name = ZabbixHostGroupContainer.hostgroup_name_factory(self.dc.name, name)
-        zgc = ZabbixHostGroupContainer.from_mgmt_data(self.ezx.zapi, zbx_name)
+        if dc_bound:
+            dc_name = self.dc.name
+        else:
+            dc_name = None
+
+        zbx_name = ZabbixHostGroupContainer.hostgroup_name_factory(dc_name, name)
+        zgc = ZabbixHostGroupContainer.from_mgmt_data(self.ezx.zapi, zbx_name, dc_bound=dc_bound)
         zgc.create()
 
         return zgc.as_mgmt_data
 
-    def hostgroup_delete(self, name):
+    def hostgroup_delete(self, name, dc_bound=True):
         """[EXTERNAL]"""
-        zbx_name = ZabbixHostGroupContainer.hostgroup_name_factory(self.dc.name, name)
-        zgc = ZabbixHostGroupContainer.from_zabbix_name(self.ezx.zapi, zbx_name)
+        if dc_bound:
+            dc_name = self.dc.name
+        else:
+            dc_name = None
+
+        zbx_name = ZabbixHostGroupContainer.hostgroup_name_factory(dc_name, name)
+        zgc = ZabbixHostGroupContainer.from_zabbix_name(self.ezx.zapi, zbx_name, dc_bound=dc_bound)
         zgc.delete()
 
         return None

@@ -1,4 +1,11 @@
+from logging import getLogger
+
+from django.http import Http404
+
 from api.api_views import APIView
+# noinspection PyProtectedMember
+from api.fields import get_boolean_value
+from api.exceptions import PermissionDenied
 from api.task.response import FailureTaskResponse, mgmt_task_response
 from api.mon import MonitoringServer
 from api.mon.messages import LOG_MON_HOSTGROUP_CREATE, LOG_MON_HOSTGROUP_DELETE
@@ -6,6 +13,9 @@ from api.mon.base.serializers import HostgroupSerializer
 from api.mon.base.tasks import (mon_template_list, mon_hostgroup_list, mon_hostgroup_get, mon_hostgroup_create,
                                 mon_hostgroup_delete)
 from que import TG_DC_BOUND, TG_DC_UNBOUND
+from vms.models import DefaultDc
+
+logger = getLogger(__name__)
 
 
 class MonBaseView(APIView):
@@ -58,7 +68,7 @@ class MonBaseView(APIView):
             args = (self.request.dc.id,)
 
         # Add information for emergency task cleanup - see api.task.utils.mgmt_task decorator
-        kwargs = {'mon_server_id': self._mon_server.id}
+        kwargs = {'mon_server_id': self._mon_server.id, 'dc_bound': self.dc_bound}
 
         if task_kwargs:
             kwargs.update(task_kwargs)
@@ -131,6 +141,35 @@ class MonHostgroupView(MonBaseView):
     api_view_name_list = 'mon_hostgroup_list'
     api_view_name_manage = 'mon_hostgroup_manage'
     mgmt_task_list = mon_hostgroup_list
+
+    @staticmethod
+    def is_dc_bound(data, default=True):
+        if bool(data):
+            return get_boolean_value(data.get('dc_bound', default))
+        else:
+            return default
+
+    @staticmethod
+    def switch_dc_to_default(request):
+        if not request.dc.is_default():
+            request.dc = DefaultDc()  # Warning: Changing request.dc
+            logger.info('"%s %s" user="%s" _changed_ dc="%s" permissions=%s', request.method, request.path,
+                        request.user.username, request.dc.name, request.dc_user_permissions)
+
+            if not request.dc.settings.MON_ZABBIX_ENABLED:  # dc1_settings
+                raise Http404
+
+    @classmethod
+    def get_dc_bound(cls, request, data):
+        dc_bound = cls.is_dc_bound(data)
+
+        if not dc_bound:
+            if not request.user.is_staff:
+                raise PermissionDenied
+
+            cls.switch_dc_to_default(request)
+
+        return dc_bound
 
     def get(self, many=False):
         if many:
