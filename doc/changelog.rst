@@ -24,6 +24,7 @@ Features
 Bugs
 ----
 
+- Added missing user callbacks for mgmt tasks - `#308 <https://github.com/erigones/esdc-ce/issues/308>`__
 - Added missing DNS record for ns1.local after install - `#301 <https://github.com/erigones/esdc-ce/issues/301>`__
 - Fixed migration of LX zones - `#294 <https://github.com/erigones/esdc-ce/issues/294>`__
 - Fixed VNC port issues in VM migration - `#306 <https://github.com/erigones/esdc-ce/issues/306>`__
