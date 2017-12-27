@@ -1,6 +1,7 @@
-from frozendict import frozendict
+from django.conf import settings
 from zabbix_api import ZabbixAPI
 
+from api.mon.backends.zabbix.exceptions import RemoteObjectDoesNotExist
 from api.mon.backends.zabbix.containers.base import ZabbixBaseContainer
 
 
@@ -25,16 +26,14 @@ class ZabbixMediaContainer(ZabbixBaseContainer):
     PERIOD_DEFAULT_WORKING_HOURS = '1-5,09:00-18:00'
     PERIOD_DEFAULT = '1-7,00:00-24:00'
 
-    MEDIA_TYPES = frozendict({
-        'email': 'E-mail',
-        'phone': 'SMS',
-        'jabber': 'Ludolph',
-    })
+    MEDIA_TYPES = (
+        'email',
+        'phone',
+        'jabber',
+    )
 
     def __init__(self, media_type, sendto, severities=SEVERITIES, period=PERIOD_DEFAULT, enabled=True, **kwargs):
-        try:
-            self.media_type_desc = self.MEDIA_TYPES[media_type]
-        except KeyError:
+        if media_type not in self.MEDIA_TYPES:
             raise ValueError('Unsupported media type')
 
         self.media_type = media_type
@@ -77,11 +76,21 @@ class ZabbixMediaContainer(ZabbixBaseContainer):
 
         return media_type_id
 
-    def to_zabbix_data(self):
-        media_type_id = self.fetch_media_type_id(self._zapi, self.media_type_desc)
+    @classmethod
+    def get_media_type_desc(cls, media_type, default=None, dc_settings=settings):
+        if media_type not in cls.MEDIA_TYPES:
+            raise ValueError('Unsupported media type')
+
+        return getattr(dc_settings, 'MON_ZABBIX_MEDIA_TYPE_' + media_type.upper(), default)
+
+    def to_zabbix_data(self, dc_settings=settings):
+        media_type_desc = self.get_media_type_desc(self.media_type, dc_settings=dc_settings)
+
+        if not media_type_desc:
+            raise RemoteObjectDoesNotExist('Media type "%s" is not available' % self.media_type)
 
         return {
-            'mediatypeid': media_type_id,
+            'mediatypeid': self.fetch_media_type_id(self._zapi, media_type_desc),
             'sendto': self.sendto,
             'period': self.period,
             'severity': self.generate_media_severity(self.severities),

@@ -28,26 +28,27 @@ MON_USERGROUP_ACTION_MESSAGES = (None, LOG_MON_USERGROUP_CREATE, LOG_MON_USERGRO
 MON_ACTIONS = ('', 'created', 'updated', 'deleted')
 
 
-def __log_mon_action(result, mon, task_id, name, messages, detail_prefix):
+def __log_mon_action(result, mon, task_id, name, dc_name, messages, detail_prefix):
     if result:
         msg = messages[result]
-        detail = '{} "{}" was successfully {}'.format(detail_prefix, name, MON_ACTIONS[result])
+        detail = '{} "{}" was successfully {} in datacenter "{}"'.format(detail_prefix, name, MON_ACTIONS[result],
+                                                                         dc_name)
         mon.task_log_success(task_id, msg=msg, detail=detail)
 
 
 @catch_exception
-def _log_mon_user_action(result, mon, task_id, name):
-    __log_mon_action(result, mon, task_id, name, MON_USER_ACTION_MESSAGES, 'Monitoring user')
+def _log_mon_user_action(result, mon, task_id, name, dc_name):
+    __log_mon_action(result, mon, task_id, name, dc_name, MON_USER_ACTION_MESSAGES, 'Monitoring user')
 
 
 @catch_exception
-def _log_mon_usergroup_action(result, mon, task_id, name):
+def _log_mon_usergroup_action(result, mon, task_id, name, dc_name):
     # The result from usergroup_action is a tuple (hostgroup_result[int], affected_users[dict])
-    __log_mon_action(result[0], mon, task_id, name, MON_USERGROUP_ACTION_MESSAGES, 'Monitoring usergroup')
+    __log_mon_action(result[0], mon, task_id, name, dc_name, MON_USERGROUP_ACTION_MESSAGES, 'Monitoring usergroup')
 
     for res, users in result[1]:
         for user_name in users:
-            _log_mon_user_action(res, mon, task_id, user_name)
+            _log_mon_user_action(res, mon, task_id, user_name, dc_name)
 
 
 def _user_group_changed(task_id, group_name, dc_name):  # noqa: R701
@@ -64,7 +65,7 @@ def _user_group_changed(task_id, group_name, dc_name):  # noqa: R701
             logger.info('Going to update group %s in dc %s.', group.name, dc.name)
             res = mon.user_group_sync(group=group)
 
-        _log_mon_usergroup_action(res, mon, task_id, group_name)
+        _log_mon_usergroup_action(res, mon, task_id, group_name, dc_name)
 
     elif dc_name:  # Something about dc changed
         try:
@@ -77,7 +78,7 @@ def _user_group_changed(task_id, group_name, dc_name):  # noqa: R701
         else:
             mon = get_monitoring(dc)
             res = mon.user_group_sync(dc_as_group=True)  # DC name is implied by the zabbix instance
-            _log_mon_usergroup_action(res, mon, task_id, group_name)
+            _log_mon_usergroup_action(res, mon, task_id, group_name, dc.name)
 
     elif group_name:  # A group under unknown dc changed
         # This is an expensive operation, but not called often
@@ -98,7 +99,7 @@ def _user_group_changed(task_id, group_name, dc_name):  # noqa: R701
                                  dc.name, group_name)
                     mon_user_group_changed.call(task_id, group_name=group_name, dc_name=dc.name)
                 else:
-                    _log_mon_usergroup_action(res, mon, task_id, group_name)
+                    _log_mon_usergroup_action(res, mon, task_id, group_name, dc.name)
 
         else:
             related_dcs = Dc.objects.filter(roles=group)
@@ -116,7 +117,7 @@ def _user_group_changed(task_id, group_name, dc_name):  # noqa: R701
                                  dc.name, group_name)
                     mon_user_group_changed.call(task_id, group_name=group_name, dc_name=dc.name)
                 else:
-                    _log_mon_usergroup_action(res, mon, task_id, group_name)
+                    _log_mon_usergroup_action(res, mon, task_id, group_name, dc.name)
 
             for dc in unrelated_dcs:  # TODO this is quite expensive and I would like to avoid this somehow
                 logger.info('Going to delete group %s from dc %s.', group.name, dc.name)
@@ -130,7 +131,7 @@ def _user_group_changed(task_id, group_name, dc_name):  # noqa: R701
                                  dc.name, group_name)
                     mon_user_group_changed.call(task_id, group_name=group_name, dc_name=dc.name)
                 else:
-                    _log_mon_usergroup_action(res, mon, task_id, group_name)
+                    _log_mon_usergroup_action(res, mon, task_id, group_name, dc.name)
 
     else:
         raise AssertionError('Either group name or dc name has to be defined.')
@@ -177,7 +178,7 @@ def _user_changed(task_id, user_name, dc_name, affected_groups):
                                  dc.name, user_name)
                     mon_user_changed.call(task_id, user_name=user_name, dc_name=dc.name)
                 else:
-                    _log_mon_user_action(res, mon, task_id, user_name)
+                    _log_mon_user_action(res, mon, task_id, user_name, dc.name)
 
         else:
             logger.info('As we don\'t know where does the user %s belonged to, '
@@ -194,7 +195,7 @@ def _user_changed(task_id, user_name, dc_name, affected_groups):
                                  dc.name, user_name)
                     mon_user_changed.call(task_id, user_name=user_name, dc_name=dc.name)
                 else:
-                    _log_mon_user_action(res, mon, task_id, user_name)
+                    _log_mon_user_action(res, mon, task_id, user_name, dc.name)
     else:
         if dc_name:
             dc = Dc.objects.get_by_name(dc_name)
@@ -215,7 +216,7 @@ def _user_changed(task_id, user_name, dc_name, affected_groups):
                                  dc.name, user_name)
                     mon_user_changed.call(task_id, user_name=user_name, dc_name=dc.name)
                 else:
-                    _log_mon_user_action(res, mon, task_id, user.username)
+                    _log_mon_user_action(res, mon, task_id, user.username, dc.name)
 
         else:
             logger.info('Going to create/update user %s in zabbixes related to all groups '
@@ -232,7 +233,7 @@ def _user_changed(task_id, user_name, dc_name, affected_groups):
                                  dc.name, user_name)
                     mon_user_changed.call(task_id, user_name=user_name, dc_name=dc.name)
                 else:
-                    _log_mon_user_action(res, mon, task_id, user.username)
+                    _log_mon_user_action(res, mon, task_id, user.username, dc.name)
 
 
 # noinspection PyUnusedLocal
