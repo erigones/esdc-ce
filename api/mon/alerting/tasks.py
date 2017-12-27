@@ -17,7 +17,7 @@ from que.mgmt import MgmtTask
 from vms.models import Dc, Vm, Node
 from gui.models import Role, User
 
-__all__ = ('mon_user_group_changed', 'mon_user_changed', 'mon_alert_list')
+__all__ = ('mon_user_group_changed', 'mon_user_changed', 'mon_all_groups_sync', 'mon_alert_list')
 
 logger = get_task_logger(__name__)
 
@@ -57,10 +57,10 @@ def _user_group_changed(task_id, group_name, dc_name):  # noqa: R701
         try:
             group = Role.objects.get(dc=dc, name=group_name)
         except Role.DoesNotExist:
-            logger.debug('Going to delete %s from %s.', group_name, dc.name)
+            logger.info('Going to delete group %s from dc %s.', group_name, dc.name)
             res = mon.user_group_delete(name=group_name)
         else:
-            logger.debug('Going to update %s from %s.', group.name, dc.name)
+            logger.info('Going to update group %s in dc %s.', group.name, dc.name)
             res = mon.user_group_sync(group=group)
 
         _log_mon_usergroup_action(res, mon, task_id, group_name)
@@ -80,14 +80,13 @@ def _user_group_changed(task_id, group_name, dc_name):  # noqa: R701
 
     elif group_name:  # A group under unknown dc changed
         # This is an expensive operation, but not called often
-
         try:
             group = Role.objects.get(name=group_name)
         except Role.DoesNotExist:
             # group does not exist-> remove from all dcs as we don't know where it was
 
             for dc in Dc.objects.all():
-                logger.debug('Going to delete %s from %s.', group_name, dc.name)
+                logger.info('Going to delete group %s from dc %s.', group_name, dc.name)
                 mon = get_monitoring(dc)
                 try:
                     res = mon.user_group_delete(name=group_name)
@@ -96,8 +95,7 @@ def _user_group_changed(task_id, group_name, dc_name):  # noqa: R701
                     # we will let it try again in a separate task and not crash this one
                     logger.error('Creating a separate task for dc %s and group %s because it crashed.',
                                  dc.name, group_name)
-                    mon_user_group_changed.call(sender='parent mon_user_group_changed', group_name=group_name,
-                                                dc_name=dc.name)
+                    mon_user_group_changed.call(task_id, group_name=group_name, dc_name=dc.name)
                 else:
                     _log_mon_usergroup_action(res, mon, task_id, group_name)
 
@@ -106,7 +104,7 @@ def _user_group_changed(task_id, group_name, dc_name):  # noqa: R701
             unrelated_dcs = Dc.objects.exclude(id__in=related_dcs)
 
             for dc in related_dcs:
-                logger.debug('Going to update %s from %s.', group.name, dc.name)
+                logger.info('Going to update group %s in dc %s.', group.name, dc.name)
                 mon = get_monitoring(dc)
                 try:
                     res = mon.user_group_sync(group=group)
@@ -115,13 +113,12 @@ def _user_group_changed(task_id, group_name, dc_name):  # noqa: R701
                     # we will let it try again in a separate task and not crash this one
                     logger.error('Creating a separate task for dc %s and group %s because it crashed.',
                                  dc.name, group_name)
-                    mon_user_group_changed.call(sender='parent mon_user_group_changed', group_name=group_name,
-                                                dc_name=dc.name)
+                    mon_user_group_changed.call(task_id, group_name=group_name, dc_name=dc.name)
                 else:
                     _log_mon_usergroup_action(res, mon, task_id, group_name)
 
             for dc in unrelated_dcs:  # TODO this is quite expensive and I would like to avoid this somehow
-                logger.debug('Going to delete %s from %s.', group.name, dc.name)
+                logger.info('Going to delete group %s from dc %s.', group.name, dc.name)
                 mon = get_monitoring(dc)
                 try:
                     res = mon.user_group_delete(name=group_name)
@@ -130,8 +127,7 @@ def _user_group_changed(task_id, group_name, dc_name):  # noqa: R701
                     # we will let it try again in a separate task and not crash this one
                     logger.error('Creating a separate task for dc %s and group %s because it crashed.',
                                  dc.name, group_name)
-                    mon_user_group_changed.call(sender='parent mon_user_group_changed', group_name=group_name,
-                                                dc_name=dc.name)
+                    mon_user_group_changed.call(task_id, group_name=group_name, dc_name=dc.name)
                 else:
                     _log_mon_usergroup_action(res, mon, task_id, group_name)
 
@@ -149,7 +145,7 @@ def mon_user_group_changed(self, task_id, sender, group_name=None, dc_name=None,
     logger.info('mon_user_group_changed task has started with dc_name %s, and group_name %s',
                 dc_name, group_name)
     try:
-        _user_group_changed(task_id, group_name, dc_name)
+        _user_group_changed(sender, group_name, dc_name)
     except (ZabbixAPIException, MonitoringError) as exc:
         logger.exception(exc)
         logger.error('mon_user_group_changed task crashed, it\'s going to be retried')
@@ -163,11 +159,11 @@ def _user_changed(task_id, user_name, dc_name, affected_groups):
         if dc_name:
             dc = Dc.objects.get_by_name(dc_name)
             mon = get_monitoring(dc)
-            logger.debug('Going to delete user with name %s in zabbix %s for dc %s.', user_name, mon, dc)
+            logger.into('Going to delete user with name %s in zabbix %s for dc %s.', user_name, mon, dc)
             mon.user_delete(name=user_name)
         elif affected_groups:
-            logger.debug('Going to delete user with name %s '
-                         'from zabbixes related to groups %s.', user_name, affected_groups)
+            logger.info('Going to delete user with name %s from zabbixes related to groups %s.',
+                        user_name, affected_groups)
 
             for dc in Dc.objects.filter(roles__in=affected_groups):
                 mon = get_monitoring(dc)
@@ -178,15 +174,13 @@ def _user_changed(task_id, user_name, dc_name, affected_groups):
                     # we will let it try again in a separate task and not crash this one
                     logger.error('Creating a separate task for dc %s and user %s because it crashed.',
                                  dc.name, user_name)
-                    mon_user_changed.call(sender='parent mon_user_changed',
-                                          user_name=user_name,
-                                          dc_name=dc.name)
+                    mon_user_changed.call(task_id, user_name=user_name, dc_name=dc.name)
                 else:
                     _log_mon_user_action(res, mon, task_id, user_name)
 
         else:
-            logger.debug('As we don\'t know where does the user %s belonged to, '
-                         'we are trying to delete it from all available zabbixes.', user_name)
+            logger.info('As we don\'t know where does the user %s belonged to, '
+                        'we are trying to delete it from all available zabbixes.', user_name)
 
             for dc in Dc.objects.all():  # Nasty
                 mon = get_monitoring(dc)
@@ -197,20 +191,17 @@ def _user_changed(task_id, user_name, dc_name, affected_groups):
                     # we will let it try again in a separate task and not crash this one
                     logger.error('Creating a separate task for dc %s and user %s because it crashed.',
                                  dc.name, user_name)
-                    mon_user_changed.call(sender='parent mon_user_changed',
-                                          user_name=user_name,
-                                          dc_name=dc.name)
+                    mon_user_changed.call(task_id, user_name=user_name, dc_name=dc.name)
                 else:
                     _log_mon_user_action(res, mon, task_id, user_name)
     else:
         if dc_name:
             dc = Dc.objects.get_by_name(dc_name)
             mon = get_monitoring(dc)
-            logger.debug('Going to create/update user %s in zabbix %s for dc %s.', user_name, mon, dc)
+            logger.info('Going to create/update user %s in zabbix %s for dc %s.', user_name, mon, dc)
             mon.user_sync(user=user)
         elif affected_groups:
-            logger.debug('Going to create/update user %s in zabbixes related to groups %s.', user_name,
-                         affected_groups)
+            logger.info('Going to create/update user %s in zabbixes related to groups %s.', user_name, affected_groups)
 
             for dc in Dc.objects.filter(roles__in=affected_groups):
                 mon = get_monitoring(dc)
@@ -221,13 +212,13 @@ def _user_changed(task_id, user_name, dc_name, affected_groups):
                     # we will let it try again in a separate task and not crash this one
                     logger.error('Creating a separate task for dc %s and user %s because it crashed.',
                                  dc.name, user_name)
-                    mon_user_changed.call(sender='parent mon_user_changed', user_name=user_name, dc_name=dc.name)
+                    mon_user_changed.call(task_id, user_name=user_name, dc_name=dc.name)
                 else:
                     _log_mon_user_action(res, mon, task_id, user.username)
 
         else:
-            logger.debug('Going to create/update user %s '
-                         'in zabbixes related to all groups to which the user is related to.', user_name)
+            logger.info('Going to create/update user %s in zabbixes related to all groups '
+                        'to which the user is related to.', user_name)
 
             for dc in Dc.objects.filter(roles__user=user):
                 mon = get_monitoring(dc)
@@ -238,7 +229,7 @@ def _user_changed(task_id, user_name, dc_name, affected_groups):
                     # we will let it try again in a separate task and not crash this one
                     logger.error('Creating a separate task for dc %s and user %s because it crashed.',
                                  dc.name, user_name)
-                    mon_user_changed.call(sender='parent mon_user_changed', user_name=user_name, dc_name=dc.name)
+                    mon_user_changed.call(task_id, user_name=user_name, dc_name=dc.name)
                 else:
                     _log_mon_user_action(res, mon, task_id, user.username)
 
@@ -258,7 +249,7 @@ def mon_user_changed(self, task_id, sender, user_name, dc_name=None, affected_gr
     logger.info('mon_user_changed task has started with dc_name %s, user_name %s and affected_groups %s',
                 dc_name, user_name, affected_groups)
     try:
-        _user_changed(task_id, user_name, dc_name, affected_groups)
+        _user_changed(sender, user_name, dc_name, affected_groups)
     except (ZabbixAPIException, MonitoringError) as exc:
         logger.exception(exc)
         logger.error('mon_user_changed task crashed, it\'s going to be retried')
@@ -270,14 +261,14 @@ def mon_user_changed(self, task_id, sender, user_name, dc_name=None, affected_gr
 def mon_all_groups_sync(task_id, sender, dc_name=None, *args, **kwargs):
     if dc_name:
         for group in Role.objects.filter(dc__name=dc_name):
-            mon_user_group_changed.call(sender='mon_all_groups_sync', dc_name=dc_name, group_name=group.name)
-        mon_user_group_changed.call(sender='mon_all_groups_sync', dc_name=dc_name)  # one special case (owner group)
+            mon_user_group_changed.call(sender, dc_name=dc_name, group_name=group.name)
+        mon_user_group_changed.call(sender, dc_name=dc_name)  # one special case (owner group)
     else:
         # super heavy
         for group in Role.objects.all():
-            mon_user_group_changed.call(sender='mon_all_groups_sync', group_name=group.name)
+            mon_user_group_changed.call(sender, group_name=group.name)
         for dc in Dc.objects.all():  # owner groups
-            mon_user_group_changed.call(sender='mon_all_groups_sync', dc_name=dc.name)
+            mon_user_group_changed.call(sender, dc_name=dc.name)
 
 
 # noinspection PyUnusedLocal

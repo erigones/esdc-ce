@@ -87,8 +87,10 @@ class MonBaseView(APIView):
         # Do not log on error
         if err:
             obj, msg = None, None
+        else:
+            obj = self._mon_server
 
-        return mgmt_task_response(self.request, tid, err, res, msg=msg, obj=self._mon_server, api_view=self._apiview,
+        return mgmt_task_response(self.request, tid, err, res, msg=msg, obj=obj, api_view=self._apiview,
                                   detail_dict=detail_dict)
 
     @classmethod
