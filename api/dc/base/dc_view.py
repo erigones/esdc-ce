@@ -112,6 +112,9 @@ class DcView(APIView):
                 if group.dc_bound:
                     remove_dc_binding_virt_object(task_id, LOG_GROUP_UPDATE, group, user=request.user)
 
+                connection.on_commit(lambda: group_relationship_changed.send(task_id, dc_name=dc.name,  # Signal!
+                                                                             group_name=group.name))
+
         # Creating new DC can affect the dc_bound flag on users (owner + users from dc.groups)
         self._remove_user_dc_binding(task_id, owner=dc.owner, groups=dc.roles.all())
 

@@ -26,25 +26,30 @@ logger = get_task_logger(__name__)
 MON_USER_ACTION_MESSAGES = (None, LOG_MON_USER_CREATE, LOG_MON_USER_UPDATE, LOG_MON_USER_DELETE)
 MON_USERGROUP_ACTION_MESSAGES = (None, LOG_MON_USERGROUP_CREATE, LOG_MON_USERGROUP_UPDATE, LOG_MON_USERGROUP_DELETE)
 MON_ACTIONS = ('', 'created', 'updated', 'deleted')
+MON_ACTION_DETAIL = '{mon_object} "{name}" was successfully {action} in datacenter "{dc_name}"'
 
 
-def __log_mon_action(result, mon, task_id, name, dc_name, messages, detail_prefix):
+def __log_mon_action(result, mon, task_id, messages, **detail_kwargs):
     if result:
         msg = messages[result]
-        detail = '{} "{}" was successfully {} in datacenter "{}"'.format(detail_prefix, name, MON_ACTIONS[result],
-                                                                         dc_name)
+        detail = MON_ACTION_DETAIL.format(action=MON_ACTIONS[result], **detail_kwargs)
         mon.task_log_success(task_id, msg=msg, detail=detail)
 
 
 @catch_exception
 def _log_mon_user_action(result, mon, task_id, name, dc_name):
-    __log_mon_action(result, mon, task_id, name, dc_name, MON_USER_ACTION_MESSAGES, 'Monitoring user')
+    __log_mon_action(result, mon, task_id, MON_USER_ACTION_MESSAGES,
+                     mon_object='Monitoring user', name=name, dc_name=dc_name)
 
 
 @catch_exception
 def _log_mon_usergroup_action(result, mon, task_id, name, dc_name):
+    if not name:
+        name = '`DC owner`'
+
     # The result from usergroup_action is a tuple (hostgroup_result[int], affected_users[dict])
-    __log_mon_action(result[0], mon, task_id, name, dc_name, MON_USERGROUP_ACTION_MESSAGES, 'Monitoring usergroup')
+    __log_mon_action(result[0], mon, task_id, MON_USERGROUP_ACTION_MESSAGES,
+                     mon_object='Monitoring usergroup', name=name, dc_name=dc_name)
 
     for res, users in result[1].items():
         for user_name in users:
