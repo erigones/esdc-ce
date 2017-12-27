@@ -178,8 +178,12 @@ function vm_delete(hostname) {
 }
 
 // Migrate VM to another compute node
-function vm_migrate(hostname, node) {
-  return esio('set', 'vm_migrate', [hostname], {'data': {'node': node}});
+function vm_migrate(hostname, node, live) {
+  var kwargs = {'data': {'node': node}};
+  if (typeof(live) !== 'undefined') {
+    kwargs['data']['live'] = live;
+  }
+  return esio('set', 'vm_migrate', [hostname], kwargs);
 }
 
 // Fail over VM to its replica
@@ -216,6 +220,16 @@ function mon_get_history(obj_type, hostname, graph, data) {
     return esio('get', 'mon_'+ obj_type +'_history', [hostname, graph], kwargs);
   }
   return null;
+}
+
+function mon_get_alerts(data) {
+  var args = [];
+  var kwargs = {'data': {}};
+
+  if (typeof(data) !== 'undefined') {
+   kwargs['data'] = data;
+  }
+  return esio('get', 'mon_alert_list', args, kwargs);
 }
 
 // Delete image from Node storage
@@ -531,6 +545,9 @@ function message_callback(code, res, view, method, args, kwargs, apiview, apidat
       case 'mon_node_sla':
         return; // do not update cached_tasklog
 
+      case 'mon_alert_list': // mon_alert_list started
+        return; // do not update cached_tasklog
+
       case 'mon_vm_history': // mon_vm_history started
       case 'mon_node_history': // mon_node_history started
         return; // do not update cached_tasklog
@@ -572,6 +589,11 @@ function message_callback(code, res, view, method, args, kwargs, apiview, apidat
       case 'mon_vm_sla': // mon_vm_sla failed
       case 'mon_node_sla':
         sla_update(view, args[0], args[1], null);
+        return; // do not update cached_tasklog
+
+      case 'mon_alert_list': // mon_alert_list failed
+        alert_message(code, _message_from_result(res));
+        alert_update(null);
         return; // do not update cached_tasklog
 
       case 'mon_vm_history': // mon_vm_history failed
@@ -677,6 +699,10 @@ function message_callback(code, res, view, method, args, kwargs, apiview, apidat
         sla_update(view, args[0], args[1], res.result);
         return; // do not update cached_tasklog
 
+      case 'mon_alert_list': // mon_alert_list result from cache
+        alert_update(res);
+        return; // do not update cached_tasklog
+
       case 'mon_vm_history': // mon_vm_history result from cache
       case 'mon_node_history': // mon_node_history result from cache
         mon_history_update(view.split('_', 2)[1], args[0], args[1], data, res.result);
@@ -760,6 +786,7 @@ function task_event_callback(result) {
 // task_status_callback for classic task events
 function _task_status_callback(res, apiview) {
   var result = res.result || {};
+  var error = null;
   var hostname = apiview.hostname || null;
   var msg = '';
   var task_prefix = '';
@@ -1001,10 +1028,18 @@ function _task_status_callback(res, apiview) {
       sla_update(apiview.view, hostname, apiview.yyyymm, result);
       return false; // do not update cached_tasklog
 
+    case 'mon_alert_list':
+      if (res.status != 'SUCCESS') {
+        result = null;
+        error = _message_from_result(res);
+      }
+      // data (filters) are irrelevant here and we don't have it
+      alert_update(result, error);
+      return false; // do not update cached_tasklog
+
     case 'mon_vm_history':
     case 'mon_node_history':
       var obj_type = apiview.view.split('_', 2)[1];
-      var error = null;
 
       if (res.status != 'SUCCESS') {
         result = null;

@@ -199,16 +199,31 @@
         <span><i class="icon-plane"></i> <span class="vm_modal_title">{% trans "Migrate Server to another Node" %}</span></span>
       </div>
       <div class="modal-body separator">
-        <form class="form-inline">
+        <form class="form-horizontal">
           <div class="vm_modal_text">
             <div id="vm_migrate_modal_error" class="alert alert-error hide"><i class="icon-warning-sign"></i> <span></span></div>
             <div class="input">
-              {% trans "Please choose target compute node:" %}
-              <select id="id_migrate-node" name="migrate-node" class="input-select2" style="width: 220px">
-                {% for node in settingsform.vm_nodes %}
-                  <option{% if node == vm.node %} disabled="disabled"{% endif %} value="{{ node.hostname }}">{{ node.hostname }}</option>
-                {% endfor %}
-              </select>
+              <div class="control-group thinner">
+                <label class="control-label" for="id_migrate-target_node">{% trans "Target compute node"%}:</label>
+                <div class="controls">
+                  <select class="input-select2 wide" id="id_migrate-target_node" name="migrate-target_node" required="required">
+                  {% for node in settingsform.vm_nodes %}
+                    <option{% if node == vm.node %} disabled="disabled"{% endif %} value="{{ node.hostname }}">{{ node.hostname }}</option>
+                  {% endfor %}
+                  </select>
+                  <span class="help-inline note"></span>
+                </div>
+              </div>
+            </div>
+            <div class="input">
+              <div class="control-group thinner ">
+                <label class="control-label">{% trans "Live migration?" %}:</label>
+                <div class="controls">
+                  <input class="normal-check" id="id_migrate-live" name="migrate-live" type="checkbox"{% if not vm.is_kvm %} disabled="disabled"{% endif %} />
+                  <label for="id_migrate-live"></label>
+                  <span class="help-inline note checkbox"> <i class="icon-info-sign"></i>&nbsp;{% trans "KVM only, EXPERIMENTAL!" %}</span>
+                </div>
+              </div>
             </div>
           </div>
         </form>

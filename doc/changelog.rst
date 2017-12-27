@@ -13,10 +13,26 @@ Features
 - Updated the VM templates API + removed *experimental* flag from the ``template_manage`` API call - `#256 <https://github.com/erigones/esdc-ce/issues/256>`__
 - DC settings implied monitoring hostgroups are shown near the VM, node monitoring_hostgroups setting - `#266 <https://github.com/erigones/esdc-ce/issues/266>`__
 - Added node version caching and internal update events - `#271 <https://github.com/erigones/esdc-ce/issues/271>`__
+- Added automatic synchronization of overlay ARP files - `#286 <https://github.com/erigones/esdc-ce/issues/286>`__
+- Added script for automating platform upgrade - `#289 <https://github.com/erigones/esdc-ce/issues/289>`__
 - Added status update button to compute node list - `#291 <https://github.com/erigones/esdc-ce/issues/291>`__
+- Made compute node IP address changeable - `#305 <https://github.com/erigones/esdc-ce/issues/305>`__
+- Added experimental support for live migration - `#306 <https://github.com/erigones/esdc-ce/issues/306>`__
+- Added value size limit to metadata - `#321 <https://github.com/erigones/esdc-ce/issues/321>`__
 
 Bugs
 ----
+
+- Added missing DNS record for ns1.local after install - `#301 <https://github.com/erigones/esdc-ce/issues/301>`__
+- Fixed migration of LX zones - `#294 <https://github.com/erigones/esdc-ce/issues/294>`__
+- Fixed VNC port issues in VM migration - `#306 <https://github.com/erigones/esdc-ce/issues/306>`__
+- Fixed wrong free storage sizes after VM migration - `#306 <https://github.com/erigones/esdc-ce/issues/306>`__
+- Added automatic synchronization of Zabbix hosts after changing DC settings - `#210 <https://github.com/erigones/esdc-ce/issues/210>`__
+- Fixed race condition in Zabbix host group manipulation - `#309 <https://github.com/erigones/esdc-ce/issues/309>`__
+- Removed reference to non-existing ``VMS_NET_NIC_TAGS`` setting in GUI - `#310 <https://github.com/erigones/esdc-ce/issues/310>`__
+- Fixed reverse lock persistence - `#317 <https://github.com/erigones/esdc-ce/issues/317>`__
+- Fixed emergency cleanup for cancelled or deleted VM migration task - `#318 <https://github.com/erigones/esdc-ce/issues/318>`__
+- Fixed SSL cert update (restart haproxy after SSL cert change) - `#322 <https://github.com/erigones/esdc-ce/issues/322>`__
 
 
 2.6.7 (released on 2017-11-06)

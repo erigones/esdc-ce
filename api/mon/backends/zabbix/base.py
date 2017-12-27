@@ -1,19 +1,23 @@
 from logging import getLogger, INFO, WARNING, CRITICAL, ERROR
 from time import time
+from datetime import timedelta
 from operator import itemgetter
 from datetime import datetime
 from subprocess import call
 import re
 
-from django.utils.six import iteritems
+from django.utils.six import iteritems, text_type
 from django.db.models import Q
 from frozendict import frozendict
 from zabbix_api import ZabbixAPI, ZabbixAPIException, ZabbixAPIError
 
+from que.tasks import get_task_logger
 from vms.models import Dc
+from api.decorators import lock
 from api.mon.backends.abstract import VM_KWARGS_KEYS, NODE_KWARGS_KEYS, MonitoringError
 
 logger = getLogger(__name__)
+task_logger = get_task_logger(__name__)
 
 RESULT_CACHE_TIMEOUT = 3600
 
@@ -33,10 +37,22 @@ class RemoteObjectDoesNotExist(ZabbixError):
     pass
 
 
+class RemoteObjectAlreadyExists(ZabbixError, ZabbixAPIError):
+    pass
+
+
+def parse_zabbix_result(result, key):
+    try:
+        return result[0][key]
+    except (KeyError, IndexError) as e:
+        raise RemoteObjectDoesNotExist(e)
+
+
 def cache_result(f):
     """
     Decorator for caching simple function output.
     """
+
     def wrap(obj, *args, **kwargs):
         if kwargs.pop('bypass_cache', False):
             return f(obj, *args, **kwargs)
@@ -87,8 +103,10 @@ class ZabbixBase(object):
 
     _log_prefix = ''
     zapi = None
+    server = None
     enabled = False
     connected = False
+    connection_id = None
 
     # "obj" is a object (node or vm) which will be represented by a zabbix host
     _obj_host_id_attr = 'id'  # object's attribute which will return a string suitable for zabbix host id
@@ -106,9 +124,15 @@ class ZabbixBase(object):
             self.enabled = True
             self.sender = settings.MON_ZABBIX_SENDER
             self.server = settings.MON_ZABBIX_SERVER.split('/')[2]  # https://<server>
+            self.connection_id = hash((settings.MON_ZABBIX_USERNAME, settings.MON_ZABBIX_PASSWORD, self.server))
 
             if api_login:
                 self.init()
+
+    def __hash__(self):
+        if not self.enabled:
+            raise RuntimeError('%r is not enabled' % self)
+        return self.connection_id
 
     def log(self, level, msg, *args):
         logger.log(level, self._log_prefix + msg, *args)
@@ -184,6 +208,13 @@ class ZabbixBase(object):
     def host_save(cls, obj, host):
         return getattr(obj, cls._obj_host_save_method)(host)
 
+    @classmethod
+    def get_cached_hostid(cls, obj, default=None):
+        try:
+            return cls.host_info(obj)['hostid']
+        except KeyError:
+            return default
+
     @staticmethod
     def _get_kwargs(obj, wanted):
         """Helper for getting retrieving attributes from object"""
@@ -215,10 +246,7 @@ class ZabbixBase(object):
     @staticmethod
     def _zabbix_result(result, key):
         """Parse zabbix result"""
-        try:
-            return result[0][key]
-        except (KeyError, IndexError) as e:
-            raise ZabbixError(e)
+        return parse_zabbix_result(result, key)
 
     def _send_data(self, host, key, value):
         """Use zabbix_sender to send a value to zabbix trapper item defined by host & key"""
@@ -279,7 +307,7 @@ class ZabbixBase(object):
             return [i['serviceid'] for i in res]
         except (KeyError, IndexError) as e:
             logger.exception(e)
-            raise ZabbixError(e)
+            raise RemoteObjectDoesNotExist(e)
 
     @cache_result
     def _zabbix_get_items(self, host, keys, search_params=None):
@@ -322,7 +350,7 @@ class ZabbixBase(object):
             return res[serviceid]['sla'][0]['sla']
         except (KeyError, IndexError) as e:
             logger.exception(e)
-            raise ZabbixError(e)
+            raise RemoteObjectDoesNotExist(e)
 
     def _get_proxy_id(self, proxy):
         """Return Zabbix proxy ID"""
@@ -338,9 +366,21 @@ class ZabbixBase(object):
             return int(self._zabbix_get_proxyid(proxy))
         except ZabbixError as ex:
             logger.exception(ex)
-            raise ZabbixError('Cannot find zabbix proxy id for proxy "%s"' % proxy)
+            raise RemoteObjectDoesNotExist('Cannot find zabbix proxy id for proxy "%s"' % proxy)
 
-    def _get_or_create_groups(self, obj_kwargs, hostgroup, dc_name, hostgroups=(), log=None):
+    @lock(key_args=(0,), wait_for_release=True, bound=True)
+    def _create_hostgroup(self, name):
+        """Create new hostgroup in Zabbix and return ZabbixHostGroupContainer object"""
+        new_hostgroup = ZabbixHostGroupContainer(name, zapi=self.zapi)
+
+        try:
+            new_hostgroup.create()
+        except RemoteObjectAlreadyExists:
+            new_hostgroup.refresh()
+
+        return new_hostgroup
+
+    def _get_or_create_hostgroups(self, obj_kwargs, hostgroup, dc_name, hostgroups=(), log=None):
         """Return set of zabbix hostgroup IDs for an object"""
         log = log or self.log
         gids = set()
@@ -386,8 +426,9 @@ class ZabbixBase(object):
             else:
                 continue
 
-            #  If not even the ~global~ hostgroup exists, we are free to create a ~local~ hostgroup.
-            gids.add(ZabbixHostGroupContainer(qualified_hostgroup_name, zapi=self.zapi).create().zabbix_id)
+            # If not even the ~global~ hostgroup exists, we are free to create a ~local~ hostgroup.
+            new_hostgroup = self._create_hostgroup(qualified_hostgroup_name)
+            gids.add(new_hostgroup.zabbix_id)
 
         return gids
 
@@ -876,27 +917,163 @@ class ZabbixBase(object):
 
     def get_template_list(self):
         """Query Zabbix API for templates"""
-        res = self.zapi.template.get({
+        return self.zapi.template.get({
             'output': ['name', 'host', 'templateid', 'description']
         })
 
-        try:
-            return res
-        except (KeyError, IndexError) as e:
-            logger.exception(e)
-            raise ZabbixError(e)
-
     def get_hostgroup_list(self):
         """Query Zabbix API for hostgroups"""
-        res = self.zapi.hostgroup.get({
+        return self.zapi.hostgroup.get({
             'output': ['name', 'groupid']
         })
 
-        try:
-            return res
-        except (KeyError, IndexError) as e:
-            logger.exception(e)
-            raise ZabbixError(e)
+    @staticmethod
+    def event_status(value):
+        value = int(value)
+
+        if value == 0:
+            return 'OK'
+        elif value == 1:
+            return 'PROBLEM'
+        else:
+            return 'UNKNOWN'
+
+    def _get_alert_events(self, triggers, since=None, until=None, max_days=7):
+        """Get all events related to triggers"""
+        triggerids = [t['triggerid'] for t in triggers]
+        events = {}
+        params = {
+            'triggerids': triggerids,
+            'object': 0,  # 0 - trigger
+            'source': 0,  # 0 - event created by a trigger
+            'output': 'extend',
+            'select_acknowledges': 'extend',
+            'sortfield': ['clock', 'eventid'],
+            'sortorder': 'DESC',
+            'nodeids': 0,
+        }
+
+        if since and until:
+            params['time_from'] = since
+            params['time_till'] = until
+        else:
+            since = datetime.now() - timedelta(days=max_days)
+            params['time_from'] = since.strftime('%s')
+
+        for e in self.zapi.event.get(params):
+            events.setdefault(e['objectid'], []).append(e)
+
+        # Because of time limits, there may be some missing events for some trigger IDs
+        missing_eventids = [t['lastEvent']['eventid'] for t in triggers if
+                            t['lastEvent'] and t['triggerid'] not in events]
+
+        if missing_eventids:
+            for e in self.zapi.event.get({'eventids': missing_eventids, 'source': 0, 'output': 'extend',
+                                          'select_acknowledges': 'extend', 'nodeids': 0}):
+                events.setdefault(e['objectid'], []).append(e)
+
+        return events
+
+    def _get_alerts(self, groupids=None, hostids=None, monitored=True, maintenance=False, skip_dependent=True,
+                    expand_description=False, select_hosts=('hostid',), active_only=True, priority=None,
+                    output=('triggerid', 'state', 'error', 'description', 'priority', 'lastchange'), **kwargs):
+        """Return iterator of current zabbix triggers"""
+        params = {
+            'groupids': groupids,
+            'hostids': hostids,
+            'monitored': monitored,
+            'maintenance': maintenance,
+            'skipDependent': skip_dependent,
+            'expandDescription': expand_description,
+            'filter': {'priority': priority},
+            'selectHosts': select_hosts,
+            'selectLastEvent': 'extend',  # API_OUTPUT_EXTEND
+            'output': output,
+            'sortfield': 'lastchange',
+            'sortorder': 'DESC',  # ZBX_SORT_DOWN
+        }
+
+        if active_only:  # Whether to show current active alerts only
+            params['filter']['value'] = 1  # TRIGGER_VALUE_TRUE
+
+        params.update(kwargs)
+
+        # If trigger is lost (broken expression) we skip it
+        return (trigger for trigger in self.zapi.trigger.get(params) if trigger['hosts'])
+
+    @classmethod
+    def _collect_trigger_events(cls, related_events):
+        for event in related_events:
+            yield {
+                'eventid': int(event['eventid']),
+                'clock': int(event['clock']),
+                'value': int(event['value']),
+                'status': cls.event_status(event['value']),
+                'acknowledged': bool(int(event['acknowledged'])),
+                'acknowledges': [{
+                    'acknowledgeid': int(ack['acknowledgeid']),
+                    'clock': int(ack['clock']),
+                    'message': ack['message'],
+                    'user': ack['alias'],
+                } for ack in event['acknowledges']]
+            }
+
+    # noinspection PyUnusedLocal
+    def show_alerts(self, hostids=None, since=None, until=None, last=None, show_events=True):
+        """Show current or historical events (alerts)"""
+        t_output = ('triggerid', 'state', 'error', 'url', 'expression', 'description', 'priority', 'type', 'comments',
+                    'lastchange')
+        t_hosts = ('hostid', 'name', 'maintenance_status', 'maintenance_type', 'maintenanceid')
+        t_options = {'expand_description': True, 'output': t_output, 'select_hosts': t_hosts}
+
+        if hostids is not None:
+            t_options['hostids'] = hostids
+
+        if since and until:
+            t_options['lastChangeSince'] = since
+            t_options['lastChangeTill'] = until
+            t_options['active_only'] = False
+
+        if last is not None:
+            t_options['limit'] = last
+            t_options['active_only'] = False
+
+        # Fetch triggers
+        triggers = list(self._get_alerts(**t_options))
+
+        # Get notes (dict) = related events + acknowledges
+        if show_events:
+            events = self._get_alert_events(triggers, since=since, until=until)
+        else:
+            events = {}
+
+        for trigger in triggers:
+            host = trigger['hosts'][0]
+            hostname = host['name']
+            related_events = events.get(trigger['triggerid'], ())
+            trigger_events = self._collect_trigger_events(related_events)
+            last_event = trigger['lastEvent']
+
+            if last_event:
+                eventid = int(last_event['eventid'])
+                ack = bool(int(last_event['acknowledged']))
+            else:
+                # WTF?
+                eventid = '????'
+                ack = None
+
+            yield {
+                'eventid': eventid,
+                'priority': int(trigger['priority']),
+                'hostname': hostname,
+                'desc': text_type(trigger['description']),
+                'acknowledged': ack,
+                'last_change': int(trigger['lastchange']),
+                'events': list(trigger_events),
+                'error': trigger['error'],
+                'comments': trigger['comments'],
+                'url': trigger['url'],
+            }
 
 
 class ZabbixNamedContainer(object):
@@ -907,8 +1084,10 @@ class ZabbixNamedContainer(object):
     """
     zabbix_id = None
 
-    def __init__(self, name):
+    def __init__(self, name, zapi=None):
         self._name = name
+        self._zapi = zapi
+        self._api_response = None
 
     def __repr__(self):
         return '{}(name={}) with zabbix_id {}'.format(self.__class__.__name__, self.name, self.zabbix_id)
@@ -933,22 +1112,34 @@ class ZabbixNamedContainer(object):
     def name(self, value):
         raise ValueError('Name is immutable')
 
+    @classmethod
+    def call_zapi(cls, zapi, zapi_method, params=None):
+        try:
+            return zapi.call(zapi_method, params=params)
+        except ZabbixAPIError as exc:
+            data = exc.error.get('data')
+            if data and ('already exists' in data or 'SQL statement execution has failed "INSERT INTO' in data):
+                exc = RemoteObjectAlreadyExists(**exc.error)
+            raise exc
+
+    def _call_zapi(self, zapi_method, params=None):
+        return self.call_zapi(self._zapi, zapi_method, params=params)
+
 
 class ZabbixUserContainer(ZabbixNamedContainer):
     """
     Container class for the Zabbix User object.
     """
     MEDIA_ENABLED = 0  # 0 - enabled, 1 - disabled [sic in zabbix docs]
-    USER_QUERY_BASE = frozendict({'selectUsrgrps': ('usrgrpid', 'name', 'gui_access'),
-                                  'selectMedias': ('mediatypeid', 'sendto')
-                                  })
+    USER_QUERY_BASE = frozendict({
+        'selectUsrgrps': ('usrgrpid', 'name', 'gui_access'),
+        'selectMedias': ('mediatypeid', 'sendto')
+    })
     _user = None
 
     def __init__(self, name, zapi=None):
-        super(ZabbixUserContainer, self).__init__(name)
-        self._zapi = zapi
+        super(ZabbixUserContainer, self).__init__(name, zapi=zapi)
         self.groups = set()
-        self._api_response = None
 
     @classmethod
     def synchronize(cls, zapi, user):
@@ -984,7 +1175,8 @@ class ZabbixUserContainer(ZabbixNamedContainer):
 
     @classmethod
     def from_zabbix_alias(cls, zapi, alias):
-        response = zapi.user.get(dict(filter={'alias': alias}, **cls.USER_QUERY_BASE))
+        params = dict(filter={'alias': alias}, **cls.USER_QUERY_BASE)
+        response = cls.call_zapi(zapi, 'user.get', params=params)
 
         if response:
             assert len(response) == 1, 'User mapping should be injective'
@@ -994,7 +1186,8 @@ class ZabbixUserContainer(ZabbixNamedContainer):
 
     @classmethod
     def from_zabbix_id(cls, zapi, zabbix_id):
-        response = zapi.user.get(dict(userids=zabbix_id, **cls.USER_QUERY_BASE))
+        params = dict(userids=zabbix_id, **cls.USER_QUERY_BASE)
+        response = cls.call_zapi(zapi, 'user.get', params=params)
 
         if response:
             assert len(response) == 1, 'User mapping should be injective'
@@ -1013,18 +1206,19 @@ class ZabbixUserContainer(ZabbixNamedContainer):
         return container
 
     @classmethod
+    def delete_by_id(cls, zapi, zabbix_id):
+        return cls.call_zapi(zapi, 'user.delete', params=[zabbix_id])
+
+    @classmethod
     def delete_by_name(cls, zapi, name):
         zabbix_id = cls.fetch_zabbix_id(zapi, name)
         if zabbix_id:
-            zapi.user.delete([zabbix_id])
+            return cls.delete_by_id(zapi, zabbix_id)
 
-    @staticmethod
-    def delete_by_id(zapi, zabbix_id):
-        zapi.user.delete([zabbix_id])
+    @classmethod
+    def fetch_zabbix_id(cls, zapi, username):
+        response = cls.call_zapi(zapi, 'user.get', params={'filter': {'alias': username}})
 
-    @staticmethod
-    def fetch_zabbix_id(zapi, username):
-        response = zapi.user.get(dict(filter={'alias': username}))
         if not len(response):
             return None
         elif len(response) == 1:
@@ -1046,15 +1240,15 @@ class ZabbixUserContainer(ZabbixNamedContainer):
         self._attach_group_membership(user_update_request_content)
         self._attach_basic_info(user_update_request_content)
 
-        logger.debug('Updating user %s with group info and identity: %s', self.zabbix_id,
-                     user_update_request_content)
-        self._api_response = self._zapi.user.update(user_update_request_content)
+        task_logger.debug('Updating user %s with group info and identity: %s', self.zabbix_id,
+                          user_update_request_content)
+        self._api_response = self._call_zapi('user.update', params=user_update_request_content)
 
         user_media_update_request_content = {'users': {'userid': self.zabbix_id}}
         self._attach_media_for_update_call(user_media_update_request_content)
 
-        logger.debug('Updating user %s with media: %s', self.zabbix_id, user_media_update_request_content)
-        self._api_response = self._zapi.user.updatemedia(user_media_update_request_content)
+        task_logger.debug('Updating user %s with media: %s', self.zabbix_id, user_media_update_request_content)
+        self._api_response = self._call_zapi('user.updatemedia', params=user_media_update_request_content)
 
     def create(self):
         assert not self.zabbix_id, \
@@ -1069,10 +1263,10 @@ class ZabbixUserContainer(ZabbixNamedContainer):
         user_object['alias'] = self._user.username
         user_object['passwd'] = self._user.__class__.objects.make_random_password(20)  # TODO let the user set it
 
-        logger.debug('Creating user: %s', user_object)
+        task_logger.debug('Creating user: %s', user_object)
 
         try:
-            self._api_response = self._zapi.user.create(user_object)
+            self._api_response = self._call_zapi('user.create', params=user_object)
         except ZabbixAPIError:
             # TODO perhaps we should ignore race condition errors, or repeat the task?
             # example: ZabbixAPIError: Application error....
@@ -1119,9 +1313,11 @@ class ZabbixUserContainer(ZabbixNamedContainer):
         )
 
     def refresh(self):
-        response = self._zapi.user.get(dict(userids=self.zabbix_id, **self.USER_QUERY_BASE))
+        params = dict(userids=self.zabbix_id, **self.USER_QUERY_BASE)
+        response = self._call_zapi('user.get', params=params)
+
         if not response:
-            raise ObjectManipulationError('%s doesn\'t exit anymore'.format(self))
+            raise ObjectManipulationError('{} doesn\'t exit anymore'.format(self))
 
         self._api_response = response[0]
         self._refresh_groups(self._api_response)
@@ -1131,8 +1327,8 @@ class ZabbixUserContainer(ZabbixNamedContainer):
         assert self.zabbix_id, 'A user in zabbix should be first created, then updated. %s has no zabbix_id.' % self
         user_object = self._get_api_request_object_stub()
         self._attach_group_membership(user_object)
-        logger.debug('Updating user: %s', user_object)
-        self._api_response = self._zapi.user.update(user_object)
+        task_logger.debug('Updating user: %s', user_object)
+        self._api_response = self._call_zapi('user.update', user_object)
 
     def _attach_group_membership(self, api_request_object):
         zabbix_ids_of_all_user_groups = [group.zabbix_id for group in self.groups]
@@ -1147,11 +1343,13 @@ class ZabbixUserContainer(ZabbixNamedContainer):
         for media_type in ZabbixMediaContainer.MEDIAS:
             user_media = getattr(self._user, 'get_alerting_{}'.format(media_type), None)
             if user_media:
-                medium = {'mediatypeid': user_media.media_type,
-                          'sendto': user_media.sendto,
-                          'period': user_media.period,
-                          'severity': user_media.severity,
-                          'active': self.MEDIA_ENABLED}
+                medium = {
+                    'mediatypeid': user_media.media_type,
+                    'sendto': user_media.sendto,
+                    'period': user_media.period,
+                    'severity': user_media.severity,
+                    'active': self.MEDIA_ENABLED
+                }
                 media.append(medium)
         return media
 
@@ -1181,17 +1379,15 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
     PERMISSION_READ_ONLY = 2
     PERMISSION_READ_WRITE = 3
     QUERY_BASE = frozendict({'selectUsers': ['alias'], 'limit': 1})
-    QUERY_WITHOUT_USERS = {'limit': 1}
+    QUERY_WITHOUT_USERS = frozendict({'limit': 1})
     OWNERS_GROUP = '#owner'
     USER_GROUP_NAME_MAX_LENGTH = 64
 
     def __init__(self, name, zapi=None):
-        super(ZabbixUserGroupContainer, self).__init__(name)
-        self._zapi = zapi
+        super(ZabbixUserGroupContainer, self).__init__(name, zapi=zapi)
         self.users = set()
         self.host_groups = set()
         self.superuser_group = False
-        self._api_response = None
 
     @classmethod
     def user_group_name_factory(cls, dc_name, local_group_name):
@@ -1207,7 +1403,8 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
 
     @classmethod
     def from_zabbix_id(cls, zapi, zabbix_id):
-        response = zapi.usergroup.get(dict(usrgrpids=[zabbix_id], **cls.QUERY_BASE))
+        params = dict(usrgrpids=[zabbix_id], **cls.QUERY_BASE)
+        response = cls.call_zapi(zapi, 'usergroup.get', params=params)
 
         if response:
             return cls.from_zabbix_data(zapi, response[0])
@@ -1221,7 +1418,8 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
         else:
             query = cls.QUERY_WITHOUT_USERS
 
-        response = zapi.usergroup.get(dict(search={'name': name}, **query))
+        params = dict(search={'name': name}, **query)
+        response = cls.call_zapi(zapi, 'usergroup.get', params=params)
 
         if response:
             return cls.from_zabbix_data(zapi, response[0])
@@ -1234,7 +1432,7 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
         container = cls(name=group_name, zapi=zapi)
         container.users = {ZabbixUserContainer.from_mgmt_data(zapi, user) for user in users}
         container.host_groups = {ZabbixHostGroupContainer.from_mgmt_data(zapi, hostgroup)
-                                 for hostgroup in accessible_hostgroups}  # self._get_or_create_groups
+                                 for hostgroup in accessible_hostgroups}  # self._get_or_create_hostgroups
         container.superuser_group = superusers  # FIXME this information is not used anywhere by now
 
         return container
@@ -1281,23 +1479,24 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
             group.delete()
 
     def delete(self):
-        logger.debug('Going to delete group %s', self.name)
-        logger.debug('Group.users before: %s', self.users)
+        task_logger.debug('Going to delete group %s', self.name)
+        task_logger.debug('Group.users before: %s', self.users)
         users_to_remove = self.users.copy()  # We have to copy it because group.users will get messed up
         self.remove_users(users_to_remove, delete_users_if_last=True)  # remove all users
-        logger.debug('Group.users after: %s', self.users)
-        self._zapi.usergroup.delete([self.zabbix_id])
+        task_logger.debug('Group.users after: %s', self.users)
+        self._call_zapi('usergroup.delete', params=[self.zabbix_id])
         self.zabbix_id = None
 
     def create(self):
         assert not self.zabbix_id, \
             '%s has the zabbix_id already and therefore you should try to update the object, not create it.' % self
 
-        user_group_object = {'name': self.name,
-                             'users_status': self.USERS_STATUS_ENABLED,
-                             'gui_access': self.FRONTEND_ACCESS_DISABLED,
-                             'rights': [],
-                             }
+        user_group_object = {
+            'name': self.name,
+            'users_status': self.USERS_STATUS_ENABLED,
+            'gui_access': self.FRONTEND_ACCESS_DISABLED,
+            'rights': [],
+        }
 
         if self.superuser_group:
             hostgroups_access_permission = self.PERMISSION_READ_WRITE
@@ -1312,8 +1511,8 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
             user_group_object['rights'].append({'permission': hostgroups_access_permission,
                                                 'id': host_group.zabbix_id})
 
-        logger.debug('Creating usergroup: %s', user_group_object)
-        self._api_response = self._zapi.usergroup.create(user_group_object)
+        task_logger.debug('Creating usergroup: %s', user_group_object)
+        self._api_response = self._call_zapi('usergroup.create', params=user_group_object)
         self.zabbix_id = self._api_response['usrgrpids'][0]
 
         user_group_object['userids'] = []
@@ -1326,7 +1525,8 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
         }
 
     def refresh(self):
-        response = self._zapi.usergroup.get(dict(usrgrpids=self.zabbix_id, **self.QUERY_BASE))
+        params = dict(usrgrpids=self.zabbix_id, **self.QUERY_BASE)
+        response = self._call_zapi('usergroup.get', params=params)
 
         if not response:
             raise ObjectManipulationError('%s doesn\'t exit anymore'.format(self))
@@ -1340,17 +1540,17 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
             self.update_hostgroup_info()  # There is some hostgroup information depending on the superuser status
 
     def update_hostgroup_info(self):
-        logger.debug('TODO host group update %s', self.name)
+        task_logger.debug('TODO host group update %s', self.name)
         # TODO
 
     def update_users(self, user_group):
-        logger.debug('synchronizing %s', self)
-        logger.debug('remote_user_group.users %s', self.users)
-        logger.debug('source_user_group.users %s', user_group.users)
+        task_logger.debug('synchronizing %s', self)
+        task_logger.debug('remote_user_group.users %s', self.users)
+        task_logger.debug('source_user_group.users %s', user_group.users)
         redundant_users = self.users - user_group.users
-        logger.debug('redundant_users: %s', redundant_users)
+        task_logger.debug('redundant_users: %s', redundant_users)
         missing_users = user_group.users - self.users
-        logger.debug('missing users: %s', missing_users)
+        task_logger.debug('missing users: %s', missing_users)
         self.remove_users(redundant_users, delete_users_if_last=True)
         self.add_users(missing_users)
 
@@ -1360,7 +1560,7 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
     def update_from(self, user_group):
         self.update_users(user_group)
         self.update_basic_information(user_group)
-        logger.debug('todo hostgroups')
+        task_logger.debug('todo hostgroups')
 
     def _refetch_users(self):
         for user in self.users:
@@ -1378,15 +1578,16 @@ class ZabbixUserGroupContainer(ZabbixNamedContainer):
         self._push_current_users()
 
     def _push_current_users(self):
-        self._zapi.usergroup.update({'usrgrpid': self.zabbix_id,
-                                     'userids': [user.zabbix_id for user in self.users]}
-                                    )
+        self._call_zapi('usergroup.update', params={
+            'usrgrpid': self.zabbix_id,
+            'userids': [user.zabbix_id for user in self.users]
+        })
 
     def remove_user(self, user, delete_user_if_last=False):
         user.refresh()
 
         if self not in user.groups:
-            logger.warn('User is not in the group: %s %s (possible race condition)', self, user.groups)
+            task_logger.warn('User is not in the group: %s %s (possible race condition)', self, user.groups)
 
         if not user.groups - {self} and not delete_user_if_last:
             raise ObjectManipulationError('Cannot remove the last group (%s) '
@@ -1413,21 +1614,11 @@ class ZabbixHostGroupContainer(ZabbixNamedContainer):
     Incomplete, TODO
     """
     RE_NAME_WITH_DC_PREFIX = re.compile(r'^:(?P<dc>.*):(?P<hostgroup>.+):$')
-    zabbix_id = None
-
-    def __init__(self, name, zapi=None):
-        super(ZabbixHostGroupContainer, self).__init__(name)
-        self._zapi = zapi
 
     @classmethod
     def from_mgmt_data(cls, name, zapi):
         container = cls(name, zapi)
-        container._zapi = zapi
-        response = zapi.hostgroup.get({'filter': {'name': name}})
-        if response:
-            assert len(response) == 1, 'Hostgroup name => locally generated hostgroup name mapping should be injective'
-            container._zabbix_response = response[0]
-        container.zabbix_id = container._zabbix_response['groupid']
+        container.refresh()
         return container
 
     @staticmethod
@@ -1439,11 +1630,15 @@ class ZabbixHostGroupContainer(ZabbixNamedContainer):
 
         return name
 
+    def refresh(self):
+        self._api_response = self._call_zapi('hostgroup.get', params={'filter': {'name': self.name}})
+        self.zabbix_id = parse_zabbix_result(self._api_response, 'groupid')
+        assert len(self._api_response) == 1, 'Locally generated hostgroup name mapping should be injective'
+
     def create(self):
-        response = self._zapi.hostgroup.create({
-                'name': self.name,
-        })
-        self.zabbix_id = response['groupids'][0]
+        self._api_response = self._call_zapi('hostgroup.create', params={'name': self.name})
+        self.zabbix_id = self._api_response['groupids'][0]
+
         return self
 
 
@@ -1487,3 +1682,7 @@ class ZabbixMediaContainer(object):
             assert severity in cls.SEVERITIES
             result += 2 ** severity
         return result
+
+    @staticmethod
+    def get_severity(s):
+        return ZabbixAPI.get_severity(s)

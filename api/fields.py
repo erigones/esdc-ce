@@ -51,6 +51,7 @@ from django.utils.encoding import is_protected_type, force_text, force_unicode, 
 from django.utils.translation import ugettext_lazy as _
 from django.utils.dateparse import parse_date, parse_datetime, parse_time
 from taggit.utils import parse_tags, split_strip
+from frozendict import frozendict
 
 from api import settings as api_settings
 from api.settings import ISO_8601
@@ -1245,6 +1246,9 @@ class BaseArrayField(CharField):
 
     def to_native(self, value):
         if not value:
+            if value is None and self.allow_none:
+                return None
+
             value = []
 
         if isinstance(value, six.string_types):
@@ -1375,12 +1379,18 @@ class BaseDictField(WritableField):
     """
     Dictionary - object.
     """
-    _key_field = NotImplemented
-    _val_field = NotImplemented
+    _key_field_class = NotImplemented
+    _key_field_params = frozendict()
+    _val_field_class = NotImplemented
+    _val_field_params = frozendict()
+    _default_max_size = None
 
     def __init__(self, *args, **kwargs):
         self.max_items = kwargs.pop('max_items', None)
+        self.max_size = kwargs.pop('max_size', self._default_max_size)  # bytes
         super(BaseDictField, self).__init__(*args, **kwargs)
+        self._key_field = self._key_field_class(**self._key_field_params)
+        self._val_field = self._val_field_class(**self._val_field_params)
 
     def to_native(self, value):
         ret = {}
@@ -1420,6 +1430,12 @@ class BaseDictField(WritableField):
                 raise ValidationError(_('Ensure this value has at most %(max)d items (it has %(count)d).') %
                                       {'max': self.max_items, 'count': count})
 
+        if self.max_size:
+            size = sum(len(val) for key, val in items)
+            if size > self.max_size:
+                raise ValidationError(_('Ensure this value has maximum size of %(max)d bytes '
+                                        '(it has %(size)d bytes).') % {'max': self.max_size, 'size': size})
+
         for k, v in items:
             self._key_field.validate(k)
             self._val_field.validate(v)
@@ -1438,18 +1454,21 @@ class RoutesField(BaseDictField):
          "10.3.0.1": "nics[1]"
      }
     """
-    _key_field = CIDRField()
-    _val_field = IPNICField()
+    _key_field_class = CIDRField
+    _val_field_class = IPNICField
 
 
 class MetadataField(BaseDictField):
-    _key_field = RegexField(r'^[A-Za-z0-9\.\-_:]+$', max_length=128)
-    _val_field = CharField(max_length=65536)
+    _key_field_class = RegexField
+    _key_field_params = frozendict(regex=r'^[A-Za-z0-9\.\-_:]+$', max_length=128)
+    _val_field_class = CharField
+    _default_max_size = 1024 * 1024 * 2  # 2 MB (mentioned in user guide)
 
 
 class URLDictField(BaseDictField):
-    _key_field = RegexField(r'^[a-z0-9][a-z0-9\.\-_]*$', max_length=32)
-    _val_field = URLField()
+    _key_field_class = RegexField
+    _key_field_params = frozendict(regex=r'^[a-z0-9][a-z0-9\.\-_]*$', max_length=32)
+    _val_field_class = URLField
 
 
 class SafeCharField(RegexField):

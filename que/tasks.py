@@ -70,7 +70,7 @@ class MetaTask(Task):
         blocked = False
 
         if lock:
-            task_lock = TaskLock(lock, desc=task, logger=self.logger)
+            task_lock = TaskLock(lock, desc=task, reverse_key=tid, logger=self.logger)
         else:
             task_lock = NoLock()
 

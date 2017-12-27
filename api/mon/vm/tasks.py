@@ -145,4 +145,5 @@ vm_node_changed.connect(mon_vm_sync.call)
 vm_notcreated.connect(mon_vm_disable.call)
 # gunicorn context signals are connected in api.signals:
 # vm_updated -> mon_vm_sync
+# vm_define_reverted -> mon_vm_sync
 # vm_undefined -> mon_vm_delete

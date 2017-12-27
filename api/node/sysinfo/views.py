@@ -9,8 +9,8 @@ __all__ = ('node_sysinfo',)
 @request_data_defaultdc(permissions=(IsSuperAdmin,))
 def node_sysinfo(request, hostname, data=None):
     """
-    Updates (:http:put:`PUT </node/(hostname)/sysinfo>`) compute node's system information by running the esysinfo
-    command on the compute node.
+    Updates (:http:put:`PUT </node/(hostname)/sysinfo>`) compute node's system information by running the esysinfo \
+command on the compute node.
 
     .. http:put:: /node/(hostname)/sysinfo
 

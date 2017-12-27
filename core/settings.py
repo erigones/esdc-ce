@@ -405,6 +405,7 @@ SYSTEM_USER = 7
 SYSTEM_USERNAME = '_system'
 
 API_SYNC_TIMEOUT = 3600
+API_LOCK_TIMEOUT = 300
 
 SHADOW_EMAIL = ''  # bcc for every outgoing email
 
@@ -573,12 +574,14 @@ VMS_NODE_SSH_KEYS_SYNC = True
 VMS_NODE_SSH_KEYS_DEFAULT = []
 VMS_NET_DEFAULT = 'lan'
 VMS_NET_ADMIN = 'admin'
+VMS_NET_ADMIN_OVERLAY = 'adminoverlay'
 VMS_NET_VLAN_RESTRICT = True
 VMS_NET_VXLAN_RESTRICT = True
 VMS_NET_VLAN_ALLOWED = []
 VMS_NET_VXLAN_ALLOWED = []
 VMS_NET_LIMIT = None
 VMS_IMAGE_VM = VMS_VM_IMG01
+VMS_IMAGE_VM_NIC = 1
 VMS_IMAGE_VM_DATASETS_DIR = '/{zfs_filesystem}/root/datasets'  # Image upload directory on ImageVm's compute node
 VMS_IMAGE_IMGADM_CONF = {
     'dockerImportSkipUuids': True,

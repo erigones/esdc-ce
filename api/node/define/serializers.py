@@ -1,6 +1,8 @@
 from logging import getLogger
 
+from django.db import IntegrityError, transaction
 from django.core.validators import RegexValidator
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
@@ -22,12 +24,12 @@ class NodeDefineSerializer(s.InstanceSerializer):
     error_negative_resources = s.ErrorList([_('Value is too low because of existing virtual machines.')])
 
     _model_ = Node
-    _update_fields_ = ('status', 'owner', 'is_compute', 'is_backup', 'note', 'cpu_coef', 'ram_coef',
+    _update_fields_ = ('status', 'owner', 'address', 'is_compute', 'is_backup', 'note', 'cpu_coef', 'ram_coef',
                        'monitoring_hostgroups', 'monitoring_templates')
 
     hostname = s.CharField(read_only=True)
     uuid = s.CharField(read_only=True)
-    address = s.CharField(read_only=True)
+    address = s.ChoiceField()
     status = s.IntegerChoiceField(choices=Node.STATUS_DB)
     node_status = s.DisplayChoiceField(source='status', choices=Node.STATUS_DB, read_only=True)
     owner = s.SlugRelatedField(slug_field='username', queryset=User.objects, read_only=False)
@@ -53,9 +55,13 @@ class NodeDefineSerializer(s.InstanceSerializer):
         super(NodeDefineSerializer, self).__init__(request, instance, *args, **kwargs)
         self.clear_cache = False
         self.status_changed = False
+        self.address_changed = False
+        self.old_ip_address = None
         self.monitoring_changed = False
 
         if not kwargs.get('many', False):
+            # Valid node IP addresses
+            self.fields['address'].choices = [(ip, ip) for ip in instance.ips]
             # Used for update_node_resources()
             self._cpu_coef = instance.cpu_coef
             self._ram_coef = instance.ram_coef
@@ -65,6 +71,20 @@ class NodeDefineSerializer(s.InstanceSerializer):
     def validate_owner(self, attrs, source):
         """Cannot change owner while pending tasks exist"""
         validate_owner(self.object, attrs.get(source, None), _('Compute node'))
+
+        return attrs
+
+    def validate_address(self, attrs, source):
+        """Mark that node IP address is going to change"""
+        new_address = attrs.get(source, None)
+
+        if new_address and self.object.address != new_address:
+            self.address_changed = True
+
+            try:
+                self.old_ip_address = self.object.ip_address
+            except ObjectDoesNotExist:
+                self.old_ip_address = None
 
         return attrs
 
@@ -135,3 +155,40 @@ class NodeDefineSerializer(s.InstanceSerializer):
     def update_node_resources(self):
         """True if cpu_coef or ram_coef changed"""
         return not(self.object.cpu_coef == self._cpu_coef and self.object.ram_coef == self._ram_coef)
+
+    def save(self):
+        """Update compute node attributes in database"""
+        node = self.object
+
+        # NOTE:
+        # Changing cpu or disk coefficients can lead to negative numbers in node.cpu/ram_free or dc_node.cpu/ram_free
+        try:
+            with transaction.atomic():
+                node.save(update_resources=self.update_node_resources, clear_cache=self.clear_cache)
+
+                if self.update_node_resources:
+                    if node.cpu_free < 0 or node.dcnode_set.filter(cpu_free__lt=0).exists():
+                        raise IntegrityError('cpu_check')
+
+                    if node.ram_free < 0 or node.dcnode_set.filter(ram_free__lt=0).exists():
+                        raise IntegrityError('ram_check')
+
+        except IntegrityError as exc:
+            errors = {}
+            exc_error = str(exc)
+            # ram or cpu constraint was violated on vms_dcnode (can happen when DcNode strategy is set to RESERVED)
+            # OR a an exception was raised above
+            if 'ram_check' in exc_error:
+                errors['ram_coef'] = self.error_negative_resources
+            if 'cpu_check' in exc_error:
+                errors['cpu_coef'] = self.error_negative_resources
+
+            if not errors:
+                raise exc
+
+            return errors
+
+        if self.update_node_resources:  # cpu_free or ram_free changed
+            self.reload()
+
+        return None

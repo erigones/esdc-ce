@@ -742,13 +742,15 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
                     ns.update_resources(save=True, recalculate_dc_vms_size=(dc,), recalculate_dc_snapshots_size=(dc,))
 
     def save(self, sync_json=False, update_hostname=False, update_node_resources=False,
-             update_storage_resources=(), **kwargs):
+             update_storage_resources=(), keep_vnc_port=False, **kwargs):
         """You can update the hostname, update node resource and set the json
         defaults before saving the object"""
         # Update node_history and vnc port if node changed
         if self._node_changed:
-            self.vnc_port = None
             self.update_node_history()
+
+            if not keep_vnc_port:
+                self.vnc_port = None
 
         # VNC port is NULL at the beginning
         if self.vnc_port is None:
@@ -1108,18 +1110,18 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
         return self.disk_image.split('-')[0]
 
     @staticmethod
-    def _get_nics(json):
+    def get_nics(json):
         """Return list of nice nics."""
         nics = json.get('nics', [])
         return nics
 
     def json_get_nics(self):
         """Get nics from json."""
-        return self._get_nics(self.json)
+        return self.get_nics(self.json)
 
     def json_active_get_nics(self):
         """Get nics from json_active."""
-        return self._get_nics(self.json_active)
+        return self.get_nics(self.json_active)
 
     @staticmethod
     def _get_ips(nics, primary_ips=True, allowed_ips=True):
@@ -1751,6 +1753,26 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
     @property
     def ips(self):
         return self.json_get_ips()
+
+    @property
+    def ips_active(self):
+        return self.json_active_get_ips()
+
+    @property
+    def primary_ip(self):
+        for nic in self.json_get_nics():
+            if is_ip(nic) and nic.get('primary', False):
+                return nic['ip']
+
+        raise LookupError('Primary IP not found')
+
+    @property
+    def primary_ip_active(self):
+        for nic in self.json_active_get_nics():
+            if is_ip(nic) and nic.get('primary', False):
+                return nic['ip']
+
+        raise LookupError('Primary IP not found')
 
     @property  # Return installed boolean
     def installed(self):

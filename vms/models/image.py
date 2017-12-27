@@ -462,6 +462,10 @@ class ImageVm(object):
         return DefaultDc().settings.VMS_IMAGE_VM  # dc1_settings
 
     @staticmethod
+    def get_nic_id():
+        return DefaultDc().settings.VMS_IMAGE_VM_NIC  # dc1_settings
+
+    @staticmethod
     def get_additional_sources():
         return DefaultDc().settings.VMS_IMAGE_SOURCES  # dc1_settings
 
@@ -471,6 +475,24 @@ class ImageVm(object):
             return self.vm.node
         else:
             return None
+
+    @property
+    def ip(self):
+        vm_ips_active = self.vm.json_active_get_ips(allowed_ips=False)
+
+        try:
+            return vm_ips_active[self.get_nic_id() - 1]
+        except LookupError:
+            try:
+                return self.vm.primary_ip_active
+            except LookupError:
+                return vm_ips_active[0]
+
+    def has_ip(self):
+        try:
+            return self.vm and self.ip
+        except LookupError:
+            return False
 
     @property
     def datasets_dir(self):
@@ -485,7 +507,7 @@ class ImageVm(object):
     @property
     def repo_url(self):
         assert self, 'Image VM does not exist'
-        return 'http://%s' % self.vm.ips[0]
+        return 'http://%s' % self.ip
 
     @property
     def sources(self):
@@ -494,7 +516,7 @@ class ImageVm(object):
         if self:
             try:
                 src = [self.repo_url]
-            except IndexError:
+            except LookupError:
                 pass
 
         src.extend(self.get_additional_sources())

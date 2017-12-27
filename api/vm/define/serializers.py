@@ -100,7 +100,7 @@ class VmDefineSerializer(VmBaseSerializer):
     maintain_resolvers = s.BooleanField(default=True)  # OS only
     routes = s.RoutesField(default={})  # OS only
     vga = s.ChoiceField(choices=Vm.VGA_MODEL, default=settings.VMS_VGA_MODEL_DEFAULT)  # KVM only
-    mdata = s.MetadataField(max_items=32, default=settings.VMS_VM_MDATA_DEFAULT,
+    mdata = s.MetadataField(default=settings.VMS_VM_MDATA_DEFAULT,
                             validators=(validate_mdata(Vm.RESERVED_MDATA_KEYS),))
     locked = s.BooleanField(read_only=True, required=False)
     created = s.DateTimeField(read_only=True, required=False)

@@ -1283,7 +1283,7 @@ function vm_control(hostname, btn) {
       mod = $('#vm_migrate_modal');
       return vm_modal(mod, btn, function() {
         mod.find('#vm_migrate_modal_error').hide();
-        return vm_migrate(hostname, $('#id_migrate-node').val());
+        return vm_migrate(hostname, $('#id_migrate-target_node').val(), $('#id_migrate-live').prop('checked'));
       });
 
     case 'replication':

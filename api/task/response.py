@@ -318,11 +318,11 @@ def mgmt_task_response(request, task_id, error, result, data=None, **kwargs):
     """
     Response class factory for mgmt task calls. Called by some api views.
     """
-    if result:
-        return SuccessTaskResponse(request, result, **kwargs)
-    elif error:
+    if error:
         return FailureTaskResponse(request, error, **kwargs)
     elif task_id:
         return TaskResponse(request, task_id, data=data, **kwargs)
+    elif result is not None:
+        return SuccessTaskResponse(request, result, **kwargs)
     else:
         return BadRequestResponse(request)

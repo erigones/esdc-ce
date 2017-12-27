@@ -1,8 +1,4 @@
-# noinspection PyCompatibility
-import ipaddress
-
 from django.utils.translation import ugettext_lazy as _
-from django.utils.six import text_type
 
 from api import serializers as s
 from vms.models import IPAddress
@@ -52,7 +48,7 @@ class NetworkIPSerializer(s.Serializer):
 
         net = self.net
         # Was already validated by IPAddressField
-        ipaddr = ipaddress.ip_address(text_type(value))
+        ipaddr = IPAddress.get_ip_address(value)
         network = net.ip_network
 
         if ipaddr not in network:
@@ -60,7 +56,9 @@ class NetworkIPSerializer(s.Serializer):
                                     {'ip': value, 'net': net.name})
 
         # Check if IP does not exist in another network with same VLAN ID
-        if IPAddress.objects.exclude(subnet=net).filter(ip=value, subnet__vlan_id=net.vlan_id).exists():
+        if IPAddress.objects.exclude(subnet=net).filter(ip=value,
+                                                        subnet__vlan_id=net.vlan_id,
+                                                        subnet__vxlan_id=net.vxlan_id).exists():
             raise s.ValidationError(_('IP address "%(ip)s" already exists in another network with the same VLAN ID.') %
                                     {'ip': value})
 

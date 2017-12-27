@@ -131,13 +131,14 @@ def _init_images(node, images, default_dc, admin_dc):
 
 
 # noinspection PyArgumentList
-def init_mgmt(head_node, images=None):
+def init_mgmt(head_node, images=None):  # noqa: R701
     """
     Initialize the system and create the "admin" datacenter.
     """
     from api.dc.views import dc_node, dc_settings, dc_domain
     from api.network.base.views import net_manage
     from api.dns.domain.views import dns_domain
+    from api.dns.record.views import dns_record
     from api.node.vm.views import harvest_vm
 
     admin = settings.VMS_DC_ADMIN
@@ -248,6 +249,8 @@ def init_mgmt(head_node, images=None):
             api_put(dc_settings, main, VMS_VM_RESOLVERS_DEFAULT=[vm_dns01_ip])
             api_put(dc_settings, admin, VMS_VM_RESOLVERS_DEFAULT=[vm_dns01_ip])
             api_put(net_manage, settings.VMS_NET_ADMIN, resolvers=[vm_dns01_ip])
+            api_post(dns_record, settings.DNS_MGMT_DOMAIN, 0, name=settings.DNS_NAMESERVERS[0], type='A',
+                     content=vm_dns01_ip)
     except Exception as e:
         logger.exception(e)
 

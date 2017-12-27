@@ -1,5 +1,6 @@
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ObjectDoesNotExist
+from frozendict import frozendict
 
 from api import serializers as s
 from api.serializers import APIValidationError
@@ -13,15 +14,21 @@ from vms.models import Node, Dc, DcNode, SlaveVm
 from pdns.models import Domain
 
 
+MIN_PLATFORM_VERSION_LIVE_MIGRATION = 20171124
+
+
 class DiskPoolDictField(s.BaseDictField):
-    _key_field = s.IntegerField(min_value=DISK_ID_MIN + 1, max_value=DISK_ID_MAX + 1)
-    _val_field = s.CharField(max_length=64)
+    _key_field_class = s.IntegerField
+    _key_field_params = frozendict(min_value=DISK_ID_MIN + 1, max_value=DISK_ID_MAX + 1)
+    _val_field_class = s.CharField
+    _val_field_params = frozendict(max_length=64)
 
 
 class VmMigrateSerializer(s.Serializer):
     node = s.SlugRelatedField(slug_field='hostname', queryset=Node.objects, required=False)
     root_zpool = s.CharField(max_length=64, required=False)
     disk_zpools = DiskPoolDictField(required=False)
+    live = s.BooleanField(default=False)
 
     def __init__(self, request, vm, *args, **kwargs):
         self.img_required = None
@@ -31,6 +38,7 @@ class VmMigrateSerializer(s.Serializer):
         super(VmMigrateSerializer, self).__init__(*args, **kwargs)
         self.fields['node'].queryset = get_nodes(request, is_compute=True)
         self._disks = vm.json_active_get_disks()
+        self._live = False
 
         if vm.is_kvm():
             self.fields['disk_zpools'].max_items = len(self._disks)
@@ -70,10 +78,33 @@ class VmMigrateSerializer(s.Serializer):
 
         return attrs
 
+    def validate_live(self, attrs, source):
+        value = attrs.get(source, None)
+
+        if value:
+            self._live = True
+
+            if not self.vm.is_kvm():
+                raise s.ValidationError(_('Live migration is currently available only for KVM.'))
+
+        return attrs
+
     def validate(self, attrs):
         vm = self.vm
         node = attrs.get('node', vm.node)
         changing_node = attrs.get('node', vm.node) != vm.node
+
+        if self._live:
+            if not changing_node:
+                self._errors['live'] = s.ErrorList([_('Live migration cannot be performed locally.')])
+                return attrs
+
+            if (node.platform_version_short < MIN_PLATFORM_VERSION_LIVE_MIGRATION or
+                    vm.node.platform_version_short < MIN_PLATFORM_VERSION_LIVE_MIGRATION):
+                self._errors['live'] = s.ErrorList([_('Source and/or target node platform does not '
+                                                      'support live migration.')])
+                return attrs
+
         # Ghost VM is a copy of a VM used to take up place in DB.
         # When node is changing we have to have all disks in a ghost VM.
         # When changing only disk pools, only the changed disks have to be in a ghost VM.
@@ -160,6 +191,12 @@ class VmMigrateSerializer(s.Serializer):
                   '-o GSSAPIKeyExchange=no -o GSSAPIAuthentication=no -o LogLevel=QUIET -l root'
             get_json = '%s %s "%s"' % (ssh, node.address, get_json)
 
+            if vm.is_kvm():
+                params.append('-C %s' % self.ghost_vm_define.vm.vnc_port)
+
+        if self._live:
+            params.append('-L')
+
         if self._root_zpool:
             params.append('-p %s' % self._root_zpool)
 
@@ -171,7 +208,7 @@ class VmMigrateSerializer(s.Serializer):
         return 'esmigrate migrate %s %s >&2; ' % (vm.uuid, ' '.join(params)) + get_json
 
     def detail_dict(self, **kwargs):
-        dd = {}
+        dd = {'live': self._live}
 
         if self.changing_node:
             dd['node'] = self.object['node'].hostname

@@ -335,8 +335,12 @@ def log_task_callback(task_id, task_status=states.REVOKED, cleanup=True, detail=
     # If a lock created by this task still exists we need to remove it now - Bug #chili-592
     if cleanup:
         lock_key = TaskLock.get_lock_key_from_value(task_id)
+
         if lock_key:
             TaskLock(lock_key, desc='LogTask %s' % task_id).delete(check_value=task_id, fail_silently=True)
+        else:
+            logger.warning('Task %s[%s] %s in log_task_callback :: Reverse lock does not exist',
+                           sender_name, task_id, detail)
 
     # Task info from cache
     task_info = UserTasks(owner_id).get(task_id)

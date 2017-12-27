@@ -72,6 +72,7 @@ def _vm_delete_cb_succeeded(task_id, vm):
     Helper function used by vm_delete_cb to run proper vm methods in order to delete the VM.
     """
     vm.status = Vm.NOTCREATED
+    old_json_active = vm.json_active
     vm.json_active = {}
     # Let's update resource counters, because they depend on Vm.is_deployed() status and json_active
     vm.save(update_node_resources=True, update_storage_resources=True)
@@ -79,7 +80,7 @@ def _vm_delete_cb_succeeded(task_id, vm):
     Snapshot.objects.filter(vm=vm).delete()
     SnapshotDefine.objects.filter(vm=vm).delete()
     BackupDefine.objects.filter(vm=vm).delete()
-    vm_notcreated.send(task_id, vm=vm)  # Signal!
+    vm_notcreated.send(task_id, vm=vm, old_json_active=old_json_active)  # Signal!
 
 
 def _vm_error(task_id, vm):
@@ -243,6 +244,7 @@ def vm_update_cb(result, task_id, vm_uuid=None, new_node_uuid=None):
                                     'following attributes: %s' % ','.join(update_dict.keys()))
             update_fields.append('node_id')
 
+        old_json_active = vm.json_active
         vm.json_active = json_active
 
         if new_node_uuid:
@@ -252,7 +254,7 @@ def vm_update_cb(result, task_id, vm_uuid=None, new_node_uuid=None):
         with transaction.atomic():
             vm.save(update_node_resources=True, update_storage_resources=True, update_fields=update_fields)
             vm_update_ipaddress_usage(vm)
-            vm_json_active_changed.send(task_id, vm=vm)  # Signal!
+            vm_json_active_changed.send(task_id, vm=vm, old_json_active=old_json_active)  # Signal!
 
         if new_node_uuid:
             vm_node_changed.send(task_id, vm=vm, force_update=True)  # Signal!

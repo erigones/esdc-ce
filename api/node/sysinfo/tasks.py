@@ -9,8 +9,8 @@ from api.node.image.tasks import run_node_img_sources_sync
 from api.node.snapshot.api_views import NodeVmSnapshotList
 from api.vm.status.tasks import vm_status_all
 from api.dns.record.api_views import RecordView
-from vms.models import Node, DefaultDc
-from vms.signals import node_created, node_json_changed
+from vms.models import Node, DefaultDc, IPAddress
+from vms.signals import node_created, node_json_changed, node_json_unchanged
 from que.tasks import cq, get_task_logger
 from que.mgmt import MgmtCallbackTask
 from que.exceptions import TaskException
@@ -18,6 +18,40 @@ from que.exceptions import TaskException
 __all__ = ('node_sysinfo_cb',)
 
 logger = get_task_logger(__name__)
+
+
+def _save_node_ip_address(task_id, node):
+    """Helper function for saving IP address and creating DNS records of a new compute node"""
+    assert node.address
+
+    try:
+        ip_address = node.create_ip_address()
+    except IPAddress.DoesNotExist as exc:
+        logger.warning('Could not save node %s IP address "%s" into admin network (%s)', node, node.address, exc)
+        return
+
+    logger.info('Saving node %s IP address "%s" into admin network', node, node.ip_address)
+    ip_address.save()
+
+    admin_net = node.ip_address.subnet  # The network was updated by init_mgmt()
+    # Reload Subnet object because it is cached inside node instance
+    admin_net = admin_net.__class__.objects.get(pk=admin_net.pk)
+    # We need a request object
+    request = get_dummy_request(DefaultDc(), 'POST', system_user=True)
+    record_cls = RecordView.Record
+
+    if admin_net.dns_domain and admin_net.dns_domain == node.domain_name:
+        logger.info('Creating forward A DNS record for node %s', node)
+        # This will fail silently
+        RecordView.add_or_update_record(request, record_cls.A, admin_net.dns_domain, node.hostname,
+                                        node.address, task_id=task_id, related_obj=node)
+
+    if admin_net.ptr_domain:
+        logger.info('Creating reverse PTR DNS record for node %s', node)
+        # This will fail silently
+        RecordView.add_or_update_record(request, record_cls.PTR, admin_net.ptr_domain,
+                                        record_cls.get_reverse(node.address), node.hostname,
+                                        task_id=task_id, related_obj=node)
 
 
 @cq.task(name='api.node.sysinfo.tasks.node_sysinfo_cb', base=MgmtCallbackTask, bind=True, ignore_result=False)  # noqa: R701,E501
@@ -79,46 +113,24 @@ def node_sysinfo_cb(result, task_id, node_uuid=None):
                 result['message'] = 'Error while initializing admin datacenter (%s)' % e
                 task_log_error(task_id, msg=LOG_NODE_CREATE, obj=node, task_result=result, update_user_tasks=True)
 
-        logger.info('Saving node %s IP address "%s" into admin network', node, node.ip_address)
-        try:  # We should proceed even if the IP address is not registered
-            node.ip_address.save()
+        try:
+            _save_node_ip_address(task_id, node)
         except Exception as e:
             logger.exception(e)
-        else:
-            admin_net = node.ip_address.subnet  # The network was updated by init_mgmt()
-            # Reload Subnet object because it is cached inside node instance
-            admin_net = admin_net.__class__.objects.get(pk=admin_net.pk)
-            # We need a request object
-            request = get_dummy_request(DefaultDc(), 'POST', system_user=True)
-            record_cls = RecordView.Record
-
-            if admin_net.dns_domain and admin_net.dns_domain == node.domain_name:
-                logger.info('Creating forward A DNS record for node %s', node)
-                # This will fail silently
-                RecordView.add_or_update_record(request, record_cls.A, admin_net.dns_domain, node.hostname,
-                                                node.address, task_id=task_id, related_obj=node)
-
-            if admin_net.ptr_domain:
-                logger.info('Creating reverse PTR DNS record for node %s', node)
-                # This will fail silently
-                RecordView.add_or_update_record(request, record_cls.PTR, admin_net.ptr_domain,
-                                                record_cls.get_reverse(node.address), node.hostname,
-                                                task_id=task_id, related_obj=node)
-
     else:
         sshkey_changed = node.sshkey_changed(esysinfo)
+        sysinfo_changed = node.sysinfo_changed(esysinfo)
 
-        if node.sysinfo_changed(esysinfo) or sshkey_changed:
+        if sysinfo_changed or sshkey_changed:
             logger.warn('Updating node %s json with sysinfo output from %s', node, node_uuid)
             node.update_from_sysinfo(esysinfo)  # Will save public SSH key too
             node_json_changed.send(task_id, node=node)  # Signal!
             result['message'] = 'Successfully updated compute node %s' % node.hostname
-            task_log_success(task_id, msg=LOG_NODE_UPDATE, obj=node, task_result=result,
-                             update_user_tasks=True)
         else:
+            node_json_unchanged.send(task_id, node=node)  # Signal!
             result['message'] = 'No changes detected on compute node %s' % node.hostname
-            task_log_success(task_id, msg=LOG_NODE_UPDATE, obj=node, task_result=result,
-                             update_user_tasks=True)
+
+        task_log_success(task_id, msg=LOG_NODE_UPDATE, obj=node, task_result=result, update_user_tasks=True)
 
     if sshkey_changed:
         logger.warn('SSH key has changed on node %s - creating authorized_keys synchronization tasks', node)

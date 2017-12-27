@@ -1,0 +1,378 @@
+{
+    "zabbix_export": {
+        "date": "2015-12-03T21:45:19Z",
+        "templates": [
+            {
+                "templates": [
+                    {
+                        "name": "t_icmp"
+                    },
+                    {
+                        "name": "t_linux"
+                    },
+                    {
+                        "name": "t_linux-disk"
+                    },
+                    {
+                        "name": "t_svc-api"
+                    },
+                    {
+                        "name": "t_svc-cache"
+                    },
+                    {
+                        "name": "t_svc-erigonesd-mgmt"
+                    },
+                    {
+                        "name": "t_svc-gui"
+                    },
+                    {
+                        "name": "t_svc-mq"
+                    },
+                    {
+                        "name": "t_svc-db"
+                    },
+                    {
+                        "name": "t_svc-remote-console"
+                    },
+                    {
+                        "name": "t_svc-sio"
+                    },
+                    {
+                        "name": "t_zabbix-agent"
+                    }
+                ],
+                "name": "t_role-mgmt",
+                "macros": [
+                    {
+                        "macro": "{$SWAP_FREE_THRESHOLD}",
+                        "value": "0M"
+                    }
+                ],
+                "items": [],
+                "screens": [
+                    {
+                        "vsize": "2",
+                        "name": "Erigones component resource usage",
+                        "hsize": "1",
+                        "screen_items": [
+                            {
+                                "application": "",
+                                "style": "0",
+                                "rowspan": "1",
+                                "resource": {
+                                    "host": "t_role-mgmt",
+                                    "name": "Erigones component CPU usage"
+                                },
+                                "sort_triggers": "0",
+                                "halign": "0",
+                                "resourcetype": "0",
+                                "colspan": "1",
+                                "dynamic": "0",
+                                "height": "100",
+                                "width": "500",
+                                "elements": "0",
+                                "url": "",
+                                "valign": "0",
+                                "y": "0",
+                                "x": "0"
+                            },
+                            {
+                                "application": "",
+                                "style": "0",
+                                "rowspan": "1",
+                                "resource": {
+                                    "host": "t_role-mgmt",
+                                    "name": "Erigones component memory usage"
+                                },
+                                "sort_triggers": "0",
+                                "halign": "0",
+                                "resourcetype": "0",
+                                "colspan": "1",
+                                "dynamic": "0",
+                                "height": "100",
+                                "width": "500",
+                                "elements": "0",
+                                "url": "",
+                                "valign": "0",
+                                "y": "1",
+                                "x": "0"
+                            }
+                        ]
+                    }
+                ],
+                "applications": [],
+                "discovery_rules": [],
+                "groups": [
+                    {
+                        "name": "Templates"
+                    }
+                ],
+                "template": "t_role-mgmt"
+            }
+        ],
+        "version": "2.0",
+        "groups": [
+            {
+                "name": "Templates"
+            }
+        ],
+        "graphs": [
+            {
+                "show_3d": "0",
+                "graph_items": [
+                    {
+                        "calc_fnc": "2",
+                        "color": "87B457",
+                        "item": {
+                            "host": "t_role-mgmt",
+                            "key": "proc.cpu[gunicorn-gui.py]"
+                        },
+                        "sortorder": "2",
+                        "drawtype": "1",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "CDDA13",
+                        "item": {
+                            "host": "t_role-mgmt",
+                            "key": "proc.cpu[tomcat]"
+                        },
+                        "sortorder": "5",
+                        "drawtype": "1",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "5370B8",
+                        "item": {
+                            "host": "t_role-mgmt",
+                            "key": "proc.cpu[erigonesd.py worker]"
+                        },
+                        "sortorder": "8",
+                        "drawtype": "0",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "CF545E",
+                        "item": {
+                            "host": "t_role-mgmt",
+                            "key": "proc.cpu[guacd]"
+                        },
+                        "sortorder": "4",
+                        "drawtype": "1",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "77897D",
+                        "item": {
+                            "host": "t_role-mgmt",
+                            "key": "proc.cpu[erigonesd.py beat]"
+                        },
+                        "sortorder": "7",
+                        "drawtype": "0",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "5DAE99",
+                        "item": {
+                            "host": "t_role-mgmt",
+                            "key": "proc.cpu[gunicorn-sio.py]"
+                        },
+                        "sortorder": "6",
+                        "drawtype": "1",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "5299AD",
+                        "item": {
+                            "host": "t_role-mgmt",
+                            "key": "proc.cpu[gunicorn-api.py]"
+                        },
+                        "sortorder": "0",
+                        "drawtype": "1",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "AE5C8A",
+                        "item": {
+                            "host": "t_role-mgmt",
+                            "key": "proc.cpu[rabbitmq]"
+                        },
+                        "sortorder": "3",
+                        "drawtype": "1",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "5D549A",
+                        "item": {
+                            "host": "t_role-mgmt",
+                            "key": "proc.cpu[redis-server]"
+                        },
+                        "sortorder": "1",
+                        "drawtype": "1",
+                        "type": "0",
+                        "yaxisside": "0"
+                    }
+                ],
+                "ymin_type_1": "0",
+                "name": "Erigones component CPU usage",
+                "percent_left": "0.0000",
+                "type": "1",
+                "ymax_type_1": "0",
+                "height": "200",
+                "yaxismax": "100.0000",
+                "width": "900",
+                "show_legend": "1",
+                "show_work_period": "0",
+                "ymax_item_1": "0",
+                "ymin_item_1": "0",
+                "show_triggers": "0",
+                "yaxismin": "0.0000",
+                "percent_right": "0.0000"
+            },
+            {
+                "show_3d": "0",
+                "graph_items": [
+                    {
+                        "calc_fnc": "2",
+                        "color": "5370B8",
+                        "item": {
+                            "host": "t_role-mgmt",
+                            "key": "proc.rss[erigonesd.py worker]"
+                        },
+                        "sortorder": "8",
+                        "drawtype": "0",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "AE5C8A",
+                        "item": {
+                            "host": "t_role-mgmt",
+                            "key": "proc.rss[rabbitmq]"
+                        },
+                        "sortorder": "3",
+                        "drawtype": "1",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "5DAE99",
+                        "item": {
+                            "host": "t_role-mgmt",
+                            "key": "proc.rss[gunicorn-sio.py]"
+                        },
+                        "sortorder": "6",
+                        "drawtype": "1",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "5299AD",
+                        "item": {
+                            "host": "t_role-mgmt",
+                            "key": "proc.rss[gunicorn-api.py]"
+                        },
+                        "sortorder": "0",
+                        "drawtype": "1",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "CF545E",
+                        "item": {
+                            "host": "t_role-mgmt",
+                            "key": "proc.rss[guacd]"
+                        },
+                        "sortorder": "4",
+                        "drawtype": "1",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "77897D",
+                        "item": {
+                            "host": "t_role-mgmt",
+                            "key": "proc.rss[erigonesd.py beat]"
+                        },
+                        "sortorder": "7",
+                        "drawtype": "0",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "5D549A",
+                        "item": {
+                            "host": "t_role-mgmt",
+                            "key": "redis.stat[used_memory_rss:]"
+                        },
+                        "sortorder": "1",
+                        "drawtype": "1",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "CDDA13",
+                        "item": {
+                            "host": "t_role-mgmt",
+                            "key": "proc.rss[tomcat]"
+                        },
+                        "sortorder": "5",
+                        "drawtype": "1",
+                        "type": "0",
+                        "yaxisside": "0"
+                    },
+                    {
+                        "calc_fnc": "2",
+                        "color": "87B457",
+                        "item": {
+                            "host": "t_role-mgmt",
+                            "key": "proc.rss[gunicorn-gui.py]"
+                        },
+                        "sortorder": "2",
+                        "drawtype": "1",
+                        "type": "0",
+                        "yaxisside": "0"
+                    }
+                ],
+                "ymin_type_1": "0",
+                "name": "Erigones component memory usage",
+                "percent_left": "0.0000",
+                "type": "1",
+                "ymax_type_1": "0",
+                "height": "200",
+                "yaxismax": "100.0000",
+                "width": "900",
+                "show_legend": "1",
+                "show_work_period": "0",
+                "ymax_item_1": "0",
+                "ymin_item_1": "0",
+                "show_triggers": "0",
+                "yaxismin": "0.0000",
+                "percent_right": "0.0000"
+            }
+        ]
+    }
+}

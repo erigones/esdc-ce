@@ -58,7 +58,7 @@ _es() {
 
 			"get"|"create"|"set"|"delete"|"options")
 				if [ ${COMP_CWORD} -lt 3 ]; then
-					COMPREPLY=( $( compgen -W "/vm/define /vm/define/snapshot /vm/define/backup /vm/status /vm/ /vm/(hostname) /mon/ /mon/vm/ /mon/node/ /mon/template /mon/hostgroup /node/ /node/(hostname) /dc/ /dc/(dc) /network/ /network/ip/ /network/(name) /image/ /image/(name) /imagestore/ /imagestore/(name) /template/ /template/(name) /iso/ /iso/(name) /dns/domain/ /dns/domain/(name) /task/log /task/ /task/(task_id) /system/ /accounts/login /accounts/logout /accounts/user /accounts/permission /accounts/group" -- "${cur}" ) )
+					COMPREPLY=( $( compgen -W "/vm/define /vm/define/snapshot /vm/define/backup /vm/status /vm/ /vm/(hostname) /mon/ /mon/vm/ /mon/node/ /mon/template /mon/hostgroup /mon/alert /node/ /node/(hostname) /dc/ /dc/(dc) /network/ /network/ip/ /network/(name) /image/ /image/(name) /imagestore/ /imagestore/(name) /template/ /template/(name) /iso/ /iso/(name) /dns/domain/ /dns/domain/(name) /task/log /task/ /task/(task_id) /system/ /accounts/login /accounts/logout /accounts/user /accounts/permission /accounts/group" -- "${cur}" ) )
 				fi
 			;;
 			*)
@@ -541,6 +541,11 @@ _es() {
 			fi
 		;;
 
+		/mon/alert)
+			[ ${COMP_CWORD} -eq 2 ] && COMPREPLY=( "${cur} " )
+			[[ "${action}" == "get" ]] && params="-since -until -last -show_events -vm_hostnames -vm_uuids -node_hostnames -node_uuids -dc_bound"
+		;;
+
 		/node/*/storage)
 			[ ${COMP_CWORD} -eq 2 ] && COMPREPLY=( "${cur}/" )
 			[[ "${action}" == "get" ]] && params="-full -extended"
@@ -569,7 +574,7 @@ _es() {
 				COMPREPLY=( $(compgen -P "${cur%/*}" -W "/ /backup" -- "/${cur##*/}" ) )
 			fi
 			[[ "${action}" == "get" ]] && params="-full"
-			[[ "${action}" == "create" ]] || [[ "${action}" == "set" ]] && params="-status -is_compute -is_backup -owner -cpu_coef -ram_coef -note"
+			[[ "${action}" == "create" ]] || [[ "${action}" == "set" ]] && params="-status -is_compute -is_backup -owner -address -cpu_coef -ram_coef -note"
 		;;
 
 		/node/*/license|/node/*/license/)
