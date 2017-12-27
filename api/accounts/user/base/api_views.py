@@ -141,6 +141,7 @@ class UserView(APIView):
             return FailureTaskResponse(self.request, message, obj=user, dc_bound=False)
 
         dd = {'email': user.email, 'date_joined': user.date_joined}
+        username = user.username
         was_staff = user.is_staff
         old_roles = list(user.roles.all())
         ser = self.serializer(self.request, user)
@@ -148,7 +149,7 @@ class UserView(APIView):
 
         res = SuccessTaskResponse(self.request, None, obj=user, msg=LOG_USER_DELETE, detail_dict=dd, dc_bound=False)
         task_id = res.data.get('task_id')
-        connection.on_commit(lambda: user_relationship_changed.send(task_id, user_name=ser.object.username,  # Signal!
+        connection.on_commit(lambda: user_relationship_changed.send(task_id, user_name=username,  # Signal!
                                                                     affected_groups=tuple(
                                                                         group.id for group in old_roles)))
 

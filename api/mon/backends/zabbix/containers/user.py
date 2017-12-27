@@ -173,7 +173,7 @@ class ZabbixUserContainer(ZabbixBaseContainer):
         from api.mon.backends.zabbix.containers.user_group import ZabbixUserGroupContainer
 
         yielded_owned_dcs = set()
-        user_related_dcs = Dc.objects.filter(Q(owner=self.user) | Q(roles__user=self.user))
+        user_related_dcs = Dc.objects.filter(Q(owner=self.user) | Q(roles__user=self.user)).distinct()
 
         for dc_name, group_name, user_id in user_related_dcs.values_list('name', 'roles__name', 'roles__user'):
             if user_id == self.user.id:

@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 from django.utils.six import text_type
+from django.db.models import Q
 from celery.utils.log import get_task_logger
 from zabbix_api import ZabbixAPIException
 
@@ -220,7 +221,7 @@ def _user_changed(task_id, user_name, dc_name, affected_groups):
             logger.info('Going to create/update user %s in zabbixes related to all groups '
                         'to which the user is related to.', user_name)
 
-            for dc in Dc.objects.filter(roles__user=user):
+            for dc in Dc.objects.filter(Q(owner=user) | Q(roles__user=user)).distinct():
                 mon = get_monitoring(dc)
                 try:
                     res = mon.user_sync(user=user)
