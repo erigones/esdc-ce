@@ -17,14 +17,14 @@ class ZabbixHostGroupContainer(ZabbixBaseContainer):
 
     @classmethod
     def hostgroup_name_factory(cls, dc_name, hostgroup_name):
-        if dc_name is None:
-            name = hostgroup_name
-        else:
+        if dc_name:  # local hostgroup
             name = cls.trans_dc_qualified_name(hostgroup_name, dc_name)
 
             if len(name) > cls.NAME_MAX_LENGTH:
                 raise ValueError('dc_name + group name should have less than 61 chars, '
                                  'but they have %d instead: %s %s' % (len(name), dc_name, hostgroup_name))
+        else:
+            name = hostgroup_name  # global hostgroup
 
         return name
 
@@ -61,11 +61,11 @@ class ZabbixHostGroupContainer(ZabbixBaseContainer):
             return True
 
     @classmethod
-    def all(cls, zapi, dc_prefix=None):
+    def all(cls, zapi, dc_name=None):
         response = cls.call_zapi(zapi, 'hostgroup.get', params=dict(cls.QUERY_BASE))
 
-        if dc_prefix is not None:
-            response = (hostgroup for hostgroup in response if cls._is_visible_from_dc(hostgroup, dc_prefix))
+        if dc_name is not None:
+            response = (hostgroup for hostgroup in response if cls._is_visible_from_dc(hostgroup, dc_name))
 
         return [cls.from_zabbix_data(zapi, item) for item in response]
 
@@ -153,4 +153,5 @@ class ZabbixHostGroupContainer(ZabbixBaseContainer):
             'id': self.zabbix_id,
             'name': name,
             'hosts': hosts,
+            'global': not bool(match),
         }

@@ -31,23 +31,16 @@ class InternalZabbix(ZabbixBase):
     # noinspection PyProtectedMember
     def _vm_groups(self, vm, log=None):
         """Return set of zabbix hostgroup IDs for a VM"""
-        return self._get_or_create_hostgroups(self._vm_kwargs(vm),
-                                              django_settings._MON_ZABBIX_HOSTGROUP_VM,
-                                              vm.dc.name,
-                                              django_settings._MON_ZABBIX_HOSTGROUPS_VM,
-                                              log)
+        return self._get_or_create_hostgroups(self._vm_kwargs(vm), django_settings._MON_ZABBIX_HOSTGROUP_VM, vm.dc.name,
+                                              hostgroups=django_settings._MON_ZABBIX_HOSTGROUPS_VM, log=log)
 
     def _node_groups(self, node, log=None):
         """Return set of zabbix hostgroup IDs for a Compute node"""
         hostgroups = set(self.settings.MON_ZABBIX_HOSTGROUPS_NODE)
         hostgroups.update(node.monitoring_hostgroups)
-        empty_prefix = ''
 
-        return self._get_or_create_hostgroups(self._node_kwargs(node),
-                                              self.settings.MON_ZABBIX_HOSTGROUP_NODE,
-                                              empty_prefix,
-                                              hostgroups,
-                                              log)
+        return self._get_or_create_hostgroups(self._node_kwargs(node), self.settings.MON_ZABBIX_HOSTGROUP_NODE, None,
+                                              hostgroups=hostgroups, log=log)
 
     # noinspection PyProtectedMember
     def _vm_templates(self, vm, log=None):

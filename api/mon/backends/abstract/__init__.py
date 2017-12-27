@@ -121,7 +121,7 @@ class AbstractMonitoringBackend(object):
     def template_list(self, full=False, extended=False):
         raise NotImplementedError
 
-    def hostgroup_list(self, dc_prefix=None):
+    def hostgroup_list(self, dc_name=None):
         raise NotImplementedError
 
     def hostgroup_detail(self, name):

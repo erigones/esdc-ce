@@ -479,14 +479,14 @@ class Zabbix(AbstractMonitoringBackend):
 
         return [getattr(ztc, display_attr) for ztc in ZabbixTemplateContainer.all(self.ezx.zapi)]
 
-    def hostgroup_list(self, dc_prefix=None, full=False, extended=False):
+    def hostgroup_list(self, dc_name=None, full=False, extended=False):
         """[EXTERNAL] Return list of available hostgroups"""
         if full or extended:
             display_attr = 'as_mgmt_data'
         else:
             display_attr = 'name_without_dc_prefix'
 
-        return [getattr(zgc, display_attr) for zgc in ZabbixHostGroupContainer.all(self.ezx.zapi, dc_prefix=dc_prefix)]
+        return [getattr(zgc, display_attr) for zgc in ZabbixHostGroupContainer.all(self.ezx.zapi, dc_name=dc_name)]
 
     def hostgroup_detail(self, name):
         """[EXTERNAL]"""

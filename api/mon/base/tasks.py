@@ -99,11 +99,11 @@ def mon_hostgroup_list(task_id, dc_id, full=False, extended=False, **kwargs):
     dc = Dc.objects.get_by_id(int(dc_id))
 
     if is_task_dc_bound(task_id):
-        dc_prefix = dc.name
+        dc_name = dc.name
     else:
-        dc_prefix = ''
+        dc_name = None
 
-    return get_monitoring(dc).hostgroup_list(dc_prefix=dc_prefix, full=full, extended=extended)
+    return get_monitoring(dc).hostgroup_list(dc_name=dc_name, full=full, extended=extended)
 
 
 # noinspection PyUnusedLocal
