@@ -6,7 +6,7 @@ from zabbix_api import ZabbixAPIException
 
 from api.decorators import catch_exception
 from api.task.utils import mgmt_task
-from api.mon import get_monitoring
+from api.mon import MonitoringBackend, get_monitoring
 from api.mon.exceptions import MonitoringError
 from api.mon.utils import MonInternalTask
 from api.mon.messages import (LOG_MON_USER_CREATE, LOG_MON_USER_UPDATE, LOG_MON_USER_DELETE,
@@ -22,10 +22,32 @@ __all__ = ('mon_user_group_changed', 'mon_user_changed', 'mon_all_groups_sync', 
 
 logger = get_task_logger(__name__)
 
+MON_OBJ_NOTHING = MonitoringBackend.NOTHING
+MON_OBJ_CREATED = MonitoringBackend.CREATED
+MON_OBJ_UPDATED = MonitoringBackend.UPDATED
+MON_OBJ_DELETED = MonitoringBackend.DELETED
 
-MON_USER_ACTION_MESSAGES = (None, LOG_MON_USER_CREATE, LOG_MON_USER_UPDATE, LOG_MON_USER_DELETE)
-MON_USERGROUP_ACTION_MESSAGES = (None, LOG_MON_USERGROUP_CREATE, LOG_MON_USERGROUP_UPDATE, LOG_MON_USERGROUP_DELETE)
-MON_ACTIONS = ('', 'created', 'updated', 'deleted')
+MON_USER_ACTION_MESSAGES = {
+    MON_OBJ_NOTHING: None,
+    MON_OBJ_CREATED: LOG_MON_USER_CREATE,
+    MON_OBJ_UPDATED: LOG_MON_USER_UPDATE,
+    MON_OBJ_DELETED: LOG_MON_USER_DELETE,
+}
+
+MON_USERGROUP_ACTION_MESSAGES = {
+    MON_OBJ_NOTHING: None,
+    MON_OBJ_CREATED: LOG_MON_USERGROUP_CREATE,
+    MON_OBJ_UPDATED: LOG_MON_USERGROUP_UPDATE,
+    MON_OBJ_DELETED: LOG_MON_USERGROUP_DELETE,
+}
+
+MON_ACTIONS = {
+    MON_OBJ_NOTHING: '',
+    MON_OBJ_CREATED: 'created',
+    MON_OBJ_UPDATED: 'updated',
+    MON_OBJ_DELETED: 'deleted',
+}
+
 MON_ACTION_DETAIL = '{mon_object} "{name}" was successfully {action} in datacenter "{dc_name}"'
 
 
@@ -45,17 +67,20 @@ def _log_mon_user_action(result, mon, task_id, name, dc_name):
 @catch_exception
 def _log_mon_usergroup_action(result, mon, task_id, name, dc_name):
     if not name:
-        return  # Do not log info bout implicit DC owner group  TODO: too much noise (name = '`DC owner group`')
+        # Do not log info bout implicit DC owner group
+        # TODO: too much noise -> maybe we want that? ('`DC owner group`')
+        return
 
-    # The result from usergroup_action is a tuple (hostgroup_result[int], affected_users[dict])
+    # The result from mon.usergroup_{action} is a tuple (hostgroup_result[int], affected_users[dict])
     __log_mon_action(result[0], mon, task_id, MON_USERGROUP_ACTION_MESSAGES,
                      mon_object='Monitoring usergroup', name=name, dc_name=dc_name)
 
     for res, users in result[1].items():
-        if res == 2:
-            continue  # Log only creations and deletions  TODO: too much noise
-        for user_name in users:
-            _log_mon_user_action(res, mon, task_id, user_name, dc_name)
+        # Log only monitoring user creations and deletions
+        # TODO: too much noise -> maybe we want that?
+        if res in (MON_OBJ_CREATED, MON_OBJ_DELETED):
+            for user_name in users:
+                _log_mon_user_action(res, mon, task_id, user_name, dc_name)
 
 
 def _user_group_changed(task_id, group_name, dc_name):  # noqa: R701
