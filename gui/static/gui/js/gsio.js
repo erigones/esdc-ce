@@ -28,13 +28,17 @@ function vm_start(hostname, cdimage, update, onetime, cdimage2) {
 }
 
 // Stop or reboot VM (with optional force boolean)
-function vm_stop_or_reboot(hostname, action, force, timeout) {
+function vm_stop_or_reboot(hostname, action, force, timeout, update) {
   var kwargs = {'action': action};
   if (force) {
     kwargs['data'] = {'force': true};
-  }
-  else if (typeof(timeout) !== 'undefined' && timeout) {
+  } else if (typeof(timeout) !== 'undefined' && timeout) {
     kwargs['data'] = {'timeout': timeout};
+  } else {
+    kwargs['data'] = {};
+  }
+  if (typeof(update) !== 'undefined') {
+    kwargs['data']['update'] = update;
   }
   return esio('set', 'vm_status', [hostname], kwargs);
 }

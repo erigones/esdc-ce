@@ -177,7 +177,7 @@ is send to the VM (KVM only) (default: 180 seconds / 300 seconds for Windows VM)
         :arg data.force: Force change of the status (default: false)
         :type data.force: boolean
         :arg data.update: Update VM configuration (if changed) before starting (after stop) \
-VM on compute node (default: false)
+VM on compute node (default: true)
         :type data.update: boolean
         :arg data.timeout: Time period (in seconds) for a graceful reboot, after which the force reboot \
 is send to the VM (KVM only) (default: 180 seconds / 300 seconds for Windows VM)

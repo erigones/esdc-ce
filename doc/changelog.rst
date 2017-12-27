@@ -18,6 +18,7 @@ Features
 - Made compute node IP address changeable - `#305 <https://github.com/erigones/esdc-ce/issues/305>`__
 - Added experimental support for live migration - `#306 <https://github.com/erigones/esdc-ce/issues/306>`__
 - Added value size limit to metadata - `#321 <https://github.com/erigones/esdc-ce/issues/321>`__
+- Changed VM reboot action to perform a VM configuration update by default - `#328 <https://github.com/erigones/esdc-ce/issues/328>`__
 
 Bugs
 ----
