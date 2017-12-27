@@ -3,7 +3,7 @@ from frozendict import frozendict
 
 from vms.models import Dc
 from que.tasks import get_task_logger
-from api.mon.backends.zabbix.exceptions import RemoteObjectDoesNotExist
+from api.mon.backends.zabbix.exceptions import RemoteObjectDoesNotExist, MultipleRemoteObjectsReturned
 from api.mon.backends.zabbix.containers.base import ZabbixBaseContainer
 from api.mon.backends.zabbix.containers.media import ZabbixMediaContainer
 
@@ -234,9 +234,12 @@ class ZabbixUserContainer(ZabbixBaseContainer):
 
                 try:
                     user_media_data = user_media.to_zabbix_data()
+                except MultipleRemoteObjectsReturned:
+                    task_logger.warning('Cannot create user media for user %s because media type "%s" '
+                                        'exists multiple times in zabbix', self.user, media_type)
                 except RemoteObjectDoesNotExist:
-                    task_logger.warning('Cannot create user media for user %s because media type "%s" does not exist '
-                                        'in zabbix', self.user, media_type)
+                    task_logger.warning('Cannot create user media for user %s because media type "%s" '
+                                        'does not exist in zabbix', self.user, media_type)
                 else:
                     media.append(user_media_data)
 

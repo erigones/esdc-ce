@@ -39,13 +39,13 @@ class ZabbixMediaContainer(ZabbixBaseContainer):
 
         self.media_type = media_type
         self.sendto = sendto
-        self.severity = self.media_severity_generator(severities)
+        self.severities = severities
         self.period = period
         self.enabled = enabled
         super(ZabbixMediaContainer, self).__init__('{}:{}'.format(media_type, sendto), **kwargs)
 
     @classmethod
-    def media_severity_generator(cls, active_severities):
+    def generate_media_severity(cls, active_severities):
         """
         :param active_severities: (SEVERITY_WARNING, SEVERITY_HIGH)
         :return: number to be used as input for media.severity
@@ -64,15 +64,16 @@ class ZabbixMediaContainer(ZabbixBaseContainer):
 
     @classmethod
     def extract_sendto_from_user(cls, media_type, user):
-        assert media_type in cls.MEDIA_TYPES, 'Unsupported media type'
+        if media_type not in cls.MEDIA_TYPES:
+            raise ValueError('Unsupported media type')
+
         return getattr(user.userprofile, 'alerting_' + media_type)
 
     @classmethod
     def fetch_media_type_id(cls, zapi, media_type_desc):
-        params = dict(filter={'description ': media_type_desc})
+        params = dict(filter={'description': media_type_desc})
         response = cls.call_zapi(zapi, 'mediatype.get', params=params)
         media_type_id = int(cls.parse_zabbix_get_result(response, 'mediatypeid'))  # May raise RemoteObjectDoesNotExist
-        assert len(response) == 1, 'Media Type should be injective'
 
         return media_type_id
 
@@ -83,6 +84,6 @@ class ZabbixMediaContainer(ZabbixBaseContainer):
             'mediatypeid': media_type_id,
             'sendto': self.sendto,
             'period': self.period,
-            'severity': self.severity,
-            'active': self.enabled,
+            'severity': self.generate_media_severity(self.severities),
+            'active': self.trans_bool_inverted(self.enabled),
         }
