@@ -29,7 +29,7 @@ class ActionSerializer(s.Serializer):
     # Also we don't have to have any hostgroup defined while we create the Action as it is not a required field.
     hostgroups = s.ArrayField(max_items=1024, default=[],
                               validators=(RegexValidator(regex=MonitoringBackend.RE_MONITORING_HOSTGROUPS),))
-    usergroups = s.ArrayField(max_items=1024)
+    usergroups = s.ArrayField(max_items=1024, default=[])
     message_subject = s.CharField(max_length=255, default=DEFAULT_ACTION_MESSAGE_SUBJECT)
     message_text = s.CharField(default=DEFAULT_ACTION_MESSAGE)
     recovery_message_enabled = s.BooleanField(default=False)
@@ -40,12 +40,6 @@ class ActionSerializer(s.Serializer):
         super(ActionSerializer, self).__init__(*args, **kwargs)
         self.request = request
         self.dc_settings = request.dc.settings
-
-        if request.method == 'POST':
-            self.fields['usergroups'].required = True
-        else:
-            self.fields['usergroups'].default = []
-            self.fields['usergroups'].required = False
 
     def validate_usergroups(self, attrs, source):
         # User groups are created in the monitoring system according to groups in the DB. We should validate this array

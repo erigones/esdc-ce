@@ -137,9 +137,10 @@ class ZabbixActionContainer(ZabbixBaseContainer):
 
         # Check operations
         check_operations = (
-            len(operations) == 1 and
-            'opmessage_grp' in operations[0] and
-            int(operations[0]['operationtype']) == cls._MESSAGE_OPERATION_PARAMS_DEFAULTS['operationtype']
+            not operations or
+            (len(operations) == 1 and
+             'opmessage_grp' in operations[0] and
+             int(operations[0]['operationtype']) == cls._MESSAGE_OPERATION_PARAMS_DEFAULTS['operationtype'])
         )
 
         # Check filter base setup
@@ -212,10 +213,13 @@ class ZabbixActionContainer(ZabbixBaseContainer):
         return conditions
 
     def _generate_operations(self):
-        operation = dict(self._MESSAGE_OPERATION_PARAMS_DEFAULTS)
-        operation['opmessage_grp'] = [{u'usrgrpid': usergroup.zabbix_id} for usergroup in self.usergroups]
+        if self.usergroups:
+            operation = dict(self._MESSAGE_OPERATION_PARAMS_DEFAULTS)
+            operation['opmessage_grp'] = [{u'usrgrpid': usergroup.zabbix_id} for usergroup in self.usergroups]
 
-        return [operation]
+            return [operation]
+        else:
+            return []
 
     def _generate_create_params(self, dc_name, create_mgmt_data):
         params = dict(self._BASE_PARAMS_DEFAULTS)

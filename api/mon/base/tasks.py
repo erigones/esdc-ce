@@ -10,7 +10,6 @@ from api.task.utils import mgmt_lock, mgmt_task
 from que.exceptions import MgmtTaskException
 from que.erigonesd import cq
 from que.internal import InternalTask
-from que.utils import is_task_dc_bound
 from que.mgmt import MgmtTask
 from vms.models import Dc, Node
 
@@ -97,11 +96,6 @@ def mon_hostgroup_list(task_id, dc_id, dc_bound=True, full=False, extended=False
     Return list of hostgroups available in Zabbix.
     """
     dc = Dc.objects.get_by_id(int(dc_id))
-
-    if is_task_dc_bound(task_id):
-        dc_name = dc.name
-    else:
-        dc_name = None
 
     return get_monitoring(dc).hostgroup_list(dc_bound=dc_bound, full=full, extended=extended)
 

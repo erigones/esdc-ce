@@ -130,7 +130,6 @@ class ZabbixHostGroupContainer(ZabbixBaseContainer):
         assert self.zabbix_id, 'Cannot delete Hostgroup without groupid'
 
         if int(self.zabbix_object.get('hosts', 0)):
-            # TODO: empty
             raise RemoteObjectManipulationError('Monitoring hostgroup is not empty')
 
         self._api_response = self._call_zapi('hostgroup.delete', params=[self.zabbix_id])
