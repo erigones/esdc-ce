@@ -114,7 +114,7 @@ def node_overlay_arp_file(task_id, overlay_rule_name, node_exclusive=None, **kwa
                                                                      overlay_rule_name=overlay_rule_name)
         queue = node.fast_queue
 
-        tid, err = execute(ERIGONES_TASK_USER, None, cmd, stdin=arp_table, callback=None, lock=lock, queue=queue,
+        tid, err = execute(ERIGONES_TASK_USER, None, cmd, stdin=arp_table, callback=False, lock=lock, queue=queue,
                            expires=300, nolog=True, tg=TG_DC_UNBOUND, ping_worker=False, check_user_tasks=False)
         if err:
             logger.error('Got error (%s) when running task %s for updating overlay ARP file %s on node %s',
