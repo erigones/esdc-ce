@@ -45,13 +45,15 @@ def _log_mon_user_action(result, mon, task_id, name, dc_name):
 @catch_exception
 def _log_mon_usergroup_action(result, mon, task_id, name, dc_name):
     if not name:
-        name = '`DC owner`'
+        return  # Do not log info bout implicit DC owner group  TODO: too much noise (name = '`DC owner group`')
 
     # The result from usergroup_action is a tuple (hostgroup_result[int], affected_users[dict])
     __log_mon_action(result[0], mon, task_id, MON_USERGROUP_ACTION_MESSAGES,
                      mon_object='Monitoring usergroup', name=name, dc_name=dc_name)
 
     for res, users in result[1].items():
+        if res == 2:
+            continue  # Log only creations and deletions  TODO: too much noise
         for user_name in users:
             _log_mon_user_action(res, mon, task_id, user_name, dc_name)
 
