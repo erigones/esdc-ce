@@ -46,7 +46,7 @@ def _log_mon_usergroup_action(result, mon, task_id, name, dc_name):
     # The result from usergroup_action is a tuple (hostgroup_result[int], affected_users[dict])
     __log_mon_action(result[0], mon, task_id, name, dc_name, MON_USERGROUP_ACTION_MESSAGES, 'Monitoring usergroup')
 
-    for res, users in result[1]:
+    for res, users in result[1].items():
         for user_name in users:
             _log_mon_user_action(res, mon, task_id, user_name, dc_name)
 

@@ -23,6 +23,12 @@ class ZabbixUserGroupContainer(ZabbixBaseContainer):
     QUERY_WITHOUT_USERS = frozendict({})
     OWNERS_GROUP = '#owner'
     NAME_MAX_LENGTH = 64
+    AFFECTED_USERS = frozendict({
+        ZabbixBaseContainer.NOTHING: set(),
+        ZabbixBaseContainer.CREATED: set(),
+        ZabbixBaseContainer.UPDATED: set(),
+        ZabbixBaseContainer.DELETED: set(),
+    })
 
     # noinspection PyUnresolvedReferences
     def __init__(self, *args, **kwargs):
@@ -30,12 +36,7 @@ class ZabbixUserGroupContainer(ZabbixBaseContainer):
         self.users = set()  # type: [ZabbixUserContainer]
         self.hostgroups = set()  # type: [ZabbixHostGroupContainer]
         self.superuser_group = False
-        self.affected_users = {
-            self.NOTHING: set(),
-            self.CREATED: set(),
-            self.UPDATED: set(),
-            self.DELETED: set(),
-        }
+        self.affected_users = dict(self.AFFECTED_USERS)
 
     @classmethod
     def user_group_name_factory(cls, dc_name, local_group_name):
@@ -126,7 +127,7 @@ class ZabbixUserGroupContainer(ZabbixBaseContainer):
         try:
             group = cls.from_zabbix_name(zapi, name)
         except RemoteObjectDoesNotExist:
-            return cls.NOTHING, cls.NOTHING
+            return cls.NOTHING, cls.AFFECTED_USERS
         else:
             return group.delete()
 
