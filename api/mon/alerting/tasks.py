@@ -52,7 +52,7 @@ MON_ACTION_DETAIL = '{mon_object} "{name}" was successfully {action} in datacent
 
 
 def __log_mon_action(result, mon, task_id, messages, **detail_kwargs):
-    if result:
+    if result and result in messages:
         msg = messages[result]
         detail = MON_ACTION_DETAIL.format(action=MON_ACTIONS[result], **detail_kwargs)
         mon.task_log_success(task_id, msg=msg, detail=detail)
