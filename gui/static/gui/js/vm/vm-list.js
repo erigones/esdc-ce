@@ -376,7 +376,7 @@ function ServerList(admin) {
    */
   function vms_reboot(force, timeout) {
     _.each(server_list, function(data, hostname, i) {
-      vm_stop_or_reboot(hostname, 'reboot', force, timeout);
+      vm_stop_or_reboot(hostname, 'reboot', force, timeout, false);
     });
     //self.reset_server_list();
   }
