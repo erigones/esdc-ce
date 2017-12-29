@@ -202,8 +202,9 @@ class DcSettingsSerializer(s.InstanceSerializer):
         'DNS_SOA_DEFAULT',
         'EMAIL_HOST_USER',
         'EMAIL_HOST_PASSWORD',
-        'SMS_SMSAPI_USERNAME',
-        'SMS_SMSAPI_PASSWORD',
+        'SMS_FROM_NUMBER',
+        'SMS_SERVICE_USERNAME',
+        'SMS_SERVICE_PASSWORD',
     })
     _null_fields_ = frozenset({
         'VMS_VM_DEFINE_LIMIT',
@@ -695,15 +696,15 @@ class DefaultDcSettingsSerializer(DcSettingsSerializer):
 
     SMS_PREFERRED_SERVICE = s.ChoiceField(label='SMS_PREFERRED_SERVICE', choices=get_services(),
                                           help_text=_('Currently used SMS provider.'))
-    SMS_PRIVATE_KEY = s.CharField(label='SMS_PRIVATE_KEY', max_length=255,
-                                  help_text=_('Secure key required for sending text messages via the API.'))
-    SMS_SMSAPI_USERNAME = s.CharField(label='SMS_SMSAPI_USERNAME', max_length=255, required=False,
-                                      help_text=_('Username required for the SMSAPI service (former HQSMS).'))
-    SMS_SMSAPI_PASSWORD = s.CharField(label='SMS_SMSAPI_PASSWORD', max_length=255, required=False,
-                                      help_text=_('Password required for the SMSAPI service (former HQSMS).'))
-    SMS_SMSAPI_FROM = s.SafeCharField(label='SMS_SMSAPI_FROM', max_length=64,
-                                      help_text=_('Phone number used for outgoing text messages sent via the '
-                                                  'SMSAPI service (former HQSMS).'))
+    SMS_SERVICE_USERNAME = s.CharField(label='SMS_SERVICE_USERNAME', max_length=255, required=False,
+                                       help_text=_('Username required for the selected SMS provider.'))
+    SMS_SERVICE_PASSWORD = s.CharField(label='SMS_SERVICE_USERNAME', max_length=255, required=False,
+                                       help_text=_('Password required for the selected SMS provider.'))
+    SMS_FROM_NUMBER = s.SafeCharField(label='SMS_FROM_NUMBER', max_length=64, required=False,
+                                      help_text=_('Phone number used as sender for outgoing text messages.'))
+    SMS_REGISTRATION_ENABLED = s.BooleanField(label='SMS_REGISTRATION_ENABLED',
+                                              help_text=_("Whether to verify user's phone number during registration "
+                                                          "and phone number change"))
 
     # noinspection PyMethodMayBeStatic,PyPep8Naming
     def validate_VMS_NODE_SSH_KEYS_DEFAULT(self, attrs, source):

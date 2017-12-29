@@ -160,10 +160,10 @@
 {% if all %}
 <tr><td colspan="2" class="row-header"><i class="icon-twitter"></i> {% trans "SMS" %}</td></tr>
 {% include "gui/table_form_field.html" with field=form.SMS_PREFERRED_SERVICE trclass="setting" %}
-{% include "gui/table_form_field.html" with field=form.SMS_PRIVATE_KEY trclass="setting" %}
-{% include "gui/table_form_field.html" with field=form.SMS_SMSAPI_USERNAME trclass="setting" %}
-{% include "gui/table_form_field.html" with field=form.SMS_SMSAPI_PASSWORD trclass="setting" %}
-{% include "gui/table_form_field.html" with field=form.SMS_SMSAPI_FROM trclass="setting" %}
+{% include "gui/table_form_field.html" with field=form.SMS_SERVICE_USERNAME trclass="setting" %}
+{% include "gui/table_form_field.html" with field=form.SMS_SERVICE_PASSWORD trclass="setting" %}
+{% include "gui/table_form_field.html" with field=form.SMS_FROM_NUMBER trclass="setting" %}
+{% include "gui/table_form_field_checkbox.html" with field=form.SMS_REGISTRATION_ENABLED trclass="setting" %}
 {% endif %}
 
 {% for app, details, name, icon in form.third_party_settings %}

@@ -20,6 +20,7 @@ __all__ = (
     'URLInput',
     'TelInput',
     'TelPrefixInput',
+    'ByteSizeInput',
     'ArrayWidget',
     'ArrayAreaWidget',
     'DictWidget',

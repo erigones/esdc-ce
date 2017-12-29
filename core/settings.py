@@ -75,7 +75,7 @@ LANGUAGE_CODE = 'en-us'
 # Languages we provide translations for.
 LANGUAGES = (
     ('en', 'English'),
-    ('sk', 'Slovensky (beta)'),
+    #  ('sk', 'Slovensky (beta)'),
 )
 
 # Cookies we create will have names with es_ prefix
@@ -451,15 +451,18 @@ PROFILE_SSH_KEY_LIMIT = 10
 PROFILE_COUNTRY_CODE_DEFAULT = 'SK'
 PROFILE_PHONE_PREFIX_DEFAULT = '+421'
 PROFILE_TIME_ZONE_DEFAULT = 'Europe/Bratislava'
+PROFILE_PHONE_REQUIRED = False
+PROFILE_ADDRESS_REQUIRED = False
+PROFILE_NEWSLETTER_ENABLED = False
+PROFILE_USERTYPE_DEFAULT = 1  # Personal account
 
-SMS_ENABLED = False  # Module. Required if REGISTRATION_ENABLED=True
-SMS_PRIVATE_KEY = ''
+SMS_REGISTRATION_ENABLED = False
+SMS_ENABLED = False  # Module. Required if SMS_REGISTRATION_ENABLED=True
 SMS_PREFERRED_SERVICE = 'smsapi'  # Former HQSMS
+SMS_FROM_NUMBER = 'DanubeCloud'
+SMS_SERVICE_USERNAME = ''
+SMS_SERVICE_PASSWORD = ''
 SMS_EXPIRATION_HOURS = 1  # In how many hours does SMS expire?
-
-SMS_SMSAPI_USERNAME = ''  # Former HQSMS
-SMS_SMSAPI_PASSWORD = ''  # Former HQSMS
-SMS_SMSAPI_FROM = 'DanubeCloud'  # Former HQSMS
 
 MON_ZABBIX_ENABLED = False  # Module
 _MON_ZABBIX_VM_SYNC = True  # local, internal, hidden

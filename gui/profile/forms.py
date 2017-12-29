@@ -9,12 +9,12 @@ from gui.countries import COUNTRIES
 from gui.models import UserProfile
 from gui.widgets import EmailInput, URLInput, TelPrefixInput
 from gui.forms import SerializerForm
-from gui.utils import user_profile_company_only_form
 from gui.profile.utils import get_user_serializer, get_userprofile_serializer
 from api.accounts.user.base.views import user_manage
 from api.accounts.user.profile.views import userprofile_manage
 from api.accounts.user.sshkey.views import sshkey_manage
 from api.utils.views import call_api_view
+from vms.models import DefaultDc
 
 logger = getLogger(__name__)
 
@@ -51,7 +51,7 @@ class UserForm(SerializerForm):
 
         # Whether to require email validation. Using global REGISTRATION_ENABLED, because the validation must be
         # performed in each DC (even if the DC has registration disabled).
-        if not user.is_staff and settings.REGISTRATION_ENABLED:
+        if not user.is_staff and user.must_email_be_verified():
             self.fields['email'].help_text = 'notverified'
             if user.userprofile.email_verified:
                 self.fields['email'].help_text = _('WARNING: After changing the email address you will receive a email '
@@ -87,7 +87,8 @@ class UserProfileForm(SerializerForm):
                             required=True,
                             widget=TelPrefixInput(attrs={
                                 'required': 'required',
-                                'maxlength': 32}),
+                                'maxlength': 32,
+                                'erase_on_empty_input': True}),
                             )
     jabber = forms.CharField(label=_('Jabber'),
                              required=False,
@@ -146,7 +147,8 @@ class UserProfileForm(SerializerForm):
     phone2 = forms.CharField(label=_('Billing Phone'),
                              required=False,
                              widget=TelPrefixInput(attrs={
-                                 'maxlength': 32}),
+                                 'maxlength': 32,
+                                 'erase_on_empty_input': True}),
                              )
     email2 = forms.CharField(label=_('Billing Email'),
                              required=False,
@@ -263,19 +265,21 @@ class UserProfileForm(SerializerForm):
 
     def __init__(self, request, profile, *args, **kwargs):
         super(UserProfileForm, self).__init__(request, profile, *args, **kwargs)
+        dc1_settings = DefaultDc().settings
 
         # Do not display the TOS acceptation checkbox if user already accepted the TOS or TOS_LINK is not set or
         # registration module is disabled
         if (profile.user.is_staff or profile.tos_acceptation or
-                not settings.REGISTRATION_ENABLED or not settings.TOS_LINK):
+                not dc1_settings.REGISTRATION_ENABLED or not dc1_settings.TOS_LINK):
             del self.fields['tos_acceptation']
-
-        if not profile.user.is_staff and user_profile_company_only_form(profile.user):
-            self.fields['usertype'].choices = list(UserProfile.USERTYPES[1:2])
 
         # Using global REGISTRATION_ENABLED,
         # because the fields must be required in each DC (even if the DC has registration disabled)
-        if not settings.REGISTRATION_ENABLED:
+        if not dc1_settings.PROFILE_NEWSLETTER_ENABLED:
+            del self.fields['newsletter_tech']
+            del self.fields['newsletter_buss']
+
+        if not dc1_settings.PROFILE_ADDRESS_REQUIRED:
             self.fields['street_1'].required = False
             self.fields['postcode'].required = False
             self.fields['city'].required = False
@@ -285,11 +289,11 @@ class UserProfileForm(SerializerForm):
             self.fields['postcode2'].required = False
             self.fields['city2'].required = False
             self.fields['country2'].required = False
-            del self.fields['newsletter_tech']
-            del self.fields['newsletter_buss']
+
+        self.fields['phone'].required = profile.is_phone_required()
 
         # Whether to require phone validation.
-        if not profile.user.is_staff and settings.REGISTRATION_ENABLED:
+        if not profile.user.is_staff and profile.must_phone_be_verified():
             self.fields['phone'].help_text = 'notverified'
             if profile.phone_verified:
                 self.fields['phone'].help_text = _('WARNING: After changing the phone number you will receive a text '
@@ -315,7 +319,7 @@ class UserProfileForm(SerializerForm):
         if not data['different_billing']:
             for index in ('phone2', 'email2', 'street_2', 'street2_2', 'postcode2', 'city2', 'state2', 'country2'):
                 if index in data:
-                    del(data[index])
+                    del data[index]
         return data
 
     def _initial_data(self, request, obj):
@@ -379,21 +383,21 @@ class PasswordForm(forms.Form):
     Password form used to set user password.
     """
     password1 = forms.CharField(
-        label=_('Password'),
+        label=_('New password'),
         required=True,
         min_length=6,
         widget=forms.PasswordInput(render_value=False, attrs={
             'class': 'input-transparent',
-            'placeholder': _('Password'),
+            'placeholder': '',
             'required': 'required',
         }),
     )
     password2 = forms.CharField(
-        label=_('Confirm password'),
+        label=_('Confirm new password'),
         required=True, min_length=6,
         widget=forms.PasswordInput(render_value=False, attrs={
             'class': 'input-transparent',
-            'placeholder': _('Confirm password'),
+            'placeholder': '',
             'required': 'required',
         }),
     )
@@ -418,13 +422,24 @@ class PasswordForm(forms.Form):
 
         return cleaned_data
 
-    def save(self, commit=True, user=None):
-        if user:
-            self.user = user
-        self.user.set_password(self.cleaned_data['password1'])
-        if commit:
-            self.user.save()
-        return self.user
+    def save(self, request=None):
+        if request is None:
+            request = self.request
+
+        assert request
+
+        username = self.user.username
+        data = {'password': self.cleaned_data['password1']}
+        logger.info('Calling API view PUT user_manage(%s, data=%s) by user %s in DC %s',
+                    username, {'password': '***'}, request.user, request.dc)
+        res = call_api_view(request, 'PUT', user_manage, username, data=data)
+
+        if res.status_code == 200:
+            logger.info('Password for user "%s" was changed successfully', username)
+        else:
+            logger.error('Failed to change password for user "%s" (%s)', username, res.data)
+
+        return res.status_code
 
 
 class ChangePasswordForm(PasswordForm):
@@ -440,27 +455,11 @@ class ChangePasswordForm(PasswordForm):
         }),
     )
 
-    def __init__(self, *args, **kwargs):
-        super(ChangePasswordForm, self).__init__(*args, **kwargs)
-        self.fields['password1'].label = _('New password')
-        self.fields['password1'].widget.attrs['placeholder'] = ''
-        self.fields['password2'].label = _('Confirm new password')
-        self.fields['password2'].widget.attrs['placeholder'] = ''
-
     def clean_old_password(self):
         old_password = self.cleaned_data['old_password']
         if not self.user.check_password(old_password):
             raise forms.ValidationError(_('Your old password was entered incorrectly.'))
         return old_password
-
-    # noinspection PyMethodOverriding
-    def save(self, request):
-        args = self.user.username
-        data = {'password': self.cleaned_data['password1']}
-        logger.info('Calling API view PUT user_manage(%s, data=%s) by user %s in DC %s',
-                    args, {'password': '***'}, request.user, request.dc)
-        res = call_api_view(request, 'PUT', user_manage, args, data=data)
-        return res.status_code
 
 
 # Change order of password fields

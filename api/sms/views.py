@@ -1,13 +1,10 @@
 from logging import getLogger
 
-from requests import codes
-
-from api.decorators import api_view, setting_required, request_data_defaultdc
-from api.response import BadRequestResponse, OKRequestResponse
-from api.sms.permissions import SmsSendPermission
 from api.sms.utils import get_current_service
+from api.sms.exceptions import InvalidSMSInput, SMSSendFailed
+from vms.models import DefaultDc
 
-__all__ = ('internal_send', 'send')
+__all__ = ('internal_send',)
 
 logger = getLogger(__name__)
 
@@ -16,62 +13,39 @@ def internal_send(phone, message):
     """
     Function for actual sending message via preferred service.
     """
-    use_service = get_current_service()
-    logger.debug('Using SMS service %s imported from %s', use_service.PROVIDER_NAME, use_service.__name__)
+    dc1_settings = DefaultDc().settings
+
+    if not dc1_settings.SMS_ENABLED:
+        logger.warning('SMS module is disabled -> ignoring SMS send request to %s!', phone)
+        return None
+
+    sms_service = get_current_service(settings=dc1_settings)
+    logger.debug('Using SMS service %s imported from %s', sms_service.PROVIDER_NAME, sms_service.__name__)
 
     # TODO: Proper phone number validation
     if not phone:
         logger.error('Phone number for SMS was not filled in.')
-        return False
+        raise InvalidSMSInput('Missing phone number')
 
     # TODO: Proper message validation (size, valid characters, ...)
     if not message:
         logger.error('Message body for SMS was not filled in.')
-        return False
+        raise InvalidSMSInput('Missing SMS body')
 
     try:
-        r = use_service.sms_send(phone, message)
+        error = sms_service.sms_send(phone, message,
+                                     username=dc1_settings.SMS_SERVICE_USERNAME,
+                                     password=dc1_settings.SMS_SERVICE_PASSWORD,
+                                     from_=dc1_settings.SMS_FROM_NUMBER,
+                                     expire_hours=dc1_settings.SMS_EXPIRATION_HOURS)
     except Exception as e:
         logger.critical('SMS sending to %s failed!', phone)
         logger.exception(e)
-        return False
+        raise SMSSendFailed('SMS provider error: %s' % e)
 
-    if r.status_code == codes.ok:
-        logger.info('SMS has been sent to %s, status_code=%s, response="%s"', phone, r.status_code, r.text)
-        return True
-    else:
-        logger.error('SMS to %s was not sent, status_code=%s, response="%s"', phone, r.status_code, r.text)
-        logger.debug(r.text)
-        return False
+    if error:
+        logger.error('SMS to %s was not sent', phone)
+        raise SMSSendFailed('SMS send failed: %s' % error)
 
-
-@api_view(('POST',))
-@request_data_defaultdc(permissions=(SmsSendPermission,))
-@setting_required('SMS_ENABLED')  # default_dc=True is implicated by request_data_defaultdc
-def send(request, data=None):
-    """
-    Send (:http:post:`POST </sms/send`) a short text message via preferred SMS provider.
-
-    .. http:post:: /sms/send
-
-        :DC-bound?:
-            * |dc-no|
-        :Permissions:
-        :Asynchronous?:
-            * |async-no|
-        :arg data.phone: Phone number
-        :type data.phone: string
-        :arg data.message: Message content
-        :type data.message: string
-        :status 200: SMS was sent
-        :status 400: SMS was not sent
-        :status 403: Forbidden
-
-    """
-    phone = data.get('phone', '')
-    message = data.get('message', '')
-
-    if internal_send(phone, message):
-        return OKRequestResponse(request, detail='SMS was sent')
-    else:
-        return BadRequestResponse(request, detail='SMS was not sent')
+    logger.info('SMS has been sent to %s', phone)
+    return None
