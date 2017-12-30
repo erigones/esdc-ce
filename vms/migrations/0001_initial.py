@@ -577,8 +577,4 @@ class Migration(migrations.Migration):
             name='backup',
             unique_together=set([('vm_hostname', 'vm_disk_id', 'name')]),
         ),
-
-        # Add custom content types (this is very, very dirty)
-        migrations.RunSQL("""INSERT INTO django_content_type (id, app_label, model) VALUES (99, 'vms', 'imagestore')"""),
-
     ]

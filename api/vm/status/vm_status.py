@@ -220,7 +220,7 @@ class VmStatus(APIView):
         elif action == 'current':
             # for PUT /current/ action user needs to be SuperAdmin
             # since this operation will forcibly change whatever status a VM has in the DB
-            if not request.user.is_super_admin(request):
+            if not request.user.is_staff:
                 raise PermissionDenied
 
             force = self.data.get('force', False)

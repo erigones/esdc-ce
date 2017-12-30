@@ -4,6 +4,7 @@ from django.utils.six import iteritems, with_metaclass
 from django.utils.translation import ugettext_lazy as _
 from django.core.cache import cache
 from django.core.exceptions import SuspiciousOperation
+from django.contrib.contenttypes.models import ContentType
 from djcelery.models import PeriodicTask, CrontabSchedule
 
 import base64
@@ -40,12 +41,22 @@ class _DummyModel(with_metaclass(_DummyModelBase)):
     """
     Dummy model simulating some properties of django models
     """
+    _pk_key = NotImplemented
+
+    class Meta:
+        pass
+
+
+class _DummyDataModel(with_metaclass(_DummyModelBase)):
+    """
+    Dummy model simulating some properties of django models + serialization of internal data dictionary.
+    """
     class Meta:
         pass
 
     def __new__(cls, *args, **kwargs):
         # noinspection PyArgumentList
-        obj = super(_DummyModel, cls).__new__(cls, *args, **kwargs)
+        obj = super(_DummyDataModel, cls).__new__(cls, *args, **kwargs)
         obj._data = {}
         return obj
 
@@ -56,19 +67,19 @@ class _DummyModel(with_metaclass(_DummyModelBase)):
     def __getattr__(self, key):
         if key.startswith('_'):
             # noinspection PyUnresolvedReferences
-            return super(_DummyModel, self).__getattr__(key)
+            return super(_DummyDataModel, self).__getattr__(key)
         else:
             return self._data[key]
 
     def __setattr__(self, key, value):
         if key.startswith('_'):
-            return super(_DummyModel, self).__setattr__(key, value)
+            return super(_DummyDataModel, self).__setattr__(key, value)
         else:
             self._data[key] = value
 
     def __delattr__(self, key):
         if key.startswith('_'):
-            return super(_DummyModel, self).__delattr__(key)
+            return super(_DummyDataModel, self).__delattr__(key)
         else:
             return self._data.__delitem__(key)
 
@@ -475,6 +486,26 @@ class _UserTasksModel(object):
     def get_log_name_lookup_kwargs(cls, log_name_value):
         """Return lookup_key=value DB pairs which can be used for retrieving objects by log_name value"""
         return {cls._log_name_attr: log_name_value}
+
+    @classmethod
+    def get_content_type(cls):
+        # Warning: get_content_type will be deprecated soon. New models should implement get_object_type()
+        return ContentType.objects.get_for_model(cls)
+
+    @classmethod
+    def get_object_type(cls, content_type=None):
+        if content_type:
+            return content_type.model
+        return cls.get_content_type().model
+
+    @classmethod
+    def get_object_by_pk(cls, pk):
+        # noinspection PyUnresolvedReferences
+        return cls.objects.get(pk=pk)
+
+    @classmethod
+    def get_pk_key(self):
+        return self._pk_key
 
     @property
     def log_name(self):

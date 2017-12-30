@@ -5,6 +5,8 @@ from django.utils.six import text_type
 
 from que.tasks import execute
 from vms.models import DefaultDc
+# noinspection PyProtectedMember
+from api.fields import get_boolean_value
 from api.exceptions import InvalidInput
 from api.task.response import TaskResponse, FailureTaskResponse, SuccessTaskResponse
 
@@ -116,22 +118,20 @@ class APIView(object):
         return SuccessTaskResponse(self.request, res, dc_bound=self.dc_bound)
 
     def is_full(self, data):
-        return self.request.method == 'GET' and data and data.get('full', False)
+        return self.request.method == 'GET' and bool(data) and get_boolean_value(data.get('full', False))
 
     def is_extended(self, data):
-        return self.request.method == 'GET' and data and data.get('extended', False)
+        return self.request.method == 'GET' and bool(data) and get_boolean_value(data.get('extended', False))
 
     @property
     def full(self):
         if self._full is None:
-            # noinspection PyTypeChecker
             self._full = self.is_full(self.data)
         return self._full
 
     @property
     def extended(self):
         if self._extended is None:
-            # noinspection PyTypeChecker
             self._extended = self.is_extended(self.data)
         return self._extended
 

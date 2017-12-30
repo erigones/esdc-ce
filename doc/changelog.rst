@@ -9,6 +9,8 @@ Features
 
 - Monitoring hostgroups are either datacenter-based or global - `#93 <https://github.com/erigones/esdc-ce/issues/93>`__
 - Monitoring hostgroups are automatically created on VM and Node update if they don't exist - `#93 <https://github.com/erigones/esdc-ce/issues/93>`__
+- Added API for managing monitoring hostgroups - `#94 <https://github.com/erigones/esdc-ce/issues/94>`__
+- Added API for managing monitoring actions - `#94 <https://github.com/erigones/esdc-ce/issues/94>`__
 - Updated registration module to work without SMS - `#235 <https://github.com/erigones/esdc-ce/issues/235>`__
 - Added ability to restore snapshot into another VM - `#236 <https://github.com/erigones/esdc-ce/issues/236>`__
 - Updated the VM templates API + removed *experimental* flag from the ``template_manage`` API call - `#256 <https://github.com/erigones/esdc-ce/issues/256>`__
@@ -25,6 +27,7 @@ Features
 Bugs
 ----
 
+- Added missing user callbacks for mgmt tasks - `#308 <https://github.com/erigones/esdc-ce/issues/308>`__
 - Added missing DNS record for ns1.local after install - `#301 <https://github.com/erigones/esdc-ce/issues/301>`__
 - Fixed migration of LX zones - `#294 <https://github.com/erigones/esdc-ce/issues/294>`__
 - Fixed VNC port issues in VM migration - `#306 <https://github.com/erigones/esdc-ce/issues/306>`__

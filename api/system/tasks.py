@@ -22,7 +22,7 @@ def vm_zabbix_sync(sender):
         logger.debug('Creating zabbix sync task for VM %s', vm)
         mon_vm_sync.call(sender, vm=vm)
 
-    mon_all_groups_sync.call(sender=sender)
+    mon_all_groups_sync.call(sender)
 
 
 # noinspection PyUnusedLocal

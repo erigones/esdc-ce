@@ -53,24 +53,5 @@ function alert_update(result, error) {
 function alert_init(filter, csrf_token) {
   MONITORING_ALERTS = new MonitoringAlerts(filter, csrf_token);
 
-  var i = 0;
-  var wait_for_socketio = null;
-
-  $(window).one('statechange', function() {
-    if (wait_for_socketio) {
-      clearInterval(wait_for_socketio);
-    }
-  });
-
-  show_loading_screen(gettext('Getting data from monitoring server...'));
-
-  wait_for_socketio = setInterval(function() {
-    i++;
-    if (SOCKET.socket.connected || i > 20) {
-      clearInterval(wait_for_socketio);
-      if (!MONITORING_ALERTS.init()) {
-        hide_loading_screen();
-      }
-    }
-  }, 500);
+  mon_initialize(MONITORING_ALERTS.init);
 }

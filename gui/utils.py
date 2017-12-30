@@ -16,8 +16,7 @@ from api.task.utils import get_user_tasks as _get_user_tasks
 from gui.navigation import Navi
 from gui.dc.forms import DcSwitch
 from gui.signals import view_data_collected
-from que import TT_MGMT
-from que.utils import tt_from_task_id
+from que.utils import is_mgmt_task
 
 
 class Messages(list):
@@ -84,7 +83,7 @@ def get_user_tasks(request):
     Like api.task.utils.get_user_tasks, but without Mgmt Tasks.
     """
     def no_m_tasks(task_id):
-        return tt_from_task_id(task_id) != TT_MGMT
+        return not is_mgmt_task(task_id)
 
     return _get_user_tasks(request, filter_fun=no_m_tasks)
 

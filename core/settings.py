@@ -522,6 +522,10 @@ MON_ZABBIX_HOST_VM_PROXY = ''  # local, external
 MON_ZABBIX_GRAPH_MAX_HISTORY = 518400  # 6 days; global, internal+external
 MON_ZABBIX_GRAPH_MAX_PERIOD = 14400  # 4 hours; global, internal+external
 
+MON_ZABBIX_MEDIA_TYPE_EMAIL = 'E-mail'
+MON_ZABBIX_MEDIA_TYPE_PHONE = 'SMS'
+MON_ZABBIX_MEDIA_TYPE_JABBER = 'Ludolph'
+
 REGISTRATION_ENABLED = False  # Module. Enable SMS_ENABLED if True
 COMPANY_NAME = 'Danube Cloud'
 TOS_LINK = ''

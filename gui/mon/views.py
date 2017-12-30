@@ -70,7 +70,37 @@ def alert_list(request):
 @admin_required
 @profile_required
 @setting_required('MON_ZABBIX_ENABLED')
+def hostgroup_list(request):
+    context = collect_view_data(request, 'mon_hostgroup_list')
+
+    return render(request, 'gui/mon/hostgroup_list.html', context)
+
+
+@login_required
+@admin_required
+@profile_required
+@setting_required('MON_ZABBIX_ENABLED')
+def template_list(request):
+    context = collect_view_data(request, 'mon_template_list')
+
+    return render(request, 'gui/mon/template_list.html', context)
+
+
+@login_required
+@admin_required
+@profile_required
+@setting_required('MON_ZABBIX_ENABLED')
 def action_list(request):
     context = collect_view_data(request, 'mon_action_list')
 
     return render(request, 'gui/mon/action_list.html', context)
+
+
+@login_required
+@admin_required
+@profile_required
+@setting_required('MON_ZABBIX_ENABLED')
+def webcheck_list(request):
+    context = collect_view_data(request, 'mon_webcheck_list')
+
+    return render(request, 'gui/mon/webcheck_list.html', context)
