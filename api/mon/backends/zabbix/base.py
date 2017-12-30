@@ -12,7 +12,7 @@ from que.tasks import get_task_logger
 from api.mon.backends.abstract import VM_KWARGS_KEYS, NODE_KWARGS_KEYS
 from api.mon.backends.zabbix.server import ZabbixMonitoringServer
 from api.mon.backends.zabbix.utils import parse_zabbix_result
-from api.mon.backends.zabbix.exceptions import MonitoringError, RemoteObjectDoesNotExist
+from api.mon.backends.zabbix.exceptions import MonitoringError, InternalMonitoringError, RemoteObjectDoesNotExist
 
 logger = getLogger(__name__)
 task_logger = get_task_logger(__name__)
@@ -795,7 +795,7 @@ class ZabbixBase(object):
             res = self.zapi.service.create(params)
         except ZabbixAPIException as e:
             logger.exception(e)
-            raise MonitoringError(e)
+            raise InternalMonitoringError(text_type(e))
 
         return parse_zabbix_result(res, 'serviceids', from_get_request=False)
 
@@ -807,7 +807,7 @@ class ZabbixBase(object):
             res = self.zapi.service.update(params)
         except ZabbixAPIException as e:
             logger.exception(e)
-            raise MonitoringError(e)
+            raise InternalMonitoringError(text_type(e))
 
         return parse_zabbix_result(res, 'serviceids', from_get_request=False)
 
@@ -864,7 +864,7 @@ class ZabbixBase(object):
 
         except ZabbixAPIException as exc:
             self.log(ERROR, 'Zabbix API Error in get_history(%s, %s): %s', hosts, items, exc)
-            raise MonitoringError('Zabbix API Error while retrieving history (%s)' % exc)
+            raise InternalMonitoringError('Zabbix API Error while retrieving history (%s)' % exc)
 
         else:
             return res

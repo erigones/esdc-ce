@@ -589,14 +589,15 @@ class Zabbix(AbstractMonitoringBackend):
 
     def action_detail(self, name):
         """[EXTERNAL]"""
-        zbx_name = ZabbixActionContainer.user_group_name_factory(self.dc.name, name)
+        zbx_name = ZabbixActionContainer.action_name_factory(self.dc.name, name)
         zac = ZabbixActionContainer.from_zabbix_name(self.ezx.zapi, zbx_name)
 
         return zac.as_mgmt_data
 
     def action_create(self, name, data):
         """[EXTERNAL]"""
-        zbx_name = ZabbixActionContainer.user_group_name_factory(self.dc.name, name)
+        data['name'] = name  # Action name must be also in data
+        zbx_name = ZabbixActionContainer.action_name_factory(self.dc.name, name)
         zac = ZabbixActionContainer.from_mgmt_data(self.ezx.zapi, zbx_name)
         zac.create(self.dc.name, data)
 
@@ -605,7 +606,7 @@ class Zabbix(AbstractMonitoringBackend):
     def action_update(self, name, data):
         """[EXTERNAL]"""
         data.pop('name', None)  # Action name cannot be changed
-        zbx_name = ZabbixActionContainer.user_group_name_factory(self.dc.name, name)
+        zbx_name = ZabbixActionContainer.action_name_factory(self.dc.name, name)
         zac = ZabbixActionContainer.from_zabbix_name(self.ezx.zapi, zbx_name,
                                                      # we don't need to fetch hostgroups when we are replacing them
                                                      resolve_hostgroups='hostgroups' not in data,
@@ -617,7 +618,7 @@ class Zabbix(AbstractMonitoringBackend):
 
     def action_delete(self, name):
         """[EXTERNAL]"""
-        zbx_name = ZabbixActionContainer.user_group_name_factory(self.dc.name, name)
+        zbx_name = ZabbixActionContainer.action_name_factory(self.dc.name, name)
         zac = ZabbixActionContainer.from_zabbix_name(self.ezx.zapi, zbx_name)
         zac.delete()
 

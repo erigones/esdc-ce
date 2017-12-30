@@ -1,7 +1,8 @@
 from celery.utils.log import get_task_logger
 
 from api.mon import get_monitoring
-from api.mon.messages import LOG_MON_HOSTGROUP_CREATE
+from api.mon.constants import MON_OBJ_CREATED, MON_OBJ_UPDATED, MON_OBJ_DELETED
+from api.mon.messages import MON_OBJ_HOSTGROUP, LOG_MON_HOSTGROUP_CREATE, MON_OBJ_ACTION, get_mon_action_detail
 from api.mon.exceptions import RemoteObjectDoesNotExist, RemoteObjectAlreadyExists
 from api.task.utils import mgmt_task
 from que.erigonesd import cq
@@ -13,12 +14,12 @@ __all__ = ('mon_action_list', 'mon_action_get', 'mon_action_create', 'mon_action
 
 logger = get_task_logger(__name__)
 
-ACTION_NOT_FOUND = 'Monitoring action "%s" not found'
-ACTION_ALREADY_EXISTS = 'Monitoring action "%s" already exists'
+ACTION_NOT_FOUND = MON_OBJ_ACTION + ' "{}" not found'
+ACTION_ALREADY_EXISTS = MON_OBJ_ACTION + ' "{}" already exists'
 
 
 def _log_hostgroup_created(mon, task_id, name):
-    detail = 'Monitoring hostgroup "%s" was successfully created' % name
+    detail = get_mon_action_detail(MON_OBJ_HOSTGROUP, MON_OBJ_CREATED, name)
     mon.task_log_success(task_id, msg=LOG_MON_HOSTGROUP_CREATE, detail=detail)
 
 
@@ -42,7 +43,7 @@ def mon_action_get(task_id, dc_id, action_name, **kwargs):
     try:
         return mon.action_detail(action_name)
     except RemoteObjectDoesNotExist:
-        raise MgmtTaskException(ACTION_NOT_FOUND % action_name)
+        raise MgmtTaskException(ACTION_NOT_FOUND.format(action_name))
 
 
 # noinspection PyUnusedLocal
@@ -57,9 +58,9 @@ def mon_action_create(task_id, dc_id, action_name, action_data=None, **kwargs):
     try:
         result = mon.action_create(action_name, action_data)
     except RemoteObjectAlreadyExists:
-        raise MgmtTaskException(ACTION_ALREADY_EXISTS % action_name)
+        raise MgmtTaskException(ACTION_ALREADY_EXISTS.format(action_name))
 
-    detail = 'Monitoring action "%s" was successfully created' % action_name
+    detail = get_mon_action_detail(MON_OBJ_ACTION, MON_OBJ_CREATED, action_name)
     mon.task_log_success(task_id, detail=detail, **kwargs['meta'])
 
     for hostgroup_name in result.get('hostgroups_created', []):
@@ -80,9 +81,9 @@ def mon_action_update(task_id, dc_id, action_name, action_data=None, **kwargs):
     try:
         result = mon.action_update(action_name, action_data)
     except RemoteObjectDoesNotExist:
-        raise MgmtTaskException(ACTION_NOT_FOUND % action_name)
+        raise MgmtTaskException(ACTION_NOT_FOUND.format(action_name))
 
-    detail = 'Monitoring action "%s" was successfully updated' % action_name
+    detail = get_mon_action_detail(MON_OBJ_ACTION, MON_OBJ_UPDATED, action_name)
     mon.task_log_success(task_id, detail=detail, **kwargs['meta'])
 
     for hostgroup_name in result.get('hostgroups_created', []):
@@ -101,9 +102,9 @@ def mon_action_delete(task_id, dc_id, action_name, action_data=None, **kwargs):
     try:
         result = mon.action_delete(action_name)  # Fail loudly if doesnt exist
     except RemoteObjectDoesNotExist:
-        raise MgmtTaskException(ACTION_NOT_FOUND % action_name)
+        raise MgmtTaskException(ACTION_NOT_FOUND.format(action_name))
 
-    detail = 'Monitoring action "%s" was successfully deleted' % action_name
+    detail = get_mon_action_detail(MON_OBJ_ACTION, MON_OBJ_DELETED, action_name)
     mon.task_log_success(task_id, detail=detail, **kwargs['meta'])
 
     return result

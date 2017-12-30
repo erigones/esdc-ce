@@ -2,15 +2,15 @@
 from django.utils.six import text_type
 from django.db.models import Q
 from celery.utils.log import get_task_logger
-from zabbix_api import ZabbixAPIException
 
 from api.decorators import catch_exception
 from api.task.utils import mgmt_task
-from api.mon import MonitoringBackend, get_monitoring
+from api.mon import get_monitoring
 from api.mon.exceptions import MonitoringError
 from api.mon.utils import MonInternalTask
-from api.mon.messages import (LOG_MON_USER_CREATE, LOG_MON_USER_UPDATE, LOG_MON_USER_DELETE,
-                              LOG_MON_USERGROUP_CREATE, LOG_MON_USERGROUP_UPDATE, LOG_MON_USERGROUP_DELETE)
+from api.mon.constants import MON_OBJ_CREATED, MON_OBJ_DELETED
+from api.mon.messages import (MON_OBJ_USER, MON_USER_ACTION_MESSAGES, MON_OBJ_USERGROUP, MON_USERGROUP_ACTION_MESSAGES,
+                              get_mon_action_detail)
 from que.erigonesd import cq
 from que.exceptions import MgmtTaskException
 from que.mgmt import MgmtTask
@@ -22,46 +22,16 @@ __all__ = ('mon_user_group_changed', 'mon_user_changed', 'mon_all_groups_sync', 
 
 logger = get_task_logger(__name__)
 
-MON_OBJ_NOTHING = MonitoringBackend.NOTHING
-MON_OBJ_CREATED = MonitoringBackend.CREATED
-MON_OBJ_UPDATED = MonitoringBackend.UPDATED
-MON_OBJ_DELETED = MonitoringBackend.DELETED
 
-MON_USER_ACTION_MESSAGES = {
-    MON_OBJ_NOTHING: None,
-    MON_OBJ_CREATED: LOG_MON_USER_CREATE,
-    MON_OBJ_UPDATED: LOG_MON_USER_UPDATE,
-    MON_OBJ_DELETED: LOG_MON_USER_DELETE,
-}
-
-MON_USERGROUP_ACTION_MESSAGES = {
-    MON_OBJ_NOTHING: None,
-    MON_OBJ_CREATED: LOG_MON_USERGROUP_CREATE,
-    MON_OBJ_UPDATED: LOG_MON_USERGROUP_UPDATE,
-    MON_OBJ_DELETED: LOG_MON_USERGROUP_DELETE,
-}
-
-MON_ACTIONS = {
-    MON_OBJ_NOTHING: '',
-    MON_OBJ_CREATED: 'created',
-    MON_OBJ_UPDATED: 'updated',
-    MON_OBJ_DELETED: 'deleted',
-}
-
-MON_ACTION_DETAIL = '{mon_object} "{name}" was successfully {action} in datacenter "{dc_name}"'
-
-
-def __log_mon_action(result, mon, task_id, messages, **detail_kwargs):
+def __log_mon_action(result, mon, task_id, messages, mon_object, name, dc_name):
     if result and result in messages:
-        msg = messages[result]
-        detail = MON_ACTION_DETAIL.format(action=MON_ACTIONS[result], **detail_kwargs)
-        mon.task_log_success(task_id, msg=msg, detail=detail)
+        detail = get_mon_action_detail(mon_object, result, name, dc_name=dc_name)
+        mon.task_log_success(task_id, msg=messages[result], detail=detail)
 
 
 @catch_exception
 def _log_mon_user_action(result, mon, task_id, name, dc_name):
-    __log_mon_action(result, mon, task_id, MON_USER_ACTION_MESSAGES,
-                     mon_object='Monitoring user', name=name, dc_name=dc_name)
+    __log_mon_action(result, mon, task_id, MON_USER_ACTION_MESSAGES, MON_OBJ_USER, name, dc_name)
 
 
 @catch_exception
@@ -72,8 +42,7 @@ def _log_mon_usergroup_action(result, mon, task_id, name, dc_name):
         return
 
     # The result from mon.usergroup_{action} is a tuple (hostgroup_result[int], affected_users[dict])
-    __log_mon_action(result[0], mon, task_id, MON_USERGROUP_ACTION_MESSAGES,
-                     mon_object='Monitoring usergroup', name=name, dc_name=dc_name)
+    __log_mon_action(result[0], mon, task_id, MON_USERGROUP_ACTION_MESSAGES, MON_OBJ_USERGROUP, name, dc_name)
 
     for res, users in result[1].items():
         # Log only monitoring user creations and deletions
@@ -124,7 +93,7 @@ def _user_group_changed(task_id, group_name, dc_name):  # noqa: R701
                 mon = get_monitoring(dc)
                 try:
                     res = mon.user_group_delete(name=group_name)
-                except (ZabbixAPIException, MonitoringError) as exc:
+                except MonitoringError as exc:
                     logger.exception(exc)
                     # we will let it try again in a separate task and not crash this one
                     logger.error('Creating a separate task for dc %s and group %s because it crashed.',
@@ -142,7 +111,7 @@ def _user_group_changed(task_id, group_name, dc_name):  # noqa: R701
                 mon = get_monitoring(dc)
                 try:
                     res = mon.user_group_sync(group=group)
-                except (ZabbixAPIException, MonitoringError) as exc:
+                except MonitoringError as exc:
                     logger.exception(exc)
                     # we will let it try again in a separate task and not crash this one
                     logger.error('Creating a separate task for dc %s and group %s because it crashed.',
@@ -156,7 +125,7 @@ def _user_group_changed(task_id, group_name, dc_name):  # noqa: R701
                 mon = get_monitoring(dc)
                 try:
                     res = mon.user_group_delete(name=group_name)
-                except (ZabbixAPIException, MonitoringError) as exc:
+                except MonitoringError as exc:
                     logger.exception(exc)
                     # we will let it try again in a separate task and not crash this one
                     logger.error('Creating a separate task for dc %s and group %s because it crashed.',
@@ -180,7 +149,7 @@ def mon_user_group_changed(self, task_id, sender, group_name=None, dc_name=None,
                 dc_name, group_name)
     try:
         _user_group_changed(sender, group_name, dc_name)
-    except (ZabbixAPIException, MonitoringError) as exc:
+    except MonitoringError as exc:
         logger.exception(exc)
         logger.error('mon_user_group_changed task crashed, it\'s going to be retried')
         self.retry(exc=exc)
@@ -203,7 +172,7 @@ def _user_changed(task_id, user_name, dc_name, affected_groups):
                 mon = get_monitoring(dc)
                 try:
                     res = mon.user_delete(name=user_name)
-                except (ZabbixAPIException, MonitoringError) as exc:
+                except MonitoringError as exc:
                     logger.exception(exc)
                     # we will let it try again in a separate task and not crash this one
                     logger.error('Creating a separate task for dc %s and user %s because it crashed.',
@@ -220,7 +189,7 @@ def _user_changed(task_id, user_name, dc_name, affected_groups):
                 mon = get_monitoring(dc)
                 try:
                     res = mon.user_delete(name=user_name)
-                except (ZabbixAPIException, MonitoringError) as exc:
+                except MonitoringError as exc:
                     logger.exception(exc)
                     # we will let it try again in a separate task and not crash this one
                     logger.error('Creating a separate task for dc %s and user %s because it crashed.',
@@ -241,7 +210,7 @@ def _user_changed(task_id, user_name, dc_name, affected_groups):
                 mon = get_monitoring(dc)
                 try:
                     res = mon.user_sync(user=user)
-                except (ZabbixAPIException, MonitoringError) as exc:
+                except MonitoringError as exc:
                     logger.exception(exc)
                     # we will let it try again in a separate task and not crash this one
                     logger.error('Creating a separate task for dc %s and user %s because it crashed.',
@@ -258,7 +227,7 @@ def _user_changed(task_id, user_name, dc_name, affected_groups):
                 mon = get_monitoring(dc)
                 try:
                     res = mon.user_sync(user=user)
-                except (ZabbixAPIException, MonitoringError) as exc:
+                except MonitoringError as exc:
                     logger.exception(exc)
                     # we will let it try again in a separate task and not crash this one
                     logger.error('Creating a separate task for dc %s and user %s because it crashed.',
@@ -284,7 +253,7 @@ def mon_user_changed(self, task_id, sender, user_name, dc_name=None, affected_gr
                 dc_name, user_name, affected_groups)
     try:
         _user_changed(sender, user_name, dc_name, affected_groups)
-    except (ZabbixAPIException, MonitoringError) as exc:
+    except MonitoringError as exc:
         logger.exception(exc)
         logger.error('mon_user_changed task crashed, it\'s going to be retried')
         self.retry(exc=exc)

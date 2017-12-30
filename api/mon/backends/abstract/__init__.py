@@ -40,11 +40,6 @@ class AbstractMonitoringBackend(object):
     """
     Base Monitoring class. Other monitoring backends must inherit from this class.
     """
-    NOTHING = 0
-    CREATED = 1
-    UPDATED = 2
-    DELETED = 3
-
     NOT_CLASSIFIED = 0
     INFORMATION = 1
     WARNING = 2

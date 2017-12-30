@@ -1,6 +1,7 @@
 from django.utils.six import text_type, iteritems
 from frozendict import frozendict
 
+from api.mon.messages import MON_OBJ_USERGROUP
 from api.mon.backends.zabbix.exceptions import (RemoteObjectDoesNotExist, RelatedRemoteObjectDoesNotExist,
                                                 RemoteObjectManipulationError)
 from api.mon.backends.zabbix.containers.base import ZabbixBaseContainer
@@ -101,7 +102,7 @@ class ZabbixActionContainer(ZabbixBaseContainer):
             self.refresh_usergroups()
 
     @classmethod
-    def user_group_name_factory(cls, dc_name, action_name):
+    def action_name_factory(cls, dc_name, action_name):
         """
         We have to qualify the dc name to prevent name clashing among actions in different datacenters,
         but in the same zabbix.
@@ -194,8 +195,7 @@ class ZabbixActionContainer(ZabbixBaseContainer):
             try:
                 usergroup = ZabbixUserGroupContainer.from_zabbix_name(self._zapi, name, resolve_users=False)
             except RemoteObjectDoesNotExist:
-                raise RelatedRemoteObjectDoesNotExist('User Group \"%s\" does not exist in the monitoring '
-                                                      'system' % mgmt_name)
+                raise RelatedRemoteObjectDoesNotExist(MON_OBJ_USERGROUP + ' "%s" not found' % mgmt_name)
 
             yield usergroup
 
@@ -229,12 +229,12 @@ class ZabbixActionContainer(ZabbixBaseContainer):
             params[zbx_key] = transform_fun(create_mgmt_data[mgmt_key], from_zabbix=False, dc_name=dc_name)
 
         # Filter conditions
-        self.hostgroups = list(self._prepare_hostgroups(dc_name, create_mgmt_data['hostgroups']))
+        self.hostgroups = list(self._prepare_hostgroups(dc_name, create_mgmt_data.get('hostgroups', [])))
         params['filter'] = dict(self._FILTER_PARAMS_DEFAULTS)
         params['filter']['conditions'] = self._generate_conditions()
 
         # Operations
-        self.usergroups = list(self._prepare_usergroups(dc_name, create_mgmt_data['usergroups']))
+        self.usergroups = list(self._prepare_usergroups(dc_name, create_mgmt_data.get('usergroups', [])))
         params['operations'] = self._generate_operations()
 
         return params

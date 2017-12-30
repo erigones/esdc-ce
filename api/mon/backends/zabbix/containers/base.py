@@ -1,8 +1,11 @@
 import re
 
-from api.mon.backends.abstract import AbstractMonitoringBackend
+from django.utils.six import text_type
+from zabbix_api import ZabbixAPIError
+
+from api.mon.constants import MON_OBJ_NOTHING, MON_OBJ_CREATED, MON_OBJ_UPDATED, MON_OBJ_DELETED
 from api.mon.backends.zabbix.utils import parse_zabbix_result
-from api.mon.backends.zabbix.exceptions import ZabbixAPIError, RemoteObjectAlreadyExists
+from api.mon.backends.zabbix.exceptions import InternalMonitoringError, RemoteObjectAlreadyExists
 
 
 class ZabbixBaseContainer(object):
@@ -11,10 +14,10 @@ class ZabbixBaseContainer(object):
     As ZabbixUserGroupContainer.users contains instances of ZabbixUserContainer instances, making it a set allows us
      to do useful operations with it. Therefore, we implemented this class so that those instances can be part of a set.
     """
-    NOTHING = AbstractMonitoringBackend.NOTHING
-    CREATED = AbstractMonitoringBackend.CREATED
-    UPDATED = AbstractMonitoringBackend.UPDATED
-    DELETED = AbstractMonitoringBackend.DELETED
+    NOTHING = MON_OBJ_NOTHING
+    CREATED = MON_OBJ_CREATED
+    UPDATED = MON_OBJ_UPDATED
+    DELETED = MON_OBJ_DELETED
 
     RE_NAME_WITH_DC_PREFIX = re.compile(r'^:(?P<dc_name>.*):(?P<name>.+):$')
     TEMPLATE_NAME_WITH_DC_PREFIX = ':{dc_name}:{name}:'
@@ -69,8 +72,8 @@ class ZabbixBaseContainer(object):
         except ZabbixAPIError as exc:
             data = exc.error.get('data')
             if data and ('already exists' in data or 'SQL statement execution has failed "INSERT INTO' in data):
-                exc = RemoteObjectAlreadyExists(data)
-            raise exc
+                raise RemoteObjectAlreadyExists(data)
+            raise InternalMonitoringError(text_type(exc))
 
     def _call_zapi(self, zapi_method, params=None):
         return self.call_zapi(self._zapi, zapi_method, params=params)

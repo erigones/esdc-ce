@@ -6,7 +6,7 @@ from zabbix_api import ZabbixAPIException
 from api.decorators import catch_exception
 from api.mon.backends.zabbix.base import ZabbixBase
 from api.mon.backends.zabbix.utils import parse_zabbix_result
-from api.mon.backends.zabbix.exceptions import MonitoringError
+from api.mon.backends.zabbix.exceptions import MonitoringError, InternalMonitoringError
 
 logger = getLogger(__name__)
 
@@ -115,11 +115,11 @@ class InternalZabbix(ZabbixBase):
         except ZabbixAPIException as exc:
             err = 'Zabbix API Error when retrieving SLA (%s)' % exc
             self.log(ERROR, err)
-            raise MonitoringError(err)
+            raise InternalMonitoringError(err)
         except MonitoringError as exc:
             err = 'Could not parse Zabbix API output when retrieving SLA (%s)' % exc
             self.log(ERROR, err)
-            raise MonitoringError(err)
+            raise exc.__class__(err)
 
         return sla
 
@@ -134,11 +134,11 @@ class InternalZabbix(ZabbixBase):
             except ZabbixAPIException as exc:
                 err = 'Zabbix API Error when retrieving SLA (%s)' % exc
                 self.log(ERROR, err)
-                raise MonitoringError(err)
+                raise InternalMonitoringError(err)
             except MonitoringError as exc:
                 err = 'Could not parse Zabbix API output when retrieving SLA (%s)' % exc
                 self.log(ERROR, err)
-                raise MonitoringError(err)
+                raise exc.__class__(err)
             else:
                 sla += float(node_sla) * i['weight']
 
@@ -209,6 +209,6 @@ class InternalZabbix(ZabbixBase):
             res = self.zapi.service.delete([serviceid])
         except ZabbixAPIException as e:
             logger.exception(e)
-            raise MonitoringError(e)
+            raise InternalMonitoringError(e)
 
         return parse_zabbix_result(res, 'serviceids', from_get_request=False)
