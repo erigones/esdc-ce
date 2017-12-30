@@ -221,7 +221,7 @@ def console(request, hostname):
 
 @login_required
 @profile_required
-@setting_required('MON_ZABBIX_ENABLED')
+@setting_required('MON_ZABBIX_ENABLED', default_dc=True)
 def monitoring(request, hostname, graph_type='cpu'):
     """
     Page with monitoring graphs.
