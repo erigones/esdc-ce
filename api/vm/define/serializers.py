@@ -612,7 +612,8 @@ class VmDefineSerializer(VmBaseSerializer):
 
         # Disable monitored flag if monitoring module/sync disabled
         # noinspection PyProtectedMember
-        if 'monitored_internal' in attrs and not (dc_settings.MON_ZABBIX_ENABLED and dc_settings._MON_ZABBIX_VM_SYNC):
+        if 'monitored_internal' in attrs and not (DefaultDc().settings.MON_ZABBIX_ENABLED and
+                                                  dc_settings._MON_ZABBIX_VM_SYNC):
             attrs['monitored_internal'] = False
 
         if 'monitored' in attrs and not (dc_settings.MON_ZABBIX_ENABLED and dc_settings.MON_ZABBIX_VM_SYNC):
