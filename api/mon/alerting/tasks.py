@@ -184,7 +184,7 @@ def mon_user_group_changed(self, task_id, sender, group_name=None, dc_name=None,
         self.retry(exc=exc)
 
 
-def _user_changed(task_id, user_name, dc_name, affected_groups):
+def _user_changed(task_id, user_name, dc_name, affected_groups):  # noqa: R701
     try:
         user = User.objects.get(username=user_name)
     except User.DoesNotExist:
