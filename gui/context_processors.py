@@ -38,9 +38,12 @@ def common_stuff(request):
     """
     Make common settings and variables available in templates.
     """
+    from vms.models import DefaultDc
+
     return {
         'settings': settings,
         'dc_settings': request.dc.settings,
+        'dc1_settings': DefaultDc().settings,
         'ANALYTICS': None if request.user.is_authenticated() else settings.ANALYTICS,
         'DEBUG': _get_debug_settings(),
         'SOCKETIO_URL': settings.SOCKETIO_URL,

@@ -153,7 +153,7 @@
             <td class="vm_control vm_control_{{ vm.hostname }} visible-bigscreen vm_control_nohide" data-vm_locked='{{ vm_locked }}'>
               {% if vm.is_kvm %}
               <a href="{% url 'vm_console' vm.hostname %}" id="vm_console__{{ vm.hostname }}" class="button mini gray" title="{% trans "Show server native console" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-picture"></i> {% trans "Console" %}</a>
-              {% if dc_settings.MON_ZABBIX_ENABLED %}
+              {% if dc1_settings.MON_ZABBIX_ENABLED %}
               <a href="{% url 'vm_monitoring' vm.hostname %}" id="vm_monitoring__{{ vm.hostname }}" class="button mini gray" title="{% trans "Show server monitoring details" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-bar-chart"></i> {% trans "Monitoring" %}</a>
               {% endif %}{% endif %}
               <a href="{% url 'vm_tasklog' vm.hostname %}" id="vm_tasklog__{{ vm.hostname }}" class="button mini gray" title="{% trans "Show server related task log" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-tasks"></i> {% trans "Task Log" %}</a>

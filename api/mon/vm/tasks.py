@@ -83,12 +83,6 @@ def mon_vm_sync(task_id, sender, vm_uuid=None, log=LOG, **kwargs):
         logger.warn('Ignoring VM %s zabbix sync, because it is currently being deployed', vm)
         return None
 
-    # This can be also called via vm_zoneid_changed signal, where VM's DC is not available and
-    # monitoring can be disabled in that DC
-    if not vm.dc.settings.MON_ZABBIX_ENABLED:
-        logger.info('Skipping VM %s zabbix sync, because zabbix module is completely disabled in DC %s', vm, vm.dc)
-        return None
-
     zx = get_monitoring(vm.dc)
     force_update = kwargs.get('force_update', False)
 
