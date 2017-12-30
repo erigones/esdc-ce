@@ -184,7 +184,7 @@ def mon_user_group_changed(self, task_id, sender, group_name=None, dc_name=None,
         self.retry(exc=exc)
 
 
-def _remove_user_from_monitoring_server(dc_name, user_name):
+def _remove_user_from_monitoring_server(task_id, dc_name, user_name):
     dc = Dc.objects.get_by_name(dc_name)
     mon = get_monitoring(dc)
 
@@ -192,8 +192,9 @@ def _remove_user_from_monitoring_server(dc_name, user_name):
         logger.info('Monitoring is disabled in DC %s', dc)
         return
 
-    logger.into('Going to delete user with name %s in zabbix %s for dc %s.', user_name, mon, dc)
-    mon.user_delete(name=user_name)
+    logger.info('Going to delete user with name %s in zabbix %s for dc %s.', user_name, mon, dc)
+    res = mon.user_delete(name=user_name)
+    _log_mon_user_action(res, mon, task_id, user_name, dc.name)
 
 
 def _remove_user_from_group_related_monitoring_servers(task_id, user_name, affected_groups):
@@ -242,7 +243,7 @@ def _remove_user_from_all_monitoring_servers(task_id, user_name):
             _log_mon_user_action(res, mon, task_id, user_name, dc.name)
 
 
-def _synchronize_user_on_monitoring_server(dc_name, user_name, user):
+def _synchronize_user_on_monitoring_server(task_id, dc_name, user_name, user):
     dc = Dc.objects.get_by_name(dc_name)
     mon = get_monitoring(dc)
 
@@ -251,7 +252,8 @@ def _synchronize_user_on_monitoring_server(dc_name, user_name, user):
         return
 
     logger.info('Going to create/update user %s in zabbix %s for dc %s.', user_name, mon, dc)
-    mon.user_sync(user=user)
+    res = mon.user_sync(user=user)
+    _log_mon_user_action(res, mon, task_id, user.username, dc.name)
 
 
 def _synchronize_user_on_group_related_monitoring_servers(task_id, user_name, user, affected_groups):
@@ -304,14 +306,14 @@ def _user_changed(task_id, user_name, dc_name, affected_groups):
         user = User.objects.get(username=user_name)
     except User.DoesNotExist:
         if dc_name:
-            _remove_user_from_monitoring_server(dc_name, user_name)
+            _remove_user_from_monitoring_server(task_id, dc_name, user_name)
         elif affected_groups:
             _remove_user_from_group_related_monitoring_servers(task_id, user_name, affected_groups)
         else:
             _remove_user_from_all_monitoring_servers(task_id, user_name)
     else:
         if dc_name:
-            _synchronize_user_on_monitoring_server(dc_name, user_name, user)
+            _synchronize_user_on_monitoring_server(task_id, dc_name, user_name, user)
         elif affected_groups:
             _synchronize_user_on_group_related_monitoring_servers(task_id, user_name, user, affected_groups)
         else:
