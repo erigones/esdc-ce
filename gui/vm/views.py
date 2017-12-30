@@ -38,7 +38,7 @@ from api.vm.utils import get_iso_images
 from api.mon.utils import MonitoringGraph as Graph
 from api.dns.record.api_views import RecordView
 
-from vms.models import Vm, Node, Image, BackupDefine
+from vms.models import Vm, Node, Image, BackupDefine, DefaultDc
 
 logger = getLogger(__name__)
 
@@ -74,7 +74,8 @@ def details(request, hostname):
     context['vm_nics'] = vm_nics = get_vm_define_nic(request, vm)
     context['ptrform'] = PTRForm(prefix='ptr')
     context['iso_rescuecd'] = dc_settings.VMS_ISO_RESCUECD
-    context['mon_sla_enabled'] = dc_settings.MON_ZABBIX_ENABLED and dc_settings.MON_ZABBIX_VM_SLA
+    context['mon_sla_enabled'] = (settings.MON_ZABBIX_ENABLED and DefaultDc().settings.MON_ZABBIX_ENABLED and
+                                  dc_settings.MON_ZABBIX_VM_SLA)
     context['can_edit'] = request.user.is_admin(request)
 
     if vm.slave_vms:
