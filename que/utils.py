@@ -2,8 +2,8 @@ from __future__ import absolute_import
 
 import re
 import json
+import hashlib
 from uuid import UUID, uuid4
-from hashlib import md5
 from ast import literal_eval
 from time import sleep
 from subprocess import Popen, PIPE
@@ -12,7 +12,7 @@ from six import string_types
 from celery import states
 from celery.app.control import flatten_reply
 
-from que import E_SHUTDOWN, Q_MGMT, TT_EXEC, TT_INTERNAL, TG_DC_BOUND
+from que import E_SHUTDOWN, Q_MGMT, TT_EXEC, TT_MGMT, TT_INTERNAL, TG_DC_BOUND
 from que.erigonesd import cq
 from que.lock import TaskLock
 from que.user_tasks import UserTasks
@@ -45,7 +45,7 @@ def task_id_from_string(user_id, owner_id=None, dummy=False, tt=TT_EXEC, tg=TG_D
     x = str(uuid4())
 
     if dummy:
-        return task_prefix + '-' + md5(user_id).hexdigest()[-8:] + x[8:-13]
+        return task_prefix + '-' + hashlib.md5(user_id).hexdigest()[-8:] + x[8:-13]
 
     return task_prefix + '-' + x[:-13]
 
@@ -161,11 +161,18 @@ def is_dummy_task(task_id):
     # noinspection PyBroadException
     try:
         user_id = user_id_from_task_id(task_id)
-        return task_id.split('-')[1] == md5(user_id).hexdigest()[-8:]
+        return task_id.split('-')[1] == hashlib.md5(user_id).hexdigest()[-8:]
     except Exception:
         pass
 
     return False
+
+
+def is_mgmt_task(task_id):
+    """
+    Return True if task has task type == 'm'
+    """
+    return tt_from_task_id(task_id) == TT_MGMT
 
 
 def is_task_dc_bound(task_id):
@@ -394,7 +401,7 @@ def delete_task(task_id, force=False):
         logger.warning('Trying to delete task %s by using force.', task_id)
         logger.warning('Forcing task deletion results in undefined behavior.')
     else:
-        return None, "Safe task deletion is not implemented."
+        return None, 'Safe task deletion is not implemented'
 
     # The task has a callback, which probably means that it has already finished on compute node.
     callback = get_callback(task_id)

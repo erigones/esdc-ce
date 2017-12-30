@@ -42,14 +42,12 @@ class DcGroupView(APIView):
     def get(self, many=False):
         return self._get(self.role, many=many, field_name='name')
 
-    def _remove_dc_binding(self, res):
+    def _remove_dc_binding(self, task_id):
         if self.role.dc_bound:
-            remove_dc_binding_virt_object(res.data.get('task_id'), LOG_GROUP_UPDATE, self.role, user=self.request.user)
+            remove_dc_binding_virt_object(task_id, LOG_GROUP_UPDATE, self.role, user=self.request.user)
 
-    def _remove_user_dc_binding(self, res):
+    def _remove_user_dc_binding(self, task_id):
         """This makes sense only for attaching group into DC"""
-        task_id = res.data.get('task_id')
-
         # Remove user.dc_bound flag for users in this group, which are DC-bound, but not to this datacenter
         for user in self.role.user_set.filter(dc_bound__isnull=False).exclude(dc_bound=self.dc):
             remove_user_dc_binding(task_id, user)
@@ -72,13 +70,13 @@ class DcGroupView(APIView):
 
         ser = self.serializer(self.request, group)
         group.dc_set.add(dc)
-
-        connection.on_commit(lambda: group_relationship_changed.send(group_name=group.name,
-                                                                     dc_name=dc.name))
         res = SuccessTaskResponse(self.request, ser.data, obj=group, status=status.HTTP_201_CREATED,
                                   detail_dict=ser.detail_dict(), msg=LOG_GROUP_ATTACH)
-        self._remove_dc_binding(res)
-        self._remove_user_dc_binding(res)
+        task_id = res.data.get('task_id')
+        connection.on_commit(lambda: group_relationship_changed.send(task_id, group_name=group.name,  # Signal!
+                                                                     dc_name=dc.name))
+        self._remove_dc_binding(task_id)
+        self._remove_user_dc_binding(task_id)
         self._update_affected_users()
 
         return res
@@ -91,9 +89,11 @@ class DcGroupView(APIView):
 
         ser = self.serializer(self.request, group)
         group.dc_set.remove(self.request.dc)
-        connection.on_commit(lambda: group_relationship_changed.send(group_name=group.name, dc_name=dc.name))
         res = SuccessTaskResponse(self.request, None, obj=group, detail_dict=ser.detail_dict(), msg=LOG_GROUP_DETACH)
-        self._remove_dc_binding(res)
+        task_id = res.data.get('task_id')
+        connection.on_commit(lambda: group_relationship_changed.send(task_id, group_name=group.name,  # Signal!
+                                                                     dc_name=dc.name))
+        self._remove_dc_binding(task_id)
         self._update_affected_users(detach=True)
 
         return res

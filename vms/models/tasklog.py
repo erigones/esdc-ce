@@ -3,6 +3,7 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
+# noinspection PyProtectedMember
 from django.core.cache import caches
 
 try:
@@ -44,6 +45,7 @@ class TaskLogEntry(models.Model):
     username = models.CharField(_('username'), max_length=254)
     owner_id = models.IntegerField(_('owner ID'), db_index=True)
     content_type = models.ForeignKey(ContentType, null=True, blank=True)
+    content_type_model = models.CharField(_('object type'), max_length=32, blank=True)
     object_pk = models.CharField(_('object ID'), max_length=128, blank=True, db_index=True)
     object_name = models.CharField(_('object name'), max_length=254, blank=True)
     object_alias = models.CharField(_('object alias'), max_length=254, blank=True)
@@ -82,11 +84,8 @@ class TaskLogEntry(models.Model):
     @classmethod
     def add(cls, **kwargs):
         """Log!"""
-        try:
-            del kwargs['object_type']  # no need to store object_type here
-        except KeyError:
-            pass
-
+        # Translate object_type to real field name
+        kwargs['content_type_model'] = kwargs.pop('object_type', '')
         entry = cls(**kwargs)
         entry.save()
 
@@ -97,7 +96,8 @@ class TaskLogEntry(models.Model):
     def object_type(self):
         if self.content_type:
             return self.content_type.model
-        return None
+        else:
+            return self.content_type_model
 
     @staticmethod
     def get_object_cache_key(content_type_id, object_pk):

@@ -13,7 +13,7 @@ import pytz
 import ipaddress
 import markdown
 
-from api.mon.backends.zabbix.base import ZabbixMediaContainer
+from api.mon.backends.zabbix.containers import ZabbixMediaContainer
 from api.utils.encoders import JSONEncoder
 from pdns.models import Record
 

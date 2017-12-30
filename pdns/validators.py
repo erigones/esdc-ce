@@ -8,7 +8,7 @@ from pdns.models import Record
 
 re_record_name_valid_chars = re.compile(r'^((([a-z\d_])|(\*\.))(-*[a-z\d_/])*)(\.([a-z\d_](-*[a-z\d/])*))*$',
                                         re.IGNORECASE)
-re_record_name_valid_labels = re.compile(r'^[^\.]{1,63}(\.[^\.]{1,63})*$', re.IGNORECASE)
+re_record_name_valid_labels = re.compile(r'^[^.]{1,63}(\.[^.]{1,63})*$', re.IGNORECASE)
 re_fqdn_parts = re.compile(r'^(?![-/])[a-z\d/-]{1,63}(?<![-/])$', re.IGNORECASE)
 err_field_required = _('This field is required.')
 
@@ -153,7 +153,7 @@ class SRVRecordValidator(BaseRecordValidator):
 
 
 class SOARecordValidator(BaseRecordValidator):
-    re_email_addr = re.compile(r'^[a-z0-9_][a-z0-9_\.-]$', re.IGNORECASE)
+    re_email_addr = re.compile(r'^[a-z0-9_][a-z0-9_.-]$', re.IGNORECASE)
     check_name_suffix_against_domain = False
 
     def __call__(self):

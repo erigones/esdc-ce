@@ -1,7 +1,9 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.contenttypes.models import ContentType
 # noinspection PyProtectedMember
 from vms.mixins import _DcBoundMixin
+# noinspection PyProtectedMember
 from gui.models.permission import Permission
 
 
@@ -45,6 +47,21 @@ class Role(_DcBoundMixin):
     @property
     def log_list(self):
         return self.log_name, self.log_alias, self.pk, self.__class__
+
+    @classmethod
+    def get_content_type(cls):
+        return ContentType.objects.get_for_model(cls)
+
+    @classmethod
+    def get_object_type(cls, content_type=None):
+        if content_type:
+            return content_type.model
+        return cls.get_content_type().model
+
+    @classmethod
+    def get_object_by_pk(cls, pk):
+        # noinspection PyUnresolvedReferences
+        return cls.objects.get(pk=pk)
 
     @classmethod
     def get_log_name_lookup_kwargs(cls, log_name_value):

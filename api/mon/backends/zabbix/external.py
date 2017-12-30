@@ -2,7 +2,7 @@ from logging import WARNING, INFO
 
 from django.core.cache import cache
 
-from .base import ZabbixBase
+from api.mon.backends.zabbix.base import ZabbixBase
 
 
 class ExternalZabbix(ZabbixBase):

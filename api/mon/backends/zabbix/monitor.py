@@ -2,9 +2,11 @@ from logging import INFO, WARNING, ERROR, DEBUG, getLogger
 
 from api.decorators import catch_exception
 from api.mon.backends.abstract import AbstractMonitoringBackend, LOG
-from .base import ZabbixBase, ZabbixUserGroupContainer, ZabbixUserContainer, ZabbixHostGroupContainer
-from .internal import InternalZabbix
-from .external import ExternalZabbix
+from api.mon.backends.zabbix.containers import (ZabbixHostGroupContainer, ZabbixUserContainer, ZabbixUserGroupContainer,
+                                                ZabbixActionContainer, ZabbixTemplateContainer)
+from api.mon.backends.zabbix.base import ZabbixBase
+from api.mon.backends.zabbix.internal import InternalZabbix
+from api.mon.backends.zabbix.external import ExternalZabbix
 from gui.models import User, AdminPermission
 from vms.models import DefaultDc
 
@@ -54,21 +56,21 @@ class Zabbix(AbstractMonitoringBackend):
         # InternalZabbix need default DC, which can be the same as the dc parameter
         if dc.is_default():
             default_dc = dc
-            dcns = dc1s = dc.settings
             reuse_zapi = True
         else:
             default_dc = DefaultDc()
             # Reuse zabbix connection if the server and username did not change
-            dcns, dc1s = dc.settings, default_dc.settings
-            reuse_zapi = (dcns.MON_ZABBIX_SERVER == dc1s.MON_ZABBIX_SERVER and
-                          dcns.MON_ZABBIX_USERNAME == dc1s.MON_ZABBIX_USERNAME)
+            dc_settings, dc1_settings = dc.settings, default_dc.settings
+            reuse_zapi = (dc_settings.MON_ZABBIX_SERVER == dc1_settings.MON_ZABBIX_SERVER and
+                          dc_settings.MON_ZABBIX_USERNAME == dc1_settings.MON_ZABBIX_USERNAME and
+                          dc_settings.MON_ZABBIX_PASSWORD == dc1_settings.MON_ZABBIX_PASSWORD)
 
-        self.izx = InternalZabbix(dc1s, name=default_dc.name, **kwargs)
+        self.izx = InternalZabbix(default_dc, **kwargs)
         self._connections = {self.izx.zapi}
         if reuse_zapi:
             kwargs['zapi'] = self.izx.zapi
 
-        self.ezx = ExternalZabbix(dcns, name=dc.name, **kwargs)
+        self.ezx = ExternalZabbix(dc, **kwargs)
         if not reuse_zapi:
             self._connections.add(self.ezx.zapi)
 
@@ -94,6 +96,24 @@ class Zabbix(AbstractMonitoringBackend):
         """Clear cache for both zabbix objects"""
         self.izx.reset_cache()
         self.ezx.reset_cache()
+
+    @catch_exception
+    def task_log_success(self, task_id, obj=None, msg='', detail='', **kwargs):
+        from api.task.utils import task_log_success
+
+        if obj is None:
+            obj = self.server_class(self.dc)
+
+        task_log_success(task_id, msg, obj=obj, detail=detail, **kwargs)
+
+    @catch_exception
+    def task_log_error(self, task_id, obj=None, msg='', detail='', **kwargs):
+        from api.task.utils import task_log_error
+
+        if obj is None:
+            obj = self.server_class(self.dc)
+
+        task_log_error(task_id, msg, obj=obj, detail=detail, **kwargs)
 
     @classmethod
     @catch_exception
@@ -262,6 +282,11 @@ class Zabbix(AbstractMonitoringBackend):
                                      (vm.is_external_zabbix_sync_active(), dc_settings.MON_ZABBIX_VM_SYNC, self.ezx)):
             log = zx.get_log_fun(task_log)
 
+            if not zx.enabled:
+                log(INFO, 'Monitoring is disabled')
+                result.append(None)
+                continue
+
             if zx_sync:
                 if force_update and zx.has_host_info(vm):
                     host = zx.host_info(vm)
@@ -292,16 +317,24 @@ class Zabbix(AbstractMonitoringBackend):
         izx_log = self.izx.get_log_fun(task_log)
         ezx_log = self.ezx.get_log_fun(task_log)
 
-        if vm.is_zabbix_sync_active():
-            result.append(self._vm_disable_host(self.izx, vm, log=izx_log))
+        if self.izx.enabled:
+            if vm.is_zabbix_sync_active():
+                result.append(self._vm_disable_host(self.izx, vm, log=izx_log))
+            else:
+                izx_log(INFO, 'Internal zabbix synchronization disabled for VM %s', vm)
+                result.append(None)
         else:
-            izx_log(INFO, 'Internal zabbix synchronization disabled for VM %s', vm)
+            izx_log(INFO, 'Monitoring is disabled')
             result.append(None)
 
-        if vm.is_external_zabbix_sync_active():
-            result.append(self._vm_disable_host(self.ezx, vm, log=ezx_log))
+        if self.ezx.enabled:
+            if vm.is_external_zabbix_sync_active():
+                result.append(self._vm_disable_host(self.ezx, vm, log=ezx_log))
+            else:
+                ezx_log(INFO, 'External zabbix synchronization disabled for VM %s', vm)
+                result.append(None)
         else:
-            ezx_log(INFO, 'External zabbix synchronization disabled for VM %s', vm)
+            ezx_log(INFO, 'Monitoring is disabled')
             result.append(None)
 
         return result
@@ -312,16 +345,24 @@ class Zabbix(AbstractMonitoringBackend):
         izx_log = self.izx.get_log_fun(task_log)
         ezx_log = self.ezx.get_log_fun(task_log)
 
-        if internal:
-            result.append(self._vm_delete_host(self.izx, vm, log=izx_log))
+        if self.izx.enabled:
+            if internal:
+                result.append(self._vm_delete_host(self.izx, vm, log=izx_log))
+            else:
+                izx_log(INFO, 'Internal zabbix synchronization disabled for VM %s', vm.uuid)
+                result.append(None)
         else:
-            izx_log(INFO, 'Internal zabbix synchronization disabled for VM %s', vm.uuid)
+            izx_log(INFO, 'Monitoring is disabled')
             result.append(None)
 
-        if external:
-            result.append(self._vm_delete_host(self.ezx, vm, log=ezx_log))
+        if self.ezx.enabled:
+            if external:
+                result.append(self._vm_delete_host(self.ezx, vm, log=ezx_log))
+            else:
+                ezx_log(INFO, 'External zabbix synchronization disabled for VM %s', vm.uuid)
+                result.append(None)
         else:
-            ezx_log(INFO, 'External zabbix synchronization disabled for VM %s', vm.uuid)
+            ezx_log(INFO, 'Monitoring is disabled')
             result.append(None)
 
         return result
@@ -335,6 +376,10 @@ class Zabbix(AbstractMonitoringBackend):
         zx = self.izx
         log = zx.get_log_fun(task_log)
         host = zx.get_host(zx.host_id(node), log=log)
+
+        if not zx.enabled:
+            log(INFO, 'Monitoring is disabled')
+            return None
 
         if not host:  # Host does not exist in Zabbix, so we have to create it
             log(WARNING, 'Node %s is not defined in Zabbix. Creating...', node)
@@ -392,6 +437,10 @@ class Zabbix(AbstractMonitoringBackend):
         log = zx.get_log_fun(task_log)
         hostid = zx.get_hostid(node, log=log)
 
+        if not zx.enabled:
+            log(INFO, 'Monitoring is disabled')
+            return None
+
         if not hostid:
             log(ERROR, 'Zabbix host for Node %s does not exist!', node)
             return False
@@ -415,6 +464,10 @@ class Zabbix(AbstractMonitoringBackend):
         log = zx.get_log_fun(task_log)
         node_uuid = zx.host_id(node)  # Node object does not exist at this point, it just carries the uuid
         host = zx.get_host(node_uuid, log=log)
+
+        if not zx.enabled:
+            log(INFO, 'Monitoring is disabled')
+            return None
 
         if not host:
             log(WARNING, 'Zabbix host for Node %s does not exist!', node_uuid)
@@ -450,28 +503,62 @@ class Zabbix(AbstractMonitoringBackend):
         """[INTERNAL] Return node history data for selected graph and period"""
         return self.izx.get_history((node_id,), items, zhistory, since, until, items_search=items_search)
 
-    def template_list(self):
+    def template_list(self, full=False, extended=False):
         """[EXTERNAL] Return list of available templates"""
-        return self.ezx.get_template_list()
+        if full or extended:
+            display_attr = 'as_mgmt_data'
+        else:
+            display_attr = 'name'
 
-    def _get_filtered_hostgroups(self, prefix):
-        """This is a generator function"""
-        for host_group in self.ezx.get_hostgroup_list():
-            match = ZabbixHostGroupContainer.RE_NAME_WITH_DC_PREFIX.match(host_group['name'])
+        return [getattr(ztc, display_attr) for ztc in ZabbixTemplateContainer.all(self.ezx.zapi)]
 
-            if match:
-                # RE_NAME_WITH_DC_PREFIX results in exactly two (named) groups: dc name and hostgroup name:
-                dc_name, host_group_name = match.groups()
-                if dc_name == prefix:
-                    # This will remove the prefix from the hostgroup name as we don't want to show this to the user.
-                    host_group['name'] = host_group_name
-                    yield host_group
-            else:
-                yield host_group
-
-    def hostgroup_list(self, prefix=''):
+    def hostgroup_list(self, dc_bound=True, full=False, extended=False):
         """[EXTERNAL] Return list of available hostgroups"""
-        return list(self._get_filtered_hostgroups(prefix=prefix))
+        if full or extended:
+            display_attr = 'as_mgmt_data'
+        else:
+            display_attr = 'name_without_dc_prefix'
+
+        return [getattr(zgc, display_attr) for zgc in ZabbixHostGroupContainer.all(self.ezx.zapi, self.dc.name,
+                                                                                   dc_bound=dc_bound)]
+
+    def hostgroup_detail(self, name, dc_bound=True):
+        """[EXTERNAL]"""
+        if dc_bound:
+            dc_name = self.dc.name
+        else:
+            dc_name = None
+
+        zbx_name = ZabbixHostGroupContainer.hostgroup_name_factory(dc_name, name)
+        zgc = ZabbixHostGroupContainer.from_zabbix_name(self.ezx.zapi, zbx_name, dc_bound=dc_bound)
+
+        return zgc.as_mgmt_data
+
+    def hostgroup_create(self, name, dc_bound=True):
+        """[EXTERNAL]"""
+        if dc_bound:
+            dc_name = self.dc.name
+        else:
+            dc_name = None
+
+        zbx_name = ZabbixHostGroupContainer.hostgroup_name_factory(dc_name, name)
+        zgc = ZabbixHostGroupContainer.from_mgmt_data(self.ezx.zapi, zbx_name, dc_bound=dc_bound)
+        zgc.create()
+
+        return zgc.as_mgmt_data
+
+    def hostgroup_delete(self, name, dc_bound=True):
+        """[EXTERNAL]"""
+        if dc_bound:
+            dc_name = self.dc.name
+        else:
+            dc_name = None
+
+        zbx_name = ZabbixHostGroupContainer.hostgroup_name_factory(dc_name, name)
+        zgc = ZabbixHostGroupContainer.from_zabbix_name(self.ezx.zapi, zbx_name, dc_bound=dc_bound)
+        zgc.delete()
+
+        return None
 
     def _get_filtered_alerts(self, vms=None, nodes=None, **kwargs):
         """This is a generator function"""
@@ -488,7 +575,8 @@ class Zabbix(AbstractMonitoringBackend):
         """[EXTERNAL] Return list of available alerts"""
         return list(self._get_filtered_alerts(*args, **kwargs))
 
-    def synchronize_user_group(self, group=None, dc_as_group=None):
+    def user_group_sync(self, group=None, dc_as_group=None):
+        """[EXTERNAL]"""
         kwargs = {}
         # TODO create also a separate superadmin group for superadmins in every DC
 
@@ -507,21 +595,64 @@ class Zabbix(AbstractMonitoringBackend):
             kwargs['accessible_hostgroups'] = ()  # TODO
             kwargs['superusers'] = group.permissions.filter(name=AdminPermission.name).exists()
 
-        for zapi in self._connections:
-            ZabbixUserGroupContainer.synchronize(zapi, **kwargs)
+        return ZabbixUserGroupContainer.synchronize(self.ezx.zapi, **kwargs)
 
-    def synchronize_user(self, user):
-        for zapi in self._connections:
-            ZabbixUserContainer.synchronize(zapi, user)
+    def user_sync(self, user):
+        """[EXTERNAL]"""
+        return ZabbixUserContainer.synchronize(self.ezx.zapi, user)
 
-    def delete_user_group(self, name):
-        group_name = ZabbixUserGroupContainer.user_group_name_factory(
-            local_group_name=name,
-            dc_name=self.dc.name)
+    def user_group_delete(self, name):
+        """[EXTERNAL]"""
+        group_name = ZabbixUserGroupContainer.user_group_name_factory(dc_name=self.dc.name, local_group_name=name)
 
-        for zapi in self._connections:
-            ZabbixUserGroupContainer.delete_by_name(zapi, group_name)
+        return ZabbixUserGroupContainer.delete_by_name(self.ezx.zapi, group_name)
 
-    def delete_user(self, name):
-        for zapi in self._connections:
-            ZabbixUserContainer.delete_by_name(zapi, name)
+    def user_delete(self, name):
+        """[EXTERNAL]"""
+        return ZabbixUserContainer.delete_by_name(self.ezx.zapi, name)
+
+    def action_list(self, full=False, extended=False):
+        """[EXTERNAL]"""
+        if full or extended:
+            display_attr = 'as_mgmt_data'
+        else:
+            display_attr = 'name_without_dc_prefix'
+
+        return [getattr(zac, display_attr) for zac in ZabbixActionContainer.all(self.ezx.zapi, self.dc.name)]
+
+    def action_detail(self, name):
+        """[EXTERNAL]"""
+        zbx_name = ZabbixActionContainer.action_name_factory(self.dc.name, name)
+        zac = ZabbixActionContainer.from_zabbix_name(self.ezx.zapi, zbx_name)
+
+        return zac.as_mgmt_data
+
+    def action_create(self, name, data):
+        """[EXTERNAL]"""
+        data['name'] = name  # Action name must be also in data
+        zbx_name = ZabbixActionContainer.action_name_factory(self.dc.name, name)
+        zac = ZabbixActionContainer.from_mgmt_data(self.ezx.zapi, zbx_name)
+        zac.create(self.dc.name, data)
+
+        return zac.as_mgmt_data
+
+    def action_update(self, name, data):
+        """[EXTERNAL]"""
+        data.pop('name', None)  # Action name cannot be changed
+        zbx_name = ZabbixActionContainer.action_name_factory(self.dc.name, name)
+        zac = ZabbixActionContainer.from_zabbix_name(self.ezx.zapi, zbx_name,
+                                                     # we don't need to fetch hostgroups when we are replacing them
+                                                     resolve_hostgroups='hostgroups' not in data,
+                                                     # we don't need to fetch usergroups when we are replacing them
+                                                     resolve_usergroups='usergroups' not in data)
+        zac.update(self.dc.name, data)
+
+        return zac.as_mgmt_data
+
+    def action_delete(self, name):
+        """[EXTERNAL]"""
+        zbx_name = ZabbixActionContainer.action_name_factory(self.dc.name, name)
+        zac = ZabbixActionContainer.from_zabbix_name(self.ezx.zapi, zbx_name)
+        zac.delete()
+
+        return None

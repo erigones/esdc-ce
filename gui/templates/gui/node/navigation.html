@@ -6,11 +6,11 @@
       <li class="{{ li_storages }}"><a href="{% url 'node_storages' node.hostname %}" data-toggle="tab" title="{% trans "Show storages available on this compute node" %}"><i class="icon-th"></i> {% trans "Storages" %}</a></li>
       <li class="{{ li_images }}"><a href="{% url 'node_images' node.hostname %}" data-toggle="tab" title="{% trans "Show images stored on this compute node storages" %}"><i class="icon-save"></i> {% trans "Images" %}</a></li>
       <li class="{{ li_vms }}"><a href="{% url 'node_vms' node.hostname %}" data-toggle="tab" title="{% trans "Show servers defined on this compute node" %}"><i class="icon-hdd"></i> {% trans "Servers" %}</a></li>
-      {% if dc_settings.VMS_VM_BACKUP_ENABLED and node.is_backup %}
+      {% if settings.VMS_VM_BACKUP_ENABLED and node.is_backup %}
       <li class="{{ li_backups }}"><a href="{% url 'node_backups' node.hostname %}" data-toggle="tab" title="{% trans "Show backups stored on this compute node" %}"><i class="icon-paste"></i> {% trans "Backups" %}</a></li>
       <li class="{{ li_backup_definitions }}"><a href="{% url 'node_backup_definitions' node.hostname %}" data-toggle="tab" title="{% trans "Show backup definitions configured for this compute node" %}"><i class="icon-paste"></i> {% trans "Backup definitions" %}</a></li>
       {% endif %}
-      {% if dc_settings.MON_ZABBIX_ENABLED %}
+      {% if dc1_settings.MON_ZABBIX_ENABLED %}
       <li class="{{ li_monitoring }}"><a href="{% url 'node_monitoring' node.hostname %}" data-toggle="tab" title="{% trans "Show compute node monitoring" %}"><i class="icon-bar-chart"></i> {% trans "Monitoring" %}</a></li>
       {% endif %}
       <li class="{{ li_tasklog }}"><a href="{% url 'node_tasklog' node.hostname %}" data-toggle="tab" title="{% trans "Show compute node related task log" %}"><i class="icon-tasks"></i> {% trans "Task Log" %}</a></li>

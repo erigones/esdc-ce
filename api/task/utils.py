@@ -3,10 +3,10 @@ from functools import wraps
 
 from celery import states
 from django.utils import timezone
+from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from django.contrib.contenttypes.models import ContentType
 from django.utils.decorators import available_attrs
-from django.utils.six import string_types
+from django.utils.six import string_types, text_type
 from gevent import sleep
 
 from que import TT_ERROR
@@ -22,7 +22,7 @@ from api.decorators import catch_exception
 from api.task.log import log, task_type_from_task_prefix, task_flag_from_task_msg
 from api.task.callback import UserCallback
 from api.task.messages import LOG_API_FAILURE
-from vms.models import TASK_MODEL_KEYS
+from vms.models import TASK_MODELS
 # noinspection PyProtectedMember
 from vms.models.base import _UserTasksModel
 from gui.models import User
@@ -50,6 +50,12 @@ TASK_EXCEPTION = {
 TASK_PARENT_STATUS_MAXWAIT = 15
 
 MGMT_LOCK_TIMEOUT = cq.conf.ERIGONES_TASK_DEFAULT_EXPIRES
+
+DUMMY_TASK_MODELS = ()
+
+if settings.MON_ZABBIX_ENABLED:
+    from api.mon import MonitoringServer
+    DUMMY_TASK_MODELS += (MonitoringServer,)
 
 
 def _get_task_state(task):
@@ -92,7 +98,7 @@ def get_task_exception(ex):
     """
     Return response dict and status code according to Exception.
     """
-    r = {'detail': ex.__class__.__name__ + ': ' + str(ex)}
+    r = {'detail': '%s: %s' % (ex.__class__.__name__, ex)}
     s = TASK_EXCEPTION.get(ex.__class__, TASK_EXCEPTION['default'])
 
     return r, s
@@ -189,17 +195,14 @@ def get_task_error_message(task_result):
     return str(res)
 
 
-def get_vms_object(kwargs):
+def get_task_object(kwargs, models=DUMMY_TASK_MODELS + TASK_MODELS):
     """
-    Search vms identifier in kwargs and try to get the object or raise DoesNotExist exception.
+    Search TaskModel (_pk_key) identifier in kwargs and try to get the object or raise DoesNotExist exception.
     """
-    for k in TASK_MODEL_KEYS:
-        v = kwargs.get(k, None)
-
-        if v:
-            model = k.split('_')[0]
-            cls = ContentType.objects.get(app_label='vms', model=model).model_class()
-            return cls.objects.get(pk=v)
+    for model in models:
+        pk_key = model.get_pk_key()
+        if pk_key in kwargs:
+            return model.get_object_by_pk(pk=kwargs[pk_key])
 
     raise ObjectDoesNotExist
 
@@ -252,12 +255,12 @@ def callback(log_exception=True, update_user_tasks=True, check_parent_status=Tru
                 task_logger.error('Task %s failed', task_id)
 
                 if not isinstance(e, TaskException):
-                    e = TaskException(result, str(e))
+                    e = TaskException(result, '%s: %s' % (e.__class__.__name__, text_type(e)))
 
                 if log_exception or update_user_tasks:
                     if e.obj is None:
                         try:
-                            obj = get_vms_object(kwargs)
+                            obj = get_task_object(kwargs)
                         except ObjectDoesNotExist:
                             obj = None
                             # noinspection PyProtectedMember
@@ -347,32 +350,49 @@ def mgmt_lock(timeout=MGMT_LOCK_TIMEOUT, key_args=(), key_kwargs=(), wait_for_re
     return wrap
 
 
-def mgmt_task(update_user_tasks=True):
+def mgmt_task(log_exception=False, update_user_tasks=True):
     """
     Decorator for celery standalone mgmt tasks.
     """
     def wrap(fun):
         @wraps(fun, assigned=available_attrs(fun))
         def inner(task_id, *args, **kwargs):
+            exc = None
+
             try:
                 return fun(task_id, *args, **kwargs)
-            except Exception as e:
-                task_logger.exception(e)
+            except Exception as exc:
+                task_logger.exception(exc)
                 task_logger.error('Mgmt Task %s failed', task_id)
 
-                if not isinstance(e, TaskException):
-                    e = MgmtTaskException(str(e))
+                if not isinstance(exc, MgmtTaskException):
+                    exc = MgmtTaskException('%s: %s' % (exc.__class__.__name__, text_type(exc)))
 
-                raise e
+                raise exc
             finally:
-                if update_user_tasks:
+                if update_user_tasks or (log_exception and exc):
                     try:
-                        obj = get_vms_object(kwargs)
+                        # First, search in dummy task models because dc_id is commonly used as a parameter in mgmt tasks
+                        obj = get_task_object(kwargs)
                     except ObjectDoesNotExist:
+                        obj = None
                         # noinspection PyProtectedMember
-                        _UserTasksModel._tasks_del(task_id)
-                    else:
+                        _UserTasksModel._tasks_del(task_id)  # Always remove user task
+
+                    if log_exception and exc:
+                        msg = kwargs['meta'].get('msg', '')
+                        # Also removes user task in task_log
+                        task_log(task_id, msg, obj=obj, task_status=states.FAILURE, task_result=exc.result)
+                    elif obj:  # update_user_tasks
                         obj.tasks_del(task_id)
+
+                cb = UserCallback(task_id).load()
+
+                if cb:
+                    task_logger.debug('Creating task for UserCallback[%s]: %s', task_id, cb)
+                    from api.task.tasks import task_user_callback_cb  # Circular import
+                    task_user_callback_cb.call(task_id, cb, **kwargs)
+
         return inner
     return wrap
 
@@ -425,15 +445,15 @@ def task_log(task_id, msg, vm=None, obj=None, user=None, api_view=None, task_sta
         object_name = obj[0]
         object_alias = obj[1]
         object_pk = obj[2]
-        content_type = ContentType.objects.get_for_model(obj[3])
-        object_type = content_type.model
+        content_type = obj[3].get_content_type()
+        object_type = obj[3].get_object_type(content_type)
         obj = None
     elif obj and not isinstance(obj, string_types):
         object_name = obj.log_name
         object_alias = obj.log_alias
         object_pk = obj.pk
-        content_type = ContentType.objects.get_for_model(obj)
-        object_type = content_type.model
+        content_type = obj.get_content_type()
+        object_type = obj.get_object_type(content_type)
 
         if update_user_tasks and hasattr(obj, 'tasks'):
             update_tasks = True
@@ -448,7 +468,7 @@ def task_log(task_id, msg, vm=None, obj=None, user=None, api_view=None, task_sta
         object_pk = ''
         obj = None
         content_type = None
-        object_type = None
+        object_type = ''
 
     if object_pk is None:
         object_pk = ''
@@ -577,7 +597,7 @@ def get_user_tasks(request, filter_fun=None):
 
 def cancel_task(task_id, force=False):
     """
-    Revoke task.
+    Revoke task + run worker kill_job.
     """
     if force:
         signal = 'SIGKILL'

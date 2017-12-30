@@ -113,6 +113,7 @@ rst_epilog = """
 .. |IsoAdmin| replace:: `IsoAdmin <%(perm)s>`__
 .. |UserAdmin| replace:: `UserAdmin <%(perm)s>`__
 .. |DnsAdmin| replace:: `DnsAdmin <%(perm)s>`__
+.. |MonitoringAdmin| replace:: `MonitoringAdmin <%(perm)s>`__
 .. |SuperAdmin| replace:: `SuperAdmin <%(perm)s>`__
 .. |UserTask| replace:: `UserTask <%(perm)s>`__
 .. |TaskCreator| replace:: `TaskCreator <%(perm)s>`__
