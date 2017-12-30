@@ -16,11 +16,6 @@ class ZabbixAPIAdapterTests(TestCase):
     """
     These tests are designed to run in one and only one DC.
     """
-    dc = None
-    zabbix = None
-    db_users = None
-    db_groups = None
-
     # noinspection PyMethodMayBeStatic
     def _create_db_user(self):
         user = User()
@@ -432,6 +427,7 @@ class ZabbixAPIAdapterTests(TestCase):
         ), [], 'action should not exist in zabbix anymore')
         self.assertRaises(RemoteObjectDoesNotExist, self.zabbix.action_delete, action_name)
 
+    # noinspection PyMethodMayBeStatic
     def _initial_action_data(self):
         return {
             'usergroups': [],

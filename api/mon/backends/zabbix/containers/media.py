@@ -1,6 +1,7 @@
 from django.conf import settings
 from zabbix_api import ZabbixAPI
 
+from api.mon.messages import MON_OBJ_MEDIA_TYPE
 from api.mon.backends.zabbix.exceptions import RemoteObjectDoesNotExist
 from api.mon.backends.zabbix.containers.base import ZabbixBaseContainer
 
@@ -87,7 +88,8 @@ class ZabbixMediaContainer(ZabbixBaseContainer):
         media_type_desc = self.get_media_type_desc(self.media_type, dc_settings=dc_settings)
 
         if not media_type_desc:
-            raise RemoteObjectDoesNotExist('Media type "%s" is not available' % self.media_type)
+            raise RemoteObjectDoesNotExist(detail='{mon_object} is not available',
+                                           mon_object=MON_OBJ_MEDIA_TYPE, name=self.media_type)
 
         return {
             'mediatypeid': self.fetch_media_type_id(self._zapi, media_type_desc),

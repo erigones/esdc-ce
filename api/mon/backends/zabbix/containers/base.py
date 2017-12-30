@@ -66,17 +66,17 @@ class ZabbixBaseContainer(object):
         raise ValueError('Name is immutable')
 
     @classmethod
-    def call_zapi(cls, zapi, zapi_method, params=None):
+    def call_zapi(cls, zapi, zapi_method, params=None, mon_object=None, mon_object_name=None):
         try:
             return zapi.call(zapi_method, params=params)
         except ZabbixAPIError as exc:
             data = exc.error.get('data')
             if data and ('already exists' in data or 'SQL statement execution has failed "INSERT INTO' in data):
-                raise RemoteObjectAlreadyExists(data)
+                raise RemoteObjectAlreadyExists(mon_object=mon_object, name=mon_object_name)
             raise InternalMonitoringError(text_type(exc))
 
-    def _call_zapi(self, zapi_method, params=None):
-        return self.call_zapi(self._zapi, zapi_method, params=params)
+    def _call_zapi(self, zapi_method, params=None, **kwargs):
+        return self.call_zapi(self._zapi, zapi_method, params=params, **kwargs)
 
     @staticmethod
     def parse_zabbix_get_result(*args, **kwargs):

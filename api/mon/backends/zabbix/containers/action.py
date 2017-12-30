@@ -1,7 +1,7 @@
 from django.utils.six import text_type, iteritems
 from frozendict import frozendict
 
-from api.mon.messages import MON_OBJ_USERGROUP
+from api.mon.messages import MON_OBJ_USERGROUP, MON_OBJ_ACTION
 from api.mon.backends.zabbix.exceptions import (RemoteObjectDoesNotExist, RelatedRemoteObjectDoesNotExist,
                                                 RemoteObjectManipulationError)
 from api.mon.backends.zabbix.containers.base import ZabbixBaseContainer
@@ -92,8 +92,8 @@ class ZabbixActionContainer(ZabbixBaseContainer):
         super(ZabbixActionContainer, self).init(zabbix_object)
 
         if validate and not self._is_supported(zabbix_object):
-            raise RemoteObjectManipulationError('Monitoring action \"%s\" has unsupported configuration'
-                                                % self.name_without_dc_prefix)
+            raise RemoteObjectManipulationError(detail='{mon_object} has unsupported configuration',
+                                                mon_object=MON_OBJ_ACTION, name=self.name_without_dc_prefix)
 
         if resolve_hostgroups:
             self.refresh_hostgroups()
@@ -195,7 +195,7 @@ class ZabbixActionContainer(ZabbixBaseContainer):
             try:
                 usergroup = ZabbixUserGroupContainer.from_zabbix_name(self._zapi, name, resolve_users=False)
             except RemoteObjectDoesNotExist:
-                raise RelatedRemoteObjectDoesNotExist(MON_OBJ_USERGROUP + ' "%s" not found' % mgmt_name)
+                raise RelatedRemoteObjectDoesNotExist(mon_object=MON_OBJ_USERGROUP, name=mgmt_name)
 
             yield usergroup
 
@@ -280,21 +280,26 @@ class ZabbixActionContainer(ZabbixBaseContainer):
 
     def refresh(self, **init_kwargs):
         params = dict(filter={'name': self.name}, **self.QUERY_BASE)
-        self._api_response = self._call_zapi('action.get', params=params)
-        zabbix_object = self.parse_zabbix_get_result(self._api_response)
+        self._api_response = self._call_zapi('action.get', params=params, mon_object=MON_OBJ_ACTION,
+                                             mon_object_name=self.name_without_dc_prefix)
+        zabbix_object = self.parse_zabbix_get_result(self._api_response, mon_object=MON_OBJ_ACTION,
+                                                     mon_object_name=self.name_without_dc_prefix)
         self.init(zabbix_object, **init_kwargs)
 
     def create(self, dc_name, create_mgmt_data):
         params = self._generate_create_params(dc_name, create_mgmt_data)
-        self._api_response = self._call_zapi('action.create', params=params)
-        self.zabbix_id = self.parse_zabbix_create_result(self._api_response, 'actionids')
+        self._api_response = self._call_zapi('action.create', params=params, mon_object=MON_OBJ_ACTION,
+                                             mon_object_name=self.name_without_dc_prefix)
+        self.zabbix_id = self.parse_zabbix_create_result(self._api_response, 'actionids', mon_object=MON_OBJ_ACTION,
+                                                         mon_object_name=self.name_without_dc_prefix)
         self.zabbix_object = params  # TODO: maybe we should rather call refresh()
 
         return self.CREATED
 
     def update(self, dc_name, update_mgmt_data):
         params = self._generate_update_params(dc_name, update_mgmt_data)
-        self._api_response = self._call_zapi('action.update', params=params)
+        self._api_response = self._call_zapi('action.update', params=params, mon_object=MON_OBJ_ACTION,
+                                             mon_object_name=self.name_without_dc_prefix)
         assert self.zabbix_id == int(self.parse_zabbix_update_result(self._api_response, 'actionids'))
         self.zabbix_object.update(params)  # TODO: maybe we should rather call refresh()
 
@@ -302,7 +307,8 @@ class ZabbixActionContainer(ZabbixBaseContainer):
 
     def delete(self):
         assert self.zabbix_id, 'Cannot delete Action without actionid'
-        self._api_response = self._call_zapi('action.delete', params=[self.zabbix_id])
+        self._api_response = self._call_zapi('action.delete', params=[self.zabbix_id], mon_object=MON_OBJ_ACTION,
+                                             mon_object_name=self.name_without_dc_prefix)
         assert self.zabbix_id == int(self.parse_zabbix_delete_result(self._api_response, 'actionids'))
         self.reset()
 

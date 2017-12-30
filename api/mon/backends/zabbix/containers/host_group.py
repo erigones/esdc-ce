@@ -1,6 +1,7 @@
 from frozendict import frozendict
 
 from api.decorators import lock
+from api.mon.messages import MON_OBJ_HOSTGROUP
 from api.mon.backends.zabbix.exceptions import (RemoteObjectDoesNotExist, RemoteObjectAlreadyExists,
                                                 RemoteObjectManipulationError)
 from api.mon.backends.zabbix.containers.base import ZabbixBaseContainer
@@ -92,14 +93,19 @@ class ZabbixHostGroupContainer(ZabbixBaseContainer):
 
     def refresh(self):
         params = dict(filter={'name': self.name}, **self.QUERY_BASE)
-        self._api_response = self._call_zapi('hostgroup.get', params=params)
-        zabbix_object = self.parse_zabbix_get_result(self._api_response)
+        self._api_response = self._call_zapi('hostgroup.get', params=params, mon_object=MON_OBJ_HOSTGROUP,
+                                             mon_object_name=self.name_without_dc_prefix)
+        zabbix_object = self.parse_zabbix_get_result(self._api_response, mon_object=MON_OBJ_HOSTGROUP,
+                                                     mon_object_name=self.name_without_dc_prefix)
         self.init(zabbix_object)
 
     def create(self):
         params = {'name': self.name}
-        self._api_response = self._call_zapi('hostgroup.create', params=params)
-        self.zabbix_id = int(self.parse_zabbix_create_result(self._api_response, 'groupids'))
+        self._api_response = self._call_zapi('hostgroup.create', params=params, mon_object=MON_OBJ_HOSTGROUP,
+                                             mon_object_name=self.name_without_dc_prefix)
+        self.zabbix_id = int(self.parse_zabbix_create_result(self._api_response, 'groupids',
+                                                             mon_object=MON_OBJ_HOSTGROUP,
+                                                             mon_object_name=self.name_without_dc_prefix))
         self.zabbix_object = params
         # Invalidate cache for mon_hostgroup_list
         self._clear_hostgroup_list_cache(self.name)
@@ -130,9 +136,12 @@ class ZabbixHostGroupContainer(ZabbixBaseContainer):
         assert self.zabbix_id, 'Cannot delete Hostgroup without groupid'
 
         if int(self.zabbix_object.get('hosts', 0)):
-            raise RemoteObjectManipulationError('Monitoring hostgroup is not empty')
+            raise RemoteObjectManipulationError(detail='{mon_object} is not empty',
+                                                mon_object=MON_OBJ_HOSTGROUP, name=self.name_without_dc_prefix)
 
-        self._api_response = self._call_zapi('hostgroup.delete', params=[self.zabbix_id])
+        self._api_response = self._call_zapi('hostgroup.delete', params=[self.zabbix_id],
+                                             mon_object=MON_OBJ_HOSTGROUP,
+                                             mon_object_name=self.name_without_dc_prefix)
         assert self.zabbix_id == int(self.parse_zabbix_delete_result(self._api_response, 'groupids'))
         self.reset()
         # Invalidate cache for mon_hostgroup_list

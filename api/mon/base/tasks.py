@@ -1,13 +1,11 @@
 from celery.utils.log import get_task_logger
 
 from api.mon import get_monitoring, del_monitoring
-from api.mon.exceptions import RemoteObjectDoesNotExist, RemoteObjectAlreadyExists
 from api.mon.vm.tasks import mon_vm_sync
 from api.mon.node.tasks import mon_node_sync
 # noinspection PyProtectedMember
 from api.mon.alerting.tasks import mon_all_groups_sync
 from api.task.utils import mgmt_lock, mgmt_task
-from que.exceptions import MgmtTaskException
 from que.erigonesd import cq
 from que.internal import InternalTask
 from que.mgmt import MgmtTask
@@ -107,10 +105,7 @@ def mon_hostgroup_get(task_id, dc_id, hostgroup_name, dc_bound=True, **kwargs):
     dc = Dc.objects.get_by_id(int(dc_id))
     mon = get_monitoring(dc)
 
-    try:
-        return mon.hostgroup_detail(hostgroup_name, dc_bound=dc_bound)
-    except RemoteObjectDoesNotExist:
-        raise MgmtTaskException(HOSTGROUP_NOT_FOUND % hostgroup_name)
+    return mon.hostgroup_detail(hostgroup_name, dc_bound=dc_bound)
 
 
 # noinspection PyUnusedLocal
@@ -119,12 +114,7 @@ def mon_hostgroup_get(task_id, dc_id, hostgroup_name, dc_bound=True, **kwargs):
 def mon_hostgroup_create(task_id, dc_id, hostgroup_name, dc_bound=True, **kwargs):
     dc = Dc.objects.get_by_id(int(dc_id))
     mon = get_monitoring(dc)
-
-    try:
-        result = mon.hostgroup_create(hostgroup_name, dc_bound=dc_bound)
-    except RemoteObjectAlreadyExists:
-        raise MgmtTaskException(HOSTGROUP_ALREADY_EXISTS % hostgroup_name)
-
+    result = mon.hostgroup_create(hostgroup_name, dc_bound=dc_bound)
     detail = 'Monitoring hostgroup "%s" was successfully created' % hostgroup_name
     mon.task_log_success(task_id, obj=mon.server_class(dc), detail=detail, **kwargs['meta'])
 
@@ -137,12 +127,7 @@ def mon_hostgroup_create(task_id, dc_id, hostgroup_name, dc_bound=True, **kwargs
 def mon_hostgroup_delete(task_id, dc_id, hostgroup_name, dc_bound=True, **kwargs):
     dc = Dc.objects.get_by_id(int(dc_id))
     mon = get_monitoring(dc)
-
-    try:
-        result = mon.hostgroup_delete(hostgroup_name, dc_bound=dc_bound)  # Fail loudly if doesnt exist
-    except RemoteObjectDoesNotExist:
-        raise MgmtTaskException(HOSTGROUP_NOT_FOUND % hostgroup_name)
-
+    result = mon.hostgroup_delete(hostgroup_name, dc_bound=dc_bound)  # Fail loudly if doesnt exist
     detail = 'Monitoring hostgroup "%s" was successfully deleted' % hostgroup_name
     mon.task_log_success(task_id, obj=mon.server_class(dc), detail=detail, **kwargs['meta'])
 

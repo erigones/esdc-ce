@@ -65,6 +65,10 @@ LOG_MON_ACTION_UPDATE = _('Update monitoring action')
 LOG_MON_ACTION_DELETE = _('Delete monitoring action')
 
 
+MON_OBJ_MEDIA = 'Monitoring media'
+MON_OBJ_MEDIA_TYPE = 'Monitoring media type'
+
+
 def get_mon_action_detail(mon_object, obj_action_result, name, dc_name=None):
     if dc_name:
         detail_msg = MON_ACTION_DETAIL_DC

@@ -25,6 +25,11 @@ logger = get_task_logger(__name__)
 
 def __log_mon_action(result, mon, task_id, messages, mon_object, name, dc_name):
     if result and result in messages:
+        if not task_id:
+            logger.warning('Cannot log message "%s" for monitoring object "%s" in DC %s because task_id is missing. '
+                           'Maybe some signal did not set the sender to task_id?', messages[result], name, dc_name)
+            return
+
         detail = get_mon_action_detail(mon_object, result, name, dc_name=dc_name)
         mon.task_log_success(task_id, msg=messages[result], detail=detail)
 
@@ -37,7 +42,7 @@ def _log_mon_user_action(result, mon, task_id, name, dc_name):
 @catch_exception
 def _log_mon_usergroup_action(result, mon, task_id, name, dc_name):
     if not name:
-        # Do not log info bout implicit DC owner group
+        # Do not log info about implicit DC owner group
         # TODO: too much noise -> maybe we want that? ('`DC owner group`')
         return
 
