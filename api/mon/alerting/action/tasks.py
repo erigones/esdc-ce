@@ -3,8 +3,10 @@ from celery.utils.log import get_task_logger
 from api.mon import get_monitoring
 from api.mon.constants import MON_OBJ_CREATED, MON_OBJ_UPDATED, MON_OBJ_DELETED
 from api.mon.messages import MON_OBJ_HOSTGROUP, LOG_MON_HOSTGROUP_CREATE, MON_OBJ_ACTION, get_mon_action_detail
+from api.mon.exceptions import RemoteObjectDoesNotExist, RemoteObjectAlreadyExists
 from api.task.utils import mgmt_task
 from que.erigonesd import cq
+from que.exceptions import MgmtTaskException
 from que.mgmt import MgmtTask
 from vms.models import Dc
 
@@ -38,7 +40,10 @@ def mon_action_get(task_id, dc_id, action_name, **kwargs):
     dc = Dc.objects.get_by_id(int(dc_id))
     mon = get_monitoring(dc)
 
-    return mon.action_detail(action_name)
+    try:
+        return mon.action_detail(action_name)
+    except RemoteObjectDoesNotExist as exc:
+        raise MgmtTaskException(exc.detail)
 
 
 # noinspection PyUnusedLocal
@@ -49,7 +54,12 @@ def mon_action_create(task_id, dc_id, action_name, action_data=None, **kwargs):
 
     dc = Dc.objects.get_by_id(int(dc_id))
     mon = get_monitoring(dc)
-    result = mon.action_create(action_name, action_data)
+
+    try:
+        result = mon.action_create(action_name, action_data)
+    except RemoteObjectAlreadyExists as exc:
+        raise MgmtTaskException(exc.detail)
+
     detail = get_mon_action_detail(MON_OBJ_ACTION, MON_OBJ_CREATED, action_name)
     mon.task_log_success(task_id, detail=detail, **kwargs['meta'])
 
@@ -67,7 +77,12 @@ def mon_action_update(task_id, dc_id, action_name, action_data=None, **kwargs):
 
     dc = Dc.objects.get_by_id(int(dc_id))
     mon = get_monitoring(dc)
-    result = mon.action_update(action_name, action_data)
+
+    try:
+        result = mon.action_update(action_name, action_data)
+    except RemoteObjectDoesNotExist as exc:
+        raise MgmtTaskException(exc.detail)
+
     detail = get_mon_action_detail(MON_OBJ_ACTION, MON_OBJ_UPDATED, action_name)
     mon.task_log_success(task_id, detail=detail, **kwargs['meta'])
 
@@ -83,6 +98,12 @@ def mon_action_update(task_id, dc_id, action_name, action_data=None, **kwargs):
 def mon_action_delete(task_id, dc_id, action_name, action_data=None, **kwargs):
     dc = Dc.objects.get_by_id(int(dc_id))
     mon = get_monitoring(dc)
+
+    try:
+        result = mon.action_delete(action_name)  # Fail loudly if doesnt exist
+    except RemoteObjectDoesNotExist as exc:
+        raise MgmtTaskException(exc.detail)
+
     result = mon.action_delete(action_name)  # Fail loudly if doesnt exist
     detail = get_mon_action_detail(MON_OBJ_ACTION, MON_OBJ_DELETED, action_name)
     mon.task_log_success(task_id, detail=detail, **kwargs['meta'])
