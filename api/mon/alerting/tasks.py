@@ -254,7 +254,7 @@ def _synchronize_user_on_monitoring_server(dc_name, user_name, user):
     mon.user_sync(user=user)
 
 
-def _synchronize_user_on_group_related_monitoring_server(task_id, user_name, user, affected_groups):
+def _synchronize_user_on_group_related_monitoring_servers(task_id, user_name, user, affected_groups):
     logger.info('Going to create/update user %s in zabbixes related to groups %s.', user_name, affected_groups)
 
     for dc in Dc.objects.filter(roles__in=affected_groups):
@@ -313,7 +313,7 @@ def _user_changed(task_id, user_name, dc_name, affected_groups):
         if dc_name:
             _synchronize_user_on_monitoring_server(dc_name, user_name, user)
         elif affected_groups:
-            _synchronize_user_on_group_related_monitoring_server(task_id, user_name, user, affected_groups)
+            _synchronize_user_on_group_related_monitoring_servers(task_id, user_name, user, affected_groups)
         else:
             _synchronize_user_on_all_related_monitoring_servers(task_id, user_name, user)
 
