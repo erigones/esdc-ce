@@ -9,7 +9,7 @@ from django.conf import settings
 
 from api.mon import MonitoringBackend
 from gui.models import User
-from vms.models import VmTemplate, Vm, Node, Image, Subnet, IPAddress, NodeStorage
+from vms.models import VmTemplate, Vm, Node, Image, Subnet, IPAddress, NodeStorage, DefaultDc
 from api import serializers as s
 from api.decorators import catch_api_exception
 from api.exceptions import APIError, ObjectAlreadyExists
@@ -135,7 +135,7 @@ class VmDefineSerializer(VmBaseSerializer):
             self.fields['ostype'].default = dc_settings.VMS_VM_OSTYPE_DEFAULT
             self.fields['zpool'].default = dc_settings.VMS_STORAGE_DEFAULT
             # noinspection PyProtectedMember
-            self.fields['monitored_internal'].default = dc_settings.MON_ZABBIX_ENABLED \
+            self.fields['monitored_internal'].default = DefaultDc().settings.MON_ZABBIX_ENABLED \
                 and dc_settings._MON_ZABBIX_VM_SYNC
             self.fields['monitored'].default = dc_settings.MON_ZABBIX_ENABLED and dc_settings.MON_ZABBIX_VM_SYNC \
                 and dc_settings.VMS_VM_MONITORED_DEFAULT

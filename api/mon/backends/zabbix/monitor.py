@@ -282,6 +282,11 @@ class Zabbix(AbstractMonitoringBackend):
                                      (vm.is_external_zabbix_sync_active(), dc_settings.MON_ZABBIX_VM_SYNC, self.ezx)):
             log = zx.get_log_fun(task_log)
 
+            if not zx.enabled:
+                log(INFO, 'Monitoring is disabled')
+                result.append(None)
+                continue
+
             if zx_sync:
                 if force_update and zx.has_host_info(vm):
                     host = zx.host_info(vm)
@@ -312,16 +317,24 @@ class Zabbix(AbstractMonitoringBackend):
         izx_log = self.izx.get_log_fun(task_log)
         ezx_log = self.ezx.get_log_fun(task_log)
 
-        if vm.is_zabbix_sync_active():
-            result.append(self._vm_disable_host(self.izx, vm, log=izx_log))
+        if self.izx.enabled:
+            if vm.is_zabbix_sync_active():
+                result.append(self._vm_disable_host(self.izx, vm, log=izx_log))
+            else:
+                izx_log(INFO, 'Internal zabbix synchronization disabled for VM %s', vm)
+                result.append(None)
         else:
-            izx_log(INFO, 'Internal zabbix synchronization disabled for VM %s', vm)
+            izx_log(INFO, 'Monitoring is disabled')
             result.append(None)
 
-        if vm.is_external_zabbix_sync_active():
-            result.append(self._vm_disable_host(self.ezx, vm, log=ezx_log))
+        if self.ezx.enabled:
+            if vm.is_external_zabbix_sync_active():
+                result.append(self._vm_disable_host(self.ezx, vm, log=ezx_log))
+            else:
+                ezx_log(INFO, 'External zabbix synchronization disabled for VM %s', vm)
+                result.append(None)
         else:
-            ezx_log(INFO, 'External zabbix synchronization disabled for VM %s', vm)
+            ezx_log(INFO, 'Monitoring is disabled')
             result.append(None)
 
         return result
@@ -332,16 +345,24 @@ class Zabbix(AbstractMonitoringBackend):
         izx_log = self.izx.get_log_fun(task_log)
         ezx_log = self.ezx.get_log_fun(task_log)
 
-        if internal:
-            result.append(self._vm_delete_host(self.izx, vm, log=izx_log))
+        if self.izx.enabled:
+            if internal:
+                result.append(self._vm_delete_host(self.izx, vm, log=izx_log))
+            else:
+                izx_log(INFO, 'Internal zabbix synchronization disabled for VM %s', vm.uuid)
+                result.append(None)
         else:
-            izx_log(INFO, 'Internal zabbix synchronization disabled for VM %s', vm.uuid)
+            izx_log(INFO, 'Monitoring is disabled')
             result.append(None)
 
-        if external:
-            result.append(self._vm_delete_host(self.ezx, vm, log=ezx_log))
+        if self.ezx.enabled:
+            if external:
+                result.append(self._vm_delete_host(self.ezx, vm, log=ezx_log))
+            else:
+                ezx_log(INFO, 'External zabbix synchronization disabled for VM %s', vm.uuid)
+                result.append(None)
         else:
-            ezx_log(INFO, 'External zabbix synchronization disabled for VM %s', vm.uuid)
+            ezx_log(INFO, 'Monitoring is disabled')
             result.append(None)
 
         return result
@@ -355,6 +376,10 @@ class Zabbix(AbstractMonitoringBackend):
         zx = self.izx
         log = zx.get_log_fun(task_log)
         host = zx.get_host(zx.host_id(node), log=log)
+
+        if not zx.enabled:
+            log(INFO, 'Monitoring is disabled')
+            return None
 
         if not host:  # Host does not exist in Zabbix, so we have to create it
             log(WARNING, 'Node %s is not defined in Zabbix. Creating...', node)
@@ -412,6 +437,10 @@ class Zabbix(AbstractMonitoringBackend):
         log = zx.get_log_fun(task_log)
         hostid = zx.get_hostid(node, log=log)
 
+        if not zx.enabled:
+            log(INFO, 'Monitoring is disabled')
+            return None
+
         if not hostid:
             log(ERROR, 'Zabbix host for Node %s does not exist!', node)
             return False
@@ -435,6 +464,10 @@ class Zabbix(AbstractMonitoringBackend):
         log = zx.get_log_fun(task_log)
         node_uuid = zx.host_id(node)  # Node object does not exist at this point, it just carries the uuid
         host = zx.get_host(node_uuid, log=log)
+
+        if not zx.enabled:
+            log(INFO, 'Monitoring is disabled')
+            return None
 
         if not host:
             log(WARNING, 'Zabbix host for Node %s does not exist!', node_uuid)
