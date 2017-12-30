@@ -462,32 +462,31 @@ class ZabbixAPIAdapterTests(TestCase):
 
     def test_201_create_get_update_delete_action(self):
         action_name = self.actions[0]
-        action_data1 = dict(
+        create_data = dict(
             self._initial_action_data(),
             usergroups=self.db_groups[:2],
             hostgroups=self.hostgroups[:2],
             enabled=False
         )
-        self._create_new_action(action_name, action_data1, nonexistent_usergroups=True)
-        self._prepare_action_data(action_data1)
-        self.assertDictContainsSubset(action_data1, self._create_new_action(action_name, action_data1))
-        self.assertDictContainsSubset(action_data1, self._get_existing_action(action_name))
+        self._create_new_action(action_name, create_data, nonexistent_usergroups=True)
+        self._prepare_action_data(create_data)
+        self.assertDictContainsSubset(create_data, self._create_new_action(action_name, create_data))
+        self.assertDictContainsSubset(create_data, self._get_existing_action(action_name))
 
-        action_data2 = dict(
-            self._initial_action_data(),
+        update_data = dict(
             usergroups=self.db_groups[2:],
             hostgroups=self.hostgroups[2:],
             enabled=True
         )
-        self._update_existing_action(action_name, action_data2, nonexistent_usergroups=True)
-        self._prepare_action_data(action_data2)
-        self._create_existing_action(action_name, action_data2)
-        self.assertDictContainsSubset(action_data2, self._update_existing_action(action_name, action_data2))
-        self.assertDictContainsSubset(action_data2, self._get_existing_action(action_name))
+        self._update_existing_action(action_name, update_data, nonexistent_usergroups=True)
+        self._prepare_action_data(update_data)
+        self._create_existing_action(action_name, dict(self._initial_action_data(), **update_data))
+        self.assertDictContainsSubset(update_data, self._update_existing_action(action_name, update_data))
+        self.assertDictContainsSubset(update_data, self._get_existing_action(action_name))
 
         self._delete_existing_action(action_name)
-        self._cleanup_action_data(action_data1)
-        self._cleanup_action_data(action_data2)
+        self._cleanup_action_data(create_data)
+        self._cleanup_action_data(update_data)
 
     def test_202_delete_new_action(self):
         action_name = self.actions[0]
