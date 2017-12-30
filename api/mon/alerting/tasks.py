@@ -282,7 +282,7 @@ def _user_changed(task_id, user_name, dc_name, affected_groups):
 
                 if not mon.enabled:
                     logger.info('Monitoring is disabled in DC %s', dc)
-                    con
+                    continue
 
                 try:
                     res = mon.user_sync(user=user)
