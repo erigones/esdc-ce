@@ -2,6 +2,7 @@ from logging import getLogger
 from django.db import models
 from django.db.models import Q
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager
+from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.utils import timezone
@@ -13,8 +14,10 @@ from django.core.exceptions import SuspiciousOperation
 from vms.mixins import _DcBoundMixin
 # noinspection PyProtectedMember
 from gui.mixins import _AclMixin
+# noinspection PyProtectedMember
 from gui.models.permission import (Permission, SuperAdminPermission, AdminPermission, AnyDcPermissionSet,
                                    UserAdminPermission)
+# noinspection PyProtectedMember
 from api.permissions import generate_random_security_hash
 
 logger = getLogger(__name__)
@@ -305,6 +308,21 @@ class User(AbstractBaseUser, PermissionsMixin, _AclMixin, _DcBoundMixin):
         return self.log_name, self.log_alias, self.pk, self.__class__
 
     @classmethod
+    def get_content_type(cls):
+        return ContentType.objects.get_for_model(cls)
+
+    @classmethod
+    def get_object_type(cls, content_type=None):
+        if content_type:
+            return content_type.model
+        return cls.get_content_type().model
+
+    @classmethod
+    def get_object_by_pk(cls, pk):
+        # noinspection PyUnresolvedReferences
+        return cls.objects.get(pk=pk)
+
+    @classmethod
     def get_log_name_lookup_kwargs(cls, log_name_value):
         """Return lookup_key=value DB pairs which can be used for retrieving objects by log_name value"""
         return {cls._log_name_attr: log_name_value}
@@ -346,36 +364,3 @@ class User(AbstractBaseUser, PermissionsMixin, _AclMixin, _DcBoundMixin):
                 rels.setdefault(obj_model_name, []).append(str(obj))
 
         return rels
-
-    @property
-    def get_alerting_email(self):
-        # todo add more logic
-        # todo put to ZMC and call it 'extract_email_from_user'
-        from api.mon.backends.zabbix.base import ZabbixMediaContainer
-        if self.userprofile.alerting_email:
-            return ZabbixMediaContainer(ZabbixMediaContainer.MEDIAS['email'], sendto=self.userprofile.alerting_email,
-                                        # TODO let the user pick up the severities
-                                        severities=ZabbixMediaContainer.SEVERITIES,
-                                        period=ZabbixMediaContainer.PERIOD_DEFAULT)
-
-    @property
-    def get_alerting_phone(self):
-        # todo add more logic - 1/0, verified/not etc
-        # todo put to ZMC and call it 'extract_phone_from_user'
-        from api.mon.backends.zabbix.base import ZabbixMediaContainer
-        if self.userprofile.alerting_phone:
-            return ZabbixMediaContainer(ZabbixMediaContainer.MEDIAS['phone'], sendto=self.userprofile.alerting_phone,
-                                        # TODO let the user pick up the severities
-                                        severities=ZabbixMediaContainer.SEVERITIES,
-                                        period=ZabbixMediaContainer.PERIOD_DEFAULT)
-
-    @property
-    def get_alerting_xmpp(self):
-        # todo add more logic - 1/0, verified/not etc
-        # todo put to ZMC and call it 'extract_xmpp_from_user'
-        from api.mon.backends.zabbix.base import ZabbixMediaContainer
-        if self.userprofile.alerting_jabber:
-            return ZabbixMediaContainer(ZabbixMediaContainer.MEDIAS['xmpp'], sendto=self.userprofile.alerting_jabber,
-                                        # TODO let the user pick up the severities
-                                        severities=ZabbixMediaContainer.SEVERITIES,
-                                        period=ZabbixMediaContainer.PERIOD_DEFAULT)

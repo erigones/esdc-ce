@@ -71,7 +71,7 @@ class PickleDict(dict):
 
     @classmethod
     def load(cls, string):
-        # noinspection PyCallingNonCallable
+        # noinspection PyArgumentList
         pickle_dict = cls(json.loads(string))
 
         # Related to https://github.com/joyent/smartos-live/pull/313

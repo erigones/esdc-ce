@@ -690,7 +690,7 @@ class DefaultDcSettingsSerializer(DcSettingsSerializer):
                                                 help_text=_('Existing Zabbix host group, which will be used for all '
                                                             'monitored compute nodes.'))
     MON_ZABBIX_HOSTGROUPS_NODE = s.ArrayField(label='MON_ZABBIX_HOSTGROUPS_NODE', max_items=32, required=False,
-                                              help_text=_('List of other existing Zabbix host groups, which will be '
+                                              help_text=_('List of other Zabbix host groups, which will be '
                                                           'used for all monitored compute nodes.'))
     MON_ZABBIX_TEMPLATES_NODE = s.ArrayField(label='MON_ZABBIX_TEMPLATES_NODE', max_items=128, required=False,
                                              help_text=_('List of existing Zabbix templates, which will be used for all'

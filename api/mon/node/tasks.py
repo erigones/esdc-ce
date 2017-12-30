@@ -7,7 +7,8 @@ from que.exceptions import MgmtTaskException
 from api.task.utils import mgmt_task, mgmt_lock
 from api.mon.log import save_task_log
 from api.mon.utils import get_mon_vms
-from api.mon import LOG, get_monitoring, MonitoringError
+from api.mon import LOG, get_monitoring
+from api.mon.exceptions import MonitoringError
 from api.mon.messages import LOG_MON_NODE_UPDATE, LOG_MON_NODE_DELETE
 from api.mon.node.utils import NodeMonInternalTask
 from vms.models import DefaultDc, Node

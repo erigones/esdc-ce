@@ -1,7 +1,7 @@
 from time import sleep
 
 from api import status
-from que.utils import user_owner_dc_ids_from_task_id
+from que.utils import user_owner_dc_ids_from_task_id, is_mgmt_task
 from que.user_tasks import UserTasks
 from api.decorators import api_view, request_data
 from api.serializers import ForceSerializer
@@ -171,20 +171,21 @@ def task_cancel(request, task_id=None, data=None):
         :status 404: Task does not exist
         :status 406: Task cannot be cancelled
     """
+    # Mgmt task cannot be killed because gevent worker does not implement kill_job
     # Task must exist in pending user tasklist
-    if task_id in get_user_tasks(request):
-        ser = TaskCancelSerializer(data=data)
+    if is_mgmt_task(task_id) or task_id not in get_user_tasks(request):
+        return TaskFailureResponse(request, 'Task cannot be canceled', status=status.HTTP_406_NOT_ACCEPTABLE)
 
-        if ser.is_valid() and ser.data['force']:
-            cancel_task(task_id, True)
-        else:
-            cancel_task(task_id, False)
+    ser = TaskCancelSerializer(data=data)
 
-        sleep(1)  # Let's give the task queue some time to update revoked state
+    if ser.is_valid() and ser.data['force']:
+        cancel_task(task_id, True)
+    else:
+        cancel_task(task_id, False)
 
-        return TaskStatusResponse(request, task_id)
+    sleep(1)  # Let's give the task queue some time to update revoked state
 
-    return TaskFailureResponse(request, 'Task cannot be canceled', status=status.HTTP_406_NOT_ACCEPTABLE)
+    return TaskStatusResponse(request, task_id)
 
 
 @api_view(('GET',))

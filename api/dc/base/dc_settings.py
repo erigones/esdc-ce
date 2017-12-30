@@ -48,6 +48,6 @@ class DcSettingsView(APIView):
         task_id = TaskID(res.data.get('task_id'), request=self.request)
 
         if old_settings != new_settings:
-            dc_settings_changed.send(task_id, dc=dc, old_settings=old_settings, new_settings=new_settings)  # Signal
+            dc_settings_changed.send(task_id, dc=dc, old_settings=old_settings, new_settings=new_settings)  # Signal!
 
         return res

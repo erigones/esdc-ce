@@ -29,7 +29,7 @@ DATACENTER_BASE = [
     },
 
     {
-        'title': _('Compute nodes'),
+        'title': _('Compute Nodes'),
         'icon': 'sitemap',
         'url': 'dc_node_list'
     },
@@ -114,7 +114,8 @@ MONITORING = {
     'title': _('Monitoring'),
     'icon': 'bar-chart',
     'url': 'mon_alert_list',
-    'active_views': {'mon_alert_list', 'mon_action_list'},
+    'active_views': {'mon_alert_list', 'mon_hostgroup_list', 'mon_template_list',
+                     'mon_action_list', 'mon_webcheck_list'},
     'children': [
         {
             'title': _('Alerts'),
@@ -122,17 +123,39 @@ MONITORING = {
             'url': 'mon_alert_list',
         },
         # {
+        #     'title': _('Host Groups'),
+        #     'icon': 'list-alt',
+        #     'url': 'mon_hostgroup_list',
+        # },
+        # {
+        #     'title': _('Templates'),
+        #     'icon': 'list-ul',
+        #     'url': 'mon_template_list',
+        # },
+        # {
         #     'title': _('Actions'),
         #     'icon': 'bolt',
         #     'url': 'mon_action_list',
         # },
+        # # {
+        # #     'title': _('Webchecks'),
+        # #     'icon': 'check',
+        # #     'url': 'mon_webcheck_list',
+        # # },
         {
-            'title': _('Zabbix'),
+            'title': _('Monitoring Server'),
             'icon': 'external-link',
             'url': 'mon_server_redirect',
             'a_class': 'no-ajax',
         },
     ]
+}
+
+MONITORING_ALERTS = {
+    'title': _('Alerts'),
+    'icon': 'bell',
+    'url': 'mon_alert_list',
+    'active_views': {'mon_alert_list'},
 }
 
 TASKLOG = {
@@ -186,6 +209,8 @@ MORE = {
 
 
 class Navi(object):
+    MAIN_ITEMS_MAX = 7
+
     def __init__(self, request, dc_dns_only=False):
         self.request = request
         dc_settings = request.dc.settings
@@ -260,11 +285,14 @@ class Navi(object):
                 self._reset_section(subitem)
 
     def init(self):
-        if len(self.navigation) > 7:
+        max_items = self.MAIN_ITEMS_MAX
+
+        if len(self.navigation) > max_items:
             # Split navigation into two lists and add the extra navigation into the last menu item as dropdown
-            MORE['dropdown'] = self.navigation[5:]
-            self.navigation = self.navigation[:5]
+            MORE['dropdown'] = self.navigation[max_items-2:]
+            self.navigation = self.navigation[:max_items-2]
             self.navigation.append(MORE)
+
         self.reset()
 
     def get_main_nav(self):

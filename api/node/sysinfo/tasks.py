@@ -4,9 +4,12 @@ from api.utils.request import get_dummy_request
 from api.task.utils import callback, mgmt_lock, task_log_success, task_log_error
 from api.node.sysinfo.utils import parse_esysinfo
 from api.node.messages import LOG_NODE_CREATE, LOG_NODE_UPDATE
+# noinspection PyProtectedMember
 from api.node.sshkey.tasks import run_node_authorized_keys_sync
+# noinspection PyProtectedMember
 from api.node.image.tasks import run_node_img_sources_sync
 from api.node.snapshot.api_views import NodeVmSnapshotList
+# noinspection PyProtectedMember
 from api.vm.status.tasks import vm_status_all
 from api.dns.record.api_views import RecordView
 from vms.models import Node, DefaultDc, IPAddress

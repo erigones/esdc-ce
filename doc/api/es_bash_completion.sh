@@ -58,7 +58,7 @@ _es() {
 
 			"get"|"create"|"set"|"delete"|"options")
 				if [ ${COMP_CWORD} -lt 3 ]; then
-					COMPREPLY=( $( compgen -W "/vm/define /vm/define/snapshot /vm/define/backup /vm/status /vm/ /vm/(hostname) /mon/ /mon/vm/ /mon/node/ /mon/template /mon/hostgroup /mon/alert /node/ /node/(hostname) /dc/ /dc/(dc) /network/ /network/ip/ /network/(name) /image/ /image/(name) /imagestore/ /imagestore/(name) /template/ /template/(name) /iso/ /iso/(name) /dns/domain/ /dns/domain/(name) /task/log /task/ /task/(task_id) /system/ /accounts/login /accounts/logout /accounts/user /accounts/permission /accounts/group" -- "${cur}" ) )
+					COMPREPLY=( $( compgen -W "/vm/define /vm/define/snapshot /vm/define/backup /vm/status /vm/ /vm/(hostname) /mon/ /mon/vm/ /mon/node/ /mon/template /mon/hostgroup/ /mon/alert /mon/action/ /node/ /node/(hostname) /dc/ /dc/(dc) /network/ /network/ip/ /network/(name) /image/ /image/(name) /imagestore/ /imagestore/(name) /template/ /template/(name) /iso/ /iso/(name) /dns/domain/ /dns/domain/(name) /task/log /task/ /task/(task_id) /system/ /accounts/login /accounts/logout /accounts/user /accounts/permission /accounts/group" -- "${cur}" ) )
 				fi
 			;;
 			*)
@@ -521,29 +521,64 @@ _es() {
 			if [ ${COMP_CWORD} -eq 2 ]; then
 				COMPREPLY=( $(compgen -P "${cur%/*}" -W "/ /(yyyymm)" -- "/${cur##*/}" ) )
 			fi
+			params="-cb_method -cb_url"
 		;;
 
 		/mon/vm/*/history/|/mon/node/*/history/)
 			if [ ${COMP_CWORD} -eq 2 ]; then
 				COMPREPLY=( $(compgen -P "${cur%/*}" -W "/ /(graph)" -- "/${cur##*/}" ) )
 			fi
+			params="-cb_method -cb_url"
 		;;
 
 		/mon/vm/*/*|/mon/node/*/*)
 			if [ ${COMP_CWORD} -eq 2 ]; then
 				COMPREPLY=( $(compgen -P "${cur%/*}" -W "/ /monitoring /sla/ /history/" -- "/${cur##*/}" ) )
 			fi
+			params="-cb_method -cb_url"
 		;;
 
 		/mon/vm/*|/mon/node/*)
 			if [ ${COMP_CWORD} -eq 2 ]; then
 				COMPREPLY=( $(compgen -P "${cur%/*}" -W "/ /(hostname)/" -- "/${cur##*/}" ) )
 			fi
+			params="-cb_method -cb_url"
 		;;
 
-		/mon/alert)
+		/mon/hostgroup|/mon/hostgroup/)
+			if [ ${COMP_CWORD} -eq 2 ]; then
+				COMPREPLY=( $(compgen -P "${cur%/*}" -W "/ /(hostgroup_name)" -- "/${cur##*/}" ) )
+			fi
+			[[ "${action}" == "get" ]] && params="-dc_bound -full -extended -cb_method -cb_url"
+		;;
+
+		/mon/hostgroup/*)
+			params="-dc_bound -cb_method -cb_url"
+		;;
+
+		/mon/template|/mon/template/)
 			[ ${COMP_CWORD} -eq 2 ] && COMPREPLY=( "${cur} " )
-			[[ "${action}" == "get" ]] && params="-since -until -last -show_events -vm_hostnames -vm_uuids -node_hostnames -node_uuids -dc_bound"
+			[[ "${action}" == "get" ]] && params="-full -extended -cb_method -cb_url"
+		;;
+
+		/mon/alert|/mon/alert/)
+			[ ${COMP_CWORD} -eq 2 ] && COMPREPLY=( "${cur} " )
+			[[ "${action}" == "get" ]] && params="-since -until -last -show_events -vm_hostnames -vm_uuids -node_hostnames -node_uuids -dc_bound -cb_method -cb_url"
+		;;
+
+		/mon/action|/mon/action/)
+			if [ ${COMP_CWORD} -eq 2 ]; then
+				COMPREPLY=( $(compgen -P "${cur%/*}" -W "/ /(action_name)" -- "/${cur##*/}" ) )
+			fi
+			[[ "${action}" == "get" ]] && params="-full -extended -cb_method -cb_url"
+		;;
+
+		/mon/action/*)
+			if [[ "${action}" == "create" ]] || [[ "${action}" == "set" ]]; then
+				params="-hostgroups -usergroups -message_subject -message_text -recovery_message_enabled -recovery_message_subject -recovery_message_text -enabled -cb_method -cb_url"
+			else
+				params="-cb_method -cb_url"
+			fi
 		;;
 
 		/node/*/storage)

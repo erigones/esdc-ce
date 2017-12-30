@@ -8,6 +8,7 @@ from datetime import datetime
 from base64 import b64encode
 from zlib import compress
 
+# noinspection PyProtectedMember
 from celery import Task
 from celery.exceptions import Terminated
 from celery.utils.log import get_task_logger

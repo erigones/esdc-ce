@@ -12,7 +12,7 @@
       {% if dc_settings.VMS_VM_BACKUP_ENABLED %}
       <li id="vm_backup__{{ vm.hostname }}" class="{{ li_backup }}"><a href="{% url 'vm_backup' vm.hostname %}" data-toggle="tab" title="{% trans "Show server backups" %}"><i class="icon-paste"></i> {% trans "Backups" %}</a></li>
       {% endif %}
-      {% if dc_settings.MON_ZABBIX_ENABLED %}
+      {% if dc1_settings.MON_ZABBIX_ENABLED %}
       <li id="vm_monitoring__{{ vm.hostname }}" class="{{ li_monitoring }}"><a href="{% url 'vm_monitoring' vm.hostname %}" data-toggle="tab" title="{% trans "Show server monitoring details" %}"><i class="icon-bar-chart"></i> {% trans "Monitoring" %}</a></li>
       {% endif %}
       <li id="vm_tasklog__{{ vm.hostname }}" class="{{ li_tasklog }}"><a href="{% url 'vm_tasklog' vm.hostname %}" data-toggle="tab" title="{% trans "Show server related task log" %}"><i class="icon-tasks"></i> {% trans "Task Log" %}</a></li>

@@ -2,6 +2,7 @@ from django.db import models, connections
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import get_user_model
+from django.contrib.contenttypes.models import ContentType
 
 
 class EmptyDomainOwner(object):
@@ -197,6 +198,21 @@ class Domain(models.Model):
     def log_list(self):
         return self.name, self.name, self.pk, self.__class__
 
+    @classmethod
+    def get_content_type(cls):
+        return ContentType.objects.get_for_model(cls)
+
+    @classmethod
+    def get_object_type(cls, content_type=None):
+        if content_type:
+            return content_type.model
+        return cls.get_content_type().model
+
+    @classmethod
+    def get_object_by_pk(cls, pk):
+        # noinspection PyUnresolvedReferences
+        return cls.objects.get(pk=pk)
+
     @staticmethod
     def get_log_name_lookup_kwargs(log_name_value):
         """Return lookup_key=value DB pairs which can be used for retrieving objects by log_name value"""
@@ -208,6 +224,7 @@ class Domain(models.Model):
         """Called via signal after domain has been saved to database"""
         if created:
             with connections['pdns'].cursor() as cursor:
+                # noinspection SqlDialectInspection,SqlNoDataSourceInspection
                 cursor.execute("INSERT INTO domainmetadata (domain_id, kind, content) VALUES "
                                "(%s, 'ALLOW-AXFR-FROM', 'AUTO-NS')", [instance.id])
 

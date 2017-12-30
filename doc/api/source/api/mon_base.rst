@@ -11,3 +11,8 @@
 
 .. autofunction:: api.mon.base.views.mon_hostgroup_list
 
+/mon/hostgroup/*(hostgroup_name)*
+---------------------------------
+
+.. autofunction:: api.mon.base.views.mon_hostgroup_manage
+

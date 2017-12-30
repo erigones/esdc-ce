@@ -1,19 +1,26 @@
 from celery.utils.log import get_task_logger
-from django.utils.six import text_type
 
-from api.mon import get_monitoring, del_monitoring, MonitoringError
+from api.mon import get_monitoring, del_monitoring
+from api.mon.exceptions import RemoteObjectDoesNotExist, RemoteObjectAlreadyExists
 from api.mon.vm.tasks import mon_vm_sync
 from api.mon.node.tasks import mon_node_sync
+# noinspection PyProtectedMember
 from api.mon.alerting.tasks import mon_all_groups_sync
 from api.task.utils import mgmt_lock, mgmt_task
-from que.erigonesd import cq
 from que.exceptions import MgmtTaskException
+from que.erigonesd import cq
 from que.internal import InternalTask
-from que.utils import is_task_dc_bound
 from que.mgmt import MgmtTask
 from vms.models import Dc, Node
 
-__all__ = ('mon_sync_all', 'mon_template_list', 'mon_hostgroup_list')
+__all__ = (
+    'mon_sync_all',
+    'mon_template_list',
+    'mon_hostgroup_list',
+    'mon_hostgroup_get',
+    'mon_hostgroup_create',
+    'mon_hostgroup_delete',
+)
 
 logger = get_task_logger(__name__)
 
@@ -68,51 +75,72 @@ def mon_sync_all(task_id, dc_id, clear_cache=True, sync_groups=True, sync_nodes=
 
 # noinspection PyUnusedLocal
 @cq.task(name='api.mon.base.tasks.mon_template_list', base=MgmtTask)
-@mgmt_task()
-def mon_template_list(task_id, dc_id, **kwargs):
+@mgmt_task(log_exception=False)
+def mon_template_list(task_id, dc_id, full=False, extended=False, **kwargs):
     """
     Return list of templates available in Zabbix.
     """
     dc = Dc.objects.get_by_id(int(dc_id))
 
-    try:
-        zabbix_templates = get_monitoring(dc).template_list()
-    except MonitoringError as exc:
-        raise MgmtTaskException(text_type(exc))
-
-    return [
-        {
-            'name': t['host'],
-            'visible_name': t['name'],
-            'desc': t['description'],
-            'id': t['templateid'],
-        }
-        for t in zabbix_templates
-    ]
+    return get_monitoring(dc).template_list(full=full, extended=extended)
 
 
 # noinspection PyUnusedLocal
 @cq.task(name='api.mon.base.tasks.mon_hostgroup_list', base=MgmtTask)
-@mgmt_task()
-def mon_hostgroup_list(task_id, dc_id, **kwargs):
+@mgmt_task(log_exception=False)
+def mon_hostgroup_list(task_id, dc_id, dc_bound=True, full=False, extended=False, **kwargs):
     """
     Return list of hostgroups available in Zabbix.
     """
     dc = Dc.objects.get_by_id(int(dc_id))
-    if is_task_dc_bound(task_id):
-        prefix = dc.name
-    else:
-        prefix = ''
+
+    return get_monitoring(dc).hostgroup_list(dc_bound=dc_bound, full=full, extended=extended)
+
+
+# noinspection PyUnusedLocal
+@cq.task(name='api.mon.base.tasks.mon_hostgroup_get', base=MgmtTask)
+@mgmt_task(log_exception=False)
+def mon_hostgroup_get(task_id, dc_id, hostgroup_name, dc_bound=True, **kwargs):
+    dc = Dc.objects.get_by_id(int(dc_id))
+    mon = get_monitoring(dc)
 
     try:
-        zabbix_hostgroups = get_monitoring(dc).hostgroup_list(prefix=prefix)
-    except MonitoringError as exc:
-        raise MgmtTaskException(text_type(exc))
+        return mon.hostgroup_detail(hostgroup_name, dc_bound=dc_bound)
+    except RemoteObjectDoesNotExist as exc:
+        raise MgmtTaskException(exc.detail)
 
-    return [
-        {
-            'name': t['name'],
-            'id': t['groupid'],
-        }
-        for t in zabbix_hostgroups
-    ]
+
+# noinspection PyUnusedLocal
+@cq.task(name='api.mon.base.tasks.mon_hostgroup_create', base=MgmtTask)
+@mgmt_task(log_exception=True)
+def mon_hostgroup_create(task_id, dc_id, hostgroup_name, dc_bound=True, **kwargs):
+    dc = Dc.objects.get_by_id(int(dc_id))
+    mon = get_monitoring(dc)
+
+    try:
+        result = mon.hostgroup_create(hostgroup_name, dc_bound=dc_bound)
+    except RemoteObjectAlreadyExists as exc:
+        raise MgmtTaskException(exc.detail)
+
+    detail = 'Monitoring hostgroup "%s" was successfully created' % hostgroup_name
+    mon.task_log_success(task_id, obj=mon.server_class(dc), detail=detail, **kwargs['meta'])
+
+    return result
+
+
+# noinspection PyUnusedLocal
+@cq.task(name='api.mon.base.tasks.mon_hostgroup_delete', base=MgmtTask)
+@mgmt_task(log_exception=True)
+def mon_hostgroup_delete(task_id, dc_id, hostgroup_name, dc_bound=True, **kwargs):
+    dc = Dc.objects.get_by_id(int(dc_id))
+    mon = get_monitoring(dc)
+
+    try:
+        result = mon.hostgroup_delete(hostgroup_name, dc_bound=dc_bound)  # Fail loudly if doesnt exist
+    except RemoteObjectDoesNotExist as exc:
+        raise MgmtTaskException(exc.detail)
+
+    detail = 'Monitoring hostgroup "%s" was successfully deleted' % hostgroup_name
+    mon.task_log_success(task_id, obj=mon.server_class(dc), detail=detail, **kwargs['meta'])
+
+    return result
