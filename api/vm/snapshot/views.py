@@ -3,6 +3,7 @@ from api.decorators import api_view, request_data, setting_required
 from api.permissions import IsAdminOrReadOnly
 from api.utils.db import get_object
 from api.vm.utils import get_vm, get_vms
+# noinspection PyProtectedMember
 from api.image.base.views import image_snapshot
 
 from api.vm.snapshot.utils import get_disk_id, filter_disk_id, output_extended_snap_count

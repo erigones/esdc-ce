@@ -16,6 +16,7 @@ Features
 - Added node version caching and internal update events - `#271 <https://github.com/erigones/esdc-ce/issues/271>`__
 - Added automatic synchronization of overlay ARP files - `#286 <https://github.com/erigones/esdc-ce/issues/286>`__
 - Added script for automating platform upgrade - `#289 <https://github.com/erigones/esdc-ce/issues/289>`__
+- Changed CPU resource accounting to use VM's cpu_cap parameter and added VMS_VM_CPU_CAP_REQUIRED setting - `#296 <https://github.com/erigones/esdc-ce/issues/296>`__
 - Made compute node IP address changeable - `#305 <https://github.com/erigones/esdc-ce/issues/305>`__
 - Added experimental support for live migration - `#306 <https://github.com/erigones/esdc-ce/issues/306>`__
 - Added value size limit to metadata - `#321 <https://github.com/erigones/esdc-ce/issues/321>`__
