@@ -82,7 +82,7 @@ or ``ip`` is not set (default: ``hostname``)
 # noinspection PyUnusedLocal
 @api_view(('GET',))
 @request_data()  # get_vm() = IsVmOwner
-@setting_required('MON_ZABBIX_ENABLED')
+@setting_required('MON_ZABBIX_ENABLED', default_dc=True)
 @setting_required('MON_ZABBIX_VM_SLA')
 def mon_vm_sla(request, hostname_or_uuid, yyyymm, data=None):
     """
@@ -118,7 +118,7 @@ def mon_vm_sla(request, hostname_or_uuid, yyyymm, data=None):
 #: vm_status:   GET: Vm.STATUS_OPERATIONAL
 @api_view(('GET',))
 @request_data()  # get_vm() = IsVmOwner
-@setting_required('MON_ZABBIX_ENABLED')
+@setting_required('MON_ZABBIX_ENABLED', default_dc=True)
 def mon_vm_history(request, hostname_or_uuid, graph, data=None):
     """
     Get (:http:get:`GET </mon/vm/(hostname_or_uuid)/history/(graph)>`) monitoring history

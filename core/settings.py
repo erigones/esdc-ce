@@ -519,6 +519,10 @@ MON_ZABBIX_HOST_VM_PROXY = ''  # local, external
 MON_ZABBIX_GRAPH_MAX_HISTORY = 518400  # 6 days; global, internal+external
 MON_ZABBIX_GRAPH_MAX_PERIOD = 14400  # 4 hours; global, internal+external
 
+MON_ZABBIX_MEDIA_TYPE_EMAIL = 'E-mail'
+MON_ZABBIX_MEDIA_TYPE_PHONE = 'SMS'
+MON_ZABBIX_MEDIA_TYPE_JABBER = 'Ludolph'
+
 REGISTRATION_ENABLED = False  # Module. Enable SMS_ENABLED if True
 COMPANY_NAME = 'Danube Cloud'
 TOS_LINK = ''
@@ -607,7 +611,9 @@ VMS_VM_BRAND_LX_ZONE_DEFAULT = 'lx'
 VMS_VM_LX_KERNEL_VERSION_DEFAULT = '4.4'
 VMS_VM_MONITORED_DEFAULT = True
 VMS_VM_CPU_SHARES_DEFAULT = 100
-VMS_VM_CPU_BURST_RATIO = 1.0  # DO NOT CHANGE THIS!
+VMS_VM_CPU_BURST_RATIO = 1.0    # Do _NOT_ change this, unless you know what you are doing!
+VMS_VM_CPU_BURST_DEFAULT = 100  # Do _NOT_ change this, unless you know what you are doing!
+VMS_VM_CPU_CAP_REQUIRED = True  # Whether the cpu_cap and vcpus count can be zero for SunOS and LX zones
 VMS_VM_KVM_MEMORY_OVERHEAD = 256  # MB
 VMS_VM_SWAP_MULTIPLIER = 2  # Cannot be lower than 1
 VMS_VM_ZFS_IO_PRIORITY_DEFAULT = 100

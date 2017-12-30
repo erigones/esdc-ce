@@ -17,7 +17,7 @@ from vms.models.tasklog import TaskLogEntry  # noqa: F401
 from vms.models.backup import BackupDefine, Backup  # noqa: F401
 from pdns.models import Domain  # noqa: F401
 
-TASK_MODEL_KEYS = ('dc_id', 'image_uuid', 'vm_uuid', 'node_uuid', 'nodestorage_id')  # The order here is important!
+TASK_MODELS = (Image, Vm, Node, NodeStorage, Dc)  # The order here is important!
 STATUS_MODELS = (Node, Vm, Snapshot, Backup)
 SCHEDULE_MODELS = (SnapshotDefine, BackupDefine)
 

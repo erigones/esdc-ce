@@ -3,6 +3,7 @@ from django.core.validators import RegexValidator
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.template.defaultfilters import filesizeformat
+# noinspection PyProtectedMember
 from django.forms.forms import NON_FIELD_ERRORS
 from datetime import datetime
 import pytz
@@ -25,9 +26,8 @@ from api.vm.define.serializers import is_kvm
 from api.vm.define.vm_define_disk import DISK_ID_MIN, DISK_ID_MAX, DISK_ID_MAX_OS
 from api.vm.define.vm_define_nic import NIC_ID_MIN, NIC_ID_MAX
 from api.vm.define.views import vm_define, vm_define_user, vm_define_disk, vm_define_nic, vm_define_revert
-from api.vm.snapshot.views import vm_define_snapshot
+from api.vm.snapshot.views import vm_define_snapshot, image_snapshot
 from api.vm.backup.views import vm_define_backup
-from api.image.base.views import image_snapshot
 
 
 DISK_ID_MIN += 1
@@ -204,10 +204,10 @@ class AdminServerSettingsForm(ServerSettingsForm):
     ostype = forms.TypedChoiceField(label=_('OS Type'), choices=Vm.OSTYPE, required=True, coerce=int,
                                     widget=forms.Select(attrs={'class': 'input-select2 narrow',
                                                                'required': 'required'}))
-    vcpus = forms.IntegerField(label=_('VCPUs'), max_value=64, min_value=1, required=True,
+    vcpus = forms.IntegerField(label=_('VCPUs'), required=False,
                                widget=NumberInput(attrs={'class': 'input-transparent narrow', 'required': 'required'}))
     # noinspection SpellCheckingInspection
-    ram = forms.IntegerField(label=_('RAM'), max_value=524288, min_value=32, required=True,
+    ram = forms.IntegerField(label=_('RAM'), required=False,
                              widget=forms.TextInput(attrs={'class': 'input-transparent narrow input-mbytes',
                                                            'required': 'required',
                                                            'pattern': '[0-9\.]+[BKMGTPEbkmgtpe]?'}))

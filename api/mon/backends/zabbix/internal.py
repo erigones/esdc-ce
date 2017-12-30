@@ -1,10 +1,14 @@
-from logging import ERROR, WARNING, INFO
+from logging import getLogger, ERROR, WARNING, INFO
 
 from django.conf import settings as django_settings
 from zabbix_api import ZabbixAPIException
 
 from api.decorators import catch_exception
-from .base import ZabbixError, ZabbixBase, logger
+from api.mon.backends.zabbix.base import ZabbixBase
+from api.mon.backends.zabbix.utils import parse_zabbix_result
+from api.mon.backends.zabbix.exceptions import MonitoringError, InternalMonitoringError
+
+logger = getLogger(__name__)
 
 
 class InternalZabbix(ZabbixBase):
@@ -27,23 +31,16 @@ class InternalZabbix(ZabbixBase):
     # noinspection PyProtectedMember
     def _vm_groups(self, vm, log=None):
         """Return set of zabbix hostgroup IDs for a VM"""
-        return self._get_or_create_hostgroups(self._vm_kwargs(vm),
-                                              django_settings._MON_ZABBIX_HOSTGROUP_VM,
-                                              vm.dc.name,
-                                              django_settings._MON_ZABBIX_HOSTGROUPS_VM,
-                                              log)
+        return self._get_or_create_hostgroups(self._vm_kwargs(vm), django_settings._MON_ZABBIX_HOSTGROUP_VM, vm.dc.name,
+                                              hostgroups=django_settings._MON_ZABBIX_HOSTGROUPS_VM, log=log)
 
     def _node_groups(self, node, log=None):
         """Return set of zabbix hostgroup IDs for a Compute node"""
         hostgroups = set(self.settings.MON_ZABBIX_HOSTGROUPS_NODE)
         hostgroups.update(node.monitoring_hostgroups)
-        empty_prefix = ''
 
-        return self._get_or_create_hostgroups(self._node_kwargs(node),
-                                              self.settings.MON_ZABBIX_HOSTGROUP_NODE,
-                                              empty_prefix,
-                                              hostgroups,
-                                              log)
+        return self._get_or_create_hostgroups(self._node_kwargs(node), self.settings.MON_ZABBIX_HOSTGROUP_NODE, None,
+                                              hostgroups=hostgroups, log=log)
 
     # noinspection PyProtectedMember
     def _vm_templates(self, vm, log=None):
@@ -118,11 +115,11 @@ class InternalZabbix(ZabbixBase):
         except ZabbixAPIException as exc:
             err = 'Zabbix API Error when retrieving SLA (%s)' % exc
             self.log(ERROR, err)
-            raise ZabbixError(err)
-        except ZabbixError as exc:
+            raise InternalMonitoringError(err)
+        except MonitoringError as exc:
             err = 'Could not parse Zabbix API output when retrieving SLA (%s)' % exc
             self.log(ERROR, err)
-            raise ZabbixError(err)
+            raise exc.__class__(err)
 
         return sla
 
@@ -137,11 +134,11 @@ class InternalZabbix(ZabbixBase):
             except ZabbixAPIException as exc:
                 err = 'Zabbix API Error when retrieving SLA (%s)' % exc
                 self.log(ERROR, err)
-                raise ZabbixError(err)
-            except ZabbixError as exc:
+                raise InternalMonitoringError(err)
+            except MonitoringError as exc:
                 err = 'Could not parse Zabbix API output when retrieving SLA (%s)' % exc
                 self.log(ERROR, err)
-                raise ZabbixError(err)
+                raise exc.__class__(err)
             else:
                 sla += float(node_sla) * i['weight']
 
@@ -210,7 +207,8 @@ class InternalZabbix(ZabbixBase):
         # Finally delete the node IT service
         try:
             res = self.zapi.service.delete([serviceid])
-            return res['serviceids'][0]
-        except (ZabbixAPIException, KeyError, IndexError) as e:
+        except ZabbixAPIException as e:
             logger.exception(e)
-            raise ZabbixError(e)
+            raise InternalMonitoringError(e)
+
+        return parse_zabbix_result(res, 'serviceids', from_get_request=False)

@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+# noinspection PyProtectedMember
 from celery import Task, states
 from celery.utils.log import get_task_logger
 
@@ -58,6 +59,9 @@ class MgmtTask(Task):
     abstract = True
     logger = None  # Task logger
 
+    TIDLOCK_KEY_TEMPLATE = KEY_PREFIX + '%s:lock'
+    CACHE_KEY_TEMPLATE = KEY_PREFIX + '%s:cache'
+
     def __call__(self, *args, **kwargs):
         self.logger = get_task_logger('que.mgmt')
         task = 'MgmtTask %s%s' % (self.name, args[:2])
@@ -113,7 +117,7 @@ class MgmtTask(Task):
         tidlock_acquired = False
 
         if cache_result:
-            cache_result = KEY_PREFIX + cache_result + ':cache'
+            cache_result = self.CACHE_KEY_TEMPLATE % cache_result
             result = redis.get(cache_result)
 
             if result is not None:
@@ -130,7 +134,7 @@ class MgmtTask(Task):
 
         try:
             if tidlock:
-                tidlock = KEY_PREFIX + tidlock + ':lock'
+                tidlock = self.TIDLOCK_KEY_TEMPLATE % tidlock
                 task_lock = TaskLock(tidlock, desc=task)
 
                 _tid = task_lock.get()
@@ -172,3 +176,7 @@ class MgmtTask(Task):
                 logger.info('%s created', task)
 
             return t.id, None, None
+
+    @classmethod
+    def clear_cache(cls, cache_result_key):
+        return redis.delete(cls.CACHE_KEY_TEMPLATE % cache_result_key)

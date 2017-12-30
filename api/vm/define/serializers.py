@@ -9,7 +9,7 @@ from django.conf import settings
 
 from api.mon import MonitoringBackend
 from gui.models import User
-from vms.models import VmTemplate, Vm, Node, Image, Subnet, IPAddress, NodeStorage
+from vms.models import VmTemplate, Vm, Node, Image, Subnet, IPAddress, NodeStorage, DefaultDc
 from api import serializers as s
 from api.decorators import catch_api_exception
 from api.exceptions import APIError, ObjectAlreadyExists
@@ -77,8 +77,8 @@ class VmDefineSerializer(VmBaseSerializer):
     alias = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\.-]+[A-Za-z0-9]$', max_length=24, min_length=4, required=False)
     ostype = s.IntegerChoiceField(choices=Vm.OSTYPE, default=settings.VMS_VM_OSTYPE_DEFAULT)
     cpu_type = s.ChoiceField(choices=Vm.CPU_TYPE, default=settings.VMS_VM_CPU_TYPE_DEFAULT)
-    vcpus = s.IntegerField(max_value=64, min_value=1)
-    ram = s.IntegerField(max_value=524288, min_value=32)
+    vcpus = s.IntegerField(max_value=1024)  # vv (min_value set below)
+    ram = s.IntegerField(max_value=1048576, min_value=1)
     note = s.CharField(required=False)
     owner = s.SlugRelatedField(slug_field='username', queryset=User.objects, read_only=False, required=False)  # vv
     node = s.SlugRelatedField(slug_field='hostname', queryset=Node.objects, read_only=False, required=False)  # vv
@@ -93,6 +93,7 @@ class VmDefineSerializer(VmBaseSerializer):
     installed = s.BooleanField(default=False)
     snapshot_limit_manual = s.IntegerField(required=False)  # Removed from json if null, limits set below
     snapshot_size_limit = s.IntegerField(required=False)  # Removed from json if null, limits set below
+    cpu_cap = s.IntegerField(read_only=True)
     cpu_shares = s.IntegerField(default=settings.VMS_VM_CPU_SHARES_DEFAULT, min_value=0, max_value=1048576)
     zfs_io_priority = s.IntegerField(default=settings.VMS_VM_ZFS_IO_PRIORITY_DEFAULT, min_value=0, max_value=1024)
     zpool = s.CharField(default=Node.ZPOOL, max_length=64)
@@ -134,7 +135,7 @@ class VmDefineSerializer(VmBaseSerializer):
             self.fields['ostype'].default = dc_settings.VMS_VM_OSTYPE_DEFAULT
             self.fields['zpool'].default = dc_settings.VMS_STORAGE_DEFAULT
             # noinspection PyProtectedMember
-            self.fields['monitored_internal'].default = dc_settings.MON_ZABBIX_ENABLED \
+            self.fields['monitored_internal'].default = DefaultDc().settings.MON_ZABBIX_ENABLED \
                 and dc_settings._MON_ZABBIX_VM_SYNC
             self.fields['monitored'].default = dc_settings.MON_ZABBIX_ENABLED and dc_settings.MON_ZABBIX_VM_SYNC \
                 and dc_settings.VMS_VM_MONITORED_DEFAULT
@@ -168,6 +169,14 @@ class VmDefineSerializer(VmBaseSerializer):
 
             if kvm:
                 self.fields['vga'].default = dc_settings.VMS_VGA_MODEL_DEFAULT
+
+            if kvm or dc_settings.VMS_VM_CPU_CAP_REQUIRED:
+                vcpus_min = 1
+            else:
+                vcpus_min = 0
+
+            # vcpus can be set to 0 only for zones and when VMS_VM_CPU_CAP_REQUIRED=False
+            self.fields['vcpus'].validators.append(validators.MinValueValidator(vcpus_min))
 
         # defaults
         if self.request.method == 'POST':
@@ -436,6 +445,13 @@ class VmDefineSerializer(VmBaseSerializer):
         node = None
         node_errors = []
 
+        if 'vcpus' in attrs:
+            in_cpu = Vm.calculate_cpu_count_from_vcpus(attrs['vcpus'])
+        else:
+            in_cpu = None
+
+        in_ram = attrs.get('ram', None)
+
         # Check if there are free resources if node was set manually
         if self.node_changed:
             # No need to check if node really exists, because this check is
@@ -474,17 +490,30 @@ class VmDefineSerializer(VmBaseSerializer):
                 ram_overhead = 0
 
             # Use new or old absolute resource counts
-            new_cpu = attrs.get('vcpus', old_cpu)
-            new_ram = attrs.get('ram', old_ram) + ram_overhead
+            if in_cpu is None:
+                new_cpu = old_cpu
+            else:
+                new_cpu = in_cpu
+
+            if in_ram is None:
+                new_ram = old_ram + ram_overhead
+            else:
+                new_ram = in_ram + ram_overhead
 
         # Also check for additional free resources if number of vcpus or ram
         # changed and node was set in the past (=> we stay on current node)
-        elif vm and vm.node and ('ram' in attrs or 'vcpus' in attrs):
+        elif vm and vm.node and (in_cpu is not None or in_ram is not None):
             node = vm.node
             old_cpu, old_ram = vm.get_cpu_ram()
-            new_cpu = attrs.get('vcpus', old_cpu) - old_cpu
-            new_ram = attrs.get('ram', old_ram) - old_ram
             new_disk = 0  # Disk size vs. node was validated in vm_define_disk
+            if in_cpu is None:
+                new_cpu = 0
+            else:
+                new_cpu = in_cpu - old_cpu
+            if in_ram is None:
+                new_ram = 0
+            else:
+                new_ram = in_ram - old_ram
 
         # At this point we have to check for resources if node is defined
         if node:
@@ -583,7 +612,8 @@ class VmDefineSerializer(VmBaseSerializer):
 
         # Disable monitored flag if monitoring module/sync disabled
         # noinspection PyProtectedMember
-        if 'monitored_internal' in attrs and not (dc_settings.MON_ZABBIX_ENABLED and dc_settings._MON_ZABBIX_VM_SYNC):
+        if 'monitored_internal' in attrs and not (DefaultDc().settings.MON_ZABBIX_ENABLED and
+                                                  dc_settings._MON_ZABBIX_VM_SYNC):
             attrs['monitored_internal'] = False
 
         if 'monitored' in attrs and not (dc_settings.MON_ZABBIX_ENABLED and dc_settings.MON_ZABBIX_VM_SYNC):

@@ -4,6 +4,7 @@ from django.db.models import Q
 from django.db import connection
 
 from api.api_views import APIView
+# noinspection PyProtectedMember
 from api.fields import get_boolean_value
 from api.status import HTTP_201_CREATED, HTTP_200_OK
 from api.signals import user_relationship_changed
@@ -84,6 +85,7 @@ class UserView(APIView):
 
         res = SuccessTaskResponse(self.request, ser.data, status=status, obj=user, msg=msg, owner=ser.object,
                                   detail_dict=ser.detail_dict(), dc_bound=False)
+        task_id = res.data.get('task_id')
 
         if serializer == UserSerializer:
             # User's is_staff attribute was changed -> Clear the cached list of super admins
@@ -107,7 +109,7 @@ class UserView(APIView):
             if ser.old_roles and not user.is_staff:
                 user.reset_current_dc()
 
-        connection.on_commit(lambda: user_relationship_changed.send(user_name=ser.object.username,
+        connection.on_commit(lambda: user_relationship_changed.send(task_id, user_name=user.username,  # Signal!
                                                                     affected_groups=tuple(
                                                                         group.id for group in affected_groups)))
         return res
@@ -139,14 +141,17 @@ class UserView(APIView):
             return FailureTaskResponse(self.request, message, obj=user, dc_bound=False)
 
         dd = {'email': user.email, 'date_joined': user.date_joined}
+        username = user.username
         was_staff = user.is_staff
         old_roles = list(user.roles.all())
         ser = self.serializer(self.request, user)
         ser.object.delete()
-        connection.on_commit(lambda: user_relationship_changed.send(user_name=ser.object.username,
+
+        res = SuccessTaskResponse(self.request, None, obj=user, msg=LOG_USER_DELETE, detail_dict=dd, dc_bound=False)
+        task_id = res.data.get('task_id')
+        connection.on_commit(lambda: user_relationship_changed.send(task_id, user_name=username,  # Signal!
                                                                     affected_groups=tuple(
                                                                         group.id for group in old_roles)))
-        res = SuccessTaskResponse(self.request, None, obj=user, msg=LOG_USER_DELETE, detail_dict=dd, dc_bound=False)
 
         # User was removed, which may affect the cached list of DC admins for DCs which are attached to user's groups
         # So we need to clear the list of admins cached for each affected DC

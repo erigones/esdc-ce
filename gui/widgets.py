@@ -23,6 +23,7 @@ __all__ = (
     'ArrayWidget',
     'ArrayAreaWidget',
     'DictWidget',
+    'TagWidget',
 )
 
 HTML5_ATTRS = frozendict({'autocorrect': 'off', 'autocapitalize': 'off', 'spellcheck': 'false'})

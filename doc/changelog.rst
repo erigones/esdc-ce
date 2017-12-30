@@ -9,6 +9,8 @@ Features
 
 - Monitoring hostgroups are either datacenter-based or global - `#93 <https://github.com/erigones/esdc-ce/issues/93>`__
 - Monitoring hostgroups are automatically created on VM and Node update if they don't exist - `#93 <https://github.com/erigones/esdc-ce/issues/93>`__
+- Added API for managing monitoring hostgroups - `#94 <https://github.com/erigones/esdc-ce/issues/94>`__
+- Added API for managing monitoring actions - `#94 <https://github.com/erigones/esdc-ce/issues/94>`__
 - Added ability to restore snapshot into another VM - `#236 <https://github.com/erigones/esdc-ce/issues/236>`__
 - Updated the VM templates API + removed *experimental* flag from the ``template_manage`` API call - `#256 <https://github.com/erigones/esdc-ce/issues/256>`__
 - DC settings implied monitoring hostgroups are shown near the VM, node monitoring_hostgroups setting - `#266 <https://github.com/erigones/esdc-ce/issues/266>`__
@@ -16,13 +18,16 @@ Features
 - Added automatic synchronization of overlay ARP files - `#286 <https://github.com/erigones/esdc-ce/issues/286>`__
 - Added script for automating platform upgrade - `#289 <https://github.com/erigones/esdc-ce/issues/289>`__
 - Added status update button to compute node list - `#291 <https://github.com/erigones/esdc-ce/issues/291>`__
+- Changed CPU resource accounting to use VM's cpu_cap parameter and added VMS_VM_CPU_CAP_REQUIRED setting - `#296 <https://github.com/erigones/esdc-ce/issues/296>`__
 - Made compute node IP address changeable - `#305 <https://github.com/erigones/esdc-ce/issues/305>`__
 - Added experimental support for live migration - `#306 <https://github.com/erigones/esdc-ce/issues/306>`__
 - Added value size limit to metadata - `#321 <https://github.com/erigones/esdc-ce/issues/321>`__
+- Changed VM reboot action to perform a VM configuration update by default - `#328 <https://github.com/erigones/esdc-ce/issues/328>`__
 
 Bugs
 ----
 
+- Added missing user callbacks for mgmt tasks - `#308 <https://github.com/erigones/esdc-ce/issues/308>`__
 - Added missing DNS record for ns1.local after install - `#301 <https://github.com/erigones/esdc-ce/issues/301>`__
 - Fixed migration of LX zones - `#294 <https://github.com/erigones/esdc-ce/issues/294>`__
 - Fixed VNC port issues in VM migration - `#306 <https://github.com/erigones/esdc-ce/issues/306>`__

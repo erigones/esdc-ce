@@ -93,9 +93,12 @@ def vm_define(request, hostname_or_uuid, data=None):
         :arg data.ostype: Operating system type (1 - Linux VM, 2 - SunOS VM, 3 - BSD VM, 4 - Windows VM, \
 5 - SunOS Zone, 6 - Linux Zone) (default: 1)
         :type data.ostype: integer
-        :arg data.vcpus: **required** - Number of virtual CPUs inside VM (1 - 64)
+        :arg data.vcpus: **required** - Number of virtual CPUs inside VM (1 - 1024); \
+This number is used to calculate an internal compute node CPU limit for the VM (cpu_cap). \
+When the :http:put:`VMS_VM_CPU_CAP_REQUIRED </dc/(dc)/settings>` DC setting is disabled, \
+then the vcpus value can be 0, which will remove the compute node CPU limit entirely (SunOS and LX Zone only)
         :type data.vcpus: integer
-        :arg data.ram: **required** - Size of RAM inside VM (32 - 524288 MB)
+        :arg data.ram: **required** - Size of RAM inside VM (1 - 1048576 MB)
         :type data.ram: integer
         :arg data.note: Text note visible to every user with access to this VM (default: "")
         :type data.note: string
@@ -144,6 +147,12 @@ Items will be set as static routes in the OS (SunOS Zone only, default: {})
         :status 403: Forbidden
         :status 406: VM already exists
 
+    .. note:: The **cpu_cap** defines a percentage of a single compute node CPU that can be used by the VM. \
+It is calculated automatically based on this formula: \
+``(vcpus * VMS_VM_CPU_BURST_RATIO * 100) + VMS_VM_CPU_BURST_DEFAULT``, where \
+*VMS_VM_CPU_BURST_RATIO* is by default 1.0 and \
+*VMS_VM_CPU_BURST_DEFAULT* is by default 100 when ``vcpus > 1`` and 50 when ``vcpus == 1``.
+
     .. http:put:: /vm/(hostname_or_uuid)/define
 
         :DC-bound?:
@@ -158,9 +167,12 @@ Items will be set as static routes in the OS (SunOS Zone only, default: {})
         :type data.alias: string
         :arg data.template: VM template name
         :type data.template: string
-        :arg data.vcpus: Number of virtual CPUs inside VM (1 - 64)
+        :arg data.vcpus: Number of virtual CPUs inside VM (1 - 1024); \
+This number is used to calculate an internal compute node CPU limit for the VM (cpu_cap). \
+When the :http:put:`VMS_VM_CPU_CAP_REQUIRED </dc/(dc)/settings>` DC setting is disabled, \
+then the vcpus value can be 0, which will remove the compute node CPU limit entirely (SunOS and LX Zone only)
         :type data.vcpus: integer
-        :arg data.ram: Size of RAM inside VM (32 - 524288 MB)
+        :arg data.ram: Size of RAM inside VM (1 - 1048576 MB)
         :type data.ram: integer
         :arg data.note: Text note visible to every user with access to this VM
         :type data.note: string

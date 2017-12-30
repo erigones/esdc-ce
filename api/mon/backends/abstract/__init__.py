@@ -48,14 +48,28 @@ class AbstractMonitoringBackend(object):
     DISASTER = 5
     RE_MONITORING_HOSTGROUPS = re.compile(r'^[\w\s.\-,\"{\}]+$')
 
+    server_class = NotImplemented
+
     def __init__(self, dc, **kwargs):
         self.dc = dc
+
+    def __hash__(self):
+        raise NotImplementedError
+
+    def enabled(self):
+        raise NotImplementedError
 
     @property
     def connected(self):
         raise NotImplementedError
 
     def reset_cache(self):
+        raise NotImplementedError
+
+    def task_log_success(self, task_id, **kwargs):
+        raise NotImplementedError
+
+    def task_log_error(self, task_id, **kwargs):
         raise NotImplementedError
 
     @classmethod
@@ -99,23 +113,47 @@ class AbstractMonitoringBackend(object):
     def node_history(self, node_id, items, zhistory, since, until, items_search=None):
         raise NotImplementedError
 
-    def template_list(self):
+    def template_list(self, full=False, extended=False):
         raise NotImplementedError
 
-    def hostgroup_list(self, prefix=False):
+    def hostgroup_list(self):
         raise NotImplementedError
 
-    def alert_list(self, prefix=False):
+    def hostgroup_detail(self, name):
         raise NotImplementedError
 
-    def synchronize_user_group(self, group=None, dc_as_group=None):
+    def hostgroup_create(self, name):
         raise NotImplementedError
 
-    def delete_user_group(self, name):
+    def hostgroup_delete(self, name):
         raise NotImplementedError
 
-    def synchronize_user(self, user):
+    def alert_list(self):
         raise NotImplementedError
 
-    def delete_user(self, name):
+    def user_group_sync(self, group=None, dc_as_group=None):
+        raise NotImplementedError
+
+    def user_group_delete(self, name):
+        raise NotImplementedError
+
+    def user_sync(self, user):
+        raise NotImplementedError
+
+    def user_delete(self, name):
+        raise NotImplementedError
+
+    def action_list(self):
+        raise NotImplementedError
+
+    def action_detail(self, name):
+        raise NotImplementedError
+
+    def action_update(self, name, data):
+        raise NotImplementedError
+
+    def action_create(self, name, data):
+        raise NotImplementedError
+
+    def action_delete(self, name):
         raise NotImplementedError

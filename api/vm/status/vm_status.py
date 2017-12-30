@@ -13,6 +13,7 @@ from api.vm.utils import get_vms, get_vm
 from api.vm.messages import (LOG_STATUS_GET, LOG_START, LOG_START_ISO, LOG_START_UPDATE, LOG_START_UPDATE_ISO,
                              LOG_STOP, LOG_STOP_FORCE, LOG_REBOOT, LOG_REBOOT_FORCE, LOG_REBOOT_UPDATE, LOG_STOP_UPDATE,
                              LOG_REBOOT_FORCE_UPDATE, LOG_STOP_FORCE_UPDATE)
+# noinspection PyProtectedMember
 from api.vm.status.tasks import vm_status_changed
 from api.vm.status.serializers import (VmStatusSerializer, VmStatusActionIsoSerializer, VmStatusFreezeSerializer,
                                        VmStatusUpdateJSONSerializer, VmStatusStopSerializer)
@@ -219,7 +220,7 @@ class VmStatus(APIView):
         elif action == 'current':
             # for PUT /current/ action user needs to be SuperAdmin
             # since this operation will forcibly change whatever status a VM has in the DB
-            if not request.user.is_super_admin(request):
+            if not request.user.is_staff:
                 raise PermissionDenied
 
             force = self.data.get('force', False)
@@ -243,7 +244,7 @@ class VmStatus(APIView):
         transition_to_stopping = False
 
         # The update parameter is used by all actions (start, stop, reboot)
-        ser_update = VmStatusUpdateJSONSerializer(data=self.data, default=(action == 'start'))
+        ser_update = VmStatusUpdateJSONSerializer(data=self.data, default=(action in ('start', 'reboot')))
 
         if not ser_update.is_valid():
             return FailureTaskResponse(request, ser_update.errors, vm=vm)
