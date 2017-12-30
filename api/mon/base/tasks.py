@@ -24,9 +24,6 @@ __all__ = (
 
 logger = get_task_logger(__name__)
 
-HOSTGROUP_NOT_FOUND = 'Monitoring hostgroup "%s" not found'
-HOSTGROUP_ALREADY_EXISTS = 'Monitoring hostgroup "%s" already exists'
-
 
 def mon_clear_zabbix_cache(dc, full=True):
     """

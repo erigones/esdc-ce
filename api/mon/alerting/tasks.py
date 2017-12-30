@@ -62,6 +62,10 @@ def _user_group_changed(task_id, group_name, dc_name):  # noqa: R701
         dc = Dc.objects.get_by_name(dc_name)
         mon = get_monitoring(dc)
 
+        if not mon.enabled:
+            logger.info('Monitoring is disabled in DC %s', dc)
+            return
+
         try:
             group = Role.objects.get(dc=dc, name=group_name)
         except Role.DoesNotExist:
@@ -83,6 +87,11 @@ def _user_group_changed(task_id, group_name, dc_name):  # noqa: R701
             # We have to provide information about zabbix connection so that we can delete related information in zabbix
         else:
             mon = get_monitoring(dc)
+
+            if not mon.enabled:
+                logger.info('Monitoring is disabled in DC %s', dc)
+                return
+
             res = mon.user_group_sync(dc_as_group=True)  # DC name is implied by the zabbix instance
             _log_mon_usergroup_action(res, mon, task_id, group_name, dc.name)
 
@@ -96,6 +105,11 @@ def _user_group_changed(task_id, group_name, dc_name):  # noqa: R701
             for dc in Dc.objects.all():
                 logger.info('Going to delete group %s from dc %s.', group_name, dc.name)
                 mon = get_monitoring(dc)
+
+                if not mon.enabled:
+                    logger.info('Monitoring is disabled in DC %s', dc)
+                    continue
+
                 try:
                     res = mon.user_group_delete(name=group_name)
                 except MonitoringError as exc:
@@ -114,6 +128,11 @@ def _user_group_changed(task_id, group_name, dc_name):  # noqa: R701
             for dc in related_dcs:
                 logger.info('Going to update group %s in dc %s.', group.name, dc.name)
                 mon = get_monitoring(dc)
+
+                if not mon.enabled:
+                    logger.info('Monitoring is disabled in DC %s', dc)
+                    continue
+
                 try:
                     res = mon.user_group_sync(group=group)
                 except MonitoringError as exc:
@@ -128,6 +147,11 @@ def _user_group_changed(task_id, group_name, dc_name):  # noqa: R701
             for dc in unrelated_dcs:  # TODO this is quite expensive and I would like to avoid this somehow
                 logger.info('Going to delete group %s from dc %s.', group.name, dc.name)
                 mon = get_monitoring(dc)
+
+                if not mon.enabled:
+                    logger.info('Monitoring is disabled in DC %s', dc)
+                    continue
+
                 try:
                     res = mon.user_group_delete(name=group_name)
                 except MonitoringError as exc:
@@ -167,6 +191,11 @@ def _user_changed(task_id, user_name, dc_name, affected_groups):
         if dc_name:
             dc = Dc.objects.get_by_name(dc_name)
             mon = get_monitoring(dc)
+
+            if not mon.enabled:
+                logger.info('Monitoring is disabled in DC %s', dc)
+                return
+
             logger.into('Going to delete user with name %s in zabbix %s for dc %s.', user_name, mon, dc)
             mon.user_delete(name=user_name)
         elif affected_groups:
@@ -175,6 +204,11 @@ def _user_changed(task_id, user_name, dc_name, affected_groups):
 
             for dc in Dc.objects.filter(roles__in=affected_groups):
                 mon = get_monitoring(dc)
+
+                if not mon.enabled:
+                    logger.info('Monitoring is disabled in DC %s', dc)
+                    continue
+
                 try:
                     res = mon.user_delete(name=user_name)
                 except MonitoringError as exc:
@@ -192,6 +226,11 @@ def _user_changed(task_id, user_name, dc_name, affected_groups):
 
             for dc in Dc.objects.all():  # Nasty
                 mon = get_monitoring(dc)
+
+                if not mon.enabled:
+                    logger.info('Monitoring is disabled in DC %s', dc)
+                    continue
+
                 try:
                     res = mon.user_delete(name=user_name)
                 except MonitoringError as exc:
@@ -206,6 +245,11 @@ def _user_changed(task_id, user_name, dc_name, affected_groups):
         if dc_name:
             dc = Dc.objects.get_by_name(dc_name)
             mon = get_monitoring(dc)
+
+            if not mon.enabled:
+                logger.info('Monitoring is disabled in DC %s', dc)
+                return
+
             logger.info('Going to create/update user %s in zabbix %s for dc %s.', user_name, mon, dc)
             mon.user_sync(user=user)
         elif affected_groups:
@@ -213,6 +257,11 @@ def _user_changed(task_id, user_name, dc_name, affected_groups):
 
             for dc in Dc.objects.filter(roles__in=affected_groups):
                 mon = get_monitoring(dc)
+
+                if not mon.enabled:
+                    logger.info('Monitoring is disabled in DC %s', dc)
+                    continue
+
                 try:
                     res = mon.user_sync(user=user)
                 except MonitoringError as exc:
@@ -230,6 +279,11 @@ def _user_changed(task_id, user_name, dc_name, affected_groups):
 
             for dc in Dc.objects.filter(Q(owner=user) | Q(roles__user=user)).distinct():
                 mon = get_monitoring(dc)
+
+                if not mon.enabled:
+                    logger.info('Monitoring is disabled in DC %s', dc)
+                    con
+
                 try:
                     res = mon.user_sync(user=user)
                 except MonitoringError as exc:
