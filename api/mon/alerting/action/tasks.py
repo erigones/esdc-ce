@@ -14,9 +14,6 @@ __all__ = ('mon_action_list', 'mon_action_get', 'mon_action_create', 'mon_action
 
 logger = get_task_logger(__name__)
 
-ACTION_NOT_FOUND = MON_OBJ_ACTION + ' "{}" not found'
-ACTION_ALREADY_EXISTS = MON_OBJ_ACTION + ' "{}" already exists'
-
 
 def _log_hostgroup_created(mon, task_id, name):
     detail = get_mon_action_detail(MON_OBJ_HOSTGROUP, MON_OBJ_CREATED, name)
