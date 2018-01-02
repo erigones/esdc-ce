@@ -406,14 +406,9 @@ class Image(_VirtModel, _JsonPickleModel, _OSType, _DcMixin, _UserTasksModel):
         if apiview.get('view') == 'image_snapshot':
             vm = self.src_vm
 
-            if vm.owner_id == self.owner_id:
+            if vm:
                 # noinspection PyProtectedMember
-                info[vm._pk_key] = vm.pk  # Share the same UserTask
-            else:
-                info2 = info.copy()
-                # noinspection PyProtectedMember
-                info2[vm._pk_key] = vm.pk
-                self._add_task(vm.owner_id, task_id, info2)  # Add another UserTask entry
+                info[vm._pk_key] = vm.pk
 
         return self._add_task(self.owner_id, task_id, info)
 
