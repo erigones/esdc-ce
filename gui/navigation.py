@@ -4,11 +4,28 @@ from gui.signals import navigation_initialized
 STYLE_KEY = 'li_class'
 STYLE_KEY_DEFAULT = 'li_class_default'
 
-DASHBOARD = {
-    'title': _('Dashboard'),
+SYSTEM = {
+    'title': _('System'),
     'icon': 'dashboard',
-    'url': 'dashboard',
-    'active_views': {'dashboard'},
+    'url': 'system_overview',
+    'active_views': {'system_overview', 'system_settings', 'system_maintenance'},
+    'children': [
+        {
+            'title': _('Overview'),
+            'icon': 'dashboard',
+            'url': 'system_overview'
+        },
+        {
+            'title': _('Configuration'),
+            'icon': 'cogs',
+            'url': 'system_settings'
+        },
+        {
+            'title': _('Maintenance'),
+            'icon': 'wrench',
+            'url': 'system_maintenance'
+        },
+    ]
 }
 
 DATACENTER = {
@@ -17,7 +34,7 @@ DATACENTER = {
     'url': 'dc_node_list',
     'active_views': {'dc_list', 'dc_node_list', 'dc_storage_list', 'dc_network_list', 'dc_image_list',
                      'dc_template_list', 'dc_iso_list', 'dc_domain_list', 'dc_settings', 'dc_user_list',
-                     'dc_group_list', 'dc_user_profile'}
+                     'dc_group_list', 'dc_user_profile'},
     # 'children': []  # Built on runtime
 }
 
@@ -231,7 +248,7 @@ class Navi(object):
             if is_staff:
                 if not dc_dns_only:
                     DATACENTER['children'] += [DATACENTER_SETTINGS]
-                nav = [DATACENTER, NODES, SERVERS]  # SuperAdmin
+                nav = [SYSTEM, DATACENTER, NODES, SERVERS]  # SuperAdmin
             else:
                 nav = [DATACENTER, SERVERS]  # DCAdmin
 

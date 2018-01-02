@@ -345,18 +345,29 @@ function _ajax_file_upload(file_input, datatype, method, url, success_handler, d
   }
 
   var backdrop = get_loading_screen(null, dim);
+  var form_data = new FormData();
+
+  if (typeof(data) !== 'undefined') {
+    for (var i=0; i < data.length; i++) {
+      form_data.append(data[i].name, data[i].value);
+    }
+  }
+
+  file_input.slice(1).each(function(index, element) {
+    for (var i=0; i < element.files.length; i++) {
+      form_data.append($(this).attr('name'), element.files[i], element.files[i].name);
+    }
+  });
+
   var kwargs = {
     type: method,
     url: url,
     dataType: datatype,
     files: file_input[0].files,
+    formData: form_data,
   };
 
-  if (typeof(data) !== 'undefined') {
-    kwargs.formData = data;
-  }
-
-  file_input.one('fileuploadsend', function(e, data) { _ajax_before_send(btn, backdrop); });
+  file_input.one('fileuploadsend', function() { _ajax_before_send(btn, backdrop); });
 
   AJAX = file_input.fileupload('send', kwargs)
     .error(function(jqXHR, textStatus, errorThrown) { ajax_error_handler(jqXHR, textStatus, errorThrown); })

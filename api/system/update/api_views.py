@@ -1,93 +1,63 @@
-import os
 from logging import getLogger
-from django.conf import settings
 
 from api.api_views import APIView
-from api.exceptions import TaskIsAlreadyRunning, PreconditionRequired
+from api.exceptions import PreconditionRequired
 from api.system.messages import LOG_SYSTEM_UPDATE
 from api.system.update.serializers import UpdateSerializer
-from api.system.update.events import SystemUpdateStarted, SystemUpdateFinished
-from api.system.update.utils import process_update_reply
-from api.system.service.control import SystemReloadThread
-from api.task.response import SuccessTaskResponse, FailureTaskResponse
-from que import TG_DC_UNBOUND, TT_DUMMY
-from que.handlers import update_command
-from que.utils import task_id_from_request
-from que.lock import TaskLock
-from vms.models import DefaultDc
+from api.system.update.tasks import system_update
+from api.task.response import FailureTaskResponse, mgmt_task_response
+from que import TG_DC_UNBOUND
 
 logger = getLogger(__name__)
-
-
-class UpdateResult(dict):
-    def __init__(self, update, success=False, rc=None, msg=None, **kwargs):
-        update = os.path.basename(update)
-        super(UpdateResult, self).__init__(update=update, success=success, rc=rc, msg=msg, **kwargs)
-
-    @property
-    def log_detail(self):
-        return SuccessTaskResponse.dict_to_detail(self)
 
 
 class UpdateView(APIView):
     """
     Update Danube Cloud application.
     """
+    LOCK = 'system_update'
     dc_bound = False
-    _updates = ()
-    _installed = 0
-    _lock_key = 'system_update'
 
     def __init__(self, request, data):
-        super(UpdateView, self).__init__(request, force_default_dc=True)
+        super(UpdateView, self).__init__(request)
         self.data = data
-        self.user = request.user
-        self.task_id = task_id_from_request(self.request, dummy=True, tt=TT_DUMMY, tg=TG_DC_UNBOUND)
-
-    def _update(self, version, key=None, cert=None):
-        logger.debug('Running system update to version: "%s"', version)
-        reply = update_command(version, key=key, cert=cert, sudo=not settings.DEBUG)
-        response_class, result = process_update_reply(reply, 'system', version)
-        response = response_class(self.request, result, task_id=self.task_id, msg=LOG_SYSTEM_UPDATE,
-                                  detail_dict=result, dc_bound=False)
-
-        if response.status_code == 200:
-            # Restart all gunicorns and erigonesd!
-            SystemReloadThread(task_id=self.task_id, request=self.request, reason='system_update').start()
-
-        return response
 
     @classmethod
-    def get_task_lock(cls):
-        # Also used in socket.io namespace
-        return TaskLock(cls._lock_key, desc='System task')
+    def is_task_running(cls):
+        return system_update.get_lock(cls.LOCK).exists()
 
     def put(self):
-        assert self.request.dc.id == DefaultDc().id
+        assert self.request.dc.is_default()
 
         ser = UpdateSerializer(self.request, data=self.data)
 
         if not ser.is_valid():
-            return FailureTaskResponse(self.request, ser.errors, task_id=self.task_id, dc_bound=False)
+            return FailureTaskResponse(self.request, ser.errors, dc_bound=False)
 
-        version = ser.object['version']
+        version = ser.data['version']
         from core.version import __version__ as mgmt_version
-
         # noinspection PyUnboundLocalVariable
-        if version == ('v' + mgmt_version):
+        if version == ('v' + mgmt_version) and not ser.data.get('force'):
             raise PreconditionRequired('System is already up-to-date')
 
-        lock = self.get_task_lock()
+        obj = self.request.dc
+        msg = LOG_SYSTEM_UPDATE
+        _apiview_ = {
+            'view': 'system_update',
+            'method': self.request.method,
+            'version': version,
+        }
+        meta = {
+            'apiview': _apiview_,
+            'msg': LOG_SYSTEM_UPDATE,
+        }
+        task_kwargs = ser.data.copy()
+        task_kwargs['dc_id'] = obj.id
 
-        if not lock.acquire(self.task_id, timeout=7200, save_reverse=False):
-            raise TaskIsAlreadyRunning
+        tid, err, res = system_update.call(self.request, None, (), kwargs=task_kwargs, meta=meta,
+                                           tg=TG_DC_UNBOUND, tidlock=self.LOCK)
+        if err:
+            msg = obj = None  # Do not log an error here
 
-        try:
-            # Emit event into socket.io
-            SystemUpdateStarted(self.task_id, request=self.request).send()
-
-            return self._update(version, key=ser.object.get('key'), cert=ser.object.get('cert'))
-        finally:
-            lock.delete(fail_silently=True, delete_reverse=False)
-            # Emit event into socket.io
-            SystemUpdateFinished(self.task_id, request=self.request).send()
+        return mgmt_task_response(self.request, tid, err, res, msg=msg, obj=obj, api_view=_apiview_, dc_bound=False,
+                                  data=self.data, detail_dict=ser.detail_dict(force_full=True))

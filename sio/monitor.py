@@ -2,6 +2,7 @@ from __future__ import print_function
 
 from blinker import signal
 from gevent import sleep
+from django.utils.six import itervalues
 
 from que.erigonesd import cq
 from que.utils import user_owner_dc_ids_from_task_id
@@ -38,6 +39,10 @@ def que_monitor(app, _info=print, _debug=print):
         if event.get('direct', None):
             # Send signal to ObjectOwner only
             users = (int(owner_id),)
+        elif event.get('broadcast', None):
+            # Send signal to all active socket.io sessions
+            from sio.namespaces import ACTIVE_USERS
+            users = set(session[0] for session in itervalues(ACTIVE_USERS))
         else:
             # Send signal to all affected users
             users = User.get_super_admin_ids()  # SuperAdmins

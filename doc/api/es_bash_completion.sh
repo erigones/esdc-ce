@@ -178,7 +178,7 @@ _es() {
 		;;
 
 		/system/node/*/update|/system/node/*/update/)
-			[[ "${action}" == "set" ]] && params="-version -key -cert"
+			[[ "${action}" == "set" ]] && params="-version -force -key -cert"
 		;;
 
 		/system/node/*/*)
@@ -208,7 +208,7 @@ _es() {
 		;;
 
 		/system/update)
-			[[ "${action}" == "set" ]] && params="-version -key -cert"
+			[[ "${action}" == "set" ]] && params="-version -force -key -cert"
 		;;
 
 		/system/settings/ssl-certificate)

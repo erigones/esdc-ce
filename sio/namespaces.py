@@ -4,6 +4,7 @@ from django.core.cache import cache
 from blinker import signal
 from gevent import sleep
 from collections import deque
+# noinspection PyProtectedMember
 from django.db import close_old_connections
 from django.utils.six import iteritems
 

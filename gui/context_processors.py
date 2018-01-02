@@ -38,7 +38,9 @@ def common_stuff(request):
     """
     Make common settings and variables available in templates.
     """
+    from core.version import __version__, __edition__
     from gui.node.utils import get_dc1_settings
+    from api.system.update.api_views import UpdateView
 
     return {
         'settings': settings,
@@ -49,4 +51,7 @@ def common_stuff(request):
         'SOCKETIO_URL': settings.SOCKETIO_URL,
         'THIRD_PARTY_JS': get_third_party_js(),
         'THIRD_PARTY_CSS': get_third_party_css(),
+        'SYSTEM_UPDATE_RUNNING': UpdateView.is_task_running(),
+        'SYSTEM_VERSION': __version__,
+        'SYSTEM_EDITION': __edition__
     }

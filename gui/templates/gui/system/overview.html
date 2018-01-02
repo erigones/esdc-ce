@@ -1,0 +1,148 @@
+{% extends load_base %}
+{% load i18n %}
+{% load gui_utils %}
+
+{% block javascript %}
+<script type="text/javascript">
+var STAT_GRAPH_OPTIONS = {
+  series: {
+    shadowSize: 0,
+    pie: {
+      show: true,
+      radius: 1,
+      innerRadius: 0.45,
+      label: {
+        show: true,
+        radius: 0.75,
+        formatter: stat_graph_label_formatter,
+        threshold: 0.1,
+      }
+    },
+  },
+  legend: {
+    show: true,
+    noColumns: 2,
+    labelFormatter: stat_graph_legend_label_formatter,
+  }
+};
+
+function stat_graph_label_formatter(label, series) {
+  return '<div class="graph-item-label">' + series.label + '<br>' + series.data[0][1] + '</div>';
+}
+
+function stat_graph_legend_label_formatter(label, series) {
+  return series.label + ': ' + series.data[0][1];
+}
+
+function init_stat_graph(graph_name, graph_data, options) {
+  var chartable = $(jq(graph_name));
+  var options = $.extend(true, {legend: {show: true, container: chartable.find('div.legend')}}, STAT_GRAPH_OPTIONS);
+
+  return $.plot(chartable.find('div.graph'), graph_data, options);
+}
+
+  $(document).ready(function() {
+    init_stat_graph('system_stats_dc', {{ stats.dcs|json|safe }});
+    init_stat_graph('system_stats_node', {{ stats.nodes|json|safe }});
+    init_stat_graph('system_stats_vm', {{ stats.vms|json|safe }});
+  });
+</script>
+{% endblock %}
+
+{% block base_content %}
+<div class="container-fluid">
+  <div class="row-fluid">
+
+    <div class="span4">
+      <div class="tab-header">
+        <i class="icon-cloud"></i> {% trans "Datacenters" %}
+      </div>
+      <table class="table box chartable" id="system_stats_dc">
+        <thead>
+          <tr>
+            <th><p class="table_desc"><i class="icon-info-sign"></i> {% trans "Total number of virtual datacenters." %}</p></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="center-text">
+              <div class="graph-container">
+                <div class="graph"></div>
+                <div class="graph-center">{{ stats.dcs_total }}</div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td>
+              <div class="legend rows3"></div>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <div class="span4">
+      <div class="tab-header">
+        <i class="icon-sitemap"></i> {% trans "Compute nodes" %}
+      </div>
+      <table class="table box chartable" id="system_stats_node">
+        <thead>
+          <tr>
+            <th><p class="table_desc"><i class="icon-info-sign"></i> {% trans "Total number of compute nodes." %}</p></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="center-text">
+              <div class="graph-container">
+                <div class="graph"></div>
+                <div class="graph-center">{{ stats.nodes_total }}</div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td>
+              <div class="legend rows3"></div>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <div class="span4">
+      <div class="tab-header">
+        <i class="icon-hdd"></i> {% trans "Servers" %}
+      </div>
+      <table class="table box chartable" id="system_stats_vm">
+        <thead>
+          <tr>
+            <th><p class="table_desc"><i class="icon-info-sign"></i> {% trans "Total number of virtual servers." %}</p></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="center-text">
+              <div class="graph-container">
+                <div class="graph"></div>
+                <div class="graph-center">{{ stats.vms_total }}</div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td>
+              <div class="legend rows3"></div>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+  </div>
+</div> <!-- end container-fluid -->
+{% endblock %}

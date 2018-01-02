@@ -74,6 +74,9 @@
     var USER_VMS_TAGS = '{{ request.user.vms_tags|escapejs }}';
     var CURRENT_DC = '{{ request.dc.name }}';
     var CURRENT_TZ = '{{ TIMEZONE }}';
+    var SYSTEM_VERSION = '{{ SYSTEM_VERSION }}';
+    var SYSTEM_EDITION = '{{ SYSTEM_EDITION }}';
+    var SYSTEM_UPDATE_RUNNING = {{ SYSTEM_UPDATE_RUNNING|yesno:"true,false" }};
   </script>
   {% compress js %}
   <script src="{{ STATIC_URL }}3rd-party/mini-signals/mini-signals.js" type="text/javascript"></script>
@@ -83,6 +86,7 @@
   <script src="{{ STATIC_URL }}3rd-party/moment/moment-timezone-with-data.js" type="text/javascript"></script>
   <script src="{{ STATIC_URL }}3rd-party/moment/moment-strftime.js" type="text/javascript"></script>
   <script src="{{ STATIC_URL }}3rd-party/jqueryFlot/jquery.flot.min.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}3rd-party/jqueryFlot/jquery.flot.pie.min.js" type="text/javascript"></script>
   <script src="{{ STATIC_URL }}3rd-party/jqueryFlot/jquery.flot.resize.min.js" type="text/javascript"></script>
   <script src="{{ STATIC_URL }}3rd-party/jqueryFlot/jquery.flot.time.min.js" type="text/javascript"></script>
   <script src="{{ STATIC_URL }}3rd-party/jqueryFlot/jquery.flot.selection.min.js" type="text/javascript"></script>
@@ -132,6 +136,7 @@
   <script src="{{ STATIC_URL }}gui/js/node/node-storage.js" type="text/javascript"></script>
   <script src="{{ STATIC_URL }}gui/js/node/node-image.js" type="text/javascript"></script>
   <script src="{{ STATIC_URL }}gui/js/node/node-backup.js" type="text/javascript"></script>
+  <script src="{{ STATIC_URL }}gui/js/system/maintenance.js" type="text/javascript"></script>
   <script src="{{ STATIC_URL }}gui/js/gsio.js" type="text/javascript"></script>
   <script src="{{ STATIC_URL }}sio/js/esio.js" type="text/javascript"></script>
   {% for jslib in THIRD_PARTY_JS %}

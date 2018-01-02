@@ -5,6 +5,8 @@ from django.conf import settings
 # noinspection PyUnresolvedReferences
 from api.system.tasks import *  # noqa: F401,F403
 # noinspection PyUnresolvedReferences
+from api.system.update.tasks import *  # noqa: F401,F403
+# noinspection PyUnresolvedReferences
 from api.task.tasks import *  # noqa: F401,F403
 # noinspection PyUnresolvedReferences
 from api.vm.tasks import *  # noqa: F401,F403

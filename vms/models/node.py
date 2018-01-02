@@ -33,6 +33,7 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
     NODES_ALL_EXPIRES = 300
     NICTAGS_ALL_KEY = 'nictag_list'
     NICTAGS_ALL_EXPIRES = None
+    SYSTEM_VERSION_EXPIRES = None
 
     OFFLINE = 1
     ONLINE = 2
@@ -850,7 +851,7 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
             version = worker_command('system_version', worker, timeout=0.5) or ''
 
             if version:
-                cache.set(self._system_version_key, version)
+                cache.set(self._system_version_key, version, self.SYSTEM_VERSION_EXPIRES)
 
         return version
 

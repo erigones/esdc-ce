@@ -2,7 +2,6 @@ from logging import getLogger
 
 from django import forms
 from django.forms.forms import NON_FIELD_ERRORS
-from django.utils.translation import ugettext
 from django.utils.six import iteritems, text_type
 from frozendict import frozendict
 
@@ -252,7 +251,7 @@ class SerializerForm(forms.Form):
             # Pair API errors to Django form errors
             for field in self.fields:
                 if field in errors:
-                    self._add_error(field, errors[field])  # should be lazy
+                    self._add_error(field, errors.pop(field))  # should be lazy
                     try:
                         del self.cleaned_data[field]
                     except KeyError:
@@ -261,7 +260,9 @@ class SerializerForm(forms.Form):
             if 'non_field_errors' in errors:
                 self._add_error(NON_FIELD_ERRORS, errors['non_field_errors'])  # should be lazy
             elif 'detail' in errors:
-                self._add_error(NON_FIELD_ERRORS, ugettext(errors['detail']))  # should be noop
+                self._add_error(NON_FIELD_ERRORS, errors['detail'])  # should be noop
+            elif 'message' in errors:
+                self._add_error(NON_FIELD_ERRORS, errors['message'])  # should be noop
 
         else:  # More serious api error
             if isinstance(errors, list):  # Maybe we have errors from multiple serializers

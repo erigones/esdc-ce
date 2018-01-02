@@ -16,70 +16,74 @@ td .wrap, th .wrap {
   white-space: normal;
 }
 
-/* line 27, ../scss/tables.scss */
+/* line 24, ../scss/tables.scss */
+td.center-text {
+  text-align: center;
+}
+/* line 30, ../scss/tables.scss */
 td .button.mini {
   padding: 0px 8px;
   margin: 0;
   font-weight: normal;
 }
-/* line 32, ../scss/tables.scss */
+/* line 35, ../scss/tables.scss */
 td .button.mini i {
   padding-top: 0.5px;
   vertical-align: middle;
 }
-/* line 37, ../scss/tables.scss */
+/* line 40, ../scss/tables.scss */
 td .button.small {
   padding: 2px 10px;
   margin: -2px 0;
 }
-/* line 41, ../scss/tables.scss */
+/* line 44, ../scss/tables.scss */
 td .button.small i {
   padding-top: 0.5px;
   vertical-align: middle;
 }
-/* line 48, ../scss/tables.scss */
+/* line 51, ../scss/tables.scss */
 td.button-group .button.small {
   margin: 0;
   margin-top: 1px;
 }
-/* line 53, ../scss/tables.scss */
+/* line 56, ../scss/tables.scss */
 td .input-error {
   color: #c94a48;
   font-style: bold;
 }
-/* line 59, ../scss/tables.scss */
+/* line 62, ../scss/tables.scss */
 td .help-inline.error {
   padding-top: 0;
   margin-bottom: -8px;
 }
-/* line 63, ../scss/tables.scss */
+/* line 66, ../scss/tables.scss */
 td .help-inline.note {
   padding-top: 0;
   margin-bottom: -8px;
   line-height: 14px;
   color: #888888;
 }
-/* line 71, ../scss/tables.scss */
+/* line 74, ../scss/tables.scss */
 td .msg {
   padding-top: 10px;
   text-align: center;
   font-weight: bold;
 }
 
-/* line 78, ../scss/tables.scss */
+/* line 81, ../scss/tables.scss */
 .nowrap tr td {
   white-space: nowrap;
 }
-/* line 80, ../scss/tables.scss */
+/* line 83, ../scss/tables.scss */
 .nowrap tr td.wrap {
   white-space: normal;
 }
 
-/* line 85, ../scss/tables.scss */
+/* line 88, ../scss/tables.scss */
 table.box {
   background-color: #FAFAFA;
 }
-/* line 89, ../scss/tables.scss */
+/* line 92, ../scss/tables.scss */
 table.box thead, table.box tfoot {
   background: #e5e5e5;
   background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4gPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiBncmFkaWVudFVuaXRzPSJvYmplY3RCb3VuZGluZ0JveCIgeDE9IjAuNSIgeTE9IjAuMCIgeDI9IjAuNSIgeTI9IjEuMCI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ViZWJlYiIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2U1ZTVlNSIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JhZCkiIC8+PC9zdmc+IA==');
@@ -94,28 +98,28 @@ table.box thead, table.box tfoot {
   -webkit-border-radius: 3px 3px;
   border-radius: 3px 3px 0 0 / 3px 3px 0 0;
 }
-/* line 96, ../scss/tables.scss */
+/* line 99, ../scss/tables.scss */
 table.box.table-striped tbody tr:nth-child(odd) td, table.box.table-striped tbody tr:nth-child(odd) th {
   background: #FDFDFD;
 }
-/* line 100, ../scss/tables.scss */
+/* line 103, ../scss/tables.scss */
 table.box.break-words {
   word-wrap: break-word;
   word-break: break-all;
 }
-/* line 106, ../scss/tables.scss */
+/* line 109, ../scss/tables.scss */
 table.box.table-striped tbody tr.info td {
   background-color: #d9edf7;
 }
-/* line 109, ../scss/tables.scss */
+/* line 112, ../scss/tables.scss */
 table.box.table-striped tbody tr.error td {
   background-color: #f2dede;
 }
-/* line 114, ../scss/tables.scss */
+/* line 117, ../scss/tables.scss */
 table.box .button {
   line-height: normal;
 }
-/* line 115, ../scss/tables.scss */
+/* line 118, ../scss/tables.scss */
 table.box .button i {
   font-size: 14px;
 }
@@ -123,32 +127,32 @@ table.box .button i {
 /*
  *  Responsive tables
  */
-/* line 127, ../scss/tables.scss */
+/* line 130, ../scss/tables.scss */
 table.table-responsive th, table.table-responsive td {
   word-wrap: break-word;
   max-width: 200px;
 }
 
-/* line 132, ../scss/tables.scss */
+/* line 135, ../scss/tables.scss */
 .tab-header {
   height: auto;
   word-wrap: break-word;
   overflow: hidden;
 }
 
-/* line 138, ../scss/tables.scss */
+/* line 141, ../scss/tables.scss */
 p.table_desc {
   margin: 0;
   color: #454545;
 }
 
-/* line 143, ../scss/tables.scss */
+/* line 146, ../scss/tables.scss */
 div.dataTables_paginate {
   float: none;
   margin-bottom: 20px;
   padding-right: 10px;
 }
-/* line 149, ../scss/tables.scss */
+/* line 152, ../scss/tables.scss */
 div.dataTables_paginate a {
   background: #ededed;
   background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4gPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiBncmFkaWVudFVuaXRzPSJvYmplY3RCb3VuZGluZ0JveCIgeDE9IjAuNSIgeTE9IjAuMCIgeDI9IjAuNSIgeTI9IjEuMCI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2VkZWRlZCIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JhZCkiIC8+PC9zdmc+IA==');
@@ -202,31 +206,31 @@ div.dataTables_paginate a:active {
   background-image: -webkit-linear-gradient(top, #d6d6d6, #e8e8e8);
   background-image: linear-gradient(to bottom, #d6d6d6, #e8e8e8);
 }
-/* line 157, ../scss/tables.scss */
+/* line 160, ../scss/tables.scss */
 div.dataTables_paginate .first {
   -moz-border-radius: 4px 0 0 4px;
   -webkit-border-radius: 4px;
   border-radius: 4px 0 0 4px;
 }
-/* line 161, ../scss/tables.scss */
+/* line 164, ../scss/tables.scss */
 div.dataTables_paginate .last {
   -moz-border-radius: 0 4px 4px 0;
   -webkit-border-radius: 0;
   border-radius: 0 4px 4px 0;
 }
-/* line 165, ../scss/tables.scss */
+/* line 168, ../scss/tables.scss */
 div.dataTables_paginate .ui-state-disabled, div.dataTables_paginate .ui-state-disabled:hover {
   background: #ddd;
   cursor: default;
   text-shadow: none;
 }
 
-/* line 173, ../scss/tables.scss */
+/* line 176, ../scss/tables.scss */
 .inner-well .table th, .inner-well .table td {
   border: none;
 }
 
-/* line 178, ../scss/tables.scss */
+/* line 181, ../scss/tables.scss */
 #debug {
   position: fixed;
   bottom: 0;
@@ -237,13 +241,13 @@ div.dataTables_paginate .ui-state-disabled, div.dataTables_paginate .ui-state-di
   padding: 0 5px;
 }
 
-/* line 188, ../scss/tables.scss */
+/* line 191, ../scss/tables.scss */
 table#debug-query-table tr td {
   padding-top: 0;
   padding-bottom: 0;
 }
 
-/* line 193, ../scss/tables.scss */
+/* line 196, ../scss/tables.scss */
 table#debug-query-table code {
   border: 0;
   margin: 0;

@@ -1,0 +1,52 @@
+#!/bin/bash
+
+if [[ "$(id -u)" != "0" ]]; then
+	echo "This script must be run as root" >&2
+	exit 6
+fi
+
+MAINDIR="$(cd "$(dirname "$0")/.." || exit 64 ; pwd -P)"
+ERIGONES_HOME="${ERIGONES_HOME:-"${MAINDIR}"}"
+
+function node_status() {
+	svcs svc:/application/erigonesd:*
+}
+
+function node_restart() {
+	svcadm restart svcs svc:/application/erigonesd:*
+}
+
+function mgmt_status() {
+	systemctl status esdc@* erigonesd erigonesd-beat
+}
+
+function mgmt_restart() {
+	systemctl restart esdc@* erigonesd erigonesd-beat
+}
+
+function is_node() {
+	[[ "$(uname -s)" == "SunOS" ]] && \
+	[[ -f /usr/bin/zonename ]] && \
+	[[ "$(/usr/bin/zonename)" == "global" ]]
+}
+
+case "$1" in
+	"status")
+		if is_node; then
+			node_status
+		else
+			mgmt_status
+		fi
+	;;
+	"restart")
+		if is_node; then
+			node_restart
+		else
+			mgmt_restart
+		fi
+	;;
+	*)
+		echo "Usage: $0 {status|restart}" >&2
+		exit 1
+	;;
+esac

@@ -1,26 +1,15 @@
-from api.event import Event
+from api.event import BroadcastEvent
 
 
-class BaseUpdateEvent(Event):
+class SystemUpdateStarted(BroadcastEvent):
     """
-    Base class for events below.
-    """
-    def __init__(self, task_id, request=None, **kwargs):
-        if request:
-            kwargs['siosid'] = getattr(request, 'siosid', None)
-
-        super(BaseUpdateEvent, self).__init__(task_id, **kwargs)
-
-
-class SystemUpdateStarted(BaseUpdateEvent):
-    """
-    Called from the UpdateView.
+    Called from the system_update task. Emitted to all socket.io sessions.
     """
     _name_ = 'system_update_started'
 
 
-class SystemUpdateFinished(BaseUpdateEvent):
+class SystemUpdateFinished(BroadcastEvent):
     """
-    Called from the UpdateView.
+    Called from the UpdateView. Emitted to all socket.io sessions.
     """
     _name_ = 'system_update_finished'

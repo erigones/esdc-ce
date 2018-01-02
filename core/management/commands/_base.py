@@ -52,6 +52,9 @@ class DanubeCloudCommand(BaseCommand):
     PROJECT_NAME = 'esdc-ce'
     CTLSH = os.path.join(PROJECT_DIR, 'bin', 'ctl.sh')
 
+    cmd_sha = 'git log --pretty=oneline -1 | cut -d " " -f 1'
+    cmd_tag = 'git symbolic-ref -q --short HEAD || git describe --tags --exact-match'
+
     default_verbosity = 1
     verbose = False
     strip_newline = False
@@ -74,6 +77,13 @@ class DanubeCloudCommand(BaseCommand):
         """This isn't used anywhere"""
         from core.version import __version__
         return 'Danube Cloud %s' % __version__
+
+    def get_git_version(self):
+        with lcd(self.PROJECT_DIR):
+            _tag = self.local(self.cmd_tag, capture=True).strip().split('/')[-1]
+            _sha = self.local(self.cmd_sha, capture=True).strip()
+
+            return _tag, _sha
 
     def execute(self, *args, **options):
         """Set some default attributes before calling handle()"""

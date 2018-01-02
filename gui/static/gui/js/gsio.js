@@ -577,6 +577,12 @@ function message_callback(code, res, view, method, args, kwargs, apiview, apidat
         // Update image list
         image_list_update(kwargs.name, false, 2, 'pending');
         break;
+
+      case 'system_node_update': // system_node_update started
+        if (SYSTEM_UPDATE && SYSTEM_UPDATE.is_displayed()) {
+          SYSTEM_UPDATE.started(hostname);
+        }
+        break;
     }
 
   // all FAILURE -> send notification
@@ -759,8 +765,31 @@ function _task_event_callback(result) {
       }
       break;
 
-    case 'system_reloaded': // SystemReloaded event called from SystemReloadThread
-      alert2(result.message);
+    case 'node_system_restarted':
+      if (result.system_version) {
+        // If there is a node system version label, then we need to update it
+        node_system_version_update(result.hostname, result.system_version);
+      }
+      break;
+
+    case 'system_update_started': // Broadcast event
+      if (SYSTEM_UPDATE && SYSTEM_UPDATE.is_displayed()) {
+        SYSTEM_UPDATE.started();
+        system_update_started();
+      } else {
+        system_update_started();
+        return false;  // do not update cached tasklog
+      }
+      break;
+
+    case 'system_update_finished': // Broadcast event
+      if (SYSTEM_UPDATE && SYSTEM_UPDATE.is_displayed()) {
+        SYSTEM_UPDATE.finished(null, result.error);
+        system_update_finished(result.error);
+      } else {
+        system_update_finished(result.error);
+        return false;  // do not update cached tasklog
+      }
       break;
 
     case 'user_current_dc_changed':
@@ -1120,6 +1149,12 @@ function _task_status_callback(res, apiview) {
       }
 
       break; // always update cached tasklog
+
+    case 'system_node_update': // system_node_update finished
+      if (SYSTEM_UPDATE && SYSTEM_UPDATE.is_displayed()) {
+        SYSTEM_UPDATE.finished(hostname, (res.status !== 'SUCCESS'));
+      }
+      break; // update cached tasklog
   }
 
   return true; // true => update cached_tasklog

@@ -103,22 +103,27 @@ def _execute(cmd, stdin=None):
 
 
 # noinspection PyUnusedLocal
-def update_command(version, key=None, cert=None, sudo=False):
+def update_command(version, key=None, cert=None, force=False, sudo=False, run=False):
     """Call update script"""
     from core import settings
 
     ssl_key_file = settings.UPDATE_KEY_FILE
     ssl_cert_file = settings.UPDATE_CERT_FILE
     update_script = os.path.join(settings.PROJECT_DIR, ERIGONES_UPDATE_SCRIPT)
-    cmd = [update_script, version]
 
     if sudo:
-        cmd.insert(0, 'sudo')
+        cmd = ['sudo', update_script, '--esdc-service-restart']
+    else:
+        cmd = [update_script, '--esdc-service-restart']
+
+    if force:
+        cmd.append('--force')
+
+    cmd.append(version)
 
     if key:
-
         try:
-            with open(ssl_key_file, 'w+') as f:
+            with os.fdopen(os.open(ssl_key_file, os.O_CREAT | os.O_WRONLY, 0o600), 'w') as f:
                 f.write(key)
         except IOError as err:
             logger.error('Error writing private key to file %s (%s)', ssl_key_file, err)
@@ -129,9 +134,8 @@ def update_command(version, key=None, cert=None, sudo=False):
         cmd.append(ssl_key_file)
 
     if cert:
-
         try:
-            with open(ssl_cert_file, 'w+') as f:
+            with os.fdopen(os.open(ssl_cert_file, os.O_CREAT | os.O_WRONLY, 0o600), 'w') as f:
                 f.write(cert)
         except IOError as err:
             logger.error('Error writing private cert to file %s (%s)', ssl_cert_file, err)
@@ -141,7 +145,10 @@ def update_command(version, key=None, cert=None, sudo=False):
     if os.path.isfile(ssl_cert_file):
         cmd.append(ssl_cert_file)
 
-    return _execute(cmd)
+    if run:
+        return _execute(cmd)
+    else:
+        return cmd
 
 
 # noinspection PyUnusedLocal
@@ -154,10 +161,10 @@ def execute(state, cmd=None, stdin=None):
 
 # noinspection PyUnusedLocal
 @Panel.register
-def system_update(state, version=None, key=None, cert=None):
-    """Panel command that is simple wrapper around update_command performing update"""
+def system_update_command(state, version=None, key=None, cert=None, force=None):
+    """Panel command that is simple wrapper around update_command"""
     assert version
-    return update_command(version, key=key, cert=cert)
+    return update_command(version, key=key, cert=cert, force=force, run=False)
 
 
 # noinspection PyUnusedLocal
