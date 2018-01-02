@@ -1,18 +1,65 @@
 #!/bin/bash
 
-ZKCLI=/usbkey/scripts/zookeepercli
-# shellcheck disable=SC2124
-QUERY_STRING="$@"
+ZKCLI="${ZKCLI:-"/usbkey/scripts/zookeepercli"}"
+CURL="${CURL:-"/opt/local/bin/curl"}"
+JSON="${JSON:-"/usr/bin/json"}"
+USE_CURL=1
+HTTP_SCHEME="https"
+HTTP_PORT="12181"
+ACTION_PARAMS=()
+ZK_FORCE=""
+ZK_USERNAME="esdc"
 
-if [ -z "${QUERY_STRING}" ]; then
-		echo "Usage:   $0 <query>" 1>&2
-		echo "Example: $0 ls /esdc/nodes" 1>&2
-		exit 10
+usage() {
+	echo "Usage:   $0 [--legacy|--no-ssl|--force|-k] <command/query>"
+	echo "Example: $0 ls /esdc/nodes"
+}
+
+while true; do
+	case "$1" in
+		--help|-h)
+			usage
+			exit 0
+			;;
+		--old|--legacy)
+			USE_CURL=""
+			shift
+			;;
+		--no-ssl|--no-tls)
+			HTTP_SCHEME="http"
+			shift
+			;;
+		--force)
+			ZK_FORCE="true"
+			shift
+			;;
+		-*)
+			ACTION_PARAMS+=("$1")
+			shift
+			;;
+		*)
+			QUERY_STRING=("${@}")
+			break
+			;;
+	esac
+done
+
+
+if [[ "${#QUERY_STRING[@]}" -le 1 ]]; then
+	usage 1>&2
+	exit 10
 fi
 
-if [ ! -x "${ZKCLI}" ]; then
-		echo "Error: Cannot find binary ${ZKCLI}" 1>&2
+if [[ -n "${USE_CURL}" ]]; then
+	if [[ ! -x "${CURL}" ]]; then
+		echo "ERROR: Cannot find binary ${CURL}" 1>&2
 		exit 20
+	fi
+else
+	if [[ ! -x "${ZKCLI}" ]]; then
+		echo "ERROR: Cannot find binary ${ZKCLI}" 1>&2
+		exit 20
+	fi
 fi
 
 # find and load config file (usually /usbkey/config)
@@ -20,6 +67,58 @@ fi
 . /lib/sdc/config.sh
 load_sdc_config
 
-# shellcheck disable=SC2154,SC2086
-"${ZKCLI}" -servers "${CONFIG_cfgdb_admin_ip}" -auth_usr "esdc" -auth_pwd "${CONFIG_esdc_install_password}" -c ${QUERY_STRING}
-exit $?
+#shellcheck disable=SC2154
+ZK_IP="${CONFIG_cfgdb_admin_ip}"
+#shellcheck disable=SC2154
+ZK_PASSWORD="${CONFIG_esdc_install_password}"
+
+if [[ -z "${ZK_IP}" ]]; then
+	echo "ERROR: Missing cfgdb_admin_ip in config file" 1>&2
+	exit 31
+fi
+
+if [[ -z "${ZK_PASSWORD}" ]]; then
+	echo "ERROR: Missing esdc_install_password in config file" 1>&2
+	exit 32
+fi
+
+if [[ -z "${USE_CURL}" ]]; then
+	# Legacy zookeepercli
+	"${ZKCLI}" -servers "${ZK_IP}" -auth_usr "${ZK_USERNAME}" -auth_pwd "${ZK_PASSWORD}" "${ACTION_PARAMS[@]}" -c "${QUERY_STRING[@]}"
+	exit $?
+fi
+
+ZK_CMD="${QUERY_STRING[0]}"
+ZK_NODE="${QUERY_STRING[1]}"
+unset -v 'QUERY_STRING[0]'
+unset -v 'QUERY_STRING[1]'
+ZK_DATA="${QUERY_STRING[*]}"
+URL="${HTTP_SCHEME}://${ZK_IP}:${HTTP_PORT}${ZK_NODE}?cmd=${ZK_CMD}"
+
+if [[ -n "${ZK_DATA}" ]]; then
+	json_data="{\"data\":\"${ZK_DATA}\"}"
+else
+	json_data="{}"
+fi
+
+if [[ -n "${ZK_FORCE}" ]]; then
+	json_data="$(echo "${json_data}{\"force\":true}" | "${JSON}" --merge -o json-0)"
+fi
+
+ACTION_PARAMS+=("-d" "${json_data}")
+
+# Here we go
+out=$("${CURL}" -s -X PUT -H "zk-username:${ZK_USERNAME}" -H "zk-password:${ZK_PASSWORD}" "${ACTION_PARAMS[@]}" "${URL}" 2>&1)
+# Output must be in JSON format
+rc="$(echo "${out}" | "${JSON}" "returncode" 2> /dev/null)"
+
+# shellcheck disable=SC2181
+if [[ "$?" -ne 0 || -z "${rc}" ]]; then
+	# Invalid JSON output - probably some error
+	echo "${out}" 1>&2
+	exit 1
+fi
+
+echo "${out}" | "${JSON}" "stdout"
+echo "${out}" | "${JSON}" "stderr" 1>&2
+exit "${rc}"
