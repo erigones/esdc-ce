@@ -18,6 +18,7 @@ Features
 - Added node version caching and internal update events - `#271 <https://github.com/erigones/esdc-ce/issues/271>`__
 - Added automatic synchronization of overlay ARP files - `#286 <https://github.com/erigones/esdc-ce/issues/286>`__
 - Added script for automating platform upgrade - `#289 <https://github.com/erigones/esdc-ce/issues/289>`__
+- Added status update button to compute node list - `#291 <https://github.com/erigones/esdc-ce/issues/291>`__
 - Changed CPU resource accounting to use VM's cpu_cap parameter and added VMS_VM_CPU_CAP_REQUIRED setting - `#296 <https://github.com/erigones/esdc-ce/issues/296>`__
 - Made compute node IP address changeable - `#305 <https://github.com/erigones/esdc-ce/issues/305>`__
 - Added experimental support for live migration - `#306 <https://github.com/erigones/esdc-ce/issues/306>`__
@@ -38,6 +39,7 @@ Bugs
 - Fixed reverse lock persistence - `#317 <https://github.com/erigones/esdc-ce/issues/317>`__
 - Fixed emergency cleanup for cancelled or deleted VM migration task - `#318 <https://github.com/erigones/esdc-ce/issues/318>`__
 - Fixed SSL cert update (restart haproxy after SSL cert change) - `#322 <https://github.com/erigones/esdc-ce/issues/322>`__
+- Fixed stale task info after image creation from snapshot - `#334 <https://github.com/erigones/esdc-ce/issues/334>`__
 
 
 2.6.7 (released on 2017-11-06)

@@ -26,6 +26,39 @@ else:
     t_long = long
 
 
+class NodeStatusForm(SerializerForm):
+    """
+    Update compute node settings.
+    """
+    _api_call = node_define
+    _node_hostname = None
+    _new_status = None
+
+    hostnames = ArrayField(required=True, widget=forms.HiddenInput(attrs={'class': 'hide'}))
+    status = forms.TypedChoiceField(label=_('Status'), choices=Node.STATUS, coerce=int,
+                                    widget=forms.Select(attrs={'class': 'narrow input-select2'}))
+
+    def _add_error(self, field_name, error):
+        if self._node_hostname:
+            if isinstance(error, (list, tuple)):
+                error = ['%s: %s' % (self._node_hostname, err) for err in error]
+            else:
+                error = '%s: %s' % (self._node_hostname, error)
+        return super(NodeStatusForm, self)._add_error(field_name, error)
+
+    def _final_data(self, data=None):
+        # Save target status from cleaned form data.
+        # The save() method may remove the cleaned_data['status'] if there is and API error.
+        if self._new_status is None:
+            self._new_status = data['status']
+        return {'status': self._new_status}
+
+    def call_node_define(self, hostname):
+        # Save current node hostname for __add_error()
+        self._node_hostname = hostname
+        return self.save(action='update', args=(hostname,))
+
+
 class NodeForm(SerializerForm):
     """
     Update compute node settings.
