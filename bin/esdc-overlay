@@ -99,6 +99,9 @@ check_orule_name() {
 }
 
 update_ans_hosts() {
+	# don't update when just listing
+	[[ "${CMD,,}" == "list" ]] && return 0
+
 	echo "Updating nodelist from DC management"
 	[[ -z "${MGMT_IP}" ]] && MGMT_IP="$(query_cfgdb get /esdc/vms/esdc-mgmt/master/ip)"
 	[[ -z "${MGMT_IP}" ]] && MGMT_IP="$(query_cfgdb get /esdc/vms/esdc-mgmt/hosts/1/ip)"
