@@ -136,8 +136,10 @@ update_ans_hosts() {
 }
 
 list_overlay_rules() {
+	# shellcheck disable=SC1117
 	printf "%-12s %-9s %-9s\n" "NAME" "PORT" "NODELIST"
 	while read -r orule; do
+		# shellcheck disable=SC1117
 		printf "%-12s %-9s %-9s\n" "${orule}" "$(query_cfgdb get "${CFGDB_ORULES_PATH}/${orule}/port")" "$(query_cfgdb get "${CFGDB_ORULES_PATH}/${orule}/nodelist")"
 	done <<< "$(query_cfgdb ls "${CFGDB_ORULES_PATH}")"
 }
@@ -180,7 +182,7 @@ get_next_orule_port() {
 		# Probably no overlay is defined.
 		# Return default overlay number + 1
 		# (to make sure we won't collide with a default).
-		new_port="$(( ${ORULE_DEFAULT_PORT} + 1 ))"
+		new_port="$(( ORULE_DEFAULT_PORT + 1 ))"
 	fi
 	echo "${new_port}"
 }
@@ -315,12 +317,14 @@ print_full_ipsec_json() {
 }
 
 print_full_firewall_json() {
+	# shellcheck disable=SC2155
 	local fw_enabled="$(query_cfgdb get "${CFGDB_FIREWALL_PATH}/globally_enabled")"
 	if [[ "${fw_enabled}" == "true" ]]; then
 		echo "$(query_cfgdb get "${CFGDB_FIREWALL_PATH}/administrator_sources")" \
 			| ${SED} -re 's/([^,]+)/"\1"/g;s/^/[/;s/$/]/'
 	else
 		# firewall is disabled, return empty list
+		# shellcheck disable=SC2005
 		echo '[]'
 	fi
 }
@@ -328,6 +332,7 @@ print_full_firewall_json() {
 verify_json() {
 	local json="${1}"
 	echo "${json}" | $JSON > /dev/null
+	# shellcheck disable=SC2181
 	if [[ "${?}" -ne 0 ]]; then
 		echo "Internal error: invalid json generated"
 		exit 9
@@ -337,12 +342,16 @@ verify_json() {
 parse_node_dc_list() {
 	# read hosts.cfg and get node list and their respective dc names
 	while read -r line; do
+		# shellcheck disable=SC1117
 		nodename="$(echo "${line}" | ${SED} -re 's/^([^ \t]+).*$/\1/g')"
 		dc="$(echo "${line}" | ${SED} -re 's/^.*dc_name="?([^"]+)"?.*$/\1/g')"
 		NODE_DC_LIST["${nodename}"]="${dc}"
+		# shellcheck disable=SC1117
 	done <<< "$(${SED} -ne "/^\[nodes\]$/,/^\[/p" "${HOSTS_FILE}" | ${GREP} -v '^\[' | ${GREP} -v '^$')"
 	if [[ "${DEBUG}" -eq 1 ]]; then
+		# shellcheck disable=SC2068
 		echo "All nodes: ${!NODE_DC_LIST[@]}"
+		# shellcheck disable=SC2068
 		echo "Node DCs:  ${NODE_DC_LIST[@]}"
 	fi
 }
@@ -406,7 +415,9 @@ run_ansible() {
 	verify_json "${FIREWALL_CFG}"
 	export FIREWALL_CFG
 
+	# shellcheck disable=SC2164
 	cd "${ANS_BASE}"
+	# shellcheck disable=SC1090
 	. "${ERIGONES_HOME}/envs/bin/activate"
 
 	if [[ "${DEBUG}" -eq 1 ]]; then
@@ -421,7 +432,8 @@ run_ansible() {
 		echo Running: "${ERIGONES_HOME}/envs/bin/ansible-playbook" "${PLAYBOOK}" --extra-vars="${extra_vars}" "${verbose}"
 	fi
 
-	"${ERIGONES_HOME}/envs/bin/ansible-playbook" "${PLAYBOOK}" ${args} --extra-vars="${extra_vars}" ${verbose}
+	"${ERIGONES_HOME}/envs/bin/ansible-playbook" "${PLAYBOOK}" --extra-vars="${extra_vars}" "${verbose}"
+	# shellcheck disable=SC2181
 	if [[ "${?}" -ne 0 ]]; then
 		echo
 		echo "Ansible run failed. CFGDB was already altered, so you don't need to modify parameters again."
@@ -563,7 +575,7 @@ case ${CMD,,} in
 		if ! cfgdb_orule_exists "${ORULE_NAME}"; then
 			echo "Warning: overlay rule '${ORULE_NAME}' does not exist in cfgdb."
 			${PRINTF} "Run ansible to make sure it's removed also from all compute nodes? (Y/n) "
-			read reply
+			read -r reply
 			if [[ "${reply,,}" != "y" && -n "${reply}" ]]; then
 				echo "Exitting.."
 				exit 0
@@ -632,7 +644,7 @@ case ${CMD,,} in
 		echo "block in quick on external0 all"
 		echo 
 		${PRINTF} "Do you really want to enable a firewall? (Y/n) "
-		read reply
+		read -r reply
 		if [[ "${reply,,}" != "y" && -n "${reply}" ]]; then
 			echo "Exitting.."
 			exit 0
