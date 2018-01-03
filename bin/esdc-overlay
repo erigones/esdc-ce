@@ -49,32 +49,33 @@ ORULES_JSON=
 # final IPSec config
 
 usage() {
-	echo
-	echo "Usage:"
-	echo "$0 create <overlay_rule_name> [node_list|all] [raw_overlay_rule_string]"
-	echo "$0 update [overlay_rule_name] [node_list|all] [raw_overlay_rule_string]"
-	echo "$0 delete <overlay_rule_name>"
-	echo "$0 list"
-	echo
-	echo "Examples:"
-	echo "$0 create <overlay_rule_name>"
-	echo "$0 create <overlay_rule_name> cn01.local,cn02.local,cn03.local"
-	echo "$0 create customers all \"-e vxlan -p vxlan/listen_ip=0.0.0.0,vxlan/listen_port=4790 -s files -p files/config=${OVERLAY_ARP_JSON_DIR}/customers_overlay.json -p mtu=1400\""
-	echo "$0 update"
-	echo "$0 update customers"
-	echo "$0 delete customers"
-	echo "$0 list"
-	echo
-	echo "To enable debug output, append \"-debug\" to a subcommand, e.g:"
-	echo "$0 create-debug <overlay_rule_name>"
-	echo
+
+	cat << EOF
+Usage:
+$0 create <overlay_rule_name> [node_list|all] [raw_overlay_rule_string]
+$0 update [overlay_rule_name] [node_list|all] [raw_overlay_rule_string]
+$0 delete <overlay_rule_name>
+$0 list
+
+Examples:
+$0 create <overlay_rule_name>
+$0 create <overlay_rule_name> cn01.local,cn02.local,cn03.local
+$0 create customers all \"-e vxlan -p vxlan/listen_ip=0.0.0.0,vxlan/listen_port=4790 -s files -p files/config=${OVERLAY_ARP_JSON_DIR}/customers_overlay.json -p mtu=1400\"
+$0 update
+$0 update customers
+$0 delete customers
+$0 list
+
+Extra:
+$0 globally-enable-firewall
+$0 globally-disable-firewall
+$0 update-firewall
+
+To enable debug output, append \"-debug\" to a subcommand, e.g:
+$0 create-debug <overlay_rule_name>
+EOF
 	exit 1
 }
-
-if [ ! -x "${QUERY_CFGDB_BIN}" ]; then
-	echo "Binary ${QUERY_CFGDB_BIN} not found. Aborting."
-	exit 1
-fi
 
 query_cfgdb() {
 	local zcmd="$@"
@@ -84,6 +85,11 @@ query_cfgdb() {
 }
 
 test_cfgdb_connect() {
+	if [ ! -x "${QUERY_CFGDB_BIN}" ]; then
+		echo "Binary ${QUERY_CFGDB_BIN} not found. Aborting."
+		exit 1
+	fi
+
 	if [[ -z "$(query_cfgdb get /esdc/settings/dc/datacenter_name)" ]]; then
 		echo "Connect to cfgdb failed! Aborting."
 		exit 11
@@ -532,15 +538,17 @@ case ${CMD,,} in
 				fi
 			fi
 
-			# update nodelist
+			# update nodelist if necessary
 			nodelist="${NODE_LIST}"
 			nodelist_saved="$(query_cfgdb get "${CFGDB_ORULES_PATH}/${ORULE_NAME}/nodelist")"
 			if [[ "${nodelist}" != "${nodelist_saved}" ]]; then
-				echo "XXXX: ${nodelist} != ${nodelist_saved}"
 				query_cfgdb set "${CFGDB_ORULES_PATH}/${ORULE_NAME}/nodelist" "${nodelist}"
 				echo "Node list for '${ORULE_NAME}' updated in cfgdb"
 			fi
 
+		elif [[ -n "${ORULE_NAME}" && -z "${NODE_LIST}" ]]; then
+			# get nodelist for specified orule
+			NODE_LIST="$(query_cfgdb get "${CFGDB_ORULES_PATH}/${ORULE_NAME}/nodelist")"
 		fi
 
 		echo "Updating configuration on nodes"
