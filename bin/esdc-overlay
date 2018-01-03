@@ -17,6 +17,7 @@ ORULE_NAME="${2}"
 NODE_LIST="$(echo "${3}" | ${SED} -e 's/[[:space:]]//g')"	# remove whitespaces
 ORULE_STRING="${4}"
 
+# shellcheck disable=SC2164
 MAINDIR="$(cd "$(dirname "$0")/.." ; pwd -P)"
 ERIGONES_HOME="${ERIGONES_HOME:-"${MAINDIR}"}"
 export ERIGONES_HOME
@@ -44,9 +45,6 @@ MGMT_IP=
 DEBUG=0
 # current list of compute nodes from mgmt
 declare -A NODE_DC_LIST		# nodelist: ${!NODE_DC_LIST[@]} ; dc list: ${NODE_DC_LIST[@]}|sort|uniq
-# final overlay config
-ORULES_JSON=
-# final IPSec config
 
 usage() {
 
@@ -80,7 +78,9 @@ EOF
 query_cfgdb() {
 	local zcmd="$@"
 
+	# shellcheck disable=SC2086
 	[[ "${DEBUG}" -eq 1 ]] && echo running command: ${QUERY_CFGDB_BIN} ${zcmd} >> /dev/stderr
+	# shellcheck disable=SC2086
 	"${QUERY_CFGDB_BIN}" ${zcmd} 2> /dev/null
 }
 
