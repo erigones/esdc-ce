@@ -14,7 +14,7 @@ Links
 - Wiki: https://github.com/erigones/esdc-ce/wiki
 - Bug Tracker: https://github.com/erigones/esdc-ce/issues
 - Twitter: https://twitter.com/danubecloud
-- Forum (Q&A): https://qa.danubecloud.org
+- Gitter: https://gitter.im/erigones/DanubeCloud
 - IRC: `irc.freenode.net#danubecloud <https://webchat.freenode.net/#danubecloud>`__
 
 
@@ -23,7 +23,7 @@ License
 
 ::
 
-    Copyright 2016-2017 Erigones, s. r. o.
+    Copyright 2016-2018 Erigones, s. r. o.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this project except in compliance with the License.
