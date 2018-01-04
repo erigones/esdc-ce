@@ -135,7 +135,7 @@ class UserProfileSerializer(InstanceSerializer):
                     return attrs
                 else:
                     # Store old phone number for later so we know we have to send text message
-                    self.old_phone = self.object.phone
+                    self.old_phone = self.object.phone or True
                 # Store formatted phone number
                 attrs[source] = value
 

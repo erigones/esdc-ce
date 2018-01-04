@@ -138,7 +138,8 @@ def registration_check(request, uidb64=None, token=None):
         # This may look strange - setting the phone_verified before the user logs in. It is not :) Actually we have
         # the last_login field, which should be set to None at this point. So we know that the user never logged in and
         # after the user logs in we would set phone_verified to True anyway.
-        profile.phone_verified = True
+        if sms_registration:
+            profile.phone_verified = True
         profile.save()
 
         if sms_registration:

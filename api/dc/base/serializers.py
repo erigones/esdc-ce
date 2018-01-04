@@ -767,4 +767,9 @@ class DefaultDcSettingsSerializer(DcSettingsSerializer):
                 _('Cannot enable EMAIL_USE_TLS and EMAIL_USE_SSL together.')
             ])
 
-        return attrs
+        # Do not allow SMS registration without the SMS module
+        if (attrs.get('SMS_REGISTRATION_ENABLED', None) and
+                not attrs.get('SMS_ENABLED', self.request.dc.settings.SMS_ENABLED)):
+            self._errors['SMS_REGISTRATION_ENABLED'] = s.ErrorList([_('SMS support must be enabled first.')])
+
+        return super(DefaultDcSettingsSerializer, self).validate(attrs)

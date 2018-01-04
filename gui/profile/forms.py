@@ -52,10 +52,11 @@ class UserForm(SerializerForm):
         # Whether to require email validation. Using global REGISTRATION_ENABLED, because the validation must be
         # performed in each DC (even if the DC has registration disabled).
         if not user.is_staff and user.must_email_be_verified():
-            self.fields['email'].help_text = 'notverified'
             if user.userprofile.email_verified:
                 self.fields['email'].help_text = _('WARNING: After changing the email address you will receive a email '
                                                    'to validate the new email address.')
+            else:
+                self.fields['email'].help_text = 'notverified'
 
     def _initial_data(self, request, obj):
         return get_user_serializer(request, obj)
@@ -294,10 +295,11 @@ class UserProfileForm(SerializerForm):
 
         # Whether to require phone validation.
         if not profile.user.is_staff and profile.must_phone_be_verified():
-            self.fields['phone'].help_text = 'notverified'
-            if profile.phone_verified:
+            if profile.phone_verified or not profile.phone:
                 self.fields['phone'].help_text = _('WARNING: After changing the phone number you will receive a text '
                                                    'message to validate the new phone number.')
+            else:
+                self.fields['phone'].help_text = 'notverified'
 
         if request.method == 'POST':
             usertype = request.POST.get('usertype', profile.usertype)
