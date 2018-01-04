@@ -1,8 +1,13 @@
 from collections import namedtuple, OrderedDict
 from subprocess import Popen, PIPE, STDOUT
+from threading import Thread
 from logging import getLogger
+from time import sleep
+from django.conf import settings
 
 from api.exceptions import GatewayTimeout
+from api.request import Request as APIRequest
+from api.system.service.events import SystemReloaded
 from que.utils import worker_command
 
 logger = getLogger(__name__)
@@ -170,3 +175,59 @@ class NodeServiceControl(_ServiceControl):
             cmd = '/usr/sbin/svcadm {action} {service}'
 
         return self._action_cmd(service, action, cmd)
+
+
+class SystemReloadThread(Thread):
+    """
+    Reload all app services in background.
+    It is important to restart/reload the calling service as last one.
+    Used by eslic.
+    """
+    daemon = True
+
+    def __init__(self, delay=3, task_id=None, request=None, reason=''):
+        self.delay = delay
+        self.task_id = task_id
+        self.request = request
+        self.reason = reason
+        self.last_service = self._get_last_service(self.request)
+        self.sctrl = ServiceControl()
+        super(SystemReloadThread, self).__init__(name='system-reload-thread')
+
+    @staticmethod
+    def _get_last_service(request):
+        if request:
+            if isinstance(request, APIRequest):
+                return 'app-api'
+            else:
+                return 'app-gui'
+        return 'erigonesd:mgmt'
+
+    def reload_service(self, name):
+        # Issue esdc-ce#20
+        self.sctrl.restart(name)
+
+    def reload_all(self):
+        last = None
+
+        for name in self.sctrl.app_services:
+            if name == self.last_service:
+                last = name
+            else:
+                self.reload_service(name)
+
+        if last:
+            self.reload_service(last)
+
+    def run(self):
+        logger.info('Initializing system reload')
+        sleep(self.delay)
+
+        if settings.DEBUG:
+            logger.info('Skipping system reload in DEBUG mode')
+        else:
+            self.reload_all()
+            logger.info('System reloaded')
+
+        if self.task_id:
+            SystemReloaded(self.task_id, request=self.request, reason=self.reason).send()

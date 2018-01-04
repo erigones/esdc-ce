@@ -765,6 +765,10 @@ function _task_event_callback(result) {
       }
       break;
 
+    case 'system_reloaded': // SystemReloaded event called from SystemReloadThread
+      alert2(result.message);
+      break;
+
     case 'node_system_restarted':
       if (result.system_version) {
         // If there is a node system version label, then we need to update it
