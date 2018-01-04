@@ -23,7 +23,7 @@ try:
     # noinspection PyPep8Naming
     from core.version import __version__ as VERSION
 except ImportError:
-    VERSION = '2.?'
+    VERSION = '3.?'
 
 # -- General configuration -----------------------------------------------------
 
@@ -49,7 +49,7 @@ master_doc = 'index'
 # General information about the project.
 project = u'Danube Cloud API'
 # noinspection PyShadowingBuiltins
-copyright = u'2013-2017, Erigones, s. r. o.'
+copyright = u'2013-2018, Erigones, s. r. o.'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
