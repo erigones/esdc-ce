@@ -238,6 +238,8 @@ class RegisterForm(_RegisterForm):
             'class': 'input-transparent',
             'placeholder': _('New password'),
             'required': 'required',
+            'pattern': '.{6,}',
+            'title': _('6 characters minimum'),
         }),
     )
 
