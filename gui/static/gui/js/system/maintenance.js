@@ -144,9 +144,7 @@ function SystemUpdate() {
 
   $('#system_update').click(function() {
     self.modal = new obj_form_modal($(this), '#system_update_modal', function(mod, start) {
-      if (start) {
-        enable_latest_system_version_btn();
-      }
+      enable_latest_system_version_btn();
     });
 
     return false;
@@ -155,11 +153,11 @@ function SystemUpdate() {
   $('#node_system_update').click(function() {
     self.modal = new obj_form_modal($(this), '#node_update_modal', function(mod, start) {
       if (start) {
-        enable_latest_system_version_btn();
         var hostnames = NODE_LIST.get_hostnames();
         $('#id_node-hostnames_text').html(hostnames.join(', '));
         $('#id_node-hostnames').val(hostnames);
       }
+      enable_latest_system_version_btn();
     });
 
     return false;
