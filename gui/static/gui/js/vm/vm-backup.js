@@ -238,12 +238,16 @@ function vm_backup_restore(hostname, btn, destroy_fun, rollback_fun) {
 
   var handler = function() {
     if (!yes.hasClass('disabled')) {
-      return destroy_fun(hostname, name, disk_id, vm_hostname);
+      confirm2(yes.data('confirm'), function() {
+        destroy_fun(hostname, name, disk_id, vm_hostname);
+      });
     }
   };
   var handler_force = function() {
     if (!yes_force.hasClass('disabled')) {
-      return rollback_fun(hostname, name, disk_id, force_box.prop('checked'), vm_hostname, target_hostname.val(), target_disk_id.val());
+      confirm2(yes_force.data('confirm'), function() {
+        rollback_fun(hostname, name, disk_id, force_box.prop('checked'), vm_hostname, target_hostname.val(), target_disk_id.val());
+      });
     }
   };
   var handler_force_box = function() {
@@ -363,12 +367,16 @@ function vm_snapshot_rollback(hostname, btn, destroy_fun, rollback_fun) {
 
   var handler = function() {
     if (!yes.hasClass('disabled')) {
-      return destroy_fun(hostname, name, disk_id, vm_hostname);
+      confirm2(yes.data('confirm'), function() {
+        destroy_fun(hostname, name, disk_id, vm_hostname);
+      });
     }
   };
   var handler_force = function() {
     if (!yes_force.hasClass('disabled')) {
-      return rollback_fun(hostname, name, disk_id, force_box.prop('checked'), vm_hostname);
+      confirm2(yes_force.data('confirm'), function() {
+        rollback_fun(hostname, name, disk_id, force_box.prop('checked'), vm_hostname);
+      });
     }
   };
   var handler_force_box = function() {
@@ -506,8 +514,10 @@ function vm_snapshots_delete_modal(hostname, btn, gsio_handler) {
 
   var handler = function() {
     if (!yes.hasClass('disabled')) {
-      gsio_handler(hostname, snapnames, disk_id, vm_hostname); // vm_destroy_snapshots
-      VM_SNAPSHOTS.et.reset_selection();
+      confirm2(yes.data('confirm'), function() {
+        gsio_handler(hostname, snapnames, disk_id, vm_hostname); // vm_destroy_snapshots
+        VM_SNAPSHOTS.et.reset_selection();
+      });
     }
   };
 
