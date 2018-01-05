@@ -100,8 +100,11 @@ trap cleanup EXIT
 
 printmsg "Download link: ${ESDC_DOWNLOAD_URL}"
 mkdir -p "${UPG_DIR}"
+
 # shellcheck disable=SC2086
-${CURL} ${CURL_QUIET} ${CURL_DEFAULT_OPTS} -o "${ESDC_IMG_FULL}.gz" "${ESDC_DOWNLOAD_URL}"
+if ! ${CURL} ${CURL_QUIET} ${CURL_DEFAULT_OPTS} -o "${ESDC_IMG_FULL}.gz" "${ESDC_DOWNLOAD_URL}"; then
+	die 5 "Cannot download new USB image archive. Please check your internet connection."
+fi
 
 printmsg "Unpacking new USB image"
 ${GZIP} -d "${ESDC_IMG_FULL}.gz"

@@ -65,7 +65,8 @@ if [[ "${PLATFORM_VER}" =~ ^v[0-9]+\.[0-9]+ ]]; then
 
 	printmsg "Downloading platform version list"
 	# shellcheck disable=SC2086
-	PLATFORM_MAP="$(${CURL} ${CURL_QUIET} ${CURL_DEFAULT_OPTS} "${PLATFORM_VERSION_MAP_URL}")"
+	PLATFORM_MAP="$(${CURL} ${CURL_QUIET} ${CURL_DEFAULT_OPTS} "${PLATFORM_VERSION_MAP_URL}" || \
+		die 5 "Cannot download platform map. Please check your internet connection.")"
 
 	if [[ -z "${PLATFORM_MAP}" ]] || ! echo "${PLATFORM_MAP}" | ${JSON} --validate; then
 		die 3 "Could not download a valid platform map from ${PLATFORM_VERSION_MAP_URL}"
@@ -163,8 +164,12 @@ fi
 
 # start download
 printmsg "Downloading the new platform"
+
 # shellcheck disable=SC2086
-${CURL} ${CURL_QUIET} ${CURL_DEFAULT_OPTS} -o "${PLATFORM_FILE}" "${PLATFORM_DOWNLOAD_URL}"
+if ! ${CURL} ${CURL_QUIET} ${CURL_DEFAULT_OPTS} -o "${PLATFORM_FILE}" "${PLATFORM_DOWNLOAD_URL}"; then
+	die 5 "Cannot download new platform archive. Please check your internet connection."
+fi
+
 printmsg "Extracting the new platform"
 ${TAR} zxf "${PLATFORM_FILE}" -C "${PLATFORM_DIR}"
 
