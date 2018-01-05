@@ -102,18 +102,18 @@ function rollback() {
 	echo "#######################################"
 	echo "Running emergency rollback"
 
-	# Deploy post command did not run
-	if [[ -n "${CURRENT_VERSION_REF}" && "${CURRENT_VERSION_REF}" != "${VERSION_REF}" ]]; then
-		echo "Running git checkout to commit before upgrade: ${CURRENT_VERSION_REF}"
-		git checkout "${CURRENT_VERSION_REF}"
-	fi
-
 	if [[ -n "${DEPLOY_RUNNING_FILE}" && -f "${DEPLOY_RUNNING_FILE}" ]]; then
-		# Deploy post command failed
+		# Deploy post command failed -> we cannot rollback + we cannot revert the repository
 		rm -f "${DEPLOY_RUNNING_FILE}"
 		# TODO: cleanup not implemented
 		echo "WARNING: The post deploy command has failed and may have left the repository in an unpleasant state"
-		echo "WARNING: Manual cleanup may be required"
+		echo "WARNING: Manual cleanup is required"
+	else
+		# Deploy post command did not run yet
+		if [[ -n "${CURRENT_VERSION_REF}" && "${CURRENT_VERSION_REF}" != "${VERSION_REF}" ]]; then
+			echo "Running git checkout to commit before upgrade: ${CURRENT_VERSION_REF}"
+			git checkout "${CURRENT_VERSION_REF}"
+		fi
 	fi
 }
 
