@@ -287,6 +287,11 @@ class User(AbstractBaseUser, PermissionsMixin, _AclMixin, _DcBoundMixin):
         if instance.id in (settings.ADMIN_USER, settings.SYSTEM_USER):
             raise SuspiciousOperation('Internal user cannot be deleted!')
 
+    @staticmethod
+    def must_email_be_verified():
+        from vms.models import DefaultDc
+        return DefaultDc().settings.REGISTRATION_ENABLED  # dc1_settings
+
     @property
     def alias(self):
         return self.get_full_name()

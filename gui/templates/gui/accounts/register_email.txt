@@ -5,7 +5,7 @@ Welcome to {{ site_name }}!
 In order to finish registration, activate your account by following this link:{% endblocktrans %}
 
 {{ site_link }}{% url 'registration_check' uidb64=uid token=token %}
-
+{% if user.userprofile.must_phone_be_verified %}
 {% trans "Once your account is active, you will receive a text message (SMS) with your password." %}
 
 {% trans "Your login details are:" %}
@@ -13,6 +13,7 @@ In order to finish registration, activate your account by following this link:{%
 {% trans "Username (email address):" %} {{ user.username }}
 {% trans "Password (will be sent):" %} **********
 {% trans "Phone number (for SMS):" %} {{ profile.phone }}
+{% endif %}
 
 {% blocktrans %}Thank you for choosing {{ site_name }}.{% endblocktrans %}
 {% endautoescape %}

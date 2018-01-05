@@ -7,9 +7,6 @@ from logging import getLogger
 from phonenumbers.data import _COUNTRY_CODE_TO_REGION_CODE
 from pytz import country_timezones
 
-from api.sms.views import internal_send
-from vms.models import DefaultDc
-
 logger = getLogger(__name__)
 
 
@@ -66,27 +63,28 @@ def get_phone_prefix(country_code):
 
 def get_initial_data(request):
     """Initial data for registration page"""
-    dc1_settings = DefaultDc().settings
+    dc_settings = request.dc.settings
+
     initial = {
         'language': get_language(),
-        'country': dc1_settings.PROFILE_COUNTRY_CODE_DEFAULT,
-        'phone': dc1_settings.PROFILE_PHONE_PREFIX_DEFAULT,
-        'time_zone': dc1_settings.PROFILE_TIME_ZONE_DEFAULT,
+        'country': dc_settings.PROFILE_COUNTRY_CODE_DEFAULT,
+        'phone': dc_settings.PROFILE_PHONE_PREFIX_DEFAULT,
+        'time_zone': dc_settings.PROFILE_TIME_ZONE_DEFAULT,
     }
 
     # This code should be bullet proof. We don't want to fail a registration because of some geo detection.
     try:
         country = get_geoip(request)['country_code']
         if not country:
-            country = dc1_settings.PROFILE_COUNTRY_CODE_DEFAULT
+            country = dc_settings.PROFILE_COUNTRY_CODE_DEFAULT
 
         phone = get_phone_prefix(country)
         if not phone:
-            phone = dc1_settings.PROFILE_PHONE_PREFIX_DEFAULT
+            phone = dc_settings.PROFILE_PHONE_PREFIX_DEFAULT
 
         time_zone = get_time_zone(country)
         if not time_zone:
-            time_zone = dc1_settings.PROFILE_TIME_ZONE_DEFAULT
+            time_zone = dc_settings.PROFILE_TIME_ZONE_DEFAULT
     except Exception as ex:
         logger.error('Registration GEO detection problem')
         logger.exception(ex)
@@ -129,17 +127,3 @@ def clear_attempts_cache(request, key):
     cache.delete(gen_key)
     gen_key, timeout = generate_key(request, key, 'forgot')
     cache.delete(gen_key)
-
-
-class SendSMSFailed(Exception):
-    pass
-
-
-def send_sms(phone, message):
-    """
-    Wrapper for API function api.sms.internal_send. Raises an exception when SMS sending fails.
-    """
-    if not internal_send(phone, message):
-        raise SendSMSFailed
-
-    return True

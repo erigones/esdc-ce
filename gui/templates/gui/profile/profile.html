@@ -6,9 +6,9 @@
   $(document).ready(function() {
     profile_control_links();
     {% if dc_settings.REGISTRATION_ENABLED %}
-    {% if not profile.email_verified %}
+    {% if not profile.email_verified and user.must_email_be_verified %}
     profile_control($('#profile_verifyemail'));
-    {% elif not profile.phone_verified %}
+    {% elif not profile.phone_verified and profile.must_phone_be_verified %}
     profile_control($('#profile_verifyphone'));
     {% endif %}{% endif %}
 

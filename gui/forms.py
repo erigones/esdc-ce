@@ -1,6 +1,7 @@
 from logging import getLogger
 
 from django import forms
+# noinspection PyProtectedMember
 from django.forms.forms import NON_FIELD_ERRORS
 from django.utils.six import iteritems, text_type
 from frozendict import frozendict
@@ -202,7 +203,7 @@ class SerializerForm(forms.Form):
                 continue
 
             if key in self._ignore_empty_fields and not val:
-                logger.debug('SerializerForm._has_changed [%s]: %s (%s) is empty and will be ignored',
+                logger.debug('SerializerForm._has_changed [%s]: "%s" (%s) is empty and will be ignored',
                              key, val, type(val))
                 continue
 
@@ -210,12 +211,12 @@ class SerializerForm(forms.Form):
                 initial_val = self.initial[key]
             except KeyError:
                 ret[key] = val
-                logger.debug('SerializerForm._has_changed [%s]: %s (%s) is missing in initial data',
+                logger.debug('SerializerForm._has_changed [%s]: "%s" (%s) is missing in initial data',
                              key, val, type(val))
             else:
                 if initial_val != val:
                     ret[key] = val
-                    logger.debug('SerializerForm._has_changed [%s]: %s (%s) != %s (%s)',
+                    logger.debug('SerializerForm._has_changed [%s]: "%s" (%s) != "%s" (%s)',
                                  key, initial_val, type(initial_val), val, type(val))
 
         return ret

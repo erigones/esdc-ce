@@ -11,7 +11,7 @@ from django.utils.six import iteritems
 from que import TT_MGMT, TT_INTERNAL, TG_DC_UNBOUND
 from que.utils import task_prefix_from_task_id, task_id_from_request, get_callback, is_callback, is_logtask
 from que.tasks import cq
-from api.utils.views import call_api_view
+from api.utils.views import INTERNAL_API_KWARGS, call_api_view
 from gui.accounts.utils import get_client_ip
 
 import api.task.views
@@ -116,6 +116,9 @@ class APINamespace(BaseNamespace):
     def _call_api_view(self, method, viewspace, view, args, kwargs):
         kwargs = dict(kwargs)
         args = list(args)
+
+        for kwarg in INTERNAL_API_KWARGS:
+            kwargs.pop(kwarg, None)
 
         self.log('Calling %s on API view "%s.%s" with args: "%s" and kwargs: "%s"',
                  method, viewspace.__name__, view, args, kwargs)
