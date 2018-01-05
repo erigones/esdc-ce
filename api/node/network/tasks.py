@@ -105,7 +105,7 @@ def node_overlay_arp_file(task_id, overlay_rule_name, node_exclusive=None, **kwa
             continue
 
         overlay_arp_file = node.overlay_rules[overlay_rule_name]['arp_file']
-        arp_table = json.dumps(_get_overlay_arp_table(node, overlay_rule_name, overlay_vnics))
+        arp_table = json.dumps(_get_overlay_arp_table(node, overlay_rule_name, overlay_vnics), indent=2)
         cmd = ('cat /dev/stdin > {arp_file} && '
                'chmod 0400 {arp_file} && '
                'chown netadm:netadm {arp_file} && '
