@@ -1,5 +1,6 @@
 from collections import defaultdict
 from django.conf import settings
+# noinspection PyProtectedMember
 from django.core.cache import caches
 from django.core.exceptions import SuspiciousOperation
 from django.db import models
@@ -1172,10 +1173,11 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
         if ignore_cpu_ram is not False and self.is_slave_vm() and not self.slavevm.reserve_resources:
             return 0, 0
 
-        if self.is_kvm():
-            cpu = json.get('vcpus', 0)
-            cpu_active = json_active.get('vcpus', 0)
+        # The CPU count is calculated from cpu_cap of the zone
+        cpu = self._get_cpu_zone(json)
+        cpu_active = self._get_cpu_zone(json_active)
 
+        if self.is_kvm():
             if ram_overhead:
                 ram = json.get('max_physical_memory', 0)
                 ram_active = json_active.get('max_physical_memory', 0)
@@ -1183,8 +1185,6 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
                 ram = json.get('ram', 0)
                 ram_active = json_active.get('ram', 0)
         else:
-            cpu = self._get_vcpus_zone(json)
-            cpu_active = self._get_vcpus_zone(json_active)
             ram = json.get('max_physical_memory', 0)
             ram_active = json_active.get('max_physical_memory', 0)
 
@@ -1659,11 +1659,41 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
         self.save_item('zpool', str(value), save=False)
 
     @staticmethod
-    def _get_vcpus_zone(json):
-        try:
-            return int((int(json.get('cpu_cap', 100)) - 100) / (settings.VMS_VM_CPU_BURST_RATIO * 100))
-        except TypeError:
+    def calculate_cpu_cap_from_vcpus(vcpus):
+        """Simple calculation of cpu_cap from vCPUs count"""
+        if vcpus:
+            if vcpus == 1:
+                cpu_burst = settings.VMS_VM_CPU_BURST_DEFAULT / 2
+            else:
+                cpu_burst = settings.VMS_VM_CPU_BURST_DEFAULT
+
+            return int(vcpus * settings.VMS_VM_CPU_BURST_RATIO * 100) + cpu_burst
+        else:
             return 0
+
+    @staticmethod
+    def calculate_cpu_count_from_cpu_cap(cpu_cap):
+        """Return CPU count suitable for resource accounting
+        This is _not_ an inverse function of calculate_cpu_cap_from_vcpus()"""
+        if cpu_cap:
+            vcpus = int((int(cpu_cap) - settings.VMS_VM_CPU_BURST_DEFAULT) / (settings.VMS_VM_CPU_BURST_RATIO * 100))
+
+            if vcpus:
+                return vcpus
+            else:
+                return 1  # this means that we have some small cpu_cap
+        else:
+            return 0
+
+    @classmethod
+    def calculate_cpu_count_from_vcpus(cls, vcpus):
+        """Always go through the same calculation and get the CPU count from cpu_cap"""
+        return cls.calculate_cpu_count_from_cpu_cap(cls.calculate_cpu_cap_from_vcpus(vcpus))
+
+    @classmethod
+    def _get_cpu_zone(cls, json):
+        """Return CPU count suitable for resource accounting (based on cpu_cap)"""
+        return cls.calculate_cpu_count_from_cpu_cap(json.get('cpu_cap', None))
 
     @property
     def cpu_type(self):
@@ -1677,32 +1707,36 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
         if self.is_kvm():
             self.save_item('cpu_type', value, save=False)
 
-    @property  # Return CPU count
+    @property
+    def cpu_cap(self):
+        return self.json.get('cpu_cap', 0)
+
+    @cpu_cap.setter
+    def cpu_cap(self, value):
+        raise NotImplementedError('cpu_cap must be set only via vcpus')
+
+    @property  # Return number of vcpus (real for KVM and a CPU count for zones)
     def vcpus(self):
         if self.is_kvm():
             return self.json.get('vcpus', 0)
         else:
-            return self._get_vcpus_zone(self.json)
+            return self._get_cpu_zone(self.json)
 
     @vcpus.setter  # Set json.vcpus
     def vcpus(self, value):
-        cpu_burst = 100
+        cpu_cap = self.calculate_cpu_cap_from_vcpus(value)
 
         if self.is_kvm():
-            if value <= 1:
-                cpu_burst = 50
-
-            cpu_cap = int(value * settings.VMS_VM_CPU_BURST_RATIO * 100) + cpu_burst
             self.save_items(vcpus=value, cpu_cap=cpu_cap, save=False)
         else:
-            self.save_item('cpu_cap', int(value * settings.VMS_VM_CPU_BURST_RATIO * 100) + cpu_burst, save=False)
+            self.save_item('cpu_cap', cpu_cap, save=False)
 
-    @property  # Return CPU count
+    @property  # Return number of vcpus
     def vcpus_active(self):
         if self.is_kvm():
             return self.json_active.get('vcpus', 0)
         else:
-            return self._get_vcpus_zone(self.json_active)
+            return self._get_cpu_zone(self.json_active)
 
     @property  # Return RAM size in MB
     def ram(self):

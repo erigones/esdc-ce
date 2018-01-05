@@ -1,7 +1,6 @@
 from itertools import chain
 
 from django.contrib.auth.decorators import login_required
-from django.contrib.contenttypes.models import ContentType
 from django.views.decorators.http import require_POST
 from django.shortcuts import render, redirect
 from django.db.models import Count, Q
@@ -12,8 +11,9 @@ from vms.models import Node, NodeStorage, Storage, TaskLogEntry, Vm
 from gui.decorators import staff_required, ajax_required
 from gui.utils import collect_view_data, get_pager, reverse
 from gui.signals import view_node_list, view_node_details
+from gui.node.forms import (NodeStatusForm, NodeForm, NodeStorageForm, UpdateBackupForm, NodeStorageImageForm,
+                            BackupFilterForm)
 from gui.node.utils import get_dc1_settings, get_nodes_extended, get_node, get_node_bkpdefs, get_node_backups
-from gui.node.forms import NodeForm, NodeStorageForm, UpdateBackupForm, NodeStorageImageForm, BackupFilterForm
 from gui.vm.forms import RestoreBackupForm
 from gui.vm.utils import get_vms
 from gui.dc.views import dc_switch
@@ -31,10 +31,35 @@ def node_list(request):
     context = collect_view_data(request, 'node_list')
     context['nodes'] = Node.all()
     context['node_list'] = get_nodes_extended(request)
+    context['status_form'] = NodeStatusForm(request, None)
 
     view_node_list.send(sender='gui.node.views.list', request=request, context=context)
 
     return render(request, 'gui/node/list.html', context)
+
+
+@login_required
+@staff_required
+@ajax_required
+@require_POST
+def status_form(request):
+    """
+    Ajax page for changing status of compute nodes.
+    """
+    form = NodeStatusForm(request, None, request.POST)
+
+    if form.is_valid():
+        res = [form.call_node_define(hostname) == 200 for hostname in form.cleaned_data['hostnames']]
+
+        if all(res):
+            if request.GET.get('current_view', None) == 'maintenance':
+                redirect_view = 'system_maintenance'
+            else:
+                redirect_view = 'node_list'
+
+            return redirect(redirect_view)
+
+    return render(request, 'gui/node/status_form.html', {'form': form})
 
 
 @login_required
@@ -378,7 +403,7 @@ def backup_form(request, hostname):
 
 @login_required
 @staff_required
-@setting_required('MON_ZABBIX_ENABLED')
+@setting_required('MON_ZABBIX_ENABLED', default_dc=True)
 def monitoring(request, hostname, graph_type='cpu'):
     """
     Compute node related monitoring.
@@ -463,8 +488,8 @@ def tasklog(request, hostname):
     context['nodes'] = (node,)
     context['submenu_auto'] = ''
     nss = node.nodestorage_set.all().extra(select={'strid': 'CAST(id AS text)'}).values_list('strid', flat=True)
-    log_query = ((Q(content_type=ContentType.objects.get_for_model(node)) & Q(object_pk=node.pk)) |
-                 (Q(content_type=ContentType.objects.get_for_model(NodeStorage)) & Q(object_pk__in=nss)))
+    log_query = ((Q(content_type=node.get_content_type()) & Q(object_pk=node.pk)) |
+                 (Q(content_type=NodeStorage.get_content_type()) & Q(object_pk__in=nss)))
     log = get_tasklog(request, context=context, base_query=log_query, filter_by_permissions=False)
     context['tasklog'] = context['pager'] = tasklog_items = get_pager(request, log, per_page=100)
     TaskLogEntry.prepare_queryset(tasklog_items)

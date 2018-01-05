@@ -44,7 +44,7 @@ class UserProfile(models.Model):
     email2 = models.EmailField(_('Billing Email'), max_length=254, blank=True)
     email2_token = models.CharField(_('Billing Email verification token'), max_length=32, blank=True)
     email2_verified = models.BooleanField(_('Billing Email verified'), default=False)
-    phone = models.CharField(_('Phone'), max_length=32)
+    phone = models.CharField(_('Phone'), max_length=32, blank=True)
     phone_token = models.CharField(_('Phone verification token'), max_length=32, blank=True)
     phone_verified = models.BooleanField(_('Phone verified'), default=False)
     phone2 = models.CharField(_('Billing Phone'), max_length=32, blank=True)
@@ -143,19 +143,33 @@ class UserProfile(models.Model):
         }
 
     def is_ok(self):
+        from vms.models import DefaultDc
+        dc1_settings = DefaultDc().settings
         # TOS acceptation, verified email/phone and usertype is required _only_ if registration is enabled
         # Using global REGISTRATION_ENABLED, because TOS acceptation and field validation
         # must be required in each DC (even if the DC has registration disabled)
         return (
-            self.user.email and self.phone and (
-                not settings.REGISTRATION_ENABLED or
-                (self.tos_acceptation or not settings.TOS_LINK) and
+            self.user.email and (
+                not dc1_settings.REGISTRATION_ENABLED or
                 self.email_verified and
-                self.phone_verified and
+                (not dc1_settings.TOS_LINK or self.tos_acceptation) and
+                (not (dc1_settings.PROFILE_PHONE_REQUIRED or dc1_settings.SMS_REGISTRATION_ENABLED)
+                 or self.phone and self.phone_verified) and
                 # A company user account also requires a valid company ID
                 (self.usertype == self.PERSONAL or (self.usertype == self.COMPANY and self.companyid))
             )
         )
+
+    @staticmethod
+    def is_phone_required():
+        from vms.models import DefaultDc
+        dc1_settings = DefaultDc().settings
+        return dc1_settings.PROFILE_PHONE_REQUIRED or dc1_settings.SMS_REGISTRATION_ENABLED
+
+    @staticmethod
+    def must_phone_be_verified():
+        from vms.models import DefaultDc
+        return DefaultDc().settings.SMS_REGISTRATION_ENABLED  # dc1_settings
 
     @staticmethod
     def generate_token(size=12):

@@ -8,7 +8,7 @@ from que.mgmt import MgmtCallbackTask
 from que.exceptions import TaskException
 from que.internal import InternalTask
 from que.utils import user_id_from_task_id
-from api.task.utils import task_log, callback, get_vms_object, get_task_status
+from api.task.utils import task_log, callback, get_task_object, get_task_status
 from api.task.cleanup import task_cleanup
 from api.task.messages import LOG_REMOTE_CALLBACK
 from api.task.callback import UserCallback
@@ -29,7 +29,7 @@ def task_log_cb(result, task_id, task_status=None, msg='', vm=None, obj=None, cl
 
     if not obj:
         try:
-            obj = get_vms_object(kwargs)
+            obj = get_task_object(kwargs)
         except ObjectDoesNotExist:
             pass
 
@@ -89,7 +89,7 @@ def task_user_callback_cb(task_id, parent_task_id, cb, **kwargs):
     Task for calling remote url in user defined callback
     """
     try:
-        obj = get_vms_object(kwargs)
+        obj = get_task_object(kwargs)
     except ObjectDoesNotExist:
         obj = None
 

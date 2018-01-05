@@ -532,6 +532,7 @@ function vm_control_update(hostname, state, apiview) {
       vm_update.removeClass('disabled').addClass('define_changed');
       vm_undo.removeClass('disabled').addClass('define_changed_undo');
       vm_start.addClass('define_changed');
+      vm_reboot.addClass('define_changed');
     } else { // admin can run update even when nothing has changed
       vm_update.removeClass('disabled');
     }
@@ -551,7 +552,7 @@ function vm_control_update(hostname, state, apiview) {
     }
     vm_start.addClass('disabled').removeClass('define_changed');
     vm_stop.addClass('disabled'); vm_stop.data('modal_force_only', false);
-    vm_reboot.addClass('disabled');
+    vm_reboot.addClass('disabled').removeClass('define_changed');
     vm_startcd.addClass('disabled');
     vm_reset.addClass('disabled');
     vm_console.addClass('disabled');

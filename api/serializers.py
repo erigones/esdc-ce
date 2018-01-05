@@ -64,6 +64,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 # serializer fields more explicit.
 from api.relations import *  # noqa: F403
 from api.fields import *  # noqa: F403
+# noinspection PyProtectedMember
 from api.fields import is_simple_callable, get_component
 
 
@@ -719,7 +720,7 @@ class BaseSerializer(WritableField):  # noqa: F405
         if not force_update and (self.request.method == 'POST' or force_full):
             show_data = self.data
         else:
-            show_data = self.init_data
+            show_data = {key: self.data[key] for key in self.init_data if key in self.data}
 
         if not show_data:
             return {}

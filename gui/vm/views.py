@@ -4,7 +4,6 @@ from itertools import chain
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.http import Http404, HttpResponse
@@ -39,7 +38,7 @@ from api.vm.utils import get_iso_images
 from api.mon.utils import MonitoringGraph as Graph
 from api.dns.record.api_views import RecordView
 
-from vms.models import Vm, Node, Image, BackupDefine
+from vms.models import Vm, Node, Image, BackupDefine, DefaultDc
 
 logger = getLogger(__name__)
 
@@ -75,7 +74,8 @@ def details(request, hostname):
     context['vm_nics'] = vm_nics = get_vm_define_nic(request, vm)
     context['ptrform'] = PTRForm(prefix='ptr')
     context['iso_rescuecd'] = dc_settings.VMS_ISO_RESCUECD
-    context['mon_sla_enabled'] = dc_settings.MON_ZABBIX_ENABLED and dc_settings.MON_ZABBIX_VM_SLA
+    context['mon_sla_enabled'] = (settings.MON_ZABBIX_ENABLED and DefaultDc().settings.MON_ZABBIX_ENABLED and
+                                  dc_settings.MON_ZABBIX_VM_SLA)
     context['can_edit'] = request.user.is_admin(request)
 
     if vm.slave_vms:
@@ -221,7 +221,7 @@ def console(request, hostname):
 
 @login_required
 @profile_required
-@setting_required('MON_ZABBIX_ENABLED')
+@setting_required('MON_ZABBIX_ENABLED', default_dc=True)
 def monitoring(request, hostname, graph_type='cpu'):
     """
     Page with monitoring graphs.
@@ -303,7 +303,7 @@ def tasklog(request, hostname):
     context['vms'] = (vm,)
     context['submenu_auto'] = ''
     context['vms_tag_filter_disabled'] = True
-    log_query = Q(content_type=ContentType.objects.get_for_model(vm)) & Q(object_pk=vm.pk)
+    log_query = Q(content_type=vm.get_content_type()) & Q(object_pk=vm.pk)
     log = get_tasklog(request, context, base_query=log_query)
     context['tasklog'] = context['pager'] = get_pager(request, log, per_page=100)
     context['can_edit'] = request.user.is_admin(request)

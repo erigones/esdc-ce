@@ -43,7 +43,7 @@ def mon_alert_list(request, data=None):
 (default: null)
         :type data.node_uuids: array
         :arg data.dc_bound: Execute as DC unbound in the main virtual datacenter => \
-fetch all alerts from the main monitoring server (requires |SuperAdmin| permission) (default: false)
+fetch all alerts from all monitoring servers (requires |SuperAdmin| permission) (default: false)
         :type data.dc_bound: boolean
 
         :status 200: SUCCESS

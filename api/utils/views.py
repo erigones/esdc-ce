@@ -6,6 +6,8 @@ from api.utils.request import set_request_method
 
 logger = getLogger(__name__)
 
+INTERNAL_API_KWARGS = ('disable_throttling', 'log_response' 'api_class')
+
 
 def call_api_view(request, method, fun, *args, **kwargs):
     """

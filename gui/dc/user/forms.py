@@ -5,7 +5,6 @@ from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from frozendict import frozendict
 
-from api.utils.views import call_api_view
 from api.accounts.user.base.views import user_manage
 from api.accounts.user.profile.views import userprofile_manage
 from api.accounts.user.profile.serializers import UserProfileSerializer
@@ -112,10 +111,10 @@ class AdminUserModalForm(AdminUserForm):
         data = super(AdminUserModalForm, self)._final_data(data=data)
 
         if 'password' in data and data['password'] == '':
-            del(data['password'])
+            del data['password']
 
         if 'password2' in data and data['password2'] == '':
-            del(data['password2'])
+            del data['password2']
 
         return data
 
@@ -138,8 +137,8 @@ class AdminUserProfileForm(SerializerForm):
     })
     _custom_widget_attrs = frozendict({
         'website': {'maxlength': 255},
-        'phone': {'required': 'required', 'maxlength': 32},
-        'phone2': {'maxlength': 32},
+        'phone': {'required': 'required', 'maxlength': 32, 'erase_on_empty_input': True},
+        'phone2': {'maxlength': 32, 'erase_on_empty_input': True},
         'usertype': {
             'required': 'required',
             'class': 'normal-radio'
@@ -153,6 +152,10 @@ class AdminUserProfileForm(SerializerForm):
     })
     _field_text_class = ''
 
+    def __init__(self, *args, **kwargs):
+        super(AdminUserProfileForm, self).__init__(*args, **kwargs)
+        self.fields['phone'].required = UserProfile.is_phone_required()
+
     def _input_data(self):
         """Overloaded because if user doesn't check different_billing we don't want to send
         address2 data for validation"""
@@ -160,7 +163,7 @@ class AdminUserProfileForm(SerializerForm):
         if not data['different_billing']:
             for index in ('phone2', 'email2', 'street_2', 'street2_2', 'postcode2', 'city2', 'state2', 'country2'):
                 if index in data:
-                    del(data[index])
+                    del data[index]
         return data
 
     def clean(self):
@@ -181,18 +184,4 @@ class AdminChangePasswordForm(PasswordForm):
     """
     Password form used to change user password.
     """
-    def __init__(self, *args, **kwargs):
-        super(AdminChangePasswordForm, self).__init__(*args, **kwargs)
-        self.fields['password1'].label = _('New password')
-        self.fields['password1'].widget.attrs['placeholder'] = ''
-        self.fields['password2'].label = _('Confirm new password')
-        self.fields['password2'].widget.attrs['placeholder'] = ''
-
-    # noinspection PyMethodOverriding
-    def save(self, request):
-        args = self.user.username
-        data = {'password': self.cleaned_data['password1']}
-        logger.info('Calling API view PUT user_manage(%s, data=%s) by user %s in DC %s',
-                    args, {'password': '***'}, request.user, request.dc)
-        res = call_api_view(request, 'PUT', user_manage, args, data=data)
-        return res.status_code
+    pass

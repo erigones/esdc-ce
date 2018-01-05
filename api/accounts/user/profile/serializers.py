@@ -3,10 +3,12 @@ from django.utils.translation import ugettext_lazy as _
 
 from api.serializers import InstanceSerializer, NoPermissionToModify
 from api.fields import EmailField, BooleanField, ChoiceField, SafeCharField, IntegerChoiceField
-from gui.accounts.utils import send_sms
+from api.sms.views import internal_send as send_sms
 from gui.models import UserProfile
+# noinspection PyProtectedMember
 from gui.widgets import clean_international_phonenumber
 from gui.countries import COUNTRIES
+from vms.models import DefaultDc
 
 
 class UserProfileSerializer(InstanceSerializer):
@@ -82,22 +84,39 @@ class UserProfileSerializer(InstanceSerializer):
     alerting_jabber = EmailField(label=_('Jabber'), max_length=255, required=False)
     alerting_email = EmailField(label=_('Email'), max_length=255, required=False)
 
+    def __init__(self, request, *args, **kwargs):
+        super(UserProfileSerializer, self).__init__(request, *args, **kwargs)
+        dc1_settings = DefaultDc().settings
+        phone_required = UserProfile.is_phone_required()
+        self.fields['phone'].required = phone_required
+        self.fields['phone'].allow_empty = not phone_required
+        self.fields['usertype'].default = dc1_settings.PROFILE_USERTYPE_DEFAULT
+
+    @staticmethod
+    def send_phone_verification(profile):
+        msg = _('Please confirm your new phone number at %(site_link)s with this activation code: %(token)s') % {
+            'site_link': profile.user.current_dc.settings.SITE_LINK,
+            'token': profile.phone_token
+        }
+        return send_sms(profile.phone, msg)
+
     # noinspection PyProtectedMember
     def save(self, **kwargs):
         profile = self.object
 
         # Changing a user phone makes the phone not verified
         # (unless request.user is not part of the staff or registration is disabled)
-        if self.old_phone and not self.request.user.is_staff and settings.REGISTRATION_ENABLED:
+        if self.old_phone and not self.request.user.is_staff and UserProfile.must_phone_be_verified():
             profile.phone_verified = False
             profile.phone_token = profile.generate_token(3)
-
-            msg = _('Please confirm your new phone number at %(site_link)s with this activation code: %(token)s') % {
-                'site_link': profile.user.current_dc.settings.SITE_LINK,
-                'token': profile.phone_token}
-            send_sms(profile.phone, msg)
+            verify_phone = True
+        else:
+            verify_phone = False
 
         profile.save()
+
+        if verify_phone:
+            self.send_phone_verification(profile)
 
         # We cannot change active language settings for other user than ourself
         if self.request.user == profile.user:
@@ -105,29 +124,33 @@ class UserProfileSerializer(InstanceSerializer):
 
     def validate_phone(self, attrs, source):
         try:
-            value = clean_international_phonenumber(attrs[source])
+            value = attrs[source]
         except KeyError:
             pass
         else:
-            if self.object.phone == value:
-                return attrs
-            else:
-                # Store old phone number for later so we know we have to send text message
-                self.old_phone = self.object.phone
-            # Store formatted phone number
-            attrs[source] = value
+            if value:
+                value = clean_international_phonenumber(value)
+
+                if self.object.phone == value:
+                    return attrs
+                else:
+                    # Store old phone number for later so we know we have to send text message
+                    self.old_phone = self.object.phone or True
+                # Store formatted phone number
+                attrs[source] = value
 
         return attrs
 
     # noinspection PyMethodMayBeStatic
     def validate_phone2(self, attrs, source):
         try:
-            value = clean_international_phonenumber(attrs[source])
+            value = attrs[source]
         except KeyError:
             pass
         else:
-            # Store formatted phone number
-            attrs[source] = value
+            if value:
+                # Store formatted phone number
+                attrs[source] = clean_international_phonenumber(value)
 
         return attrs
 

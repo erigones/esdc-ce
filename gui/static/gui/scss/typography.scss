@@ -34,6 +34,19 @@ a.btn-icon {
       color: #333 !important;
     }
   }
+
+  &.field-icon {
+    font-size: 17px;
+    color: #ccc !important;
+    line-height: 17px;
+    vertical-align: middle;
+    margin-left: -18px;
+    margin-right: 9px;
+
+    &:hover {
+      color: #81D8F1 !important;
+    }
+  }
 }
 
 a.btn-icon-edit:after {
@@ -48,6 +61,16 @@ a.btn-icon-link:after {
 a.btn-icon-external-link:after {
   @extend a.btn-icon;
   content: "\f08e";
+}
+
+a.btn-icon-eye-open:after {
+  @extend a.btn-icon;
+  content: "\f06e";
+}
+
+a.btn-icon-eye-close:after {
+  @extend a.btn-icon;
+  content: "\f070";
 }
 
 a.btn-text {

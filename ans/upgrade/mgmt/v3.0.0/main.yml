@@ -1,0 +1,4 @@
+# https://github.com/erigones/esdc-factory/issues/109
+- name: Fix /etc/rc.d/rc.local permissions
+  file: dest=/etc/rc.d/rc.local
+        mode=u+x

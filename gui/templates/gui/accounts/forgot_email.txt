@@ -3,8 +3,9 @@
 {% trans "Please go to the following page and request a new password:" %}
 
 {{ site_link }}{% url 'forgot_check' uidb64=uid token=token %}
-
+{% if user.userprofile.must_phone_be_verified %}
 {% trans "Your new password will be send as text message (SMS) to your phone number:" %} {{ user.userprofile.phone }}
+{% endif %}
 {% trans "Your username (email address), in case you've forgotten:" %} {{ user.username }}
 {% endautoescape %}
 

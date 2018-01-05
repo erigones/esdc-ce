@@ -1,6 +1,41 @@
 {% extends "base_no_auth.html" %}
 {% load i18n %}
 
+{% block head %}
+<script type="text/javascript">
+$(document).ready(function(){
+  $('#password-peek').click(function() {
+    var btn = $(this);
+    var input = btn.prev('input');
+    var change_type;
+
+    if (btn.hasClass('btn-icon-eye-open')) {
+      change_type = 'text';
+      btn.removeClass('btn-icon-eye-open').addClass('btn-icon-eye-close');
+    } else if (btn.hasClass('btn-icon-eye-close')) {
+      change_type = 'password';
+      btn.removeClass('btn-icon-eye-close').addClass('btn-icon-eye-open');
+    } else {
+      return;
+    }
+
+    var rep = $('<input type="' + change_type + '" />')
+                .attr('id', input.attr('id'))
+                .attr('name', input.attr('name'))
+                .attr('class', input.attr('class'))
+                .attr('title', input.attr('title'))
+                .attr('pattern', input.attr('pattern'))
+                .attr('required', input.attr('required'))
+                .attr('placeholder', input.attr('placeholder'))
+                .val(input.val())
+                .insertBefore(input);
+    input.remove();
+    input = rep;
+  });
+});
+</script>
+{% endblock %}
+
 {% block login_content %}
 <form class="form-horizontal animated{% if failed_registration %} wobble{% endif %}" action="{{ request.path }}" method="POST">
 
@@ -12,7 +47,7 @@
 
     {% for field in uform %}
     <div class="input{% if field.errors %} error wobble{% endif %}">
-      {{ field }}
+      {{ field }}{% if field.name == "password" %}<a href="#" id="password-peek" class="btn-icon btn-icon-eye-open field-icon"></a>{% endif %}
       {% for error in field.errors %}
       <span class="help-inline error"><i class="icon-warning-sign"></i> {{ error }}</span>
       {% empty %}{% if field.help_text %}
@@ -21,7 +56,7 @@
     </div>
     {% endfor %}
 
-    {% with field=upform.phone %}
+    {% with field=upform.phone %}{% if field %}
     <div class="input{% if field.errors %} error wobble{% endif %}">
       <div class="multiwidget">{% spaceless %}
         {{ field }}
@@ -31,10 +66,10 @@
       {% empty %}{% if field.help_text %}
       <span class="help-inline note"><i class="icon-info-sign"></i> {{ field.help_text }}</span>
       {% endif %}{% endfor %}
-    </div>{% endwith %}
+    </div>
+    {% endif %}{% endwith %}
 
-    {% if upform.company and upform.companyid %}
-    {% with field=upform.company %}
+    {% with field=upform.company %}{% if field %}
     <div class="input{% if field.errors %} error wobble{% endif %}">
       {{ field }}
       {% for error in field.errors %}
@@ -42,9 +77,10 @@
       {% empty %}{% if field.help_text %}
       <span class="help-inline note"><i class="icon-info-sign"></i> {{ field.help_text }}</span>
       {% endif %}{% endfor %}
-    </div>{% endwith %}
+    </div>
+    {% endif %}{% endwith %}
 
-    {% with field=upform.companyid %}
+    {% with field=upform.companyid %}{% if field %}
     <div class="input{% if field.errors %} error wobble{% endif %}">
       {{ field }}
       {% for error in field.errors %}
@@ -52,11 +88,10 @@
       {% empty %}{% if field.help_text %}
       <span class="help-inline note"><i class="icon-info-sign"></i> {{ field.help_text }}</span>
       {% endif %}{% endfor %}
-    </div>{% endwith %}
-    {% endif %}
+    </div>
+    {% endif %}{% endwith %}
 
-    {% if upform.tos_acceptation %}
-    {% with field=upform.tos_acceptation %}
+    {% if upform.tos_acceptation %}{% with field=upform.tos_acceptation %}
     <div class="input{% if field.errors %} error{% endif %}">
       <div class="no-auth-checkbox">
         {{ field }} <label for="id_tos_acceptation">{% blocktrans with endlink='</a>' startlink1='<a href="' startlink2='" target="_blank" class="btn-link">' %}I accept {{ startlink1 }}{{ tos_link }}{{ startlink2 }}the General Terms and Conditions{{ endlink }}.{% endblocktrans %}</label>
@@ -66,9 +101,8 @@
       {% empty %}{% if field.help_text %}
       <span class="help-inline note"><i class="icon-info-sign"></i> {{ field.help_text }}</span>
       {% endif %}{% endfor %}
-    </div>{% endwith %}
-    {% endif %}
-
+    </div>
+    {% endwith %}{% endif %}
   </div>
 
   {% for error in uform.non_field_errors %}<div class="help-inline error"><i class="icon-warning-sign"></i> {{ error }}</div>{% endfor %}

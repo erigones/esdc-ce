@@ -202,8 +202,9 @@ class DcSettingsSerializer(s.InstanceSerializer):
         'DNS_SOA_DEFAULT',
         'EMAIL_HOST_USER',
         'EMAIL_HOST_PASSWORD',
-        'SMS_SMSAPI_USERNAME',
-        'SMS_SMSAPI_PASSWORD',
+        'SMS_FROM_NUMBER',
+        'SMS_SERVICE_USERNAME',
+        'SMS_SERVICE_PASSWORD',
     })
     _null_fields_ = frozenset({
         'VMS_VM_DEFINE_LIMIT',
@@ -275,10 +276,13 @@ class DcSettingsSerializer(s.InstanceSerializer):
     VMS_ZONE_ENABLED = s.BooleanField(label='VMS_ZONE_ENABLED',  # Module
                                       help_text=_('Whether to enable support for SunOS and Linux zones in '
                                                   'this virtual datacenter.'))
-
     VMS_VM_DEFINE_LIMIT = s.IntegerField(label='VMS_VM_DEFINE_LIMIT', required=False,
                                          help_text=_('Maximum number of virtual servers that can be defined in '
                                                      'this virtual datacenter.'))
+    VMS_VM_CPU_CAP_REQUIRED = s.BooleanField(label='VMS_VM_CPU_CAP_REQUIRED',
+                                             help_text='When disabled, the vCPUs server parameter on SunOS and LX Zones'
+                                                       ' can be set to 0, which removes the compute node CPU limit'
+                                                       ' (cpu_cap) for the virtual server.')
     VMS_VM_STOP_TIMEOUT_DEFAULT = s.IntegerField(label='VMS_VM_STOP_TIMEOUT_DEFAULT',
                                                  help_text='Default time period (in seconds) for a graceful VM stop or '
                                                            'reboot, after which a force stop/reboot is send to the VM '
@@ -687,7 +691,7 @@ class DefaultDcSettingsSerializer(DcSettingsSerializer):
                                                 help_text=_('Existing Zabbix host group, which will be used for all '
                                                             'monitored compute nodes.'))
     MON_ZABBIX_HOSTGROUPS_NODE = s.ArrayField(label='MON_ZABBIX_HOSTGROUPS_NODE', max_items=32, required=False,
-                                              help_text=_('List of other existing Zabbix host groups, which will be '
+                                              help_text=_('List of other Zabbix host groups, which will be '
                                                           'used for all monitored compute nodes.'))
     MON_ZABBIX_TEMPLATES_NODE = s.ArrayField(label='MON_ZABBIX_TEMPLATES_NODE', max_items=128, required=False,
                                              help_text=_('List of existing Zabbix templates, which will be used for all'
@@ -695,15 +699,15 @@ class DefaultDcSettingsSerializer(DcSettingsSerializer):
 
     SMS_PREFERRED_SERVICE = s.ChoiceField(label='SMS_PREFERRED_SERVICE', choices=get_services(),
                                           help_text=_('Currently used SMS provider.'))
-    SMS_PRIVATE_KEY = s.CharField(label='SMS_PRIVATE_KEY', max_length=255,
-                                  help_text=_('Secure key required for sending text messages via the API.'))
-    SMS_SMSAPI_USERNAME = s.CharField(label='SMS_SMSAPI_USERNAME', max_length=255, required=False,
-                                      help_text=_('Username required for the SMSAPI service (former HQSMS).'))
-    SMS_SMSAPI_PASSWORD = s.CharField(label='SMS_SMSAPI_PASSWORD', max_length=255, required=False,
-                                      help_text=_('Password required for the SMSAPI service (former HQSMS).'))
-    SMS_SMSAPI_FROM = s.SafeCharField(label='SMS_SMSAPI_FROM', max_length=64,
-                                      help_text=_('Phone number used for outgoing text messages sent via the '
-                                                  'SMSAPI service (former HQSMS).'))
+    SMS_SERVICE_USERNAME = s.CharField(label='SMS_SERVICE_USERNAME', max_length=255, required=False,
+                                       help_text=_('Username required for the selected SMS provider.'))
+    SMS_SERVICE_PASSWORD = s.CharField(label='SMS_SERVICE_USERNAME', max_length=255, required=False,
+                                       help_text=_('Password required for the selected SMS provider.'))
+    SMS_FROM_NUMBER = s.SafeCharField(label='SMS_FROM_NUMBER', max_length=64, required=False,
+                                      help_text=_('Phone number used as sender for outgoing text messages.'))
+    SMS_REGISTRATION_ENABLED = s.BooleanField(label='SMS_REGISTRATION_ENABLED',
+                                              help_text=_("Whether to verify user's phone number during registration "
+                                                          "and phone number change"))
 
     # noinspection PyMethodMayBeStatic,PyPep8Naming
     def validate_VMS_NODE_SSH_KEYS_DEFAULT(self, attrs, source):
@@ -763,4 +767,9 @@ class DefaultDcSettingsSerializer(DcSettingsSerializer):
                 _('Cannot enable EMAIL_USE_TLS and EMAIL_USE_SSL together.')
             ])
 
-        return attrs
+        # Do not allow SMS registration without the SMS module
+        if (attrs.get('SMS_REGISTRATION_ENABLED', None) and
+                not attrs.get('SMS_ENABLED', self.request.dc.settings.SMS_ENABLED)):
+            self._errors['SMS_REGISTRATION_ENABLED'] = s.ErrorList([_('SMS support must be enabled first.')])
+
+        return super(DefaultDcSettingsSerializer, self).validate(attrs)

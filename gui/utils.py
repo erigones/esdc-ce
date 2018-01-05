@@ -7,7 +7,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import resolve_url, redirect as _redirect
 from django.utils.six import iteritems
 
-# noinspection PyUnresolvedReferences
+# noinspection PyUnresolvedReferences,PyProtectedMember
 from api.fields import get_boolean_value  # noqa: F401 (Leave it here - used by gui.views)
 from api.api_views import APIView
 from api.exceptions import InvalidInput
@@ -15,9 +15,8 @@ from api.task.log import get_tasklog_cached
 from api.task.utils import get_user_tasks as _get_user_tasks
 from gui.navigation import Navi
 from gui.dc.forms import DcSwitch
-from gui.signals import view_data_collected, allow_switch_company_profile
-from que import TT_MGMT
-from que.utils import tt_from_task_id
+from gui.signals import view_data_collected
+from que.utils import is_mgmt_task
 
 
 class Messages(list):
@@ -84,7 +83,7 @@ def get_user_tasks(request):
     Like api.task.utils.get_user_tasks, but without Mgmt Tasks.
     """
     def no_m_tasks(task_id):
-        return tt_from_task_id(task_id) != TT_MGMT
+        return not is_mgmt_task(task_id)
 
     return _get_user_tasks(request, filter_fun=no_m_tasks)
 
@@ -224,14 +223,3 @@ def get_query_string(request, **kwargs):
                 qs[name] = 1
 
     return qs
-
-
-def user_profile_company_only_form(user):
-    result = allow_switch_company_profile.send(sender='gui.utils.user_profile_company_only_form', user=user)
-    allow = False
-
-    for signal_results in result:
-        if signal_results[1]:
-            allow = True
-
-    return allow

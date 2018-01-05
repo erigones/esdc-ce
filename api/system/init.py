@@ -9,6 +9,7 @@ from django.conf import settings
 from api import status
 from api.utils.request import get_dummy_request
 from api.utils.views import call_api_view
+from api.task.utils import get_task_status
 from api.system.utils import get_local_netinfo
 from api.dns.domain.utils import reverse_domain_from_network
 from api.mon.alerting.tasks import mon_all_groups_sync
@@ -213,17 +214,28 @@ def init_mgmt(head_node, images=None):  # noqa: R701
     while True:
         ret = api_post(harvest_vm, head_node.hostname, dc=admin)
 
-        if status.is_success(ret.status_code):
-            logger.info('POST harvest_vm(%s) has started: %s', head_node.hostname, ret.data)
+        if ret.is_success(ret.status_code):
+            harvest_vm_task_id = ret.data.get('task_id')
+            logger.info('POST harvest_vm(%s) has started with task ID: %s', head_node.hostname, harvest_vm_task_id)
             break
         else:
             logger.error('POST harvest_vm(%s) has failed; retrying in 3 seconds', head_node.hostname)
             sleep(3)
+            continue
 
     # The harvest is performing some other tasks asynchronously during which the node must stay in online state.
-    # So let's sleep for some time to give the tasks some breathing space.
-    logger.info('Sleeping for 60 seconds after admin datacenter initialization')
-    sleep(60)
+    while True:
+        sleep(3)
+        result, status_code = get_task_status(harvest_vm_task_id)
+
+        if status_code == status.HTTP_201_CREATED:
+            logger.info('POST harvest_vm(%s) has not finished yet; sleeping for 3 seconds', head_node.hostname)
+            continue
+        else:
+            logger.info('POST harvest_vm(%s) has finished with: %s', head_node.hostname, result)
+            break
+
+    logger.warning('Admin datacenter "%s" service VMs were successfully harvested', admin_dc)
 
     # Let's update the default image server after we've harvested the VMS_VM_IMG01
     try:
@@ -255,6 +267,9 @@ def init_mgmt(head_node, images=None):  # noqa: R701
         logger.exception(e)
 
     # Initial user group zabbix synchronization
-    mon_all_groups_sync.call(sender='init_mgmt')
+    try:
+        mon_all_groups_sync.call('init_mgmt')
+    except Exception as e:
+        logger.exception(e)
 
     return ret

@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+# noinspection PyProtectedMember
 from celery import Task
 
 from que import Q_MGMT
