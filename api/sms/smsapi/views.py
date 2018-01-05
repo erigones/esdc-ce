@@ -1,5 +1,5 @@
+import hashlib
 from logging import getLogger
-from hashlib import md5
 from datetime import datetime, timedelta
 
 from django.http import HttpResponse
@@ -30,20 +30,16 @@ CALLBACK_STATUS_CODES = {
 CALLBACK_STATUS_CODES_OK = frozenset(['403', '404', '409', '410'])
 
 
-def login_data():
+def login_data(username, password):
     """
     Login credentials in SMSAPI (former HQSMS) service
     """
-    dc1_settings = DefaultDc().settings
-    mh = md5()
-    mh.update(dc1_settings.SMS_SMSAPI_PASSWORD)
-    expire = datetime.now() + timedelta(hours=dc1_settings.SMS_EXPIRATION_HOURS)
+    mh = hashlib.md5()
+    mh.update(password)
 
     return {
-        'username': dc1_settings.SMS_SMSAPI_USERNAME,
+        'username': username,
         'password': mh.hexdigest(),
-        'from': dc1_settings.SMS_SMSAPI_FROM,
-        'expiration_date': expire.strftime('%s'),
     }
 
 
@@ -61,16 +57,31 @@ def _smsapi_response_adapter(response):
     return response
 
 
-def sms_send(phone, message):
+# noinspection PyUnusedLocal
+def sms_send(phone, message, username=None, password=None, from_=None, expire_hours=None, **unused_kwargs):
     """
     Send text message.
     Function shall not be called directly as validation happens in view above.
     """
-    data = login_data()
+    assert username and password
+    data = login_data(username, password)
     data['to'] = phone.replace('+', '')
     data['message'] = message
 
-    return _smsapi_response_adapter(requests.post('https://api.smsapi.com/sms.do', data))
+    if from_:
+        data['from'] = from_
+
+    if expire_hours:
+        expiration_dt = datetime.now() + timedelta(hours=expire_hours)
+        data['expiration_date'] = expiration_dt.strftime('%s')
+
+    r = _smsapi_response_adapter(requests.post('https://api.smsapi.com/sms.do', data))
+
+    if r.status_code == requests.codes.ok:
+        return None  # Only return something if an error occurred
+
+    logger.error('SMSAPI error when sending message to %s, status_code=%s, response="%s"', phone, r.status_code, r.text)
+    return r.status_code
 
 
 def _get_callback_param(data, attr, index):

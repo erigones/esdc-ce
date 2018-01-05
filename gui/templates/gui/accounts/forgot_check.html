@@ -2,20 +2,37 @@
 {% load i18n %}
 
 {% block head %}
+{% if sms_registration %}
 <script type="text/javascript">
 $(document).ready(function(){
    $('#password-reset').submit();
 });
 </script>
+{% endif %}
 {% endblock %}
 
 {% block login_content %}{% if validlink %}
-<form class="form-horizontal" id="password-reset" action="" method="POST">
+<form class="form-horizontal animated{% if request.method == "POST" %} wobble{% endif %}" id="password-reset" action="{{ request.path }}" method="POST">
   {% csrf_token %}
+  {% if sms_registration %}
   <div class="no-auth-message black-box inner-well">
     <h4>{% trans "Password reset" %}</h4>
     <p>{% trans "Your new password will be send as a text message (SMS) to your phone number." %}</p>
   </div>
+  {% else %}
+  <div class="input-group">
+    {% for field in form %}
+    <div class="input{% if field.errors %} error wobble{% endif %}">
+      {{ field }}
+      {% for error in field.errors %}
+      <span class="help-inline error"><i class="icon-warning-sign"></i> {{ error }}</span>
+      {% empty %}{% if field.help_text %}
+      <span class="help-inline note"><i class="icon-info-sign"></i> {{ field.help_text }}</span>
+      {% endif %}{% endfor %}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
   <button type="submit" class="no-auth-button">{% trans "Reset my password" %}</button>
 </form>
 {% else %}

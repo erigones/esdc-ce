@@ -11,9 +11,13 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 
 from api.email import sendmail
+from api.sms.views import internal_send as send_sms
 from gui.models import User, UserProfile
+# noinspection PyProtectedMember
 from gui.widgets import EmailInput, TelPrefixInput, clean_international_phonenumber
-from gui.accounts.utils import send_sms, generate_key, set_attempts_to_cache
+from gui.accounts.utils import generate_key, set_attempts_to_cache
+from gui.profile.forms import PasswordForm
+from vms.models import DefaultDc
 
 logger = getLogger(__name__)
 
@@ -138,7 +142,7 @@ class ForgotForm(_PasswordResetForm):
             })
 
 
-class PasswordResetForm(object):
+class SMSSendPasswordResetForm(object):
     """
     Dummy "password reset" form used by django.contrib.auth.forms.password_reset_confirm.
     """
@@ -161,7 +165,22 @@ class PasswordResetForm(object):
         return None
 
 
-class RegisterForm(forms.ModelForm):
+class PasswordResetForm(PasswordForm):
+    def __init__(self, *args, **kwargs):
+        super(PasswordResetForm, self).__init__(*args, **kwargs)
+        self.fields['password1'].widget.attrs['placeholder'] = _('New password')
+        self.fields['password2'].widget.attrs['placeholder'] = _('Confirm new password')
+
+    # noinspection PyMethodOverriding
+    def save(self):
+        logger.info('Changing password for user "%s"', self.user.username)
+        self.user.set_password(self.cleaned_data['password1'])
+        self.user.save()
+
+        return None
+
+
+class _RegisterForm(forms.ModelForm):
     """
     User details registration form, for basic user data (Django users table)
     """
@@ -187,7 +206,7 @@ class RegisterForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-        super(RegisterForm, self).__init__(*args, **kwargs)
+        super(_RegisterForm, self).__init__(*args, **kwargs)
         self.fields['first_name'].required = True
         self.fields['last_name'].required = True
         self.fields['email'].required = True
@@ -210,13 +229,42 @@ class RegisterForm(forms.ModelForm):
         return email
 
 
+class RegisterForm(_RegisterForm):
+    password = forms.CharField(
+        label=_('Password'),
+        required=True,
+        min_length=6,
+        widget=forms.PasswordInput(render_value=False, attrs={
+            'class': 'input-transparent',
+            'placeholder': _('New password'),
+            'required': 'required',
+            'pattern': '.{6,}',
+            'title': _('6 characters minimum'),
+        }),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(RegisterForm, self).__init__(*args, **kwargs)
+        dc1_settings = DefaultDc().settings
+
+        if dc1_settings.SMS_REGISTRATION_ENABLED:
+            del self.fields['password']
+
+    def save(self, *args, **kwargs):
+        password = self.cleaned_data.pop('password', None)
+        user = super(RegisterForm, self).save(*args, **kwargs)
+
+        if password:
+            user.set_password(password)
+
+        return user
+
+
 class UserProfileRegisterForm(forms.ModelForm):
     """
     User profile registration form, for extended data collected about user (gui users table)
     """
     include_company = False
-    include_tos = bool(settings.TOS_LINK)
-    include_others = True
     phone_help_text = _('You will receive a text message (SMS) with password.')
 
     class Meta:
@@ -226,8 +274,8 @@ class UserProfileRegisterForm(forms.ModelForm):
             'phone': TelPrefixInput(attrs={
                 'class': 'input-transparent',
                 'placeholder': _('Phone'),
-                'required': 'required',
-                'maxlength': 32
+                'maxlength': 32,
+                'erase_on_empty_input': True,
             }),
             'tos_acceptation': forms.CheckboxInput(attrs={
                 'class': 'normal-check',
@@ -255,20 +303,27 @@ class UserProfileRegisterForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(UserProfileRegisterForm, self).__init__(*args, **kwargs)
-        self.fields['phone'].required = True
-        self.fields['phone'].help_text = self.phone_help_text
+        dc1_settings = DefaultDc().settings
 
-        if not self.include_tos:
-            del(self.fields['tos_acceptation'])
+        if dc1_settings.PROFILE_PHONE_REQUIRED or dc1_settings.SMS_REGISTRATION_ENABLED:
+            self.fields['phone'].widget.attrs['required'] = 'required'
+            self.fields['phone'].widget.erase_on_empty_input = False
+            self.fields['phone'].required = True
 
-        if not self.include_company:
-            del(self.fields['company'], self.fields['companyid'])
+            if dc1_settings.SMS_REGISTRATION_ENABLED:
+                self.fields['phone'].help_text = self.phone_help_text
         else:
+            del self.fields['phone']
+
+        if not dc1_settings.TOS_LINK:
+            del self.fields['tos_acceptation']
+
+        if self.include_company:
             self.fields['company'].required = True
             self.fields['companyid'].required = True
-
-        if not self.include_others:
-            del(self.fields['country'], self.fields['timezone'], self.fields['language'])
+        else:
+            del self.fields['company']
+            del self.fields['companyid']
 
     def clean_phone(self):
         return clean_international_phonenumber(self.cleaned_data['phone'])

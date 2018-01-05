@@ -15,7 +15,7 @@ from api.task.log import get_tasklog_cached
 from api.task.utils import get_user_tasks as _get_user_tasks
 from gui.navigation import Navi
 from gui.dc.forms import DcSwitch
-from gui.signals import view_data_collected, allow_switch_company_profile
+from gui.signals import view_data_collected
 from que.utils import is_mgmt_task
 
 
@@ -223,14 +223,3 @@ def get_query_string(request, **kwargs):
                 qs[name] = 1
 
     return qs
-
-
-def user_profile_company_only_form(user):
-    result = allow_switch_company_profile.send(sender='gui.utils.user_profile_company_only_form', user=user)
-    allow = False
-
-    for signal_results in result:
-        if signal_results[1]:
-            allow = True
-
-    return allow

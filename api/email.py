@@ -126,6 +126,7 @@ def _sendmail(user, subject_template_name, body_template_name, recipient_list=No
         'site_name': dc_settings.SITE_NAME,
         'site_signature': dc_settings.SITE_SIGNATURE,
         'company_name': dc_settings.COMPANY_NAME,
+        'settings': dc_settings,
     }
 
     # Add extra context if specified

@@ -12,6 +12,7 @@ Features
 - Added API for managing monitoring hostgroups - `#94 <https://github.com/erigones/esdc-ce/issues/94>`__
 - Added API for managing monitoring actions - `#94 <https://github.com/erigones/esdc-ce/issues/94>`__
 - Added confirmation dialog to delete/restore of snapshots and backups - `#94 <https://github.com/erigones/esdc-ce/issues/94>`__
+- Updated registration module to work without SMS - `#235 <https://github.com/erigones/esdc-ce/issues/235>`__
 - Added ability to restore snapshot into another VM - `#236 <https://github.com/erigones/esdc-ce/issues/236>`__
 - Updated the VM templates API + removed *experimental* flag from the ``template_manage`` API call - `#256 <https://github.com/erigones/esdc-ce/issues/256>`__
 - DC settings implied monitoring hostgroups are shown near the VM, node monitoring_hostgroups setting - `#266 <https://github.com/erigones/esdc-ce/issues/266>`__

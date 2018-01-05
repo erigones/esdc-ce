@@ -6,7 +6,9 @@ from django.utils.translation import ugettext_lazy as _
 from api import serializers as s
 from api.dc.utils import get_dc
 from api.email import sendmail
+# noinspection PyProtectedMember
 from api.fields import get_boolean_value
+# noinspection PyProtectedMember
 from api.permissions import generate_random_security_hash
 from api.serializers import ConditionalDCBoundSerializer
 from gui.models import User, Role
@@ -74,6 +76,17 @@ class UserSerializer(ApiKeysSerializer, ConditionalDCBoundSerializer):
         # noinspection PyProtectedMember
         return super(UserSerializer, self)._normalize(attr, value)
 
+    @staticmethod
+    def send_email_verification(user):
+        return sendmail(
+            user,
+            'accounts/user/base/profile_verify_subject.txt',
+            'accounts/user/base/profile_verify_email.txt',
+            extra_context={
+                'email_token': user.userprofile.email_token,
+            }
+        )
+
     # noinspection PyProtectedMember
     @atomic
     def save(self, **kwargs):
@@ -97,18 +110,11 @@ class UserSerializer(ApiKeysSerializer, ConditionalDCBoundSerializer):
 
         # Changing a user email makes the email not verified
         # (unless request.user is not part of the staff or registration is disabled)
-        if self.old_email and not self.request.user.is_staff and settings.REGISTRATION_ENABLED:
+        if self.old_email and not self.request.user.is_staff and User.must_email_be_verified():
             user.userprofile.email_verified = False
             user.userprofile.email_token = user.userprofile.generate_token(6)
             user.userprofile.save()
-
-            sendmail(
-                user,
-                'accounts/user/base/profile_verify_subject.txt',
-                'accounts/user/base/profile_verify_email.txt', extra_context={
-                    'email_token': user.userprofile.email_token,
-                }
-            )
+            self.send_email_verification(user)
 
     def validate_username(self, attrs, source):
         try:

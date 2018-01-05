@@ -75,7 +75,7 @@ LANGUAGE_CODE = 'en-us'
 # Languages we provide translations for.
 LANGUAGES = (
     ('en', 'English'),
-    ('sk', 'Slovensky (beta)'),
+    #  ('sk', 'Slovensky (beta)'),
 )
 
 # Cookies we create will have names with es_ prefix
@@ -447,19 +447,31 @@ CURRENCY = (
 )
 CURRENCY_DEFAULT = 'EUR'
 
+REGISTRATION_ENABLED = False  # Module. Enable SMS_ENABLED if True
+COMPANY_NAME = 'Danube Cloud'
+TOS_LINK = ''
+SITE_LINK = 'http://127.0.0.1:8000'
+SITE_NAME = 'Danube Cloud'
+SITE_SIGNATURE = SITE_NAME + '\r\n' + SITE_LINK
+SITE_LOGO = ''
+SITE_ICON = ''
+
 PROFILE_SSH_KEY_LIMIT = 10
 PROFILE_COUNTRY_CODE_DEFAULT = 'SK'
 PROFILE_PHONE_PREFIX_DEFAULT = '+421'
 PROFILE_TIME_ZONE_DEFAULT = 'Europe/Bratislava'
+PROFILE_PHONE_REQUIRED = False
+PROFILE_ADDRESS_REQUIRED = False
+PROFILE_NEWSLETTER_ENABLED = False
+PROFILE_USERTYPE_DEFAULT = 1  # Personal account
 
-SMS_ENABLED = False  # Module. Required if REGISTRATION_ENABLED=True
-SMS_PRIVATE_KEY = ''
+SMS_REGISTRATION_ENABLED = False
+SMS_ENABLED = False  # Module. Required if SMS_REGISTRATION_ENABLED=True
 SMS_PREFERRED_SERVICE = 'smsapi'  # Former HQSMS
+SMS_FROM_NUMBER = 'DanubeCloud'
+SMS_SERVICE_USERNAME = ''
+SMS_SERVICE_PASSWORD = ''
 SMS_EXPIRATION_HOURS = 1  # In how many hours does SMS expire?
-
-SMS_SMSAPI_USERNAME = ''  # Former HQSMS
-SMS_SMSAPI_PASSWORD = ''  # Former HQSMS
-SMS_SMSAPI_FROM = 'DanubeCloud'  # Former HQSMS
 
 MON_ZABBIX_ENABLED = False  # Module
 _MON_ZABBIX_VM_SYNC = True  # local, internal, hidden
@@ -522,15 +534,6 @@ MON_ZABBIX_GRAPH_MAX_PERIOD = 14400  # 4 hours; global, internal+external
 MON_ZABBIX_MEDIA_TYPE_EMAIL = 'E-mail'
 MON_ZABBIX_MEDIA_TYPE_PHONE = 'SMS'
 MON_ZABBIX_MEDIA_TYPE_JABBER = 'Ludolph'
-
-REGISTRATION_ENABLED = False  # Module. Enable SMS_ENABLED if True
-COMPANY_NAME = 'Danube Cloud'
-TOS_LINK = ''
-SITE_LINK = 'http://127.0.0.1:8000'
-SITE_NAME = 'Danube Cloud'
-SITE_SIGNATURE = SITE_NAME + '\r\n' + SITE_LINK
-SITE_LOGO = ''
-SITE_ICON = ''
 
 SUPPORT_ENABLED = True  # Module
 SUPPORT_EMAIL = 'support@example.com'
