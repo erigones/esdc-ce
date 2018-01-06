@@ -1,0 +1,27 @@
+#!/bin/bash
+
+ZKCLI=/usr/local/bin/zookeepercli
+
+if [[ -z "${2}" ]]; then
+	echo "Usage:   $0 <query>" 1>&2
+	echo "Example: $0 ls /esdc/nodes" 1>&2
+	exit 10
+fi
+
+if [[ ! -x "${ZKCLI}" ]]; then
+	echo "Error: Cannot find binary ${ZKCLI}" 1>&2
+	exit 20
+fi
+
+# query cfgdb credentials
+CFGDB_USERNAME="$(mdata-get org.erigones:cfgdb_username 2>/dev/null || echo 'esdc')"
+CFGDB_PASSWORD="$(mdata-get org.erigones:cfgdb_password 2>/dev/null)"
+
+if [[ -n "${CFGDB_USERNAME}" && -n "${CFGDB_PASSWORD}" ]]; then
+	"${ZKCLI}" -servers localhost -auth_usr "${CFGDB_USERNAME}" -auth_pwd "${CFGDB_PASSWORD}" -c "${@}"
+else
+	"${ZKCLI}" -servers localhost -c "${@}"
+fi
+
+exit $?
+

@@ -45,3 +45,5 @@
   # can't use service module because SmartOS svcadm doesn't have "-s" switch
   - name: restart pdns
     shell: /usr/sbin/svcadm disable -s svc:/pkgsrc/pdns:default && /usr/sbin/svcadm enable -s svc:/pkgsrc/pdns:default
+  - name: iptables-save
+    shell: iptables-save > /etc/sysconfig/iptables

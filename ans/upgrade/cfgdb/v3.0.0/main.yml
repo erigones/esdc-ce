@@ -1,0 +1,83 @@
+#
+# https://github.com/erigones/esdc-factory/issues/102
+# https://github.com/erigones/esdc-factory/issues/108
+#
+- name: Copy fixed query_cfgdb local script
+  copy: src=query_cfgdb_local
+        dest=/usr/local/bin/query_cfgdb
+        owner=root
+        group=root
+        mode=0755
+
+- name: Get or create erigonesd SSL certificate (locally)
+  include: "{{ upg_base }}/lib/erigonesd_ssl.yml"
+
+- name: Check /esdc/settings/security/services_ssl_cert in ZooKeeper
+  command: /usr/local/bin/query_cfgdb get /esdc/settings/security/services_ssl_cert
+  register: zk_ssl_cert
+  ignore_errors: true
+  changed_when: zk_ssl_cert|failed or zk_ssl_cert.stdout.strip() != "{{ ERIGONESD_SSL_CERT.strip() }}"
+
+# Store striped in ZooKeeper (because zookeepercli appends a newline when reading)
+- name: Create /esdc/settings/security/services_ssl_cert in ZooKeeper
+  command: /usr/local/bin/query_cfgdb creater /esdc/settings/security/services_ssl_cert "{{ ERIGONESD_SSL_CERT.strip() }}"
+  when: zk_ssl_cert|failed
+
+- name: Update /esdc/settings/security/services_ssl_cert in ZooKeeper
+  command: /usr/local/bin/query_cfgdb set /esdc/settings/security/services_ssl_cert "{{ ERIGONESD_SSL_CERT.strip() }}"
+  when: zk_ssl_cert|succeeded and zk_ssl_cert|changed
+
+# Store raw in metadata (so we have the same metadata as on mgmt)
+- name: Set metadata for cfgdb ZK REST SSL certificate and key
+  shell: mdata-put "{{ item.key }}" "{{ item.value }}"
+  with_items:
+    - { key: "org.erigones:cfgdb_zk_rest_ssl_key", value: "{{ ERIGONESD_SSL_KEY }}" }
+    - { key: "org.erigones:cfgdb_zk_rest_ssl_cert", value: "{{ ERIGONESD_SSL_CERT }}" }
+  when: zk_ssl_cert|changed
+
+- name: Save erigonesd SSL certificate to /usr/local/etc/zk_rest_http_ssl.crt
+  copy: content="{{ ERIGONESD_SSL_CERT }}"
+        dest="/usr/local/etc/zk_rest_http_ssl.crt"
+        owner=root
+        group=root
+        mode=0644
+
+- name: Save erigonesd SSL key to /usr/local/etc/zk_rest_http_ssl.key
+  copy: content="{{ ERIGONESD_SSL_KEY }}"
+        dest="/usr/local/etc/zk_rest_http_ssl.key"
+        owner=nobody
+        group=root
+        mode=0400
+
+- name: Copy cfgdb_zk_rest_server.py script
+  copy: src=cfgdb_zk_rest_server.py
+        dest=/usr/local/bin/cfgdb_zk_rest_server.py
+        owner=root
+        group=root
+        mode=0755
+
+- name: Copy cfgdb-zk-rest SMF manifest
+  copy: src=cfgdb-zk-rest.xml
+        dest=/opt/local/lib/svc/manifest/cfgdb-zk-rest.xml
+  register: zk_rest_manifest
+
+- name: Import cfgdb-zk-rest SMF manifest
+  command: /usr/sbin/svccfg import /opt/local/lib/svc/manifest/cfgdb-zk-rest.xml
+  when: zk_rest_manifest|changed
+
+- name: Restart cfgdb-zk-rest
+  service: name=cfgdb-zk-rest
+           state=restarted
+           enabled=yes
+  when: zk_rest_manifest|changed or zk_ssl_cert|changed
+
+- name: Make sure that cfgdb-zk-rest is running
+  service: name=cfgdb-zk-rest
+           state=started
+           enabled=yes
+
+- name: Check service health
+  shell: /usr/bin/svcs -x
+  register: svcs_x
+  changed_when: false
+  failed_when: svcs_x.stdout.strip() != "" or svcs_x.stderr.strip() != ""

@@ -2,3 +2,72 @@
 - name: Fix /etc/rc.d/rc.local permissions
   file: dest=/etc/rc.d/rc.local
         mode=u+x
+
+#
+# https://github.com/erigones/esdc-factory/issues/102
+#
+- name: Set IP address of cfgdb
+  set_fact:
+    cfgdb_ip: "{{ hostvars['cfgdb' + inventory_hostname.lstrip('mgmt')].ansible_ssh_host|mandatory }}"
+    cfgdb_ip_mdata_key: "org.erigones:cfgdb_ip"
+
+- name: Get or create erigonesd SSL certificate (locally)
+  include: "{{ upg_base }}/lib/erigonesd_ssl.yml"
+
+- name: Read current metadata
+  shell: mdata-list
+  register: mdata_list
+  changed_when: false
+
+- name: Set metadata for new erigonesd SSL certificate and key
+  shell: mdata-put "{{ item.key }}" "{{ item.value }}"
+  with_items:
+    - { key: "org.erigones:erigonesd_ssl_key", value: "{{ ERIGONESD_SSL_KEY }}" }
+    - { key: "org.erigones:erigonesd_ssl_cert", value: "{{ ERIGONESD_SSL_CERT }}" }
+  when: ERIGONESD_SSL_NEW
+
+- name: Set metadata for cfgdb_ip
+  shell: mdata-put "{{ cfgdb_ip_mdata_key }}" "{{ cfgdb_ip }}"
+  when: cfgdb_ip_mdata_key not in mdata_list.stdout_lines
+
+- name: Add admin services proxy into haproxy.cfg
+  blockinfile:
+    dest: /etc/haproxy/haproxy.cfg
+    validate: "/usr/sbin/haproxy -c -f '%s'"
+    marker: "# {mark} Danube Cloud {{ item.name }} service proxy"
+    block: "listen {{ item.name }}\n{{ item.config|join('\n') }}\n"
+  with_items:
+    - name: rabbitmq
+      config:
+        - "\tmode tcp"
+        - "\tbind *:15672 ssl crt {{ ERIGONESD_SSL_FILE }}"
+        - "\tserver rabbitmq-mgmt 127.0.0.1:5672"
+    - name: redis
+      config:
+        - "\tmode tcp"
+        - "\tbind *:16379 ssl crt {{ ERIGONESD_SSL_FILE }}"
+        - "\tserver redis-mgmt 127.0.0.1:6379"
+    - name: zk_rest
+      config:
+        - "\tmode tcp"
+        - "\tbind *:12181"
+        - "\tserver zk-rest-cfgdb {{ cfgdb_ip }}:12181"
+  notify:
+    - reload haproxy
+
+- name: Configure firewall for admin services
+  iptables:
+    action: insert
+    chain: INPUT
+    ctstate: NEW
+    in_interface: eth0
+    protocol: tcp
+    destination_port: "{{ item }}"
+    jump: ACCEPT
+  with_items:
+    - 15672
+    - 16379
+    - 12181
+  notify:
+    - iptables-save
+

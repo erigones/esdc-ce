@@ -1,0 +1,75 @@
+#
+# Get or create erigonesd SSL certificate and key on mgmt server.
+# https://github.com/erigones/esdc-factory/issues/102
+#
+# This will ensure that the dc-erigonesd.pem file exists on the mgmt_host
+# and will set some facts:
+#   - ERIGONESD_SSL_CERT_FILE
+#   - ERIGONESD_SSL_KEY_FILE
+#   - ERIGONESD_SSL_FILE
+#   - ERIGONESD_SSL_CERT
+#   - ERIGONESD_SSL_KEY
+#   - ERIGONESD_SSL_NEW
+#
+
+- name: Set erigonesd SSL file fact
+  set_fact:
+    ERIGONESD_SSL_CERT_FILE: "/etc/pki/tls/certs/dc-erigonesd.crt"
+    ERIGONESD_SSL_KEY_FILE: "/etc/pki/tls/certs/dc-erigonesd.key"
+    ERIGONESD_SSL_FILE: "/etc/pki/tls/certs/dc-erigonesd.pem"
+  delegate_to: "{{ mgmt_host | default('127.0.0.1') }}"
+
+- name: Configure openssl.cnf for generating new erigonesd SSL certificate
+  ini_file: dest="/etc/pki/tls/openssl.cnf"
+            section="SAN"
+            option="subjectAltName"
+            value="DNS:esdc.local,DNS:mgmt01.local,DNS:mgmt.local,DNS:mon01.local,DNS:mon.local,DNS:cfgdb01.local,DNS:cfgdb.local,DNS:img01.local,DNS:img.local,DNS:dns01.local,DNS:dns.local,DNS:*.local"
+  delegate_to: "{{ mgmt_host | default('127.0.0.1') }}"
+
+- name: Generate new erigonesd SSL key and certificate
+  shell: openssl req -x509 -sha256 -nodes -days 10000 -subj '/CN=esdc.local/O=Danube Cloud/' -reqexts SAN -extensions SAN -newkey rsa:8192 -keyout "{{ ERIGONESD_SSL_KEY_FILE }}" -out "{{ ERIGONESD_SSL_CERT_FILE }}"
+  args:
+    creates: "{{ ERIGONESD_SSL_CERT_FILE }}"
+  register: openssl_generate_cert
+  delegate_to: "{{ mgmt_host | default('127.0.0.1') }}"
+
+- name: Create {{ ERIGONESD_SSL_FILE }}
+  shell: cat "{{ ERIGONESD_SSL_KEY_FILE }}" "{{ ERIGONESD_SSL_CERT_FILE }}" > "{{ ERIGONESD_SSL_FILE }}"
+  args:
+    creates: "{{ ERIGONESD_SSL_FILE }}"
+  delegate_to: "{{ mgmt_host | default('127.0.0.1') }}"
+
+- name: Set permissions on the new erigonesd SSL file
+  file: path="{{ item }}"
+        mode=0600
+  with_items:
+    - "{{ ERIGONESD_SSL_KEY_FILE }}"
+    - "{{ ERIGONESD_SSL_FILE }}"
+  delegate_to: "{{ mgmt_host | default('127.0.0.1') }}"
+
+- name: Load {{ ERIGONESD_SSL_CERT_FILE }}
+  slurp: src="{{ ERIGONESD_SSL_CERT_FILE }}"
+  register: erigonesd_ssl_cert
+  delegate_to: "{{ mgmt_host | default('127.0.0.1') }}"
+
+- name: Load {{ ERIGONESD_SSL_KEY_FILE }}
+  slurp: src="{{ ERIGONESD_SSL_KEY_FILE }}"
+  register: erigonesd_ssl_key
+  delegate_to: "{{ mgmt_host | default('127.0.0.1') }}"
+
+- name: Set ERIGONESD_SSL_CERT and ERIGONESD_SSL_KEY facts
+  set_fact:
+    ERIGONESD_SSL_CERT: "{{ erigonesd_ssl_cert['content'] | b64decode }}"
+    ERIGONESD_SSL_KEY: "{{ erigonesd_ssl_key['content'] | b64decode  }}"
+    ERIGONESD_SSL_NEW: "{{ openssl_generate_cert|changed }}"
+  delegate_to: "{{ mgmt_host | default('127.0.0.1') }}"
+
+- name: Fail if ERIGONESD_SSL_CERT is empty
+  fail: msg="ERIGONESD_SSL_CERT is empty"
+  when: ERIGONESD_SSL_CERT == ""
+  delegate_to: "{{ mgmt_host | default('127.0.0.1') }}"
+
+- name: Fail if ERIGONESD_SSL_KEY is empty
+  fail: msg="ERIGONESD_SSL_KEY is empty"
+  when: ERIGONESD_SSL_KEY == ""
+  delegate_to: "{{ mgmt_host | default('127.0.0.1') }}"
