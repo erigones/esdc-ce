@@ -9,6 +9,7 @@ HTTP_PORT="12181"
 ACTION_PARAMS=()
 ZK_FORCE=""
 ZK_USERNAME="esdc"
+CFGDB_HOSTNAME="esdc.local"
 
 usage() {
 	echo "Usage:   $0 [--legacy|--no-ssl|--force|-k] <command/query>"
@@ -93,8 +94,24 @@ ZK_NODE="${QUERY_STRING[1]}"
 unset -v 'QUERY_STRING[0]'
 unset -v 'QUERY_STRING[1]'
 ZK_DATA="${QUERY_STRING[*]}"
+
+# For SSL connection we need to connect to $CFGDB_HOSTNAME because the certificate is valid only for this name
+if [[ "${HTTP_SCHEME}" == "https" ]]; then
+	if [[ "${ZK_IP}" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+		ip="${ZK_IP}"
+	else
+		ip="$(getent hosts "${ZK_IP}" | awk '{ print $1 ; exit }')"
+	fi
+
+	if [[ -n "${ip}" ]]; then
+		ACTION_PARAMS+=("--resolve" "${CFGDB_HOSTNAME}:${HTTP_PORT}:${ZK_IP}")
+		ZK_IP="${CFGDB_HOSTNAME}"
+	fi
+fi
+
 URL="${HTTP_SCHEME}://${ZK_IP}:${HTTP_PORT}${ZK_NODE}?cmd=${ZK_CMD}"
 
+# Create json object with "data" and/or "force" attributes
 if [[ -n "${ZK_DATA}" ]]; then
 	json_data="{\"data\":\"${ZK_DATA}\"}"
 else
@@ -105,10 +122,20 @@ if [[ -n "${ZK_FORCE}" ]]; then
 	json_data="$(echo "${json_data}{\"force\":true}" | "${JSON}" --merge -o json-0)"
 fi
 
-ACTION_PARAMS+=("-d" "${json_data}")
+if [[ "${json_data}" != "{}" ]]; then
+	ACTION_PARAMS+=("--data" "${json_data}")
+fi
 
 # Here we go
-out=$("${CURL}" -s -X PUT -H "zk-username:${ZK_USERNAME}" -H "zk-password:${ZK_PASSWORD}" "${ACTION_PARAMS[@]}" "${URL}" 2>&1)
+out=$("${CURL}" -s -S -X PUT -H "zk-username:${ZK_USERNAME}" -H "zk-password:${ZK_PASSWORD}" "${ACTION_PARAMS[@]}" "${URL}" 2>&1)
+rc_curl="$?"
+
+# Check for curl errors first
+if [[ "${rc_curl}" -ne 0 ]]; then
+	echo "${out}" 1>&2
+	exit "${rc_curl}"
+fi
+
 # Output must be in JSON format
 rc="$(echo "${out}" | "${JSON}" "returncode" 2> /dev/null)"
 
