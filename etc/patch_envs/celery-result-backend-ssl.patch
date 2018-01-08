@@ -10,7 +10,7 @@ diff -Naur celery.orig/backends/redis.py celery/backends/redis.py
 +        # "REDIS_BACKEND_USE_SSL" must be a dict with the keys:
 +        # 'ssl_cert_reqs', 'ssl_ca_certs', 'ssl_certfile', 'ssl_keyfile'
 +        # (the same as "BROKER_USE_SSL")
-+        ssl = _get('REDIS_BACKEND_USE_SSL')
++        ssl = _get('BACKEND_USE_SSL')
 +        if ssl:
 +            if isinstance(ssl, dict):
 +                self.connparams.update(ssl)
