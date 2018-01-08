@@ -26,6 +26,7 @@ Features
 - Added value size limit to metadata - `#321 <https://github.com/erigones/esdc-ce/issues/321>`__
 - Changed VM reboot action to perform a VM configuration update by default - `#328 <https://github.com/erigones/esdc-ce/issues/328>`__
 - Changed system update API and added maintenance view with system update functionality into GUI - `#338 <https://github.com/erigones/esdc-ce/issues/338>`__
+- Added script for automating overlays creation - `#91 <https://github.com/erigones/esdc-factory/issues/91>`__
 
 Bugs
 ----
