@@ -11,11 +11,7 @@ CUT=/usr/bin/cut
 GREP=/usr/bin/grep
 SSH="/usr/bin/ssh -o StrictHostKeyChecking=no -o GSSAPIKeyExchange=no -o GSSAPIAuthentication=no"
 
-
 CMD="${1}"
-ORULE_NAME="${2}"
-NODE_LIST="$(echo "${3}" | ${SED} -e 's/[[:space:]]//g')"	# remove whitespaces
-ORULE_STRING="${4}"
 
 # shellcheck disable=SC2164
 MAINDIR="$(cd "$(dirname "$0")/.." ; pwd -P)"
@@ -32,12 +28,23 @@ HOSTS_TMP_FILE="${ANS_BASE}/.hosts.cfg.tmp"
 QUERY_CFGDB_BIN="${ERIGONES_HOME}/bin/query_cfgdb"
 CFGDB_FIREWALL_PATH="/esdc/settings/firewall"
 CFGDB_IPSEC_PATH="/esdc/settings/ipsec"
+CFGDB_ORULES_PATH="/esdc/settings/overlay_rules"
+CFGDB_ADMINOVERLAY_PATH="/esdc/settings/adminoverlay"
 
 # overlay vars
 OVERLAY_ARP_JSON_DIR="/opt/custom/networking"
 ORULE_TEMPLATE="-e vxlan -p vxlan/listen_ip=0.0.0.0 -p vxlan/listen_port=%%%OVERLAY_RULE_PORT%%% -s files -p files/config=${OVERLAY_ARP_JSON_DIR}/%%%OVERLAY_RULE_NAME%%%_overlay.json -p mtu=1400"
-CFGDB_ORULES_PATH="/esdc/settings/overlay_rules"
 ORULE_DEFAULT_PORT=4789
+
+# adminoverlay vars
+ADMINOVERLAY_NAME="adminoverlay"
+ADMINOVERLAY_STARTING_IP_NUM=11	# start assingnig IPs from x.x.x.11
+# list of adminoverlay IP addresses assigned to all nodes
+declare -A ADMINOVERLAY_NODE_IP_MAP
+ADMINOVERLAY_SUBNET=
+ADMINOVERLAY_NETMASK=
+ADMINOVERLAY_VXLAN=2
+ADMINOVERLAY_VLAN=2
 
 # misc global vars
 CFGDB_ORULE_LIST=
@@ -55,28 +62,43 @@ $0 update [overlay_rule_name] [node_list|all] [raw_overlay_rule_string]
 $0 delete <overlay_rule_name>
 $0 list
 
+Adminoverlay:
+$0 adminoverlay-init <adminoverlay_subnet/netmask> [nodename1=ip1,nodename=ip2,...]
+$0 adminoverlay-update [nodename1=ip1,nodename=ip2,...]
+$0 adminoverlay-list
+
+Firewall:
+$0 globally-enable-firewall <allowed_IP_list>
+$0 globally-disable-firewall
+$0 globally-update-firewall
+
 Examples:
 $0 create <overlay_rule_name>
 $0 create <overlay_rule_name> cn01.local,cn02.local,cn03.local
 $0 create customers all \"-e vxlan -p vxlan/listen_ip=0.0.0.0,vxlan/listen_port=4790 -s files -p files/config=${OVERLAY_ARP_JSON_DIR}/customers_overlay.json -p mtu=1400\"
+$0 adminoverlay-init 10.10.10.0/255.255.0.0
+$0 adminoverlay-init 10.10.10.0/255.255.255.0 cn01.local=10.10.10.11,cn02.local=10.10.10.12
+$0 adminoverlay-update cn01.local=10.10.10.21,cn02.local=10.10.10.22
 $0 update
 $0 update customers
 $0 delete customers
 $0 list
-
-Extra:
-$0 globally-enable-firewall
-$0 globally-disable-firewall
-$0 update-firewall
+$0 globally-enable-firewall <admin_IP1,allowed_IP2,good_subnet/24>
+$0 globally-enable-firewall <12.13.14.0/26,100.150.200.5>
 
 To enable debug output, append \"-debug\" to a subcommand, e.g:
 $0 create-debug <overlay_rule_name>
+
+To update everything everywhere, run
+$0 update
+
 EOF
 	exit 1
 }
 
 query_cfgdb() {
 	[[ "${DEBUG}" -eq 1 ]] && echo "running command: ${QUERY_CFGDB_BIN} ${*}" >> /dev/stderr
+	#"${QUERY_CFGDB_BIN}" --old "${@}" 2> /dev/null
 	"${QUERY_CFGDB_BIN}" "${@}" 2> /dev/null
 }
 
@@ -382,6 +404,541 @@ generate_ipsec_keys() {
 
 }
 
+load_adminoverlay_hosts() {
+	ADMINOVERLAY_SUBNET="$(query_cfgdb get "${CFGDB_ADMINOVERLAY_PATH}/subnet")"
+	ADMINOVERLAY_NETMASK="$(query_cfgdb get "${CFGDB_ADMINOVERLAY_PATH}/netmask")"
+
+	while read -r xnode; do
+		[[ -z "${xnode}" ]] && continue
+		ADMINOVERLAY_NODE_IP_MAP["${xnode}"]="$(query_cfgdb get "${CFGDB_ADMINOVERLAY_PATH}/IPs/${xnode}")"
+	done <<< "$(query_cfgdb ls "${CFGDB_ADMINOVERLAY_PATH}/IPs")"
+}
+
+check_adminoverlay_enabled() {
+	if [[ "$(query_cfgdb exists "${CFGDB_ADMINOVERLAY_PATH}/subnet")" == "true" ]]; then
+		return 0
+	else
+		return 1
+	fi
+}
+
+# ensure that all nodes have assigned their adminoverlay IP addresses
+generate_adminoverlay_ips() {
+	# if adminoverlay is not configured, do nothing
+	check_adminoverlay_enabled || return 0
+
+	for node in "${!NODE_DC_LIST[@]}"; do
+		if [[ -z "${ADMINOVERLAY_NODE_IP_MAP["${node}"]}" ]]; then
+			# this node's IP addr was not specified in cmd line
+			# We have to generate it.
+			next_ip="$(generate_next_adminoverlay_addr)"
+
+			# and save it directly to cfgdb
+			update_adminoverlay_cfgdb_node_ip "${node}" "${next_ip}"
+
+			# and save into local temporary array
+			ADMINOVERLAY_NODE_IP_MAP["${node}"]="${next_ip}"
+		fi
+	done
+}
+
+# write node's IP to cfgdb
+update_adminoverlay_cfgdb_node_ip() {
+	local nodename="$1"
+	local node_ip="$2"
+
+	if [[ -n "${ADMINOVERLAY_NODE_IP_MAP["${nodename}"]}" ]]; then
+		# this node entry is already present (loaded from cfgdb)
+		# we'll update the entry in cfgdb if needed
+		if [[ "${node_ip}" != "${ADMINOVERLAY_NODE_IP_MAP["${nodename}"]}" ]]; then
+			[[ "${DEBUG}" -eq 1 ]] && echo "Updating IP in cfgdb: ${nodename} -> ${node_ip}"
+			query_cfgdb set "${CFGDB_ADMINOVERLAY_PATH}/IPs/${nodename}" "${node_ip}"
+		else
+			[[ "${DEBUG}" -eq 1 ]] && echo "NOT updating IP in cfgdb: ${nodename} -> ${node_ip}"
+		fi
+	else
+		# the entry is not present in cfgdb
+		# we'll create it
+		[[ "${DEBUG}" -eq 1 ]] && echo "Creating node IP entry in cfgdb: ${nodename} -> ${node_ip}"
+		query_cfgdb creater "${CFGDB_ADMINOVERLAY_PATH}/IPs/${nodename}" "${node_ip}"
+	fi
+}
+
+update_adminoverlay_hosts() {
+	local node_ip_list="$1"
+	local nodename
+	local node_ip
+
+	for node_ip_pair in $(echo "${node_ip_list}" | "${TR}" ',' ' '); do
+		# skip empty lines
+		[[ -z "${node_ip_pair}" ]] && continue
+
+		nodename="$(echo "${node_ip_pair}" | cut -d= -f1)"
+		node_ip="$(echo "${node_ip_pair}" | cut -d= -f2)"
+
+		if [[ -z "${nodename}" ]]; then
+			echo "Invalid compute node name: '${nodename}'"
+			exit 8
+		fi
+		if ! is_net "${node_ip}"; then
+			echo "Invalid IP address for node ${nodename}: ${node_ip}"
+			exit 8
+		fi
+
+		if ! ip_from_subnet "${node_ip}" "${ADMINOVERLAY_SUBNET}" "${ADMINOVERLAY_NETMASK}"; then
+			echo "Compute node IP address (${node_ip_pair}) does not belong to the adminoverlay subnet (${ADMINOVERLAY_SUBNET}/${ADMINOVERLAY_NETMASK})"
+			exit 8
+		fi
+
+		if [[ "${CMD,,}" == "adminoverlay-update" ]]; then
+			# save new IP to cfgdb
+			update_adminoverlay_cfgdb_node_ip "${nodename}" "${node_ip}"
+		fi
+
+		# write node address to a local array
+		ADMINOVERLAY_NODE_IP_MAP["${nodename}"]="${node_ip}"
+	done
+}
+
+ip_to_num()
+{
+	local net="$1"
+	# shellcheck disable=SC2155
+	local num_a="$(echo "${net}" | "${CUT}" -d. -f1)"
+	# shellcheck disable=SC2155
+	local num_b="$(echo "${net}" | "${CUT}" -d. -f2)"
+	# shellcheck disable=SC2155
+	local num_c="$(echo "${net}" | "${CUT}" -d. -f3)"
+	# shellcheck disable=SC2155
+	local num_d="$(echo "${net}" | "${CUT}" -d. -f4)"
+
+	num_a="$((num_a << 24))"
+	num_b="$((num_b << 16))"
+	num_c="$((num_c << 8))"
+	#num_d=$num_d
+
+	echo "$((num_a + num_b + num_c + num_d))"
+}
+
+num_to_ip()
+{
+	local num="$1"
+	local fld_a
+	local fld_b
+	local fld_c
+	local fld_d
+
+	fld_d="$((num & 255))"
+	num="$((num >> 8))"
+	fld_c="$((num & 255))"
+	num="$((num >> 8))"
+	fld_b="$((num & 255))"
+	num="$((num >> 8))"
+	fld_a="${num}"
+
+	echo "$fld_a.$fld_b.$fld_c.$fld_d"
+}
+
+# Tests whether entire string is a number.
+isdigit()
+{
+	[ $# -eq 1 ] || return 1
+
+	if [[ "$1" =~ ^[0-9]+$ ]]; then
+		return 0
+	else
+		return 1
+	fi
+}
+
+# Tests network numner (num.num.num.num)
+is_net()
+{
+	local net="$1"
+	[[ "${net}" =~ ^[^.]+\.[^.]+\.[^.]+\.[^.]+$ ]] || return 1
+
+	# shellcheck disable=SC2155
+	local a="$(echo "${net}" | "${CUT}" -d. -f1)"
+	# shellcheck disable=SC2155
+	local b="$(echo "${net}" | "${CUT}" -d. -f2)"
+	# shellcheck disable=SC2155
+	local c="$(echo "${net}" | "${CUT}" -d. -f3)"
+	# shellcheck disable=SC2155
+	local d="$(echo "${net}" | "${CUT}" -d. -f4)"
+
+	isdigit "${a}" || return 1
+	isdigit "${b}" || return 1
+	isdigit "${c}" || return 1
+	isdigit "${d}" || return 1
+
+	[ "${a}" -lt 0 ] && return 1
+	[ "${a}" -gt 255 ] && return 1
+	[ "${b}" -lt 0 ] && return 1
+	[ "${b}" -gt 255 ] && return 1
+	[ "${c}" -lt 0 ] && return 1
+	[ "${c}" -gt 255 ] && return 1
+	[ "${d}" -lt 0 ] && return 1
+	[ "${d}" -gt 255 ] && return 1
+
+	return 0
+}
+
+get_network()
+{
+	local ip="$1"
+	local netmask="$2"
+
+	# shellcheck disable=SC2155
+	local ip_num="$(ip_to_num "${ip}")"
+	# shellcheck disable=SC2155
+	local netmask_num="$(ip_to_num "${netmask}")"
+
+	num_to_ip "$((netmask_num & ip_num))"
+}
+
+get_broadcast()
+{
+	local ip="$1"
+	local netmask="$2"
+
+	# shellcheck disable=SC2155
+	local ip_num="$(ip_to_num "${ip}")"
+	# shellcheck disable=SC2155
+	local netmask_num="$(ip_to_num "${netmask}")"
+	local network="$((netmask_num & ip_num))"
+
+	# shellcheck disable=SC2155
+	local bcast="$(ip_to_num "255.255.255.255")"
+	local bcasthost="$((~netmask_num & bcast))"
+
+	num_to_ip "$((network + bcasthost))"
+}
+
+# check if specified IP belongs to the subnet
+ip_from_subnet()
+{
+	local ip="$1"
+	local network="$2"
+	local netmask="$3"
+
+	bcast="$(get_broadcast "${network}" "${netmask}")"
+	# double-check that $network is computed correctly
+	network="$(get_network "${network}" "${netmask}")"
+
+	# shellcheck disable=SC2155
+	local ip_num="$(ip_to_num "${ip}")"
+	# shellcheck disable=SC2155
+	local bcast_num="$(ip_to_num "${bcast}")"
+	# shellcheck disable=SC2155
+	local network_num="$(ip_to_num "${network}")"
+
+	if [[ "$ip_num" -gt "${network_num}" && "$ip_num" -lt "${bcast_num}" ]]; then
+		# IP belongs to the subnet
+		return 0
+	else
+		return 1
+	fi
+}
+
+get_next_ip() 
+{
+	local ip="${1}"
+	local ipnum
+
+	is_net "${ip}" ||  return 1
+	ipnum="$(ip_to_num "${ip}")"
+	num_to_ip "$((ipnum + 1))"
+}
+
+generate_next_adminoverlay_addr() {
+	# get the highest assigned IP and increment by 1
+	local highest_ip="0.0.0.0"
+	local highest_ip_node
+	local next_ip
+
+	for node in "${!ADMINOVERLAY_NODE_IP_MAP[@]}"; do
+		if [[ "${ADMINOVERLAY_NODE_IP_MAP["${node}"]}" > "${highest_ip}" ]]; then
+			highest_ip_node="${node}"
+			highest_ip="${ADMINOVERLAY_NODE_IP_MAP["${node}"]}"
+		fi
+	done
+	if [[ -z "${highest_ip_node}" ]]; then
+		# most probably no IP was assigned yet
+		# return a (default) starting IP
+		adminoverlay_subnet_num="$(ip_to_num "${ADMINOVERLAY_SUBNET}")"
+		next_ip_num="$((adminoverlay_subnet_num + ADMINOVERLAY_STARTING_IP_NUM))"
+
+		next_ip="$(num_to_ip "${next_ip_num}")"
+		if ! is_net "${next_ip}"; then
+			echo "Failed to assign a starting IP for a compute node" > /dev/stderr
+			# we're in a subshell.. exit will not end program here
+			kill $$
+			sleep 10
+		fi
+	else
+		next_ip="$(get_next_ip "${ADMINOVERLAY_NODE_IP_MAP["${highest_ip_node}"]}")"
+	fi
+
+	if ! ip_from_subnet "${next_ip}" "${ADMINOVERLAY_SUBNET}" "${ADMINOVERLAY_NETMASK}"; then
+		# we've exceeded the subnet
+		cat << EOF > /dev/stderr
+Could not find enough free IP addresses for compute nodes.
+If you believe there are still free IPs, assign them manually using command:
+
+$0 adminoverlay-update node1=ip.add.re.ss,node2=ip.add.re.ss,...
+
+No changes were made to the system.
+EOF
+		# we're in a subshell.. exit will not end program here
+		kill $$
+		sleep 10
+	fi
+
+	# return new IP
+	echo "${next_ip}"
+}
+
+print_full_adminoverlay_json() {
+	local first_run=1
+
+	cat << EOF
+{
+  "subnet": "${ADMINOVERLAY_SUBNET}",
+  "netmask": "${ADMINOVERLAY_NETMASK}",
+  "vxlan_id": "${ADMINOVERLAY_VXLAN}",
+  "vlan_id": "${ADMINOVERLAY_VLAN}",
+  "ips":
+  {
+EOF
+	for node in "${!ADMINOVERLAY_NODE_IP_MAP[@]}"; do
+		if [[ "${first_run}" -eq 1 ]]; then
+			first_run=0
+		else
+			# adding next element
+			echo ','
+		fi
+
+		${PRINTF} "    \"%s\": \"%s\"" "${node}" "${ADMINOVERLAY_NODE_IP_MAP["${node}"]}"
+	done
+	cat << EOF
+
+  }
+}
+EOF
+}
+
+# main overlay create function
+create_overlay() {
+	local orule_port
+
+	check_orule_name_missing
+	check_orule_name
+
+	if cfgdb_orule_exists "${ORULE_NAME}"; then
+		echo "ERROR: overlay rule '${ORULE_NAME}' already exists."
+		echo "You probably want to run this command instead:"
+		[[ -n "${ORULE_STRING}" ]] && buf="\"${ORULE_STRING}\""
+		echo "$0 update ${ORULE_NAME} ${NODE_LIST} ${buf}"
+		exit 5
+	fi
+
+	# if no nodelist is provided, assume all nodes
+	[[ -z "${NODE_LIST}" ]] && NODE_LIST="all"
+
+	# if no overlay string is provided, generate a default one
+	if [[ -z "${ORULE_STRING}" ]]; then
+		# get first unused overlay udp port
+		orule_port="$(get_next_orule_port)"
+
+		ORULE_STRING="$(echo "${ORULE_TEMPLATE}" | \
+			${SED} -e "s/%%%OVERLAY_RULE_PORT%%%/${orule_port}/" -e "s/%%%OVERLAY_RULE_NAME%%%/${ORULE_NAME}/g")"
+	else
+		# parse orule port from provided string
+		orule_port="$(parse_orule_port "${ORULE_STRING}")"
+		if ! check_orule_port_unique "${orule_port}"; then
+			echo "Error: overlay port ${orule_port} is already used"
+			exit 3
+		fi
+	fi
+	
+	if [[ -z "${NODE_LIST}" || -z "${orule_port}" || -z "${ORULE_STRING}" ]]; then
+		echo "nodelist=${NODE_LIST}"
+		echo "orule_port=${orule_port}"
+		echo "orule=${ORULE_STRING}"
+		echo "Config error. Aborting."
+		exit 11
+	fi
+
+	echo "Writing new overlay parameters into cfgdb"
+	query_cfgdb creater "${CFGDB_ORULES_PATH}/${ORULE_NAME}/port" "${orule_port}"
+	query_cfgdb creater "${CFGDB_ORULES_PATH}/${ORULE_NAME}/nodelist" "${NODE_LIST}"
+	# encode rule string to remove whitespaces
+	query_cfgdb creater "${CFGDB_ORULES_PATH}/${ORULE_NAME}/rule" "$(echo "${ORULE_STRING}" | ${BASE64} | ${TR} -d ' \n\t')"
+}
+
+# update everything everywhere
+update_overlays() {
+	local orule
+	local orule_port
+
+	if [[ -n "${ORULE_NAME}" ]] && ! cfgdb_orule_exists "${ORULE_NAME}"; then
+		echo "Error: overlay rule '${ORULE_NAME}' does not exist. Exiting."
+		exit 5
+	fi
+
+	if [[ -n "${ORULE_NAME}" && -n "${NODE_LIST}" ]]; then
+		# get orule config from cfgdb
+		if [[ -n "${ORULE_STRING}" ]]; then
+			# rule provided from cmd line
+			orule="${ORULE_STRING}"
+			# check if rule needs to be updated
+			orule_saved="$(cfgdb_get_orule "${ORULE_NAME}")"
+			if [[ "${orule}" != "${orule_saved}" ]]; then
+				orule_port="$(parse_orule_port "${orule}")"
+				cfgdb_orule_port="$(query_cfgdb get "${CFGDB_ORULES_PATH}/${ORULE_NAME}/port")"
+				if [[ "${orule_port}" -ne "${cfgdb_orule_port}" ]]; then
+					if ! check_orule_port_unique "${orule_port}"; then
+						echo "Error: overlay port ${orule_port} is already used"
+						exit 3
+					fi
+					# update port
+					query_cfgdb set "${CFGDB_ORULES_PATH}/${ORULE_NAME}/port" "${orule_port}"
+				fi
+				# encode rule string to remove whitespaces
+				query_cfgdb set "${CFGDB_ORULES_PATH}/${ORULE_NAME}/rule" "$(echo "${orule}" | ${BASE64} | ${TR} -d ' \n\t')"
+				echo "Overlay rule '${ORULE_NAME}' updated in cfgdb"
+			fi
+		fi
+
+		# update nodelist if necessary
+		nodelist="${NODE_LIST}"
+		nodelist_saved="$(query_cfgdb get "${CFGDB_ORULES_PATH}/${ORULE_NAME}/nodelist")"
+		if [[ "${nodelist}" != "${nodelist_saved}" ]]; then
+			query_cfgdb set "${CFGDB_ORULES_PATH}/${ORULE_NAME}/nodelist" "${nodelist}"
+			echo "Node list for '${ORULE_NAME}' updated in cfgdb"
+		fi
+
+	elif [[ -n "${ORULE_NAME}" && -z "${NODE_LIST}" ]]; then
+		# get nodelist for specified orule
+		NODE_LIST="$(query_cfgdb get "${CFGDB_ORULES_PATH}/${ORULE_NAME}/nodelist")"
+	fi
+}
+
+adminoverlay_init() {
+	local adminnet="$1"
+	local node_ip_list="$2"
+
+	if [[ "$(query_cfgdb exists "${CFGDB_ADMINOVERLAY_PATH}/subnet")" == "true" ]]; then
+		echo "Error: Adminoverlay is already initialized."
+		echo "Use adminoverlay-update command instead."
+		exit 1
+	fi
+
+	if [[ -z "${adminnet}" ]]; then
+		echo "Adminoverlay subnet is required!"
+		echo
+		usage
+	elif [[ ! "${adminnet}" =~ /. ]]; then
+		echo "Incorrect adminoverlay subnet format!"
+		echo
+		usage
+	fi
+
+	ADMINOVERLAY_SUBNET="$(echo "${adminnet}" | "${CUT}" -d/ -f1)"
+	ADMINOVERLAY_NETMASK="$(echo "${adminnet}" | "${CUT}" -d/ -f2)"
+	if ! is_net "${ADMINOVERLAY_SUBNET}"; then
+		echo "Invalid network: ${ADMINOVERLAY_SUBNET}"
+		exit 7
+	fi
+	if ! is_net "${ADMINOVERLAY_NETMASK}"; then
+		echo "Invalid netmask: ${ADMINOVERLAY_NETMASK}"
+		exit 7
+	fi
+	if [[ "${ADMINOVERLAY_SUBNET}" != "$(get_network "${ADMINOVERLAY_SUBNET}" "${ADMINOVERLAY_NETMASK}")" ]]; then
+		# not a real subnet number
+		echo "Incorrect subnet/netmask combination: ${adminnet}"
+		exit 7
+	fi
+
+	if [[ -n "${node_ip_list}" ]]; then
+		# parse IP list for nodes
+		update_adminoverlay_hosts "${node_ip_list}"
+	fi
+
+	# generate IPs for the rest of compute nodes if necessary
+	for node in "${!NODE_DC_LIST[@]}"; do
+		if [[ -z "${ADMINOVERLAY_NODE_IP_MAP["${node}"]}" ]]; then
+			# this node's IP addr was not specified in cmd line
+			# We have to generate it.
+			next_ip="$(generate_next_adminoverlay_addr)"
+			ADMINOVERLAY_NODE_IP_MAP["${node}"]="${next_ip}"
+		fi
+	done
+
+	# write config to cfgdb
+	query_cfgdb creater "${CFGDB_ADMINOVERLAY_PATH}/subnet" "${ADMINOVERLAY_SUBNET}"
+	query_cfgdb creater "${CFGDB_ADMINOVERLAY_PATH}/netmask" "${ADMINOVERLAY_NETMASK}"
+
+	# write node IPs to cfgdb
+	for node in "${!ADMINOVERLAY_NODE_IP_MAP[@]}"; do
+		query_cfgdb creater "${CFGDB_ADMINOVERLAY_PATH}/IPs/${node}" "${ADMINOVERLAY_NODE_IP_MAP[${node}]}"
+	done
+}
+
+globally_enable_firewal() {
+	# remove whitespaces and add trailing /32 to single IPs
+	# parse second cmd line argument as a comma-separated IP/subnet list
+	# shellcheck disable=SC2155
+	local administrator_sources_list="$(echo "${1}" | tr -d ' \t' )"
+
+	# shellcheck disable=SC2155
+	local cfgdb_administrator_sources="$(query_cfgdb get "${CFGDB_FIREWALL_PATH}/administrator_sources")"
+
+	if [[ -z "${administrator_sources_list}" && -z "${cfgdb_administrator_sources}" ]]; then
+		# no sources specified and no sources in cfgdb
+		echo "Error: administrator_sources_list cannot be empty"
+		echo "You would cut yourself from external interfaces on all compute nodes!"
+		exit 1
+	elif [[ -z "${administrator_sources_list}" ]]; then
+		# no sources specified but there are sources in cfgdb
+		administrator_sources_list="${cfgdb_administrator_sources}"
+	fi
+
+
+	if [[ -z "${cfgdb_administrator_sources}" ]]; then
+		query_cfgdb creater "${CFGDB_FIREWALL_PATH}/administrator_sources" "${administrator_sources_list}"
+	elif [[ "${cfgdb_administrator_sources}" != "${administrator_sources_list}" ]]; then
+		echo "Updating administrator_sources_list in cfgdb"
+		query_cfgdb set "${CFGDB_FIREWALL_PATH}/administrator_sources" "${administrator_sources_list}"
+	fi
+
+	echo "#### Read carefully ####"
+	echo "You are about to to enable firewall on all existing external0 interfaces on all compute nodes in the cluster. This means that all Danube Cloud hypervisors will block all incoming traffic except from compute nodes within this Danube Cloud installation and from these IPs: ${administrator_sources_list}"
+	echo "This action will not affect virtual machines."
+	echo "You should have a fallback plan - create a virtual machine that is on the admin subnet and that is also reachable from the internet (e.g. it has one NIC on the admin network and the second (primary) NIC pointing to the internet)."
+	echo "You are responsible for providing correct IP addresses/subnets."
+	echo
+	echo "These rules will be added to each node's ipfilter config:"
+	echo "${administrator_sources_list}" | tr ',' '\n' \
+		| ${SED} -re 's/^(.*)$/pass in quick on external0 from \1 to <external_node_ip> keep state/'
+	echo "block in quick on external0 all"
+	echo 
+	${PRINTF} "Do you really want to enable a firewall? (Y/n) "
+	read -r reply
+	if [[ "${reply,,}" != "y" && -n "${reply}" ]]; then
+		echo "Exitting.."
+		exit 0
+	fi
+
+	# enable fw in cfgdb
+	fw_enabled="$(query_cfgdb get "${CFGDB_FIREWALL_PATH}/globally_enabled")"
+	if [[ -z "${fw_enabled}" ]]; then
+		query_cfgdb creater "${CFGDB_FIREWALL_PATH}/globally_enabled" "true"
+	elif [[ "${fw_enabled}" != "true" ]]; then
+		query_cfgdb set "${CFGDB_FIREWALL_PATH}/globally_enabled" "true"
+	fi
+}
+
 run_ansible() {
 	local nodelist="${1}"
 	local custom_vars="${2}"
@@ -397,17 +954,19 @@ run_ansible() {
 
 	# export configuration for ansible
 	OVERLAY_RULES="$(print_full_overlay_json)"
-	verify_json "${OVERLAY_RULES}"
 	export OVERLAY_RULES
-	generate_ipsec_keys
 
+	generate_ipsec_keys
 	IPSEC_KEYS="$(print_full_ipsec_json)"
-	verify_json "${IPSEC_KEYS}"
 	export IPSEC_KEYS
 
 	FIREWALL_CFG="$(print_full_firewall_json)"
-	verify_json "${FIREWALL_CFG}"
 	export FIREWALL_CFG
+
+	load_adminoverlay_hosts
+	generate_adminoverlay_ips
+	ADMINOVERLAY_CFG="$(print_full_adminoverlay_json)"
+	export ADMINOVERLAY_CFG
 
 	# shellcheck disable=SC2164
 	cd "${ANS_BASE}"
@@ -421,12 +980,19 @@ run_ansible() {
 		echo "${IPSEC_KEYS}"
 		echo "FIREWALL_CFG="
 		echo "${FIREWALL_CFG}"
+		echo "ADMINOVERLAY_CFG="
+		echo "${ADMINOVERLAY_CFG}"
 		echo
 		verbose="-v"
-		echo Running: "${ERIGONES_HOME}/envs/bin/ansible-playbook" "${PLAYBOOK}" --extra-vars="${extra_vars}" "${verbose}"
+		echo Running: "${ERIGONES_HOME}/envs/bin/ansible-playbook" "${PLAYBOOK}" --extra-vars="${extra_vars}" ${verbose}
 	fi
 
-	"${ERIGONES_HOME}/envs/bin/ansible-playbook" "${PLAYBOOK}" --extra-vars="${extra_vars}" "${verbose}"
+	verify_json "${OVERLAY_RULES}"
+	verify_json "${IPSEC_KEYS}"
+	verify_json "${FIREWALL_CFG}"
+	verify_json "${ADMINOVERLAY_CFG}"
+
+	"${ERIGONES_HOME}/envs/bin/ansible-playbook" "${PLAYBOOK}" --extra-vars="${extra_vars}" ${verbose}
 	# shellcheck disable=SC2181
 	if [[ "${?}" -ne 0 ]]; then
 		echo
@@ -444,6 +1010,7 @@ run_ansible() {
 	fi
 }
 
+
 ##### BEGIN #####
 
 if [[ -z "${CMD}" ]]; then
@@ -460,52 +1027,15 @@ test_cfgdb_connect
 update_ans_hosts
 parse_node_dc_list
 
+CMD="${1}"
 
 case ${CMD,,} in
 	create)
-		check_orule_name_missing
-		check_orule_name
+		ORULE_NAME="${2}"
+		NODE_LIST="$(echo "${3}" | ${SED} -e 's/[[:space:]]//g')"	# remove whitespaces
+		ORULE_STRING="${4}"
 
-		if cfgdb_orule_exists "${ORULE_NAME}"; then
-			echo "ERROR: overlay rule '${ORULE_NAME}' already exists."
-			echo "You probably want to run this command instead:"
-			[[ -n "${ORULE_STRING}" ]] && buf="\"${ORULE_STRING}\""
-			echo "$0 update ${ORULE_NAME} ${NODE_LIST} ${buf}"
-			exit 5
-		fi
-
-		# if no nodelist is provided, assume all nodes
-		[[ -z "${NODE_LIST}" ]] && NODE_LIST="all"
-
-		# if no overlay string is provided, generate a default one
-		if [[ -z "${ORULE_STRING}" ]]; then
-			# get first unused overlay udp port
-			orule_port="$(get_next_orule_port)"
-
-			ORULE_STRING="$(echo "${ORULE_TEMPLATE}" | \
-				${SED} -e "s/%%%OVERLAY_RULE_PORT%%%/${orule_port}/" -e "s/%%%OVERLAY_RULE_NAME%%%/${ORULE_NAME}/g")"
-		else
-			# parse orule port from provided string
-			orule_port="$(parse_orule_port "${ORULE_STRING}")"
-			if ! check_orule_port_unique "${orule_port}"; then
-				echo "Error: overlay port ${orule_port} is already used"
-				exit 3
-			fi
-		fi
-		
-		if [[ -z "${NODE_LIST}" || -z "${orule_port}" || -z "${ORULE_STRING}" ]]; then
-			echo "nodelist=${NODE_LIST}"
-			echo "orule_port=${orule_port}"
-			echo "orule=${ORULE_STRING}"
-			echo "Config error. Aborting."
-			exit 11
-		fi
-
-		echo "Writing new overlay parameters into cfgdb"
-		query_cfgdb creater "${CFGDB_ORULES_PATH}/${ORULE_NAME}/port" "${orule_port}"
-		query_cfgdb creater "${CFGDB_ORULES_PATH}/${ORULE_NAME}/nodelist" "${NODE_LIST}"
-		# encode rule string to remove whitespaces
-		query_cfgdb creater "${CFGDB_ORULES_PATH}/${ORULE_NAME}/rule" "$(echo "${ORULE_STRING}" | ${BASE64} | ${TR} -d ' \n\t')"
+		create_overlay
 
 		# run ansible tasks
 		run_ansible "${NODE_LIST}"
@@ -514,48 +1044,11 @@ case ${CMD,,} in
 
 	update)
 		# if ORULE_NAME is not specified, we'll update all overlays on all nodes
+		ORULE_NAME="${2}"
+		NODE_LIST="$(echo "${3}" | ${SED} -e 's/[[:space:]]//g')"	# remove whitespaces
+		ORULE_STRING="${4}"
 
-		if [[ -n "${ORULE_NAME}" ]] && ! cfgdb_orule_exists "${ORULE_NAME}"; then
-			echo "Error: overlay rule '${ORULE_NAME}' does not exist. Exiting."
-			exit 5
-		fi
-
-		if [[ -n "${ORULE_NAME}" && -n "${NODE_LIST}" ]]; then
-			# get orule config from cfgdb
-			if [[ -n "${ORULE_STRING}" ]]; then
-				# rule provided from cmd line
-				orule="${ORULE_STRING}"
-				# check if rule needs to be updated
-				orule_saved="$(cfgdb_get_orule "${ORULE_NAME}")"
-				if [[ "${orule}" != "${orule_saved}" ]]; then
-					orule_port="$(parse_orule_port "${orule}")"
-					cfgdb_orule_port="$(query_cfgdb get "${CFGDB_ORULES_PATH}/${ORULE_NAME}/port")"
-					if [[ "${orule_port}" -ne "${cfgdb_orule_port}" ]]; then
-						if ! check_orule_port_unique "${orule_port}"; then
-							echo "Error: overlay port ${orule_port} is already used"
-							exit 3
-						fi
-						# update port
-						query_cfgdb set "${CFGDB_ORULES_PATH}/${ORULE_NAME}/port" "${orule_port}"
-					fi
-					# encode rule string to remove whitespaces
-					query_cfgdb set "${CFGDB_ORULES_PATH}/${ORULE_NAME}/rule" "$(echo "${orule}" | ${BASE64} | ${TR} -d ' \n\t')"
-					echo "Overlay rule '${ORULE_NAME}' updated in cfgdb"
-				fi
-			fi
-
-			# update nodelist if necessary
-			nodelist="${NODE_LIST}"
-			nodelist_saved="$(query_cfgdb get "${CFGDB_ORULES_PATH}/${ORULE_NAME}/nodelist")"
-			if [[ "${nodelist}" != "${nodelist_saved}" ]]; then
-				query_cfgdb set "${CFGDB_ORULES_PATH}/${ORULE_NAME}/nodelist" "${nodelist}"
-				echo "Node list for '${ORULE_NAME}' updated in cfgdb"
-			fi
-
-		elif [[ -n "${ORULE_NAME}" && -z "${NODE_LIST}" ]]; then
-			# get nodelist for specified orule
-			NODE_LIST="$(query_cfgdb get "${CFGDB_ORULES_PATH}/${ORULE_NAME}/nodelist")"
-		fi
+		update_overlays
 
 		echo "Updating configuration on nodes"
 
@@ -564,6 +1057,8 @@ case ${CMD,,} in
 		;;
 
 	delete)
+		ORULE_NAME="${2}"
+
 		check_orule_name_missing
 
 		if ! cfgdb_orule_exists "${ORULE_NAME}"; then
@@ -591,72 +1086,85 @@ case ${CMD,,} in
 		echo "Overlay rule ${ORULE_NAME} was successfully deleted from cfgdb and from nodes: ${nodelist}"
 		;;
 
-	init-admin)
+	adminoverlay-init)
+		adminnet="$2"
+		node_ip_list="$3"
+
+		adminoverlay_init "${adminnet}" "${node_ip_list}" 
+
+		# create overlay (re-call myself)
+		[[ "${DEBUG}" -eq 1 ]] && append="-debug"
+		$0 "create${append}" "${ADMINOVERLAY_NAME}" all
 
 		;;
+	adminoverlay-update)
+		node_ip_list="$2"
+
+		if check_adminoverlay_enabled; then
+			echo "Error: Adminoverlay is not yet initialized."
+			echo "Use adminoverlay-init command instead."
+			exit 1
+		fi
+
+		if [[ -z "${node_ip_list}" ]]; then
+			echo "No nodes specified. Nothing to do."
+			echo "If you want to update configuration on compute nodes, use the 'update' subcommand instead."
+			echo
+		fi
+
+		# load data from cfgdb
+		load_adminoverlay_hosts
+
+		update_adminoverlay_hosts "${node_ip_list}"
+
+		# auto-generate IPs for unlisted new nodes (if any exist)
+		generate_adminoverlay_ips
+
+		# update overlay on nodes (re-call myself)
+		[[ "${DEBUG}" -eq 1 ]] && append="-debug"
+		$0 "update${append}" "${ADMINOVERLAY_NAME}" all
+
+		;;
+
+	adminoverlay-list)
+		load_adminoverlay_hosts
+
+		echo "Adminoverlay subnet:  ${ADMINOVERLAY_SUBNET}"
+		echo "Adminoverlay netmask: ${ADMINOVERLAY_NETMASK}"
+		echo "Adminoverlay vxlan_id: ${ADMINOVERLAY_VXLAN}"
+		echo "Adminoverlay vlan_id: ${ADMINOVERLAY_VLAN}"
+		echo
+
+		# shellcheck disable=SC1117
+		${PRINTF} "%-12s %-9s\n" "NODE" "IP"
+		for node in "${!ADMINOVERLAY_NODE_IP_MAP[@]}"; do
+			# shellcheck disable=SC1117
+			${PRINTF} "%-12s %-9s\n" "${node}" "${ADMINOVERLAY_NODE_IP_MAP["${node}"]}"
+		done
+
+		;;
+
 	apply)
-		run_ansible
-
+		NODE_LIST="${2}"
+		run_ansible "${NODE_LIST}"
 		;;
+
 	list)
 		list_overlay_rules
 		;;
 
 	globally-enable-firewall)
-		# remove whitespaces and add trailing /32 to single IPs
-		# parse second cmd line argument as a comma-separated IP/subnet list
-		administrator_sources_list="$(echo "${2}" | tr -d ' \t' )"
+		administrator_sources_list="$2"
 
-		cfgdb_administrator_sources="$(query_cfgdb get "${CFGDB_FIREWALL_PATH}/administrator_sources")"
-		if [[ -z "${administrator_sources_list}" && -z "${cfgdb_administrator_sources}" ]]; then
-			# no sources specified and no sources in cfgdb
-			echo "Error: administrator_sources_list cannot be empty"
-			echo "You would cut yourself from external interfaces on all compute nodes!"
-			exit 1
-		elif [[ -z "${administrator_sources_list}" ]]; then
-			# no sources specified but there are sources in cfgdb
-			administrator_sources_list="${cfgdb_administrator_sources}"
-		fi
+		globally_enable_firewal "${administrator_sources_list}"
 
-
-		if [[ -z "${cfgdb_administrator_sources}" ]]; then
-			query_cfgdb creater "${CFGDB_FIREWALL_PATH}/administrator_sources" "${administrator_sources_list}"
-		elif [[ "${cfgdb_administrator_sources}" != "${administrator_sources_list}" ]]; then
-			echo "Updating administrator_sources_list in cfgdb"
-			query_cfgdb set "${CFGDB_FIREWALL_PATH}/administrator_sources" "${administrator_sources_list}"
-		fi
-
-		echo "#### Read carefully ####"
-		echo "You are about to to enable firewall on all existing external0 interfaces on all compute nodes in the cluster. This means that all Danube Cloud hypervisors will block all incoming traffic except from compute nodes within this Danube Cloud installation and from these IPs: ${administrator_sources_list}"
-		echo "This action will not affect virtual machines."
-		echo "You should have a fallback plan - create a virtual machine that is on the admin subnet and that is also reachable from the internet (e.g. it has one NIC on the admin network and the second (primary) NIC pointing to the internet)."
-		echo "You are responsible for providing correct IP addresses/subnets."
-		echo
-		echo "These rules will be added to each node's ipfilter config:"
-		echo "${administrator_sources_list}" | tr ',' '\n' \
-			| ${SED} -re 's/^(.*)$/pass in quick on external0 from \1 to <external_node_ip> keep state/'
-		echo "block in quick on external0 all"
-		echo 
-		${PRINTF} "Do you really want to enable a firewall? (Y/n) "
-		read -r reply
-		if [[ "${reply,,}" != "y" && -n "${reply}" ]]; then
-			echo "Exitting.."
-			exit 0
-		fi
-
-		# enable fw in cfgdb
-		fw_enabled="$(query_cfgdb get "${CFGDB_FIREWALL_PATH}/globally_enabled")"
-		if [[ -z "${fw_enabled}" ]]; then
-			query_cfgdb creater "${CFGDB_FIREWALL_PATH}/globally_enabled" "true"
-		elif [[ "${fw_enabled}" != "true" ]]; then
-			query_cfgdb set "${CFGDB_FIREWALL_PATH}/globally_enabled" "true"
-		fi
 		echo "Firewall enabled in cfgdb"
 
 		run_ansible
 
 		echo "Firewall enabled on all nodes"
 		;;
+
 	globally-disable-firewall)
 		# disable fw in cfgdb
 		fw_enabled="$(query_cfgdb get "${CFGDB_FIREWALL_PATH}/globally_enabled")"
@@ -665,6 +1173,7 @@ case ${CMD,,} in
 		elif [[ "${fw_enabled}" != "false" ]]; then
 			query_cfgdb set "${CFGDB_FIREWALL_PATH}/globally_enabled" "false"
 		fi
+
 		echo "Firewall disabled in cfgdb"
 
 		run_ansible
@@ -672,7 +1181,7 @@ case ${CMD,,} in
 		echo "Firewall disabled on all nodes"
 		;;
 
-	update-firewall)
+	globally-update-firewall)
 		run_ansible
 		;;
 	*)

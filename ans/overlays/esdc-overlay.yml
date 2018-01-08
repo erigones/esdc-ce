@@ -13,6 +13,7 @@
     overlay_rules: "{{ lookup('env','OVERLAY_RULES')| from_json }}"
     ipsec_keys: "{{ lookup('env','IPSEC_KEYS')| from_json }}"
     fw_administrator_IPs: "{{ lookup('env','FIREWALL_CFG')| from_json }}"
+    adminoverlay_IPs: "{{ lookup('env','ADMINOVERLAY_CFG')| from_json }}"
     # list of all known nodes in Danube Cloud
     all_nodes: "{{ hostvars[ansible_fqdn]['groups']['nodes'] }}"
     # this variable is evaluated on each host separately
@@ -114,6 +115,23 @@
                 overlay_rules[item]['nodelist'] == 'all') and
             (overlay_rules[item]['arp_json_path'] and not
             (del_orule is defined and del_orule == item))
+
+  - name: "configure adminoverlay IP in {{ usbconfig }}"
+    lineinfile: 
+      dest: "{{ usbconfig }}"
+      state: "{% if adminoverlay_IPs['ips'][ansible_fqdn] is defined %}present{% else %}absent{% endif %}"
+      regexp: '^adminoverlay_0_{{ item.name }}='
+      line:    'adminoverlay_0_{{ item.name }}="{{ item.value }}"'
+    with_items:
+      - name: vxlan_id
+        value: "{{ adminoverlay_IPs['vxlan_id'] }}"
+      - name: vlan_id
+        value: "{{ adminoverlay_IPs['vlan_id'] }}"
+      - name: ip
+        value: "{% if adminoverlay_IPs['ips'][ansible_fqdn] is defined %}{{ adminoverlay_IPs['ips'][ansible_fqdn] }}{% endif %}"
+      - name: netmask
+        value: "{{ adminoverlay_IPs['netmask'] }}"
+    notify: reload overlays config
 
   - name: remove overlay arp file if necessary
     file:
