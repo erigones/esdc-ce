@@ -1,0 +1,8 @@
+p1_xform
+  { auth_method preshared oakley_group 5 auth_alg sha256 encr_alg aes }
+p2_pfs 2
+{% for node in all_nodes %}
+{% if hostvars[node]['dc_name'] != my_datacenter %}
+  { label "{{ ansible_fqdn }}-{{ node }}" local_addr {{ external_ip }} remote_addr {{ hostvars[node]['ansible_ssh_host'] }} p1_xform { auth_method preshared oakley_group 5 auth_alg sha256 encr_alg aes } p2_pfs 5 }
+{% endif %}
+{% endfor %}
