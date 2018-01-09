@@ -46,6 +46,7 @@ from django.utils.decorators import available_attrs
 from django.core.exceptions import PermissionDenied
 
 from api.views import View
+from api.exceptions import ServiceUnavailable
 from api.utils.request import is_request
 from api.dc.utils import get_dc
 from que.lock import TaskLock
@@ -152,6 +153,14 @@ def permission_classes(_permission_classes):
     return decorator
 
 
+def _check_system_update(request):
+    """Only SuperAdmins can access the API during system update"""
+    from api.system.update.api_views import UpdateView
+
+    if UpdateView.is_task_running() and not request.user.is_staff:
+        raise ServiceUnavailable('System update in progress')
+
+
 def request_data(catch_dc=True, force_dc=None, permissions=()):
     def request_data_decorator(fun):
         """
@@ -210,6 +219,9 @@ def request_data(catch_dc=True, force_dc=None, permissions=()):
                                  'in DC "%s"!',
                                  request.user, request.method, fun.__name__, args, kwargs, perm.__name__, request.dc)
                     raise PermissionDenied
+
+            # Only SuperAdmins can access the API during system update
+            _check_system_update(request)
 
             return fun(request, *args, **kwargs)
 
