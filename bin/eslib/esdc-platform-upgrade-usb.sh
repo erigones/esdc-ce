@@ -125,6 +125,6 @@ printmsg "ESDC version on USB: ${CURR_USB_VER}"
 
 FINISHED_SUCCESSFULLY=1
 
-printmsg "Upgrade completed successfuly"
+printmsg "Upgrade completed successfully"
 printmsg "Please reboot to load new platform"
 
