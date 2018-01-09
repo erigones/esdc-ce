@@ -280,9 +280,9 @@ class DcSettingsSerializer(s.InstanceSerializer):
                                          help_text=_('Maximum number of virtual servers that can be defined in '
                                                      'this virtual datacenter.'))
     VMS_VM_CPU_CAP_REQUIRED = s.BooleanField(label='VMS_VM_CPU_CAP_REQUIRED',
-                                             help_text='When disabled, the vCPUs server parameter on SunOS and LX Zones'
-                                                       ' can be set to 0, which removes the compute node CPU limit'
-                                                       ' (cpu_cap) for the virtual server.')
+                                             help_text='When disabled, the vCPUs server parameter on SunOS and Linux '
+                                                       'Zones can be set to 0, which removes the compute node CPU '
+                                                       'limit (cpu_cap) for the virtual server.')
     VMS_VM_STOP_TIMEOUT_DEFAULT = s.IntegerField(label='VMS_VM_STOP_TIMEOUT_DEFAULT',
                                                  help_text='Default time period (in seconds) for a graceful VM stop or '
                                                            'reboot, after which a force stop/reboot is send to the VM '
