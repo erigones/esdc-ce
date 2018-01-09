@@ -21,6 +21,9 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
     """
     _esysinfo = ('sysinfo', 'diskinfo', 'zpools', 'nictags', 'overlay_rules')
     _vlan_id = None
+    _sysinfo_shown = ('Boot Time', 'Manufacturer', 'Product', 'Serial Number', 'SKU Number', 'HW Version', 'HW Family',
+                      'Datacenter Name', 'VM Capable', 'CPU Type', 'CPU Virtualization', 'CPU Physical Cores',
+                      'Live Image')
 
     ZPOOL = 'zones'
     DEFAULT_OVERLAY_PORT = 4789
@@ -154,9 +157,7 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
     def sysinfo(self):
         """System information displayed in gui/api"""
         x = self._sysinfo
-        wanted = ('Boot Time', 'Manufacturer', 'Product', 'Serial Number', 'SKU Number', 'HW Version', 'HW Family',
-                  'Setup', 'VM Capable', 'CPU Type', 'CPU Virtualization', 'CPU Physical Cores')
-        return {i: x.get(i, '') for i in wanted}
+        return {i: x.get(i, '') for i in self._sysinfo_shown}
 
     @property
     def diskinfo(self):
