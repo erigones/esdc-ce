@@ -212,4 +212,4 @@ _beadm_activate_be "${NEW_BE}"
 
 FINISHED_SUCCESSFULLY=1
 
-printmsg "Upgrade completed successfuly"
+printmsg "Upgrade completed successfully"

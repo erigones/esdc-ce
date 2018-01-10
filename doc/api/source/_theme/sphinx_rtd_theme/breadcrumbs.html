@@ -32,9 +32,6 @@
         {% for doc in parents %}
           <li><a href="{{ doc.link|e }}">{{ doc.title }}</a> &raquo;</li>
         {% endfor %}
-        {% if pagename == 'http-routingtable' %}
-          {% set title = 'API routing table' %}
-        {% endif %}
       <li>{{ title }}</li>
     {% endblock %}
     {% block breadcrumbs_aside %}
