@@ -281,6 +281,11 @@ class OperationNotSupported(APIException):
     default_detail = _('Operation not supported')
 
 
+class ServiceUnavailable(APIException):
+    status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+    default_detail = _('Service Unavailable')
+
+
 class GatewayTimeout(APIException):
     status_code = status.HTTP_504_GATEWAY_TIMEOUT
     default_detail = _('Gateway Timeout')

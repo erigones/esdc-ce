@@ -12,9 +12,11 @@ from api.node.snapshot.api_views import NodeVmSnapshotList
 # noinspection PyProtectedMember
 from api.vm.status.tasks import vm_status_all
 from api.dns.record.api_views import RecordView
+from api.system.node.events import NodeSystemRestarted
 from vms.models import Node, DefaultDc, IPAddress
 from vms.signals import node_created, node_json_changed, node_json_unchanged
 from que.tasks import cq, get_task_logger
+from que.utils import TASK_USER, owner_id_from_task_id
 from que.mgmt import MgmtCallbackTask
 from que.exceptions import TaskException
 
@@ -163,5 +165,15 @@ def node_sysinfo_cb(result, task_id, node_uuid=None):
             NodeVmSnapshotList.sync(node)
         except Exception as e:
             logger.exception(e)
+
+    # Refresh cached version information + emit event informing about restarted erigonesd:fast
+    try:
+        del node.system_version
+
+        if owner_id_from_task_id(task_id) == TASK_USER:  # internal user ID
+            NodeSystemRestarted(node, system_version=node.system_version).send()
+
+    except Exception as e:
+        logger.exception(e)
 
     return result

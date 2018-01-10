@@ -17,6 +17,14 @@
   border-top: none;
 }
 /* line 22, ../scss/graphs.scss */
+.chartable .legend.rows2 table {
+  height: 54px;
+}
+/* line 26, ../scss/graphs.scss */
+.chartable .legend.rows3 table {
+  height: 81px;
+}
+/* line 30, ../scss/graphs.scss */
 .chartable .graph_history_control {
   padding: 0;
   margin-top: 2px;
@@ -24,7 +32,7 @@
   margin-left: 10px;
   margin-right: 10px;
 }
-/* line 29, ../scss/graphs.scss */
+/* line 37, ../scss/graphs.scss */
 .chartable .graph_history_control a.active {
   background: #46464d;
   background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4gPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjUwJSIgeTE9IjAlIiB4Mj0iNTAlIiB5Mj0iMTAwJSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzY2NjY3MCIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzQ2NDY0ZCIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JhZCkiIC8+PC9zdmc+IA==");
@@ -42,15 +50,15 @@
   opacity: 0.90;
   filter: alpha(opacity=90);
 }
-/* line 48, ../scss/graphs.scss */
+/* line 56, ../scss/graphs.scss */
 .chartable.disabled > tbody > tr > td {
   background: #C0C0C0;
 }
-/* line 52, ../scss/graphs.scss */
+/* line 60, ../scss/graphs.scss */
 .chartable.problem > tbody > tr > td {
   background: #FF6666;
 }
-/* line 56, ../scss/graphs.scss */
+/* line 64, ../scss/graphs.scss */
 .chartable .period-wrap {
   font-size: 10px;
   color: #545454;
@@ -58,12 +66,36 @@
   text-align: center;
 }
 
-/* line 64, ../scss/graphs.scss */
+/* line 72, ../scss/graphs.scss */
+.graph-container {
+  position: relative;
+  height: 260px;
+}
+
+/* line 77, ../scss/graphs.scss */
 .graph {
   width: 100%;
   height: 260px;
 }
-/* line 68, ../scss/graphs.scss */
+/* line 81, ../scss/graphs.scss */
 .graph.tall {
   height: 500px;
+}
+
+/* line 86, ../scss/graphs.scss */
+.graph-center {
+  position: absolute;
+  top: 125px;
+  left: 0;
+  width: 100%;
+  font-size: 48px;
+}
+
+/* line 94, ../scss/graphs.scss */
+.graph-item-label {
+  font-size: 14px;
+  line-height: 18px;
+  text-align: center;
+  padding: 2px;
+  color: #fff;
 }

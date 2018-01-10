@@ -15,23 +15,16 @@ class Command(BuildCommand):
 
         if que_only:
             if update:
-                self.display(
-                    'You can now restart the erigonesd service:\n'
-                    '\tsvcadm restart svc:/application/erigonesd:*\n'
-                )
+                self.display('You can now restart the erigonesd service:\n'
+                             '\tesdc-service-control restart\n')
             else:
                 self.display('You can now import the erigonesd SMF manifest (doc/init.d/erigonesd.xml)')
         else:
             if update:
                 self.ctlsh('db_sync', '--force')
                 self.ctlsh('post_update')
-                self.display(
-                    'You can now restart all Danube Cloud services:\n'
-                    '\tsystemctl restart erigonesd.service\n'
-                    '\tsystemctl restart esdc@gunicorn-api.service\n'
-                    '\tsystemctl restart esdc@gunicorn-gui.service\n'
-                    '\tsystemctl restart esdc@gunicorn-sio.service\n'
-                )
+                self.display('You can now restart all Danube Cloud services:\n'
+                             '\tesdc-service-control restart\n')
             else:
                 self.ctlsh('secret_key')
                 self.ctlsh('db_sync', '--init', '--force')

@@ -178,5 +178,9 @@ class MgmtTask(Task):
             return t.id, None, None
 
     @classmethod
+    def get_lock(cls, tidlock_key, **kwargs):
+        return TaskLock(cls.TIDLOCK_KEY_TEMPLATE % tidlock_key, **kwargs)
+
+    @classmethod
     def clear_cache(cls, cache_result_key):
         return redis.delete(cls.CACHE_KEY_TEMPLATE % cache_result_key)

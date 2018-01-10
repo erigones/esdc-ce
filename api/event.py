@@ -34,3 +34,17 @@ class DirectEvent(Event):
         task_id = task_id_from_string(user_id, dummy=True, dc_id=dc_id, tt=TT_DUMMY, tg=tg)
         kwargs['direct'] = True
         super(DirectEvent, self).__init__(task_id, **kwargs)
+
+
+class BroadcastEvent(Event):
+    """
+    Broadcast task event dispatched to socket.io monitor, which then sends the signal to all active users.
+    """
+    def __init__(self, task_id=None, **kwargs):
+        if not task_id:
+            dc_id = cq.conf.ERIGONES_DEFAULT_DC  # DefaultDc().id
+            system_user_id = cq.conf.ERIGONES_TASK_USER  # 7
+            task_id = task_id_from_string(system_user_id, dummy=True, dc_id=dc_id, tt=TT_DUMMY, tg=TG_DC_UNBOUND)
+
+        kwargs['broadcast'] = True
+        super(BroadcastEvent, self).__init__(task_id, **kwargs)

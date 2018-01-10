@@ -67,3 +67,14 @@ def dc_vm_backup(request, dc, hostname):
     dc_switch(request, dc)
 
     return redirect('vm_backup', hostname=hostname)
+
+
+@login_required
+@staff_required
+def dc_dc_settings(request, dc=settings.VMS_DC_MAIN):
+    """
+    Switch current datacenter and redirect to dc_settings page.
+    """
+    dc_switch(request, dc)
+
+    return redirect('dc_settings', query_string=request.GET)

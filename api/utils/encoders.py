@@ -89,4 +89,7 @@ class JSONEncoder(json.JSONEncoder):
                 pass
         elif hasattr(obj, '__iter__'):
             return tuple(item for item in obj)
+        # Bug in celery exception pickling
+        if isinstance(obj, Exception):
+            return '%s: %s' % (obj.__class__.__name__, six.text_type(obj))
         return super(JSONEncoder, self).default(obj)

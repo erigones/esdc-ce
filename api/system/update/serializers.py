@@ -6,9 +6,10 @@ class UpdateSerializer(s.Serializer):
     """
     Validate update urls and login credentials.
     """
-    version = s.CharField(required=True, max_length=1024, min_length=2)
-    key = s.CharField(required=False, max_length=1048576, validators=(validate_pem_key,))
-    cert = s.CharField(required=False, max_length=1048576, validators=(validate_pem_cert,))
+    version = s.SafeCharField(required=True, max_length=1024, min_length=2)
+    force = s.BooleanField(default=False)
+    key = s.CharField(required=False, max_length=102400, validators=(validate_pem_key,))
+    cert = s.CharField(required=False, max_length=102400, validators=(validate_pem_cert,))
 
     def __init__(self, request, *args, **kwargs):
         self.request = request

@@ -181,7 +181,7 @@ class SystemReloadThread(Thread):
     """
     Reload all app services in background.
     It is important to restart/reload the calling service as last one.
-    Used by system update and eslic.
+    Used by eslic.
     """
     daemon = True
 
