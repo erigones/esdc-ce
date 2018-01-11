@@ -1,0 +1,34 @@
+<?xml version='1.0'?>
+<!DOCTYPE service_bundle SYSTEM '/usr/share/lib/xml/dtd/service_bundle.dtd.1'>
+<service_bundle type='manifest' name='cfgdb-zk-rest'>
+    <service name='application/cfgdb-zk-rest' type='service' version='0'>
+        <create_default_instance enabled='false' />
+        <single_instance />
+        <dependency name='network' grouping='require_all' restart_on='error' type='service'>
+            <service_fmri value='svc:/milestone/network:default' />
+        </dependency>
+        <dependency name='filesystem' grouping='require_all' restart_on='error' type='service'>
+            <service_fmri value='svc:/system/filesystem/local' />
+        </dependency>
+        <exec_method name='start' type='method' exec='/usr/local/bin/cfgdb_zk_rest_server.py &amp;' timeout_seconds='60'>
+            <method_context>
+                <method_credential group='nobody' user='nobody' />
+                <method_environment>
+                    <envvar name='PATH' value='/usr/local/sbin:/usr/local/bin:/opt/local/sbin:/opt/local/bin:/usr/sbin:/usr/bin:/sbin' />
+                    <envvar name='ZK_REST_HTTP_SSL_CERT' value='/usr/local/etc/zk_rest_http_ssl.crt' />
+                    <envvar name='ZK_REST_HTTP_SSL_KEY' value='/usr/local/etc/zk_rest_http_ssl.key' />
+                </method_environment>
+            </method_context>
+        </exec_method>
+        <exec_method name='stop' type='method' exec=':kill' timeout_seconds='10' />
+        <property_group name='startd' type='framework'>
+            <propval name='duration' type='astring' value='contract' />
+            <propval name='ignore_error' type='astring' value='core,signal' />
+        </property_group>
+        <template>
+            <common_name>
+                <loctext xml:lang='C'>Danube Cloud cfgdb ZooKeeper REST service</loctext>
+            </common_name>
+        </template>
+    </service>
+</service_bundle>
