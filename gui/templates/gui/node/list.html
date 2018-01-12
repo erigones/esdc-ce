@@ -119,8 +119,7 @@
           <tr>
             <td colspan="11">
               <span>
-                {% blocktrans count node_len=node_list|length %}Selected <span id="selected">0</span> of {{ node_len }} node
-                {% plural %}Selected <span id="selected">0</span> of {{ node_len }} nodes{% endblocktrans %}
+                {% blocktrans count node_len=node_list|length %}Selected <span id="selected">0</span> of {{ node_len }} node{% plural %}Selected <span id="selected">0</span> of {{ node_len }} nodes{% endblocktrans %}
               </span>
               <div class="vm_control">
                 <a href="#" id="node_status" class="button gray no-ajax" title="{% trans "Change status of selected compute nodes" %}" data-toggle="tooltip" data-placement="top"><i class="icon-ok"></i> {% trans "Change status" %}</a>

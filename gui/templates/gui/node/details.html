@@ -114,11 +114,7 @@
             {% with up=node.boottime|uptime %}
             <td>
             <span title="{% trans "The displayed uptime is based on the last known boot time of the compute node" %}" data-toggle="tooltip" data-placement="bottom">
-            {% blocktrans with hms=up.seconds|timeformat count days=up.days %}
-            {{ days }} day, {{ hms }}
-            {% plural %}
-            {{ days }} days, {{ hms }}
-            {% endblocktrans %}
+            {% blocktrans with hms=up.seconds|timeformat count days=up.days %}{{ days }} day, {{ hms }}{% plural %}{{ days }} days, {{ hms }}{% endblocktrans %}
             <i class="icon-info-sign"></i></span>
             </td>
             {% endwith %}

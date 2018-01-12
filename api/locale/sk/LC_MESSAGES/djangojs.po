@@ -55,12 +55,3 @@ msgstr ""
 #: static/api/doc/_static/searchtools.js:517
 msgid ", in "
 msgstr ""
-
-#~ msgid "Your servers can not be started until the payment is received."
-#~ msgstr "Vaše servery budú spustené až po prijatí platby."
-
-#~ msgid ""
-#~ "You will be forwarded to FastSpring site where you can finish your order."
-#~ msgstr ""
-#~ "Budete presmerovaný na stránku FastSpring, kde môžete dokončit svoju "
-#~ "objednávku."

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-02-09 13:34+0000\n"
+"POT-Creation-Date: 2018-01-12 10:06+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,147 +21,187 @@ msgstr ""
 msgid "'"
 msgstr ""
 
-#: static/guacamole/scripts/guacamole-erigones.js:183
+#: static/guacamole/scripts/guacamole-erigones.js:204
 msgid "Idle."
 msgstr ""
 
-#: static/guacamole/scripts/guacamole-erigones.js:186
+#: static/guacamole/scripts/guacamole-erigones.js:207
 msgid "Connecting..."
 msgstr ""
 
-#: static/guacamole/scripts/guacamole-erigones.js:189
+#: static/guacamole/scripts/guacamole-erigones.js:210
 msgid "Connected, waiting for first update..."
 msgstr ""
 
-#: static/guacamole/scripts/guacamole-erigones.js:195
+#: static/guacamole/scripts/guacamole-erigones.js:216
 msgid "Disconnecting..."
 msgstr ""
 
-#: static/guacamole/scripts/guacamole-erigones.js:198
+#: static/guacamole/scripts/guacamole-erigones.js:219
 msgid "Disconnected."
 msgstr ""
 
-#: static/guacamole/scripts/guacamole-erigones.js:201
+#: static/guacamole/scripts/guacamole-erigones.js:222
 msgid "Unknown status"
 msgstr ""
 
-#: static/gui/js/gsio.js:327
+#: static/gui/js/gsio.js:357
 msgid "Socket.io connection error."
 msgstr ""
 
-#: static/gui/js/gsio.js:336
+#: static/gui/js/gsio.js:366
 msgid "Socket.io connection problem. Please try again later."
 msgstr ""
 
-#: static/gui/js/gsio.js:345
+#: static/gui/js/gsio.js:375
 msgid ""
 "Your current datacenter was changed by another user session. Please refresh "
 "your browser."
 msgstr ""
 
-#: static/gui/js/gsio.js:654
+#: static/gui/js/gsio.js:747
 msgid "Server"
 msgstr ""
 
-#: static/gui/js/gsio.js:654
+#: static/gui/js/gsio.js:747
 msgid "changed status to"
 msgstr ""
 
-#: static/gui/js/gsio.js:762
+#: static/gui/js/gsio.js:800
+msgid ""
+"Your current datacenter was changed. Please log out and log in again or <a "
+"class=\"btn-link\" href=\"/\">navigate to the default page</a>."
+msgstr ""
+
+#: static/gui/js/gsio.js:893
 msgid "Snapshot successfully created"
 msgstr ""
 
-#: static/gui/js/gsio.js:765
+#: static/gui/js/gsio.js:896
 msgid "Snapshot successfully deleted"
 msgstr ""
 
-#: static/gui/js/gsio.js:768
+#: static/gui/js/gsio.js:899
 msgid "Snapshot successfully restored"
 msgstr ""
 
-#: static/gui/js/gsio.js:776
+#: static/gui/js/gsio.js:907
 msgid "Creating new snapshot failed"
 msgstr ""
 
-#: static/gui/js/gsio.js:779
+#: static/gui/js/gsio.js:910
 msgid "Deleting snapshot failed"
 msgstr ""
 
-#: static/gui/js/gsio.js:782
+#: static/gui/js/gsio.js:913
 msgid "Restoring snapshot failed"
 msgstr ""
 
-#: static/gui/js/gsio.js:827
+#: static/gui/js/gsio.js:958
 msgid "Backup successfully created"
 msgstr ""
 
-#: static/gui/js/gsio.js:830
+#: static/gui/js/gsio.js:961
 msgid "Backup successfully deleted"
 msgstr ""
 
-#: static/gui/js/gsio.js:833
+#: static/gui/js/gsio.js:964
 msgid "Backup successfully restored"
 msgstr ""
 
-#: static/gui/js/gsio.js:841
+#: static/gui/js/gsio.js:972
 msgid "Creating new backup failed"
 msgstr ""
 
-#: static/gui/js/gsio.js:844
+#: static/gui/js/gsio.js:975
 msgid "Deleting backup failed"
 msgstr ""
 
-#: static/gui/js/gsio.js:847
+#: static/gui/js/gsio.js:978
 msgid "Restoring backup failed"
 msgstr ""
 
-#: static/gui/js/helpers.js:243
+#: static/gui/js/helpers.js:252
 msgid "Unknown error"
 msgstr ""
 
-#: static/gui/js/helpers.js:247
+#: static/gui/js/helpers.js:256
 msgid "Network error"
 msgstr ""
 
-#: static/gui/js/mon.js:99
+#: static/gui/js/mon/base.js:16
+msgid "Contacting monitoring server..."
+msgstr ""
+
+#: static/gui/js/mon/sla.js:99
 msgid "N/A"
 msgstr ""
 
-#: static/user-guide/_static/doctools.js:167
+#: static/gui/js/obj.js:286
+msgid "Are you sure you want to delete this?"
+msgstr ""
+
+#: static/gui/js/system/maintenance.js:60
+msgid "The system was restarted. Please refresh your browser."
+msgstr ""
+
+#: static/gui/js/system/maintenance.js:113
+#, javascript-format
+msgid "System update on node %s failed (see task log in the main DC)"
+msgstr ""
+
+#: static/gui/js/system/maintenance.js:115
+msgid "System update failed (see task log in the main DC)"
+msgstr ""
+
+#: static/gui/js/system/maintenance.js:119
+#, javascript-format
+msgid ""
+"System update on node %s successfully finished<br>(Please wait for the node "
+"software to be restarted)"
+msgstr ""
+
+#: static/gui/js/system/maintenance.js:122
+msgid ""
+"System update successfully finished<br>(Please wait for the system software "
+"to be restarted)"
+msgstr ""
+
+#: static/user-guide/_static/doctools.js:191
 msgid "Permalink to this headline"
 msgstr ""
 
-#: static/user-guide/_static/doctools.js:173
+#: static/user-guide/_static/doctools.js:197
 msgid "Permalink to this definition"
 msgstr ""
 
-#: static/user-guide/_static/doctools.js:206
+#: static/user-guide/_static/doctools.js:230
 msgid "Hide Search Matches"
 msgstr ""
 
-#: static/user-guide/_static/searchtools.js:300
+#: static/user-guide/_static/searchtools.js:400
 msgid "Searching"
 msgstr ""
 
-#: static/user-guide/_static/searchtools.js:305
+#: static/user-guide/_static/searchtools.js:405
 msgid "Preparing search..."
 msgstr ""
 
-#: static/user-guide/_static/searchtools.js:461
+#: static/user-guide/_static/searchtools.js:569
 msgid "Search Results"
 msgstr ""
 
-#: static/user-guide/_static/searchtools.js:463
+#: static/user-guide/_static/searchtools.js:571
 msgid ""
 "Your search did not match any documents. Please make sure that all words are "
 "spelled correctly and that you've selected enough categories."
 msgstr ""
 
-#: static/user-guide/_static/searchtools.js:465
+#: static/user-guide/_static/searchtools.js:573
 #, javascript-format
 msgid "Search finished, found %s page(s) matching the search query."
 msgstr ""
 
-#: static/user-guide/_static/searchtools.js:517
+#: static/user-guide/_static/searchtools.js:626
 msgid ", in "
 msgstr ""

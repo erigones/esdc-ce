@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Erigones GUI JS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-07-10 16:10+0000\n"
+"POT-Creation-Date: 2018-01-12 10:06+0000\n"
 "PO-Revision-Date: 2013-10-18 14:02+0100\n"
 "Last-Translator: Richard Kellner <richard.kellner@erigones.com>\n"
 "Language-Team: Erigones s. r. o. <erigones@erigones.com>\n"
@@ -46,97 +46,137 @@ msgstr "Odpojený."
 msgid "Unknown status"
 msgstr "Neznámy stav"
 
-#: static/gui/js/gsio.js:339
+#: static/gui/js/gsio.js:357
 msgid "Socket.io connection error."
 msgstr "Chyba v spojení so Socket.io."
 
-#: static/gui/js/gsio.js:348
+#: static/gui/js/gsio.js:366
 msgid "Socket.io connection problem. Please try again later."
 msgstr "Chyba v spojení so Socket.io. Prosím skúste to znovu."
 
-#: static/gui/js/gsio.js:357
+#: static/gui/js/gsio.js:375
 msgid ""
 "Your current datacenter was changed by another user session. Please refresh "
 "your browser."
 msgstr ""
 
-#: static/gui/js/gsio.js:699
+#: static/gui/js/gsio.js:747
 msgid "Server"
 msgstr "Server"
 
-#: static/gui/js/gsio.js:699
+#: static/gui/js/gsio.js:747
 msgid "changed status to"
 msgstr "zmenil stav na"
 
-#: static/gui/js/gsio.js:802
+#: static/gui/js/gsio.js:800
+msgid ""
+"Your current datacenter was changed. Please log out and log in again or <a "
+"class=\"btn-link\" href=\"/\">navigate to the default page</a>."
+msgstr ""
+
+#: static/gui/js/gsio.js:893
 msgid "Snapshot successfully created"
 msgstr "Snapshot bol úspešne vytvorený"
 
-#: static/gui/js/gsio.js:805
+#: static/gui/js/gsio.js:896
 msgid "Snapshot successfully deleted"
 msgstr "Snapshot bol úspešne vymazaný"
 
-#: static/gui/js/gsio.js:808
+#: static/gui/js/gsio.js:899
 msgid "Snapshot successfully restored"
 msgstr "Snapshot bol úspešne obnovený"
 
-#: static/gui/js/gsio.js:816
+#: static/gui/js/gsio.js:907
 msgid "Creating new snapshot failed"
 msgstr "Vytvorenie snapshotu zlyhalo"
 
-#: static/gui/js/gsio.js:819
+#: static/gui/js/gsio.js:910
 msgid "Deleting snapshot failed"
 msgstr "Vymazanie snapshotu zlyhalo"
 
-#: static/gui/js/gsio.js:822
+#: static/gui/js/gsio.js:913
 msgid "Restoring snapshot failed"
 msgstr "Obnova snapshotu zlyhala"
 
-#: static/gui/js/gsio.js:867
+#: static/gui/js/gsio.js:958
 msgid "Backup successfully created"
 msgstr ""
 
-#: static/gui/js/gsio.js:870
+#: static/gui/js/gsio.js:961
 msgid "Backup successfully deleted"
 msgstr ""
 
-#: static/gui/js/gsio.js:873
+#: static/gui/js/gsio.js:964
 msgid "Backup successfully restored"
 msgstr ""
 
-#: static/gui/js/gsio.js:881
+#: static/gui/js/gsio.js:972
 msgid "Creating new backup failed"
 msgstr ""
 
-#: static/gui/js/gsio.js:884
+#: static/gui/js/gsio.js:975
 msgid "Deleting backup failed"
 msgstr ""
 
-#: static/gui/js/gsio.js:887
+#: static/gui/js/gsio.js:978
 msgid "Restoring backup failed"
 msgstr ""
 
-#: static/gui/js/helpers.js:273
+#: static/gui/js/helpers.js:252
 msgid "Unknown error"
 msgstr ""
 
-#: static/gui/js/helpers.js:277
+#: static/gui/js/helpers.js:256
 msgid "Network error"
+msgstr ""
+
+#: static/gui/js/mon/base.js:16
+msgid "Contacting monitoring server..."
 msgstr ""
 
 #: static/gui/js/mon/sla.js:99
 msgid "N/A"
 msgstr "N/A"
 
-#: static/user-guide/_static/doctools.js:167
+#: static/gui/js/obj.js:286
+msgid "Are you sure you want to delete this?"
+msgstr ""
+
+#: static/gui/js/system/maintenance.js:60
+msgid "The system was restarted. Please refresh your browser."
+msgstr ""
+
+#: static/gui/js/system/maintenance.js:113
+#, javascript-format
+msgid "System update on node %s failed (see task log in the main DC)"
+msgstr ""
+
+#: static/gui/js/system/maintenance.js:115
+msgid "System update failed (see task log in the main DC)"
+msgstr ""
+
+#: static/gui/js/system/maintenance.js:119
+#, javascript-format
+msgid ""
+"System update on node %s successfully finished<br>(Please wait for the node "
+"software to be restarted)"
+msgstr ""
+
+#: static/gui/js/system/maintenance.js:122
+msgid ""
+"System update successfully finished<br>(Please wait for the system software "
+"to be restarted)"
+msgstr ""
+
+#: static/user-guide/_static/doctools.js:191
 msgid "Permalink to this headline"
 msgstr ""
 
-#: static/user-guide/_static/doctools.js:173
+#: static/user-guide/_static/doctools.js:197
 msgid "Permalink to this definition"
 msgstr ""
 
-#: static/user-guide/_static/doctools.js:206
+#: static/user-guide/_static/doctools.js:230
 msgid "Hide Search Matches"
 msgstr ""
 
@@ -148,84 +188,21 @@ msgstr ""
 msgid "Preparing search..."
 msgstr ""
 
-#: static/user-guide/_static/searchtools.js:566
+#: static/user-guide/_static/searchtools.js:569
 msgid "Search Results"
 msgstr ""
 
-#: static/user-guide/_static/searchtools.js:568
+#: static/user-guide/_static/searchtools.js:571
 msgid ""
 "Your search did not match any documents. Please make sure that all words are "
 "spelled correctly and that you've selected enough categories."
 msgstr ""
 
-#: static/user-guide/_static/searchtools.js:570
+#: static/user-guide/_static/searchtools.js:573
 #, javascript-format
 msgid "Search finished, found %s page(s) matching the search query."
 msgstr ""
 
-#: static/user-guide/_static/searchtools.js:623
+#: static/user-guide/_static/searchtools.js:626
 msgid ", in "
 msgstr ""
-
-#~ msgid "recurring"
-#~ msgstr "Pravidelné platby"
-
-#~ msgid "non-recurring"
-#~ msgstr "Jednorazová platba"
-
-#~ msgid "save "
-#~ msgstr "ušetríte "
-
-#~ msgid "Test period"
-#~ msgstr "Testovacia perióda"
-
-#~ msgid ""
-#~ "We are sorry, but this subscription cannot be changed automatically.\n"
-#~ "Please submit a support ticket or contact us via email for custom "
-#~ "subscription offer."
-#~ msgstr ""
-#~ "Je nám lúto, ale Vaše predplatené obdobie nie je možné automaticky "
-#~ "zmeniť. Prosím zadajte supportnú požiadavku alebo nás kontaktujte emailom "
-#~ "pre vypracovanie ponuky na zmenu predplateného obdobia."
-
-#~ msgid "This payment provider is not available for custom subscriptions."
-#~ msgstr ""
-#~ "Tohto poskytovateľa platobných služieb nie je možné použiť na úhradu "
-#~ "Vášho špeciálneho predplateného obdobia."
-
-#~ msgid "Contacting Payment Provider"
-#~ msgstr "Kontaktujem poskytovateľa platobných služieb"
-
-#~ msgid ""
-#~ "Test period cannot be renewed. Please change subscription parameters for "
-#~ "the next period."
-#~ msgstr ""
-#~ "Testovacie predplatené obdobie nie je možné obnoviť. Prosím zvoľte nové "
-#~ "predplatné na daľšie obdobie."
-
-#~ msgid "Server name is already used by another server"
-#~ msgstr "Názov servera sa už používa"
-
-#~ msgid "Server name has to be between 4 and 24 characters long"
-#~ msgstr "Názov servera musí mať dĺžku od 4 do 24 znakov"
-
-#~ msgid "Server name can contain only letters, numbers and hyphens"
-#~ msgstr "Názov servera môže obsahovať len písmena, čísla a pomlčky"
-
-#~ msgid "Invalid server configuration"
-#~ msgstr "Chybná konfigurácia servera"
-
-#~ msgid "Invalid server name"
-#~ msgstr "Chybný názov servera"
-
-#~ msgid "Invalid disk image"
-#~ msgstr "Chybný obraz disku"
-
-#~ msgid "Invalid subscription period"
-#~ msgstr "Chybné predplatené obdobie"
-
-#~ msgid "Error"
-#~ msgstr "Chyba"
-
-#~ msgid "Your request has timed out."
-#~ msgstr "Vaša požiadavka vypršala."

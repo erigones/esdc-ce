@@ -133,11 +133,7 @@
           <tr><th>{% trans "Description" %}:</th><td><small>{{ net.desc }}</small></td></tr>
           {% if is_staff %}{% with ip_network=net.ip_network %}{% url 'dc_subnet_ip_list' ip_network.network_address ip_network.prefixlen net.vlan_id as subnet_url %}
           <tr class="row-alert"><td colspan="2">
-          {% blocktrans with ip_network=ip_network vlan_id=net.vlan_id count counter=networks %}
-          This subnet <small>({{ ip_network }})</small> with this VLAN ID <small>({{ vlan_id }})</small> is <a href="{{ subnet_url }}" class="btn-link">used by {{ networks }} network</a>.
-          {% plural %}
-          This subnet <small>({{ ip_network }})</small> with this VLAN ID <small>({{ vlan_id }})</small> is <a href="{{ subnet_url }}" class="btn-link">used by {{ networks }} networks</a>.
-          {% endblocktrans %}
+          {% blocktrans with ip_network=ip_network vlan_id=net.vlan_id count counter=networks %}This subnet <small>({{ ip_network }})</small> with this VLAN ID <small>({{ vlan_id }})</small> is <a href="{{ subnet_url }}" class="btn-link">used by {{ networks }} network</a>.{% plural %}This subnet <small>({{ ip_network }})</small> with this VLAN ID <small>({{ vlan_id }})</small> is <a href="{{ subnet_url }}" class="btn-link">used by {{ networks }} networks</a>.{% endblocktrans %}
           </td></tr>
           {% endwith %}{% endif %}
           {% if net.dhcp_passthrough %}

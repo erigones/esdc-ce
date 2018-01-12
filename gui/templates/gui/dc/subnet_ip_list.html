@@ -33,11 +33,7 @@
             <td>{{ netinfo.hosts }} / {{ total }} / {{ free }}</td>
           </tr>
            <tr><td colspan="2">
-          {% blocktrans count counter=num_networks %}
-          This subnet with this VLAN ID is used by {{ num_networks }} network.
-          {% plural %}
-          This subnet with this VLAN ID is used by {{ num_networks }} networks.
-          {% endblocktrans %}
+          {% blocktrans count counter=num_networks %}This subnet with this VLAN ID is used by {{ num_networks }} network.{% plural %}This subnet with this VLAN ID is used by {{ num_networks }} networks.{% endblocktrans %}
           </td></tr>
         </tbody>
 
