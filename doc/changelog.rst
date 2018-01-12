@@ -1,8 +1,9 @@
 Changelog
 #########
 
-3.0.0 (unreleased)
-==================
+3.0.0
+=====
+Unreleased
 
 Features
 --------
@@ -22,6 +23,7 @@ Features
 - Added status update button to compute node list - `#291 <https://github.com/erigones/esdc-ce/issues/291>`__
 - Changed CPU resource accounting to use VM's cpu_cap parameter and added VMS_VM_CPU_CAP_REQUIRED setting - `#296 <https://github.com/erigones/esdc-ce/issues/296>`__
 - Made compute node IP address changeable - `#305 <https://github.com/erigones/esdc-ce/issues/305>`__
+- Enabled SSH multiplexing and connection reuse for inter-node communication - `#306 <https://github.com/erigones/esdc-ce/issues/306>`__
 - Added experimental support for live migration - `#306 <https://github.com/erigones/esdc-ce/issues/306>`__
 - Added value size limit to metadata - `#321 <https://github.com/erigones/esdc-ce/issues/321>`__
 - Changed VM reboot action to perform a VM configuration update by default - `#328 <https://github.com/erigones/esdc-ce/issues/328>`__
@@ -45,8 +47,9 @@ Bugs
 - Fixed stale task info after image creation from snapshot - `#334 <https://github.com/erigones/esdc-ce/issues/334>`__
 
 
-2.6.7 (released on 2017-11-06)
-==============================
+2.6.7
+=====
+Released on 2017-11-06
 
 Features
 --------
@@ -60,8 +63,9 @@ Bugs
 ----
 
 
-2.6.6 (released on 2017-10-11)
-==============================
+2.6.6
+=====
+Released on 2017-10-11
 
 Features
 --------
@@ -73,8 +77,9 @@ Bugs
 - Added longer timeout to gunicorn-gui - `#279 <https://github.com/erigones/esdc-ce/issues/279>`__
 
 
-2.6.5 (released on 2017-10-04)
-==============================
+2.6.5
+=====
+Released on 2017-10-04
 
 Features
 --------
@@ -93,8 +98,9 @@ Bugs
 - Fixed VM stop and reboot actions in compute node's server list - `#275 <https://github.com/erigones/esdc-ce/issues/275>`__
 
 
-2.6.4 (released on 2017-09-11)
-==============================
+2.6.4
+=====
+Released on 2017-09-11
 
 Features
 --------
@@ -116,8 +122,9 @@ Bugs
 - Fixed bug when deploying VM with dhcp_passthrough network - `#249 <https://github.com/erigones/esdc-ce/issues/249>`__
 
 
-2.6.3 (released on 2017-08-21)
-==============================
+2.6.3
+=====
+Released on 2017-08-21
 
 Features
 --------
@@ -133,8 +140,9 @@ Bugs
 - Fixed SMSAPI return response status code 200 but text of the response is ERROR - `#230 <https://github.com/erigones/esdc-ce/issues/230>`__
 
 
-2.6.2 (released on 2017-08-09)
-==============================
+2.6.2
+=====
+Released on 2017-08-09
 
 Features
 --------
@@ -145,8 +153,9 @@ Bugs
 - Corrected version list handling during node upgrade - `#229 <https://github.com/erigones/esdc-ce/pull/229>`__
 
 
-2.6.1 (released on 2017-08-07)
-==============================
+2.6.1
+=====
+Released on 2017-08-07
 
 Features
 --------
@@ -167,8 +176,9 @@ Bugs
 - Fixed 403 Forbidden message when switching datacenter in DNS domain records - `#143 <https://github.com/erigones/esdc-ce/issues/143>`__
 
 
-2.6.0 (released on 2017-07-21)
-==============================
+2.6.0
+=====
+Released on 2017-07-21
 
 Features
 --------
@@ -203,8 +213,9 @@ Bugs
 - Fixed plotting of stacked graph when a series has no data - `#205 <https://github.com/erigones/esdc-ce/issues/205>`__
 
 
-2.5.3 (released on 2017-05-16)
-==============================
+2.5.3
+=====
+Released on 2017-05-16
 
 Features
 --------
@@ -229,8 +240,9 @@ Bugs
 - Fixed VM hostname fetching in `message_callback` (GUI/JS) - `#159 <https://github.com/erigones/esdc-ce/issues/159>`__
 
 
-2.5.2 (released on 2017-04-11)
-==============================
+2.5.2
+=====
+Released on 2017-04-11
 
 Features
 --------
@@ -262,8 +274,9 @@ Bugs
 - Changed erigonesd mgmt worker systemd manifest - `#150 <https://github.com/erigones/esdc-ce/issues/150>`__
 
 
-2.5.1 (released on 2017-03-07)
-==============================
+2.5.1
+=====
+Released on 2017-03-07
 
 Features
 --------
@@ -275,8 +288,9 @@ Bugs
 - Fixed scrolling to first input field with an error in modal form - `#88 <https://github.com/erigones/esdc-ce/issues/88>`__
 
 
-2.5.0 (released on 2017-03-03)
-==============================
+2.5.0
+=====
+Released on 2017-03-03
 
 Features
 --------
@@ -296,8 +310,9 @@ Bugs
 - Fixed race conditions that could happen during VM status changes - `#85 <https://github.com/erigones/esdc-ce/issues/85>`__
 
 
-2.4.0 (released on 2017-02-22)
-==============================
+2.4.0
+=====
+Released on 2017-02-22
 
 Features
 --------
@@ -338,8 +353,9 @@ Bugs
 - Fixed object_type filter in Task Log (API & GUI) - `#74 <https://github.com/erigones/esdc-ce/pull/74>`__
 
 
-2.3.3 (released on 2017-02-04)
-==============================
+2.3.3
+=====
+Released on 2017-02-04
 
 Features
 --------
@@ -357,8 +373,9 @@ Bugs
 - Fixed DNS permission checking for DC-bound domains - `#63 <https://github.com/erigones/esdc-ce/issues/63>`__
 
 
-2.3.2 (released on 2016-12-17)
-==============================
+2.3.2
+=====
+Released on 2016-12-17
 
 Features
 --------
@@ -372,8 +389,9 @@ Bugs
 - Fixed problem when reading big log files via GET system_logs and system_node_logs - `#22 <https://github.com/erigones/esdc-ce/issues/22>`__
 
 
-2.3.1 (released on 2016-12-15)
-==============================
+2.3.1
+=====
+Released on 2016-12-15
 
 Features
 --------
@@ -394,8 +412,9 @@ Bugs
 - Fixed error causing inability of SuperAdmin user to add SSH key for another user - `#18 <https://github.com/erigones/esdc-ce/issues/18>`__
 
 
-2.3.0 (released on 2016-11-14)
-==============================
+2.3.0
+=====
+Released on 2016-11-14
 
 Features
 --------
