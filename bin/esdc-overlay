@@ -715,9 +715,10 @@ EOF
 generate_mac()
 {
 	hexchars="0123456789abcdef"
+	# shellcheck disable=SC2034
 	echo "00:e5:dc$(
 	for i in {1..6}; do
-		echo -n ${hexchars:$(( $RANDOM % 16 )):1}
+		echo -n ${hexchars:$(( RANDOM % 16 )):1}
 	done | sed -e 's/\(..\)/:\1/g'
 	)"
 }
