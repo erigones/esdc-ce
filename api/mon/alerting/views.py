@@ -42,9 +42,14 @@ def mon_alert_list(request, data=None):
         :arg data.node_uuids: List of compute node UUIDs to be filtered by (requires ``dc_bound=false``) \
 (default: null)
         :type data.node_uuids: array
-        :arg data.dc_bound: Execute as DC unbound in the main virtual datacenter => \
-fetch all alerts from all monitoring servers (requires |SuperAdmin| permission) (default: false)
+        :arg data.dc_bound: When true, only alerts for DC-bound objects (i.e., virtual servers) are fetched \
+from the DC monitoring server. When false, alerts for DC-bound and DC-unbound objects (i.e, compute nodes) are fetched \
+either from the main or from all monitoring servers across all DCs (depending on the ``show_all`` parameter) \
+(requires |SuperAdmin| permission) (default: true)
         :type data.dc_bound: boolean
+        :arg data.show_all: Execute as DC-unbound in the main virtual datacenter and fetch all alerts \
+from all monitoring servers (implies ``dc_bound=false``) (requires |SuperAdmin| permission) (default: false)
+        :type data.show_all: boolean
 
         :status 200: SUCCESS
         :status 201: PENDING

@@ -24,6 +24,7 @@ class AlertSerializer(s.Serializer):
     node_uuids = s.ArrayField(required=False, allow_none=True)
     show_events = s.BooleanField(default=True)
     dc_bound = s.BooleanField(default=True)
+    show_all = s.BooleanField(default=False)
 
     def __init__(self, request, *args, **kwargs):
         super(AlertSerializer, self).__init__(*args, **kwargs)
@@ -37,7 +38,16 @@ class AlertSerializer(s.Serializer):
 
         return attrs
 
+    def validate_show_all(self, attrs, source):
+        if attrs.get(source) and not self.request.user.is_staff:
+            raise s.ValidationError(PERMISSION_DENIED)
+
+        return attrs
+
     def validate(self, attrs):
+        if attrs.get('show_all', False):
+            attrs['dc_bound'] = False
+
         request = self.request
         since = attrs.get('since', None)
         until = attrs.get('until', None)

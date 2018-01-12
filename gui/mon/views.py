@@ -54,7 +54,12 @@ def alert_list_table(request):
 @setting_required('MON_ZABBIX_ENABLED')
 def alert_list(request):
     context = collect_view_data(request, 'mon_alert_list')
-    context['filters'] = form = BaseAlertFilterForm(request, request.GET.copy())
+    data = request.GET.copy()
+
+    if request.user.is_staff and request.dc.is_default() and 'show_nodes' not in data:
+        data['show_nodes'] = True
+
+    context['filters'] = form = BaseAlertFilterForm(request, data)
     context['init'] = True
 
     if form.is_valid() and form.api_data is not None:  # new visit, or form submission

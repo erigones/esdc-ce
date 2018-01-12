@@ -23,10 +23,6 @@ class BaseAlertFilterForm(SerializerForm):
                                                               'class': 'fill-up input-navigation input-transparent '
                                                                        'input-date'}))
 
-    last = forms.IntegerField(label=_('Limit alerts to fetch'), required=False, min_value=0, max_value=1024,
-                              widget=forms.TextInput(attrs={'placeholder': _('Limit alerts to fetch'),
-                                                            'class': 'fill-up input-navigation input-transparent'}))
-
     vm_hostnames = ArrayField(label=_('Server hostnames'), required=False,
                               widget=ArrayWidget(attrs={'placeholder': _('Server hostnames'),
                                                         'class': 'fill-up input-navigation input-transparent'}))
@@ -35,11 +31,14 @@ class BaseAlertFilterForm(SerializerForm):
                                 widget=ArrayWidget(attrs={'placeholder': _('Node hostnames'),
                                                           'class': 'fill-up input-navigation input-transparent'}))
 
-    show_all = forms.BooleanField(label=_('Show all?'), required=False,
-                                  widget=forms.CheckboxInput(attrs={'class': 'checkbox fill-up input-navigation'}))
-
     show_events = forms.BooleanField(label=_('Show events?'), required=False,
                                      widget=forms.CheckboxInput(attrs={'class': 'checkbox fill-up input-navigation'}))
+
+    show_nodes = forms.BooleanField(label=_('Include compute nodes?'), required=False,
+                                    widget=forms.CheckboxInput(attrs={'class': 'checkbox fill-up input-navigation'}))
+
+    show_all = forms.BooleanField(label=_('Show all?'), required=False,
+                                  widget=forms.CheckboxInput(attrs={'class': 'checkbox fill-up input-navigation'}))
 
     def __init__(self, request, *args, **kwargs):
         super(BaseAlertFilterForm, self).__init__(request, None, *args, **kwargs)
@@ -47,6 +46,7 @@ class BaseAlertFilterForm(SerializerForm):
 
         if not request.user.is_staff:  # SuperAdmin only fields
             self.fields.pop('node_hostnames')
+            self.fields.pop('show_nodes')
             self.fields.pop('show_all')
 
     @staticmethod
@@ -72,7 +72,12 @@ class BaseAlertFilterForm(SerializerForm):
         if data['until']:
             data['until'] = data['until'].replace(tzinfo=tz).astimezone(utc).strftime('%s')
 
-        data['dc_bound'] = not data.pop('show_all', False)
+        show_nodes = data.pop('show_nodes', False)
+
+        if data.get('show_all', False):
+            data['dc_bound'] = False
+        else:
+            data['dc_bound'] = not show_nodes
 
         self._remove_empty_fields(data)
         ser = AlertSerializer(self._request, data=data)
@@ -80,11 +85,13 @@ class BaseAlertFilterForm(SerializerForm):
         if ser.is_valid():
             api_data = ser.data
             # Not used filters
+            del api_data['last']
             del api_data['node_uuids']
             del api_data['vm_uuids']
 
             if not self._request.user.is_staff:  # SuperAdmin only fields
                 del api_data['node_hostnames']
+                del api_data['show_all']
                 api_data['dc_bound'] = True
 
             self.api_data = self._remove_empty_fields(api_data)

@@ -361,7 +361,7 @@ def mon_all_groups_sync(task_id, sender, dc_name=None, *args, **kwargs):
 @cq.task(name='api.mon.alerting.tasks.mon_alert_list', base=MgmtTask)
 @mgmt_task()
 def mon_alert_list(task_id, dc_id, dc_bound=True, node_uuids=None, vm_uuids=None, since=None, until=None, last=None,
-                   show_events=True, **kwargs):
+                   show_all=False, show_events=True, **kwargs):
     """
     Return list of alerts available in Zabbix.
     """
@@ -384,7 +384,11 @@ def mon_alert_list(task_id, dc_id, dc_bound=True, node_uuids=None, vm_uuids=None
 
         if vm_uuids is None and node_uuids is None:
             nodes_qs = Node.objects.all()
-            vms_qs = Vm.objects.select_related('dc').filter(slavevm__isnull=True).exclude(status=Vm.NOTCREATED)  # All
+
+            if show_all:
+                vms_qs = Vm.objects.select_related('dc').filter(slavevm__isnull=True).exclude(status=Vm.NOTCREATED)
+            else:
+                vms_qs = Vm.objects.filter(dc=dc, slavevm__isnull=True).exclude(status=Vm.NOTCREATED)
         elif vm_uuids is not None and node_uuids is None:
             nodes_qs = empty
             vms_qs = Vm.objects.select_related('dc').filter(uuid__in=vm_uuids).exclude(status=Vm.NOTCREATED)  # Filtered
