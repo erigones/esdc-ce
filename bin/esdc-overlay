@@ -39,8 +39,9 @@ ORULE_DEFAULT_PORT=4789
 # adminoverlay vars
 ADMINOVERLAY_NAME="adminoverlay"
 ADMINOVERLAY_STARTING_IP_NUM=11	# start assingnig IPs from x.x.x.11
-# list of adminoverlay IP addresses assigned to all nodes
+# list of adminoverlay IP/MAC addresses assigned to all nodes
 declare -A ADMINOVERLAY_NODE_IP_MAP
+declare -A ADMINOVERLAY_NODE_MAC_MAP
 ADMINOVERLAY_SUBNET=
 ADMINOVERLAY_NETMASK=
 ADMINOVERLAY_VXLAN=2
@@ -410,8 +411,9 @@ load_adminoverlay_hosts() {
 
 	while read -r xnode; do
 		[[ -z "${xnode}" ]] && continue
-		ADMINOVERLAY_NODE_IP_MAP["${xnode}"]="$(query_cfgdb get "${CFGDB_ADMINOVERLAY_PATH}/IPs/${xnode}")"
-	done <<< "$(query_cfgdb ls "${CFGDB_ADMINOVERLAY_PATH}/IPs")"
+		ADMINOVERLAY_NODE_IP_MAP["${xnode}"]="$(query_cfgdb get "${CFGDB_ADMINOVERLAY_PATH}/nodes/${xnode}/ip")"
+		ADMINOVERLAY_NODE_MAC_MAP["${xnode}"]="$(query_cfgdb get "${CFGDB_ADMINOVERLAY_PATH}/nodes/${xnode}/mac")"
+	done <<< "$(query_cfgdb ls "${CFGDB_ADMINOVERLAY_PATH}/nodes")"
 }
 
 check_adminoverlay_enabled() {
@@ -432,35 +434,45 @@ generate_adminoverlay_ips() {
 			# this node's IP addr was not specified in cmd line
 			# We have to generate it.
 			next_ip="$(generate_next_adminoverlay_addr)"
+			next_mac="$(generate_adminoverlay_mac)"
 
 			# and save it directly to cfgdb
-			update_adminoverlay_cfgdb_node_ip "${node}" "${next_ip}"
+			update_adminoverlay_cfgdb_node_addr "${node}" "${next_ip}" "${next_mac}"
 
 			# and save into local temporary array
 			ADMINOVERLAY_NODE_IP_MAP["${node}"]="${next_ip}"
+			ADMINOVERLAY_NODE_MAC_MAP["${node}"]="${next_mac}"
 		fi
 	done
 }
 
 # write node's IP to cfgdb
-update_adminoverlay_cfgdb_node_ip() {
+update_adminoverlay_cfgdb_node_addr() {
 	local nodename="$1"
 	local node_ip="$2"
+	local node_mac="$3"
 
 	if [[ -n "${ADMINOVERLAY_NODE_IP_MAP["${nodename}"]}" ]]; then
 		# this node entry is already present (loaded from cfgdb)
 		# we'll update the entry in cfgdb if needed
-		if [[ "${node_ip}" != "${ADMINOVERLAY_NODE_IP_MAP["${nodename}"]}" ]]; then
+		if [[	"${node_ip}" != "${ADMINOVERLAY_NODE_IP_MAP["${nodename}"]}" || 
+				"${node_mac}" != "${ADMINOVERLAY_NODE_MAC_MAP["${nodename}"]}" ]]; then
+
 			[[ "${DEBUG}" -eq 1 ]] && echo "Updating IP in cfgdb: ${nodename} -> ${node_ip}"
-			query_cfgdb set "${CFGDB_ADMINOVERLAY_PATH}/IPs/${nodename}" "${node_ip}"
+			query_cfgdb set "${CFGDB_ADMINOVERLAY_PATH}/nodes/${nodename}/ip" "${node_ip}"
+			[[ "${DEBUG}" -eq 1 ]] && echo "Updating MAC in cfgdb: ${nodename} -> ${node_mac}"
+			query_cfgdb set "${CFGDB_ADMINOVERLAY_PATH}/nodes/${nodename}/mac" "${node_mac}"
 		else
 			[[ "${DEBUG}" -eq 1 ]] && echo "NOT updating IP in cfgdb: ${nodename} -> ${node_ip}"
+			[[ "${DEBUG}" -eq 1 ]] && echo "NOT updating MAC in cfgdb: ${nodename} -> ${node_mac}"
 		fi
 	else
 		# the entry is not present in cfgdb
 		# we'll create it
 		[[ "${DEBUG}" -eq 1 ]] && echo "Creating node IP entry in cfgdb: ${nodename} -> ${node_ip}"
-		query_cfgdb creater "${CFGDB_ADMINOVERLAY_PATH}/IPs/${nodename}" "${node_ip}"
+		[[ "${DEBUG}" -eq 1 ]] && echo "Creating node MAC entry in cfgdb: ${nodename} -> ${node_mac}"
+		query_cfgdb creater "${CFGDB_ADMINOVERLAY_PATH}/nodes/${nodename}/ip" "${node_ip}"
+		query_cfgdb creater "${CFGDB_ADMINOVERLAY_PATH}/nodes/${nodename}/mac" "${node_mac}"
 	fi
 }
 
@@ -492,11 +504,13 @@ update_adminoverlay_hosts() {
 
 		if [[ "${CMD,,}" == "adminoverlay-update" ]]; then
 			# save new IP to cfgdb
-			update_adminoverlay_cfgdb_node_ip "${nodename}" "${node_ip}"
+			next_mac="$(generate_adminoverlay_mac)"
+			update_adminoverlay_cfgdb_node_addr "${nodename}" "${node_ip}" "${next_mac}"
 		fi
 
 		# write node address to a local array
 		ADMINOVERLAY_NODE_IP_MAP["${nodename}"]="${node_ip}"
+		ADMINOVERLAY_NODE_MAC_MAP["${node}"]="${next_mac}"
 	done
 }
 
@@ -698,6 +712,40 @@ EOF
 	echo "${next_ip}"
 }
 
+generate_mac()
+{
+	hexchars="0123456789abcdef"
+	# shellcheck disable=SC2034
+	echo "00:e5:dc$(
+	for i in {1..6}; do
+		echo -n ${hexchars:$(( RANDOM % 16 )):1}
+	done | sed -e 's/\(..\)/:\1/g'
+	)"
+}
+
+check_duplicate_mac() {
+	local mac="$1"
+	for node in "${!ADMINOVERLAY_NODE_MAC_MAP[@]}"; do
+		if [[ "${ADMINOVERLAY_NODE_MAC_MAP["${node}"]}" == "${mac}" ]]; then
+			return 1
+		fi
+	done
+}
+
+generate_adminoverlay_mac() {
+	local new_mac
+	new_mac="$(generate_mac)"
+
+	# check for duplicates
+	while ! check_duplicate_mac "${new_mac}"; do
+		# duplicate MAC found
+		# regenerate mac and check again
+		new_mac="$(generate_mac)"
+	done
+
+	echo "${new_mac}"
+}
+
 print_full_adminoverlay_json() {
 	local first_run=1
 
@@ -707,7 +755,7 @@ print_full_adminoverlay_json() {
   "netmask": "${ADMINOVERLAY_NETMASK}",
   "vxlan_id": "${ADMINOVERLAY_VXLAN}",
   "vlan_id": "${ADMINOVERLAY_VLAN}",
-  "ips":
+  "nodes":
   {
 EOF
 	for node in "${!ADMINOVERLAY_NODE_IP_MAP[@]}"; do
@@ -718,7 +766,10 @@ EOF
 			echo ','
 		fi
 
-		${PRINTF} "    \"%s\": \"%s\"" "${node}" "${ADMINOVERLAY_NODE_IP_MAP["${node}"]}"
+		${PRINTF} "    \"%s\": {" "${node}"
+		${PRINTF} "      \"ip\": \"%s\"," "${ADMINOVERLAY_NODE_IP_MAP["${node}"]}"
+		${PRINTF} "      \"mac\": \"%s\"" "${ADMINOVERLAY_NODE_MAC_MAP["${node}"]}"
+		${PRINTF} "    }"
 	done
 	cat << EOF
 
@@ -872,6 +923,8 @@ adminoverlay_init() {
 			# We have to generate it.
 			next_ip="$(generate_next_adminoverlay_addr)"
 			ADMINOVERLAY_NODE_IP_MAP["${node}"]="${next_ip}"
+			next_mac="$(generate_adminoverlay_mac)"
+			ADMINOVERLAY_NODE_MAC_MAP["${node}"]="${next_mac}"
 		fi
 	done
 
@@ -881,7 +934,8 @@ adminoverlay_init() {
 
 	# write node IPs to cfgdb
 	for node in "${!ADMINOVERLAY_NODE_IP_MAP[@]}"; do
-		query_cfgdb creater "${CFGDB_ADMINOVERLAY_PATH}/IPs/${node}" "${ADMINOVERLAY_NODE_IP_MAP[${node}]}"
+		query_cfgdb creater "${CFGDB_ADMINOVERLAY_PATH}/nodes/${node}/ip" "${ADMINOVERLAY_NODE_IP_MAP[${node}]}"
+		query_cfgdb creater "${CFGDB_ADMINOVERLAY_PATH}/nodes/${node}/mac" "${ADMINOVERLAY_NODE_MAC_MAP[${node}]}"
 	done
 }
 
@@ -1017,17 +1071,18 @@ if [[ -z "${CMD}" ]]; then
 	usage
 fi
 
-# turn on debug
-if [[ "${CMD}" =~ -debug$ ]]; then
-	DEBUG=1
-	CMD="$(echo "${CMD}" | ${SED} -e 's/-debug$//')"
-fi
-
 test_cfgdb_connect
 update_ans_hosts
 parse_node_dc_list
 
 CMD="${1}"
+
+if [[ "${CMD}" =~ -debug$ ]]; then
+	# turn on debug
+	DEBUG=1
+	CMD="$(echo "${CMD}" | ${SED} -e 's/-debug$//')"
+fi
+
 
 case ${CMD,,} in
 	create)
@@ -1136,10 +1191,10 @@ case ${CMD,,} in
 		echo
 
 		# shellcheck disable=SC1117
-		${PRINTF} "%-12s %-9s\n" "NODE" "IP"
+		${PRINTF} "%-12s %-20s %-15s\n" "IP" "MAC" "NODE"
 		for node in "${!ADMINOVERLAY_NODE_IP_MAP[@]}"; do
 			# shellcheck disable=SC1117
-			${PRINTF} "%-12s %-9s\n" "${node}" "${ADMINOVERLAY_NODE_IP_MAP["${node}"]}"
+			${PRINTF} "%-12s %-20s %-15s\n" "${ADMINOVERLAY_NODE_IP_MAP["${node}"]}" "${ADMINOVERLAY_NODE_MAC_MAP["${node}"]}" "${node}"
 		done
 
 		;;
