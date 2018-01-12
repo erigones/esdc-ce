@@ -55,6 +55,7 @@ def alert_list_table(request):
 def alert_list(request):
     context = collect_view_data(request, 'mon_alert_list')
     data = request.GET.copy()
+    data.pop('_', None)
 
     if not data and request.user.is_staff and request.dc.is_default():
         data['show_nodes'] = True
