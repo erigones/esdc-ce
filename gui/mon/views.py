@@ -56,7 +56,7 @@ def alert_list(request):
     context = collect_view_data(request, 'mon_alert_list')
     data = request.GET.copy()
 
-    if request.user.is_staff and request.dc.is_default() and 'show_nodes' not in data:
+    if not data and request.user.is_staff and request.dc.is_default():
         data['show_nodes'] = True
 
     context['filters'] = form = BaseAlertFilterForm(request, data)

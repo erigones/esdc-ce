@@ -8,6 +8,7 @@ from gui.forms import SerializerForm
 from gui.fields import ArrayField
 from gui.widgets import ArrayWidget
 from api.mon.alerting.serializers import AlertSerializer
+from vms.models import DefaultDc
 
 
 class BaseAlertFilterForm(SerializerForm):
@@ -44,7 +45,11 @@ class BaseAlertFilterForm(SerializerForm):
         super(BaseAlertFilterForm, self).__init__(request, None, *args, **kwargs)
         self.api_data = None
 
-        if not request.user.is_staff:  # SuperAdmin only fields
+        if request.user.is_staff:
+            dc = request.dc
+            if not dc.is_default() and dc.settings.MON_ZABBIX_SERVER != DefaultDc().settings.MON_ZABBIX_SERVER:
+                self.fields['show_nodes'].widget.attrs['disabled'] = 'disabled'
+        else:  # SuperAdmin only fields
             self.fields.pop('node_hostnames')
             self.fields.pop('show_nodes')
             self.fields.pop('show_all')
