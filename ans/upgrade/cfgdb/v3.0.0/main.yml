@@ -16,7 +16,7 @@
   command: /usr/local/bin/query_cfgdb get /esdc/settings/security/services_ssl_cert
   register: zk_ssl_cert
   ignore_errors: true
-  changed_when: zk_ssl_cert|failed or zk_ssl_cert.stdout.strip() != "{{ ERIGONESD_SSL_CERT.strip() }}"
+  changed_when: zk_ssl_cert|failed or zk_ssl_cert.stdout.strip() != ERIGONESD_SSL_CERT.strip()
 
 # Store striped in ZooKeeper (because zookeepercli appends a newline when reading)
 - name: Create /esdc/settings/security/services_ssl_cert in ZooKeeper
