@@ -13,7 +13,7 @@ function node_status() {
 }
 
 function node_restart() {
-	svcadm restart svcs svc:/application/erigonesd:*
+	svcadm restart svc:/application/erigonesd:*
 }
 
 function mgmt_status() {
