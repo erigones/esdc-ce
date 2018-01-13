@@ -249,6 +249,14 @@ fi
 # 2nd run starts
 #
 
+# Upgrade from an pre-3.x version
+if [[ -z "${VERSION_REF}" && -z "${CURRENT_VERSION_REF}" ]]; then
+	echo "WARNING: Detected upgrade from a pre-3.x version => no support for rollback"
+	VERSION_REF="$(git rev-parse HEAD || die ${ERR_GIT_CMD})"
+	CURRENT_VERSION_REF=""
+	DEPLOY_RUNNING_FILE="/tmp/.deploy.${VERSION_REF}.running"
+fi
+
 # Double-check current commit
 if [[ "${VERSION_REF}" != "$(git rev-parse HEAD || die ${ERR_GIT_CMD})" ]]; then
 	die ${ERR_GIT_CMD} "Git commit changed during update"
