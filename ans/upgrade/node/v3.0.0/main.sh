@@ -72,6 +72,9 @@ if grep -q "^BROKER_USE_SSL" "${ERIGONESD_CONFIG}"; then
 fi
 
 # For the next operation we need to patch celery in our virtualenv
+echo "+ Installing the patch program"
+pkgin -y install patch > /dev/null
+
 echo "+ Patching packages in virtualenv"
 "${CTLSH}" patch_envs > /dev/null
 
