@@ -170,6 +170,13 @@ def node_sysinfo_cb(result, task_id, node_uuid=None):
     try:
         del node.system_version
 
+        # Sometimes the node worker does not respond within the given timeout so we have to try more than once
+        for i in range(5):
+            if node.system_version:
+                break
+
+        logger.info('Node %s has system version %s', node, node.system_version)
+
         if owner_id_from_task_id(task_id) == TASK_USER:  # internal user ID
             NodeSystemRestarted(node, system_version=node.system_version).send()
 
