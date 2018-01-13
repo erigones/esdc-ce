@@ -192,7 +192,7 @@ if [[ -z "${ESDC_GIT_UPDATE_2ND_RUN}" ]]; then
 		# fetch most recent changes first
 		# MERGE will be done only if requested VERSION is among fetched objects
 		git fetch origin > "${LOG_DIR}/update_git_fetch.log" 2>&1 || \
-			die ${ERR_FAILED_FETCH} "Unable to fetch changes from git remote ($(cat ${LOG_DIR}/update_git_fetch.log))"
+			die ${ERR_FAILED_FETCH} "Unable to fetch changes from git remote ($(cat "${LOG_DIR}/update_git_fetch.log"))"
 
 		AVAILABLE_TAGS=$(git show-ref --tags)
 		# When VERSION matches one of the tags name in the list of reference-tags
@@ -223,7 +223,7 @@ if [[ -z "${ESDC_GIT_UPDATE_2ND_RUN}" ]]; then
 
 		echo "Running git checkout to commit: ${VERSION_REF}"
 		git checkout "${VERSION_REF}" > "${LOG_DIR}/update_git_checkout.log" 2>&1 || \
-			die ${ERR_FAILED_CHECKOUT} "Failed to checkout commit: ${VERSION_REF} ($(cat ${LOG_DIR}/update_git_checkout.log))"
+			die ${ERR_FAILED_CHECKOUT} "Failed to checkout commit: ${VERSION_REF} ($(cat "${LOG_DIR}/update_git_checkout.log"))"
 	fi
 
 	# Set and truncate the log file
