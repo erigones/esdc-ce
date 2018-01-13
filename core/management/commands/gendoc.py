@@ -84,7 +84,7 @@ class Command(DanubeCloudCommand):
             self.display('Checked out esdc-docs branch "%s"' % branch, color='green')
             # If the branch is no a tag name, then we need to merge/pull
             if existing_repo and not re.search('^v[0-9]', branch):
-                self.local('git merge --ff-only')
+                self.local('git merge --ff-only origin/%s' % branch)
                 self.display('Merged esdc-docs branch "%s"' % branch, color='green')
 
         # Build sphinx docs
