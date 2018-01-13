@@ -563,7 +563,7 @@ _es() {
 
 		/mon/alert|/mon/alert/)
 			[ ${COMP_CWORD} -eq 2 ] && COMPREPLY=( "${cur} " )
-			[[ "${action}" == "get" ]] && params="-since -until -last -show_events -vm_hostnames -vm_uuids -node_hostnames -node_uuids -dc_bound -cb_method -cb_url"
+			[[ "${action}" == "get" ]] && params="-since -until -last -show_events -vm_hostnames -vm_uuids -node_hostnames -node_uuids -dc_bound -show_all -cb_method -cb_url"
 		;;
 
 		/mon/action|/mon/action/)
