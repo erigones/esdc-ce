@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 import os
 from logging import getLogger
-from subprocess import PIPE
+from subprocess import PIPE, STDOUT
 
 from psutil import Popen
 from celery.worker.control import Panel
@@ -89,10 +89,16 @@ def worker_start(worker_hostname):
         node_worker_start(worker_hostname)
 
 
-def _execute(cmd, stdin=None):
+def _execute(cmd, stdin=None, stderr_to_stdout=False):
     """Run command and return output"""
     logger.warn('Running command (panel): %s', cmd)  # Warning level because we want to see this in logs
-    proc = Popen(cmd, bufsize=0, close_fds=True, stdout=PIPE, stderr=PIPE, stdin=PIPE)
+
+    if stderr_to_stdout:
+        stderr = STDOUT
+    else:
+        stderr = PIPE
+
+    proc = Popen(cmd, bufsize=0, close_fds=True, stdout=PIPE, stderr=stderr, stdin=PIPE)
     stdout, stderr = proc.communicate(input=stdin)
 
     return {
@@ -146,7 +152,7 @@ def update_command(version, key=None, cert=None, force=False, sudo=False, run=Fa
         cmd.append(ssl_cert_file)
 
     if run:
-        return _execute(cmd)
+        return _execute(cmd, stderr_to_stdout=True)
     else:
         return cmd
 
