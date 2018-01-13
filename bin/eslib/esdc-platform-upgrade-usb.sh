@@ -68,7 +68,9 @@ if [[ -a "${UPG_DIR}" ]]; then
 	die 1 "Upgrade dir (${UPG_DIR}) exists. Please remove it first."
 fi
 
-mount_usb_key
+if ! mount_usb_key; then
+	die 2 "Failed to mount USB key. Aborting."
+fi
 
 USBMNT="$(_usbkey_get_mountpoint)"
 USB_DEV="$(_usbkey_get_device)"
@@ -78,6 +80,7 @@ if [[ -z "${USB_DEV}" ]]; then
 	die 2 "ESDC USB key not found. Aborting."
 fi
 if ! [[ -f "${USB_VERSION_FILE}" ]]; then
+	umount_usb_key || true
 	die 3 "Invalid or unknown USB key format. Aborting upgrade."
 fi
 
@@ -86,6 +89,7 @@ CURR_USB_VER="$(cat "${USB_VERSION_FILE}" | sed -e 's/^esdc-.e-.n-//')"
 # shellcheck disable=SC2002
 WANTED_USB_IMG_VARIANT="$(cat "${USB_VERSION_FILE}" | sed -re 's/^(esdc-.e-.n-).*/\1/')"
 if [[ ${FORCE} -ne 1 ]] && [[ "${CURR_USB_VER}" == "${NEW_USB_VER}" ]]; then
+	umount_usb_key || true
 	die 0 "Requested ESDC version is already on the USB key. Nothing to do."
 fi
 
@@ -122,6 +126,7 @@ printmsg "Verifying newly written USB key"
 # shellcheck disable=SC2002
 CURR_USB_VER="$(cat "${USB_VERSION_FILE}" | sed -e 's/^esdc-.e-.n-//')"
 printmsg "ESDC version on USB: ${CURR_USB_VER}"
+umount_usb_key || true
 
 FINISHED_SUCCESSFULLY=1
 
