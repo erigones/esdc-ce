@@ -32,7 +32,7 @@ else:
     string_types = (basestring,)
 
 
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG,
+logging.basicConfig(stream=sys.stdout, level=logging.INFO,
                     format='%(asctime)s %(levelname)-8s %(name)s: %(message)s')
 logger = logging.getLogger(__name__)
 
@@ -56,6 +56,19 @@ class ValidationError(ValueError):
 # noinspection PyPep8Naming
 class RESTRequestHandler(BaseHTTPRequestHandler):
     method = None
+    _content = None
+
+    @property
+    def content(self):
+        if self._content is None:
+            content_length = int(self.headers.getheader('Content-Length', 0))
+
+            if content_length:
+                self._content = self.rfile.read(content_length)
+            else:
+                self._content = ''
+
+        return self._content
 
     def send_json_response(self, data, status=200):
         self.send_response(status)
@@ -63,15 +76,13 @@ class RESTRequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(json.dumps(data))
 
-    def parse_json_request(self):
-        content_length = int(self.headers.getheader('Content-Length', 0))
+    def parse_json_content(self):
+        content = self.content
 
-        if content_length:
-            content = json.loads(self.rfile.read(content_length))
+        if content:
+            return json.loads(content)
         else:
-            content = {}
-
-        return content
+            return {}
 
     def handle_request(self):
         raise NotImplementedError
@@ -80,6 +91,7 @@ class RESTRequestHandler(BaseHTTPRequestHandler):
         try:
             self.handle_request()
         except ValidationError as exc:
+            logger.exception(exc)
             self.send_json_response(exc.as_json, status=exc.status)
         except Exception as exc:
             logger.exception(exc)
@@ -177,18 +189,24 @@ class ZKRESTRequestHandler(RESTRequestHandler):
         else:
             zk_cmd = self.method_to_zk_command.get(self.method, None)
 
+        logger.info('Got request: [%s %s]', zk_cmd, url.path)
+
         if not zk_cmd or zk_cmd not in self.zk_commands:
+            logger.error('Request [%s %s] command is invalid', zk_cmd, url.path)
             self.send_json_response({'detail': 'Invalid command'}, status=400)
             return
 
         try:
-            data = self.parse_json_request()
+            data = self.parse_json_content()
 
             if not isinstance(data, dict):
                 raise TypeError
         except (TypeError, ValueError):
+            logger.error('Request [%s %s] has invalid JSON content: "%s"', zk_cmd, url.path, self.content)
             self.send_json_response('Malformed request', status=400)
             return
+        else:
+            logger.debug('Request [%s %s] has JSON content: "%s"', zk_cmd, url.path, data)
 
         res = self.run_zk_cmd(
             zk_cmd,
@@ -209,6 +227,7 @@ class ZKRESTRequestHandler(RESTRequestHandler):
             else:
                 status = 400
 
+        logger.info('Request [%s %s] response: "%s"', zk_cmd, url.path, res)
         self.send_json_response(res, status=status)
 
 
