@@ -217,7 +217,7 @@ class ESDCZKRESTRequestHandler(ZKRESTRequestHandler):
         return 'ESDC ' + ZKRESTRequestHandler.version_string(self)
 
     def handle_request(self):
-        if self.path.startswith('/esdc/'):
+        if self.path.startswith('/esdc'):
             ZKRESTRequestHandler.handle_request(self)
         else:
             self.send_json_response({'detail': 'Permission Denied'}, status=403)
