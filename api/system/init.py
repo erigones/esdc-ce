@@ -214,7 +214,7 @@ def init_mgmt(head_node, images=None):  # noqa: R701
     while True:
         ret = api_post(harvest_vm, head_node.hostname, dc=admin)
 
-        if ret.is_success(ret.status_code):
+        if status.is_success(ret.status_code):
             harvest_vm_task_id = ret.data.get('task_id')
             logger.info('POST harvest_vm(%s) has started with task ID: %s', head_node.hostname, harvest_vm_task_id)
             break
