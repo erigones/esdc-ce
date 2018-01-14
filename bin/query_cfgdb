@@ -113,7 +113,8 @@ URL="${HTTP_SCHEME}://${ZK_IP}:${HTTP_PORT}${ZK_NODE}?cmd=${ZK_CMD}"
 
 # Create json object with "data" and/or "force" attributes
 if [[ -n "${ZK_DATA}" ]]; then
-	json_data="{\"data\":\"${ZK_DATA}\"}"
+	stringified_json_data="$(printf '%s' "${ZK_DATA}" | python -c 'import json,sys; print(json.dumps(sys.stdin.read()))')"
+	json_data="{\"data\":${stringified_json_data}}"
 else
 	json_data="{}"
 fi
