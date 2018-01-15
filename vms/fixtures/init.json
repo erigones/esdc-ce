@@ -3,7 +3,7 @@
     "pk": 1,
     "model": "vms.dc",
     "fields": {
-        "enc_json": "KGRwMQpTJ1JFR0lTVFJBVElPTl9FTkFCTEVEJwpwMgpJMDAKc1MnU01TX0VOQUJMRUQnCnAzCkkw\nMApzLg==\n",
+        "enc_json": "KGRwMQpTJ3NldHRpbmdzJwpwMgooZHAzClMnUkVHSVNUUkFUSU9OX0VOQUJMRUQnCnA0CkkwMApz\nUydTTVNfRU5BQkxFRCcKcDUKSTAwCnNzLg==\n",
         "name": "main",
         "created": "2013-10-22T16:11:38.158Z",
         "changed": "2013-10-22T16:11:38.158Z",
@@ -18,7 +18,7 @@
     "pk": 2,
     "model": "vms.dc",
     "fields": {
-        "enc_json": "KGRwMQpTJ1JFR0lTVFJBVElPTl9FTkFCTEVEJwpwMgpJMDAKc1MnVk1TX1ZNX0NQVV9DQVBfUkVR\nVUlSRUQnCnAzCkkwMApzLg==\n",
+        "enc_json": "KGRwMQpTJ3NldHRpbmdzJwpwMgooZHAzClMnUkVHSVNUUkFUSU9OX0VOQUJMRUQnCnA0CkkwMApz\ncy4=\n",
         "name": "admin",
         "created": "2013-10-22T16:11:38.158Z",
         "changed": "2013-10-22T16:11:38.158Z",
