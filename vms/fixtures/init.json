@@ -18,7 +18,7 @@
     "pk": 2,
     "model": "vms.dc",
     "fields": {
-        "enc_json": "KGRwMQpTJ3NldHRpbmdzJwpwMgooZHAzClMnUkVHSVNUUkFUSU9OX0VOQUJMRUQnCnA0CkkwMApz\ncy4=\n",
+        "enc_json": "KGRwMQpTJ3NldHRpbmdzJwpwMgooZHAzClMnUkVHSVNUUkFUSU9OX0VOQUJMRUQnCnA0CkkwMApz\nUydWTVNfVk1fQ1BVX0NBUF9SRVFVSVJFRCcKcDUKSTAwCnNzLg==\n",
         "name": "admin",
         "created": "2013-10-22T16:11:38.158Z",
         "changed": "2013-10-22T16:11:38.158Z",
