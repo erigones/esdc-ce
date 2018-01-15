@@ -230,6 +230,15 @@ class ZKRESTRequestHandler(RESTRequestHandler):
         logger.info('Request [%s %s] response: "%s"', zk_cmd, url.path, res)
         self.send_json_response(res, status=status)
 
+    # noinspection PyPep8Naming
+    def do_HEAD(self):
+        if self.path == '/':
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+        else:
+            self.send_error(501, 'Unsupported method')
+
 
 class ESDCZKRESTRequestHandler(ZKRESTRequestHandler):
     def version_string(self):
