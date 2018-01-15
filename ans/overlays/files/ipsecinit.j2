@@ -3,12 +3,12 @@
 { ulp tcp lport 111 } ipsec {encr_algs aes encr_auth_algs sha512 sa shared}
 
 # Don't use IPSec on admin network
-{ saddr {{ hostvars[ansible_fqdn]['admin_ip'] }} smask {{ hostvars[ansible_fqdn]['admin_netmask'] }} } bypass {}
+{ laddr {{ hostvars[ansible_fqdn]['admin_ip'] }} dir both } bypass {}
 
-{% for orule in overlay_rules %}
-{% if overlay_rules[orule]['nodelist']|issuperset([ansible_fqdn]) or overlay_rules[orule]['nodelist'] == 'all' %}
-# {{ orule }}
-{ ulp udp lport {{ overlay_rules[orule]['port'] }} } ipsec {encr_algs aes encr_auth_algs sha512 sa shared}
-{ ulp udp rport {{ overlay_rules[orule]['port'] }} } ipsec {encr_algs aes encr_auth_algs sha512 sa shared}
+{% for node in all_nodes %}
+{% if hostvars[node]['dc_name'] != my_datacenter %}
+# {{ ansible_fqdn }}
+{ ulp udp laddr {{ external_ip }} raddr {{ hostvars[node]['ansible_ssh_host'] }} } ipsec {encr_algs aes encr_auth_algs sha512 sa shared }
 {% endif %}
 {% endfor %}
+

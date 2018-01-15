@@ -141,55 +141,55 @@
             overlay_rules[del_orule] is defined and
             overlay_rules[del_orule]['arp_json_path']
 
-  #- name: configure IPSec ike config
-  #  template:
-  #  args:
-  #    src: '{{ templates_dir }}/ike-config.j2'
-  #    dest: '/opt/custom/etc/ipsec/config'
-  #    mode: 0640
-  #    owner: root
-  #    group: root
-  #  notify: refresh IPSec
+  - name: configure IPSec ike config
+    template:
+    args:
+      src: '{{ templates_dir }}/ike-config.j2'
+      dest: '/opt/custom/etc/ipsec/config'
+      mode: 0640
+      owner: root
+      group: root
+    notify: refresh IPSec
 
-  #- name: configure IPSec init
-  #  template:
-  #  args:
-  #    src: '{{ templates_dir }}/ipsecinit.j2'
-  #    dest: '/opt/custom/etc/ipsec/ipsecinit.conf'
-  #    mode: 0640
-  #    owner: root
-  #    group: root
-  #  notify: refresh IPSec
+  - name: configure IPSec init
+    template:
+    args:
+      src: '{{ templates_dir }}/ipsecinit.j2'
+      dest: '/opt/custom/etc/ipsec/ipsecinit.conf'
+      mode: 0640
+      owner: root
+      group: root
+    notify: refresh IPSec
 
-  #- name: configure IPSec pre-shared keys
-  #  template:
-  #  args:
-  #    src: '{{ templates_dir }}/ike.preshared.j2'
-  #    dest: '/opt/custom/etc/ipsec/ike.preshared'
-  #    mode: 0400
-  #    owner: root
-  #    group: root
-  #  notify: refresh IPSec
+  - name: configure IPSec pre-shared keys
+    template:
+    args:
+      src: '{{ templates_dir }}/ike.preshared.j2'
+      dest: '/opt/custom/etc/ipsec/ike.preshared'
+      mode: 0400
+      owner: root
+      group: root
+    notify: refresh IPSec
 
-  #- name: update firewall for overlays
-  #  template:
-  #  args:
-  #    src: '{{ templates_dir }}/ipf.conf-overlays.j2'
-  #    dest: '/opt/custom/etc/ipf.d/ipf.conf-020-overlays'
-  #    mode: 0640
-  #    owner: root
-  #    group: root
-  #  notify: reload firewall
+  - name: update firewall for overlays
+    template:
+    args:
+      src: '{{ templates_dir }}/ipf.conf-overlays.j2'
+      dest: '/opt/custom/etc/ipf.d/ipf.conf-020-overlays'
+      mode: 0640
+      owner: root
+      group: root
+    notify: reload firewall
 
-  #- name: update firewall for administrator IPs
-  #  template:
-  #  args:
-  #    src: '{{ templates_dir }}/ipf.conf-administration.j2'
-  #    dest: '/opt/custom/etc/ipf.d/ipf.conf-090-administration'
-  #    mode: 0640
-  #    owner: root
-  #    group: root
-  #  notify: reload firewall
+  - name: update firewall for administrator IPs
+    template:
+    args:
+      src: '{{ templates_dir }}/ipf.conf-administration.j2'
+      dest: '/opt/custom/etc/ipf.d/ipf.conf-090-administration'
+      mode: 0640
+      owner: root
+      group: root
+    notify: reload firewall
 
   - meta: end_play
 
