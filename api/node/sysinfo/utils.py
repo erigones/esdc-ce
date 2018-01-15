@@ -120,10 +120,15 @@ def parse_esysinfo(stdout):
     nictags = []
     overlay_rules = {}
 
-    try:
-        img_initial = json.loads(x[8].strip())
-    except ValueError as exc:
-        logger.exception(exc)
+    img_initial_raw = x[8].strip()
+
+    if img_initial_raw:
+        try:
+            img_initial = json.loads(img_initial_raw)
+        except ValueError as exc:
+            logger.exception(exc)
+            img_initial = None
+    else:
         img_initial = None
 
     for i in x[2].strip().splitlines():

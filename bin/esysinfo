@@ -25,6 +25,6 @@ fi
 echo "||||"
 (nictagadm list -p -d'|')
 echo "||||"
-(cat /var/run/smartdc/networking/overlay_rules.json)
+(cat /var/run/smartdc/networking/overlay_rules.json 2> /dev/null)
 
 exit 0
