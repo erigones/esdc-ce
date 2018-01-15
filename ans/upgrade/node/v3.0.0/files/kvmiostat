@@ -1,0 +1,240 @@
+#!/opt/local/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Std;
+use IO::Socket::UNIX;
+use JSON::PP;
+
+use Data::Dumper;
+
+# Process command line arguments
+usage() if defined $ARGV[0] and $ARGV[0] eq "--help";
+getopts('bhIMrzZv:d:') or usage();
+usage() if defined $main::opt_h;
+$main::opt_h = 0;
+
+my $USE_B = defined $main::opt_b ? $main::opt_b : 0;
+my $USE_MB = defined $main::opt_M ? $main::opt_M : 0;
+my $USE_INTERVAL = defined $main::opt_I ? $main::opt_I : 0;
+my $USE_COMMA = defined $main::opt_r ? $main::opt_r : 0;
+my $HIDE_ZEROES = defined $main::opt_z ? $main::opt_z : 0;
+my $ALL_ZONES = defined $main::opt_Z ? $main::opt_Z : 0;
+my $ONLY_ZONE = defined $main::opt_v ? $main::opt_v : 0;
+my $ONLY_DEVICE = defined $main::opt_d ? $main::opt_d : 0;
+
+my $HEADER_FMT = $USE_COMMA ?
+    "zone,device,r/%s,w/%s,%sr/%s,%sw/%s\n" :
+    "zone                                 device  r/%s   w/%s  %sr/%s  %sw/%s\n";
+my $DATA_FMT = $USE_COMMA ?
+    "%s,%s,%.1f,%.1f,%.1f,%.1f\n" :
+    "%s %s %5.1f %5.1f %5.1f %5.1f \n";
+
+my ($interval, $count);
+if ( defined($ARGV[0]) ) {
+        $interval = $ARGV[0];
+        $count = defined ($ARGV[1]) ? $ARGV[1] : 2**32;
+        usage() if ($interval == 0);
+} else {
+        $interval = 1;
+        $count = 1;
+}
+
+my @fields = ('rd_operations', 'wr_operations', 'rd_bytes', 'wr_bytes');
+
+#my $BYTES_PREFIX = $USE_MB ? "M" : "k";
+my $BYTES_PREFIX = $USE_MB ? "M" : $USE_B ? "b" : "k"; 
+my $BYTES_DIVISOR = $USE_MB ? 1024 * 1024 : $USE_B ? 1 : 1024;
+#my $BYTES_DIVISOR = $USE_MB ? 1024 * 1024 : 1024;
+my $INTERVAL_SUFFIX = $USE_INTERVAL ? "i" : "s";
+
+my %old = ();
+my $rows_printed = 0;
+
+my %vms = ();
+
+my %zonepaths = ();
+my @zones = ();
+my %qmp_sockets = ();
+
+# crap
+my $json = JSON::PP->new;
+my $json_data;
+
+for (my $ii = 0; $ii < $count; $ii++) {
+    
+    @zones = ();
+    my $vmadm = `zoneadm list -p  | egrep '.*running.*kvm' | cut -d: -f2,4`;
+    my @lines = split(/\n/, $vmadm);
+  
+    foreach my $line (@lines) {
+	my @tok = split(/:/, $line);
+
+	push(@zones, $tok[0]);
+
+	$zonepaths{$tok[0]} = $tok[1];
+    }
+
+    for my $uuid (@zones) {
+	if($ONLY_ZONE && $uuid ne $ONLY_ZONE) { 
+	    next;
+	}
+
+	my $disk_count = `egrep -c -- '-disk[0-9]+">' /etc/zones/$uuid.xml`;
+	chomp($disk_count);
+        $vms{$uuid}{'disk_count'} = $disk_count;
+       
+        #my $socket_path = "$zonepaths{$uuid}/root/tmp/vm.qmp";
+        #if (! $qmp_sockets{$uuid}) { 
+	#	$qmp_sockets{$uuid} = qmp_connect($socket_path);
+	#	$qmp_sockets{$uuid}->print('{"execute": "qmp_capabilities"}'); 
+	#}
+    }
+
+    # Print the column header every 20 rows
+    if ($rows_printed == 0 || $ALL_ZONES) {
+             printf($HEADER_FMT, $INTERVAL_SUFFIX, $INTERVAL_SUFFIX,
+                  $BYTES_PREFIX, $INTERVAL_SUFFIX, $BYTES_PREFIX,
+                  $INTERVAL_SUFFIX);
+    }
+
+    $rows_printed = $rows_printed >= 0 ? 0 : $rows_printed + 1;
+
+    foreach my $uuid (@zones) {
+	    if($ONLY_ZONE && $uuid ne $ONLY_ZONE) { 
+		    next;
+	    }
+
+	    #my $socket = $qmp_sockets{$uuid};
+
+	    my $socket_path = "$zonepaths{$uuid}/root/tmp/vm.qmp";
+	    my $ts = time();
+	    my $socket = IO::Socket::UNIX->new(
+			Type => SOCK_STREAM,
+			Peer => $socket_path 
+	    );
+
+  	    print $socket "{\"execute\": \"qmp_capabilities\"}\n{\"execute\": \"query-blockstats\"}";
+	    #$socket->print("{\"execute\": \"query-blockstats\"}");
+	    
+	    while(<$socket>) {
+		    unless (/QMP/ || /\{"return": \{\}\}/) {;
+	    		    $json_data = $_;
+			    last;
+	    	    }
+	    }
+	  
+            $socket->close;
+
+            my $perl_scalar = $json->decode($json_data);
+
+	    for(my $di = 0; $di < $vms{$uuid}{'disk_count'}; $di++) {
+		    if ($ONLY_DEVICE && "disk$di" ne $ONLY_DEVICE) {
+			    next;
+		    }
+
+		    #my $diskstats = `(curl -s 127.0.0.1:8080/vm/$uuid/info?types=blockstats | json blockstats.$di.stats)`;
+				    
+		    my $diskstats = $perl_scalar->{'return'}[$di]{'stats'}; 
+
+		    $vms{$uuid}{'blockstats'}{$di} = parse_blockstats($diskstats);
+		    $vms{$uuid}{'blockstats'}{$di}{'timestamp'} = $ts;
+		    if(!defined $old{$uuid}{'blockstats'}{$di}) {
+			    $old{$uuid}{'blockstats'}{$di} = ();
+			    foreach my $item (@fields) {
+				    $old{$uuid}{'blockstats'}{$di}{$item} = 0;
+			    }
+		    	    $old{$uuid}{'blockstats'}{$di}{'timestamp'} = 0;
+		    }
+			
+		    print_stats($uuid, "disk$di", $vms{$uuid}{'blockstats'}{$di}, $old{$uuid}{'blockstats'}{$di});
+
+		    foreach my $item (@fields) {$old{$uuid}{'blockstats'}{$di}->{$item} = $vms{$uuid}{'blockstats'}{$di}->{$item}};
+		    $old{$uuid}{'blockstats'}{$di}{'timestamp'} = $vms{$uuid}{'blockstats'}{$di}{'timestamp'};
+	    }
+
+	    $old{$uuid}{'disk_count'} = $vms{$uuid}{'disk_count'};
+    }
+
+    sleep($interval);
+  }
+
+# Close all connections to QMP sockets
+
+#foreach my $uuid (@zones) {
+#	
+#	$qmp_sockets{$uuid}->close;
+#}	
+
+exit(0);
+
+sub qmp_connect {
+    
+    my $path = shift;
+
+    my $socket = IO::Socket::UNIX->new(
+		    Type => SOCK_STREAM,
+		    Peer => $path 
+		    ) or die "Unable to connect to QMP socket: $!\n";
+
+    return $socket;
+}
+
+sub parse_blockstats {
+
+    my $arg = shift;
+
+    my %blockstats = ();
+
+    #my @lines = split(/\n/,$arg);
+    #foreach my $line (@lines) {
+    #    $blockstats{$1} = $2 if $line =~ /"(.*)": ([0-9]+),?/;
+    #}
+
+    foreach my $field (@fields) {
+	$blockstats{$field} = $arg->{$field};
+    }
+
+    return \%blockstats;
+}
+
+sub print_stats {
+    my $vm = $_[0];
+    my $disk = $_[1];
+    my $data = $_[2];
+    my $old = $_[3];
+
+    my $etime = $data->{'timestamp'} - $old->{'timestamp'};
+
+    my $rate_divisor = $USE_INTERVAL ? 1 : $etime;
+    #my $rate_divisor = 1;
+
+    my $rd_operations = ($data->{'rd_operations'} - $old->{'rd_operations'}) / $rate_divisor;
+    my $wr_operations = ($data->{'wr_operations'} - $old->{'wr_operations'}) / $rate_divisor;
+
+    my $rd_bytes  = ($data->{'rd_bytes'} - $old->{'rd_bytes'}) / $rate_divisor / $BYTES_DIVISOR;
+    my $wr_bytes  = ($data->{'wr_bytes'} - $old->{'wr_bytes'}) / $rate_divisor / $BYTES_DIVISOR;
+
+    if (! $HIDE_ZEROES || $rd_operations != 0.0 || $wr_operations != 0.0 ||
+            $rd_bytes != 0.0 || $wr_bytes!= 0.0) {
+            
+            printf($DATA_FMT, $vm, $disk, $rd_operations, $wr_operations, 
+                $rd_bytes, $wr_bytes);
+    }
+}
+
+sub usage {
+        print STDERR <<END;
+USAGE: kvmiostat [-hIMrzZ] [interval [count]]
+   eg, kvmiostat                # print summary since zone boot
+       kvmiostat 1              # print continually every 1 second
+       kvmiostat 1 5            # print 5 times, every 1 second
+       kvmiostat -I             # print results per interval (where applicable)
+       kvmiostat -M           # print results in MB/s
+       kvmiostat -r             # print results in comma-separated format
+       kvmiostat -z            # hide zones with no disk activity
+       kvmiostat -Z            # print results for all KVM zones
+END
+        exit 1;
+}

@@ -6,6 +6,13 @@ ERIGONES_HOME="${ERIGONES_HOME:-"/opt/erigones"}"
 VERSION_DIR="$(cd "$(dirname "$0")" ; pwd -P)"
 
 #
+# https://github.com/erigones/esdc-factory/commit/6861ab0b
+#
+echo "+ Updating /opt/zabbix/etc/scripts/kvmiostat"
+cat "${VERSION_DIR}/files/kvmiostat" > "/opt/zabbix/etc/scripts/kvmiostat"
+svcadm restart svc:/application/zabbix/vm-kvm-disk-io-monitor
+
+#
 # https://github.com/erigones/esdc-factory/issues/89
 #
 CUSTOM_ETC="/opt/custom/etc"
