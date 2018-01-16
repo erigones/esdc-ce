@@ -10,14 +10,15 @@ ESLIB="${ESLIB:-"${ERIGONES_HOME}/bin/eslib"}"
 
 PLATFORM_VER="${1}"
 if [[ -z "${PLATFORM_VER}" ]]; then
-	echo "Usage:   $0 <new_dc_version|new_platform_version> [--keep-smf-db] [-v] [-f]"
-	echo "Example: $0 v2.6.7"
-	echo "Example: $0 20170624T192838Z"
-	echo "Args:"
-	echo "  --keep-smf-db       don't clear SMF database (useful if you don't want to loose"
-	echo "                      your manual changes to any SMF service properties)"
-	echo "  -v                  verbose download"
-	echo "  -f                  force upgrade even when the requested version is already running"
+	echo "Usage:   $0 <new_dc_version|new_platform_version> [--keep-smf-db] [-v] [-f] [y]"
+	echo "Example: $0 v3.0.1"
+	echo "Example: $0 20180105T193033Z"
+	echo "Parameters:"
+	echo "  --keep-smf-db     don't clear SMF database (useful if you don't want to loose"
+	echo "                    your manual changes to any SMF service properties)"
+	echo "  -v                verbose download"
+	echo "  -f                force upgrade even when the requested version is already running"
+	echo "  -y                assume \"yes\" as default answer for all questions"
 
 	exit 1
 fi
@@ -29,7 +30,7 @@ PLATFORM_VERSION_MAP_URL="https://download.erigones.org/esdc/factory/platform/es
 CURL_DEFAULT_OPTS="--connect-timeout 15 -L --max-time 1000 -f"
 CURL_QUIET="-s"
 KEEP_SMF_DB=0
-FORCE="0"
+FORCE=0
 
 # process additional arguments
 shift
@@ -42,7 +43,10 @@ while [[ ${#} -gt 0 ]]; do
 			CURL_QUIET=""
 			;;
 		"-f")
-			FORCE="1"
+			FORCE=1
+			;;
+		"-y")
+			YES=1
 			;;
 		*)
 			echo "WARNING: Ignoring unknown argument '${1}'"
@@ -112,6 +116,7 @@ USR_ARCHIVE="${PLATFORM_MOUNT_DIR}/usr.lgz"
 USR_ARCHIVE_MOUNT_DIR="${MOUNT_DIR}/usr"
 PLATFORM_DOWNLOAD_URL="https://download.erigones.org/esdc/factory/platform/platform-${PLATFORM_VER}.tgz"
 FINISHED_SUCCESSFULLY=0
+ACTIVATE_BE=1
 
 post_cleanup() {
 	printmsg "Cleaning up"
@@ -125,7 +130,11 @@ post_cleanup() {
 cleanup() {
 	if [[ ${FINISHED_SUCCESSFULLY} -eq 1 ]]; then
 		post_cleanup
-		printmsg "Please reboot as soon as possible"
+		if [[ "${ACTIVATE_BE}" -eq 1 ]]; then
+			printmsg "Please reboot as soon as possible"
+		else
+			printmsg "Please activate the new boot environment and reboot"
+		fi
 	else
 		echo
 		printmsg "UPGRADE FAILED!"
@@ -179,11 +188,13 @@ ${MOUNT} -F ufs "${PLATFORM_LOOPDEV}" "${PLATFORM_MOUNT_DIR}"
 USR_LOOPDEV="$(lofi_add "${USR_ARCHIVE}")"
 ${MOUNT} -r -F ufs "${USR_LOOPDEV}" "${USR_ARCHIVE_MOUNT_DIR}"
 
-printmsg "Creating a new boot environment"
 NEW_BE="$(_beadm_get_next_be_name)"
+printmsg "Creating a new boot environment: ${NEW_BE}"
+
 if [[ -z "${NEW_BE}" ]]; then
 	die 5 "Cannot determine name of new boot environment"
 fi
+
 ${BEADM} create "${NEW_BE}"
 ${BEADM} mount "${NEW_BE}" "${DCOS_MNTDIR}"
 
@@ -207,8 +218,19 @@ if [[ -f "${DCOS_MNTDIR}/etc/issue" ]]; then
 	set -e
 fi
 
-printmsg "Activating the new boot environment at next reboot"
-_beadm_activate_be "${NEW_BE}"
+if [[ "${YES}" -ne 1 ]]; then
+	read -p "*** Activate the new boot environment at next reboot? [Y/n] " -n 1 -r confirm
+	echo
+	if [[ -n "${confirm}" ]] && [[ ! "${confirm}" =~ ^[Yy]$ ]]; then
+		ACTIVATE_BE=0
+	fi
+fi
+
+
+if [[ "${ACTIVATE_BE}" -eq 1 ]]; then
+	printmsg "Activating the new boot environment at next reboot"
+	_beadm_activate_be "${NEW_BE}"
+fi
 
 FINISHED_SUCCESSFULLY=1
 

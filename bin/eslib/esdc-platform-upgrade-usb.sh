@@ -10,11 +10,12 @@ ESLIB="${ESLIB:-"${ERIGONES_HOME}/bin/eslib"}"
 
 ESDC_VER="${1}"
 if [[ -z "${ESDC_VER}" ]]; then
-	echo "Usage:   $0 <new_dc_version> [-v] [-f]"
-	echo "Example: $0 v2.6.7"
-	echo "Args:"
+	echo "Usage:   $0 <new_dc_version> [-v] [-f] [-y]"
+	echo "Example: $0 v3.0.1"
+	echo "Parameters:"
 	echo "  -v                verbose download"
 	echo "  -f                force upgrade even when the requested version is already installed"
+	echo "  -y                assume \"yes\" as default answer for all questions"
 
 	exit 1
 fi
@@ -27,7 +28,8 @@ fi
 # curl: 15s conn T/O; allow redirects; 1000s max duration, fail on 404
 CURL_DEFAULT_OPTS="--connect-timeout 15 -L --max-time 3600 -f"
 CURL_QUIET="-s"
-FORCE="0"
+FORCE=0
+YES=0
 shift
 while [[ ${#} -gt 0 ]]; do
 	case "${1}" in
@@ -35,7 +37,10 @@ while [[ ${#} -gt 0 ]]; do
 			CURL_QUIET=""
 			;;
 		"-f")
-			FORCE="1"
+			FORCE=1
+			;;
+		"-y")
+			YES=1
 			;;
 		*)
 			echo "WARNING: Ignoring unknown argument '${1}'"
@@ -79,6 +84,9 @@ USB_VERSION_FILE="${USBMNT}/version"
 if [[ -z "${USB_DEV}" ]]; then
 	die 2 "ESDC USB key not found. Aborting."
 fi
+
+printmsg "Found USB device: ${USB_DEV}"
+
 if ! [[ -f "${USB_VERSION_FILE}" ]]; then
 	umount_usb_key || true
 	die 3 "Invalid or unknown USB key format. Aborting upgrade."
@@ -102,7 +110,7 @@ ESDC_DOWNLOAD_URL="https://download.erigones.org/esdc/usb/stable/${ESDC_IMG}.gz"
 
 trap cleanup EXIT
 
-printmsg "Download link: ${ESDC_DOWNLOAD_URL}"
+printmsg "Download URL: ${ESDC_DOWNLOAD_URL}"
 mkdir -p "${UPG_DIR}"
 
 # shellcheck disable=SC2086
@@ -113,10 +121,24 @@ fi
 printmsg "Unpacking new USB image"
 ${GZIP} -d "${ESDC_IMG_FULL}.gz"
 
-# start upgrade
-printmsg "Writing new image to the USB"
 # change trailing p1 for p0 (c1t1d0p1 -> c1t1d0p0)
-${DD} if="${ESDC_IMG_FULL}" of="${USB_DEV/p1*}p0" bs=16M
+USB_DEV_P0="${USB_DEV/p1*}p0"
+
+# confirmation
+printmsg "Going to write ${ESDC_IMG} image to USB device: ${USB_DEV_P0}"
+printmsg "This will overwrite the whole the USB device!"
+
+if [[ "${YES}" -ne 1 ]]; then
+	read -p "*** Are you sure you want to continue? [y/N] " -n 1 -r confirm
+	echo
+	if [[ ! "${confirm}" =~ ^[Yy]$ ]]; then
+		die 10 "Aborted by user."
+	fi
+fi
+
+# start upgrade
+printmsg "Writing new image to the USB device: ${USB_DEV_P0}"
+${DD} if="${ESDC_IMG_FULL}" of="${USB_DEV_P0}" bs=16M
 
 printmsg "Mounting newly written USB key into ${USBMNT}"
 # mount exactly the same dev that was written to
