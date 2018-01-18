@@ -1,4 +1,5 @@
 from django.conf import settings
+# noinspection PyProtectedMember
 from django.core.cache import caches
 from django.utils.six import iteritems
 from logging import getLogger
@@ -137,8 +138,11 @@ class Guacamole(object):
             )
         except requests.exceptions.RequestException as exc:
             logger.exception(exc)
+            status = None
+        else:
+            status = r.status_code
 
-        if exc is None and r and r.status_code == 200 and settings.GUACAMOLE_COOKIE in r.cookies:
+        if status == 200 and settings.GUACAMOLE_COOKIE in r.cookies:
             token = r.json().get('authToken', '')
             cookie = r.cookies[settings.GUACAMOLE_COOKIE]
             logger.info('User %s got guacamole cookie=%s and token=%s.', self.usr, cookie, token)
@@ -158,7 +162,8 @@ class Guacamole(object):
                 }
             }
         else:
-            logger.error('User %s could not login to guacamole, response="%r".', self.usr, exc or r.text)
+            logger.error('User %s could not login to guacamole, status=%s, response="%r".',
+                         self.usr, status, exc or r.text)
             res = {}
 
         return res

@@ -1,0 +1,61 @@
+# https://github.com/erigones/esdc-ce/issues/344
+# https://github.com/erigones/esdc-factory/commit/fc04c0e
+- name: Ensure that additional JAR files are installed
+  get_url: url="{{ item.url }}" checksum="{{ item.checksum }}" dest=/var/lib/tomcat/webapps/guacamole/WEB-INF/lib/
+  with_items:
+    - {"url": "https://repo1.maven.org/maven2/org/apache/commons/commons-pool2/2.4.2/commons-pool2-2.4.2.jar", "checksum": "sha1:e5f4f28f19d57716fbc3989d7a357ebf1e454fea"}
+    - {"url": "https://repo1.maven.org/maven2/redis/clients/jedis/2.9.0/jedis-2.9.0.jar", "checksum": "sha1:292bc9cc26553acd3cccc26f2f95620bf88a04c2"}
+    - {"url": "https://github.com/erigones/guacamole-auth-redis/releases/download/0.2.1/guacamole-auth-redis-0.2.1.jar", "checksum": "sha1:75381d583b62fc7a5ba0e871894b7e42c964f3fb"}
+  register: guacamole_jars
+
+- name: Setting correct owners of JAR files
+  file: path=/var/lib/tomcat/webapps/guacamole/WEB-INF/lib owner=tomcat group=tomcat recurse=yes
+  when: guacamole_jars|changed
+
+# https://github.com/erigones/esdc-ce/issues/344
+# https://github.com/erigones/esdc-factory/commit/9cd6cf0
+- name: Create /etc/tomcat/conf.d/java_opts.conf
+  copy: dest=/etc/tomcat/conf.d/java_opts.conf
+        content="JAVA_OPTS='-Djava.security.egd=file:/dev/urandom'\n"
+        mode=0644
+
+# https://github.com/erigones/esdc-ce/issues/344
+# https://github.com/erigones/esdc-factory/commit/c55497b
+- name: Fix permissions on guacamole.properties
+  file: dest=/var/lib/tomcat/webapps/guacamole/WEB-INF/classes/guacamole.properties
+        owner=root
+        group=tomcat
+        mode=0640
+
+# https://github.com/erigones/esdc-ce/issues/344
+# https://github.com/erigones/esdc-factory/commit/fae33a2
+- name: Upload tomcat_redis_connect SELinux module
+  copy: src="{{ current_task_dir }}/files/tomcat_redis_connect.pp" dest=/tmp/tomcat_redis_connect.pp
+- name: Install tomcat_redis_connect SELinux module
+  command: semodule -i /tmp/tomcat_redis_connect.pp
+
+# https://github.com/erigones/esdc-ce/issues/344
+# https://github.com/erigones/esdc-factory/commit/fc04c0e
+- name: Restart tomcat
+  service: name=tomcat state=restarted
+  when: guacamole_jars|changed
+
+# Fix ZK rest service port
+- name: Set IP address of cfgdb
+  set_fact:
+    cfgdb_ip: "{{ hostvars['cfgdb' + inventory_hostname.lstrip('mgmt')].ansible_ssh_host|mandatory }}"
+# https://github.com/erigones/esdc-factory/commit/4a6b441
+- name: Fix admin services proxy into haproxy.cfg
+  blockinfile:
+    dest: /etc/haproxy/haproxy.cfg
+    validate: "/usr/sbin/haproxy -c -f '%s'"
+    marker: "# {mark} Danube Cloud {{ item.name }} service proxy"
+    block: "listen {{ item.name }}\n{{ item.config|join('\n') }}\n"
+  with_items:
+    - name: zk_rest
+      config:
+        - "\tmode tcp"
+        - "\tbind *:12181"
+        - "\tserver zk-rest-cfgdb {{ cfgdb_ip }}:12181"
+  notify:
+    - reload haproxy
