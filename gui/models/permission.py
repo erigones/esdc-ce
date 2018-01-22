@@ -57,7 +57,7 @@ MonitoringAdminPermission = SimpleLazyObject(lambda: Permission.objects.get(name
 AnyDcPermissionSet = frozenset([
     'network_admin',
     'image_admin',
-    'image_import_admin'
+    'image_import_admin',
     'template_admin',
     'iso_admin',
     'user_admin',
