@@ -168,16 +168,10 @@ if [[ -z "${ESDC_GIT_UPDATE_2ND_RUN}" ]]; then
 	if [[ -n "${VERBOSE}" ]]; then
 		# Gather information about current status of esdc git repository
 		UPDATE_URL=$(git config --list | grep "remote.origin.url" | awk -F '=' '{print $2}')
-		# get most recent tag reachable from current commit
-		GIT_DESCRIBE=$(git describe)
-		MOST_RECENT_TAG=$(echo "${GIT_DESCRIBE}" | awk -F '-' '{print $1}')
-		COMMITS_AHEAD_TAG=$(echo "${GIT_DESCRIBE}" | awk -F '-' '{print $2}')
 
 		echo "#######################################"
 		echo "Remote git repository URL: ${UPDATE_URL}"
 		echo "Current HEAD points to commit: ${CURRENT_VERSION_REF}"
-		echo "Most recent tag reachable: ${MOST_RECENT_TAG}"
-		echo "Number of commits ahead of recent tag: ${COMMITS_AHEAD_TAG}"
 		echo "SSL key file: ${KEY_PATH}"
 		echo "SSL certificate file: ${CERT_PATH}"
 		echo "Target version: ${VERSION}"
@@ -199,7 +193,8 @@ if [[ -z "${ESDC_GIT_UPDATE_2ND_RUN}" ]]; then
 		# assign the commit reference to VERSION_REF variable
 		# else assume that VERSION holds value of the commit reference
 		if echo "${AVAILABLE_TAGS}" | awk '{print $NF}' | grep "refs/tags/${VERSION}$" >/dev/null; then
-			VERSION_REF=$(git rev-parse "${VERSION}")
+			# Follow the tag to the target commit hash
+			VERSION_REF=$(git rev-list -n1 "${VERSION}" || die ${ERR_GIT_CMD})
 		else
 			if git rev-list --all | grep "^${VERSION}$" >/dev/null; then
 				VERSION_REF="${VERSION}"
@@ -259,7 +254,8 @@ if [[ -z "${VERSION_REF}" && -z "${CURRENT_VERSION_REF}" ]]; then
 fi
 
 # Double-check current commit
-if [[ "${VERSION_REF}" != "$(git rev-parse HEAD || die ${ERR_GIT_CMD})" ]]; then
+# (we need to to follow the old commit because it can point to a tag)
+if [[ "$(git rev-list -n1 "${VERSION_REF}" || die ${ERR_GIT_CMD})" != "$(git rev-parse HEAD || die ${ERR_GIT_CMD})" ]]; then
 	die ${ERR_GIT_CMD} "Git commit changed during update"
 fi
 
