@@ -39,7 +39,7 @@ class Command(DanubeCloudCommand):
                 else:
                     ip = node.address_external
 
-            yield '%s ansible_ssh_host=%s ansible_python_interpreter=/opt/local/bin/python dc_name=%s' % \
+            yield '%s ansible_ssh_host=%s ansible_python_interpreter=/opt/local/bin/python dc_name="%s"' % \
                   (node.hostname, ip, node.dc_name)
 
     @staticmethod
