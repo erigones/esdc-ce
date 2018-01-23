@@ -67,7 +67,7 @@ $0 list
 Adminoverlay:
 $0 adminoverlay-init <adminoverlay_subnet/netmask> [nodename1=ip1,nodename=ip2,...]
 $0 adminoverlay-update [nodename1=ip1,nodename=ip2,...]
-$0 adminoverlay-list
+$0 adminoverlay-info
 
 Firewall:
 $0 globally-enable-firewall <allowed_IP_list>
@@ -1198,7 +1198,7 @@ case ${CMD,,} in
 
 		;;
 
-	adminoverlay-list)
+	adminoverlay-info)
 		load_adminoverlay_hosts
 
 		echo "Adminoverlay subnet:  ${ADMINOVERLAY_SUBNET}"
