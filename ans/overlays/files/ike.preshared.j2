@@ -38,7 +38,7 @@
     localidtype IP
     localid {{ external_ip }}
     remoteidtype IP
-    remoteid {{ hostvars[node]['ansible_ssh_host'] }}
+    remoteid {{ hostvars[node]['external_ip'] }}
     key "{{ ipsec_keys[node_pair] }}"
 }
 {% endif %}

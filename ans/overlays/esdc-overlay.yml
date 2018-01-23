@@ -119,7 +119,7 @@
   - name: "configure adminoverlay IP in {{ usbconfig }}"
     lineinfile: 
       dest: "{{ usbconfig }}"
-      state: "{% if adminoverlay_IPs['ips'][ansible_fqdn] is defined %}present{% else %}absent{% endif %}"
+      state: "{% if adminoverlay_IPs['nodes'][ansible_fqdn] is defined %}present{% else %}absent{% endif %}"
       regexp: '^adminoverlay_0_{{ item.name }}='
       line:    'adminoverlay_0_{{ item.name }}="{{ item.value }}"'
     with_items:
@@ -128,9 +128,11 @@
       - name: vlan_id
         value: "{{ adminoverlay_IPs['vlan_id'] }}"
       - name: ip
-        value: "{% if adminoverlay_IPs['ips'][ansible_fqdn] is defined %}{{ adminoverlay_IPs['ips'][ansible_fqdn] }}{% endif %}"
+        value: "{% if adminoverlay_IPs['nodes'][ansible_fqdn] is defined %}{{ adminoverlay_IPs['nodes'][ansible_fqdn]['ip'] }}{% endif %}"
       - name: netmask
         value: "{{ adminoverlay_IPs['netmask'] }}"
+      - name: mac
+        value: "{% if adminoverlay_IPs['nodes'][ansible_fqdn] is defined %}{{ adminoverlay_IPs['nodes'][ansible_fqdn]['mac'] }}{% endif %}"
     notify: reload overlays config
 
   - name: remove overlay arp file if necessary

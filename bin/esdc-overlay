@@ -288,8 +288,11 @@ print_full_overlay_json() {
 			# there are multiple nodes
 			# transform them to json list
 			nodelist="$(echo "${nodelist}" | ${SED} -re 's/([^,]+)/"\1"/g;s/^/[/;s/$/]/')"
+		elif [[ "${nodelist}" != "all" ]]; then
+			# there's only one node (but we'll create a json list anyway)
+			nodelist="[ \"${nodelist}\" ]"
 		else
-			# there's only one string (either a node name or "all")
+			# nodelist == "all"
 			nodelist="\"${nodelist}\""
 		fi
 
@@ -360,6 +363,9 @@ verify_json() {
 }
 
 parse_node_dc_list() {
+	# do nothing if the file does not exist
+	[[ -f "${HOSTS_FILE}" ]] || return 0
+
 	# read hosts.cfg and get node list and their respective dc names
 	while read -r line; do
 		# shellcheck disable=SC1117
@@ -397,7 +403,7 @@ generate_ipsec_keys() {
 			else
 				# generate a new pair
 				key="$(${OSSL} rand -hex 128)"
-				echo "generated key: $key"
+				[[ "${DEBUG}" -eq 1 ]] && echo "Generated IPSEC key for ${local_node}<->${remote_node}: $key"
 				query_cfgdb creater "${CFGDB_IPSEC_PATH}/psk/${node_pair}" "${key}"
 			fi
 		done
@@ -1071,10 +1077,6 @@ if [[ -z "${CMD}" ]]; then
 	usage
 fi
 
-test_cfgdb_connect
-update_ans_hosts
-parse_node_dc_list
-
 CMD="${1}"
 
 if [[ "${CMD}" =~ -debug$ ]]; then
@@ -1082,6 +1084,10 @@ if [[ "${CMD}" =~ -debug$ ]]; then
 	DEBUG=1
 	CMD="$(echo "${CMD}" | ${SED} -e 's/-debug$//')"
 fi
+
+test_cfgdb_connect
+update_ans_hosts
+parse_node_dc_list
 
 
 case ${CMD,,} in
