@@ -10,7 +10,7 @@ ESLIB="${ESLIB:-"${ERIGONES_HOME}/bin/eslib"}"
 
 PLATFORM_VER="${1}"
 if [[ -z "${PLATFORM_VER}" ]]; then
-	echo "Usage:   $0 <new_dc_version|new_platform_version> [--keep-smf-db] [-v] [-f] [y]"
+	echo "Usage:   $0 <new_dc_version|new_platform_version> [--keep-smf-db] [-v] [-f] [-y]"
 	echo "Example: $0 v3.0.1"
 	echo "Example: $0 20180105T193033Z"
 	echo "Parameters:"
