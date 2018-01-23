@@ -46,6 +46,7 @@ ADMINOVERLAY_SUBNET=
 ADMINOVERLAY_NETMASK=
 ADMINOVERLAY_VXLAN=2
 ADMINOVERLAY_VLAN=2
+ADMINOVERLAY_MTU=1300
 
 # misc global vars
 CFGDB_ORULE_LIST=
@@ -1156,9 +1157,16 @@ case ${CMD,,} in
 
 		adminoverlay_init "${adminnet}" "${node_ip_list}" 
 
+		# get first unused overlay udp port
+		orule_port="$(get_next_orule_port)"
+
+		orule_string="$(echo "${ORULE_TEMPLATE}" | \
+			${SED} -e "s/%%%OVERLAY_RULE_PORT%%%/${orule_port}/" -e "s/%%%OVERLAY_RULE_NAME%%%/${ADMINOVERLAY_NAME}/g" \
+			-e "s/mtu=[0-9]*/mtu=${ADMINOVERLAY_MTU}/g")"
+
 		# create overlay (re-call myself)
 		[[ "${DEBUG}" -eq 1 ]] && append="-debug"
-		$0 "create${append}" "${ADMINOVERLAY_NAME}" all
+		$0 "create${append}" "${ADMINOVERLAY_NAME}" all "${orule_string}"
 
 		;;
 	adminoverlay-update)
