@@ -972,17 +972,20 @@ globally_enable_firewal() {
 		query_cfgdb set "${CFGDB_FIREWALL_PATH}/administrator_sources" "${administrator_sources_list}"
 	fi
 
-	echo "#### Read carefully ####"
-	echo "You are about to to enable firewall on all existing external0 interfaces on all compute nodes in the cluster. This means that all Danube Cloud hypervisors will block all incoming traffic except from compute nodes within this Danube Cloud installation and from these IPs: ${administrator_sources_list}"
-	echo "This action will not affect virtual machines."
-	echo "You should have a fallback plan - create a virtual machine that is on the admin subnet and that is also reachable from the internet (e.g. it has one NIC on the admin network and the second (primary) NIC pointing to the internet)."
-	echo "You are responsible for providing correct IP addresses/subnets."
-	echo
-	echo "These rules will be added to each node's ipfilter config:"
-	echo "${administrator_sources_list}" | tr ',' '\n' \
-		| ${SED} -re 's/^(.*)$/pass in quick on external0 from \1 to <external_node_ip> keep state/'
-	echo "block in quick on external0 all"
-	echo 
+	cat << EOF
+
+#### Read carefully ####
+You are about to to enable firewall on all existing external0 interfaces on all compute nodes in the cluster. This means that all Danube Cloud hypervisors will block all incoming internet traffic except from compute nodes within this Danube Cloud installation and from these IPs: ${administrator_sources_list}
+This action will not affect traffic from/to virtual machines.
+
+You should have a fallback plan - create a virtual machine that is on the admin subnet and that is also reachable from the internet (e.g. it has one NIC on the admin network and the second (primary) NIC pointing to the internet).
+You are responsible for providing correct IP addresses/subnets.
+
+These rules will be added to each node's ipfilter config:
+$(echo "${administrator_sources_list}" | tr ',' '\n' | ${SED} -re 's/^(.*)$/pass in quick on external0 from \1 to <external_node_ip> keep state/')
+block in quick on external0 all
+
+EOF
 	${PRINTF} "Do you really want to enable a firewall? (Y/n) "
 	read -r reply
 	if [[ "${reply,,}" != "y" && -n "${reply}" ]]; then
