@@ -914,7 +914,7 @@ adminoverlay_init() {
 	fi
 	if [[ "${ADMINOVERLAY_SUBNET}" != "$(get_network "${ADMINOVERLAY_SUBNET}" "${ADMINOVERLAY_NETMASK}")" ]]; then
 		# not a real subnet number
-		echo "Incorrect subnet/netmask combination: ${adminnet}"
+		echo "Incorrect subnet/netmask combination: ${adminnet}. Network address must be the lowest IP in the subnet."
 		exit 7
 	fi
 
