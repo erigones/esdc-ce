@@ -1,6 +1,6 @@
 {% spaceless %}
 {% if pager.has_previous %}
-<a href="?page={{ pager.previous_page_number }}" class="first"><i class="icon-backward"></i></a>
+<a href="?{{ querystring }}page={{ pager.previous_page_number }}" class="first"><i class="icon-backward"></i></a>
 {% else %}
 <a class="first ui-state-disabled"><i class="icon-backward"></i></a>
 {% endif %}
