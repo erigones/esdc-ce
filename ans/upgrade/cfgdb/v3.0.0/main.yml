@@ -66,9 +66,7 @@
   when: zk_rest_manifest|changed
 
 - name: Restart cfgdb-zk-rest
-  service: name=cfgdb-zk-rest
-           state=restarted
-           enabled=yes
+  shell: /usr/sbin/svcadm disable -s cfgdb-zk-rest && /usr/sbin/svcadm enable -s cfgdb-zk-rest
   when: zk_rest_manifest|changed or zk_ssl_cert|changed
 
 - name: Make sure that cfgdb-zk-rest is running
