@@ -17,7 +17,7 @@ class Command(DanubeCloudCommand):
 
     def pip_install(self, req_path, params=''):
         if self._path_exists(req_path):
-            self.local('pip install %s -r %s' % (params, req_path))
+            self.local('pip install --no-cache-dir %s -r %s' % (params, req_path))
             self.display('%s have been successfully installed.\n\n ' % req_path, color='green')
 
     def handle(self, update=False, que_only=False, **options):
