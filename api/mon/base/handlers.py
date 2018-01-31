@@ -44,11 +44,12 @@ def mon_settings_changed_handler(task_id, dc, old_settings, new_settings):
     """
     Handle changes in MON_* DC settings; triggered by dc_settings_changed signal.
     """
-    mon_zabbix_enabled = new_settings.get('MON_ZABBIX_ENABLED', None)
+    old_mon_zabbix_enabled = old_settings.get('MON_ZABBIX_ENABLED', None)
+    new_mon_zabbix_enabled = new_settings.get('MON_ZABBIX_ENABLED', None)
 
-    if old_settings.get('MON_ZABBIX_ENABLED', None) != mon_zabbix_enabled:
+    if old_mon_zabbix_enabled != new_mon_zabbix_enabled:
         # We are going to do one of two things:
-        if mon_zabbix_enabled:
+        if new_mon_zabbix_enabled:
             # (a) switch ON the zabbix backend and sync all objects in this DC
             logger.warning('Monitoring got enabled in DC %s', dc)
             sync_groups = sync_vms = True
@@ -61,7 +62,7 @@ def mon_settings_changed_handler(task_id, dc, old_settings, new_settings):
         mon_sync_all.call(dc.id, clear_cache=True, sync_groups=sync_groups, sync_nodes=sync_nodes, sync_vms=sync_vms)
         return  # And we don't care about other changed monitoring settings
 
-    if not mon_zabbix_enabled:
+    if not dc.settings.MON_ZABBIX_ENABLED:
         logger.info('Monitoring is disabled in DC %s', dc)
         return
 
