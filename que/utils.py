@@ -12,7 +12,7 @@ from six import string_types
 from celery import states
 from celery.app.control import flatten_reply
 
-from que import E_SHUTDOWN, Q_MGMT, TT_EXEC, TT_MGMT, TT_INTERNAL, TG_DC_BOUND
+from que import IMPORTANT, E_SHUTDOWN, Q_MGMT, TT_EXEC, TT_MGMT, TT_INTERNAL, TG_DC_BOUND
 from que.erigonesd import cq
 from que.lock import TaskLock
 from que.user_tasks import UserTasks
@@ -310,7 +310,7 @@ def send_task_forever(sender, task, delay=3, nolog=False, **kwargs):
             if nolog:
                 logger.debug('Task "%s" with id %s was created by %s', task, t.id, sender)
             else:
-                logger.warning('Task "%s" with id %s was created by %s', task, t.id, sender)  # Should be INFO (dano)
+                logger.log(IMPORTANT, 'Task "%s" with id %s was created by %s', task, t.id, sender)
 
             return t
 

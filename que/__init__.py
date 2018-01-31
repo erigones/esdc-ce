@@ -1,4 +1,11 @@
+from logging import addLevelName
 from multiprocessing import Event
+
+# Our custom log severity. We need this because we want to see some special messages and on node the default log level
+# of workers is set to WARNING (INFO would be too much noise). These messages are not errors nor warnings, but can help
+# in some situations (e.g. tracing tasks).
+IMPORTANT = 45
+addLevelName(IMPORTANT, 'IMPORTANT')
 
 # Que events
 E_SHUTDOWN = Event()

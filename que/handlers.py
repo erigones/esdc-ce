@@ -7,7 +7,7 @@ from subprocess import PIPE, STDOUT
 from psutil import Popen
 from celery.worker.control import Panel
 
-from que import Q_FAST, Q_MGMT
+from que import IMPORTANT, Q_FAST, Q_MGMT
 from que.erigonesd import cq
 from que.utils import generate_internal_task_id, log_task_callback, fetch_node_uuid, read_file
 from que.tasks import execute_sysinfo
@@ -65,7 +65,7 @@ def node_worker_start(sender):
         if err:
             logger.error('Error creating internal %s task: %s in %s queue', SYSINFO_TASK, err, queue)
         else:
-            logger.warning('Created internal %s task %s in %s queue', SYSINFO_TASK, tid, queue)
+            logger.log(IMPORTANT, 'Created internal %s task %s in %s queue', SYSINFO_TASK, tid, queue)
 
 
 # noinspection PyUnusedLocal
@@ -91,7 +91,7 @@ def worker_start(worker_hostname):
 
 def _execute(cmd, stdin=None, stderr_to_stdout=False):
     """Run command and return output"""
-    logger.warn('Running command (panel): %s', cmd)  # Warning level because we want to see this in logs
+    logger.log(IMPORTANT, 'Running command (panel): %s', cmd)
 
     if stderr_to_stdout:
         stderr = STDOUT
