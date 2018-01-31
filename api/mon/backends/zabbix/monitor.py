@@ -519,8 +519,9 @@ class Zabbix(AbstractMonitoringBackend):
         else:
             display_attr = 'name_without_dc_prefix'
 
-        return [getattr(zgc, display_attr) for zgc in ZabbixHostGroupContainer.all(self.ezx.zapi, self.dc.name,
-                                                                                   dc_bound=dc_bound)]
+        return [getattr(zgc, display_attr) for zgc in
+                ZabbixHostGroupContainer.all(self.ezx.zapi, self.dc.name, include_global=True, count_hosts=True,
+                                             dc_bound=dc_bound)]
 
     def hostgroup_detail(self, name, dc_bound=True):
         """[EXTERNAL]"""
@@ -586,16 +587,14 @@ class Zabbix(AbstractMonitoringBackend):
             kwargs['group_name'] = ZabbixUserGroupContainer.user_group_name_factory(
                 dc_name=self.dc.name, local_group_name=ZabbixUserGroupContainer.OWNERS_GROUP
             )
-            kwargs['users'] = [User.objects.filter(dc=self.dc).first()]  # cannot use self.dc.owner due to cache !!!
-            kwargs['accessible_hostgroups'] = ()  # TODO
+            kwargs['users'] = User.objects.filter(dc=self.dc)  # cannot use self.dc.owner due to cache !!!
         else:
             kwargs['group_name'] = ZabbixUserGroupContainer.user_group_name_factory(dc_name=self.dc.name,
                                                                                     local_group_name=group.name)
             kwargs['users'] = group.user_set.all()
-            kwargs['accessible_hostgroups'] = ()  # TODO
             kwargs['superusers'] = group.permissions.filter(name=AdminPermission.name).exists()
 
-        return ZabbixUserGroupContainer.synchronize(self.ezx.zapi, **kwargs)
+        return ZabbixUserGroupContainer.synchronize(self.ezx.zapi, self.dc.name, **kwargs)
 
     def user_sync(self, user):
         """[EXTERNAL]"""

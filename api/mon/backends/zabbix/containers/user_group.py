@@ -19,8 +19,8 @@ class ZabbixUserGroupContainer(ZabbixBaseContainer):
     PERMISSION_DENY = 0
     PERMISSION_READ_ONLY = 2
     PERMISSION_READ_WRITE = 3
-    QUERY_BASE = frozendict({'selectUsers': ['alias']})
-    QUERY_WITHOUT_USERS = frozendict({})
+    QUERY_BASE = frozendict({'selectUsers': ['alias'], 'selectRights': 'extend'})
+    QUERY_WITHOUT_USERS = frozendict({'selectRights': 'extend'})
     OWNERS_GROUP = '#owner'
     NAME_MAX_LENGTH = 64
     AFFECTED_USERS = frozendict({
@@ -34,7 +34,7 @@ class ZabbixUserGroupContainer(ZabbixBaseContainer):
     def __init__(self, *args, **kwargs):
         super(ZabbixUserGroupContainer, self).__init__(*args, **kwargs)
         self.users = set()  # type: [ZabbixUserContainer]
-        self.hostgroups = set()  # type: [ZabbixHostGroupContainer]
+        self.hostgroup_ids = set()  # type: [int]
         self.superuser_group = False
         self.affected_users = dict(self.AFFECTED_USERS)
 
@@ -60,6 +60,7 @@ class ZabbixUserGroupContainer(ZabbixBaseContainer):
         #  container.superuser_group = FIXME cannot determine from this data
         container.users = {ZabbixUserContainer.from_zabbix_data(zapi, userdata)
                            for userdata in zabbix_object.get('users', [])}
+        container.hostgroup_ids = {int(right['id']) for right in zabbix_object.get('rights', [])}
 
         return container
 
@@ -89,28 +90,42 @@ class ZabbixUserGroupContainer(ZabbixBaseContainer):
         return cls.from_zabbix_data(zapi, zabbix_object)
 
     @classmethod
-    def from_mgmt_data(cls, zapi, group_name, users, accessible_hostgroups=(), superusers=False):
+    def from_mgmt_data(cls, zapi, dc_name, group_name, users, superusers=False):
         from api.mon.backends.zabbix.containers.user import ZabbixUserContainer
         from api.mon.backends.zabbix.containers.host_group import ZabbixHostGroupContainer
 
         # I should probably get all existing user ids for user names, and hostgroup ids for hostgroup names
         container = cls(group_name, zapi=zapi)
         container.users = {ZabbixUserContainer.from_mgmt_data(zapi, user) for user in users}
-        container.hostgroups = {ZabbixHostGroupContainer.get_or_create(zapi, hostgroup)
-                                for hostgroup in accessible_hostgroups}
+        container.hostgroup_ids = {zgc.zabbix_id for zgc in ZabbixHostGroupContainer.all(zapi, dc_name)}
         container.superuser_group = superusers  # FIXME this information is not used anywhere by now
 
         return container
 
     @classmethod
-    def synchronize(cls, zapi, group_name, users, accessible_hostgroups, superusers=False):
+    def all(cls, zapi, dc_name, resolve_users=True):
+        if resolve_users:
+            query = cls.QUERY_BASE
+        else:
+            query = cls.QUERY_WITHOUT_USERS
+
+        params = dict(
+            search={'name': cls.TEMPLATE_NAME_WITH_DC_PREFIX.format(dc_name=dc_name, name='*')},
+            searchWildcardsEnabled=True,
+            **query
+        )
+        response = cls.call_zapi(zapi, 'usergroup.get', params=params)
+
+        return [cls.from_zabbix_data(zapi, item) for item in response]
+
+    @classmethod
+    def synchronize(cls, zapi, dc_name, group_name, users, superusers=False):
         """
         Make sure that in the end, there will be a user group with specified users in zabbix.
         :param group_name: should be the qualified group name (<DC>:<group name>:)
         """
         # TODO synchronization of superadmins should be in the DC settings
-        # TODO will hosts be added in the next step?
-        user_group = cls.from_mgmt_data(zapi, group_name, users, accessible_hostgroups, superusers)
+        user_group = cls.from_mgmt_data(zapi, dc_name, group_name, users,  superusers=superusers)
 
         try:
             zabbix_user_group = cls.from_zabbix_name(zapi, group_name, resolve_users=True)
@@ -130,6 +145,13 @@ class ZabbixUserGroupContainer(ZabbixBaseContainer):
             return cls.NOTHING, cls.AFFECTED_USERS
         else:
             return group.delete()
+
+    @classmethod
+    def _generate_hostgroup_rights(cls, hostgroup_ids):
+        return [{
+            'id': hostgroup_zabbix_id,
+            'permission': cls.PERMISSION_READ_ONLY,
+        } for hostgroup_zabbix_id in hostgroup_ids]
 
     def delete(self):
         task_logger.debug('Going to delete group %s', self.name)
@@ -151,20 +173,8 @@ class ZabbixUserGroupContainer(ZabbixBaseContainer):
             'name': self.name,
             'users_status': self.USERS_STATUS_ENABLED,
             'gui_access': self.FRONTEND_ACCESS_DISABLED,
-            'rights': [],
+            'rights': self._generate_hostgroup_rights(self.hostgroup_ids),
         }
-
-        if self.superuser_group:
-            hostgroups_access_permission = self.PERMISSION_READ_WRITE
-        else:
-            hostgroups_access_permission = self.PERMISSION_READ_ONLY
-
-        for hostgroup in self.hostgroups:
-            assert hostgroup.zabbix_id
-            user_group_object['rights'].append({
-                'permission': hostgroups_access_permission,
-                'id': hostgroup.zabbix_id
-            })
 
         task_logger.debug('Creating usergroup: %s', user_group_object)
         self._api_response = self._call_zapi('usergroup.create', params=user_group_object)
@@ -190,15 +200,6 @@ class ZabbixUserGroupContainer(ZabbixBaseContainer):
         self.init(zabbix_object)
         self._refresh_users()
 
-    def update_superuser_status(self, superuser_group):
-        if self.superuser_group != superuser_group:
-            self.superuser_group = superuser_group
-            self.update_hostgroup_info()  # There is some hostgroup information depending on the superuser status
-
-    def update_hostgroup_info(self):
-        task_logger.debug('TODO host group update %s', self.name)
-        # TODO
-
     def update_users(self, user_group):
         task_logger.debug('synchronizing %s', self)
         task_logger.debug('remote_user_group.users %s', self.users)
@@ -210,13 +211,24 @@ class ZabbixUserGroupContainer(ZabbixBaseContainer):
         self.remove_users(redundant_users, delete_users_if_last=True)
         self.add_users(missing_users)
 
-    def update_basic_information(self, user_group):
-        self.update_superuser_status(user_group.superuser_group)
+    def set_hostgroup_rights(self, new_hostgroup_ids):
+        task_logger.debug('setting usergroup %s hostgroups rights to: %s', self, new_hostgroup_ids)
+        params = dict(usrgrpid=self.zabbix_id, rights=self._generate_hostgroup_rights(new_hostgroup_ids))
+        self._api_response = self._call_zapi('usergroup.update', params=params)
+        self.parse_zabbix_update_result(self._api_response, 'usrgrpids')
+        self.hostgroup_ids = new_hostgroup_ids
+
+    def add_hostgroup_right(self, hostgroup_id):
+        if hostgroup_id not in self.hostgroup_ids:
+            hostgroup_ids = self.hostgroup_ids.copy()
+            hostgroup_ids.add(hostgroup_id)
+            self.set_hostgroup_rights(hostgroup_ids)
 
     def update_from(self, user_group):
         self.update_users(user_group)
-        self.update_basic_information(user_group)
-        task_logger.debug('TODO hostgroups')
+
+        if self.hostgroup_ids != user_group.hostgroup_ids:
+            self.set_hostgroup_rights(user_group.hostgroup_ids)
 
         return self.UPDATED, self.affected_users
 

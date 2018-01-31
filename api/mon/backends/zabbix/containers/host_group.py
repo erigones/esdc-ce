@@ -17,7 +17,8 @@ class ZabbixHostGroupContainer(ZabbixBaseContainer):
     """
     ZABBIX_ID_ATTR = 'groupid'
     NAME_MAX_LENGTH = 64
-    QUERY_BASE = frozendict({'output': ['name', 'groupid'], 'selectHosts': 'count'})
+    QUERY_BASE = frozendict({'output': ['name', 'groupid']})
+    QUERY_EXTENDED = frozendict({'output': ['name', 'groupid'], 'selectHosts': 'count'})
 
     def __init__(self, name, dc_bound=False, **kwargs):
         self.new = False  # Used by actions
@@ -54,27 +55,33 @@ class ZabbixHostGroupContainer(ZabbixBaseContainer):
 
     @classmethod
     def from_zabbix_ids(cls, zapi, zabbix_ids):
-        params = dict({'groupids': zabbix_ids}, **cls.QUERY_BASE)
+        params = dict({'groupids': zabbix_ids}, **cls.QUERY_EXTENDED)
         response = cls.call_zapi(zapi, 'hostgroup.get', params=params)
 
         return [cls.from_zabbix_data(zapi, item) for item in response]
 
     @classmethod
-    def _is_visible_from_dc(cls, zabbix_object, dc_name):
+    def _is_visible_from_dc(cls, zabbix_object, dc_name, allow_global=False):
         match = cls.RE_NAME_WITH_DC_PREFIX.match(zabbix_object['name'])
 
         if match:
             # RE_NAME_WITH_DC_PREFIX results in exactly two (named) groups: dc name and hostgroup name:
             return match.group('dc_name') == dc_name
         else:
-            return True
+            return allow_global
 
     @classmethod
-    def all(cls, zapi, dc_name, **kwargs):
-        response = cls.call_zapi(zapi, 'hostgroup.get', params=dict(cls.QUERY_BASE))
+    def all(cls, zapi, dc_name, include_global=False, count_hosts=False, **kwargs):
+        if count_hosts:
+            query = cls.QUERY_EXTENDED
+        else:
+            query = cls.QUERY_BASE
+
+        response = cls.call_zapi(zapi, 'hostgroup.get', params=dict(query))
 
         if dc_name is not None:
-            response = (hostgroup for hostgroup in response if cls._is_visible_from_dc(hostgroup, dc_name))
+            response = (hostgroup for hostgroup in response if cls._is_visible_from_dc(hostgroup, dc_name,
+                                                                                       allow_global=include_global))
 
         return [cls.from_zabbix_data(zapi, item, **kwargs) for item in response]
 
@@ -92,12 +99,23 @@ class ZabbixHostGroupContainer(ZabbixBaseContainer):
                     MonHostgroupView.clear_cache(dc_name, dc_bound, full=full)
 
     def refresh(self):
-        params = dict(filter={'name': self.name}, **self.QUERY_BASE)
+        params = dict(filter={'name': self.name}, **self.QUERY_EXTENDED)
         self._api_response = self._call_zapi('hostgroup.get', params=params, mon_object=MON_OBJ_HOSTGROUP,
                                              mon_object_name=self.name_without_dc_prefix)
         zabbix_object = self.parse_zabbix_get_result(self._api_response, mon_object=MON_OBJ_HOSTGROUP,
                                                      mon_object_name=self.name_without_dc_prefix)
         self.init(zabbix_object)
+
+    def _update_related_user_groups(self):
+        from api.mon.backends.zabbix.containers.user_group import ZabbixUserGroupContainer
+
+        match = self.RE_NAME_WITH_DC_PREFIX.match(self.name)
+
+        if match:
+            dc_name = match.group('dc_name')
+
+            for related_user_group in ZabbixUserGroupContainer.all(self._zapi, dc_name, resolve_users=False):
+                related_user_group.add_hostgroup_right(self.zabbix_id)
 
     def create(self):
         params = {'name': self.name}
@@ -109,6 +127,8 @@ class ZabbixHostGroupContainer(ZabbixBaseContainer):
         self.zabbix_object = params
         # Invalidate cache for mon_hostgroup_list
         self._clear_hostgroup_list_cache(self.name)
+        # Add our new hostgroup to all user groups related to our DC prefix
+        self._update_related_user_groups()
         self.new = True
 
         return self.CREATED
