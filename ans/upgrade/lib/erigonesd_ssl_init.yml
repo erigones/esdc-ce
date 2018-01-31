@@ -12,12 +12,7 @@
 #   - ERIGONESD_SSL_NEW
 #
 
-- name: Set erigonesd SSL file fact
-  set_fact:
-    ERIGONESD_SSL_CERT_FILE: "/etc/pki/tls/certs/dc-erigonesd.crt"
-    ERIGONESD_SSL_KEY_FILE: "/etc/pki/tls/certs/dc-erigonesd.key"
-    ERIGONESD_SSL_FILE: "/etc/pki/tls/certs/dc-erigonesd.pem"
-  delegate_to: "{{ mgmt_host | default('127.0.0.1') }}"
+- include: "{{ upg_base }}/lib/erigonesd_ssl_vars.yml"
 
 - name: Configure openssl.cnf for generating new erigonesd SSL certificate
   ini_file: dest="/etc/pki/tls/openssl.cnf"

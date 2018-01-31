@@ -1,4 +1,0 @@
-This upgrade exists  because of the 3.0.0-beta1 release of the mgmt appliance,
-which was shipped with:
-    - broken deployment of Guacamole (VM console) - Issue #344
-    - incorrect port of ZK rest service in haproxy

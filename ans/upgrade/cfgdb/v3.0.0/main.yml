@@ -10,7 +10,7 @@
         mode=0755
 
 - name: Get or create erigonesd SSL certificate (locally)
-  include: "{{ upg_base }}/lib/erigonesd_ssl.yml"
+  include: "{{ upg_base }}/lib/erigonesd_ssl_init.yml"
 
 - name: Check /esdc/settings/security/services_ssl_cert in ZooKeeper
   command: /usr/local/bin/query_cfgdb get /esdc/settings/security/services_ssl_cert

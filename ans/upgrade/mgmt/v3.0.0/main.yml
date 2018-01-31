@@ -12,7 +12,7 @@
     cfgdb_ip_mdata_key: "org.erigones:cfgdb_ip"
 
 - name: Get or create erigonesd SSL certificate (locally)
-  include: "{{ upg_base }}/lib/erigonesd_ssl.yml"
+  include: "{{ upg_base }}/lib/erigonesd_ssl_init.yml"
 
 - name: Read current metadata
   shell: mdata-list
@@ -41,16 +41,22 @@
       config:
         - "\tmode tcp"
         - "\tbind *:15672 ssl crt {{ ERIGONESD_SSL_FILE }}"
+        - "\toption tcplog"
+        - "\toption tcpka"
+        - "\ttimeout client 3h"
+        - "\ttimeout server 3h"
         - "\tserver rabbitmq-mgmt 127.0.0.1:5672"
     - name: redis
       config:
         - "\tmode tcp"
         - "\tbind *:16379 ssl crt {{ ERIGONESD_SSL_FILE }}"
+        - "\toption tcplog"
         - "\tserver redis-mgmt 127.0.0.1:6379"
     - name: zk_rest
       config:
         - "\tmode tcp"
         - "\tbind *:12181"
+        - "\toption tcplog"
         - "\tserver zk-rest-cfgdb {{ cfgdb_ip }}:12181"
   notify:
     - reload haproxy

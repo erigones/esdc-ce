@@ -1,0 +1,13 @@
+#
+# Set some facts related to mgmt:
+#   - ERIGONESD_SSL_CERT_FILE
+#   - ERIGONESD_SSL_KEY_FILE
+#   - ERIGONESD_SSL_FILE
+#
+
+- name: Set erigonesd SSL file fact
+  set_fact:
+    ERIGONESD_SSL_CERT_FILE: "/etc/pki/tls/certs/dc-erigonesd.crt"
+    ERIGONESD_SSL_KEY_FILE: "/etc/pki/tls/certs/dc-erigonesd.key"
+    ERIGONESD_SSL_FILE: "/etc/pki/tls/certs/dc-erigonesd.pem"
+  delegate_to: "{{ mgmt_host | default('127.0.0.1') }}"
