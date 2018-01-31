@@ -701,7 +701,7 @@ class DefaultDcSettingsSerializer(DcSettingsSerializer):
                                           help_text=_('Currently used SMS provider.'))
     SMS_SERVICE_USERNAME = s.CharField(label='SMS_SERVICE_USERNAME', max_length=255, required=False,
                                        help_text=_('Username required for the selected SMS provider.'))
-    SMS_SERVICE_PASSWORD = s.CharField(label='SMS_SERVICE_USERNAME', max_length=255, required=False,
+    SMS_SERVICE_PASSWORD = s.CharField(label='SMS_SERVICE_PASSWORD', max_length=255, required=False,
                                        help_text=_('Password required for the selected SMS provider.'))
     SMS_FROM_NUMBER = s.SafeCharField(label='SMS_FROM_NUMBER', max_length=64, required=False,
                                       help_text=_('Phone number used as sender for outgoing text messages.'))
