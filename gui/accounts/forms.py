@@ -184,7 +184,6 @@ class _RegisterForm(forms.ModelForm):
     """
     User details registration form, for basic user data (Django users table)
     """
-    validate_against_users = True
     email_help_text = _('You will receive an email to activate your account.')
 
     class Meta:
@@ -216,10 +215,9 @@ class _RegisterForm(forms.ModelForm):
     def clean_email(self, *args, **kwargs):
         email = self.cleaned_data['email']
 
-        if self.validate_against_users:
-            if User.objects.filter(Q(email__iexact=email) | Q(username__iexact=email)):
-                raise forms.ValidationError(_('This email address is already in use. Please supply a different email '
-                                              'address.'))
+        if User.objects.filter(Q(email__iexact=email) | Q(username__iexact=email)).exists():
+            raise forms.ValidationError(_('This email address is already in use. Please supply a different email '
+                                          'address.'))
 
         email_clean_regex = re.compile("^[A-Za-z0-9@.+_-]+$")
 
