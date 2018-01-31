@@ -16,16 +16,16 @@
   <tbody id="tasklog" class="nowrap">
     {% for log in tasklog %}
     <tr class="{{ log.task }} {{ log.status }}{% if log.status == 'PENDING' and log.task in pending_tasks %} running{% endif %}" data-task_id="{{ log.task }}">
-      <td><i class="icon-time"></i> <span>{{ log.time|date:"H:i:s" }}<br>{{ log.time|date:"SHORT_DATE_FORMAT" }}</span></td>
+      <td><i class="icon-time"></i>&nbsp;<span>{{ log.time|date:"H:i:s" }}<br>{{ log.time|date:"SHORT_DATE_FORMAT" }}</span></td>
       <td>
         <div class="status">
-          <i class="icon-{{ log.status }}" title="{% trans log.status %}"></i> <span class="hidden-phone">{% trans log.status %}</span><br>
-          <small class="hidden-phone tiny"><i class="icon-link"></i> {{ log.task }}</small>
+          <i class="icon-{{ log.status }}" title="{% trans log.status %}"></i>&nbsp;<span class="hidden-phone">{% trans log.status %}</span><br>
+          <small class="hidden-phone tiny"><i class="icon-link"></i>&nbsp;{{ log.task }}</small>
         </div>
       </td>
-      <td class="wrap"><i class="icon-{{ log.object_type }}"></i> <span>{{ log.get_object_alias }}</span><br><small>{{ log.get_object_name }}</small></td>
-      <td class="log-msg wrap"><i class="icon-task-flag{{ log.flag }}"></i> <span class="logmsg">{% if log.msg %}{% trans log.msg %}{% endif %}</span></td>
-      <td class="log-user"><i class="icon-user"></i> <span>{{ log.get_username }}</span></td>
+      <td class="wrap"><i class="icon-{{ log.object_type }}"></i>&nbsp;<span>{{ log.get_object_alias }}</span><br><small>{{ log.get_object_name }}</small></td>
+      <td class="log-msg wrap"><i class="icon-task-flag{{ log.flag }}"></i>&nbsp;<span class="logmsg">{% if log.msg %}{% trans log.msg %}{% endif %}</span></td>
+      <td class="log-user"><i class="icon-user"></i>&nbsp;<span>{{ log.get_username }}</span></td>
       <td class="log-detail wrap">{% if log.detail %}<pre>{{ log.detail }}</pre>{% endif %}</td>
     </tr>
     {% empty %}

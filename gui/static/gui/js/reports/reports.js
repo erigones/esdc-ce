@@ -23,6 +23,7 @@ function report_table_init() {
 function filter_links() {
   var form = $('#filter_form');
   var dateinput = form.find('.input-date');
+  var form_confirm_btn = form.find('#report_filter');
 
   form.find('a.filter_action').click(function() {
     filter_action(form, $(this));
@@ -30,6 +31,10 @@ function filter_links() {
   });
 
   dateinput.datepicker({dateFormat: 'yy-mm-dd'});
+
+  if ((form_confirm_btn.length === 1) && !form_confirm_btn.hasClass('disabled') && form_confirm_btn.is(':visible')) {
+    form.on('keypress', {btn_enter: form_confirm_btn}, enter_click);
+  }
 }
 
 function filter_action(form, btn) {
