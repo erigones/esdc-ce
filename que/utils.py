@@ -454,8 +454,7 @@ def ping(queue, timeout=True, count=1):
         try:
             res = cq.control.ping(destination=workers, timeout=timeout)
         except Exception as ex:
-            logger.critical('Could not ping task queue "%s" workers: %s', queue, workers)
-            logger.exception(ex)
+            logger.log(IMPORTANT, 'Could not ping task queue "%s" workers: %s error: %s', queue, workers, ex)
         else:
             if res:
                 for answer in res:
