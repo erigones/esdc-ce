@@ -135,6 +135,13 @@
         value: "{% if adminoverlay_IPs['nodes'][ansible_fqdn] is defined %}{{ adminoverlay_IPs['nodes'][ansible_fqdn]['mac'] }}{% endif %}"
     notify: reload overlays config
 
+  - name: "change VNC listen address for VMs"
+    lineinfile:
+      dest: "{{ usbconfig }}"
+      state: "{% if adminoverlay_IPs['nodes'][ansible_fqdn] is defined %}present{% else %}absent{% endif %}"
+      regexp: '^vnc_listen_address='
+      line:    "vnc_listen_address=\"{% if adminoverlay_IPs['nodes'][ansible_fqdn] is defined %}{{ adminoverlay_IPs['nodes'][ansible_fqdn]['ip'] }}{% endif %}\""
+
   - name: remove overlay arp file if necessary
     file:
       state: absent
