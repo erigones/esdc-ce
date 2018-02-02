@@ -11,6 +11,7 @@
 {% if overlay_rules[orule]['nodelist']|issuperset([ansible_fqdn]) or overlay_rules[orule]['nodelist'] == 'all' %}
 {% if external_ip != 0 %}
 block out log quick on external0 proto udp from {{ external_ip }} to any port = {{ overlay_rules[orule]['port'] }}
+block in log quick on external0 proto udp from any to {{ external_ip }} port = {{ overlay_rules[orule]['port'] }}
 {% endif %}
 {% endif %}
 {% endfor %}
