@@ -1174,15 +1174,14 @@ case ${CMD,,} in
 	adminoverlay-update)
 		node_ip_list="$2"
 
-		if check_adminoverlay_enabled; then
+		if ! check_adminoverlay_enabled; then
 			echo "Error: Adminoverlay is not yet initialized."
 			echo "Use adminoverlay-init command instead."
 			exit 1
 		fi
 
 		if [[ -z "${node_ip_list}" ]]; then
-			echo "No nodes specified. Nothing to do."
-			echo "If you want to update configuration on compute nodes, use the 'update' subcommand instead."
+			echo "No node IP addresses specified as parameter. Running the 'update' command instead."
 			echo
 		fi
 
