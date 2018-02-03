@@ -75,7 +75,7 @@ SSH_ARGS=${SSH_ARGS:-"\
 -o GSSAPIAuthentication=no \
 -o ControlMaster=auto \
 -o ControlPath=~/.ssh/master-%r@%h:%p \
--o ControlPersist=1m \
+-o ControlPersist=2m \
 "}
 
 ###############################################################
