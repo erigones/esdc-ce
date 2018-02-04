@@ -1,0 +1,3 @@
+# https://github.com/erigones/esdc-ce/issues/350
+- name: Copy rabbitmq.config file to /etc/rabbitmq
+  copy: src="{{ current_task_dir }}/files/rabbitmq.config" dest=/etc/rabbitmq/rabbitmq.config owner=root group=root mode=0644
