@@ -14,7 +14,7 @@ ip_drop_packet:entry
 
 	printf("\nIPsec dropped an %s IPv4 packet.\n",
 			arg1 ? "inbound" : "outbound");
-	printf("IPPROTO: %d    (1-ICMP, 6-TCP, 17-UDP; see netinet/in.h)\n",
+	printf("IPPROTO: %d    (1=ICMP, 6=TCP, 17=UDP; 50=ESP, see netinet/in.h)\n",
 			*(((mblk_t *)arg0)->b_rptr+9));
 	printf("Src IP address: %d.%d.%d.%d\n",
 			*(((mblk_t *)arg0)->b_rptr+12),

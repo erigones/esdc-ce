@@ -70,14 +70,14 @@ $0 adminoverlay-update [nodename1=ip1,nodename=ip2,...]
 $0 adminoverlay-info
 
 Firewall:
-$0 globally-enable-firewall <allowed_IP_list>
+$0 globally-enable-firewall [allowed_IP_list]
 $0 globally-disable-firewall
 $0 globally-update-firewall
 
 Examples:
 $0 create <overlay_rule_name>
 $0 create <overlay_rule_name> cn01.local,cn02.local,cn03.local
-$0 create customers all \"-e vxlan -p vxlan/listen_ip=0.0.0.0,vxlan/listen_port=4790 -s files -p files/config=${OVERLAY_ARP_JSON_DIR}/customers_overlay.json -p mtu=1400\"
+$0 create customers all "-e vxlan -p vxlan/listen_ip=0.0.0.0,vxlan/listen_port=4790 -s files -p files/config=${OVERLAY_ARP_JSON_DIR}/customers_overlay.json -p mtu=1400"
 $0 adminoverlay-init 10.10.10.0/255.255.0.0
 $0 adminoverlay-init 10.10.10.0/255.255.255.0 cn01.local=10.10.10.11,cn02.local=10.10.10.12
 $0 adminoverlay-update cn01.local=10.10.10.21,cn02.local=10.10.10.22
@@ -85,10 +85,10 @@ $0 update
 $0 update customers
 $0 delete customers
 $0 list
-$0 globally-enable-firewall <admin_IP1,allowed_IP2,good_subnet/24>
-$0 globally-enable-firewall <12.13.14.0/26,100.150.200.5>
+$0 globally-enable-firewall admin_IP1,allowed_IP2,good_subnet/24
+$0 globally-enable-firewall 12.13.14.0/26,100.150.200.5
 
-To enable debug output, append \"-debug\" to a subcommand, e.g:
+To enable debug output, append "-debug" to a subcommand, e.g:
 $0 create-debug <overlay_rule_name>
 
 To update everything everywhere, run
@@ -1097,7 +1097,8 @@ parse_node_dc_list
 case ${CMD,,} in
 	create)
 		ORULE_NAME="${2}"
-		NODE_LIST="$(echo "${3}" | ${SED} -e 's/[[:space:]]//g')"	# remove whitespaces
+		# remove whitespaces and unnecessary commas
+		NODE_LIST="$(echo "${3}" | ${SED} -e 's/[[:space:]]//g' -e 's/^,//' -e 's/,$//')"
 		ORULE_STRING="${4}"
 
 		create_overlay
@@ -1110,7 +1111,8 @@ case ${CMD,,} in
 	update)
 		# if ORULE_NAME is not specified, we'll update all overlays on all nodes
 		ORULE_NAME="${2}"
-		NODE_LIST="$(echo "${3}" | ${SED} -e 's/[[:space:]]//g')"	# remove whitespaces
+		# remove whitespaces and unnecessary commas
+		NODE_LIST="$(echo "${3}" | ${SED} -e 's/[[:space:]]//g' -e 's/^,//' -e 's/,$//')"
 		ORULE_STRING="${4}"
 
 		update_overlays
@@ -1172,15 +1174,14 @@ case ${CMD,,} in
 	adminoverlay-update)
 		node_ip_list="$2"
 
-		if check_adminoverlay_enabled; then
+		if ! check_adminoverlay_enabled; then
 			echo "Error: Adminoverlay is not yet initialized."
 			echo "Use adminoverlay-init command instead."
 			exit 1
 		fi
 
 		if [[ -z "${node_ip_list}" ]]; then
-			echo "No nodes specified. Nothing to do."
-			echo "If you want to update configuration on compute nodes, use the 'update' subcommand instead."
+			echo "No node IP addresses specified as parameter. Running the 'update' command instead."
 			echo
 		fi
 
@@ -1255,6 +1256,10 @@ case ${CMD,,} in
 
 	globally-update-firewall)
 		run_ansible
+		;;
+
+	update-ans-hosts)
+		echo "Ansible hosts file updated"
 		;;
 	*)
 		echo "Unknown command: $CMD"
