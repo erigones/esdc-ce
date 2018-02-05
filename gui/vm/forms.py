@@ -563,8 +563,9 @@ class SnapshotDefineForm(SerializerForm, HostnameForm):
                                      widget=forms.Select(attrs={'class': 'input-select2 narrow',
                                                                 'required': 'required'}))
     schedule = forms.CharField(label=_('Schedule'), required=True, max_length=100,
-                               help_text=_('Schedule in CRON format. Please use your local time for the hour field '
-                                           '(will be internally converted into UTC).'),
+                               help_text=_('CRON format (<minute> <hour> <day of month> <month> <day of week>). '
+                                           'Use your local time for the hour field '
+                                           '(it will be internally converted into UTC).'),
                                widget=forms.TextInput(attrs={'class': 'input-transparent narrow',
                                                              'required': 'required'}))
     retention = forms.IntegerField(label=_('Retention'), max_value=65536, min_value=0, required=True,
