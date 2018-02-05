@@ -69,21 +69,25 @@ td .msg {
   text-align: center;
   font-weight: bold;
 }
+/* line 80, ../scss/tables.scss */
+td.packed {
+  line-height: 11px;
+}
 
-/* line 81, ../scss/tables.scss */
+/* line 85, ../scss/tables.scss */
 .nowrap tr td {
   white-space: nowrap;
 }
-/* line 83, ../scss/tables.scss */
+/* line 87, ../scss/tables.scss */
 .nowrap tr td.wrap {
   white-space: normal;
 }
 
-/* line 88, ../scss/tables.scss */
+/* line 92, ../scss/tables.scss */
 table.box {
   background-color: #FAFAFA;
 }
-/* line 92, ../scss/tables.scss */
+/* line 96, ../scss/tables.scss */
 table.box thead, table.box tfoot {
   background: #e5e5e5;
   background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4gPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiBncmFkaWVudFVuaXRzPSJvYmplY3RCb3VuZGluZ0JveCIgeDE9IjAuNSIgeTE9IjAuMCIgeDI9IjAuNSIgeTI9IjEuMCI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ViZWJlYiIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2U1ZTVlNSIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JhZCkiIC8+PC9zdmc+IA==');
@@ -98,28 +102,28 @@ table.box thead, table.box tfoot {
   -webkit-border-radius: 3px 3px;
   border-radius: 3px 3px 0 0 / 3px 3px 0 0;
 }
-/* line 99, ../scss/tables.scss */
+/* line 103, ../scss/tables.scss */
 table.box.table-striped tbody tr:nth-child(odd) td, table.box.table-striped tbody tr:nth-child(odd) th {
   background: #FDFDFD;
 }
-/* line 103, ../scss/tables.scss */
+/* line 107, ../scss/tables.scss */
 table.box.break-words {
   word-wrap: break-word;
   word-break: break-all;
 }
-/* line 109, ../scss/tables.scss */
+/* line 113, ../scss/tables.scss */
 table.box.table-striped tbody tr.info td {
   background-color: #d9edf7;
 }
-/* line 112, ../scss/tables.scss */
+/* line 116, ../scss/tables.scss */
 table.box.table-striped tbody tr.error td {
   background-color: #f2dede;
 }
-/* line 117, ../scss/tables.scss */
+/* line 121, ../scss/tables.scss */
 table.box .button {
   line-height: normal;
 }
-/* line 118, ../scss/tables.scss */
+/* line 122, ../scss/tables.scss */
 table.box .button i {
   font-size: 14px;
 }
@@ -127,32 +131,32 @@ table.box .button i {
 /*
  *  Responsive tables
  */
-/* line 130, ../scss/tables.scss */
+/* line 134, ../scss/tables.scss */
 table.table-responsive th, table.table-responsive td {
   word-wrap: break-word;
   max-width: 200px;
 }
 
-/* line 135, ../scss/tables.scss */
+/* line 139, ../scss/tables.scss */
 .tab-header {
   height: auto;
   word-wrap: break-word;
   overflow: hidden;
 }
 
-/* line 141, ../scss/tables.scss */
+/* line 145, ../scss/tables.scss */
 p.table_desc {
   margin: 0;
   color: #454545;
 }
 
-/* line 146, ../scss/tables.scss */
+/* line 150, ../scss/tables.scss */
 div.dataTables_paginate {
   float: none;
   margin-bottom: 20px;
   padding-right: 10px;
 }
-/* line 152, ../scss/tables.scss */
+/* line 156, ../scss/tables.scss */
 div.dataTables_paginate a {
   background: #ededed;
   background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4gPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiBncmFkaWVudFVuaXRzPSJvYmplY3RCb3VuZGluZ0JveCIgeDE9IjAuNSIgeTE9IjAuMCIgeDI9IjAuNSIgeTI9IjEuMCI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2VkZWRlZCIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JhZCkiIC8+PC9zdmc+IA==');
@@ -206,31 +210,31 @@ div.dataTables_paginate a:active {
   background-image: -webkit-linear-gradient(top, #d6d6d6, #e8e8e8);
   background-image: linear-gradient(to bottom, #d6d6d6, #e8e8e8);
 }
-/* line 160, ../scss/tables.scss */
+/* line 164, ../scss/tables.scss */
 div.dataTables_paginate .first {
   -moz-border-radius: 4px 0 0 4px;
   -webkit-border-radius: 4px;
   border-radius: 4px 0 0 4px;
 }
-/* line 164, ../scss/tables.scss */
+/* line 168, ../scss/tables.scss */
 div.dataTables_paginate .last {
   -moz-border-radius: 0 4px 4px 0;
   -webkit-border-radius: 0;
   border-radius: 0 4px 4px 0;
 }
-/* line 168, ../scss/tables.scss */
+/* line 172, ../scss/tables.scss */
 div.dataTables_paginate .ui-state-disabled, div.dataTables_paginate .ui-state-disabled:hover {
   background: #ddd;
   cursor: default;
   text-shadow: none;
 }
 
-/* line 176, ../scss/tables.scss */
+/* line 180, ../scss/tables.scss */
 .inner-well .table th, .inner-well .table td {
   border: none;
 }
 
-/* line 181, ../scss/tables.scss */
+/* line 185, ../scss/tables.scss */
 #debug {
   position: fixed;
   bottom: 0;
@@ -241,13 +245,13 @@ div.dataTables_paginate .ui-state-disabled, div.dataTables_paginate .ui-state-di
   padding: 0 5px;
 }
 
-/* line 191, ../scss/tables.scss */
+/* line 195, ../scss/tables.scss */
 table#debug-query-table tr td {
   padding-top: 0;
   padding-bottom: 0;
 }
 
-/* line 196, ../scss/tables.scss */
+/* line 200, ../scss/tables.scss */
 table#debug-query-table code {
   border: 0;
   margin: 0;

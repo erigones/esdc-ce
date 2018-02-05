@@ -76,6 +76,10 @@ td {
     text-align: center;
     font-weight: bold;
   }
+
+  &.packed {
+    line-height: 11px;
+  }
 }
 
 .nowrap tr td {

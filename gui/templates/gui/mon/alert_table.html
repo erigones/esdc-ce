@@ -36,14 +36,11 @@
         <i class="icon-{{ alert.acknowledged|yesno:"ok,remove" }}"></i>
       </td>
       {% if show_events %}
-      <td class="log-detail wrap">
+      <td class="log-detail wrap packed">
         {% if alert.events %}{% for event in alert.events %}
         <small class="hidden-phone tiny">
-          <i class="icon-time"></i> {{ event.clock|dttimestamp:TZ|date:"LONG_DATETIME_FORMAT"  }} - {{ event.status }} - {% trans "Ack" %}:
-          <span{% if event.acknowledges %} title="{% for ack in event.acknowledges %}{{ ack.user }}: {{ ack.message }}
-{% endfor %}" data-toggle="tooltip" data-placement="top"{% endif %}>
-            <i class="icon-{{ event.acknowledged|yesno:"ok,remove" }}"></i>
-          </span>
+          <i class="icon-time"></i> {{ event.clock|dttimestamp:TZ|date:"LONG_DATETIME_FORMAT"  }} - {{ event.status }} - {% trans "Ack" %}:&nbsp;<i class="icon-{{ event.acknowledged|yesno:"ok,remove" }}"></i>
+          {% if event.acknowledges %}{% for ack in event.acknowledges %}<br>&nbsp;&nbsp;&#8230;{{ ack.user }}:&nbsp;{{ ack.message }}{% endfor %}{% endif %}
         </small><br>
         {% endfor %}{% endif %}
       </td>
