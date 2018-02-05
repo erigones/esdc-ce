@@ -471,6 +471,11 @@ class AdminServerNicSettingsForm(ServerNicSettingsForm):
     primary = forms.BooleanField(label=_('Primary NIC?'), required=False,
                                  help_text=_("Use this NIC's gateway as VM's default gateway."),
                                  widget=forms.CheckboxInput(attrs={'class': 'normal-check'}))
+    use_net_dns = forms.BooleanField(label=_('Set DNS resolvers from network\'s configuration?'), required=False,
+                                     help_text=_("If checked, then the virtual server inherits DNS resolvers from "
+                                                 "network's configuration, otherwise the virtual datacenter resolvers "
+                                                 "are used."),
+                                     widget=forms.CheckboxInput(attrs={'class': 'normal-check'}))
     allow_dhcp_spoofing = forms.BooleanField(label=_('Allow DHCP Spoofing?'), required=False,
                                              help_text=_('Allow packets required for DHCP server.'),
                                              widget=forms.CheckboxInput(attrs={'class': 'normal-check'}))
@@ -497,6 +502,9 @@ class AdminServerNicSettingsForm(ServerNicSettingsForm):
 
         self.max_nics = NIC_ID_MAX
         self.fields['net'].choices = [(i.name, i) for i in get_subnets(request, include=net_inc)]
+        self.fields['use_net_dns'].help_text += _(' Current VM configuration: %(resolvers)s') % {
+            'resolvers': ', '.join(vm.resolvers),
+        }
 
         if not request.user.is_staff:
             self.fields['allow_dhcp_spoofing'].widget.attrs['disabled'] = 'disabled'

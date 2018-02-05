@@ -21,6 +21,7 @@
 {% endif %}
 {# {% include "gui/form_field.html" with field=nic_settingsform.allowed_ips %} #}
 {# {% include "gui/form_field.html" with field=nic_settingsform.blocked_outgoing_ports %} #}
+{% include "gui/form_field_checkbox.html" with field=nic_settingsform.use_net_dns %}
 {% include "gui/form_field_checkbox.html" with field=nic_settingsform.allow_dhcp_spoofing %}
 {% include "gui/form_field_checkbox.html" with field=nic_settingsform.allow_ip_spoofing %}
 {% include "gui/form_field_checkbox.html" with field=nic_settingsform.allow_mac_spoofing %}
