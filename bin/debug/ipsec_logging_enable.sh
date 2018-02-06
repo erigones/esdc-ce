@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ndd -set ip ipsec_policy_log_interval 1
 ikeadm set debug all
