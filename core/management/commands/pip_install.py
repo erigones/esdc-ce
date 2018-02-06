@@ -20,18 +20,18 @@ class Command(DanubeCloudCommand):
             self.local('pip install --no-cache-dir %s -r %s' % (params, req_path))
             self.display('%s have been successfully installed.\n\n ' % req_path, color='green')
 
-    def pip_install_pip(self):
+    def pip_update_pip(self):
         self.local('pip install -U pip')
         self.display('pip has been successfully updated.\n\n ', color='green')
 
     def handle(self, update=False, que_only=False, **options):
+        # Always update pip first
+        self.pip_update_pip()
+
         if update:
             params = '-U'
         else:
             params = ''
-
-            # Update pip immediately during first install
-            self.pip_install_pip()
 
         with lcd(self.PROJECT_DIR):
             self.pip_install(self.req_file_both, params=params)
