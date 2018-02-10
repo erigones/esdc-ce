@@ -1,4 +1,4 @@
 #!/bin/bash
 svcadm disable ike policy
-ipseckey flush
+ipseckey -n flush
 svcadm enable ike policy

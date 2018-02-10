@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ndd -set ip ipsec_policy_log_interval 1
-ikeadm set debug all
+ikeadm -n set debug all
 cat << EOF
 
 IPSec debugging enabled. See these logfiles:
