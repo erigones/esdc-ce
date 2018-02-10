@@ -1,2 +1,2 @@
 #!/bin/bash
-ipseckey flush
+ipseckey -n flush
