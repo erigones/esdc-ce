@@ -166,19 +166,6 @@ class AdminUserProfileForm(SerializerForm):
                     del data[index]
         return data
 
-    def clean(self):
-        cleaned_data = super(AdminUserProfileForm, self).clean()
-        phone = cleaned_data.get('phone')
-        cleaned_data['phone'] = phone.replace(' ', '')
-
-        phone2 = cleaned_data.get('phone2')
-        cleaned_data['phone2'] = phone2.replace(' ', '')
-
-        alerting_phone = cleaned_data.get('alerting_phone')
-        cleaned_data['alerting_phone'] = alerting_phone.replace(' ', '')
-
-        return cleaned_data
-
 
 class AdminChangePasswordForm(PasswordForm):
     """
