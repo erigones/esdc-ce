@@ -94,7 +94,7 @@ def remove_dc_binding_virt_object(task_id, msg, obj, user=None, dc_id=None):
             dc_id = obj.dc_bound.id
 
     obj.dc_bound = None
-    obj.save(update_fields=('dc_bound', 'changed'))
+    obj.save(update_fields=('dc_bound',))
 
     task_id = task_id_from_task_id(task_id, tg=TG_DC_UNBOUND, dc_id=dc_id, keep_task_suffix=True)
     task_log_success(task_id, msg, obj=obj, owner=getattr(obj, 'owner', None), user=user, update_user_tasks=False,
