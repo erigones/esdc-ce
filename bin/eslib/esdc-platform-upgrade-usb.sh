@@ -10,10 +10,11 @@ ESLIB="${ESLIB:-"${ERIGONES_HOME}/bin/eslib"}"
 
 ESDC_VER="${1}"
 if [[ -z "${ESDC_VER}" ]]; then
-	echo "Usage:   $0 <new_dc_version> [-v] [-f] [-y]"
+	echo "Usage:   $0 <new_dc_version> [-v] [-f] [-y] [-u <usr:pwd>]"
 	echo "Example: $0 v3.0.1"
 	echo "Parameters:"
 	echo "  -v                verbose download"
+	echo "  -u <usr:pwd>      username and password required for accessing the enterprise edition download server"
 	echo "  -f                force upgrade even when the requested version is already installed"
 	echo "  -y                assume \"yes\" as default answer for all questions"
 
@@ -28,8 +29,10 @@ fi
 # curl: 15s conn T/O; allow redirects; 1000s max duration, fail on 404
 CURL_DEFAULT_OPTS="--connect-timeout 15 -L --max-time 3600 -f"
 CURL_QUIET="-s"
+CURL_AUTH=""
 FORCE=0
 YES=0
+
 shift
 while [[ ${#} -gt 0 ]]; do
 	case "${1}" in
@@ -41,6 +44,10 @@ while [[ ${#} -gt 0 ]]; do
 			;;
 		"-y")
 			YES=1
+			;;
+		"-u")
+			shift
+			CURL_AUTH="${1}"
 			;;
 		*)
 			echo "WARNING: Ignoring unknown argument '${1}'"
@@ -106,7 +113,23 @@ umount_usb_key
 printmsg "Downloading new USB image"
 ESDC_IMG="${WANTED_USB_IMG_VARIANT}${NEW_USB_VER}.img"
 ESDC_IMG_FULL="${UPG_DIR}/${ESDC_IMG}"
-ESDC_DOWNLOAD_URL="https://download.erigones.org/esdc/usb/stable/${ESDC_IMG}.gz"
+
+if [[ "${WANTED_USB_IMG_VARIANT}" == *"-ee-"* ]]; then
+	ESDC_DOWNLOAD_URL="https://download.erigones.com/esdc/usb/${ESDC_IMG}.gz"
+
+	if [[ -z "${CURL_AUTH}" ]]; then
+		read -p "*** Enter your enterprise edition download username: " -r curl_username
+		read -p "*** Enter your enterprise edition download password: " -rs curl_password
+		echo
+		CURL_AUTH="${curl_username}:${curl_password}"
+	fi
+else
+	ESDC_DOWNLOAD_URL="https://download.erigones.org/esdc/usb/stable/${ESDC_IMG}.gz"
+fi
+
+if [[ -n "${CURL_AUTH}" ]]; then
+	CURL_EXTRA_OPTS="-u ${CURL_AUTH}"
+fi
 
 trap cleanup EXIT
 
@@ -114,7 +137,7 @@ printmsg "Download URL: ${ESDC_DOWNLOAD_URL}"
 mkdir -p "${UPG_DIR}"
 
 # shellcheck disable=SC2086
-if ! ${CURL} ${CURL_QUIET} ${CURL_DEFAULT_OPTS} -o "${ESDC_IMG_FULL}.gz" "${ESDC_DOWNLOAD_URL}"; then
+if ! ${CURL} ${CURL_QUIET} ${CURL_DEFAULT_OPTS} ${CURL_EXTRA_OPTS} -o "${ESDC_IMG_FULL}.gz" "${ESDC_DOWNLOAD_URL}"; then
 	die 5 "Cannot download new USB image archive. Please check your internet connection."
 fi
 
