@@ -149,7 +149,7 @@ USB_DEV_P0="${USB_DEV/p1*}p0"
 
 # confirmation
 printmsg "Going to write ${ESDC_IMG} image to USB device: ${USB_DEV_P0}"
-printmsg "This will overwrite the whole the USB device!"
+printmsg "This will overwrite the whole USB device!"
 
 if [[ "${YES}" -ne 1 ]]; then
 	read -p "*** Are you sure you want to continue? [y/N] " -n 1 -r confirm
