@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Erigones GUI\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-12 10:19+0000\n"
+"POT-Creation-Date: 2018-02-15 07:25+0000\n"
 "PO-Revision-Date: 2014-02-27 10:46+0100\n"
 "Last-Translator: Erigones, s. r. o. <erigones@erigones.com>\n"
 "Language-Team: Erigones, s. r. o. <erigones@erigones.com>\n"
@@ -27,7 +27,7 @@ msgstr "Login alebo email"
 msgid "Username or Email"
 msgstr "Login alebo email"
 
-#: accounts/forms.py:40 accounts/forms.py:234
+#: accounts/forms.py:40 accounts/forms.py:232
 msgid "Password"
 msgstr "Heslo"
 
@@ -65,7 +65,7 @@ msgstr ""
 msgid "Your password at %(site_name)s has been reset to: %(password)s"
 msgstr "Vase heslo na stranke %(site_name)s bolo zmenene na: %(password)s"
 
-#: accounts/forms.py:171 accounts/forms.py:239 dc/user/forms.py:77
+#: accounts/forms.py:171 accounts/forms.py:237 dc/user/forms.py:77
 #: profile/forms.py:388
 msgid "New password"
 msgstr "Nové heslo"
@@ -74,63 +74,63 @@ msgstr "Nové heslo"
 msgid "Confirm new password"
 msgstr "Nové heslo (znova)"
 
-#: accounts/forms.py:188
+#: accounts/forms.py:187
 msgid "You will receive an email to activate your account."
 msgstr ""
 "Na Vašu emailovú adresu bude doručený email, na aktivovanie Vášho "
 "použivateľského účtu."
 
-#: accounts/forms.py:195 dc/user/forms.py:74 models/userprofile.py:89
+#: accounts/forms.py:194 dc/user/forms.py:74 models/userprofile.py:89
 #: profile/forms.py:42
 msgid "Email address"
 msgstr "Email"
 
-#: accounts/forms.py:199 dc/user/forms.py:70 profile/forms.py:30
+#: accounts/forms.py:198 dc/user/forms.py:70 profile/forms.py:30
 #: templates/gui/dc/user_list.html:73
 msgid "First name"
 msgstr "Meno"
 
-#: accounts/forms.py:203 dc/user/forms.py:72 profile/forms.py:36
+#: accounts/forms.py:202 dc/user/forms.py:72 profile/forms.py:36
 #: templates/gui/dc/user_list.html:74
 msgid "Last name"
 msgstr "Priezvisko"
 
-#: accounts/forms.py:221
+#: accounts/forms.py:219
 msgid ""
 "This email address is already in use. Please supply a different email "
 "address."
 msgstr "Zadaná emailová adresa sa už používa. Zadajte inú emailovú adresu."
 
-#: accounts/forms.py:227
+#: accounts/forms.py:225
 msgid "Sorry. Your email address did not pass the validity test."
 msgstr ""
 
-#: accounts/forms.py:242
+#: accounts/forms.py:240
 msgid "6 characters minimum"
 msgstr ""
 
-#: accounts/forms.py:268
+#: accounts/forms.py:266
 msgid "You will receive a text message (SMS) with password."
 msgstr "Na toto číslo Vám bude zaslaná SMS správa s vygenerovaným heslom."
 
-#: accounts/forms.py:276 models/userprofile.py:47 models/userprofile.py:88
+#: accounts/forms.py:274 models/userprofile.py:47 models/userprofile.py:88
 #: profile/forms.py:87 profile/forms.py:251
 msgid "Phone"
 msgstr "Mobilné tel. číslo"
 
-#: accounts/forms.py:282
+#: accounts/forms.py:280
 msgid "TOS Confirmation"
 msgstr "Potvrdenie TOS"
 
-#: accounts/forms.py:289 models/userprofile.py:82 profile/forms.py:193
+#: accounts/forms.py:287 models/userprofile.py:82 profile/forms.py:193
 msgid "Company"
 msgstr "Spoločnosť"
 
-#: accounts/forms.py:295 models/userprofile.py:83 profile/forms.py:200
+#: accounts/forms.py:293 models/userprofile.py:83 profile/forms.py:200
 msgid "Company ID"
 msgstr "IČO"
 
-#: accounts/forms.py:334
+#: accounts/forms.py:332
 msgid "In order to use this service, you have to accept the Terms of Service."
 msgstr ""
 
@@ -1272,7 +1272,7 @@ msgstr "Zimbabwe"
 #: templates/gui/vm/backup_define_list.html:8
 #: templates/gui/vm/backup_list.html:13 templates/gui/vm/details.html:296
 #: templates/gui/vm/list.html:98 templates/gui/vm/snapshot_define_list.html:8
-#: templates/gui/vm/snapshot_list.html:13 vm/forms.py:558
+#: templates/gui/vm/snapshot_list.html:13 vm/forms.py:566
 msgid "Name"
 msgstr "Názov"
 
@@ -1325,7 +1325,7 @@ msgstr ""
 #: templates/gui/node/backup_define_list.html:16
 #: templates/gui/node/images.html:94 templates/gui/node/storages.html:63
 #: templates/gui/vm/backup_define_list.html:14
-#: templates/gui/vm/snapshot_define_list.html:13 vm/forms.py:576
+#: templates/gui/vm/snapshot_define_list.html:13 vm/forms.py:585
 msgid "Description"
 msgstr ""
 
@@ -1633,7 +1633,7 @@ msgstr "Použitie"
 #: templates/gui/node/backup_list_novm.html:21
 #: templates/gui/node/details.html:153 templates/gui/vm/backup_list.html:20
 #: templates/gui/vm/details.html:386 templates/gui/vm/snapshot_list.html:19
-#: vm/forms.py:214 vm/forms.py:666 vm/forms.py:784
+#: vm/forms.py:214 vm/forms.py:675 vm/forms.py:793
 msgid "Note"
 msgstr "Poznámka"
 
@@ -2080,32 +2080,32 @@ msgstr "SSH klúč"
 msgid "SSH keys"
 msgstr ""
 
-#: mon/forms.py:14 mon/forms.py:16 tasklog/forms.py:19 tasklog/forms.py:21
+#: mon/forms.py:15 mon/forms.py:17 tasklog/forms.py:19 tasklog/forms.py:21
 msgid "Since"
 msgstr "Od"
 
-#: mon/forms.py:20 mon/forms.py:22 tasklog/forms.py:24 tasklog/forms.py:26
+#: mon/forms.py:21 mon/forms.py:23 tasklog/forms.py:24 tasklog/forms.py:26
 msgid "Until"
 msgstr "Do"
 
-#: mon/forms.py:26 mon/forms.py:27
-msgid "Limit alerts to fetch"
-msgstr ""
-
-#: mon/forms.py:30 mon/forms.py:31
+#: mon/forms.py:27 mon/forms.py:28
 msgid "Server hostnames"
 msgstr ""
 
-#: mon/forms.py:34 mon/forms.py:35
+#: mon/forms.py:31 mon/forms.py:32
 msgid "Node hostnames"
 msgstr ""
 
+#: mon/forms.py:35
+msgid "Show events?"
+msgstr ""
+
 #: mon/forms.py:38
-msgid "Show all?"
+msgid "Include compute nodes?"
 msgstr ""
 
 #: mon/forms.py:41
-msgid "Show events?"
+msgid "Show all?"
 msgstr ""
 
 #: navigation.py:8
@@ -2330,7 +2330,7 @@ msgstr ""
 
 #: node/forms.py:203 templates/gui/node/image_multi_form.html:16
 #: templates/gui/vm/details.html:514 vm/forms.py:240 vm/forms.py:368
-#: vm/forms.py:753
+#: vm/forms.py:762
 msgid "Storage"
 msgstr ""
 
@@ -2340,7 +2340,7 @@ msgstr ""
 msgid "Server"
 msgstr "Server"
 
-#: node/forms.py:223 vm/forms.py:748
+#: node/forms.py:223 vm/forms.py:757
 msgid "Backup type"
 msgstr ""
 
@@ -3011,7 +3011,7 @@ msgstr ""
 #: templates/gui/dc/storage_list.html:120
 #: templates/gui/dc/subnet_ip_list.html:108
 #: templates/gui/dc/template_list.html:110 templates/gui/dc/user_list.html:118
-#: templates/gui/mon/alert_table.html:70
+#: templates/gui/mon/alert_table.html:67
 #: templates/gui/node/backup_define_list.html:41
 #: templates/gui/node/backup_list_all.html:46
 #: templates/gui/node/images.html:131 templates/gui/node/storages.html:94
@@ -3775,7 +3775,7 @@ msgstr ""
 msgid "RAM Overhead"
 msgstr ""
 
-#: templates/gui/dc/node_list.html:70 vm/forms.py:44 vm/forms.py:834
+#: templates/gui/dc/node_list.html:70 vm/forms.py:44 vm/forms.py:843
 msgid "Disk"
 msgstr "Disk"
 
@@ -4179,7 +4179,7 @@ msgstr ""
 msgid "Events"
 msgstr ""
 
-#: templates/gui/mon/alert_table.html:59
+#: templates/gui/mon/alert_table.html:56
 msgid "No alerts found."
 msgstr ""
 
@@ -4248,10 +4248,6 @@ msgstr "Filtruj"
 msgid "Reset"
 msgstr "Reset"
 
-#: templates/gui/navigation_pager.html:3
-msgid "Page"
-msgstr "Strana"
-
 #: templates/gui/node/backup_define_list.html:10
 #: templates/gui/node/backup_list.html:14
 #: templates/gui/node/backup_list_all.html:10
@@ -4265,13 +4261,13 @@ msgstr "ID&nbsp;disku"
 
 #: templates/gui/node/backup_define_list.html:12
 #: templates/gui/vm/backup_define_list.html:11
-#: templates/gui/vm/snapshot_define_list.html:10 vm/forms.py:565
+#: templates/gui/vm/snapshot_define_list.html:10 vm/forms.py:573
 msgid "Schedule"
 msgstr ""
 
 #: templates/gui/node/backup_define_list.html:14
 #: templates/gui/vm/backup_define_list.html:12
-#: templates/gui/vm/snapshot_define_list.html:11 vm/forms.py:570
+#: templates/gui/vm/snapshot_define_list.html:11 vm/forms.py:579
 msgid "Retention"
 msgstr ""
 
@@ -4562,6 +4558,7 @@ msgid "Backup node"
 msgstr ""
 
 #: templates/gui/node/list.html:122 templates/gui/system/maintenance.html:121
+#, python-format
 msgid "Selected <span id=\"selected\">0</span> of %(node_len)s node"
 msgid_plural "Selected <span id=\"selected\">0</span> of %(node_len)s nodes"
 msgstr[0] ""
@@ -5157,6 +5154,38 @@ msgstr ""
 
 #: templates/gui/system/settings.html:10
 msgid "System configuration"
+msgstr ""
+
+#: templates/gui/system/settings.html:15
+msgid "Switch to main DC<br>and show all settings"
+msgstr ""
+
+#: templates/gui/system/settings.html:19
+msgid ""
+"Virtual datacenters and the Danube Cloud system itself can be configured via "
+"virtual datacenter settings. There are two kinds of settings:"
+msgstr ""
+
+#: templates/gui/system/settings.html:21
+msgid "Global DC settings"
+msgstr ""
+
+#: templates/gui/system/settings.html:21
+msgid ""
+"Global settings have an impact on the behavior of all virtual datacenters "
+"and the Danube Cloud system, including objects that cannot be associated "
+"with a virtual datacenter (compute nodes). These settings can be modified in "
+"the default <em>main</em> virtual datacenter."
+msgstr ""
+
+#: templates/gui/system/settings.html:22
+msgid "Local DC settings"
+msgstr ""
+
+#: templates/gui/system/settings.html:22
+msgid ""
+"Local DC settings affect an actual virtual datacenter and can be modified in "
+"every virtual datacenter."
 msgstr ""
 
 #: templates/gui/system/update_modal.html:5
@@ -5861,7 +5890,7 @@ msgstr "disky"
 msgid "FS"
 msgstr ""
 
-#: templates/gui/vm/details.html:515 vm/forms.py:366 vm/forms.py:755
+#: templates/gui/vm/details.html:515 vm/forms.py:366 vm/forms.py:764
 msgid "Compression"
 msgstr ""
 
@@ -8119,8 +8148,8 @@ msgstr ""
 msgid "(auto)"
 msgstr "(auto)"
 
-#: vm/forms.py:329 vm/forms.py:562 vm/forms.py:663 vm/forms.py:822
-#: vm/forms.py:896
+#: vm/forms.py:329 vm/forms.py:570 vm/forms.py:672 vm/forms.py:831
+#: vm/forms.py:905
 msgid "Disk ID"
 msgstr "ID disku"
 
@@ -8182,128 +8211,143 @@ msgid "Use this NIC's gateway as VM's default gateway."
 msgstr ""
 
 #: vm/forms.py:474
-msgid "Allow DHCP Spoofing?"
+msgid "Set DNS resolvers from network's configuration?"
 msgstr ""
 
 #: vm/forms.py:475
+msgid ""
+"If checked, then the virtual server inherits DNS resolvers from network's "
+"configuration, otherwise the virtual datacenter resolvers are used."
+msgstr ""
+
+#: vm/forms.py:479
+msgid "Allow DHCP Spoofing?"
+msgstr ""
+
+#: vm/forms.py:480
 msgid "Allow packets required for DHCP server."
 msgstr ""
 
-#: vm/forms.py:477
+#: vm/forms.py:482
 msgid "Allow IP Spoofing?"
 msgstr ""
 
-#: vm/forms.py:478
+#: vm/forms.py:483
 msgid ""
 "Allow sending and receiving packets for IP addresses other than specified in "
 "NIC's IP address field."
 msgstr ""
 
-#: vm/forms.py:481
+#: vm/forms.py:486
 msgid "Allow MAC Spoofing?"
 msgstr ""
 
-#: vm/forms.py:482
+#: vm/forms.py:487
 msgid ""
 "Allow sending packets with MAC addresses other than specified in NIC's MAC "
 "address field."
 msgstr ""
 
-#: vm/forms.py:485
+#: vm/forms.py:490
 msgid "Allow Restricted Traffic?"
 msgstr ""
 
-#: vm/forms.py:486
+#: vm/forms.py:491
 msgid "Allow sending packets that are not IPv4, IPv6, or ARP."
 msgstr ""
 
-#: vm/forms.py:531
+#: vm/forms.py:505
+#, python-format
+msgid " Current VM configuration: %(resolvers)s"
+msgstr ""
+
+#: vm/forms.py:539
 msgid "File with servers"
 msgstr ""
 
-#: vm/forms.py:547
+#: vm/forms.py:555
 msgid "File type is not supported"
 msgstr ""
 
-#: vm/forms.py:566
+#: vm/forms.py:574
 msgid ""
-"Schedule in CRON format. Please use your local time for the hour field (will "
-"be internally converted into UTC)."
+"CRON format (<minute> <hour> <day of month> <month> <day of week>). Use your "
+"local time for the hour field (it will be internally converted into UTC)."
 msgstr ""
 
-#: vm/forms.py:571
+#: vm/forms.py:580
 msgid "Maximum number of snapshots to keep."
 msgstr ""
 
-#: vm/forms.py:574
+#: vm/forms.py:583
 msgid "Active?"
 msgstr ""
 
-#: vm/forms.py:578 vm/forms.py:682
+#: vm/forms.py:587 vm/forms.py:691
 msgid "Freeze filesystem?"
 msgstr ""
 
-#: vm/forms.py:579 vm/forms.py:683
+#: vm/forms.py:588 vm/forms.py:692
 msgid "Create application-consistent snapshot; Requires QEMU Guest Agent."
 msgstr ""
 
-#: vm/forms.py:658 vm/forms.py:893
+#: vm/forms.py:667 vm/forms.py:902
 msgid "Snapshot Name"
 msgstr ""
 
-#: vm/forms.py:660
+#: vm/forms.py:669
 msgid "backup1"
 msgstr "zaloha1"
 
-#: vm/forms.py:666
+#: vm/forms.py:675
 msgid "Optional snapshot comment."
 msgstr "Komentár k snapshotu (nepovinný)."
 
-#: vm/forms.py:680
+#: vm/forms.py:689
 msgid "All disks?"
 msgstr "Všetky disky?"
 
-#: vm/forms.py:704
+#: vm/forms.py:713
 msgid "Snapshot name is already used"
 msgstr "Názov snapshotu sa už používa"
 
-#: vm/forms.py:714
+#: vm/forms.py:723
 msgid "Snapshot limit reached"
 msgstr "Dosiahli ste maximálny počet povolených snapshotov"
 
-#: vm/forms.py:751
+#: vm/forms.py:760
 msgid "Backup Node"
 msgstr ""
 
-#: vm/forms.py:758
+#: vm/forms.py:767
 msgid "Bandwidth limit"
 msgstr ""
 
-#: vm/forms.py:759
+#: vm/forms.py:768
 msgid "Optional transfer rate limit in bytes."
 msgstr ""
 
-#: vm/forms.py:764
+#: vm/forms.py:773
 msgid "Maximum number of backups to keep."
 msgstr ""
 
-#: vm/forms.py:784
+#: vm/forms.py:793
 msgid "Optional backup comment."
 msgstr "Komentár k zálohe (nepovinný)."
 
-#: vm/forms.py:797
+#: vm/forms.py:806
 msgid "Definition"
 msgstr ""
 
-#: vm/forms.py:825
+#: vm/forms.py:834
 msgid "Backup Name"
 msgstr ""
 
-#: vm/forms.py:859
+#: vm/forms.py:868
 msgid "Restore to Server"
 msgstr ""
 
-#: vm/forms.py:861
+#: vm/forms.py:870
 msgid "Restore to Disk"
 msgstr ""
 
@@ -8327,3 +8371,6 @@ msgstr ""
 #: widgets.py:211
 msgid "The phone number entered is not valid."
 msgstr "Telefónne číslo nie je v správnom formáte."
+
+#~ msgid "Page"
+#~ msgstr "Strana"

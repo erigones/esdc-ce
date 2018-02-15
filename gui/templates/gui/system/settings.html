@@ -12,17 +12,14 @@
         <div class="padded">
           <div class="pull-right">
             <a class="button large" href="{% url 'dc_default_settings' %}?all=1">
-              <i class="icon-cogs"></i><span>Switch to main DC<br>and show all settings</span>
+              <i class="icon-cogs"></i><span>{% trans "Switch to main DC<br>and show all settings" %}</span>
             </a>
           </div>
           <div>
-            <p>Virtual datacenters and the Danube Cloud system itself can be configured via virtual datacenter settings. There are two kinds of settings:</p>
+            <p>{% trans "Virtual datacenters and the Danube Cloud system itself can be configured via virtual datacenter settings. There are two kinds of settings:" %}</p>
             <ul>
-              <li>
-                <strong>Global DC settings</strong> - Global settings have an impact on the behavior of all virtual datacenters and the Danube Cloud system, including objects that cannot be associated with a virtual datacenter (compute nodes). These settings can be modified in the default <em>main</em> virtual datacenter.
-
-              </li>
-              <li><strong>Local DC settings</strong> - Local DC settings affect an actual virtual datacenter and can be modified in every virtual datacenter.</li>
+              <li><strong>{% trans "Global DC settings" %}</strong> - {% trans "Global settings have an impact on the behavior of all virtual datacenters and the Danube Cloud system, including objects that cannot be associated with a virtual datacenter (compute nodes). These settings can be modified in the default <em>main</em> virtual datacenter." %}</li>
+              <li><strong>{% trans "Local DC settings" %}</strong> - {% trans "Local DC settings affect an actual virtual datacenter and can be modified in every virtual datacenter." %}</li>
             </ul>
           </div>
         </div>

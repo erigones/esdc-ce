@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-12 10:22+0000\n"
+"POT-Creation-Date: 2018-02-15 07:26+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1477,7 +1477,7 @@ msgstr ""
 msgid "Permission denied."
 msgstr ""
 
-#: mon/alerting/serializers.py:46
+#: mon/alerting/serializers.py:56
 msgid "Missing value."
 msgstr ""
 
