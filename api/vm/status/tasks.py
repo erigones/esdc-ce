@@ -3,6 +3,7 @@ from datetime import datetime
 
 from pytz import utc
 from dateutil.parser import parse as datetime_parse
+# noinspection PyProtectedMember
 from django.core.cache import cache, caches
 from django.utils import timezone
 from django.db import transaction
@@ -14,8 +15,9 @@ from que.mgmt import MgmtCallbackTask
 from que.utils import task_id_from_task_id
 from que.internal import InternalTask
 from que.exceptions import TaskException
+# noinspection PyProtectedMember
 from api.task.tasks import task_log_cb_success
-from api.task.utils import task_log, callback
+from api.task.utils import task_log, callback, mgmt_lock
 from api.vm.base.utils import is_vm_missing, vm_deploy, vm_update_ipaddress_usage, vm_delete_snapshots_of_removed_disks
 from api.vm.messages import LOG_STATUS_CHANGE
 from api.vm.status.events import VmStatusChanged
@@ -183,6 +185,7 @@ def _save_vm_status(task_id, vm, new_state, old_state=None, **kwargs):
     vm_status_changed(task_id, vm, new_state, old_state=old_state, **kwargs)  # calls save()
 
 
+@mgmt_lock(timeout=15, key_args=(2,), wait_for_release=True, base_name='vm_status_changed')  # noqa: R701
 def _vm_status_check(task_id, node_uuid, uuid, state, state_cache=None, vm=None,  # noqa: R701
                      change_time=None, force_change=False, **kwargs):
     """Helper function for checking VM's new/actual state used by following callbacks:
@@ -203,6 +206,7 @@ def _vm_status_check(task_id, node_uuid, uuid, state, state_cache=None, vm=None,
         state_cache = int(state_cache)
 
     if state_cache == state:
+        logger.info('Ignoring new status %s of vm %s because it is already saved', state, uuid)
         return
 
     # vm status changed!!!
@@ -409,11 +413,9 @@ def vm_status_current_cb(result, task_id, vm_uuid=None, force_change=False):
     else:
         result['message'] = ''
         state_cache = cache.get(Vm.status_key(vm_uuid))
-
-        if state_cache != state:
-            # Check and eventually save VM's status
-            _vm_status_check(task_id, vm.node.uuid, vm_uuid, state, state_cache=state_cache, force_change=force_change,
-                             change_time=_get_task_time(result, 'exec_time'))
+        # Check and eventually save VM's status
+        _vm_status_check(task_id, vm.node.uuid, vm_uuid, state, state_cache=state_cache, force_change=force_change,
+                         change_time=_get_task_time(result, 'exec_time'))
 
     vm.tasks_del(task_id)
     return result

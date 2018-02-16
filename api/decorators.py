@@ -313,7 +313,8 @@ def catch_api_exception(fun):
     return wrap
 
 
-def lock(timeout=settings.API_LOCK_TIMEOUT, key_args=(), key_kwargs=(), wait_for_release=False, bound=False):
+def lock(timeout=settings.API_LOCK_TIMEOUT, key_args=(), key_kwargs=(), wait_for_release=False, bound=False,
+         base_name=None):
     """
     Ensure that the decorated function does not run in parallel with the same function and arguments.
     """
@@ -325,7 +326,11 @@ def lock(timeout=settings.API_LOCK_TIMEOUT, key_args=(), key_kwargs=(), wait_for
             else:
                 params = args
 
-            fun_name = fun.__name__
+            if base_name:
+                fun_name = base_name
+            else:
+                fun_name = fun.__name__
+
             lock_keys = [fun_name]
             lock_keys.extend(str(params[i]) for i in key_args)
             lock_keys.extend(str(kwargs[i]) for i in key_kwargs)

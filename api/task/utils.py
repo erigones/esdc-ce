@@ -295,7 +295,8 @@ def callback(log_exception=True, update_user_tasks=True, check_parent_status=Tru
     return wrap
 
 
-def mgmt_lock(timeout=MGMT_LOCK_TIMEOUT, key_args=(), key_kwargs=(), wait_for_release=False, bound_task=False):
+def mgmt_lock(timeout=MGMT_LOCK_TIMEOUT, key_args=(), key_kwargs=(), wait_for_release=False, bound_task=False,
+              base_name=None):
     """
     Decorator for runtime task locks.
     This means that task will run, but will wait in a loop until it acquires a lock or will fail if timeout is reached.
@@ -308,8 +309,12 @@ def mgmt_lock(timeout=MGMT_LOCK_TIMEOUT, key_args=(), key_kwargs=(), wait_for_re
             else:
                 params = args
 
+            if base_name:
+                task_name = base_name
+            else:
+                task_name = fun.__name__
+
             task_id = params[0]
-            task_name = fun.__name__
             lock_keys = [task_name]
             lock_keys.extend(str(params[i]) for i in key_args)
             lock_keys.extend(str(kwargs[i]) for i in key_kwargs)
