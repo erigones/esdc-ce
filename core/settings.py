@@ -634,8 +634,16 @@ VMS_NIC_MODEL_DEFAULT = 'virtio'
 VMS_NIC_MONITORING_DEFAULT = 1
 VMS_VGA_MODEL_DEFAULT = 'std'
 VMS_STORAGE_DEFAULT = 'zones'
-VMS_VM_ZONE_USER_SCRIPT_DEFAULT = """if [ ! -f /var/svc/provision_esdc ]; then   touch /var/svc/provision_esdc;   /usr/sbin/mdata-get root_authorized_keys > /root/.ssh/authorized_keys;   /usr/sbin/mdata-get deploy-script > /var/svc/user-deploy-script && /usr/bin/bash /var/svc/user-deploy-script;   {image_deploy}; fi;  /usr/sbin/mdata-get startup-script > /var/svc/user-startup-script && /usr/bin/bash /var/svc/user-startup-script;  exit 0
-"""
+VMS_VM_ZONE_USER_SCRIPT_DEFAULT = 'if [ ! -f /var/svc/provision_esdc ]; then   ' \
+                                  'touch /var/svc/provision_esdc;   ' \
+                                  '/usr/sbin/mdata-get root_authorized_keys > /root/.ssh/authorized_keys;   ' \
+                                  '/usr/sbin/mdata-get deploy-script > /var/svc/user-deploy-script && ' \
+                                  '/usr/bin/bash /var/svc/user-deploy-script;   ' \
+                                  '{image_deploy}; ' \
+                                  'fi;  ' \
+                                  '/usr/sbin/mdata-get startup-script > /var/svc/user-startup-script && ' \
+                                  '/usr/bin/bash /var/svc/user-startup-script;  ' \
+                                  'exit 0'
 
 VMS_VM_SNAPSHOT_ENABLED = True  # Module
 VMS_VM_SNAPSHOT_DEFINE_LIMIT = None  # Maximum number of snapshot definitions (None - unlimited)
