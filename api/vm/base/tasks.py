@@ -94,7 +94,7 @@ def _vm_error(task_id, vm):
     vm_status_one(task_id, vm)
 
 
-@cq.task(name='api.vm.base.tasks.vm_create_cb', base=MgmtCallbackTask, bind=True)
+@cq.task(name='api.vm.base.tasks.vm_create_cb', base=MgmtCallbackTask, bind=True)  # noqa: R701
 @callback()
 def vm_create_cb(result, task_id, vm_uuid=None):
     """
