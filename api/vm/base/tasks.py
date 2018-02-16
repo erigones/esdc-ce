@@ -10,10 +10,12 @@ from vms.models import Vm, Snapshot, SnapshotDefine, BackupDefine, Node
 from vms.signals import vm_created, vm_deployed, vm_notcreated, vm_json_active_changed, vm_node_changed
 from api.email import sendmail
 from api.utils.request import get_dummy_request
+# noinspection PyProtectedMember
 from api.task.tasks import task_log_cb_success, task_log_cb_error
 from api.task.utils import callback
 from api.vm.base.utils import (is_vm_missing, vm_update_ipaddress_usage, vm_delete_snapshots_of_removed_disks,
                                vm_reset, vm_update)
+# noinspection PyProtectedMember
 from api.vm.status.tasks import vm_status_changed, vm_status_one
 from api.vm.snapshot.vm_define_snapshot import SnapshotDefineView
 from api.vm.backup.vm_define_backup import BackupDefineView
@@ -99,6 +101,7 @@ def vm_create_cb(result, task_id, vm_uuid=None):
     A callback function for api.vm.base.views.vm_manage.
     """
     vm = Vm.objects.select_related('dc').get(uuid=vm_uuid)
+    dc_settings = vm.dc.settings
     msg = result.get('message', '')
 
     if result['returncode'] == 0 and msg.find('Successfully created') >= 0:
@@ -133,8 +136,9 @@ def vm_create_cb(result, task_id, vm_uuid=None):
                 _vm_error(task_id, vm)
                 raise TaskException(result, 'Initial start failed (%s)' % msg)
 
-            sendmail(vm.owner, 'vm/base/vm_create_subject.txt', 'vm/base/vm_create_email.txt',
-                     extra_context={'vm': vm}, user_i18n=True, dc=vm.dc, fail_silently=True)
+            if dc_settings.VMS_VM_CREATE_EMAIL_SEND:
+                sendmail(vm.owner, 'vm/base/vm_create_subject.txt', 'vm/base/vm_create_email.txt',
+                         extra_context={'vm': vm}, user_i18n=True, dc=vm.dc, fail_silently=True)
 
     else:
         logger.error('Found nonzero returncode in result from POST vm_manage(%s). Error: %s', vm_uuid, msg)
@@ -174,8 +178,10 @@ def vm_create_cb(result, task_id, vm_uuid=None):
     internal_metadata = vm.json.get('internal_metadata', {}).copy()  # save internal_metadata for email
     vm = Vm.objects.select_related('dc', 'template').get(pk=vm.pk)  # Reload vm
     vm_deployed.send(task_id, vm=vm)  # Signal!
-    sendmail(vm.owner, 'vm/base/vm_deploy_subject.txt', 'vm/base/vm_deploy_email.txt', fail_silently=True,
-             extra_context={'vm': vm, 'internal_metadata': internal_metadata}, user_i18n=True, dc=vm.dc)
+
+    if dc_settings.VMS_VM_DEPLOY_EMAIL_SEND:
+        sendmail(vm.owner, 'vm/base/vm_deploy_subject.txt', 'vm/base/vm_deploy_email.txt', fail_silently=True,
+                 extra_context={'vm': vm, 'internal_metadata': internal_metadata}, user_i18n=True, dc=vm.dc)
 
     try:
         result['message'] = '\n'.join(result['message'].strip().split('\n')[:-1])  # Remove "started" stuff

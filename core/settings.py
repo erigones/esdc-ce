@@ -664,6 +664,9 @@ VMS_VM_BACKUP_DEFINE_LIMIT = None  # Maximum number of backup definitions (None 
 VMS_VM_BACKUP_LIMIT = None  # Maximum number of backups (retention limit) (None - unlimited)
 VMS_VM_BACKUP_DC_SIZE_LIMIT = None  # Maximum total size of backups in one DC (None - unlimited)
 
+VMS_VM_CREATE_EMAIL_SEND = False
+VMS_VM_DEPLOY_EMAIL_SEND = True
+
 SECURITY_OWASP_AT_002 = False  # Testing for Account Enumeration and Guessable User Account (False: UX, True: Security)
 
 ACL_ENABLED = True  # Module

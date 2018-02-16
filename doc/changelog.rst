@@ -8,6 +8,7 @@ Unreleased
 Features
 --------
 
+- Added script for automating overlays creation - `#91 <https://github.com/erigones/esdc-factory/issues/91>`__
 - Monitoring hostgroups are either datacenter-based or global - `#93 <https://github.com/erigones/esdc-ce/issues/93>`__
 - Monitoring hostgroups are automatically created on VM and Node update if they don't exist - `#93 <https://github.com/erigones/esdc-ce/issues/93>`__
 - Added API for managing monitoring hostgroups - `#94 <https://github.com/erigones/esdc-ce/issues/94>`__
@@ -29,7 +30,7 @@ Features
 - Added value size limit to metadata - `#321 <https://github.com/erigones/esdc-ce/issues/321>`__
 - Changed VM reboot action to perform a VM configuration update by default - `#328 <https://github.com/erigones/esdc-ce/issues/328>`__
 - Changed system update API and added maintenance view with system update functionality into GUI - `#338 <https://github.com/erigones/esdc-ce/issues/338>`__
-- Added script for automating overlays creation - `#91 <https://github.com/erigones/esdc-factory/issues/91>`__
+- Disabled sending of the first email during new VM creation - `#357 <https://github.com/erigones/esdc-ce/issues/357>`__
 
 Bugs
 ----
