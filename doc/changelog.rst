@@ -47,6 +47,7 @@ Bugs
 - Fixed emergency cleanup for cancelled or deleted VM migration task - `#318 <https://github.com/erigones/esdc-ce/issues/318>`__
 - Fixed SSL cert update (restart haproxy after SSL cert change) - `#322 <https://github.com/erigones/esdc-ce/issues/322>`__
 - Fixed stale task info after image creation from snapshot - `#334 <https://github.com/erigones/esdc-ce/issues/334>`__
+- Fixed potential race condition when processing incoming VM status events - `#358 <https://github.com/erigones/esdc-ce/issues/358>`__
 
 
 2.6.7
