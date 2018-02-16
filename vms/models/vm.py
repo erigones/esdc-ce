@@ -662,7 +662,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
             if deploy:
                 deploy_cmd = '/usr/sbin/poweroff'
             else:
-                deploy_cmd = ''
+                deploy_cmd = 'echo'
 
             user_script = user_script.format(image_deploy=deploy_cmd)
             _json['customer_metadata']['user-script'] = user_script
