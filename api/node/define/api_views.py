@@ -193,7 +193,8 @@ class NodeDefineView(APIView):
         # Check if node has VMs and backups if not using force
         if force:
             # Fetch data for vm_undefined signal
-            vms = [{'vm_uuid': vm.uuid, 'dc': vm.dc, 'zabbix_sync': vm.is_zabbix_sync_active(),
+            vms = [{'vm_uuid': vm.uuid, 'vm_hostname': vm.hostname, 'vm_alias': vm.alias, 'dc': vm.dc,
+                    'zabbix_sync': vm.is_zabbix_sync_active(),
                     'external_zabbix_sync': vm.is_external_zabbix_sync_active()}
                    for vm in node.vm_set.select_related('dc').all()]
         else:
