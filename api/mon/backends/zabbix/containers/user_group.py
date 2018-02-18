@@ -24,10 +24,10 @@ class ZabbixUserGroupContainer(ZabbixBaseContainer):
     OWNERS_GROUP = '#owner'
     NAME_MAX_LENGTH = 64
     AFFECTED_USERS = frozendict({
-        ZabbixBaseContainer.NOTHING: set(),
-        ZabbixBaseContainer.CREATED: set(),
-        ZabbixBaseContainer.UPDATED: set(),
-        ZabbixBaseContainer.DELETED: set(),
+        ZabbixBaseContainer.NOTHING: frozenset(),
+        ZabbixBaseContainer.CREATED: frozenset(),
+        ZabbixBaseContainer.UPDATED: frozenset(),
+        ZabbixBaseContainer.DELETED: frozenset(),
     })
 
     # noinspection PyUnresolvedReferences
@@ -36,7 +36,7 @@ class ZabbixUserGroupContainer(ZabbixBaseContainer):
         self.users = set()  # type: [ZabbixUserContainer]
         self.hostgroup_ids = set()  # type: [int]
         self.superuser_group = False
-        self.affected_users = dict(self.AFFECTED_USERS)
+        self.affected_users = frozendict({key: set() for key in self.AFFECTED_USERS})
 
     @classmethod
     def user_group_name_factory(cls, dc_name, local_group_name):
