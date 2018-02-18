@@ -6,9 +6,11 @@ from api.mon import MonitoringBackend
 from gui.models import Role
 
 
-DEFAULT_ACTION_MESSAGE_SUBJECT = "{TRIGGER.STATUS}: {TRIGGER.NAME}"
+DEFAULT_ACTION_MESSAGE_SUBJECT = "{TRIGGER.STATUS} on {HOST.NAME}: {TRIGGER.NAME}"
 
-DEFAULT_ACTION_MESSAGE = """Trigger: {TRIGGER.NAME}
+DEFAULT_ACTION_MESSAGE = """Hostname: {HOST.NAME}
+
+Trigger: {TRIGGER.NAME}
 Trigger status: {TRIGGER.STATUS}
 Trigger severity: {TRIGGER.SEVERITY}
 Trigger URL: {TRIGGER.URL}
