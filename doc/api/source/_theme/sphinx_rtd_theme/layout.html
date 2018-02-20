@@ -136,6 +136,11 @@
 
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           {% block menu %}
+            <ul>
+              <li{% if pagename == 'http-routingtable' %} class="current"{% endif %}>
+                <a href="{{ pathto('http-routingtable') }}" rel="nofollow">API routing table</a>
+              </li>
+            </ul>
             {#
               The singlehtml builder doesn't handle this toctree call when the
               toctree is empty. Skip building this for now.
