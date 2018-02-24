@@ -133,6 +133,8 @@ then the vcpus value can be 0, which will remove the compute node CPU limit enti
         :type data.cpu_type: string
         :arg data.vga: **KVM only**; VGA emulation driver. One of std, cirrus, vmware (default: std)
         :type data.vga: string
+        :arg data.dns_domain: Search domain set in /etc/hosts (SunOS Zone only, default: domain part of ``hostname``)
+        :type data.dns_domain: string
         :arg data.routes: Key-value object that maps destinations to gateways. \
 Items will be set as static routes in the OS (SunOS Zone only, default: {})
         :type data.routes: object
@@ -203,6 +205,8 @@ then the vcpus value can be 0, which will remove the compute node CPU limit enti
         :type data.cpu_type: string
         :arg data.vga: **KVM only**; VGA emulation driver. One of std, cirrus, vmware
         :type data.vga: string
+        :arg data.dns_domain: Search domain set in /etc/hosts (SunOS Zone only)
+        :type data.dns_domain: string
         :arg data.routes: Key-value object that maps destinations to gateways. \
 Items will be set as static routes in the OS (SunOS Zone only)
         :type data.routes: object

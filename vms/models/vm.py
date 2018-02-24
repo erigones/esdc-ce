@@ -1867,6 +1867,15 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
             self.save_item('routes', value or {}, save=False)
 
     @property
+    def dns_domain(self):
+        return self.json.get('dns_domain', '')
+
+    @dns_domain.setter
+    def dns_domain(self, value):
+        if not self.is_kvm():
+            self.save_item('dns_domain', value or '', save=False)
+
+    @property
     def resolvers(self):
         return self.json.get('resolvers', [])
 

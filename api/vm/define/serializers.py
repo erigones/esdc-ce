@@ -99,6 +99,7 @@ class VmDefineSerializer(VmBaseSerializer):
     zpool = s.CharField(default=Node.ZPOOL, max_length=64)
     resolvers = s.ArrayField(read_only=True)
     maintain_resolvers = s.BooleanField(default=True)  # OS only
+    dns_domain = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\ \._/-]*$', max_length=1024, required=False)  # OS only
     routes = s.RoutesField(default={})  # OS only
     vga = s.ChoiceField(choices=Vm.VGA_MODEL, default=settings.VMS_VGA_MODEL_DEFAULT)  # KVM only
     mdata = s.MetadataField(default=settings.VMS_VM_MDATA_DEFAULT,
@@ -126,6 +127,7 @@ class VmDefineSerializer(VmBaseSerializer):
         if kvm:
             del self.fields['maintain_resolvers']
             del self.fields['routes']
+            del self.fields['dns_domain']
         else:
             del self.fields['cpu_type']
             del self.fields['vga']
@@ -182,6 +184,13 @@ class VmDefineSerializer(VmBaseSerializer):
         if self.request.method == 'POST':
             self.fields['hostname'].default = hostname
             self.fields['alias'].default = hostname
+
+            # default dns_domain for zones is domain part of hostname
+            if not kvm:
+                if '.' in hostname:
+                    self.fields['dns_domain'].default = hostname.split('.', 1)[-1]
+                else:
+                    self.fields['dns_domain'].default = ''
 
             # defaults from template
             if data is not None and 'template' in data:

@@ -31,6 +31,7 @@ Features
 - Changed VM reboot action to perform a VM configuration update by default - `#328 <https://github.com/erigones/esdc-ce/issues/328>`__
 - Changed system update API and added maintenance view with system update functionality into GUI - `#338 <https://github.com/erigones/esdc-ce/issues/338>`__
 - Disabled sending of the first email during new VM creation - `#357 <https://github.com/erigones/esdc-ce/issues/357>`__
+- Added support for setting DNS search domain in SunOS zones - `#363 <https://github.com/erigones/esdc-ce/issues/363>`__
 
 Bugs
 ----
