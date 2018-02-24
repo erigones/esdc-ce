@@ -1,0 +1,12 @@
+# https://github.com/erigones/esdc-factory/issues/113
+- name: Switch pgbouncer pool_mode to session
+  ini_file: dest=/etc/pgbouncer/pgbouncer.ini
+            section="pgbouncer"
+            option="{{ item.option }}"
+            value="{{ item.value }}"
+  with_items:
+    - {option: "pool_mode", value: "session"}
+    - {option: "server_reset_query", value: "DISCARD ALL;"}
+    - {option: "default_pool_size", value: "80"}
+  notify:
+    - reload pgbouncer
