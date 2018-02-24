@@ -107,7 +107,7 @@ class VmDefineSerializer(VmBaseSerializer):
     locked = s.BooleanField(read_only=True, required=False)
     created = s.DateTimeField(read_only=True, required=False)
 
-    def __init__(self, request, *args, **kwargs):
+    def __init__(self, request, *args, **kwargs):  # noqa: R701
         self.request = request
         self.old_hostname = None
         self.hostname_changed = False
