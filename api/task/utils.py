@@ -329,11 +329,17 @@ def mgmt_lock(timeout=MGMT_LOCK_TIMEOUT, key_args=(), key_kwargs=(), wait_for_re
                 if wait_for_release:
                     task_logger.warn('Task %s(%s, %s) must wait (%s), because another task %s is already running',
                                      task_name, args, kwargs, timeout or 'forever', existing_lock)
+                    sleep_seconds = [3.0, 2.0, 1.5]
                     wait = 0
 
                     while wait < timeout:
-                        sleep(3)
-                        wait += 3
+                        if len(sleep_seconds) > 1:
+                            sleep_time = sleep_seconds.pop()
+                        else:
+                            sleep_time = sleep_seconds[0]
+
+                        sleep(sleep_time)
+                        wait += sleep_time
 
                         if acquire_lock():
                             break

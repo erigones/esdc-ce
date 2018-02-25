@@ -185,7 +185,7 @@ def _save_vm_status(task_id, vm, new_state, old_state=None, **kwargs):
     vm_status_changed(task_id, vm, new_state, old_state=old_state, **kwargs)  # calls save()
 
 
-@mgmt_lock(timeout=15, key_args=(2,), wait_for_release=True, base_name='vm_status_changed')  # noqa: R701
+@mgmt_lock(timeout=300, key_args=(2,), wait_for_release=True, base_name='vm_status_changed')  # noqa: R701
 def _vm_status_check(task_id, node_uuid, uuid, state, state_cache=None, vm=None,  # noqa: R701
                      change_time=None, force_change=False, **kwargs):
     """Helper function for checking VM's new/actual state used by following callbacks:
