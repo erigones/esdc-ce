@@ -50,6 +50,7 @@ Bugs
 - Fixed stale task info after image creation from snapshot - `#334 <https://github.com/erigones/esdc-ce/issues/334>`__
 - Fixed potential race condition when processing incoming VM status events - `#358 <https://github.com/erigones/esdc-ce/issues/358>`__
 - Fixed logging of removed VMs when node is force removed from DB - `#361 <https://github.com/erigones/esdc-ce/issues/361>`__
+- Fixed creating of new VM when using a template via vm_define API call - `#364 <https://github.com/erigones/esdc-ce/issues/364>`__
 
 
 2.6.7

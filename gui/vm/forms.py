@@ -22,7 +22,6 @@ from gui.vm.utils import get_vm_define, get_vm_define_disk, get_vm_define_nic
 # noinspection PyProtectedMember
 from gui.dc.image.forms import _ImageForm
 from api.vm.utils import get_templates, get_nodes, get_images, get_subnets, get_zpools, get_owners
-from api.vm.define.serializers import is_kvm
 from api.vm.define.vm_define_disk import DISK_ID_MIN, DISK_ID_MAX, DISK_ID_MAX_OS
 from api.vm.define.vm_define_nic import NIC_ID_MIN, NIC_ID_MAX
 from api.vm.define.views import vm_define, vm_define_user, vm_define_disk, vm_define_nic, vm_define_revert
@@ -263,7 +262,6 @@ class AdminServerSettingsForm(ServerSettingsForm):
     def __init__(self, request, vm, *args, **kwargs):
         super(AdminServerSettingsForm, self).__init__(request, vm, *args, **kwargs)
         dc_settings = request.dc.settings
-        self.is_kvm = is_kvm(vm, self.data, prefix='opt-')
         # Set choices
         self.vm_nodes = get_nodes(request, is_compute=True)
         # TODO: node.color

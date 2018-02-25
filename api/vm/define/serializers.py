@@ -25,12 +25,30 @@ NIC_ALLOWED_IPS_MAX = 8
 logger = getLogger(__name__)
 
 
-def is_kvm(vm, data=None, prefix='', ostype=None):
+def get_vm_template(request, data, prefix=''):
+    if not data:
+        return None
+
+    template_name = data.get(prefix + 'template', None)
+
+    if template_name:
+        try:
+            return get_templates(request).get(name=template_name)
+        except VmTemplate.DoesNotExist:
+            pass  # this should be stopped by default validate_template
+
+    return None
+
+
+def is_kvm(vm, data=None, prefix='', ostype=None, template=None):
     if vm:
         return vm.is_kvm()
 
     if data is not None:
         ostype = data.get(prefix + 'ostype', None)
+
+    if ostype is None and template:
+        ostype = template.vm_define.get('ostype', None) or template.ostype
 
     if ostype:
         try:
@@ -122,7 +140,13 @@ class VmDefineSerializer(VmBaseSerializer):
         data = kwargs.get('data', None)
 
         super(VmDefineSerializer, self).__init__(request, *args, **kwargs)
-        self._is_kvm = kvm = is_kvm(self.object, data)
+
+        if self.request.method == 'POST':
+            vm_template = get_vm_template(request, data)
+        else:
+            vm_template = None
+
+        self._is_kvm = kvm = is_kvm(self.object, data, template=vm_template)
 
         if kvm:
             del self.fields['maintain_resolvers']
@@ -193,21 +217,17 @@ class VmDefineSerializer(VmBaseSerializer):
                     self.fields['dns_domain'].default = ''
 
             # defaults from template
-            if data is not None and 'template' in data:
-                try:
-                    template = get_templates(self.request).get(name=str(data['template']))
-                except VmTemplate.DoesNotExist:
-                    pass  # this should be stopped by default validate_template
-                else:
-                    # ostype is in own column
-                    if template.ostype is not None:
-                        self.fields['ostype'].default = template.ostype
-                    # all serializer attributes are in json['vm_define'] object
-                    for field, value in template.vm_define.items():
-                        try:
-                            self.fields[field].default = value
-                        except KeyError:
-                            pass
+            if vm_template:
+                # ostype is in own column
+                if vm_template.ostype is not None:
+                    self.fields['ostype'].default = vm_template.ostype
+                # all serializer attributes are in json['vm_define'] object
+                # (also the ostype can be defined here)
+                for field, value in vm_template.vm_define.items():
+                    try:
+                        self.fields[field].default = value
+                    except KeyError:
+                        pass
 
     def restore_object(self, attrs, instance=None):
         if instance is not None:  # set (PUT)
