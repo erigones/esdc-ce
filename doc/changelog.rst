@@ -32,6 +32,7 @@ Features
 - Changed system update API and added maintenance view with system update functionality into GUI - `#338 <https://github.com/erigones/esdc-ce/issues/338>`__
 - Disabled sending of the first email during new VM creation - `#357 <https://github.com/erigones/esdc-ce/issues/357>`__
 - Added support for setting DNS search domain in SunOS zones - `#363 <https://github.com/erigones/esdc-ce/issues/363>`__
+- Do not allow ``vm_define*`` API calls when a read-write task is running - `#367 <https://github.com/erigones/esdc-ce/issues/367>`__
 
 Bugs
 ----

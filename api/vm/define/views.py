@@ -220,6 +220,7 @@ Items will be set as static routes in the OS (SunOS Zone only)
         :status 400: FAILURE
         :status 403: Forbidden
         :status 404: VM not found
+        :status 409: VM has pending tasks
         :status 423: VM is not operational / VM is locked or has slave VMs
 
     .. http:delete:: /vm/(hostname_or_uuid)/define
@@ -236,6 +237,7 @@ Items will be set as static routes in the OS (SunOS Zone only)
         :status 400: FAILURE
         :status 403: Forbidden
         :status 404: VM not found
+        :status 409: VM has pending tasks
         :status 423: VM is not operational / VM is not notcreated / VM is locked or has slave VMs
     """
     vm = get_vm(request, hostname_or_uuid, sr=('owner', 'node', 'template', 'slavevm'), check_node_status=None,
@@ -362,6 +364,7 @@ def vm_define_disk(request, hostname_or_uuid, disk_id=None, data=None):
         :status 403: Forbidden
         :status 404: VM not found
         :status 406: VM disk out of range / VM disk already exists
+        :status 409: VM has pending tasks
         :status 423: VM is not operational / VM is locked or has slave VMs
 
     .. http:put:: /vm/(hostname_or_uuid)/define/disk/(disk_id)
@@ -397,6 +400,7 @@ def vm_define_disk(request, hostname_or_uuid, disk_id=None, data=None):
         :status 403: Forbidden
         :status 404: VM not found
         :status 406: VM disk out of range
+        :status 409: VM has pending tasks
         :status 423: VM is not operational / VM is locked or has slave VMs
 
     .. http:delete:: /vm/(hostname_or_uuid)/define/disk/(disk_id)
@@ -418,6 +422,7 @@ def vm_define_disk(request, hostname_or_uuid, disk_id=None, data=None):
         :status 403: Forbidden
         :status 404: VM not found
         :status 406: VM disk out of range
+        :status 409: VM has pending tasks
         :status 423: VM is not operational / VM is locked or has slave VMs
 
     """
@@ -551,6 +556,7 @@ other VMs. Useful for floating/shared IPs (default: [])
         :status 403: Forbidden
         :status 404: VM not found
         :status 406: VM NIC out of range / VM NIC already exists
+        :status 409: VM has pending tasks
         :status 423: VM is not operational / VM is locked or has slave VMs
 
     .. http:put:: /vm/(hostname_or_uuid)/define/nic/(nic_id)
@@ -606,6 +612,7 @@ other VMs. Useful for floating/shared IPs
         :status 403: Forbidden
         :status 404: VM not found
         :status 406: VM NIC out of range
+        :status 409: VM has pending tasks
         :status 423: VM is not operational / VM is locked or has slave VMs
 
     .. http:delete:: /vm/(hostname_or_uuid)/define/nic/(nic_id)
@@ -625,6 +632,7 @@ other VMs. Useful for floating/shared IPs
         :status 403: Forbidden
         :status 404: VM not found
         :status 406: VM NIC out of range
+        :status 409: VM has pending tasks
         :status 423: VM is not operational / VM is locked or has slave VMs
 
     """

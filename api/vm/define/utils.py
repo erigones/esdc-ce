@@ -1,5 +1,5 @@
 from vms.models import Vm
-from api.exceptions import VmIsNotOperational, VmIsLocked, OperationNotSupported
+from api.exceptions import VmIsNotOperational, VmIsLocked, VmHasPendingTasks, OperationNotSupported
 
 VM_STATUS_OPERATIONAL = frozenset([Vm.NOTCREATED, Vm.RUNNING, Vm.STOPPED, Vm.STOPPING])
 
@@ -20,5 +20,7 @@ def is_vm_operational(fun):
             raise VmIsLocked
         if vm.status not in VM_STATUS_OPERATIONAL:
             raise VmIsNotOperational
+        if vm.tasks_rw:
+            raise VmHasPendingTasks
         return fun(view, vm, *args, **kwargs)
     return wrap

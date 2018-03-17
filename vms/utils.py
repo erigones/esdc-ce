@@ -123,3 +123,13 @@ class ConcatJSONDecoder(json.JSONDecoder):
             objs.append(obj)
 
         return objs
+
+
+class _RWMethods(object):
+    methods = frozenset(['POST', 'PUT', 'DELETE'])
+
+    def __eq__(self, other):
+        return other in self.methods
+
+
+RWMethods = _RWMethods()

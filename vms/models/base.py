@@ -16,7 +16,7 @@ try:
 except ImportError:
     import pickle
 
-from vms.utils import PickleDict
+from vms.utils import PickleDict, RWMethods
 from gui.models import User
 from que.utils import owner_id_from_task_id
 from que.user_tasks import UserTasks
@@ -434,6 +434,13 @@ class _UserTasksModel(object):
     def tasks(self):
         return self.get_tasks()
 
+    @property
+    def tasks_rw(self):
+        return self.get_tasks(match_dict={'method': RWMethods})
+
+    def tasks_ro(self):
+        return self.get_tasks(match_dict={'method': 'GET'})
+
     @classmethod
     def _create_task_info(cls, pk, apiview, msg, additional_apiview=None):
         """Prepare task info dict (will be stored in UserTasks cache)"""
@@ -504,8 +511,8 @@ class _UserTasksModel(object):
         return cls.objects.get(pk=pk)
 
     @classmethod
-    def get_pk_key(self):
-        return self._pk_key
+    def get_pk_key(cls):
+        return cls._pk_key
 
     @property
     def log_name(self):
