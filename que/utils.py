@@ -437,7 +437,7 @@ def queue_to_hostnames(queue):
     return (queue.replace('.', '@', 1),)
 
 
-def ping(queue, timeout=True, count=1):
+def ping(queue, timeout=True, count=1, retry_wait=0.5):
     """
     Ping erigonesd worker(s) according to queue and return list of alive workers.
     """
@@ -450,6 +450,9 @@ def ping(queue, timeout=True, count=1):
 
     while not pong and i < count:
         i += 1
+
+        if i > 1:
+            sleep(retry_wait)
 
         try:
             res = cq.control.ping(destination=workers, timeout=timeout)
