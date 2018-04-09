@@ -1,0 +1,128 @@
+#!/usr/perl5/bin/perl
+
+# Kstats we are interested in
+my @fields = ("obytes64", "rbytes64", "opackets64", "ipackets64", "oerrors", "ierrors", "ifspeed");
+
+# Kstat to Zabbix items mapping
+my @metrics = ( 
+	{
+		
+		kstat => "obytes64",
+		send_interval => 10,
+		zabbix_item => "vm.net[_DEV_,obytes64]"
+	},
+	{
+		kstat => "obytes64",
+		send_interval => 10,
+		zabbix_item => "vm.net.bytes[_DEV_,out]"
+	},
+	{
+		kstat => "rbytes64",
+		send_interval => 10,
+		zabbix_item => "vm.net[_DEV_,rbytes64]"
+	},
+	{
+		kstat => "rbytes64",
+		send_interval => 10,
+		zabbix_item => "vm.net.bytes[_DEV_,in]"
+	},
+	{
+		kstat => "opackets64",
+		send_interval => 10,
+		zabbix_item => "vm.net[_DEV_,opackets64]"
+	},
+	{
+		kstat => "ipackets64",
+		send_interval => 10,
+		zabbix_item => "vm.net[_DEV_,ipackets64]"
+	},
+	{
+		kstat => "oerrors",
+		send_interval => 10,
+		zabbix_item => "vm.net[_DEV_,oerrors]"
+	},
+	{
+		kstat => "ierrors",
+		send_interval => 10,
+		zabbix_item => "vm.net[_DEV_,ierrors]"
+	},
+	{
+		kstat => "ifspeed",
+		send_interval => 50,
+		zabbix_item => "vm.net[_DEV_,ifspeed]"
+	}
+);
+
+# Main part
+use strict;
+use warnings;
+use Sun::Solaris::Kstat;
+
+my $Kstat = Sun::Solaris::Kstat->new();
+
+my $interval = 10;
+
+my @zoneids = ();
+
+my $date;
+
+my $zabbix_data;
+
+
+while(1) {
+	my $zoneadm = `/usr/sbin/zoneadm list -p | grep -v global | grep running | cut -d: -f1`;
+
+	@zoneids = split(/\n/, $zoneadm);
+	$zabbix_data = undef;
+
+	$date = time();
+	$Kstat->update();
+
+	my %ifstats = %{$Kstat->{'link'}{'0'}};
+
+	foreach my $zoneid (@zoneids) {
+		foreach my $key (keys %ifstats) {
+			next unless $key =~ /z$zoneid\_(.*)/;
+
+			my (undef, $device) = split(/_/, $key);
+			my $zone = $ifstats{$key}->{'zonename'};
+
+			$device =~ s/eth/net/;
+
+			foreach my $field (@fields) {
+				$zabbix_data .= kstat_to_zabbix_item($zone, $device, $field, $date, $ifstats{$key}->{$field});
+			}
+		}
+	}
+
+ 	open my $zabbix_sender, "| /opt/zabbix/bin/zabbix_sender -c /opt/zabbix/etc/zabbix_agentd.conf -T -i - >/dev/null" or die "Can't execute zabbix_sender: $!\n";
+        print $zabbix_sender $zabbix_data;
+        close $zabbix_sender;
+
+	sleep($interval);
+}
+
+exit(0);
+
+sub kstat_to_zabbix_item {
+
+	my $host = shift;
+	my $iface = shift;
+	my $kstat = shift;
+	my $ts = shift;
+	my $value = shift;
+	
+	my $zabbix_item;
+	my $zabbix_data;
+
+	foreach my $metric (@metrics) {
+		next unless $kstat eq $metric->{'kstat'};
+	
+		$zabbix_item = $metric->{'zabbix_item'};
+		$zabbix_item =~ s/_DEV_/$iface/g;
+
+		$zabbix_data .= "$host $zabbix_item $ts $value\n";
+	}
+	
+	return $zabbix_data;
+}
