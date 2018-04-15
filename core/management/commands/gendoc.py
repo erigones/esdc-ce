@@ -1,5 +1,6 @@
 import os
 import re
+import shutil
 
 from ._base import DanubeCloudCommand, CommandOption, CommandError, lcd
 
@@ -63,13 +64,17 @@ class Command(DanubeCloudCommand):
             else:
                 self.display('We are on branch "%s"' % branch)
 
-        if self._path_exists(self.DOC_TMP_DIR):
+        if self._path_exists(self.DOC_TMP_DIR, 'user-guide', 'conf.py'):
             existing_repo = True
             self.display('%s already exists in %s' % (self.DOC_REPO, self.DOC_TMP_DIR), color='yellow')
             with lcd(self.DOC_TMP_DIR):
                 self.local('git fetch')
             self.display('%s has been successfully updated.' % self.DOC_REPO, color='green')
         else:
+            if self._path_exists(self.DOC_TMP_DIR):
+                self.display('Removing stale %s', self.DOC_TMP_DIR, color='yellow')
+                shutil.rmtree(self.DOC_TMP_DIR)
+
             existing_repo = False
             self.local('git clone %s %s' % (self.DOC_REPO, self.DOC_TMP_DIR))
             self.display('%s has been successfully cloned.' % self.DOC_TMP_DIR, color='green')
