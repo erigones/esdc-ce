@@ -12,7 +12,7 @@ from six import string_types
 from celery import states
 from celery.app.control import flatten_reply
 
-from que import IMPORTANT, E_SHUTDOWN, Q_MGMT, TT_EXEC, TT_MGMT, TT_INTERNAL, TG_DC_BOUND
+from que import IMPORTANT, E_SHUTDOWN, Q_MGMT, TT_EXEC, TT_MGMT, TT_INTERNAL, TG_DC_BOUND, TT, TG
 from que.erigonesd import cq
 from que.lock import TaskLock
 from que.user_tasks import UserTasks
@@ -28,6 +28,23 @@ RE_TASK_PREFIX = re.compile(r'([a-zA-Z]+)')
 DEFAULT_FILE_READ_SIZE = 102400
 
 logger = getLogger(__name__)
+
+
+def is_valid_task_id(task_id):
+    """
+    Return False if task ID is not valid.
+    """
+    parts = task_id.split('-')
+
+    if len(parts) == 5 and [len(i) for i in parts[1:]] == [8, 4, 4, 4]:
+        tp = RE_TASK_PREFIX.split(parts[0])
+
+        return (len(tp) == 5 and
+                all(i.isdigit() for i in tp[::2]) and
+                tp[1] in TT and
+                tp[3] in TG)
+
+    return False
 
 
 def task_id_from_string(user_id, owner_id=None, dummy=False, tt=TT_EXEC, tg=TG_DC_BOUND,
