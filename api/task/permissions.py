@@ -1,6 +1,7 @@
+# noinspection PyProtectedMember
 from api.permissions import DcBasePermission
 from vms.models import Dc
-from que.utils import user_owner_dc_ids_from_task_id
+from que.utils import is_valid_task_id, user_owner_dc_ids_from_task_id
 
 
 class IsUserTask(DcBasePermission):
@@ -12,7 +13,7 @@ class IsUserTask(DcBasePermission):
     def has_permission(self, request, view, args, kwargs):
         task_id = kwargs.get('task_id', None)
 
-        if not task_id:
+        if not task_id or not is_valid_task_id(task_id):
             return False
 
         user_id, owner_id, dc_id = user_owner_dc_ids_from_task_id(task_id)
@@ -26,7 +27,12 @@ class IsUserTask(DcBasePermission):
         except ValueError:
             return False
 
-        if request.user.is_admin(request, dc=Dc.objects.get_by_id(dc_id)):
+        try:
+            dc = Dc.objects.get_by_id(dc_id)
+        except Dc.DoesNotExist:
+            return False
+
+        if request.user.is_admin(request, dc=dc):
             return True
 
         return user_id == request_user_id or owner_id == request_user_id
@@ -39,7 +45,7 @@ class IsTaskCreator(DcBasePermission):
     def has_permission(self, request, view, args, kwargs):
         task_id = kwargs.get('task_id', None)
 
-        if not task_id:
+        if not task_id or not is_valid_task_id(task_id):
             return False
 
         user_id, owner_id, dc_id = user_owner_dc_ids_from_task_id(task_id)
@@ -52,7 +58,12 @@ class IsTaskCreator(DcBasePermission):
         except ValueError:
             return False
 
-        if request.user.is_admin(request, dc=Dc.objects.get_by_id(dc_id)):
+        try:
+            dc = Dc.objects.get_by_id(dc_id)
+        except Dc.DoesNotExist:
+            return False
+
+        if request.user.is_admin(request, dc=dc):
             return True
 
         return user_id == str(request.user.id)
