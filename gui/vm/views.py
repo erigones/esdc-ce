@@ -53,7 +53,9 @@ def my_list(request):
     context['vms'] = vms = get_vms(request)
     context['vms_tags'] = get_vms_tags(vms)
     context['can_edit'] = request.user.is_admin(request)
-    context['vms_node_online'] = not Vm.objects.filter(node__isnull=False).exclude(node__status=Node.ONLINE).exists()
+    context['vms_node_online'] = not Vm.objects.filter(dc=request.dc, node__isnull=False)\
+                                               .exclude(node__status=Node.ONLINE)\
+                                               .exists()
     context['stop_timeout_period'] = request.dc.settings.VMS_VM_STOP_TIMEOUT_DEFAULT
 
     return render(request, 'gui/vm/list.html', context)

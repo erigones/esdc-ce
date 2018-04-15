@@ -53,6 +53,7 @@ Bugs
 - Fixed logging of removed VMs when node is force removed from DB - `#361 <https://github.com/erigones/esdc-ce/issues/361>`__
 - Fixed creating of new VM when using a template via vm_define API call - `#364 <https://github.com/erigones/esdc-ce/issues/364>`__
 - Fixed task ID validation in /task/* API calls - `#370 <https://github.com/erigones/esdc-ce/issues/370>`__
+- Fixed VM message to show only if DC-related nodes are not online - `#372 <https://github.com/erigones/esdc-ce/issues/372>`__
 
 
 2.6.7
