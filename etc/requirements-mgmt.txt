@@ -2,7 +2,7 @@
 ### project
 pip
 setuptools==36.2.0
-Django==1.8.18
+Django==1.8.19
 Sphinx==1.6.5
 Jinja2==2.10
 sphinxcontrib-httpdomain==1.5.0
