@@ -3,7 +3,7 @@ Changelog
 
 3.0.0
 =====
-Unreleased
+Released on 2018-05-07
 
 Features
 --------
