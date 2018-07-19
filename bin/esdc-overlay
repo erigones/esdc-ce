@@ -147,7 +147,7 @@ update_ans_hosts() {
 	fi
 
 	# Update ansible inventory
-	${SSH} "root@${MGMT_IP}" "${ERIGONES_HOME}/bin/ctl.sh" genhosts --nodes --pdc "${dc_name}" > "${HOSTS_TMP_FILE}"
+	${SSH} "root@${MGMT_IP}" "${ERIGONES_HOME}/bin/ctl.sh" genhosts --nodes --pdc "'${dc_name}'" > "${HOSTS_TMP_FILE}"
 	# shellcheck disable=SC2181
 	if [[ $? -eq 0 ]]; then
 		# update succeeded
