@@ -69,6 +69,9 @@ $0 adminoverlay-init <adminoverlay_subnet/netmask> [nodename1=ip1,nodename=ip2,.
 $0 adminoverlay-update [nodename1=ip1,nodename=ip2,...]
 $0 adminoverlay-info
 
+Cleanup:
+$0 wipe			# deletes all overlays on all nodes
+
 Firewall:
 $0 globally-enable-firewall [allowed_IP_list]
 $0 globally-disable-firewall
@@ -144,7 +147,7 @@ update_ans_hosts() {
 	fi
 
 	# Update ansible inventory
-	${SSH} "root@${MGMT_IP}" "${ERIGONES_HOME}/bin/ctl.sh" genhosts --nodes --pdc "${dc_name}" > "${HOSTS_TMP_FILE}"
+	${SSH} "root@${MGMT_IP}" "${ERIGONES_HOME}/bin/ctl.sh" genhosts --nodes --pdc "'${dc_name}'" > "${HOSTS_TMP_FILE}"
 	# shellcheck disable=SC2181
 	if [[ $? -eq 0 ]]; then
 		# update succeeded
@@ -370,7 +373,7 @@ parse_node_dc_list() {
 	# read hosts.cfg and get node list and their respective dc names
 	while read -r line; do
 		# shellcheck disable=SC1117
-		nodename="$(echo "${line}" | ${SED} -re 's/^([^ \t]+).*$/\1/g')"
+		nodename="$(echo "${line}" | ${SED} -re 's/^([^ ]+).*$/\1/g')"
 		dc="$(echo "${line}" | ${SED} -re 's/^.*dc_name="?([^"]+)"?.*$/\1/g')"
 		NODE_DC_LIST["${nodename}"]="${dc}"
 	done <<< "$(${SED} -ne '/^\[nodes\]$/,/^\[/p' "${HOSTS_FILE}" | ${GREP} -v '^\[' | ${GREP} -v '^$')"
@@ -1261,6 +1264,37 @@ case ${CMD,,} in
 	update-ans-hosts)
 		echo "Ansible hosts file updated"
 		;;
+
+	wipe)
+		echo 
+		${PRINTF} "This will completely wipe out overlays configuration database."
+		${PRINTF} "Please remove any existing overlay networks from the GUI/API before running this."
+		${PRINTF} "Do you really want to continue? (Y/n) "
+		read -r reply
+		if [[ "${reply,,}" != "y" && -n "${reply}" ]]; then
+			echo "Exitting without changes."
+			exit 0
+		else
+			echo "Deleting all overlays from database..."
+		fi
+
+		if [[ "$(query_cfgdb exists "${CFGDB_ADMINOVERLAY_PATH}")" == "true" ]]; then
+			query_cfgdb --force rmr "${CFGDB_ADMINOVERLAY_PATH}"
+		fi
+		if [[ "$(query_cfgdb exists "${CFGDB_ORULES_PATH}")" == "true" ]]; then
+			query_cfgdb --force rmr "${CFGDB_ORULES_PATH}"
+		fi
+		if [[ "$(query_cfgdb exists "${CFGDB_IPSEC_PATH}")" == "true" ]]; then
+			query_cfgdb --force rmr "${CFGDB_IPSEC_PATH}"
+		fi
+
+		echo "Done"
+
+		run_ansible
+
+		echo "You can start over by adminoverlay-init command"
+		;;
+
 	*)
 		echo "Unknown command: $CMD"
 		usage
