@@ -23,7 +23,7 @@ License
 
 ::
 
-    Copyright 2016-2018 Erigones, s. r. o.
+    Copyright 2016-2019 Erigones, s. r. o.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this project except in compliance with the License.

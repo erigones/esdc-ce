@@ -1,0 +1,78 @@
+# vim: set filetype=yaml expandtab tabstop=2 shiftwidth=2 softtabstop=2 background=dark :
+
+- debug: msg='cluster_members={{play_hosts}}'
+  run_once: true
+
+- name: "Build hosts file"
+  lineinfile: dest=/etc/hosts regexp='.*{{ item }} {{ item }}.local$' line="{{ hostvars[item].ansible_default_ipv4.address }} {{ item }} {{ item }}.local" state=present
+  when: hostvars[item].ansible_default_ipv4.address is defined
+  with_items: "{{play_hosts}}"
+
+- name: install cluster pkgs
+  yum:
+    name: pcs
+    state: present
+
+- name: service pcsd start                         
+  service: name=pcsd state=started enabled=yes
+
+- name: setup hacluster password
+  user:
+    name: hacluster
+    state: present
+    update_password: always
+    password: "{{ cluster_ha_password_hash }}"
+
+- name: setup cluster auth
+  shell: pcs cluster auth {{ play_hosts | join( " ") }} -u hacluster -p "{{ cluster_ha_password }}"
+
+- name: create cluster
+  #shell: pcs cluster setup --name {{ cluster_name }} {{ play_hosts | join( " ") }}
+  shell: pcs cluster setup --name {{ cluster_name }} "{{ cluster_master_host }}"
+  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
+  args:
+    creates: /etc/corosync/corosync.conf
+
+- name: join cluster nodes
+  shell: /bin/sh -c "if ! grep -q 'ring0_addr[:] *{{ item }}[\t ]*$' /etc/corosync/corosync.conf; then pcs cluster node add {{ item }}; fi"
+  when: inventory_hostname == "{{ cluster_master_host }}"             # run only on one node
+  with_items: '{{ play_hosts | difference([inventory_hostname]) }}'   # all hosts except me
+  register: join_cluster
+
+#- name: alter votequorum config
+#  template: src=corosync.conf.j2 dest=/etc/corosync/corosync.conf
+#  notify: reload corosync
+#  #notify: restart corosync
+
+# start cluster on every node separately (can be run multiple times without failure)
+- name: start cluster
+  shell: pcs cluster start
+  #args:
+  # creates: /var/lib/pacemaker/cib/cib.xml
+ 
+# restart corosync if needed
+- meta: flush_handlers
+
+#- name: query cluster status
+#  shell: pcs cluster status
+#  #register: cluster_state
+#  #failed_when: True
+
+- name: alter stonith settings
+  pcs_property: name=stonith-enabled value=false
+
+- name: alter cluster settings
+  pcs_property: name=symmetric-cluster value=false
+
+- name: alter cluster settings
+  pcs_property: name=crmd-transition-delay value=3s
+
+- name: verify cluster configuration
+  shell: crm_verify -L -V
+
+- name: enable cluster autostart
+  shell: pcs cluster enable
+
+# reload corosync if neccessary (done automatically on the end of the tasklist)
+#- meta: flush_handlers
+

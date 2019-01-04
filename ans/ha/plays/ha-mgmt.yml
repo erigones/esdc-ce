@@ -1,0 +1,47 @@
+# vim: set filetype=yaml expandtab tabstop=2 shiftwidth=2 softtabstop=2 background=dark :
+
+# start order of clustered services: mgmt-IP pgbouncer postgresql-9.5 redis erigonesd erigonesd-beat esdc@gunicorn-sio esdc@gunicorn-api esdc@gunicorn-gui nginx haproxy
+# services that run on every node: rabbitmq-server tomcat guacd zabbix-agent 
+#
+# grp1: mgmt-IP pgbouncer
+# grp2: postgresql-9.5
+# grp3: redis erigonesd erigonesd-beat esdc@gunicorn-sio esdc@gunicorn-api esdc@gunicorn-gui nginx haproxy
+
+- hosts: mgmt??
+  any_errors_fatal: true
+  gather_facts: true
+  vars_files:
+    - ../cfg/defaults.yml
+    - ../cfg/local_vars.yml
+
+  pre_tasks:
+    - debug: msg='MASTER NODE SET TO {{ cluster_master_host }}'
+
+    - name: verify cluster_master_host
+      fail:
+        msg: "CRITICAL: defined master host ({{ cluster_master_host }}) not in host list {{ play_hosts }}"
+      when: cluster_master_host not in play_hosts
+
+    - name: checking presence of mandatory variables
+      fail:
+        msg: "ERROR: variable {{ item }} is not present in ha_vars.yml"
+      when: item is undefined
+      run_once: true
+      with_items:
+        - '{{ cluster_vip }}'
+        - '{{ cluster_vip_mask }}'
+        - '{{ pg_repl_pass }}'
+        - '{{ cluster_ha_password }}'
+        - '{{ cluster_ha_password_hash }}'
+        - '{{ rabbitmq_password }}'
+        - '{{ redis.password }}'
+
+    - name: run database backup
+      shell: if pidof postgres > /dev/null; then echo "Running DB backup.."; /usr/local/sbin/backup_pgsql.sh > /dev/null; fi
+      register: runbackup
+      failed_when: (runbackup.rc != 0) and (runbackup.rc != 9)   # 9 = db is a slave
+
+  roles:
+    - basepkgs
+    - cluster
+

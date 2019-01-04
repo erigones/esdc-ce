@@ -1,0 +1,20 @@
+# vim: set filetype=yaml expandtab tabstop=2 shiftwidth=2 softtabstop=2 background=dark :
+
+- include: firewall.yml
+- include: pcs.yml
+- include: postgresql_sync.yml
+- include: maintenance.yml
+- include: paf.yml
+- include: resources.yml
+
+- name: test constraints presence
+  stat: path=/root/.constraints_processed
+  register: constraints_processed
+
+- include: constraints.yml
+  when: not constraints_processed.stat.exists
+
+- include: verify_replication.yml
+- include: rabbitmq.yml
+- include: esdc-config.yml
+

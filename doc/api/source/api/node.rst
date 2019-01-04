@@ -11,5 +11,4 @@
     node_snapshot
     node_backup
     node_sysinfo
-    node_license
     node_vm

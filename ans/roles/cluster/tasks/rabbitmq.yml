@@ -1,0 +1,48 @@
+# vim: set filetype=yaml expandtab tabstop=2 shiftwidth=2 softtabstop=2 background=dark :
+
+- name: ensure rabbitmq server is running
+  service:
+    name: "{{ rabbitmq.service }}"
+    state: started
+    enabled: true
+
+# in current rmq server version, there's no option to turn off federation errors
+- name: disable rabbitmq extensive logging
+  lineinfile:
+    state=present
+    dest=/etc/rabbitmq/rabbitmq-env.conf
+    regexp="^RABBITMQ_SASL_LOGS *=.*$"
+    line='RABBITMQ_SASL_LOGS=/dev/null'
+  notify: restart rabbitmq-server
+
+- name: check presence of rabbitmq federation plugin (failure is ok)
+  shell: rabbitmq-plugins list | grep -i '^\[e\] rabbitmq_federation[ \t]' &> /dev/null
+  register: rc_fed
+  ignore_errors: True
+
+- name: enable rabbitmq federation plugin
+  shell: rabbitmq-plugins enable rabbitmq_federation
+  notify: restart rabbitmq-server
+  when: rc_fed|failed
+
+- meta: flush_handlers
+
+- name: create rabbitmq federation interconnects
+  shell: if ! rabbitmqctl -p '{{ rabbitmq.vhost }}' list_parameters | grep 'amqp://.*@{{ hostvars[item].ansible_default_ipv4.address }}",' &> /dev/null ; then rabbitmqctl set_parameter -p '{{ rabbitmq.vhost }}' federation-upstream 'interconnect_{{ item }}' '{"uri":"amqp://{{ rabbitmq.user }}:{{ rabbitmq_password }}@{{ hostvars[item].ansible_default_ipv4.address }}","ack-mode":"on-confirm","trust-user-id":true}'; fi
+  with_items: '{{ mgmt_nodes | difference([inventory_hostname]) }}'   # all hosts except me
+
+# Problem with the module
+#- name: create rabbitmq federation interconnects
+#  rabbitmq_parameter:
+#    component: federation
+#    vhost: '{{ rabbitmq.vhost }}'
+#    name: 'interconnect_{{ item }}'
+#    value: '{"uri":"amqp://{{ rabbitmq.user }}:{{ rabbitmq_password }}@{{ hostvars[item].ansible_default_ipv4.address }}","ack-mode":"on-confirm","trust-user-id":true}'
+#    state: present
+#  with_items: '{{ mgmt_nodes | difference([inventory_hostname]) }}'   # all hosts except me
+
+- name: create rabbitmq federation policy
+  shell: if ! rabbitmqctl -p '{{ rabbitmq.vhost }}' list_policies | grep '{{ item.name }}' &> /dev/null; then rabbitmqctl set_policy -p '{{ rabbitmq.vhost }}' --apply-to '{{ item.applyto }}'  '{{ item.name }}' '{{ item.match }}' '{"federation-upstream-set":"all"}'; fi
+  with_items: '{{ rabbitmq_federation_policy }}'
+  #register: output       # doesn't work but not needed anyway
+  #changed_when: output.stdout.find('Setting policy') == 1

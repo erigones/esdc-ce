@@ -1,0 +1,27 @@
+# Danube Cloud Daemon systemd service file
+#
+# INSTALL:
+#   - copy erigonesd.service into /etc/systemd/system/ 
+#   - run: systemctl enable erigonesd.service && systemctl start erigonesd.service 
+
+[Unit]
+Description=Danube Cloud Mgmt Worker Daemon
+Documentation=https://docs.danubecloud.org
+After=network.target
+Requires=redis.service rabbitmq-server.service
+
+[Service]
+Type=forking
+User=erigones
+Group=erigones
+Environment="DJANGO_SETTINGS_MODULE=core.settings" "PYTHONPATH={PYTHONPATH}:/opt/erigones"
+#PIDFile=/opt/erigones/var/run/erigonesd.pid
+ExecStart=/opt/erigones/bin/erigonesd mgmt multi start mgmt --workdir=/opt/erigones/var/run --umask=002 --loglevel=INFO --logfile=/opt/erigones/var/log/mgmt.log --pidfile=/opt/erigones/var/run/erigonesd.pid -c 512 -E -P gevent -I api.tasks --quiet
+ExecReload=/opt/erigones/bin/erigonesd mgmt multi restart mgmt --workdir=/opt/erigones/var/run --umask=002 --loglevel=INFO --logfile=/opt/erigones/var/log/mgmt.log --pidfile=/opt/erigones/var/run/erigonesd.pid -c 512 -E -P gevent -I api.tasks -HUP
+ExecStop=/opt/erigones/bin/erigonesd mgmt multi stopwait mgmt --workdir=/opt/erigones/var/run --umask=002 --loglevel=INFO --logfile=/opt/erigones/var/log/mgmt.log --pidfile=/opt/erigones/var/run/erigonesd.pid -c 512 -E -P gevent -I api.tasks
+TimeoutStopSec=300
+Restart=on-failure
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target

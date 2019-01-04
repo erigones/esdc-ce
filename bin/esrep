@@ -1,0 +1,91 @@
+#!/usr/bin/env python
+
+from argparse import ArgumentParser
+
+from eslib.esrep import Replication
+from eslib.cmd_args import t_ascii, t_int, t_uuid, t_python_fun, JSONFileType
+
+
+def main():
+    """Parse input, create Replication instance and run method"""
+    parser = ArgumentParser()
+    subparsers = parser.add_subparsers(help='Actions', dest='action')
+
+    verbose = ArgumentParser(add_help=False)
+    verbose.add_argument('-v', '--verbose', help='Verbose output to stderr', action='store_true')
+    parents = (verbose,)
+
+    # Replication manipulation sub-commands
+    init = subparsers.add_parser('init', help='Create hot standby VM and perform initial sync', parents=parents)
+    destroy = subparsers.add_parser('destroy', help='Destroy hot standby VM and cleanup', parents=parents)
+    destroy_clear = subparsers.add_parser('destroy-clear', help='Destroy new standby VM after failover '
+                                                                '(instead of reinit)', parents=parents)
+    clear = subparsers.add_parser('clear', help='Remove replication metadata and snapshots from master VM',
+                                  parents=parents)
+    sync = subparsers.add_parser('sync', help='Sync hot standby VM with master VM', parents=parents)
+    failover = subparsers.add_parser('failover', help='Switch standby VM to master', parents=parents)
+    reinit = subparsers.add_parser('reinit', help='Restore replication for from old master VM '
+                                                  'after successful failover', parents=parents)
+
+    # Service manipulation sub-commands
+    svc_create = subparsers.add_parser('svc-create', help='Create replication service which will perform '
+                                                          'a sync in an endless loop', parents=parents)
+    svc_remove = subparsers.add_parser('svc-remove', help='Remove replication service', parents=parents)
+    svc_status = subparsers.add_parser('svc-status', help='Display replication service status', parents=parents)
+    svc_enable = subparsers.add_parser('svc-enable', help='Start the replication service', parents=parents)
+    svc_disable = subparsers.add_parser('svc-disable', help='Stop the replication service', parents=parents)
+
+    for subparser in (init, destroy, destroy_clear, clear, sync, failover, reinit, svc_create, svc_remove,
+                      svc_status, svc_enable, svc_disable):
+        subparser.add_argument('-m', '--master', required=True, metavar='UUID', type=t_uuid,
+                               help='Master (source) VM uuid')
+        subparser.add_argument('-s', '--slave', required=True, metavar='UUID', type=t_uuid,
+                               help='Slave (standby) VM uuid')
+        subparser.add_argument('-i', '--id', required=False, metavar='ID', type=t_int, default='1',
+                               help='Optional replication ID')
+
+    for subparser in (init, destroy, destroy_clear, sync, failover, reinit, svc_create):
+        subparser.add_argument('-H', '--host', required=True, metavar='HOST', type=t_ascii,
+                               help='Source VM host')
+
+    init.add_argument('-j', '--json', required=True, metavar='JSON', type=JSONFileType(),
+                      help='Slave (standby) VM json')
+    init.add_argument('-l', '--limit', metavar='BW_LIMIT', type=t_int, help='Bandwidth limit')
+    init.add_argument('-p', '--pickle', action='store_true', help='Pickle slave json on output')
+
+    destroy.add_argument('-f', '--force', action='store_true',
+                         help='Force destroying of standby VM, even if the master VM is unreachable')
+
+    sync.add_argument('-t', '--sleep-time', metavar='SECONDS', type=t_int,
+                      help='Perform sync in an endless loop with a pause between two syncs')
+    sync.add_argument('-l', '--limit', metavar='BW_LIMIT', type=t_int, help='Bandwidth limit')
+    sync.add_argument('-q', '--quiet', action='store_true',
+                      help='Suppress printing of output for each sync during sync loop')
+    sync.add_argument('-c', '--callback', metavar='MODULE:FUNCTION', type=t_python_fun,
+                      help='Python function to run each after successful sync')
+
+    failover.add_argument('-f', '--force', action='store_true',
+                          help='Force switch to standby VM, even if the master VM is not reachable')
+
+    svc_create.add_argument('-t', '--sleep-time', required=True, metavar='SECONDS', type=t_int,
+                            help='Perform sync in an endless loop with a pause between two syncs')
+    svc_create.add_argument('-l', '--limit', metavar='BW_LIMIT', type=t_int, help='Bandwidth limit')
+    svc_create.add_argument('-c', '--callback', metavar='MODULE:FUNCTION', type=t_python_fun,
+                            help='Python function to run after each successful sync')
+    svc_create.add_argument('-e', '--enabled', action='store_true',
+                            help='Immediately start the replication service after it is created')
+
+    args = parser.parse_args()
+    # Create replication instance
+    rep = Replication(args.master, args.slave, **args.__dict__)
+
+    try:
+        method = getattr(rep, args.action.replace('-', '_'))
+    except AttributeError:
+        raise SystemExit('Invalid action')
+
+    rep.output_and_exit(method())
+
+
+if __name__ == '__main__':
+    main()

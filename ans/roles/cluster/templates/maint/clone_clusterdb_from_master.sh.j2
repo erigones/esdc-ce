@@ -1,0 +1,160 @@
+#!/bin/sh
+
+if [ $(whoami) != "postgres" ]; then 
+	echo "Please run this script as user postgres!"
+	exit 1
+fi
+
+CLUSTER_NAME="{{ cluster_name }}"
+DBMASTER_IP="{{ cluster_vip }}"
+DBPORT="{{ postgres_port }}"
+PGDATA="{{ pgdata }}"
+PGBINDIR="{{ bindir }}"
+DBVERSION="{{ pgversion }}"
+REPL_USER="{{ pg_repl_user }}"
+CLUSTER_RES_NAME="{{ cluster_postgres_HA_res_name }}"
+RECOVERY_TEMPLATE="$(dirname "${PGDATA}")/recovery.conf.${CLUSTER_NAME}.pcmk"
+RECOVERY_DEST="${PGDATA}/recovery.conf"
+
+# usage: if check_reply_yes "Some question?"; then echo yes; else echo no; fi
+function check_reply_yes()
+{
+	echo -n "*** $1 (Y/n)"
+	read reply
+	if [[ -z "$reply" ]] || [[ $reply == "y" ]] || [[ $reply == "Y" ]]
+	then
+		return 0
+	else
+		return 1
+	fi
+}
+
+function check_retval()
+{
+	retval=$?
+	if [ $retval -ne 0 ]
+	then
+		echo
+		echo "***** Error in module $1 *****"
+		echo
+		exit $retval
+	fi
+}
+
+
+#######################################################################################
+# PROGRAM START
+#######################################################################################
+
+PGDATA=${PGDATA%%+(/)}	# remove trailing slash
+cat << EOF
+****************************************************************************************
+This script will sync postgresql datadir from master. It can also be used to convert
+a failed master node to slave and reconnect it to the cluster.
+Please make sure that postgres database is not running on this node!
+Cluster command to shut down database locally:
+pcs resource ban $CLUSTER_RES_NAME {{ inventory_hostname }} lifetime=60M
+And to bring it up before lifetime expiration:
+pcs resource clear $CLUSTER_RES_NAME {{ inventory_hostname }}
+
+Cluster parameters:
+CLUSTER NAME: $CLUSTER_NAME
+DB MASTER IP: $DBMASTER_IP
+DB PORT:      $DBPORT
+PG DATADIR:   $PGDATA
+
+EOF
+
+# check if the master IP is on this host (makes no sense to sync from myself)
+if /usr/sbin/ip addr show | grep -q "[ \t]$DBMASTER_IP/"; then
+    echo "THIS IS THE MASTER NODE!!!"
+    echo "Aborting action."
+    exit 111
+fi
+
+# check if master DB is running
+if ! ${PGBINDIR}/pg_isready -qh "$DBMASTER_IP" -p "$DBPORT" -U "$REPL_USER"; then
+    echo "The master database is not responding!"
+    echo "Aborting action."
+    exit 112
+fi
+
+# checks succeeded, we are ready to run the sync
+if ! check_reply_yes "Continue?"; then
+	echo
+	echo "Exiting without changes.."
+	exit 0
+fi
+echo "****************************************************************************************"
+echo
+
+
+if ps auxww | grep -v grep | grep -Eq -- "-D +${PGDATA}( |$)"; then
+	echo "**************************************************"
+	echo "Postgresql server is still running. Stop it first!"
+	echo "**************************************************"
+	exit 1
+fi
+if ${PGBINDIR}/pg_ctl -D "$PGDATA" status > /dev/null; then
+	echo "***********************************"
+	echo "Postgresql server is still running!"
+	echo "***********************************"
+	
+	echo ${PGBINDIR}/pg_ctl -D "$PGDATA" status
+	${PGBINDIR}/pg_ctl -D "$PGDATA" status
+	echo
+	echo Please stop the database and run this script again.
+	exit 1
+fi
+
+if [ -d ${PGDATA} ]; then
+	if ! check_reply_yes "Keep old datadir? (requires additional space)"; then
+		echo "Moving old datadir.."
+		echo mv ${PGDATA} ${PGDATA}.oldmaster-$(date +%Y%m%d)
+		mv ${PGDATA} ${PGDATA}.oldmaster-$(date +%Y%m%d)
+		check_retval rename_old_dir
+	else
+		echo "Removing old datadir.."
+		echo rm -rf ${PGDATA}
+		rm -rf "${PGDATA}"
+		check_retval delete_old_dir
+	fi
+else
+	echo "Old datadir ${PGDATA} does not exist. Continuing without backing it up."
+	echo
+fi
+echo
+echo "Cloning the DB:"
+echo pg_basebackup -h $DBMASTER_IP -D "$PGDATA" -X stream -P -p $DBPORT -U $REPL_USER
+pg_basebackup -h $DBMASTER_IP -D "$PGDATA" -X stream -P -p $DBPORT -U $REPL_USER
+check_retval clone_DB
+echo
+echo Writing recovery.conf
+echo cp -f "${RECOVERY_TEMPLATE}" "${RECOVERY_DEST}"
+
+cp -f "${RECOVERY_TEMPLATE}" "${RECOVERY_DEST}"
+
+cat << EOF
+Slave database cloned successfully.
+
+You can start it now:
+pcs resource clear $CLUSTER_RES_NAME {{ inventory_hostname }}
+
+Or (in case of emergency) manually by command:
+${PGBINDIR}/pg_ctl -D "$PGDATA" start
+
+Also check logs:
+tail -f ${PGDATA}/pg_log/\$(cd ${PGDATA}/pg_log; ls -1 | tail -1)
+or
+journalctl --follow
+
+EOF
+
+if [ -d ${PGDATA}.oldmaster-$(date +%Y%m%d) ]; then
+	echo "Old datadir can be safely removed:"
+	echo "rm -rf ${PGDATA}.oldmaster-$(date +%Y%m%d)"
+	echo
+fi
+echo May the Force be with you..
+echo
+exit 0

@@ -1,0 +1,25 @@
+
+- hosts: dns??
+  any_errors_fatal: true
+  gather_facts: true
+  vars_files:
+    - ../cfg/defaults.yml
+    - ../cfg/local_vars.yml
+
+  vars:
+    pdns_fmri: "svc:/pkgsrc/pdns:default"
+    pdns_conf: "/opt/local/etc/pdns.conf"
+
+  tasks:
+    - name: alter DNS database IP to clustered one
+      lineinfile:
+        state=present
+        dest="{{ pdns_conf }}"
+        regexp="^gpgsql-host *=.*$"
+        line="gpgsql-host={{ cluster_vip }}"
+      notify: restart pdns
+
+  handlers:
+    - name: restart pdns
+      service: name='{{ pdns_fmri }}' state=restarted
+
