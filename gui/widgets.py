@@ -149,7 +149,7 @@ class ByteSizeInput(_DefaultAttrsWidget, widgets.TextInput):
     """
     HTML5 input type for url address
     """
-    default_attrs = frozendict({'pattern': '[0-9\.]+[BKMGTPEbkmgtpe]?'})
+    default_attrs = frozendict({'pattern': '[0-9.]+[BKMGTPEbkmgtpe]?'})
 
 
 # noinspection PyAbstractClass

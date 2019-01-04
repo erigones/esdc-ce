@@ -137,7 +137,7 @@ class ImageView(TaskAPIView):
 
                 return TaskResponse(request, self.task_id, msg=msg, obj=img, api_view=apiview, detail_dict=detail_dict,
                                     data=self.data)
-        except Exception as exc:
+        except Exception:
             pass
 
         # Rollback + return error response

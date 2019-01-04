@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e
 
@@ -30,12 +30,14 @@ ZKCLI=/usbkey/scripts/zookeepercli
 
 # get IP of mgmt01
 if [ -f /usbkey/config ] && [ -x "${ZKCLI}" ]; then
+	#shellcheck disable=SC1091
 	. /usbkey/config
+	#shellcheck disable=SC2154
 	MGMT_IP="$("${ZKCLI}" -servers "${cfgdb_admin_ip}" -auth_usr "esdc" -auth_pwd "${esdc_install_password}" -c get /esdc/vms/esdc-mgmt/hosts/1/ip)"
 fi
 
 set +e
-if [ ! -z "${MGMT_IP}" ]; then
+if [ -n "${MGMT_IP}" ]; then
 	# Update ansible inventory
 	ssh "root@${MGMT_IP}" "${ERIGONES_HOME}/bin/ctl.sh" genhosts --include-nodes > "${HOSTS_TMP_FILE}"
 	if [ "x$?" == "x0" ]; then

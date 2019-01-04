@@ -22,12 +22,12 @@ class DcForm(SerializerForm):
 
     name = forms.CharField(label=_('Name'), max_length=16, required=True,
                            widget=forms.TextInput(attrs={'class': 'input-transparent narrow disable_created',
-                                                         'required': 'required', 'pattern': '[A-Za-z0-9:\._-]+'}))
+                                                         'required': 'required', 'pattern': '[A-Za-z0-9:._-]+'}))
     alias = forms.CharField(label=_('Alias'), required=True, max_length=32,
                             widget=forms.TextInput(attrs={'class': 'input-transparent narrow', 'required': 'required'}))
     site = forms.CharField(label=_('Site Hostname'), max_length=260, required=True,
                            widget=forms.TextInput(attrs={'class': 'input-transparent narrow', 'required': 'required',
-                                                         'pattern': '[a-z0-9\.-]+'}))
+                                                         'pattern': '[a-z0-9.-]+'}))
     owner = forms.ChoiceField(label=_('Owner'), required=False,
                               widget=forms.Select(attrs={'class': 'narrow input-select2'}))
     access = forms.TypedChoiceField(label=_('Access'), required=False, coerce=int, choices=Dc.ACCESS,
