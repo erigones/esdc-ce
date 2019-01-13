@@ -1,6 +1,17 @@
 Changelog
 #########
 
+3.1.0
+=====
+Released on `TBD`
+
+Features
+--------
+
+- Moved VM replication from Enterprise Edition to Community Edition - `#381 <https://github.com/erigones/esdc-factory/issues/381>`__
+- Moved HA scripts and playbooks from Enterprise Edition to Community Edition - `#381 <https://github.com/erigones/esdc-factory/issues/381>`__
+
+
 3.0.0
 =====
 Released on 2018-05-07

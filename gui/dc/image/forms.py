@@ -33,7 +33,7 @@ class _ImageForm(SerializerForm):
     """
     name = forms.CharField(label=_('Name'), max_length=32, required=True,
                            widget=forms.TextInput(attrs={'class': 'input-transparent narrow disable_created',
-                                                         'required': 'required', 'pattern': '[A-Za-z0-9\._-]+'}))
+                                                         'required': 'required', 'pattern': '[A-Za-z0-9._-]+'}))
     alias = forms.CharField(label=_('Alias'), required=True, max_length=32,
                             widget=forms.TextInput(attrs={'class': 'input-transparent narrow', 'required': 'required'}))
     version = forms.CharField(label=_('Version'), required=False, max_length=16,

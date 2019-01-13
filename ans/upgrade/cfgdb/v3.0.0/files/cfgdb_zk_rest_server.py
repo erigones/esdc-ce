@@ -28,8 +28,8 @@ PY3 = sys.version_info[0] >= 3
 if PY3:
     string_types = (str,)
 else:
-    # noinspection PyUnresolvedReferences
-    string_types = (basestring,)
+    # noinspection PyUnresolvedReferences,PyCompatibility
+    string_types = (basestring,)  # noqa: F821
 
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO,

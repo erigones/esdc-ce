@@ -1,0 +1,27 @@
+# Gunicorn systemd service file
+#
+# INSTALL:
+#   - copy gunicorn@.service into /etc/systemd/system/ 
+#   - run: systemctl enable gunicorn@gunicorn-api.service && systemctl start gunicorn@gunicorn-api.service
+#   - run: systemctl enable gunicorn@gunicorn-sio.service && systemctl start gunicorn@gunicorn-sio.service
+#   - run: systemctl enable gunicorn@gunicorn-gui.service && systemctl start gunicorn@gunicorn-gui.service
+
+[Unit]
+Description=Danube Cloud {{ item|upper }} Application Server
+Documentation=https://docs.danubecloud.org
+After=network.target
+
+[Service]
+Environment="DJANGO_SETTINGS_MODULE=core.settings" "PYTHONPATH={PYTHONPATH}:/opt/erigones"
+PIDFile=/opt/erigones/var/run/{{ item }}.pid
+User=root
+ExecStart=/opt/erigones/envs/bin/gunicorn core.wsgi:application -u erigones -g erigones -c /opt/erigones/core/{{ item }}.py --pid /opt/erigones/var/run/{{ item }}.pid
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s TERM $MAINPID
+PrivateTmp=true
+Restart=on-failure
+RestartPreventExitStatus=2
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target

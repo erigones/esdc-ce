@@ -1,0 +1,26 @@
+#!/bin/sh
+
+if [ $(whoami) != "postgres" ]; then 
+	echo "Please run this script as user postgres!"
+	exit 1
+fi
+
+DBMASTER_IP="{{ cluster_vip }}"
+DBPORT="{{ postgres_port }}"
+PGDATA="{{ pgdata }}"
+DBVERSION="{{ pgversion }}"
+REPL_USER="{{ pg_repl_user }}"
+
+EXTENDED_QUERY="SELECT application_name AS slave_name, client_addr, pg_xlog_location_diff(pg_stat_replication.sent_location, pg_stat_replication.replay_location) AS byte_lag, backend_start AS connected_at FROM pg_stat_replication"
+
+SLAVES_COUNT=$(psql -Aqtc "SELECT count(*) FROM pg_stat_replication" -h "$DBMASTER_IP" -U "$REPL_USER" postgres)
+echo "Slaves connected: $SLAVES_COUNT"
+echo
+psql -c "$EXTENDED_QUERY" -h "$DBMASTER_IP" -U "$REPL_USER" postgres
+
+# TODO:
+# "SELECT client_addr FROM pg_stat_replication"
+# - zistit chybajuce
+# - preiterovat pripojene a zistit timeline cez:
+# psql -Aqt -h 10.0.1.131 -p 5432 -U replicator -F' ' -c 'IDENTIFY_SYSTEM' 'dbname=replication replication=true' | awk '{print $2}'
+# - ak je mensia, ako master, vyhlasit warning (a ak sa nezmeni v priebehu par minut, je to problem)

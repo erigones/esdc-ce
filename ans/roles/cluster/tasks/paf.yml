@@ -1,0 +1,96 @@
+# vim: set filetype=yaml expandtab tabstop=2 shiftwidth=2 softtabstop=2 background=dark :
+
+
+#- name: reconfigure database
+#  copy: src=postgresql.conf dest="/var/lib/pgsql/9.5/data/postgresql.conf"
+#  notify: restart postgresql
+#  args:
+#    owner: postgres
+#    group: postgres
+#    mode:  0644
+#
+## netreba nutne
+#- meta: flush_handlers
+
+
+- name: prepare install of DB failover agent
+  copy: src=resource-agents-paf-2.1~rc1-1.noarch.rpm dest=/root/resource-agents-paf-2.1~rc1-1.noarch.rpm
+
+- name: install DB failover agent
+  yum:
+    name: /root/resource-agents-paf-2.1~rc1-1.noarch.rpm
+    state: present
+
+- name: apply patches to DB failover agent
+  copy: src=pgsqlms dest=/usr/lib/ocf/resource.d/heartbeat/pgsqlms
+  args:
+    owner: root
+    group: root
+    mode:  0555
+
+- name: prepare DB recovery config
+  template: src=recovery.conf.pcmk.j2 dest="{{ pgdata }}/../recovery.conf.{{cluster_name}}.pcmk"
+  args:
+    owner: postgres
+    group: postgres
+    mode:  0644
+
+- name: stop database for clustering
+  service: name="{{ postgres_orig_svcname }}" state=stopped enabled=false
+
+- name: create database cluster resource
+  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
+  pcs_resource: command=create resource_id="{{ cluster_postgres_res_name }}" type=ocf:heartbeat:pgsqlms
+  args:
+    disabled: True
+    options:
+      bindir: "{{ bindir }}"
+      pgdata: "{{ pgdata }}"
+      pgport: "{{ postgres_port }}"
+      recovery_template: "{{ pgdata }}/../recovery.conf.{{cluster_name}}.pcmk"
+    operations:
+      - action: start
+        options:
+          timeout: 60s
+      - action: stop
+        options:
+          timeout: 60s
+      - action: promote
+        options:
+          timeout: 30s
+      - action: demote
+        options:
+          timeout: 120s
+      - action: notify
+        options:
+          timeout: 60s
+      - action: monitor
+        options:
+          interval: 15s
+          timeout: 10s
+          role: Master
+      - action: monitor
+        options:
+          interval: 16s
+          timeout: 10s
+          role: Slave
+
+- name: create master DB resource
+  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
+  pcs_resource: command=master resource_id="{{ cluster_postgres_HA_res_name }}" ms_name="{{ cluster_postgres_res_name }}" disabled=True
+  args:
+    options:
+      master-max      : 1
+      master-node-max : 1
+      clone-max       : "{{ play_hosts|length }}"
+      clone-node-max  : 1
+      notify          : true
+
+- name: enable database cluster resource
+  shell: pcs resource enable "{{ cluster_postgres_HA_res_name }}" 
+  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
+
+- name: setting DB location constraints
+  shell: pcs constraint location "{{ cluster_postgres_HA_res_name }}" prefers {% for clhost in play_hosts %}{{clhost}}=100 {% endfor %}
+  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
+

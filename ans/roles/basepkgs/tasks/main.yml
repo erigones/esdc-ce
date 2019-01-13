@@ -1,0 +1,6 @@
+---
+- name: install base pkgs
+  yum:
+   name: vim, screen, tmux
+   state: present
+

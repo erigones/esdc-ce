@@ -1,0 +1,71 @@
+
+# auth config
+pg_repl_user: replicator
+
+# hosts config
+mgmt_nodes: '{{ play_hosts | select("match","^mgmt[0-9]{2}$") | list }}'
+cluster_observer_hosts: []
+cluster_all_hosts: "{{ play_hosts }}"
+cluster_master_host: "{{ mgmt_nodes[0] }}"     # sync DB from this node (set to first node if not defined)
+
+# generic config
+pgversion: 9.5
+postgres_orig_svcname: postgresql-9.5
+pgdata: /var/lib/pgsql/9.5/data
+bindir: /usr/pgsql-9.5/bin
+postgres_port:  5432
+cluster_name: 'ansiblecl'
+cluster_vip_res_name:  'mgmt-vip'
+cluster_postgres_res_name: 'postgres'         # slave DB resource
+cluster_postgres_HA_res_name: 'postgres-ha'   # this resource is used in cluster management
+cluster_resgroup_name_pre_db: 'grp1'
+cluster_resgroup_name_post_db: 'grp2'
+restart_on_esdc_cfg_change_systemd:
+  - erigonesd
+  - esdc@gunicorn-sio
+  - esdc@gunicorn-api
+  - esdc@gunicorn-gui
+restart_on_esdc_cfg_change_cluster:
+  - erigonesd-beat
+services_systemd_enabled:
+  - redis
+  - erigonesd
+  - esdc@gunicorn-sio
+  - esdc@gunicorn-api
+  - esdc@gunicorn-gui
+  - nginx
+  - haproxy
+
+rabbitmq:
+  user: 'esdc'
+  # this will be replaced by local CARP IP
+  # After that, pls change ha-nodes.yml task
+  host: '127.0.0.1'
+  port: '5672'
+  password: '{{ rabbitmq_password }}'
+  vhost: 'esdc'
+  cfgdir: '/etc/rabbitmq'
+  dbdir: '/var/lib/rabbitmq'
+  service: 'rabbitmq-server'
+rabbitmq_federation_policy:
+    - 1:
+      name: 'federate_dc_queues'
+      applyto: 'queues'
+      match: '^(fast|slow|backup|image)\\..*'
+    - 2:
+      name: 'federate_events'
+      applyto: 'exchanges'
+      match: '^celeryev$'
+    - 3:
+      name: 'federate_pidbox'
+      applyto: 'exchanges'
+      match: '^celery.pidbox$'
+    - 4:
+      name: 'federate_reply_pidbox'
+      applyto: 'exchanges'
+      match: '^reply.celery.pidbox$'
+    - 5:
+      name: 'federate_mgmt'
+      applyto: 'queues'
+      match: '^mgmt$'
+

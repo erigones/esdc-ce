@@ -32,13 +32,13 @@ class DcNodeForm(SerializerForm):
                              help_text=_('Total RAM size in MB for VMs.'),
                              widget=forms.TextInput(attrs={'class': 'input-transparent narrow input-mbytes',
                                                            'required': 'required',
-                                                           'pattern': '[0-9\.]+[BKMGTPEbkmgtpe]?'}))
+                                                           'pattern': '[0-9.]+[BKMGTPEbkmgtpe]?'}))
     # noinspection SpellCheckingInspection
     disk = forms.IntegerField(label=_('Disk pool size'), required=False,
                               help_text=_('Size of the local disk pool for VMs.'),
                               widget=forms.TextInput(attrs={'class': 'input-transparent narrow input-mbytes',
                                                             'required': 'required',
-                                                            'pattern': '[0-9\.]+[BKMGTPEbkmgtpe]?'}))
+                                                            'pattern': '[0-9.]+[BKMGTPEbkmgtpe]?'}))
     add_storage = forms.TypedChoiceField(label=_('Attach node Storages'), required=False, coerce=int, empty_value=0,
                                          choices=add_storage_choices,
                                          widget=forms.Select(attrs={'class': 'narrow input-select2 disable_created2'}))
