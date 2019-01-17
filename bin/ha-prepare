@@ -1,0 +1,766 @@
+#!/usr/bin/env python
+
+###### CONFIG START ######
+
+ERIGONES_HOME = '/opt/erigones'
+CFGDB_BIN = '%s/bin/query_cfgdb' % ERIGONES_HOME
+CFG_FILE = '%s/ans/ha/cfg/haconf.py' % ERIGONES_HOME
+ANSIBLE_CFG_FILE = '%s/ans/ha/cfg/local_vars.yml' % ERIGONES_HOME
+PWDHASHER = '/usr/lib/cryptpass'
+SSH_ARGS = '-o StrictHostKeyChecking=no'
+DEBUG_LEVEL = 3
+
+# LOGLEVELS:
+loglevels = {}
+loglevels[0] = 'CRIT'       # App unusable. Call to end application ASAP.
+loglevels[1] = 'WARN'       # App unstable, but probably we can still continue.
+loglevels[2] = 'INFO'       # Things are going as they should.
+loglevels[3] = 'DEBUG'      # More info about what's happening. Output diffs included.
+loglevels[4] = 'TRACE1'     # Even more info, dump important variables.
+loglevels[5] = 'TRACE2'     # Dump also variables in cycles (= print a lot of data).
+
+# activate virtualenv
+activate_script = '%s/envs/bin/activate_this.py' % ERIGONES_HOME
+execfile(activate_script, dict(__file__=activate_script))
+
+CONF_DEFAULTS = {
+    'dc_timeout': 500,
+    'mgmt': {
+        'mgmt01': {
+        },
+    },
+    'mgmt_ram_required': 2048,
+}
+
+## Example configuration:
+#{   'mgmt_failover_ip': '10.0.1.168',
+#    'dc_url': 'https://10.0.1.140/api',
+#    'dc_timeout': 500,
+#    'mgmt': {
+#        'mgmt01': {
+#            'ip': 'auto',
+#        },
+#        'mgmt08': {
+#            'node': 'erigodev-phys2.office.erigones.com',
+#            'image': 'esdc-mgmt-ee-251',
+#            'ip': 'auto',
+#        },
+#        'mgmt09': {
+#            'node': 'erigodev-phys1.office.erigones.com',
+#            'image': 'esdc-mgmt-ee-251',
+#            'ip': 'auto',
+#        },
+#    },
+#    'mgmt_ram_required': 2048,
+#    'mgmt_keys': 'ssh-rsa ...',
+#}
+
+try:
+    execfile(CFG_FILE)
+except IOError:
+    CONF = CONF_DEFAULTS
+
+######  CONFIG END  ######
+
+
+
+from esdc_api import Client
+from esdc_api.exceptions import ClientError, ServerError
+#from esdc_api.response import Response
+from requests.auth import HTTPBasicAuth
+from requests.packages.urllib3 import disable_warnings
+from requests.exceptions import RequestException, ConnectionError
+disable_warnings()
+import pprint
+from time import sleep
+from os.path import isfile
+from yaml import safe_dump
+
+
+# runcmd requirements
+import subprocess
+import shlex
+from sys import stdout, exc_info
+
+import signal
+import datetime
+
+# password generation
+import string
+import random
+
+# esdc connection handle
+es = None
+
+class ValidationError(Exception):
+    pass
+
+
+
+#### SYSTEM FUNCTIONS ####
+
+logger = None
+def init_logging():
+    # log handling
+    global logger
+    import logging
+    logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%Y-%m-%d %H:%M:%S %p')
+
+def logline(severity, text):
+    if severity <= DEBUG_LEVEL:
+        try:
+            if logger:
+                logger.info("%s: %s" % (loglevels[severity], text))
+            else:
+                print "%s %s: %s" % (str(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')), loglevels[severity], text)
+                                                                                                    #logger.info("%s %s: %s" % (str(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')), loglevels[severity], text))
+        except KeyError:
+            logline(0, 'Invalid loglevel specified (%s) for message: %s' % (str(severity), text))
+
+def end(retcode = 0, msg = '', severity = 0):
+    if msg:
+        logline(severity, msg)
+    if retcode:
+        logline(3, "Exitting with error code %i." % retcode)
+    else:
+        logline(3, "Exitting with success.")
+    exit(retcode)
+
+def init_signals():
+    # signal handling
+    def ctrl_c(signal, frame):
+        logline(1, 'Interrupt received. Exiting..')
+        end(0)
+    signal.signal(signal.SIGINT, ctrl_c)
+    signal.signal(signal.SIGTERM, ctrl_c)
+
+def runcmd(cmd, stdin_buf=None):
+    def printoutput(severity, msg, header_msg=''):
+        if msg:
+            if header_msg:
+                logline(severity, header_msg)
+            for line in msg.splitlines():
+                logline(severity, line)
+
+    try:
+        process = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+        if(stdin_buf == None):
+            stdout, stderr = process.communicate()
+        else:
+            stdout, stderr = process.communicate(input=stdin_buf)
+        proc_retval = process.wait()
+        if proc_retval:
+            # command returned non-zero
+            logline(1, 'Command failed: ' + cmd)
+            printoutput(1, stdout, 'Failed command STDOUT:')
+            printoutput(1, stderr, 'Failed command STDERR:')
+            return None
+        else:
+            logline(3, 'Command succeeded: ' + cmd)
+            printoutput(4, stdout, 'Command STDOUT:')
+            printoutput(4, stderr, 'Command STDERR:')
+            return stdout
+    #TODO
+    #except (OSError, ValueError) as e:
+    except:
+        import traceback
+        logline(1, 'Command "%s" failed with message: %s' % (cmd, traceback.format_exception(*exc_info())))
+        return None
+
+
+def cfgdb_get(path):
+    out = runcmd(CFGDB_BIN + ' get ' + path)
+    return out.rstrip() if out else ''
+
+def cfgdb_set(path, node_data):
+    return runcmd(CFGDB_BIN + ' set %s %s' % (path, node_data))
+
+# create recursive
+def cfgdb_creater(path, node_data):
+    return runcmd(CFGDB_BIN + ' creater ' + path + ' ' + node_data)
+
+
+def generate_random_password(length=20):
+    return ''.join(random.SystemRandom().choice(string.ascii_letters + string.digits) for _ in range(length))
+
+def hash_password(passwd):
+    hashed = runcmd('%s %s' % (PWDHASHER, passwd))
+    if hashed == None or hashed.rstrip() == '':
+        end(22, 'ERROR: Could not generate password hash!')
+    else:
+        return hashed.rstrip()
+
+# save discevered options, so this script it can be
+# run multiple times without messing things up
+def save_conf():
+    logline(5, 'Saving CONF:\n%s' % pprint.pformat(CONF))
+    with open(CFG_FILE, 'w') as cfgf:
+        cfgf.truncate()
+        cfgf.write('CONF = %s\n' % pprint.pformat(CONF))
+
+def load_conf():
+    with open(ANSIBLE_CFG_FILE, 'r') as stream:
+        try:
+            print(yaml.load(stream))
+        except yaml.YAMLError as exc:
+            print(exc)
+
+# save preferences needed for next stage of HA deployment
+def write_ansible_conf():
+    ANSCFG = {}
+    if isfile(ANSIBLE_CFG_FILE):
+        logline(3, 'Ansible conf file already exists. Not overwriting (%s)' % ANSIBLE_CFG_FILE)
+    else:
+        logline(5, 'Saving ansible conf:\n%s' % pprint.pformat(ANSIBLE_CFG_FILE))
+        # create a conf
+        ANSCFG.update({'cluster_vip': CONF['mgmt_failover_ip']})
+        ANSCFG.update({'cluster_vip_mask': get_net_prefix('admin')})
+        rabbitmq_password = get_vm_mdata('mgmt01.local', 'org.erigones:rabbitmq_password')
+        if not rabbitmq_password:
+            end(7, 'Cannot retrieve rabbitmq password from mgmt01 metadata')
+        ANSCFG.update({'rabbitmq_password': rabbitmq_password})
+
+        redis_password = get_vm_mdata('mgmt01.local', 'org.erigones:redis_password')
+        if not redis_password:
+            end(7, 'Cannot retrieve redis password from mgmt01 metadata')
+        ANSCFG.update({'redis': {'password': redis_password}})
+
+        # generate cluster sync & replicate passwords
+        cluster_ha_password = generate_random_password(30)
+        cluster_ha_password_hash = hash_password(cluster_ha_password)
+        pg_repl_pass = generate_random_password(30)
+        ANSCFG.update({'cluster_ha_password': cluster_ha_password})
+        ANSCFG.update({'cluster_ha_password_hash': cluster_ha_password_hash})
+        ANSCFG.update({'pg_repl_pass': pg_repl_pass})
+
+        # convert to YAML and save
+        with open(ANSIBLE_CFG_FILE, 'w') as acfg:
+            acfg.write(safe_dump(ANSCFG, default_flow_style=False))
+            logline(2, 'Next stage config written for ansible use: %s' % ANSIBLE_CFG_FILE)
+
+
+# Ask for user input. Supports default values.
+# If default value is None, user is required to supply answer.
+def ask_user(message, default=None):
+    if default == None:
+        message = ('\n** %s: ' % message) 
+    else:
+        message = ('\n** %s (%s): ' % (message, default)) 
+
+    while True:
+        stdout.write(message)
+        buf = raw_input()
+        if default == None and buf == '':
+            continue
+        return default if buf == '' else buf
+
+# Perform basic configuration so we are able to connect to API
+def config_basic():
+    global CONF
+    # mgmt01
+    if not CONF['mgmt']['mgmt01'].has_key('ip'):
+        update_mgmt01_ip()
+        update_mgmt_url()
+    elif CONF['mgmt']['mgmt01'].has_key('ip') and CONF['mgmt']['mgmt01']['ip'] == 'auto':
+        update_mgmt01_ip()
+        update_mgmt_url()
+    # API key
+    if not CONF.has_key('dc_api_key'):
+        CONF['dc_api_key'] = ask_user('Please specify Danube Cloud API key')
+
+# Check availability of all required info and ask user if something's required
+def config_extended():
+    global CONF
+    populate_vms = ['mgmt01', 'mgmt02', 'mgmt03']
+    mgmt_image = None
+
+    # Ask for new failover IP addr.
+    # List empty IPs.
+    getparams = {'usage': 1}
+    free_ips = es_get('/network/admin/ip', **getparams)
+    free_ips.append('auto') # auto is also a valid option
+    # get mgmt IP info
+    if not CONF.has_key('mgmt_failover_ip'):
+        for ipaddr in free_ips:
+            print ipaddr
+        ip = ask_user('Please specify a new mgmt failover IP address', 'auto')
+        while ip not in free_ips:
+            for i in free_ips:
+                print i
+            ip = ask_user('Please specify a free IP address from the list', 'auto')
+        if ip == 'auto':
+            # auto-assign the first free IP
+            ip = free_ips[0]
+        free_ips.remove(ip)
+        CONF['mgmt_failover_ip'] = ip
+
+        # set failover IP as type 'other' so it won't be assigned to another VM
+        logline(2, 'Setting IP %s as reserved' % CONF['mgmt_failover_ip'])
+        params = {'note': 'Danube Cloud HA GUI failover IP'}
+        es_change('/network/admin/ip/'+CONF['mgmt_failover_ip'], **params)
+        save_conf()
+
+    for vm in populate_vms:
+        # create base entry for vm
+        if not CONF['mgmt'].has_key(vm):
+            CONF['mgmt'][vm] = {}
+
+        if not CONF['mgmt'][vm].has_key('ip'):
+            ip = ask_user('Please specify an IP address for ' + vm, 'auto')
+            while ip not in free_ips:
+                for i in free_ips:
+                    print i
+                ip = ask_user('Please specify a free IP address from the list', 'auto')
+            if ip == 'auto':
+                # auto-assign the first free IP
+                ip = free_ips[0]
+            free_ips.remove(ip)
+            CONF['mgmt'][vm]['ip'] = ip
+
+        # assign vm image
+        if not CONF['mgmt'][vm].has_key('image'):
+            if not mgmt_image:
+                imglist = es_get('/image')
+                print '\nImage list:'
+                for img in imglist:
+                    print img
+                mgmt_image = ask_user('Please specify image name for all new mgmt VMs')
+                while mgmt_image not in imglist:
+                    mgmt_image = ask_user('Please specify CORRECT image name for all new mgmt VMs')
+
+            CONF['mgmt'][vm]['image'] = mgmt_image
+
+        # on which node the VM will be running on?
+        # Answer is mandatory.
+        CONF['mgmt']['mgmt01']['node'] = es_get('/vm/mgmt01.local')['node']
+        if (vm != 'mgmt01') and (not CONF['mgmt'][vm].has_key('node')):
+            nodelist = es_get('/node')
+            print '\nNode list:'
+            for n in nodelist:
+                print n
+            dstnode = ask_user('Please specify destination node of %s VM' % vm)
+            while dstnode not in nodelist:
+                dstnode = ask_user('Please specify CORRECT destination node of %s VM' % vm)
+            CONF['mgmt'][vm]['node'] = dstnode
+
+    save_conf()
+    # gather authorized keys from all nodes that will be hosting mgmt servers
+    if not CONF.has_key('mgmt_keys'):
+        logline(3, 'Getting public keys of nodes')
+        mgmt_keys = es_get('/vm/mgmt01.local/define')['mdata']['root_authorized_keys']
+        GETCMD = 'ssh %s root@%s cat /root/.ssh/id_rsa.pub'
+        nodelist = []
+        for vm in populate_vms:
+            n = CONF['mgmt'][vm]['node']
+            if n not in nodelist:
+                nodelist.append(es_get('/node/'+n)['address'])
+        pubkeylist = ''
+        for n in nodelist:
+            pubkey = runcmd(GETCMD % (SSH_ARGS, n))
+            if pubkey not in pubkeylist:
+                pubkeylist += pubkey
+        if pubkeylist:
+            CONF['mgmt_keys'] = pubkeylist
+        else:
+            logline(1, 'Failed to populate root_authorized_keys! Store them manually to metadata of newly created mgmt VMs.')
+    save_conf()
+
+
+# get API IP from available sources
+def update_mgmt01_ip():
+    global CONF
+    ip = cfgdb_get('/esdc/vms/esdc-mgmt/hosts/1/ip')
+    if ip:
+        CONF['mgmt']['mgmt01']['ip'] = ip
+    else:
+        CONF['mgmt']['mgmt01']['ip'] = ask_user('Please specify IP address of mgmt01 VM')
+
+def update_mgmt_url():
+    global CONF
+    CONF['dc_url'] = 'https://%s/api' % CONF['mgmt']['mgmt01']['ip']
+
+
+#### ESDC FUNCTIONS ####
+
+def login():
+    try:
+        logline(2, 'Logging into API')
+        global es
+        es = Client(api_url=CONF['dc_url'], ssl_verify=False, timeout=CONF['dc_timeout'], api_key=CONF['dc_api_key'])
+        #es.login(username=CONF['dc_user'], password=CONF['dc_pass'])
+        if es.ping() != 'pong':
+            end(5, 'Cannot login to API')
+        logline(3, 'Logged in')
+    except (ClientError, ServerError) as e:
+        end(e.status_code, "Login error: %s" % e)
+
+def logout():
+    try:
+        logline(2, 'Logging off from API')
+        global es
+        es.logout()
+        es = None
+    except ClientError as e:
+        end(e.status_code, "Logoff error: %s" % e)
+    except:
+        es = None
+        pass
+
+# GET
+def es_get(api_req, dc='admin', **params):
+    try:
+        return es.get(api_req, dc=dc, **params).content.result
+    except ClientError as e:
+        end(e.status_code, "ESDC error: %s" % e)
+
+# POST
+def es_create(api_req, dc='admin', **params):
+    try:
+        return es.post(api_req, dc=dc, **params).content.result
+    except ClientError as e:
+        end(e.status_code, "ESDC error: %s" % e)
+
+# PUT
+def es_change(api_req, dc='admin', **params):
+    try:
+        return es.put(api_req, dc=dc, **params).content.result
+    except ClientError as e:
+        end(e.status_code, "ESDC error: %s" % e)
+# PUT
+def es_set(*args, **kwargs):
+    return es_change(*args, **kwargs)
+
+# DELETE
+def es_delete(api_req, dc='admin', **params):
+    try:
+        return es.delete(api_req, dc=dc, **params).content.result
+    except ClientError as e:
+        end(e.status_code, "ESDC error: %s" % e)
+
+def vm_exists(name, dc='admin'):
+    try:
+        es.get('/vm/' + name, dc=dc).content.result
+    except ClientError as e:
+        if e.status_code == 404:
+            return False
+        else:
+            end(e.status_code, "ESDC error: %s" % e)
+    return True
+
+def get_node_ip(nodename, dc='admin'):
+    try:
+        return es_get('/node/'+nodename, dc)["address"]
+    except:
+        logline(1, 'Cannot determine IP address of node ' + nodename)
+        exit(55)
+
+def get_node_param(host, param, dc='admin'):
+    try:
+        return es_get('/node/'+host, dc)[param]
+    except:
+        logline(1, 'Cannot determine parameter "%s" of host %s' % (param, host))
+        exit(55)
+
+def get_vm_param(vmname, param, dc='admin'):
+    try:
+        return es_get('/vm/'+vmname, dc)[param]
+    except:
+        logline(1, 'Cannot get parameter "%s" of VM %s' % (param, vmname))
+        exit(55)
+
+def get_vm_config(vmname, dc='admin'):
+    getparams = {'full':True}
+    return es_get('/vm/'+mgmtname_full+'/define', dc, **getparams)
+
+def get_net_prefix(netname):
+    netmask = es_get('/network/'+netname)['netmask']
+    # convert to prefix
+    return sum([bin(int(x)).count("1") for x in netmask.split(".")])
+
+def get_vm_mdata(vmname, key, dc='admin'):
+    vmcfg = es_get('/vm/'+vmname+'/define', dc)
+    if vmcfg.has_key('mdata') and vmcfg['mdata'].has_key(key):
+        return vmcfg['mdata'][key]
+    else:
+        return None
+
+def check_nodes_availability(catcherrors=True):
+    # check status of all nodes (all need to be available for success)
+    try:
+        nodes = es.get('/node').content.result
+        for n in nodes:
+            if es.get('/node/'+n).content.result['node_status'] != 'online':
+                return False
+        # all nodes in online state
+        return True
+    except ClientError as e:
+        if catcherrors:
+            logline(1, 'Failed to check nodes availability (%s)' % e)
+        else:
+            raise
+
+# create new dict that will contain selected items (VM settings)
+# copied from the source definition
+def replicate_vm_definition(src_definition, settings_list):
+    newdef = {}
+    [newdef.update({x: src_definition[x]}) for x in settings_list]
+    return newdef
+
+def add_to_vm_definition(definition, settings):
+    if not isinstance(settings, dict):
+        raise ValidationError("add_to_vm_definition: inserted settings is not in dict format")
+    return definition.update(settings)
+
+
+
+#### VM CREATE/ALTER FUNCTIONS ####
+
+def modify_mgmt01(mgmtname_full):
+    global CONF
+
+    mgmt_conf_changed = False
+
+    logline(2, "Inspecting config of VM %s" % mgmtname_full)
+    mgmt01_vm_definition = get_vm_config(mgmtname_full)
+    logline(5, pprint.pformat(mgmt01_vm_definition))
+
+    # check mgmt01 config
+    # Let's make checks - determine what's needed
+    if(mgmt01_vm_definition['ram'] < CONF['mgmt_ram_required']):
+        update_data = {}
+        update_data['ram'] = CONF['mgmt_ram_required']
+        es_change('/vm/'+mgmtname_full+'/define', 'admin', **update_data)
+        mgmt_conf_changed = True
+
+    # buggy, using allow_ip_spoofing instead
+    #if (CONF['mgmt_failover_ip'] not in mgmt01_vm_definition['nics'][0]['allowed_ips']):
+    #    update_data = {'allowed_ips': [CONF['mgmt_failover_ip']]}
+    #    #update_data['allowed_ips'] = [CONF['mgmt_failover_ip']]
+    #    es_change('/vm/'+mgmtname_full+'/define/nic/1', 'admin', **update_data)
+    #    mgmt_conf_changed = True
+
+    if (not mgmt01_vm_definition['nics'][0]['allow_ip_spoofing']):
+        update_data = {'allow_ip_spoofing': True}
+        es_change('/vm/'+mgmtname_full+'/define/nic/1', 'admin', **update_data)
+        mgmt_conf_changed = True
+
+    if (mgmt01_vm_definition['mdata']['root_authorized_keys'] != CONF['mgmt_keys']):
+        # we need to update the root_authorized_keys mdata
+        update_data = {}
+        mgmt01_vm_definition['mdata']['root_authorized_keys'] = CONF['mgmt_keys']
+        update_data['mdata'] = mgmt01_vm_definition['mdata']
+        es_change('/vm/'+mgmtname_full+'/define', 'admin', **update_data)
+        mgmt_conf_changed = True
+
+    if mgmt_conf_changed:
+        logline(2, "Applying changes to %s" % mgmtname_full)
+        es_change('/vm/'+mgmtname_full)
+        reboot_mgmt(mgmtname_full)
+
+    else:
+        logline(2, "No changes required to %s" % mgmtname_full)
+
+    logline(3, 'Writing new failover IP (%s) to cfgdb' % CONF['mgmt_failover_ip'])
+    cfgdb_set('/esdc/vms/esdc-mgmt/master/ip', CONF['mgmt_failover_ip'])
+
+        
+def reboot_mgmt(mgmtname_full):
+    # we have to use vmadm command because API command would leave the mgmt VM in a "shutting down" state
+    mgmt01_uuid=get_vm_param(mgmtname_full, 'uuid')
+    mgmt01_node=get_vm_param(mgmtname_full, 'node')
+    mgmt01_node_ip=get_node_param(mgmt01_node, 'address')
+    REBOOT_CMD='ssh %s root@%s /usr/sbin/vmadm reboot %s 2>&1' % (SSH_ARGS,  mgmt01_node_ip, mgmt01_uuid)
+
+    logout()
+    # ** no API functions can be called from now on!!
+
+    logline(2, 'Rebooting VM %s using vmadm (%s)' % (mgmtname_full, REBOOT_CMD))
+    output = runcmd(REBOOT_CMD)
+    if 'Successfully ' not in output:
+        end(22, 'Failed to reboot VM with error: %s' % output)
+
+    # wait for VM to become reachable again
+    global es
+    es = Client(api_url=CONF['dc_url'], ssl_verify=False, timeout=5, api_key=CONF['dc_api_key'])
+    #es = Client(api_url=CONF['dc_url'], ssl_verify=False, timeout=5)
+    retries = 60
+    sleep_time = 2  # seconds
+
+    waiting_for_nodes = False
+    while retries > 0:
+        retries-=1
+        try:
+            #response = es.login(username=CONF['dc_user'], password=CONF['dc_pass'])
+            #if not response.ok:
+            #    raise RequestException()
+            if es.ping() != 'pong':
+                raise RequestException()
+
+            # api is already available, waiting for nodes to connect
+            waiting_for_nodes = True
+            # check status of all nodes (allow errors to be caught by upper try block)
+            if not check_nodes_availability(catcherrors=False):
+                raise RequestException()
+
+        except ClientError as e:
+            if e.status_code == 403:
+                # auth failed, there's nothing to retry in this case
+                raise
+            else:
+                raise RequestException()
+
+        except (RequestException, ServerError) as e:
+            if waiting_for_nodes:
+                logline(2, 'Waiting nodes to reconnect (%i retries left)...' % retries)
+            else:
+                logline(2, 'Waiting for %s to become reachable (%i retries left)...' % (mgmtname_full, retries))
+            sleep(sleep_time)
+
+        else:
+            logline(2, 'Logged in')
+            logline(2, 'Continuing pre-deployment..')
+            break
+
+    if retries == 0:
+        if waiting_for_nodes:
+            print '!!!! All nodes did not reconnect. Please correct the problem and press ENTER to continue...'
+            raw_input("")
+            # we will trust the user that nodes are already ok..
+            pass
+        else:
+            end(66, 'Cannot reconnect to API. Please check the "dc_url" variable in cfg file %s' % CFG_FILE)
+
+        # ** API functions can be called again from now on
+
+
+def clone_mgmt_vm(name, original_vm):
+
+    vmname = name + '.local'
+
+    params = {'full': True}
+    source_template = es_get('/vm/'+original_vm+'/define', **params)
+
+    ## es create /vm/mgmt03.local/define -dc admin -alias mgmt03 -ostype 1 -vcpus 1 -ram 512 -node cn1 -monitoring_templates t_role-mgmt -resolvers 10.0.1.123 -installed true -mdata json::''
+    logline(2, "Creating VM %s" % vmname)
+    #new_vm_definition = replicate_vm_definition(source_template, ['ostype', 'vcpus', 'ram', 'monitoring_templates', 'resolvers', 'mdata'])
+    new_vm_definition = replicate_vm_definition(source_template, ['ostype', 'vcpus', 'ram', 'resolvers', 'mdata'])
+    add_to_vm_definition(new_vm_definition, {'dc': 'admin'})
+    add_to_vm_definition(new_vm_definition, {'alias': name})
+    add_to_vm_definition(new_vm_definition, {'node':CONF['mgmt'][name]['node']})
+    
+    # Add ssh pubkey of node that will mgmt02 reside on (so the node can login to mgmt02 locally).
+    # And keep also the pubkey of the first node (the original one).
+    #mgmt02_node_ssh_key = 'my new key'
+    #new_vm_definition['mdata']['root_authorized_keys'] = new_vm_definition['mdata']['root_authorized_keys'] + '\n' + mgmt02_node_ssh_key
+    # -- not needed, already updated on mgmt01:
+    #new_vm_definition['mdata']['root_authorized_keys'] = CONF['mgmt_keys']
+
+    logline(5, pprint.pformat(new_vm_definition))
+    
+    es_create('/vm/'+vmname+'/define', **new_vm_definition)
+    logline(2, 'VM created')
+    
+    # create network
+    # es create /vm/mgmt03.local/define/nic/1 -net admin -ip 10.0.1.132 -allow_ip_spoofing true 
+    logline(2, "Adding network to %s" % vmname)
+    #new_vm_net = source_template['nics'][0]
+    new_vm_net = replicate_vm_definition(source_template['nics'][0], ['allow_ip_spoofing', 'allow_mac_spoofing', 'allow_restricted_traffic', 'allow_unfiltered_promisc', 'allowed_ips', 'model', 'monitoring', 'net', 'primary'])
+    add_to_vm_definition(new_vm_net, {'dc': 'admin'})
+    add_to_vm_definition(new_vm_net, {'ip': CONF['mgmt'][name]['ip']})
+    
+    logline(5, pprint.pformat(new_vm_net))
+    es_create('/vm/'+vmname+'/define/nic/1', **new_vm_net)
+    logline(2, 'Network added')
+    
+    # add disk
+    # es create /vm/mgmt03.local/define/disk/1 -dc admin -image esdc-mgmt-ee -size 10240 -boot true 
+    logline(2, "Adding disk to %s" % vmname)
+    new_vm_disk = source_template['disks'][0]
+    add_to_vm_definition(new_vm_disk, {'dc': 'admin'})
+    add_to_vm_definition(new_vm_disk, {'image': CONF['mgmt'][name]['image']})
+    logline(5, pprint.pformat(new_vm_disk))
+    es_create('/vm/'+vmname+'/define/disk/1', **new_vm_disk)
+    logline(2, 'Disk added')
+    
+    # deploy VM
+    # es create /vm/mgmt03.local 
+    logline(2, "Deploying VM %s..." % vmname)
+    retries = 60
+    sleep_time = 5
+    try:
+        es_create('/vm/'+vmname)
+    except ConnectionError:
+        logline(2, 'Waiting for VM become ready..')
+        while retries > 0:
+            retries-=1
+            if (es_get('/vm/'+vmname)['status'] == 'running'):
+                break
+            else:
+                sleep(sleep_time)
+
+    logline(2, 'VM deployed')
+
+
+
+
+
+
+
+
+
+
+
+#### BEGIN ####
+init_logging()
+init_signals()
+
+BANNER = '\n\
+        This program is a first step in HA deployment.\n\
+\n\
+        It will do following actions:\n\
+            - verify and alter configuration of mgmt01\n\
+            - configure a failover IP of management VMs\n\
+            - reboot mgmt01 if necessary\n\
+            - prepare and deploy mgmt02 and mgmt03\n\
+\n\
+        Before continuing, please check that:\n\
+            - you have current mgmt image downloaded\n\
+            - there are at least 3 free IPs in the admin network\n\
+            - you have free CPUs and RAM resources on nodes\n\
+\n\
+        If this script fails, just remove the created VMs and rerun it.\n\
+\n\
+        Already existing mgmt* VMs will not be touched in this phase.\n\
+\n\
+        Press ENTER to continue...'
+
+print BANNER
+raw_input("")
+
+config_basic()
+login()
+save_conf()
+config_extended()
+logline(2, 'Config saved. For further changes edit or delete this config file %s and then re-run this script.' % CFG_FILE)
+
+logline(2, 'Checking status of all nodes')
+if not check_nodes_availability():
+    end(22, 'Not all nodes are in online state. Please correct the problems and re-run this script.')
+
+mgmtname = 'mgmt01'
+mgmtname_full=mgmtname + '.local'
+
+modify_mgmt01(mgmtname_full)
+
+# create the VMs
+vmlist = [x for x in CONF['mgmt'] if x != 'mgmt01']
+for vmname in vmlist:
+    vmname_full = vmname + '.local'
+    if not vm_exists(vmname_full):
+        clone_mgmt_vm(vmname, mgmtname_full)
+    else:
+        logline(2, 'VM %s already exists. If it\' not deployed correctly, please delete it and rerun this script.' % vmname_full)
+
+save_conf()
+write_ansible_conf()
+logline(2, 'The preparation for the HA deployment finished successfully.')

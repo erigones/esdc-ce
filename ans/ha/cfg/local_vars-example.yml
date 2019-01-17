@@ -1,0 +1,16 @@
+# This is a sample file of local_vars.yml.
+# Without creating the local_vars.yml file, 
+# the deployment of HA will throw an error.
+# Every variable listed here needs to be
+# altered according to local installation.
+# You will find most of these settings 
+# in metadata variables of mgmt01.local.
+
+cluster_vip:  10.0.1.140
+cluster_vip_mask: 24
+pg_repl_pass: nif0OndayufZics2
+cluster_ha_password: 'fropFav7epAbOch2'
+cluster_ha_password_hash: '$6$MHAki4YS$Nk7O3FEC2G.INznoSUj4ByFgdwFJ8mcI9.Ks3XAoLLe9f9GB36G8hZe9o8ygDySJwvnLVCn0LGPzcOapK42/A/'  # fropFav7epAbOch2
+rabbitmq_password: 'MJjGmJMnB8CBPUF8SptjwxemhkVYfa0O'
+redis:
+  password: 'Nw8mL4979pwfjHtWy3m4lksLBxLgWqdQ'

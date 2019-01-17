@@ -1,0 +1,5 @@
+{% load i18n %}
+<tr id="vm_replica_status_{{ vm.hostname }}"{% if not slave_vm %} class="hide"{% endif %}>
+  <td>{% trans "Replication status" %}:</td>
+  <td><span class="vm_replica_sync_status {{ slave_vm.rep_enabled|yesno:"icon-enabled,icon-disabled" }}"><i class="icon-arrow-right"></i></span> <span class="vm_replica_last_sync dynatext" data-toggle="tooltip" data-placement="right" title="{% trans "Time of last successful sync" %}">{% if slave_vm %}{{ slave_vm.last_sync|date:"LONG_DATETIME_FORMAT" }}{% endif %}</span></td>
+</tr>

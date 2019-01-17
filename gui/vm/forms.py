@@ -52,10 +52,10 @@ class PTRForm(forms.Form):
     """
     Form for changing reverse DNS name of IP on VM's nics.
     """
-    content = forms.RegexField(label=_('Reverse DNS name'), regex=r'^[a-z0-9][a-z0-9\.-]+[a-z0-9]$',
+    content = forms.RegexField(label=_('Reverse DNS name'), regex=r'^[a-z0-9][a-z0-9.-]+[a-z0-9]$',
                                max_length=1024, min_length=4,
                                widget=forms.TextInput(attrs={'class': 'input-transparent', 'required': 'required',
-                                                             'style': 'width: 200px;', 'pattern': '[a-z0-9\.-]+'}))
+                                                             'style': 'width: 200px;', 'pattern': '[a-z0-9.-]+'}))
 
     def set_api_errors(self, data):
         """All errors except content related are transformed to non_field_errors"""
@@ -93,16 +93,16 @@ class ServerSettingsForm(SerializerForm):
     _api_call = vm_define_user
 
     alias = forms.RegexField(label=_('Short server name'), required=True,
-                             regex=r'^[A-Za-z0-9][A-Za-z0-9\.-]+[A-Za-z0-9]$', max_length=24, min_length=4,
+                             regex=r'^[A-Za-z0-9][A-Za-z0-9.-]+[A-Za-z0-9]$', max_length=24, min_length=4,
                              widget=forms.TextInput(attrs={'class': 'input-transparent narrow',
                                                            'required': 'required',
-                                                           'pattern': '[A-Za-z0-9\.-]+'}))
+                                                           'pattern': '[A-Za-z0-9.-]+'}))
     # The hostname part of FQDN
-    hostname = forms.RegexField(label=_('Server hostname'), required=True, regex=r'^[a-z0-9][a-z0-9\.-]+[a-z0-9]$',
+    hostname = forms.RegexField(label=_('Server hostname'), required=True, regex=r'^[a-z0-9][a-z0-9.-]+[a-z0-9]$',
                                 max_length=64, min_length=3,
                                 widget=forms.TextInput(attrs={'class': 'input-transparent narrow',
                                                               'required': 'required',
-                                                              'pattern': '[a-z0-9\.-]+'}))
+                                                              'pattern': '[a-z0-9.-]+'}))
     # The domain part of FQDN
     domain = forms.TypedChoiceField(label=_('DNS domain name'), required=True, coerce=str, empty_value=None,
                                     widget=forms.Select(attrs={'class': 'control-inline narrow input-select2'}))
@@ -209,7 +209,7 @@ class AdminServerSettingsForm(ServerSettingsForm):
     ram = forms.IntegerField(label=_('RAM'), required=False,
                              widget=forms.TextInput(attrs={'class': 'input-transparent narrow input-mbytes',
                                                            'required': 'required',
-                                                           'pattern': '[0-9\.]+[BKMGTPEbkmgtpe]?'}))
+                                                           'pattern': '[0-9.]+[BKMGTPEbkmgtpe]?'}))
     note = forms.CharField(label=_('Note'), help_text=_('Text with markdown support, visible to every user with access '
                                                         'to this server.'),
                            required=False,
@@ -355,7 +355,7 @@ class AdminServerDiskSettingsForm(ServerDiskSettingsForm):
                                           'can cause data loss!'),
                               widget=forms.TextInput(attrs={'class': 'input-transparent narrow input-mbytes',
                                                             'required': 'required',
-                                                            'pattern': '[0-9\.]+[BKMGTPEbkmgtpe]?'}))
+                                                            'pattern': '[0-9.]+[BKMGTPEbkmgtpe]?'}))
     boot = forms.BooleanField(label=_('Bootable'), required=False,
                               widget=forms.CheckboxInput(attrs={'class': 'normal-check'}))
     # refreservation disabled
@@ -561,10 +561,10 @@ class SnapshotDefineForm(SerializerForm, HostnameForm):
     """
     _api_call = vm_define_snapshot
 
-    name = forms.RegexField(label=_('Name'), regex=r'^[A-Za-z0-9][A-Za-z0-9\._-]*$', required=True,
+    name = forms.RegexField(label=_('Name'), regex=r'^[A-Za-z0-9][A-Za-z0-9._-]*$', required=True,
                             max_length=8, min_length=1,
                             widget=forms.TextInput(attrs={'class': 'input-transparent narrow',
-                                                          'required': 'required', 'pattern': '[A-Za-z0-9\._-]+'}))
+                                                          'required': 'required', 'pattern': '[A-Za-z0-9._-]+'}))
     disk_id = forms.TypedChoiceField(label=_('Disk ID'), required=True, coerce=int,
                                      widget=forms.Select(attrs={'class': 'input-select2 narrow',
                                                                 'required': 'required'}))
@@ -666,7 +666,7 @@ class SnapshotForm(HostnameForm):
                             max_length=24, min_length=1,
                             widget=forms.TextInput(attrs={'placeholder': _('backup1'),
                                                           'class': 'input-transparent narrow',
-                                                          'required': 'required', 'pattern': '[A-Za-z0-9\._-]+'}))
+                                                          'required': 'required', 'pattern': '[A-Za-z0-9._-]+'}))
     disk_id = forms.TypedChoiceField(label=_('Disk ID'), required=True, coerce=int,
                                      widget=forms.Select(attrs={'class': 'input-select2 narrow',
                                                                 'required': 'required'}))

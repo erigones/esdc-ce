@@ -1,0 +1,9 @@
+# vim: set filetype=yaml expandtab tabstop=2 shiftwidth=2 softtabstop=2 background=dark :
+
+# add to firewall_additional_rules
+
+- name: reconfigure firewall
+  template: src=iptables.j2 dest="/etc/sysconfig/iptables"
+  notify: reload iptables
+
+- meta: flush_handlers

@@ -23,7 +23,7 @@ def lcd(dirpath):
     """A context manager which changes the working directory to the given
     path, and then changes it back to its previous value on exit."""
     prev_cwd = os.getcwd()
-    dirpath = dirpath.replace(' ', '\ ')
+    dirpath = dirpath.replace(' ', '\ ')  # noqa: W605
 
     if not dirpath.startswith('/') and not dirpath.startswith('~'):
         new_cwd = os.path.join(os.path.abspath(os.getcwd()), dirpath)

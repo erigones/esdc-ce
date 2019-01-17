@@ -36,7 +36,7 @@ class AdminIsoForm(SerializerForm):
     name = forms.CharField(label=_('Name'), max_length=32, required=True,
                            help_text=_('ISO image file name (including file extension).'),
                            widget=forms.TextInput(attrs={'class': 'input-transparent narrow disable_created',
-                                                         'required': 'required', 'pattern': '[A-Za-z0-9\._-]+'}))
+                                                         'required': 'required', 'pattern': '[A-Za-z0-9._-]+'}))
     alias = forms.CharField(label=_('Alias'), required=True, max_length=32,
                             widget=forms.TextInput(attrs={'class': 'input-transparent narrow', 'required': 'required'}))
     owner = forms.ChoiceField(label=_('Owner'), required=False,

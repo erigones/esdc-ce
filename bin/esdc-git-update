@@ -144,14 +144,14 @@ if [[ -z "${ESDC_GIT_UPDATE_2ND_RUN}" ]]; then
 	fi
 
 	# Git environmental variables for cloning over HTTPS
-	if [[ ! -z "${KEY_PATH}" ]]; then
+	if [[ -n "${KEY_PATH}" ]]; then
 		if [[ ! -f "${KEY_PATH}" ]]; then
 			die ${ERR_PARAM_MISSING} "File does not exist: ${KEY_PATH}"
 		fi
 		export GIT_SSL_KEY=${KEY_PATH}
 	fi
 
-	if [[ ! -z "${CERT_PATH}" ]]; then
+	if [[ -n "${CERT_PATH}" ]]; then
 		if [[ ! -f "${CERT_PATH}" ]]; then
 			die ${ERR_PARAM_MISSING} "File does not exist: ${CERT_PATH}"
 		fi
@@ -260,6 +260,7 @@ if [[ "$(git rev-list -n1 "${VERSION_REF}" || die ${ERR_GIT_CMD})" != "$(git rev
 fi
 
 # In case we've upgraded from a version without locking
+# shellcheck disable=SC2244
 [[ ! "${LOCK}" ]] && acquire_lock
 
 # Deactivate our Git SSL configuration, because the upcoming commands may use git

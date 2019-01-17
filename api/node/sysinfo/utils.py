@@ -9,7 +9,7 @@ from celery.utils.log import get_task_logger
 if PY3:
     t_long = int
 else:
-    t_long = long
+    t_long = long  # noqa: F821
 
 RE_OVERLAY_PORT = re.compile(r'vxlan/listen_port=([0-9]{1,5})')
 RE_OVERLAY_IP = re.compile(r'vxlan/listen_ip=(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})')

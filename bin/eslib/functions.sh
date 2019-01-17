@@ -93,7 +93,7 @@ die() {
 	shift
 	local msg=$*
 
-	[[ ! -z "${msg}" ]] && echo "ERROR: ${msg}" 1>&2
+	[[ -n "${msg}" ]] && echo "ERROR: ${msg}" 1>&2
 	[[ -z "${exit_code}" ]] && exit_code=${_ERR_UNKNOWN}
 
 	exit "${exit_code}"

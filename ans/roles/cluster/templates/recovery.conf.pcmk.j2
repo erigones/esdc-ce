@@ -1,0 +1,3 @@
+standby_mode = on
+primary_conninfo = 'port={{ postgres_port }} host={{ cluster_vip }} user={{ pg_repl_user }} application_name={{ inventory_hostname }}'
+recovery_target_timeline = 'latest'

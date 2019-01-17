@@ -1,0 +1,18 @@
+# vim: set filetype=yaml expandtab tabstop=2 shiftwidth=2 softtabstop=2 background=dark :
+
+- name: refresh database cluster resource
+  shell: pcs resource cleanup "{{ cluster_postgres_HA_res_name }}" && pcs resource manage "{{ cluster_postgres_HA_res_name }}" && pcs resource clear "{{ cluster_postgres_HA_res_name }}"
+  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
+
+- name: check if slaves are connected
+  shell: psql -Aqtc "SELECT count(*) FROM pg_stat_replication"
+  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
+  become: yes
+  become_user: postgres
+  register: slavecount
+  vars:
+    ansible_ssh_pipelining: no
+  until: (slavecount.stdout|string) == ((cluster_all_hosts|length - 1)|string)
+  retries: 25
+  delay: 2
+

@@ -1,0 +1,48 @@
+
+- hosts: nodes
+  any_errors_fatal: true
+  gather_facts: true
+  vars_files:
+    - ../cfg/defaults.yml
+    - ../cfg/local_vars.yml
+
+  vars:
+    erigones_home: "{{ lookup('env','ERIGONES_HOME')|default('/opt/erigones', true) }}"
+    node_workers_list:
+      - svc:/application/erigonesd:slow
+      - svc:/application/erigonesd:image
+      - svc:/application/erigonesd:fast
+      - svc:/application/erigonesd:backup
+
+  tasks:
+    - name: alter ERIGONES_MGMT_WORKERS in local_config
+      lineinfile:
+        state=present
+        dest="{{ erigones_home }}/core/celery/local_config.py"
+        regexp="^ERIGONES_MGMT_WORKERS *=.*$"
+        line="ERIGONES_MGMT_WORKERS = ({% for mgmtnode in mgmt_nodes %}'mgmt@{{ mgmtnode }}.local',{% endfor %})"
+      notify: restart erigonesd
+
+    - name: alter BROKER_URL in local_config
+      replace:
+        dest="{{ erigones_home }}/core/celery/local_config.py"
+        regexp="^(BROKER_URL *=.*$)"
+        replace="BROKER_URL = 'amqp://{{ rabbitmq.user }}:{{ rabbitmq.password }}@{{ cluster_vip }}:{{ rabbitmq.port}}/{{ rabbitmq.vhost }}'"
+      notify: restart erigonesd
+
+    - name: alter CELERY_RESULT_BACKEND in local_config
+      replace:
+        dest="{{ erigones_home }}/core/celery/local_config.py"
+        regexp="^(CELERY_RESULT_BACKEND *=.*)"
+        replace="CELERY_RESULT_BACKEND = 'redis://:{{ redis.password }}@{{ cluster_vip }}:6379/0'"
+      notify: restart erigonesd
+
+  handlers:
+    - name: restart erigonesd
+      service: name='{{ item }}' state=stopped
+      with_items: '{{ node_workers_list }}'
+      notify: start erigonesd
+
+    - name: start erigonesd
+      service: name='{{ item }}' state=started enabled=yes
+      with_items: '{{ node_workers_list }}'

@@ -1,0 +1,5 @@
+---
+
+- include: plays/ha-mgmt.yml
+- include: plays/ha-dns.yml
+- include: plays/ha-nodes.yml

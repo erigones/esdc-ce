@@ -1,0 +1,57 @@
+#!/bin/bash
+
+set -e
+
+# continue only if master node parameter is defined
+if [ $# -lt 1 ]; then
+	echo "Usage:   $0 <master_node>"
+	echo "Example: $0 mgmt01"
+	exit 1
+fi
+
+# master node name:
+# also sync DB from this node
+CLUSTER_MASTER_HOST="$1"
+
+MAINDIR="$(cd "$(dirname "$0")/.." ; pwd -P)"
+ERIGONES_HOME="${ERIGONES_HOME:-"${MAINDIR}"}"
+ANS_BASE="${ERIGONES_HOME}/ans"
+PLAYBOOK="${ANS_BASE}/ha/init-ha.yml"
+HOSTS_FILE="${ANS_BASE}/hosts.cfg"
+HOSTS_TMP_FILE="${ANS_BASE}/.hosts.cfg.tmp"
+export ERIGONES_HOME
+
+#PYTHONPATH="${ERIGONES_HOME}:${PYTHONPATH}:${ERIGONES_HOME}/envs/lib/python2.7/site-packages"
+#VIRTUAL_ENV="${ERIGONES_HOME}/envs"
+#export PYTHONPATH VIRTUAL_ENV
+
+echo "Updating hosts.cfg.."
+ZKCLI=/usbkey/scripts/zookeepercli
+
+# get IP of mgmt01
+if [ -f /usbkey/config ] && [ -x "${ZKCLI}" ]; then
+	#shellcheck disable=SC1091
+	. /usbkey/config
+	#shellcheck disable=SC2154
+	MGMT_IP="$("${ZKCLI}" -servers "${cfgdb_admin_ip}" -auth_usr "esdc" -auth_pwd "${esdc_install_password}" -c get /esdc/vms/esdc-mgmt/hosts/1/ip)"
+fi
+
+set +e
+if [ -n "${MGMT_IP}" ]; then
+	# Update ansible inventory
+	ssh "root@${MGMT_IP}" "${ERIGONES_HOME}/bin/ctl.sh" genhosts --include-nodes > "${HOSTS_TMP_FILE}"
+	if [ "x$?" == "x0" ]; then
+		# update succeeded
+		mv -f "${HOSTS_TMP_FILE}" "${HOSTS_FILE}"
+	else
+		echo "WARNING: Unable to update ansible hosts file. Trying to reuse the old one."
+		rm -f "${HOSTS_TMP_FILE}"
+	fi
+else
+	echo "Unable to update hosts.cfg. Aborting."
+	exit 1
+fi
+set -e
+
+cd "${ANS_BASE}"
+ansible-playbook "${PLAYBOOK}" --extra-vars "cluster_master_host=$CLUSTER_MASTER_HOST"

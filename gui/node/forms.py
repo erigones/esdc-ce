@@ -23,7 +23,7 @@ from vms.models import Node, Storage, Backup, Image, Vm
 if PY3:
     t_long = int
 else:
-    t_long = long
+    t_long = long  # noqa: F821
 
 
 class NodeStatusForm(SerializerForm):

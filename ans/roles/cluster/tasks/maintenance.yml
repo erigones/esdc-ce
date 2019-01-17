@@ -1,0 +1,18 @@
+# vim: set filetype=yaml expandtab tabstop=2 shiftwidth=2 softtabstop=2 background=dark :
+
+- name: create cluster maintenance directory
+  file:
+    path: /var/lib/pgsql/maintenance
+    state: directory
+    owner: postgres
+    group: postgres
+    mode: 0755
+
+- name: generate cluster maintenance scripts
+  template: src="{{ item }}" dest="/var/lib/pgsql/maintenance/{{ item | basename | regex_replace('\.j2$', '') }}"
+  args:
+    owner: postgres
+    group: postgres
+    mode:  0700
+  with_fileglob: "{{ role_path }}/templates/maint/*"
+
