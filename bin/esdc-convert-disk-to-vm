@@ -25,8 +25,8 @@ fi
 
 DEST_VM_UUID="$(vmadm list -H -o uuid hostname="${DEST_VM}")"
 if [[ -z "${DEST_VM_UUID}" ]]; then
-    echo "ERROR: Virtual machine ${DEST_VM} does not seem to exist on this host!"
-    exit 2
+	echo "ERROR: Virtual machine ${DEST_VM} does not seem to exist on this host!"
+	exit 2
 fi
 
 echo
@@ -41,8 +41,8 @@ echo "PLEASE, USE THE DESTINATION DISK EQUAL OR GREATER THAN THE SOURCE IMAGE SI
 echo
 echo
 if ! zfs list -Ho name  "zones/${DEST_VM_UUID}-disk0" > /dev/null 2>&1; then
-    echo "ERROR: Virtual machine ${DEST_VM} does not seem to have any disk attached!"
-    exit 3
+	echo "ERROR: Virtual machine ${DEST_VM} does not seem to have any disk attached!"
+	exit 3
 fi
 
 
@@ -54,20 +54,20 @@ echo
 # usage: if check_reply_yes "Some question?"; then echo yes; else echo no; fi
 function check_reply_yes()
 {
-    echo -n "*** $1 (Y/n)"
-    read -r reply
-    if [[ -z "${reply}" ]] || [[ "${reply}" == "y" ]] || [[ "${reply}" == "Y" ]]
-    then
-        return 0
-    else
-        return 1
-    fi
+	echo -n "*** $1 (Y/n)"
+	read -r reply
+	if [[ -z "${reply}" ]] || [[ "${reply}" == "y" ]] || [[ "${reply}" == "Y" ]]
+	then
+		return 0
+	else
+		return 1
+	fi
 }
 
 if check_reply_yes "Continue?"; then
-    echo "Converting..."
-    ${QEMUBIN} convert -p -O host_device "${SRC_FILE}" "${VM_DISK_DEV}"
+	echo "Converting..."
+	${QEMUBIN} convert -p -O host_device "${SRC_FILE}" "${VM_DISK_DEV}"
 else
-    echo "Exiting without change."
+	echo "Exiting without change."
 fi
 
