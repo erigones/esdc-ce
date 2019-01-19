@@ -55,7 +55,7 @@ echo
 function check_reply_yes()
 {
     echo -n "*** $1 (Y/n)"
-    read reply
+    read -r reply
     if [[ -z "${reply}" ]] || [[ "${reply}" == "y" ]] || [[ "${reply}" == "Y" ]]
     then
         return 0
