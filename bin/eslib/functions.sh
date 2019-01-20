@@ -651,6 +651,22 @@ _vm_update() {
 	${VMADM} update "${uuid}" "${@}"
 }
 
+# return error after VM is not present after the timeout
+_vm_wait_for_become_visble() {
+	local uuid="$1"
+	local timeout_sec="${2:-60}"	# 60 sec is default if not specified
+
+	while [[ "$timeout_sec" -gt 0 ]]; do
+		if vmadm lookup -1 "uuid=${uuid}" &>/dev/null; then
+			return 0
+		fi
+		let --timeout_sec
+		sleep 1
+	done
+	return 1
+}
+
+
 _vm_remove_indestructible_property() {
 	local uuid="$1"
 
@@ -709,6 +725,16 @@ _zone_detach() {
 
 _vmadmd_restart() {
 	${SVCADM} restart vmadmd
+}
+
+_vminfod_restart() {
+	if ${SVCS} -H vminfod &>/dev/null; then
+		${SVCADM} restart vminfod
+	else
+		# on older platforms the functionality is
+		# not separated from vmadmd
+		_vmadmd_restart
+	fi
 }
 
 _image_exists() {
