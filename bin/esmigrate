@@ -1341,11 +1341,22 @@ destroy_datasets_src() {
 	SNAPSHOTS=()
 }
 
-vmadmd_restart() {
-	if _dest_host_cmd _vmadmd_restart; then
-		techo "Restarted vmadmd"
+vminfod_restart() {
+	if _dest_host_cmd _vminfod_restart; then
+		techo "Restarted vminfod"
 	else
-		echo "vmadmd restart failed" 1>&2
+		echo "vminfod restart failed" 1>&2
+	fi
+}
+
+wait_for_vmadm_detect() {
+	local timeout=180	# sec
+
+	techo "Waiting for VM to become visible by vmadm"
+	if _dest_host_cmd _vm_wait_for_become_visble "${UUID_SRC}" "${timeout}"; then
+		techo "VM is present"
+	else
+		die ${ERR_VM_AFTER_CHECK} "Transferred VM was not detected by vminfod!"
 	fi
 }
 
@@ -1557,6 +1568,8 @@ migrate() {
 	init_core_dataset			# Ensure that global cores dataset exists
 	zone_attach					# Attach zone on remote host when doing remote migration
 	create_core_dataset			# Create cores dataset when changing root pool locally or doing remote migration
+	vminfod_restart				# Restart vminfod to ensure detection of transferred VM's presence
+	wait_for_vmadm_detect		# Wait for dest VM to become visible by vmadm
 
 	# stage 4 (live migration + checks)
 	check_vm_migrate			# Check if migrated destination VM can be started
@@ -1569,7 +1582,6 @@ migrate() {
 	fi
 
 	# stage 5
-	vmadmd_restart				# Restart vmadmd to ensure detection of transferred VM's presence
 	destroy_snapshots_dst		# Remove migration snapshots on target host
 	destroy_datasets_src		# Remove source datasets which are not needed anymore
 
