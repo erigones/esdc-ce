@@ -660,7 +660,7 @@ _vm_wait_for_become_visble() {
 		if vmadm lookup -1 "uuid=${uuid}" &>/dev/null; then
 			return 0
 		fi
-		let --timeout_sec
+		(( --timeout_sec ))
 		sleep 1
 	done
 	return 1
