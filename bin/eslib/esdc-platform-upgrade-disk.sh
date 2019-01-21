@@ -59,7 +59,7 @@ done
 # check if it's a local file
 if [[ -f "${PLATFORM_VER}" ]] && [[ "${PLATFORM_VER}" =~ platform-[0-9]+T[0-9]+Z\.tgz$ ]]; then
 	PLATFORM_FILE="${PLATFORM_VER}"
-	PLATFORM_VER="$(echo ${PLATFORM_VER} | sed -re 's/^.*platform-([0-9]+T[0-9]+Z)\.tgz$/\1/')"
+	PLATFORM_VER="$(echo "${PLATFORM_VER}" | sed -re 's/^.*platform-([0-9]+T[0-9]+Z)\.tgz$/\1/')"
 fi
 
 # check platform version format
