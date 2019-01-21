@@ -13,6 +13,7 @@ if [[ -z "${PLATFORM_VER}" ]]; then
 	echo "Usage:   $0 <new_dc_version|new_platform_version> [--keep-smf-db] [-v] [-f] [-y]"
 	echo "Example: $0 v3.0.1"
 	echo "Example: $0 20180105T193033Z"
+	echo "Example: $0 platform-20190107T203140Z.tgz"
 	echo "Parameters:"
 	echo "  --keep-smf-db     don't clear SMF database (useful if you don't want to loose"
 	echo "                    your manual changes to any SMF service properties)"
@@ -54,6 +55,12 @@ while [[ ${#} -gt 0 ]]; do
 	esac
 	shift
 done
+
+# check if it's a local file
+if [[ -f "${PLATFORM_VER}" ]] && [[ "${PLATFORM_VER}" =~ platform-[0-9]+T[0-9]+Z\.tgz$ ]]; then
+	PLATFORM_FILE="${PLATFORM_VER}"
+	PLATFORM_VER="$(echo ${PLATFORM_VER} | sed -re 's/^.*platform-([0-9]+T[0-9]+Z)\.tgz$/\1/')"
+fi
 
 # check platform version format
 if [[ ! "${PLATFORM_VER}" =~ ^[0-9]+T[0-9]+Z$ ]] && [[ ! "${PLATFORM_VER}" =~ ^v[0-9]+\.[0-9]+ ]]; then
@@ -107,7 +114,7 @@ fi
 
 UPG_DIR="${UPGRADE_DIR:-"/opt/upgrade"}"
 PLATFORM_DIR="${UPG_DIR}/platform"
-PLATFORM_FILE="${UPG_DIR}/platform-${PLATFORM_VER}.tgz"
+[[ -z "${PLATFORM_FILE}" ]] && PLATFORM_FILE="${UPG_DIR}/platform-${PLATFORM_VER}.tgz"
 BOOT_ARCHIVE="${PLATFORM_DIR}/platform-${PLATFORM_VER}/i86pc/amd64/boot_archive"
 MOUNT_DIR="${UPG_DIR}/mnt"
 DCOS_MNTDIR="${MOUNT_DIR}/dcos"
@@ -174,9 +181,11 @@ fi
 # start download
 printmsg "Downloading the new platform"
 
-# shellcheck disable=SC2086
-if ! ${CURL} ${CURL_QUIET} ${CURL_DEFAULT_OPTS} -o "${PLATFORM_FILE}" "${PLATFORM_DOWNLOAD_URL}"; then
-	die 5 "Cannot download new platform archive. Please check your internet connection."
+if [[ ! -f "${PLATFORM_FILE}" ]]; then
+	# shellcheck disable=SC2086
+	if ! ${CURL} ${CURL_QUIET} ${CURL_DEFAULT_OPTS} -o "${PLATFORM_FILE}" "${PLATFORM_DOWNLOAD_URL}"; then
+		die 5 "Cannot download new platform archive. Please check your internet connection."
+	fi
 fi
 
 printmsg "Extracting the new platform"
