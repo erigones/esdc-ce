@@ -231,7 +231,7 @@ base64_decode() {
 remote_function_exist() {
 	local funcname="$1"
 
-	_dest_host_cmd type "${funcname}" &> /dev/null; then
+	_dest_host_cmd type "${funcname}" &> /dev/null
 }
 
 ###############################################################
