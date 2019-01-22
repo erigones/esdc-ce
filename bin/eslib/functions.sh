@@ -228,6 +228,11 @@ base64_decode() {
 	printf "%s" "${str}" | python -m base64 -d -
 }
 
+remote_function_exist() {
+	local funcname="$1"
+
+	_dest_host_cmd type "${funcname}" &> /dev/null; then
+}
 
 ###############################################################
 # Validators (motto: die as soon as possible)
