@@ -185,11 +185,12 @@ if [[ ! -f "${PLATFORM_FILE}" ]]; then
 	PLATFORM_TMPFILE="${PLATFORM_FILE}.part"
 	rm -f "${PLATFORM_TMPFILE}"
 	# shellcheck disable=SC2086
-	if ! ${CURL} ${CURL_QUIET} ${CURL_DEFAULT_OPTS} -o "${PLATFORM_FILE}" "${PLATFORM_DOWNLOAD_URL}"; then
-		rm -f "${PLATFORM_TMPFILE}"
-		die 5 "Cannot download new platform archive. Please check your internet connection."
-	else
+	if ${CURL} ${CURL_QUIET} ${CURL_DEFAULT_OPTS} -o "${PLATFORM_FILE}" "${PLATFORM_DOWNLOAD_URL}"; then
+		# file successfully downloaded
 		mv -f "${PLATFORM_TMPFILE}" "${PLATFORM_FILE}"
+	else
+		rm -f "${PLATFORM_TMPFILE}"
+		die 5 "Failed to download new platform archive. Please check your internet connection."
 	fi
 fi
 
