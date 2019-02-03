@@ -1297,7 +1297,8 @@ _delete_vm() {
 		_vm_remove_indestructible_property "${uuid}" &>/dev/null
 	fi
 
-	_vm_destroy "${uuid}" > /dev/null
+	# we cannot use "vmadm destroy" because it refuses to destroy a detached VM
+	_zone_delete "${uuid}" > /dev/null
 
 	# shellcheck disable=SC2181
 	if [[ $? -eq 0 ]]; then
@@ -1314,26 +1315,25 @@ destroy_datasets_src() {
 	local ds_root
 	local ds_data
 
-	if [[ -z "${DEST_HOST}" ]]; then  # local migration -> remove only migrated source datasets
-		if [[ -n "${DS_ROOT}" ]]; then
-			ds_root=${DS_ROOT%% *}
-			_destroy_dataset "${ds_root}"
+	# remove migrated source datasets
+	if [[ -n "${DS_ROOT}" ]]; then
+		ds_root=${DS_ROOT%% *}
+		_destroy_dataset "${ds_root}"
+		if [[ -z "${DEST_HOST}" ]]; then  # local migration
 			# Destroy source cores dataset in local migration and when root pool has changed
 			_destroy_dataset "$(_get_core_dataset "${ds_root}")"
 		fi
+	fi
 
-		# The OS zone delegated dataset is a child and destroyed together with the DS_ROOT
-		if [[ "${#DS_DATA[@]}" -ne 0 ]] && is_kvm; then
-			for ds_data in "${DS_DATA[@]}"; do
-				_destroy_dataset "${ds_data%% *}"
-			done
-		fi
+	# The OS zone delegated dataset is a child and destroyed together with the DS_ROOT
+	if [[ "${#DS_DATA[@]}" -ne 0 ]] && is_kvm; then
+		for ds_data in "${DS_DATA[@]}"; do
+			_destroy_dataset "${ds_data%% *}"
+		done
+	fi
 
-	else  # remote migration -> remove source VM, which will remove all source datasets
+	if [[ -n "${DEST_HOST}" ]]; then  # remote migration -> remove also source VM
 		_delete_vm "${UUID_SRC}"
-		if [[ -z "${VM_DETACHED_FAKE}" ]]; then
-			_destroy_dataset "${DS_ROOT%% *}"  # We have to destroy the root zone manually, because vmadm won't do it for detached zone
-		fi
 	fi
 
 	DS_RECV=()
