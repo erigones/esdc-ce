@@ -1315,6 +1315,14 @@ destroy_datasets_src() {
 	local ds_root
 	local ds_data
 
+	if live_migration; then
+		# we need to get src VM to detached state before datasets removal
+		techo "Halting source VM"
+		_zone_halt   "${UUID_SRC}"
+		techo "Detaching source VM"
+		_zone_detach "${UUID_SRC}"
+	fi
+
 	# remove migrated source datasets
 	if [[ -n "${DS_ROOT}" ]]; then
 		ds_root=${DS_ROOT%% *}

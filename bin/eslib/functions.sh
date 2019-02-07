@@ -716,6 +716,12 @@ _zone_delete() {
 	${ZONECFG} -z "${zonename}" delete -F
 }
 
+_zone_halt() {
+	local zone="$1"
+
+	${ZONEADM} -z "${zone}" halt
+}
+
 _zone_attach() {
 	local zone="$1"
 
