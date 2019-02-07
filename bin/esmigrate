@@ -1315,10 +1315,16 @@ destroy_datasets_src() {
 	local ds_root
 	local ds_data
 
-	if live_migration; then
+	if live_migration && [[ -n "${DEST_HOST}" ]]; then
 		# we need to get src VM to detached state before datasets removal
+		# (apply delete only to remote migration)
 		techo "Halting source VM"
-		_zone_halt   "${UUID_SRC}"
+		_zone_halt "${UUID_SRC}"
+
+		# core dataset can be destroyed only after VM stop
+		set_vm_status_src
+		destroy_core_dataset
+
 		techo "Detaching source VM"
 		_zone_detach "${UUID_SRC}"
 	fi
@@ -1350,10 +1356,20 @@ destroy_datasets_src() {
 }
 
 vminfod_restart() {
-	if _dest_host_cmd _vminfod_restart; then
-		techo "Restarted vminfod"
+	local service_name=""
+
+	# check compatibility with older esmigrate clients
+	if remote_function_exists _vminfod_restart; then
+		service_name="vminfod"
 	else
-		echo "vminfod restart failed" 1>&2
+		techo "Info: the remote side has v3.0.0 or older"
+		service_name="vmadmd"
+	fi
+
+	if _dest_host_cmd "_${service_name}_restart"; then
+		techo "Restarted ${service_name}"
+	else
+		echo "${service_name} restart failed" 1>&2
 	fi
 }
 
