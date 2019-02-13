@@ -11,11 +11,15 @@ Features
 - Moved VM replication from Enterprise Edition to Community Edition - `#381 <https://github.com/erigones/esdc-ce/issues/381>`__
 - Moved HA scripts and playbooks from Enterprise Edition to Community Edition - `#381 <https://github.com/erigones/esdc-ce/issues/381>`__
 - Added script for converting VM disks from other virtualization platforms - `#383 <https://github.com/erigones/esdc-ce/pull/383>`__
+- Updated VM migration to reflect new presence of vminfod in SmartOS - `#384 <https://github.com/erigones/esdc-ce/pull/384>`__
+- Allow upgrading a diskinstall platform from local custom platform file - `#385 <https://github.com/erigones/esdc-ce/pull/385>`__
+- Added esdc-overlay wipe command to delete all created overlays - `#378 <https://github.com/erigones/esdc-ce/pull/378>`__
 
 Bugs
 ----
 
 - Fixed core dataset re-creation during rollback after failed migration - `#386 <https://github.com/erigones/esdc-ce/pull/386>`__
+- Fixed node MAC address map in esdc-overlay command - `#404 <https://github.com/erigones/esdc-ce/pull/404>`__
 
 
 3.0.0
