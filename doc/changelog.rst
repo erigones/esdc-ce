@@ -12,6 +12,11 @@ Features
 - Moved HA scripts and playbooks from Enterprise Edition to Community Edition - `#381 <https://github.com/erigones/esdc-ce/issues/381>`__
 - Added script for converting VM disks from other virtualization platforms - `#383 <https://github.com/erigones/esdc-ce/pull/383>`__
 
+Bugs
+----
+
+- Fixed core dataset re-creation during rollback after failed migration - `#386 <https://github.com/erigones/esdc-ce/pull/386>`__
+
 
 3.0.0
 =====
