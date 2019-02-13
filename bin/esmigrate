@@ -487,7 +487,7 @@ create_core_dataset_err() {
 	# shellcheck disable=SC2155
 	local core_ds="$(_get_core_dataset "${DS_ROOT%% *}")"
 
-	if zfs_dataset_exists "${core_ds}"; then
+	if _zfs_dataset_exists "${core_ds}"; then
 		VM_CORES_RM=""
 		techo "Source VM's cores dataset exists: ${core_ds}"
 	else
