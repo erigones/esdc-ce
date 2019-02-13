@@ -1377,10 +1377,17 @@ wait_for_vmadm_detect() {
 	local timeout=180	# sec
 
 	techo "Waiting for VM to become visible by vmadm"
-	if _dest_host_cmd _vm_wait_for_become_visble "${UUID_SRC}" "${timeout}"; then
-		techo "VM is present"
+
+	# check compatibility with older esmigrate clients
+	if remote_function_exists _vm_wait_for_become_visble; then
+		if _dest_host_cmd _vm_wait_for_become_visble "${UUID_SRC}" "${timeout}"; then
+			techo "VM is present"
+		else
+			die ${ERR_VM_AFTER_CHECK} "Transferred VM was not detected by vminfod!"
+		fi
 	else
-		die ${ERR_VM_AFTER_CHECK} "Transferred VM was not detected by vminfod!"
+		# older clients must just wait
+		sleep 10
 	fi
 }
 
