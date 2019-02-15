@@ -63,6 +63,7 @@ LOFIADM=${LOFIADM:-"/usr/sbin/lofiadm"}
 TAR=${TAR:-"/usr/bin/tar"}
 DD=${DD:-"/usr/bin/dd"}
 FSTYP=${FSTYP:-"/usr/sbin/fstyp"}
+GSORT=${GSORT:="/opt/local/bin/gsort"}
 
 ###############################################################
 # Arguments passed to ssh
@@ -232,6 +233,69 @@ remote_function_exist() {
 	local funcname="$1"
 
 	_dest_host_cmd type "${funcname}" &> /dev/null
+}
+
+###############################################################
+# Versioning
+###############################################################
+
+# returns success if the version is correct
+# (can be used to filter out the commit numbers or other bogus)
+function validate_dc_version() {
+	local ver="$1"
+
+	if [[ $ver =~ v[0-9]+\.[0-9]+ ]]; then
+		return 0
+	else
+		return 1
+	fi
+}
+
+function version_sort() {
+	sed -re 's/^(v[^-]+)$/\1-zzz/' | ${GSORT} -V | sed -e 's/-zzz$//'
+}
+
+# appends "-zzz" to all versions without a suffix
+# so the release versions (without suffix) 
+# are last in the sort
+function normalize_ver() {
+	echo "$1" | sed -re 's/^(v[^-]+)$/\1-zzz/'
+}
+
+# Return values:
+# 0: version are equal
+# 1: v1 > v2
+# 2: v1 < v2
+function vercmp() {
+	local v1="$(normalize_ver "$1")"
+	local v2="$(normalize_ver "$2")"
+	local greater=
+
+	if [ "$v1" = "$v2" ]; then
+		return 0
+	fi
+
+	greater="$(printf "%s\n%s\n" "${v1}" "${v2}" | ${GSORT} -V | tail -1)"
+
+	if [ "${greater}" = "${v1}" ]; then
+		return 1
+	else
+		return 2
+	fi
+}
+
+function get_newer_versions_dirs() {
+	local ref_version="$1"	# version to compare with
+	local dir="$2"			# directory with version dirs
+
+	# shellcheck disable=SC2012
+	for ver in $(ls -1 "$dir" | version_sort); do
+		vercmp "${ref_version}" "${ver}"
+		# print only if the version is newer than ref_version
+		if [[ "$?" == 2 ]]; then
+			echo "${ver}"
+		fi
+	done
 }
 
 ###############################################################
