@@ -63,7 +63,8 @@ LOFIADM=${LOFIADM:-"/usr/sbin/lofiadm"}
 TAR=${TAR:-"/usr/bin/tar"}
 DD=${DD:-"/usr/bin/dd"}
 FSTYP=${FSTYP:-"/usr/sbin/fstyp"}
-GSORT=${GSORT:="/opt/local/bin/gsort"}
+[[ "$( uname -s )" != "Linux" ]] && GSORT=${GSORT:="/opt/local/bin/gsort"}
+[[ "$( uname -s )" =  "Linux" ]] && GSORT=${GSORT:="/usr/bin/sort"}
 
 ###############################################################
 # Arguments passed to ssh
