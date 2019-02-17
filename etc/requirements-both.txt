@@ -1,19 +1,26 @@
 ### que
 setuptools==36.2.0
-six==1.11.0
-psutil==5.4.3
+six==1.12.0
+psutil==5.4.8
+# might want upgrade but can break things
 celery==3.1.25
 billiard==3.3.0.23
+# might want upgrade but can break things
 amqp==1.4.9
+# might want upgrade but can break things
 kombu==3.0.37
 anyjson==0.3.3
+# might want upgrade but can break things
 redis==2.10.6
-pytz==2017.3
-simplejson==3.11.1
+pytz==2018.9
+simplejson==3.16.0
 frozendict==1.2
-requests==2.18.4
+requests==2.21.0
 esdc-api==2.0.1
-ansible==2.4.2.0
+# dep of ansible but 1.3.0 build is broken on SmartOS
+PyNaCl==1.2.1
+ansible==2.7.5
 Jinja2==2.10
+# seems there's no need for upgrade
 idna==2.5
-cryptography==1.5.3
+cryptography==2.4.2
