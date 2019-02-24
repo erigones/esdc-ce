@@ -1,0 +1,125 @@
+#!/usr/perl5/bin/perl
+
+use strict;
+use POSIX;
+
+my $interval = 10;
+
+my $vmadm_interval = my $vmadm_list_interval = 60;
+
+my ($zabbix_data, $date, $cpu_perc, $real_perc, $zonename);
+
+my %cpu_stats = {};
+my $cpu_shares_total = 0;
+my $cpu_count = `/usr/sbin/psrinfo | wc -l | tr -d ' '`;
+
+sub trim_whitespaces {
+	my $string = shift;
+
+	$string =~ s/^\s+//;
+	$string =~ s/\s+/ /g;
+
+	return $string;
+}
+
+sub parse_vmadm {
+
+	my %arg;
+
+
+	my @vmadm = `vmadm list -Hpo uuid,type,cpu_shares,vcpus`;
+
+	foreach my $key (@vmadm) {
+
+		$key =~ /^([\w-]+):(\w+):(\d+):(\d+)?$/;
+
+		$arg{$1} = {};
+		$arg{$1}->{'type'} = $2;
+
+		$arg{$1}->{'cpu_shares'} = $3;
+		$cpu_shares_total += $3;	
+
+		if ($arg{$1}->{'type'} eq 'KVM') {
+			$arg{$1}->{'vcpus'} = $4;
+			$arg{$1}->{'cpu_perc_max'} = ceil($arg{$1}->{'vcpus'} / $cpu_count * 100);
+		}
+	}
+
+	return %arg;
+}
+
+# Main part
+%cpu_stats = parse_vmadm;
+
+my %data;
+
+open(PRSTAT, "/usr/bin/prstat -Z -c -s cpu -n0,99999 $interval |") || die "Failed to execute /usr/bin/prstat: $!\n";
+
+while(my $line = <PRSTAT>) {
+
+	# Update CPU hash
+	if ($line =~ /ZONEID/) {
+
+		if ($vmadm_interval == 0) {
+			%cpu_stats = parse_vmadm;
+			$vmadm_interval = $vmadm_list_interval;
+		} else {
+			$vmadm_interval -= $interval;
+		}
+		next;
+	}
+
+	# We don't care about the GZ
+	next if $line =~ /global/;
+
+	# We are ready to sent the data into Zabbix
+	if ($line =~ /Total/) {
+
+		$date = time();
+
+		foreach $zonename (keys %cpu_stats) {
+			# Skip OS zones for now	
+			next if $cpu_stats{$zonename}->{'type'} ne 'KVM';
+			
+			unless ($data{$zonename}) {
+				$data{$zonename} = "$zonename vm.cpu.perc $date 0\n";
+			}
+		}
+
+		foreach $zonename (keys %data) {
+			$zabbix_data .= $data{$zonename};
+		}
+
+		open my $zabbix_sender, "| /opt/zabbix/bin/zabbix_sender -c /opt/zabbix/etc/zabbix_agentd.conf -T -i - >/dev/null" or die "Can't execute zabbix_sender: $!\n";
+		print $zabbix_sender $zabbix_data;
+		close $zabbix_sender;
+
+		$zabbix_data = undef;
+		%data = {};
+		next;
+	}
+	
+	$date = time(); 
+
+	#ZONEID    NPROC  SWAP   RSS MEMORY      TIME  CPU ZONE
+	#     6        2 2143M 2131M   4.3% 304:14:43 1.0% 12b23776-32c0-457d-99e0-3ed1e9f951aa
+	#    21        2 4187M 4175M   8.5% 165:04:13 1.2% bbadc7c8-410c-48ad-a906-b5e05c7826b8
+
+	$line = trim_whitespaces($line);
+
+	$line =~ m/^(\w+) (\w+) (\w+) (\w+) ([\d\.]+%) ([\d:]+) ([\d\.]+)% ([\w-]+) $/; 
+
+	$cpu_perc = $7;
+	$zonename = $8;
+
+	# Skip OS zones for now
+	next if $cpu_stats{$zonename}->{'type'} ne 'KVM';
+	
+	if ($cpu_perc == 0) {
+		$real_perc = 0;
+	} else {
+		$real_perc = sprintf("%0.2f", (100 * $cpu_perc) / $cpu_stats{$zonename}->{'cpu_perc_max'});
+	}
+	
+	$data{$zonename} = "$zonename vm.cpu.perc $date $real_perc\n";
+}
