@@ -20,6 +20,7 @@ Bugs
 
 - Fixed core dataset re-creation during rollback after failed migration - `#386 <https://github.com/erigones/esdc-ce/pull/386>`__
 - Fixed node MAC address map in esdc-overlay command - `#404 <https://github.com/erigones/esdc-ce/pull/404>`__
+- Added script for manually cleaning up resources after failed VM migration - `#403 <https://github.com/erigones/esdc-ce/pull/403>`__
 
 
 3.0.0

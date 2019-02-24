@@ -520,7 +520,7 @@ update_adminoverlay_hosts() {
 
 		# write node address to a local array
 		ADMINOVERLAY_NODE_IP_MAP["${nodename}"]="${node_ip}"
-		ADMINOVERLAY_NODE_MAC_MAP["${node}"]="${next_mac}"
+		ADMINOVERLAY_NODE_MAC_MAP["${nodename}"]="${next_mac}"
 	done
 }
 
