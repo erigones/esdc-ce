@@ -136,6 +136,17 @@ trap cleanup EXIT
 printmsg "Download URL: ${ESDC_DOWNLOAD_URL}"
 mkdir -p "${UPG_DIR}"
 
+# remove reference to mounted partition so we target the whole disk
+if [[ "${USB_DEV}" =~ p1$ ]]; then
+	# change trailing p1 for p0 (c1t1d0p1 -> c1t1d0p0)
+	USB_DEV_P0="${USB_DEV/p1*}p0"
+elif [[ "${USB_DEV}" =~ p0:1$ ]]; then
+	# remove trailing :1 (c1t0d0p0:1 -> c1t0d0p0)
+	USB_DEV_P0="${USB_DEV/:1*}"
+else
+	die 9 "Unrecognized partition specification: ${USB_DEV}"
+fi
+
 # shellcheck disable=SC2086
 if ! ${CURL} ${CURL_QUIET} ${CURL_DEFAULT_OPTS} ${CURL_EXTRA_OPTS} -o "${ESDC_IMG_FULL}.gz" "${ESDC_DOWNLOAD_URL}"; then
 	die 5 "Cannot download new USB image archive. Please check your internet connection."
@@ -143,9 +154,6 @@ fi
 
 printmsg "Unpacking new USB image"
 ${GZIP} -d "${ESDC_IMG_FULL}.gz"
-
-# change trailing p1 for p0 (c1t1d0p1 -> c1t1d0p0)
-USB_DEV_P0="${USB_DEV/p1*}p0"
 
 # confirmation
 printmsg "Going to write ${ESDC_IMG} image to USB device: ${USB_DEV_P0}"
