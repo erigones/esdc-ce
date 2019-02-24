@@ -33,7 +33,7 @@ class ZabbixUserGroupContainer(ZabbixBaseContainer):
     # noinspection PyUnresolvedReferences
     def __init__(self, *args, **kwargs):
         super(ZabbixUserGroupContainer, self).__init__(*args, **kwargs)
-        self.users = set()  # type: [ZabbixUserContainer]
+        self.users = set()  # type: [ZabbixUserContainer]  # noqa: F821
         self.hostgroup_ids = set()  # type: [int]
         self.superuser_group = False
         self.affected_users = frozendict({key: set() for key in self.AFFECTED_USERS})

@@ -24,8 +24,8 @@ class ZabbixUserContainer(ZabbixBaseContainer):
     # noinspection PyUnresolvedReferences
     def __init__(self, *args, **kwargs):
         super(ZabbixUserContainer, self).__init__(*args, **kwargs)
-        self.user = None  # type: [gui.models.User]
-        self.groups = set()  # type: [ZabbixUserGroupContainer]
+        self.user = None  # type: [gui.models.User]  # noqa: F821
+        self.groups = set()  # type: [ZabbixUserGroupContainer]  # noqa: F821
 
     @classmethod
     def synchronize(cls, zapi, user):
