@@ -123,7 +123,7 @@ function fix_ansible_symlinks() {
 	for ans_link in $(ls -1 "${ERIGONES_HOME}/envs/bin/ansible-*"); do
 		if [[ -L "${ans_link}" ]] && [[ "$(readlink "${ans_link}")" == "ansible" ]]; then
 			rm -f "${ans_link}"
-			cp -a "${ERIGONES_HOME}/envs/bin/ansible" "${ans_link}"
+			ln "${ERIGONES_HOME}/envs/bin/ansible" "${ans_link}"
 		fi
 	done
 }
