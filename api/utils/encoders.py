@@ -42,7 +42,7 @@ from django.utils.functional import Promise
 from api.compat import total_seconds
 
 
-class JSONEncoder(json.JSONEncoder):
+class JSONEncoder(json.JSONEncoder):  # noqa: R701
     """
     JSONEncoder subclass that knows how to encode date/time/timedelta,
     decimal types, generators and other basic python objects.
