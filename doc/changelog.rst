@@ -11,6 +11,7 @@ Features
 - Moved VM replication from Enterprise Edition to Community Edition - `#381 <https://github.com/erigones/esdc-ce/issues/381>`__
 - Moved HA scripts and playbooks from Enterprise Edition to Community Edition - `#381 <https://github.com/erigones/esdc-ce/issues/381>`__
 - Added script for converting VM disks from other virtualization platforms - `#383 <https://github.com/erigones/esdc-ce/pull/383>`__
+- Added script for manually cleaning up resources after failed VM migration - `#403 <https://github.com/erigones/esdc-ce/pull/403>`__
 
 
 3.0.0
