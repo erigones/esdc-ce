@@ -117,6 +117,16 @@ function rollback() {
 	fi
 }
 
+# "pip uninstall ansible" chokes on broken symlinks
+function fix_ansible_symlinks() {
+	for ans_link in $(ls -1 "${ERIGONES_HOME}/envs/bin/ansible-*"); do
+		if [[ -L "${ans_link}" ]] && [[ "$(readlink "${ans_link}")" == "ansible" ]]; then
+			rm -f "${ans_link}"
+			cp -a /opt/erigones/envs/bin/ansible "${ans_link}"
+		fi
+	done
+}
+
 # Change working directory to ERIGONES_HOME
 cd "${ERIGONES_HOME}" || exit 64
 
@@ -311,6 +321,8 @@ echo "Running post deploy command: ${DEPLOY_CMD}"
 
 # This will enable rollback
 echo "$$" > "${DEPLOY_RUNNING_FILE}"
+
+fix_ansible_symlinks
 
 # Running ctl.sh deploy --update
 deploy_log="${LOG_DIR}/update_deploy.${VERSION_REF}.log"
