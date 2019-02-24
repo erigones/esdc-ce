@@ -1,5 +1,5 @@
 ### que
-setuptools==40.8.0
+setuptools==36.2.0
 six==1.12.0
 psutil==5.5.1
 # might want upgrade but can break things
@@ -17,7 +17,5 @@ simplejson==3.16.0
 frozendict==1.2
 requests==2.21.0
 esdc-api==2.0.1
-# dep of ansible but 1.3.0 build is broken on SmartOS
-PyNaCl==1.2.1
 ansible==2.7.8
 Jinja2==2.10
