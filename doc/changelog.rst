@@ -23,6 +23,7 @@ Bugs
 - Added script for manually cleaning up resources after failed VM migration - `#403 <https://github.com/erigones/esdc-ce/pull/403>`__
 - Fixed version sort during upgrades - `#398 <https://github.com/erigones/esdc-ce/issues/398>`__
 - Fixed source VM deletion after migration on new SmartOS platform - `#396 <https://github.com/erigones/esdc-ce/pull/386>`__
+- Fixed migration of VM containing delegated dataset with children - `#405 <https://github.com/erigones/esdc-ce/issues/405>`__
 
 
 3.0.0
