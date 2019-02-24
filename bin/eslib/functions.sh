@@ -350,13 +350,17 @@ _zfs_snap() {
 	local snapshot="$1"
 	local metadata="${2:-"null"}"
 	local fsfreeze="${3:-}"  # path to QA socket
+	local recursive="${4:-"false"}"
+	local snap_options=
 	local -i rc
+
+	[[ "${recursive}" == "true" ]] && snap_options="-r"
 
 	if [[ -z "${fsfreeze}" ]]; then
 		if [[ "${metadata}" == "null" ]]; then
-			${ZFS} snapshot "${snapshot}"
+			${ZFS} snapshot ${snap_options} "${snapshot}"
 		else
-			${ZFS} snapshot -o "${metadata}" "${snapshot}"
+			${ZFS} snapshot ${snap_options} -o "${metadata}" "${snapshot}"
 		fi
 	else
 		if [[ "${metadata}" == "null" ]]; then
