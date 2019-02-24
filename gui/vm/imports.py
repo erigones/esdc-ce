@@ -50,8 +50,8 @@ def handle_uploaded_file(import_file, request):
             or import_file.content_type == 'application/vms.ms-excel' \
             or import_file.content_type == 'application/msexcel':
 
-            imp = Import(request, filename=import_file)
-            return imp.process_file()
+        imp = Import(request, filename=import_file)
+        return imp.process_file()
 
     elif import_file.content_type == 'application/vnd.oasis.opendocument.spreadsheet':
         return process_ods(import_file)
