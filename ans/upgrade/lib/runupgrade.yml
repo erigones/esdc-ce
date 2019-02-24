@@ -14,11 +14,11 @@
   - name: Getting list of upgrades
     local_action:
         module: shell
-        args: find "{{ upg_dir }}" -maxdepth 1 -type d -name 'v*' | sort --version-sort
+        args: . /opt/erigones/bin/eslib/functions.sh && get_newer_versions_dirs "{{ appliance_version.stdout }}" "{{ upg_dir }}"
     register: upg_subdirs
   - include: "{{ upg_base }}/lib/runtasks.yml"
     with_items: "{{ upg_subdirs.stdout.split('\n') }}"
-    when: ( tasklist | basename | version_compare(appliance_version.stdout, '>'))
+    when: tasklist
     loop_control:
       loop_var: tasklist
   handlers:

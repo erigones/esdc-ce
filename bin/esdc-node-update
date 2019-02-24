@@ -13,6 +13,9 @@ ANS_BASE="${ERIGONES_HOME}/ans"
 UPG_BASE="${ANS_BASE}/upgrade"
 export ERIGONES_HOME UPG_BASE
 
+# shellcheck disable=SC1090
+. "${ERIGONES_HOME}"/bin/eslib/functions.sh
+
 PYTHONPATH="${ERIGONES_HOME}:${PYTHONPATH}:${ERIGONES_HOME}/envs/lib/python2.7/site-packages"
 VIRTUAL_ENV="${ERIGONES_HOME}/envs"
 export PYTHONPATH VIRTUAL_ENV
@@ -32,7 +35,14 @@ fi
 
 cd "${UPG_DIR}"
 
-RUN_VERSIONS=$(python -c "from pkg_resources import parse_version
+if ! validate_dc_version "${VERSION}"; then
+	# if it's a commit number or any invalid string, don't run upgrades
+	RUN_VERSIONS=
+elif [[ -x "${GSORT}" ]]; then
+	RUN_VERSIONS="$(get_newer_versions_dirs "${VERSION}" "${UPG_DIR}")"
+else
+	# fallback if we don't have a gnu sort (needed for version sort)
+	RUN_VERSIONS=$(python -c "from pkg_resources import parse_version
 import os
 upg_subdirs = (i for i in os.listdir('${UPG_DIR}') if os.path.isdir(i) and i.startswith('v'))
 version = parse_version('${VERSION}')
@@ -40,7 +50,7 @@ for i in sorted(upg_subdirs, key=parse_version):
     if parse_version(i) > version:
         print(i)
 ")
-
+fi
 
 # shellcheck disable=SC1117
 echo -e "Current node version: ${VERSION}\n"
