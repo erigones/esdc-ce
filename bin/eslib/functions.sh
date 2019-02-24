@@ -271,7 +271,9 @@ function normalize_ver() {
 # 1: v1 > v2
 # 2: v1 < v2
 function vercmp() {
+	# shellcheck disable=SC2155
 	local v1="$(normalize_ver "$1")"
+	# shellcheck disable=SC2155
 	local v2="$(normalize_ver "$2")"
 	local greater=
 
