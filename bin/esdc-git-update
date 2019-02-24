@@ -119,7 +119,7 @@ function rollback() {
 
 # "pip uninstall ansible" chokes on broken symlinks
 function fix_ansible_symlinks() {
-	for ans_link in ${ERIGONES_HOME}/envs/bin/ansible-*; do
+	for ans_link in "${ERIGONES_HOME}"/envs/bin/ansible-*; do
 		if [[ -L "${ans_link}" ]] && [[ "$(readlink "${ans_link}")" == "ansible" ]]; then
 			rm -f "${ans_link}"
 			ln "${ERIGONES_HOME}/envs/bin/ansible" "${ans_link}"
