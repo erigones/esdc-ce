@@ -1,0 +1,23 @@
+# Danube Cloud Beat Daemon systemd service file
+#
+# INSTALL:
+#   - copy erigonesd-beat.service into /etc/systemd/system/ 
+#   - run: systemctl enable erigonesd-beat.service && systemctl start erigonesd-beat.service 
+
+[Unit]
+Description=Danube Cloud Beat Daemon
+Documentation=https://docs.danubecloud.org
+After=network.target
+
+[Service]
+Type=simple
+User=erigones
+Group=erigones
+Environment="DJANGO_SETTINGS_MODULE=core.settings" "PYTHONPATH={PYTHONPATH}:/opt/erigones"
+ExecStart=/opt/erigones/bin/erigonesd mgmt beat --workdir=/opt/erigones/var/run --umask=002 --logfile=/opt/erigones/var/log/erigonesd-beat.log --loglevel=WARNING --pidfile=/opt/erigones/var/run/erigonesd-beat.pid -s /opt/erigones/var/run/celerybeat
+TimeoutStopSec=60
+Restart=on-failure
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target

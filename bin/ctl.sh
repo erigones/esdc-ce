@@ -19,12 +19,12 @@ ACTION="$1"
 
 init_envs() {
 	if [ -z "${1}" ]; then
-		virtualenv "${ENVS}"
+		virtualenv --python=python2 "${ENVS}"
 	else
-		virtualenv --always-copy "${ENVS}"
+		virtualenv --python=python2 --always-copy "${ENVS}"
 	fi
 	activate_envs
-	pip install -r "${ERIGONES_HOME}/etc/requirements-init.txt"
+	pip2 install -r "${ERIGONES_HOME}/etc/requirements-init.txt"
 }
 
 activate_envs() {

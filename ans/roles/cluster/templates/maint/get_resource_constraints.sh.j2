@@ -1,0 +1,11 @@
+#!/bin/sh
+
+if [ $(whoami) != "root" ]; then
+        echo "Please run this script as user root!"
+        exit 1
+fi
+
+CLUSTER_RES_NAME="{{ cluster_postgres_HA_res_name }}"
+
+/usr/sbin/pcs constraint location show resources "$CLUSTER_RES_NAME" | grep 'abled on:' | sed -Ee 's/^ *(Enabled|Disabled) on: ([^ ]+) \(score:(.+)\)$/{"node": "\2", "status": "\1", "score": "\3"}/'
+

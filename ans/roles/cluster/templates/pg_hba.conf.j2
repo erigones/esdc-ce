@@ -1,0 +1,16 @@
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+
+# Default:
+#####!!!!!######local  all  postgres    ident map=superuser
+local  all  postgres    trust
+# "local" is for Unix domain socket connections only
+local  all  all    md5
+# replication ACLs
+{% for node in play_hosts %}
+host  replication  {{ pg_repl_user }}  {{ hostvars[node].ansible_default_ipv4.address }}/32  md5
+host  postgres     {{ pg_repl_user }}  {{ hostvars[node].ansible_default_ipv4.address }}/32  md5
+{% endfor %}
+# IPv4 local connections
+host  all  all  127.0.0.1/32  md5
+# IPv6 local connections
+host  all  all  ::1/128  md5

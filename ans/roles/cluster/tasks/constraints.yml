@@ -1,0 +1,51 @@
+# vim: set filetype=yaml expandtab tabstop=2 shiftwidth=2 softtabstop=2 background=dark :
+
+
+# colocation constraints
+- name: setting resources colocation group 1
+  shell: pcs constraint colocation add "{{ cluster_resgroup_name_pre_db }}" with master "{{ cluster_postgres_HA_res_name }}" INFINITY
+  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
+
+- name: setting resources colocation group 2
+  shell: pcs constraint colocation add "{{ cluster_resgroup_name_post_db }}" with master "{{ cluster_postgres_HA_res_name }}" INFINITY
+  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
+
+# start order constraints
+# this one is blocking start of all resources:
+#- name: setting resources start order group 1
+#  shell: pcs constraint order start "{{ cluster_resgroup_name_pre_db }}" then promote "{{ cluster_postgres_HA_res_name }}" symmetrical=false
+#  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
+
+- name: setting resources start order group 2
+  shell: pcs constraint order promote "{{ cluster_postgres_HA_res_name }}" then start "{{ cluster_resgroup_name_post_db }}" symmetrical=false
+  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
+
+- name: setting resources stop order group 1
+  shell: pcs constraint order stop "{{ cluster_resgroup_name_post_db }}" then demote "{{ cluster_postgres_HA_res_name }}" symmetrical=false
+  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
+
+- name: setting resources stop order group 2
+  shell: pcs constraint order demote  "{{ cluster_postgres_HA_res_name }}" then stop  "{{ cluster_resgroup_name_pre_db }}" symmetrical=false
+  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
+
+
+#- name: setting resources colocation
+#  shell:  pcs constraint colocation add "{{ cluster_vip_res_name }}" with master "{{ cluster_postgres_HA_res_name }}" INFINITY
+#  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
+#
+#- name: setting resources start order (1)
+#  shell: pcs constraint order promote "{{ cluster_postgres_HA_res_name }}" then start "{{ cluster_vip_res_name }}" symmetrical=false
+#  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
+#
+#- name: setting resources start order (2)
+#  shell: pcs constraint order demote  "{{ cluster_postgres_HA_res_name }}" then stop  "{{ cluster_vip_res_name }}" symmetrical=false
+#  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
+#
+#- name: setting DB location constraints
+#  shell: pcs constraint location "{{ cluster_postgres_HA_res_name }}" prefers {% for clhost in play_hosts %}{{clhost}}=100 {% endfor %}
+#  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
+
+- name: marking constraints as processed
+  shell: echo "LOCKFILE. Do not delete!" > /root/.constraints_processed
+  args:
+    creates: /root/.constraints_processed

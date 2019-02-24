@@ -20,7 +20,7 @@ SELECT_ATTRS = {'class': 'narrow input-select2'}
 if PY3:
     t_long = int
 else:
-    t_long = long
+    t_long = long  # noqa: F821
 
 
 class DcDomainForm(SerializerForm):
@@ -50,7 +50,7 @@ class AdminDomainForm(SerializerForm):
                                   widget=forms.CheckboxInput(attrs={'class': 'normal-check'}))
     name = forms.CharField(label=_('Name'), max_length=255, required=True,
                            widget=forms.TextInput(attrs={'class': 'input-transparent narrow disable_created',
-                                                         'required': 'required', 'pattern': '[A-Za-z0-9\._-]+'}))
+                                                         'required': 'required', 'pattern': '[A-Za-z0-9._-]+'}))
     owner = forms.ChoiceField(label=_('Owner'), required=False,
                               widget=forms.Select(attrs=SELECT_ATTRS))
     access = forms.TypedChoiceField(label=_('Access'), required=False, coerce=int, choices=Domain.ACCESS,

@@ -1,0 +1,70 @@
+# vim: set filetype=yaml expandtab tabstop=2 shiftwidth=2 softtabstop=2 background=dark :
+
+- name: create MGMT virtual IP
+  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
+  pcs_resource: command=create resource_id="{{ cluster_vip_res_name }}" type=ocf:heartbeat:IPaddr2
+  args:
+    options:
+      ip: "{{ cluster_vip }}"
+      cidr_netmask: "{{ cluster_vip_mask }}"
+    operations:
+      - action: monitor
+        options:
+          interval: 10s
+    group: "{{ cluster_resgroup_name_pre_db }}"
+
+- name: disable autostart of services before clustering
+  service: name="{{ item }}" enabled=no
+  with_items:
+      - erigonesd-beat
+      - pgbouncer
+
+- name: modify systemd unit files
+  copy: src="{{ item }}.service" dest=/etc/systemd/system/{{ item }}.service
+  notify: reload systemd
+  with_items:
+      - esdc@
+      - erigonesd
+      - erigonesd-beat
+
+- meta: flush_handlers
+
+- name: add cluster resources (pre-DB-start)
+  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
+  pcs_resource: command=create resource_id="{{ item }}" type=systemd:"{{ item }}"
+  args:
+    operations:
+      - action: monitor
+        options:
+          interval: 30s
+    group: "{{ cluster_resgroup_name_pre_db }}"
+  with_items:
+    - pgbouncer
+
+- name: add cluster resources (post-DB-start)
+  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
+  pcs_resource: command=create resource_id="{{ item }}" type=systemd:"{{ item }}"
+  args:
+    operations:
+      - action: monitor
+        options:
+          interval: 30s
+    group: "{{ cluster_resgroup_name_post_db }}"
+  with_items:
+      - erigonesd-beat
+
+# To consider: higher location weight for cluster_master_host?
+- name: set resource location constraint 1
+  shell: pcs constraint location "{{ cluster_resgroup_name_pre_db }}" prefers {% for clhost in play_hosts %}{{clhost}}=100 {% endfor %}
+
+- name: set resource location constraint 2
+  shell: pcs constraint location "{{ cluster_resgroup_name_post_db }}" prefers {% for clhost in play_hosts %}{{clhost}}=100 {% endfor %}
+
+- name: refresh cluster resources status 1
+  shell: pcs resource cleanup "{{ cluster_resgroup_name_pre_db }}" && pcs resource clear "{{ cluster_resgroup_name_pre_db }}" && pcs resource manage "{{ cluster_resgroup_name_pre_db }}"
+  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
+
+- name: refresh cluster resources status 2
+  shell: pcs resource cleanup "{{ cluster_resgroup_name_post_db }}" && pcs resource clear "{{ cluster_resgroup_name_post_db }}" && pcs resource manage "{{ cluster_resgroup_name_post_db }}"
+  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
+

@@ -1,0 +1,24 @@
+#!/bin/sh
+
+# Output:
+# - string: master node of the resource with name CLUSTER_RES_NAME
+# - nothing: no master is running for resource CLUSTER_RES_NAME
+# Exit status:
+# - zero: cluster is running
+# - non-zero: cluster is not running
+
+
+if [ $(whoami) != "root" ]; then
+        echo "Please run this script as user root!"
+        exit 1
+fi
+
+CLUSTER_RES_NAME="{{ cluster_postgres_HA_res_name }}"
+
+if ! crm_node -l &> /dev/null; then
+        # cluster is not running!
+        exit 1
+fi
+
+/usr/sbin/crm_resource -r "$CLUSTER_RES_NAME" --locate 2>&1 | grep -E "^resource $CLUSTER_RES_NAME is running on: [^ ]+ Master$" | sed -E "s/^resource $CLUSTER_RES_NAME is running on: ([^ ]+) Master$/\1/"
+

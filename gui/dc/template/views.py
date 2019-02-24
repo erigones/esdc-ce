@@ -37,12 +37,12 @@ def dc_template_list(request):
         context['templates'] = vmts.select_related('owner', 'dc_bound').filter(dc=dc)
 
     if is_staff:
-            context['form'] = TemplateForm(request, vmts)
+        context['form'] = TemplateForm(request, vmts)
 
-            if _all:  # Uses set() because of optimized membership ("in") checking
-                context['can_add'] = set(vmts.exclude(dc=dc).values_list('pk', flat=True))
-            else:
-                context['can_add'] = vmts.exclude(dc=dc).count()
+        if _all:  # Uses set() because of optimized membership ("in") checking
+            context['can_add'] = set(vmts.exclude(dc=dc).values_list('pk', flat=True))
+        else:
+            context['can_add'] = vmts.exclude(dc=dc).count()
 
     return render(request, 'gui/dc/template_list.html', context)
 

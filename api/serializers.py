@@ -1352,7 +1352,7 @@ class InstanceSerializer(Serializer):
     @staticmethod
     def _null(value):
         """Return None instead of empty string"""
-        if not value and value is not 0:
+        if not value and value is not 0:  # noqa: F632
             return None
         return value
 

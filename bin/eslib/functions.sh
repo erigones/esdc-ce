@@ -93,7 +93,7 @@ die() {
 	shift
 	local msg=$*
 
-	[[ ! -z "${msg}" ]] && echo "ERROR: ${msg}" 1>&2
+	[[ -n "${msg}" ]] && echo "ERROR: ${msg}" 1>&2
 	[[ -z "${exit_code}" ]] && exit_code=${_ERR_UNKNOWN}
 
 	exit "${exit_code}"
@@ -228,6 +228,11 @@ base64_decode() {
 	printf "%s" "${str}" | python -m base64 -d -
 }
 
+remote_function_exist() {
+	local funcname="$1"
+
+	_dest_host_cmd type "${funcname}" &> /dev/null
+}
 
 ###############################################################
 # Validators (motto: die as soon as possible)
@@ -651,6 +656,22 @@ _vm_update() {
 	${VMADM} update "${uuid}" "${@}"
 }
 
+# return error after VM is not present after the timeout
+_vm_wait_for_become_visble() {
+	local uuid="$1"
+	local timeout_sec="${2:-60}"	# 60 sec is default if not specified
+
+	while [[ "$timeout_sec" -gt 0 ]]; do
+		if vmadm lookup -1 "uuid=${uuid}" &>/dev/null; then
+			return 0
+		fi
+		(( --timeout_sec ))
+		sleep 1
+	done
+	return 1
+}
+
+
 _vm_remove_indestructible_property() {
 	local uuid="$1"
 
@@ -709,6 +730,16 @@ _zone_detach() {
 
 _vmadmd_restart() {
 	${SVCADM} restart vmadmd
+}
+
+_vminfod_restart() {
+	if ${SVCS} -H vminfod &>/dev/null; then
+		${SVCADM} restart vminfod
+	else
+		# on older platforms the functionality is
+		# not separated from vmadmd
+		_vmadmd_restart
+	fi
 }
 
 _image_exists() {

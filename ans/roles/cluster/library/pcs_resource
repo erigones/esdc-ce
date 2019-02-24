@@ -1,0 +1,117 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+DOCUMENTATION = '''
+---
+module: pcs_resource
+short_description: Manages I(pacemaker) cluster resources with pcs tool.
+options:
+  command:
+    required: true
+    description: Supported commands.
+    choices: [ "create", "master"]
+  resource_id:
+    required: true
+    description: Id of the resource.
+  type:
+    required: true
+    description: type of resource. Used in «create» command.
+  ms_name:
+    required: true
+    description: name of the resource. Used in «master» command.
+  group:
+    required: false
+    description: add the resource to specified group.
+  options:
+    required: false
+    description: hash of resource options.
+  operations:
+    required: false
+    description: list of hashes of operations. Used in «create» command.
+  disabled:
+    required: false
+    type: bool
+    description: don't start resource after creation.
+'''
+
+def main():
+    module = AnsibleModule(
+        argument_spec   = dict(
+            command    = dict(choices=['create', 'master']),
+            name       = dict(required=True, aliases=['resource_id']),
+            ms_name    = dict(required=False, type='str'),
+            type       = dict(required=False),
+            group      = dict(required=False, type='str'),
+            options    = dict(required=False, type='dict'),
+            operations = dict(required=False, type='raw'),
+            disabled   = dict(required=False, type='bool'),
+        ),
+        supports_check_mode=True,
+    )
+
+    # TODO check pcs command is available.
+    # TODO check pacemaker/corosync is running.
+
+    # Check if resource already exists.
+    cmd = "pcs resource show %(name)s"  % module.params
+    rc, out, err = module.run_command(cmd)
+    exists = (rc is 0)
+
+    if exists:
+        module.exit_json(changed=False, msg="Resource already exists.")
+    elif module.check_mode:
+        module.exit_json(changed=True)
+
+    # Validate and process command specific params.
+    if module.params['command'] == 'create':
+        if not module.params.has_key('type'):
+            module.fail_json(msg="missing required arguments: type.")
+        if not module.params.has_key('options'):
+            module.fail_json(msg="missing required arguments: options.")
+        # Command template.
+        cmd = 'pcs resource %(command)s %(resource_id)s %(type)s %(options)s'
+        # Process operations.
+        if module.params.has_key('operations'):
+            cmd += ' %(operations)s'
+            operations = []
+            for op in module.params['operations']:
+                op['options'] = ' '.join(['%s="%s"' % (key, value) for (key, value) in op['options'].items()])
+                operations.append('op %(action)s %(options)s' % op)
+            module.params['operations'] = ' '.join(operations)
+
+    elif module.params['command'] == 'master':
+        if not module.params.has_key('options'):
+            module.fail_json(msg="missing required arguments: options.")
+        if not module.params.has_key('ms_name'):
+            module.fail_json(msg="missing required arguments: ms_name.")
+        # Command template.
+        cmd = 'pcs resource %(command)s %(name)s %(ms_name)s %(options)s'
+
+    # Process options.
+    if module.params.has_key('options'):
+        options = module.params['options']
+        if options:
+            options = ' '.join(['%s="%s"' % (key, value) for (key, value) in options.items()])
+            module.params['options'] = options
+
+    if module.params.has_key('group'):
+        if module.params['group']:
+            cmd += ' --group ' + module.params['group']
+
+    if module.params.has_key('disabled'):
+        if module.params['disabled']:
+            cmd += ' --disabled'
+
+    # Run command.
+    cmd = cmd % module.params
+    message = 'Running cmd: %s' % cmd
+    rc, out, err = module.run_command(cmd)
+    if rc is 1:
+        module.fail_json(msg="Execution failed.\nCommand: `%s`\nError: %s" % (cmd, err))
+
+    module.exit_json(changed=True, msg=message)
+
+# import module snippets
+from ansible.module_utils.basic import *
+main()
+

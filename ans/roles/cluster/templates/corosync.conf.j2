@@ -1,0 +1,42 @@
+totem {
+    version: 2
+    secauth: off
+    cluster_name: ansiblecl
+    transport: udpu
+}
+
+nodelist {
+{% set even_nodecount = ((cluster_all_hosts|length) % 2 == 0) %}
+{% set nodeid = 1 %}
+{% for node in play_hosts %}
+    node {
+        ring0_addr: {{ node }}
+        nodeid: {{ nodeid }}
+        {% if node == cluster_master_host and even_nodecount -%}
+		{# if there is even number of nodes, set master votecount to 2 #}
+        quorum_votes: 2
+		{% else %}
+        quorum_votes: 1
+        {% endif %}
+    }
+{% set nodeid = nodeid + 1 %}
+{% endfor %}
+}
+
+quorum {
+    provider: corosync_votequorum
+	{# in case of even node count, we must wait for all nodes to be
+		sure that we don't get split-brain #}
+	{% if even_nodecount %}
+    wait_for_all: 1
+	{% else %}
+    wait_for_all: 0
+	{% endif %}
+}
+
+logging {
+    to_logfile: yes
+    logfile: /var/log/cluster/corosync.log
+    to_syslog: yes
+    debug: on
+}

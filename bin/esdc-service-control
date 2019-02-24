@@ -16,12 +16,32 @@ function node_restart() {
 	svcadm restart svc:/application/erigonesd:*
 }
 
+function node_start() {
+	svcadm enable svc:/application/erigonesd:*
+}
+
+function node_stop() {
+	svcadm disable -t svc:/application/erigonesd:*
+}
+
+function node_disable() {
+	svcadm disable svc:/application/erigonesd:*
+}
+
 function mgmt_status() {
 	systemctl status esdc@* erigonesd erigonesd-beat
 }
 
 function mgmt_restart() {
 	systemctl restart esdc@* erigonesd erigonesd-beat
+}
+
+function mgmt_stop() {
+	systemctl stop esdc@* erigonesd erigonesd-beat
+}
+
+function mgmt_disable() {
+	systemctl disable esdc@* erigonesd erigonesd-beat
 }
 
 function is_node() {
@@ -45,8 +65,22 @@ case "$1" in
 			mgmt_restart
 		fi
 	;;
+	"start")
+		if is_node; then
+			node_start
+		else
+			mgmt_restart
+		fi
+	;;
+	"stop")
+		if is_node; then
+			node_stop
+		else
+			mgmt_stop
+		fi
+	;;
 	*)
-		echo "Usage: $0 {status|restart}" >&2
+		echo "Usage: $0 {status|start|stop|restart}" >&2
 		exit 1
 	;;
 esac

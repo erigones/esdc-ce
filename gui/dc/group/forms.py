@@ -36,7 +36,7 @@ class AdminGroupForm(SerializerForm):
                                   widget=forms.CheckboxInput(attrs={'class': 'normal-check'}))
     name = forms.CharField(label=_('Name'), max_length=NAME_AND_ALIAS_MAX_LENGTH, required=True,
                            widget=forms.TextInput(attrs={'class': 'input-transparent narrow disable_created',
-                                                         'required': 'required', 'pattern': '[A-Za-z0-9\._-]+'}))
+                                                         'required': 'required', 'pattern': '[A-Za-z0-9._-]+'}))
     alias = forms.CharField(label=_('Alias'), required=True, max_length=NAME_AND_ALIAS_MAX_LENGTH,
                             widget=forms.TextInput(attrs={'class': 'input-transparent narrow', 'required': 'required'}))
     users = forms.MultipleChoiceField(label=_('Users'), required=False,

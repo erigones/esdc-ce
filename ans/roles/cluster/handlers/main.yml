@@ -1,0 +1,35 @@
+# vim: set filetype=yaml expandtab tabstop=2 shiftwidth=2 softtabstop=2 background=dark :
+
+- name: reload iptables
+  service: name=iptables state=restarted
+
+- name: restart postgresql
+  service: name="{{ postgres_orig_svcname }}" state=restarted
+
+- name: reload postgresql
+  shell: "{{ bindir }}/pg_ctl -D {{ pgdata }} reload"
+  become: yes
+  become_user: postgres
+  vars:
+    ansible_ssh_pipelining: no
+
+- name: reload corosync
+  shell: pcs cluster reload corosync
+
+- name: restart corosync
+  service: name=corosync state=restarted
+
+- name: reload systemd
+  shell: /bin/systemctl daemon-reload
+
+- name: restart esdc services
+  service: name="{{ item }}" state=restarted
+  with_items: "{{ restart_on_esdc_cfg_change_systemd }}"
+  notify: restart esdc cluster services
+
+- name: restart esdc cluster services
+  shell: pcs resource unmanage "{{ item }}" && systemctl restart "{{ item }}" && pcs resource manage "{{ item }}"
+  with_items: "{{ restart_on_esdc_cfg_change_cluster }}"
+
+- name: restart rabbitmq-server
+  service: name="{{ rabbitmq.service }}" state=restarted
