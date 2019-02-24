@@ -564,20 +564,32 @@ zone_attach_err() {
 _create_snapshot() {
 	local snap="$1"
 	local target="${2:-"source"}"
+	local recursive="${3:-"false"}"
+	local msg=
 
-	_zfs_snap "${snap}" || die ${ERR_DS_SNAP} "Could not create ${target} snapshot: ${snap}"
+	[[ "${recursive}" == "true" ]] && msg=" recursively"
 
-	techo "Created ${target} snapshot: ${snap}"
+	_zfs_snap "${snap}" "null" "" "${recursive}" || die ${ERR_DS_SNAP} "Could not create ${target} snapshot:${msg} ${snap}"
+
+	techo "Created ${target} snapshot${msg}: ${snap}"
 }
 
 _destroy_snapshot() {
 	local snap="$1"
 	local target="${2:-"source"}"
+	local recursive="${3:-"false"}"
+	local options=
+	local msg=
 
-	if "${ZFS}" destroy -f "${snap}"; then
-		techo "Destroyed ${target} snapshot: ${snap}"
+	if [[ "${recursive}" == "true" ]]; then
+		options="-r"
+		msg=" recursively"
+	fi
+
+	if "${ZFS}" destroy -f ${options} "${snap}"; then
+		techo "Destroyed ${target} snapshot${msg}: ${snap}"
 	else
-		echo "Could not destroy ${target} snapshot: ${snap}" 1>&2
+		echo "Could not destroy ${target} snapshot${msg}: ${snap}" 1>&2
 	fi
 }
 
@@ -614,7 +626,8 @@ _create_snapshots() {
 	if [[ "${#DS_DATA[@]}" -ne 0 ]]; then
 		for ds_data in "${DS_DATA[@]}"; do
 			dsnap="${ds_data%% *}@${snapshot}"
-			_create_snapshot "${dsnap}"
+			# create source snap recursively (possible delegated datasets)
+			_create_snapshot "${dsnap}" "source" "true"
 
 			size=$(_get_snapshot_size "${dsnap}" "${snapshot_previous}")
 			((SIZE+=size))
@@ -657,7 +670,8 @@ _destroy_snapshots() {
 
 	if [[ "${#DS_DATA[@]}" -ne 0 ]]; then
 		for ds_data in "${DS_DATA[@]}"; do
-			_destroy_snapshot "${ds_data%% *}@${snapshot}"
+			# destroy source snap recursively (possible delegated datasets)
+			_destroy_snapshot "${ds_data%% *}@${snapshot}" "source" "true"
 		done
 	fi
 }
