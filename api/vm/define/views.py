@@ -490,7 +490,7 @@ def vm_define_nic(request, hostname_or_uuid, nic_id=None, data=None):
             * |async-no|
         :arg hostname_or_uuid: **required** - Server hostname or uuid
         :type hostname_or_uuid: string
-        :arg nic_id: **required** - NIC number/ID (1 - 6)
+        :arg nic_id: **required** - NIC number/ID (1 - 16)
         :type nic_id: integer
         :arg data.active: Display currently active VM NIC definition on compute node (default: false)
         :type data.active: boolean
@@ -512,7 +512,7 @@ def vm_define_nic(request, hostname_or_uuid, nic_id=None, data=None):
             * |async-no|
         :arg hostname_or_uuid: **required** - Server hostname or uuid
         :type hostname_or_uuid: string
-        :arg nic_id: **required** - NIC number/ID (1 - 6)
+        :arg nic_id: **required** - NIC number/ID (1 - 16)
         :type nic_id: integer
         :arg data.net: **required** - Name of a virtual network
         :type data.net: string
@@ -569,7 +569,7 @@ other VMs. Useful for floating/shared IPs (default: [])
             * |async-no|
         :arg hostname_or_uuid: **required** - Server hostname or uuid
         :type hostname_or_uuid: string
-        :arg nic_id: **required** - NIC number/ID (1 - 6)
+        :arg nic_id: **required** - NIC number/ID (1 - 16)
         :type nic_id: integer
         :arg data.net: Name of a virtual network
         :type data.net: string
@@ -625,7 +625,7 @@ other VMs. Useful for floating/shared IPs
             * |async-no|
         :arg hostname_or_uuid: **required** - Server hostname or uuid
         :type hostname_or_uuid: string
-        :arg nic_id: **required** - NIC number/ID (1 - 6)
+        :arg nic_id: **required** - NIC number/ID (1 - 16)
         :type nic_id: integer
         :status 200: SUCCESS
         :status 400: FAILURE

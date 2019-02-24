@@ -9,7 +9,7 @@ from api.vm.define.serializers import VmDefineNicSerializer
 from api.vm.messages import LOG_NIC_CREATE, LOG_NIC_UPDATE, LOG_NIC_DELETE
 
 NIC_ID_MIN = 0
-NIC_ID_MAX = 5
+NIC_ID_MAX = 15
 
 
 def _nic_params(fun):
