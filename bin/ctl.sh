@@ -54,6 +54,20 @@ set_django_settings() {
 	export DJANGO_SETTINGS_MODULE
 }
 
+update_env() {
+	export PYTHONUNBUFFERED="true"
+
+	case "${1}" in
+		pip_*)
+			# When uninstalling or upgrading Python packages with symlinks our version of
+			# Python/pip has a bug that causes the uninstall to fail in situations where
+			# the default TMPDIR (/tmp) is located on a different filesystem than the virtualenv.
+			# To fix this, we set TMPDIR closer to our virtualenv for all pip_* commands.
+			export TMPDIR="${ERIGONES_HOME}/var"
+		;;
+	esac
+}
+
 case "${ACTION}" in
 	"clean_envs")
 		virtualenv --relocatable "${ENVS}"
@@ -67,7 +81,7 @@ case "${ACTION}" in
 	*)
 		activate_envs
 		set_django_settings "$1"
-		export PYTHONUNBUFFERED="true"
+		update_env "$1"
 		"${MANAGEPY}" "${@}"
 	;;
 esac
