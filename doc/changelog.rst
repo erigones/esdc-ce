@@ -25,6 +25,7 @@ Bugs
 - Fixed version sort during upgrades - `#398 <https://github.com/erigones/esdc-ce/issues/398>`__
 - Fixed source VM deletion after migration on new SmartOS platform - `#396 <https://github.com/erigones/esdc-ce/pull/386>`__
 - Fixed migration of VM containing delegated dataset with children - `#405 <https://github.com/erigones/esdc-ce/issues/405>`__
+- Fixed problem with upgrading Python packages - `#408 <https://github.com/erigones/esdc-ce/issues/408>`__
 
 
 3.0.0
