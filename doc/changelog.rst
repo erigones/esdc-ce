@@ -29,6 +29,7 @@ Bugs
 - Fixed source VM deletion after migration on new SmartOS platform - `#396 <https://github.com/erigones/esdc-ce/pull/386>`__
 - Fixed migration of VM containing delegated dataset with children - `#405 <https://github.com/erigones/esdc-ce/issues/405>`__
 - Fixed problem with upgrading Python packages - `#408 <https://github.com/erigones/esdc-ce/issues/408>`__
+- Fixed failure when displaying comparative VM graphs on compute node - `#395 <https://github.com/erigones/esdc-ce/issues/395>`__
 
 
 3.0.0

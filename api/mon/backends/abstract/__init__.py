@@ -83,7 +83,7 @@ class AbstractMonitoringBackend(object):
     def vm_sla(self, vm_node_history):
         raise NotImplementedError
 
-    def vm_history(self, vm_host_id, items, zhistory, since, until, items_search=None):
+    def vm_history(self, vm_host_id, items, zhistory, since, until, **kwargs):
         raise NotImplementedError
 
     def is_vm_host_created(self, vm):
