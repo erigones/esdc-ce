@@ -15,6 +15,7 @@ Features
 - Allow upgrading a diskinstall platform from local custom platform file - `#385 <https://github.com/erigones/esdc-ce/pull/385>`__
 - Added esdc-overlay wipe command to delete all created overlays - `#378 <https://github.com/erigones/esdc-ce/pull/378>`__
 - Increased number of possible vNICs to 16 - `#387 <https://github.com/erigones/esdc-ce/issues/387>`__
+- Add `hostname` property into VM's metadata implicitly - `#401 <https://github.com/erigones/esdc-ce/issues/401>`__
 
 Bugs
 ----
