@@ -435,7 +435,7 @@ DNS_MGMT_DOMAIN = 'local'  # Internal setting related to initial_data
 DNS_HOSTMASTER = 'hostmaster@example.com'  # This will be used as a placeholder for generating SOA records
 DNS_NAMESERVERS = ['ns1.' + DNS_MGMT_DOMAIN]  # Items will be used as a placeholder for generating SOA and NS records
 DNS_SOA_DEFAULT = '{nameserver} {hostmaster} 2013010100 28800 7200 604800 86400'  # For auto-generated SOA records
-DNS_PTR_DEFAULT = 'ptr-{ipaddr}.example.com'  # Content for the per VM PTR records.
+DNS_PTR_DEFAULT = '{hostname}'  # Content of VM's PTR record
 DNS_DOMAIN_TYPE_DEFAULT = 'MASTER'
 
 ESLIC_ENABLED = False  # Module. Enterprise Edition.
