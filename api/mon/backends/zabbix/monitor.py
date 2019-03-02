@@ -157,13 +157,13 @@ class Zabbix(AbstractMonitoringBackend):
         """[INTERNAL] Return SLA (%) for VM.node_history and selected time period; Returns None in case of problems"""
         return self.izx.vm_get_sla(vm_node_history)
 
-    def vm_history(self, vm_host_id, items, zhistory, since, until, items_search=None):
+    def vm_history(self, vm_host_id, items, zhistory, since, until, **kwargs):
         """[INTERNAL] Return VM history data for selected graph and period"""
-        return self.izx.get_history((vm_host_id,), items, zhistory, since, until, items_search=items_search)
+        return self.izx.get_history((vm_host_id,), items, zhistory, since, until, **kwargs)
 
-    def vms_history(self, vm_host_ids, items, zhistory, since, until, items_search=None):
+    def vms_history(self, vm_host_ids, items, zhistory, since, until, **kwargs):
         """[INTERNAL] Return VM history data for selected VMs, graph and period"""
-        return self.izx.get_history(vm_host_ids, items, zhistory, since, until, items_search=items_search)
+        return self.izx.get_history(vm_host_ids, items, zhistory, since, until, **kwargs)
 
     @staticmethod
     def _vm_disable_sync(zx, vm, log=None):

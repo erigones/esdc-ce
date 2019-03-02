@@ -811,7 +811,7 @@ class ZabbixBase(object):
 
         return parse_zabbix_result(res, 'serviceids', from_get_request=False)
 
-    def get_history(self, hosts, items, history, since, until, items_search=None):
+    def get_history(self, hosts, items, history, since, until, items_search=None, skip_nonexistent_items=False):
         """Return monitoring history for selected zabbix host, items and period"""
         res = {'history': [], 'items': []}
 
@@ -837,7 +837,10 @@ class ZabbixBase(object):
                 host_items = self._zabbix_get_items(host, items, search_params=items_search)
 
                 if not host_items:
-                    raise ZabbixAPIException('Cannot find items for host "%s" in Zabbix' % host)
+                    if skip_nonexistent_items:
+                        continue
+                    else:
+                        raise ZabbixAPIException('Cannot find items for host "%s" in Zabbix' % host)
 
                 itemids.update(i['itemid'] for i in host_items)
                 res['items'].extend(host_items)
