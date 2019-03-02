@@ -532,7 +532,7 @@
                   {% if is_kvm %}
                     <td class="hidden-phone-small">{{ disk.model }}</td>
                   {% else %}
-                    <td class="hidden-phone-small">{{ vm.DISK_FS|keyvalue:disk.disk_id }}</td>
+                    <td class="hidden-phone-small">{% if disk.disk_id == 1 %}/{% else %}{% trans "(delegated)" %}{% endif %}</td>
                   {% endif %}
                   {% if is_kvm %}
                     <td>{{ disk.size|multiply:1048576|filesizeformat }}</td>
