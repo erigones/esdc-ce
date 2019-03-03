@@ -286,6 +286,13 @@ class VmDefineSerializer(VmBaseSerializer):
             vm.save_item('quota', int(round(float(self.zone_img.size) / float(1024))), save=False)
             vm.save_item('zfs_root_compression', self.dc_settings.VMS_DISK_COMPRESSION_DEFAULT, save=False)
 
+        # Add `hostname` to customer_metadata if its missing or changed
+        mdata = vm.mdata
+
+        if 'hostname' not in mdata or self.hostname_changed:
+            mdata['hostname'] = vm.hostname
+            vm.mdata = mdata
+
         return vm
 
     def validate_owner(self, attrs, source):

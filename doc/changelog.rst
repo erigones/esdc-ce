@@ -17,6 +17,7 @@ Features
 - Increased number of possible vNICs to 16 - `#387 <https://github.com/erigones/esdc-ce/issues/387>`__
 - Renamed FS for delegated dataset in the GUI - `#389 <https://github.com/erigones/esdc-ce/issues/389>`__
 - Changed value of VM's default PTR record to be its hostname - `#390 <https://github.com/erigones/esdc-ce/issues/390>`__
+- Add `hostname` property into VM's metadata implicitly - `#401 <https://github.com/erigones/esdc-ce/issues/401>`__
 
 Bugs
 ----
