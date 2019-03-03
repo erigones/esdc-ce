@@ -16,6 +16,7 @@ Features
 - Added esdc-overlay wipe command to delete all created overlays - `#378 <https://github.com/erigones/esdc-ce/pull/378>`__
 - Increased number of possible vNICs to 16 - `#387 <https://github.com/erigones/esdc-ce/issues/387>`__
 - Renamed FS for delegated dataset in the GUI - `#389 <https://github.com/erigones/esdc-ce/issues/389>`__
+- Changed value of VM's default PTR record to be its hostname - `#390 <https://github.com/erigones/esdc-ce/issues/390>`__
 
 Bugs
 ----
