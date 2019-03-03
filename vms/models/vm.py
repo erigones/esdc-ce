@@ -86,11 +86,6 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
         ('scsi', 'scsi'),
     )
 
-    DISK_FS = frozendict({
-        1: '/',
-        2: '/data',
-    })
-
     DISK_COMPRESSION = (
         ('off', 'off'),
         ('lzjb', 'lzjb'),
