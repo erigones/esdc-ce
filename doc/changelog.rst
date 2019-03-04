@@ -18,18 +18,19 @@ Features
 - Renamed FS for delegated dataset in the GUI - `#389 <https://github.com/erigones/esdc-ce/issues/389>`__
 - Changed value of VM's default PTR record to be its hostname - `#390 <https://github.com/erigones/esdc-ce/issues/390>`__
 - Add `hostname` property into VM's metadata implicitly - `#401 <https://github.com/erigones/esdc-ce/issues/401>`__
+- Added script for manually cleaning up resources after failed VM migration - `#403 <https://github.com/erigones/esdc-ce/pull/403>`__
 
 Bugs
 ----
 
 - Fixed core dataset re-creation during rollback after failed migration - `#386 <https://github.com/erigones/esdc-ce/pull/386>`__
 - Fixed node MAC address map in esdc-overlay command - `#404 <https://github.com/erigones/esdc-ce/pull/404>`__
-- Added script for manually cleaning up resources after failed VM migration - `#403 <https://github.com/erigones/esdc-ce/pull/403>`__
 - Fixed version sort during upgrades - `#398 <https://github.com/erigones/esdc-ce/issues/398>`__
 - Fixed source VM deletion after migration on new SmartOS platform - `#396 <https://github.com/erigones/esdc-ce/pull/386>`__
 - Fixed migration of VM containing delegated dataset with children - `#405 <https://github.com/erigones/esdc-ce/issues/405>`__
 - Fixed problem with upgrading Python packages - `#408 <https://github.com/erigones/esdc-ce/issues/408>`__
 - Fixed failure when displaying comparative VM graphs on compute node - `#395 <https://github.com/erigones/esdc-ce/issues/395>`__
+- Fixed printing qemu error log when destination VM fails to start - `#422 <https://github.com/erigones/esdc-ce/pull/422>`__
 
 
 3.0.0
