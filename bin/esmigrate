@@ -1308,6 +1308,7 @@ _remove_indestructible() {
 	local uuid="$1"
 
 	if _vm_property "${JSON_SRC}" "indestructible_zoneroot" &> /dev/null; then
+		techo "Removing indestructible properties from VM datasets"
 		_vm_remove_indestructible_property "${uuid}" &>/dev/null
 	fi
 }
