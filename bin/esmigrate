@@ -1247,7 +1247,7 @@ recv_kvm_ram() {
 	else
 		echo "ERROR: Unexpected problem with destination VM: ${UUID_SRC}" 1>&2
 		# Debug info
-		_dest_host_cmd "${SED}" -ne '/^=== OUTPUT/,//p' "${zone_root_dst}/root/tmp/vm.log" 1>&2
+		_dest_host_cmd "${SED}" -ne '/^=== OUTPUT/,//p' "/${zone_root_dst}/root/tmp/vm.log" 1>&2
 		die ${ERR_VM_MEM_SENDRECV} "Failed to resume destination VM: ${UUID_SRC}"
 	fi
 }
@@ -1304,12 +1304,18 @@ destroy_snapshots_dst() {
 	fi
 }
 
-_delete_vm() {
+_remove_indestructible() {
 	local uuid="$1"
 
 	if _vm_property "${JSON_SRC}" "indestructible_zoneroot" &> /dev/null; then
 		_vm_remove_indestructible_property "${uuid}" &>/dev/null
 	fi
+}
+
+_delete_vm() {
+	local uuid="$1"
+
+	_remove_indestructible "${uuid}"
 
 	# we cannot use "vmadm destroy" because it refuses to destroy a detached VM
 	_zone_delete "${uuid}" > /dev/null
@@ -1329,14 +1335,16 @@ destroy_datasets_src() {
 	local ds_root
 	local ds_data
 
+	_remove_indestructible "${UUID_SRC}"
+
 	if live_migration && [[ -n "${DEST_HOST}" ]]; then
-		# we need to get src VM to detached state before datasets removal
-		# (apply delete only to remote migration)
+		# - apply delete only to remote migration
+		# - we need to get src VM to detached state before datasets removal
 		techo "Halting source VM"
 		_zone_halt "${UUID_SRC}"
 
 		# core dataset can be destroyed only after VM stop
-		set_vm_status_src
+		set_vm_status_src	# re-read VM state
 		destroy_core_dataset
 
 		techo "Detaching source VM"
