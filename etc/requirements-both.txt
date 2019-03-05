@@ -17,5 +17,7 @@ simplejson==3.16.0
 frozendict==1.2
 requests==2.21.0
 esdc-api==2.0.1
+# build of PyNaCl 1.3.0 is broken on SmartOS
+PyNaCl==1.2.1
 ansible==2.7.8
 Jinja2==2.10
