@@ -1,5 +1,5 @@
 ---
 
-- include: plays/ha-mgmt.yml
-- include: plays/ha-dns.yml
-- include: plays/ha-nodes.yml
+- import_playbook: plays/ha-mgmt.yml
+- import_playbook: plays/ha-dns.yml
+- import_playbook: plays/ha-nodes.yml

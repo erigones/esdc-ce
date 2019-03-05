@@ -39,7 +39,7 @@ fi
 set +e
 if [ -n "${MGMT_IP}" ]; then
 	# Update ansible inventory
-	ssh "root@${MGMT_IP}" "${ERIGONES_HOME}/bin/ctl.sh" genhosts --include-nodes > "${HOSTS_TMP_FILE}"
+	ssh "root@${MGMT_IP}" "${ERIGONES_HOME}/bin/ctl.sh" genhosts --nodes --vms --pdc "admin" > "${HOSTS_TMP_FILE}"
 	if [ "x$?" == "x0" ]; then
 		# update succeeded
 		mv -f "${HOSTS_TMP_FILE}" "${HOSTS_FILE}"
@@ -52,6 +52,9 @@ else
 	exit 1
 fi
 set -e
+
+# activate python virtualenv
+. "${ERIGONES_HOME}/envs/bin/activate"
 
 cd "${ANS_BASE}"
 ansible-playbook "${PLAYBOOK}" --extra-vars "cluster_master_host=$CLUSTER_MASTER_HOST"

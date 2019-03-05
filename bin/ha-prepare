@@ -647,6 +647,9 @@ def clone_mgmt_vm(name, original_vm):
     add_to_vm_definition(new_vm_definition, {'dc': 'admin'})
     add_to_vm_definition(new_vm_definition, {'alias': name})
     add_to_vm_definition(new_vm_definition, {'node':CONF['mgmt'][name]['node']})
+
+    # set new hostname using mdata
+    new_vm_definition['mdata']['hostname'] = vmname
     
     # Add ssh pubkey of node that will mgmt02 reside on (so the node can login to mgmt02 locally).
     # And keep also the pubkey of the first node (the original one).
