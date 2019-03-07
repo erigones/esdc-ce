@@ -54,6 +54,7 @@ fi
 set -e
 
 # activate python virtualenv
+# shellcheck disable=SC1090
 . "${ERIGONES_HOME}/envs/bin/activate"
 
 cd "${ANS_BASE}"
