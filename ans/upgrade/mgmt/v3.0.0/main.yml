@@ -66,7 +66,6 @@
     action: insert
     chain: INPUT
     ctstate: NEW
-    in_interface: eth0
     protocol: tcp
     destination_port: "{{ item }}"
     jump: ACCEPT
