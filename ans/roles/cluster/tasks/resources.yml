@@ -1,17 +1,23 @@
 # vim: set filetype=yaml expandtab tabstop=2 shiftwidth=2 softtabstop=2 background=dark :
 
 - name: create MGMT virtual IP
-  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
-  pcs_resource: command=create resource_id="{{ cluster_vip_res_name }}" type=ocf:heartbeat:IPaddr2
-  args:
-    options:
-      ip: "{{ cluster_vip }}"
-      cidr_netmask: "{{ cluster_vip_mask }}"
-    operations:
-      - action: monitor
-        options:
-          interval: 10s
-    group: "{{ cluster_resgroup_name_pre_db }}"
+  when: inventory_hostname == cluster_master_host    # run only on one node
+  pcs_resource:
+    name: "{{ cluster_vip_res_name }}"
+    resource_type: "ocf:heartbeat:IPaddr2"
+    options: >
+      ip="{{ cluster_vip }}" cidr_netmask="{{ cluster_vip_mask }}"
+      op monitor interval=10s
+      --group "{{ cluster_resgroup_name_pre_db }}"
+  #args:
+  #  options:
+  #    ip: "{{ cluster_vip }}"
+  #    cidr_netmask: "{{ cluster_vip_mask }}"
+  #  operations:
+  #    - action: monitor
+  #      options:
+  #        interval: 10s
+  #  group: "{{ cluster_resgroup_name_pre_db }}"
 
 - name: disable autostart of services before clustering
   service: name="{{ item }}" enabled=no
@@ -30,26 +36,24 @@
 - meta: flush_handlers
 
 - name: add cluster resources (pre-DB-start)
-  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
-  pcs_resource: command=create resource_id="{{ item }}" type=systemd:"{{ item }}"
-  args:
-    operations:
-      - action: monitor
-        options:
-          interval: 30s
-    group: "{{ cluster_resgroup_name_pre_db }}"
+  when: inventory_hostname == cluster_master_host    # run only on one node
+  pcs_resource:
+    name: "{{ item }}"
+    resource_type: "systemd:{{ item }}"
+    options: >
+      op monitor interval=30s
+      --group "{{ cluster_resgroup_name_pre_db }}"
   with_items:
     - pgbouncer
 
 - name: add cluster resources (post-DB-start)
-  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
-  pcs_resource: command=create resource_id="{{ item }}" type=systemd:"{{ item }}"
-  args:
-    operations:
-      - action: monitor
-        options:
-          interval: 30s
-    group: "{{ cluster_resgroup_name_post_db }}"
+  when: inventory_hostname == cluster_master_host    # run only on one node
+  pcs_resource:
+    name: "{{ item }}"
+    resource_type: "systemd:{{ item }}"
+    options: >
+      op monitor interval=30s
+      --group "{{ cluster_resgroup_name_post_db }}"
   with_items:
       - erigonesd-beat
 
@@ -62,9 +66,9 @@
 
 - name: refresh cluster resources status 1
   shell: pcs resource cleanup "{{ cluster_resgroup_name_pre_db }}" && pcs resource clear "{{ cluster_resgroup_name_pre_db }}" && pcs resource manage "{{ cluster_resgroup_name_pre_db }}"
-  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
+  when: inventory_hostname == cluster_master_host    # run only on one node
 
 - name: refresh cluster resources status 2
   shell: pcs resource cleanup "{{ cluster_resgroup_name_post_db }}" && pcs resource clear "{{ cluster_resgroup_name_post_db }}" && pcs resource manage "{{ cluster_resgroup_name_post_db }}"
-  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
+  when: inventory_hostname == cluster_master_host    # run only on one node
 

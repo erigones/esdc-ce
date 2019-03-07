@@ -198,7 +198,7 @@
 
 - name: start slave DBs
   service: name="{{ postgres_orig_svcname }}" state=started enabled=yes
-  when: (inventory_hostname != "{{ cluster_master_host }}") and
+  when: (inventory_hostname != cluster_master_host) and
         (db_resource_exists is failed) and
         delete_datadir.changed
 

@@ -762,7 +762,7 @@ for vmname in vmlist:
     if not vm_exists(vmname_full):
         clone_mgmt_vm(vmname, mgmtname_full)
     else:
-        logline(2, 'VM %s already exists. If it\' not deployed correctly, please delete it and rerun this script.' % vmname_full)
+        logline(2, 'VM %s already exists. If it\'s not deployed correctly, please delete it and rerun this script.' % vmname_full)
 
 save_conf()
 write_ansible_conf()

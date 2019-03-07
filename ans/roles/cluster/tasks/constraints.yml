@@ -4,11 +4,11 @@
 # colocation constraints
 - name: setting resources colocation group 1
   shell: pcs constraint colocation add "{{ cluster_resgroup_name_pre_db }}" with master "{{ cluster_postgres_HA_res_name }}" INFINITY
-  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
+  when: inventory_hostname == cluster_master_host    # run only on one node
 
 - name: setting resources colocation group 2
   shell: pcs constraint colocation add "{{ cluster_resgroup_name_post_db }}" with master "{{ cluster_postgres_HA_res_name }}" INFINITY
-  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
+  when: inventory_hostname == cluster_master_host    # run only on one node
 
 # start order constraints
 # this one is blocking start of all resources:
@@ -18,15 +18,15 @@
 
 - name: setting resources start order group 2
   shell: pcs constraint order promote "{{ cluster_postgres_HA_res_name }}" then start "{{ cluster_resgroup_name_post_db }}" symmetrical=false
-  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
+  when: inventory_hostname == cluster_master_host    # run only on one node
 
 - name: setting resources stop order group 1
   shell: pcs constraint order stop "{{ cluster_resgroup_name_post_db }}" then demote "{{ cluster_postgres_HA_res_name }}" symmetrical=false
-  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
+  when: inventory_hostname == cluster_master_host    # run only on one node
 
 - name: setting resources stop order group 2
   shell: pcs constraint order demote  "{{ cluster_postgres_HA_res_name }}" then stop  "{{ cluster_resgroup_name_pre_db }}" symmetrical=false
-  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
+  when: inventory_hostname == cluster_master_host    # run only on one node
 
 
 #- name: setting resources colocation

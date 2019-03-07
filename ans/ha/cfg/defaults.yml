@@ -42,6 +42,7 @@ rabbitmq:
   # After that, pls change ha-nodes.yml task
   host: '127.0.0.1'
   port: '5672'
+  sslport: '15672'
   password: '{{ rabbitmq_password }}'
   vhost: 'esdc'
   cfgdir: '/etc/rabbitmq'
