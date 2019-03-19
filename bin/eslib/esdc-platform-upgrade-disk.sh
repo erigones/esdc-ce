@@ -222,8 +222,8 @@ checksum "${DCOS_MNTDIR}/platform/i86pc/amd64/boot_archive" > "${DCOS_MNTDIR}/pl
 chown -R root:root "${DCOS_MNTDIR}/platform/i86pc/amd64"
 
 if [[ ${KEEP_SMF_DB} -ne 1 ]]; then
-	printmsg "Clear SMF database so it can be recreated at reboot"
-	rm -f "${DCOS_MNTDIR}/etc/svc/repository.db"
+	printmsg "Update SMF database from the new platform"
+	cp -af "${PLATFORM_MOUNT_DIR}/etc/svc/repository.db" "${DCOS_MNTDIR}/etc/svc/repository.db"
 fi
 
 if [[ -f "${DCOS_MNTDIR}/etc/issue" ]]; then
