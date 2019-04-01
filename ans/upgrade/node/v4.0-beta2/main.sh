@@ -14,3 +14,5 @@ chmod +x "/opt/custom/etc/rc-pre-network.d/020-ipsec-restore.sh"
 #
 echo "+ Updating /opt/custom/smf/zabbix-agent.xml"
 cat "${VERSION_DIR}/files/zabbix-agent.xml" > "/opt/custom/smf/zabbix-agent.xml"
+# when OS is installed on disk, the SMF DB is permanent and needs explicit import:
+/usr/sbin/svccfg import "/opt/custom/smf/zabbix-agent.xml"
