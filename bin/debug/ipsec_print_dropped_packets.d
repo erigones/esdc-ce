@@ -1,7 +1,9 @@
 #!/usr/sbin/dtrace -FCs
-#
-# Inspired by Jiri Klimes from here:
-# https://groups.google.com/forum/#!topic/comp.unix.solaris/GpLL9pNhE9o
+
+/*
+ * Inspired by Jiri Klimes from here:
+ * https://groups.google.com/forum/#!topic/comp.unix.solaris/GpLL9pNhE9o
+ */
 
 #define      SADB_EXT_MAX                    27
 #include <inet/ipsec_info.h>
