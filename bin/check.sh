@@ -147,7 +147,7 @@ lint_python() {
 	local errors
 	local error_files
 
-	output=$(flake8 --max-line-length=120 --radon-max-cc="${RADON_MAX_CC}" --exclude="migrations" --count "${targets[@]}")
+	output=$(flake8 --max-line-length=120 --radon-max-cc="${RADON_MAX_CC}" --exclude="migrations,ans/roles/cluster/library" --count "${targets[@]}")
 	rc=$?
 
 	if [[ ${rc} -ne 0 ]]; then
