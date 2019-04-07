@@ -86,7 +86,8 @@ update_ipsec_conf() {
 	if [[ "${rc1}" -eq 0 || "${rc2}" -eq 0 ]]; then
 		# at least one file has been updated
 		reload_svc "${IKE_SERVICE}"
-	else
+	elif [[ -f "${IKE_CONF_DST}" ]]; then
+		# config file exists, enable ike service
 		clear_maint "${IKE_SERVICE}"
 	fi
 

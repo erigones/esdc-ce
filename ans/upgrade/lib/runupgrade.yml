@@ -18,7 +18,7 @@
     register: upg_subdirs
   - include: "{{ upg_base }}/lib/runtasks.yml"
     with_items: "{{ upg_subdirs.stdout.split('\n') }}"
-    when: tasklist
+    when: tasklist != ""
     loop_control:
       loop_var: tasklist
   handlers:

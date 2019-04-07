@@ -1,0 +1,49 @@
+<?xml version='1.0'?>
+<!DOCTYPE service_bundle SYSTEM '/usr/share/lib/xml/dtd/service_bundle.dtd.1'>
+<service_bundle type='manifest' name='agent'>
+  <service name='application/zabbix/agent' type='service' version='1'>
+     <create_default_instance enabled="true"/>
+     <single_instance/>
+
+     <dependency name='fs' grouping='require_all' restart_on='none' type='service'>
+        <service_fmri value='svc:/system/filesystem/local'/>
+     </dependency>
+     <dependency name='net' grouping='require_all' restart_on='none' type='service'>
+        <service_fmri value='svc:/network/physical:default'/>
+     </dependency>
+     <dependency name='config' grouping='require_all' restart_on='none' type='path'>
+        <service_fmri value='file://localhost/opt/zabbix/etc/zabbix_agentd.conf'/>
+     </dependency>
+
+     <exec_method name='start' type='method' exec='/opt/zabbix/sbin/zabbix_agentd --config /opt/zabbix/etc/zabbix_agentd.conf' timeout_seconds='60'>
+        <method_context working_directory="/opt/zabbix">
+                <method_credential user="root" group="bin"/>
+                <method_environment>
+                        <envvar name="PATH" value="/usr/bin:/sbin:/usr/sbin:/opt/local/bin:/opt/zabbix/sbin:/usr/sfw/bin" />
+                        <envvar name="LD_LIBRARY_PATH" value="/opt/local/lib" />
+                </method_environment>
+        </method_context>
+     </exec_method>
+
+     <exec_method name='stop' type='method' exec=':kill' timeout_seconds='60'>
+        <method_context working_directory="/opt/zabbix">
+                <method_credential user="root" group="bin"/>
+                <method_environment>
+                        <envvar name="PATH" value="/usr/bin:/sbin:/usr/sbin:/opt/local/bin:/opt/zabbix/sbin:/usr/sfw/bin" />
+                </method_environment>
+        </method_context>
+     </exec_method>
+
+     <stability value='Unstable' />
+
+     <template>
+        <common_name>
+                <loctext xml:lang='C'>ZABBIX Agent Daemon</loctext>
+        </common_name>
+        <documentation>
+                <doc_link name='zabbix.com' uri='https://www.zabbix.com/documentation/3.0/manual' />
+        </documentation>
+     </template>
+
+  </service>
+</service_bundle>
