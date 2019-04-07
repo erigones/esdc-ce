@@ -2,8 +2,27 @@
 
 # add to firewall_additional_rules
 
-- name: reconfigure firewall
-  template: src=iptables.j2 dest="/etc/sysconfig/iptables"
+- name: firewall - permit cluster members
+  lineinfile:
+    dest: /etc/sysconfig/iptables
+    insertafter: "-A INPUT -i lo -j ACCEPT"
+    line: "-A INPUT -s {{ hostvars[item].ansible_default_ipv4.address }}/32 -j ACCEPT"
+  with_items:
+    - "{{ play_hosts }}"
+  notify: reload iptables
+
+- name: firewall - permit floating IP
+  lineinfile:
+    dest: /etc/sysconfig/iptables
+    insertafter: "-A INPUT -i lo -j ACCEPT"
+    line: "-A INPUT -s {{ cluster_vip }}/32 -j ACCEPT"
+  notify: reload iptables
+
+- name: firewall - permit postgres port
+  lineinfile:
+    dest: /etc/sysconfig/iptables
+    insertafter: "-A INPUT -m state --state NEW -m tcp -p tcp --dport 6432 -i eth0 -j ACCEPT"
+    line:        "-A INPUT -m state --state NEW -m tcp -p tcp --dport 5432 -i eth0 -j ACCEPT"
   notify: reload iptables
 
 - meta: flush_handlers

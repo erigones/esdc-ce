@@ -29,13 +29,13 @@
 - name: create cluster
   #shell: pcs cluster setup --name {{ cluster_name }} {{ play_hosts | join( " ") }}
   shell: pcs cluster setup --name {{ cluster_name }} "{{ cluster_master_host }}"
-  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
+  when: inventory_hostname == cluster_master_host    # run only on one node
   args:
     creates: /etc/corosync/corosync.conf
 
 - name: join cluster nodes
   shell: /bin/sh -c "if ! grep -q 'ring0_addr[:] *{{ item }}[\t ]*$' /etc/corosync/corosync.conf; then pcs cluster node add {{ item }}; fi"
-  when: inventory_hostname == "{{ cluster_master_host }}"             # run only on one node
+  when: inventory_hostname == cluster_master_host             # run only on one node
   with_items: '{{ play_hosts | difference([inventory_hostname]) }}'   # all hosts except me
   register: join_cluster
 

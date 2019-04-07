@@ -34,7 +34,7 @@
 
 - name: push DB config (logging)
   copy: src=pg-ansible.conf dest="{{ pgdata }}/conf.d/ansible.conf"
-  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
+  when: inventory_hostname == cluster_master_host    # run only on one node
   notify: restart postgresql
   args:
     owner: postgres
@@ -43,7 +43,7 @@
 
 - name: push DB clustering conf
   copy: src=pg-clustering.conf dest="{{ pgdata }}/conf.d/clustering.conf"
-  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
+  when: inventory_hostname == cluster_master_host    # run only on one node
   notify: restart postgresql
   args:
     owner: postgres
@@ -54,7 +54,7 @@
 
 - name: push DB config (ACL)
   template: src=pg_hba.conf.j2 dest="{{ pgdata }}/pg_hba.conf"
-  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
+  when: inventory_hostname == cluster_master_host    # run only on one node
   notify: reload postgresql
   args:
     owner: postgres
@@ -99,7 +99,7 @@
 
 - name: check if master host ("{{ cluster_master_host }}") is really a DB master
   shell: psql -Aqtc "SELECT pg_is_in_recovery()"
-  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
+  when: inventory_hostname == cluster_master_host    # run only on one node
   become: yes
   become_user: postgres
   vars:
@@ -114,7 +114,7 @@
     group: postgres
     mode:  0600
     create: yes
-  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
+  when: inventory_hostname == cluster_master_host    # run only on one node
   register: create_syncfile
 
 - name: check if DB is running (failure is ok)
@@ -137,16 +137,16 @@
 
 - name: start master DB if necessary (without cluster)
   service: name="{{ postgres_orig_svcname }}" state=started enabled=yes
-  when: (inventory_hostname == "{{ cluster_master_host }}") and
-        (db_resource_exists|failed) and
-        (db_running|failed)
+  when: (inventory_hostname == cluster_master_host) and
+        (db_resource_exists is failed) and
+        (db_running is failed)
 
 # if DB is clustered and is not running, we have a problem.. try at least cleaning the resource status
 - name: start master DB if necessary (in cluster)
-  shell: pcs resource cleanup "{{ cluster_postgres_HA_res_name }}" && sleep 15
-  when: (inventory_hostname == "{{ cluster_master_host }}") and
-        (db_resource_exists|succeeded) and
-        (db_running|failed)
+  shell: pcs resource cleanup "{{ cluster_postgres_HA_res_name }}" && pcs resource enable "{{ cluster_postgres_HA_res_name }}" && sleep 15
+  when: (inventory_hostname == cluster_master_host) and
+        (db_resource_exists is succeeded) and
+        (db_running is failed)
 
 - name: setup DB replication auth
   postgresql_user:
@@ -159,7 +159,7 @@
   become_user: postgres
   vars:
     ansible_ssh_pipelining: no
-  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
+  when: inventory_hostname == cluster_master_host    # run only on one node
 
 #- name: re-check DB datadir
 #  find: paths="{{ pgdata }}"
@@ -173,8 +173,8 @@
 - name: stop slave DB
   service: name="{{ postgres_orig_svcname }}" state=stopped enabled=false
   when: (not db_sync_file.stat.exists) and
-        (db_resource_exists|failed) and
-        (db_running|succeeded)
+        (db_resource_exists is failed) and
+        (db_running is succeeded)
 
 - name: remove slave DB datadir before sync
   file: state=absent path="{{ pgdata }}"
@@ -196,18 +196,15 @@
   #when: (inventory_hostname != "{{ cluster_master_host }}") and
   #      (datadir_files.matched|int == 0)
 
-#- name: Exterminate mankind
-#  pause: prompt='Please confirm you want to exterminate mankind! Press return to continue. Press Ctrl+c and then "a" to abort'
-
 - name: start slave DBs
   service: name="{{ postgres_orig_svcname }}" state=started enabled=yes
-  when: (inventory_hostname != "{{ cluster_master_host }}") and
-        (db_resource_exists|failed) and
+  when: (inventory_hostname != cluster_master_host) and
+        (db_resource_exists is failed) and
         delete_datadir.changed
 
 #- name: check if slaves are connected
 #  shell: psql -Aqtc "SELECT count(*) FROM pg_stat_replication"
-#  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
+#  when: inventory_hostname == cluster_master_host    # run only on one node
 #  become: yes
 #  become_user: postgres
 #  register: slavecount

@@ -2,11 +2,11 @@
 
 - name: refresh database cluster resource
   shell: pcs resource cleanup "{{ cluster_postgres_HA_res_name }}" && pcs resource manage "{{ cluster_postgres_HA_res_name }}" && pcs resource clear "{{ cluster_postgres_HA_res_name }}"
-  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
+  when: inventory_hostname == cluster_master_host    # run only on one node
 
 - name: check if slaves are connected
   shell: psql -Aqtc "SELECT count(*) FROM pg_stat_replication"
-  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
+  when: inventory_hostname == cluster_master_host    # run only on one node
   become: yes
   become_user: postgres
   register: slavecount

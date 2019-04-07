@@ -27,14 +27,14 @@
       replace:
         dest="{{ erigones_home }}/core/celery/local_config.py"
         regexp="^(BROKER_URL *=.*$)"
-        replace="BROKER_URL = 'amqp://{{ rabbitmq.user }}:{{ rabbitmq.password }}@{{ cluster_vip }}:{{ rabbitmq.port}}/{{ rabbitmq.vhost }}'"
+        replace="BROKER_URL = 'amqp://{{ rabbitmq.user }}:{{ rabbitmq.password }}@{{ cluster_vip }}:{{ rabbitmq.sslport}}/{{ rabbitmq.vhost }}'"
       notify: restart erigonesd
 
     - name: alter CELERY_RESULT_BACKEND in local_config
       replace:
         dest="{{ erigones_home }}/core/celery/local_config.py"
         regexp="^(CELERY_RESULT_BACKEND *=.*)"
-        replace="CELERY_RESULT_BACKEND = 'redis://:{{ redis.password }}@{{ cluster_vip }}:6379/0'"
+        replace="CELERY_RESULT_BACKEND = 'redis://:{{ redis.password }}@{{ cluster_vip }}:16379/0'"
       notify: restart erigonesd
 
   handlers:

@@ -23,7 +23,7 @@
 - name: enable rabbitmq federation plugin
   shell: rabbitmq-plugins enable rabbitmq_federation
   notify: restart rabbitmq-server
-  when: rc_fed|failed
+  when: rc_fed is failed
 
 - meta: flush_handlers
 

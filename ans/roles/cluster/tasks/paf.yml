@@ -9,7 +9,7 @@
 #    group: postgres
 #    mode:  0644
 #
-## netreba nutne
+## not required:
 #- meta: flush_handlers
 
 
@@ -39,58 +39,43 @@
   service: name="{{ postgres_orig_svcname }}" state=stopped enabled=false
 
 - name: create database cluster resource
-  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
-  pcs_resource: command=create resource_id="{{ cluster_postgres_res_name }}" type=ocf:heartbeat:pgsqlms
-  args:
-    disabled: True
-    options:
-      bindir: "{{ bindir }}"
-      pgdata: "{{ pgdata }}"
-      pgport: "{{ postgres_port }}"
-      recovery_template: "{{ pgdata }}/../recovery.conf.{{cluster_name}}.pcmk"
-    operations:
-      - action: start
-        options:
-          timeout: 60s
-      - action: stop
-        options:
-          timeout: 60s
-      - action: promote
-        options:
-          timeout: 30s
-      - action: demote
-        options:
-          timeout: 120s
-      - action: notify
-        options:
-          timeout: 60s
-      - action: monitor
-        options:
-          interval: 15s
-          timeout: 10s
-          role: Master
-      - action: monitor
-        options:
-          interval: 16s
-          timeout: 10s
-          role: Slave
+  when: inventory_hostname == cluster_master_host   # run only on one node
+  pcs_resource:
+    name: "{{ cluster_postgres_res_name }}"
+    resource_type: "ocf:heartbeat:pgsqlms"
+    options: >
+      --disabled
+      bindir="{{ bindir }}"
+      pgdata="{{ pgdata }}"
+      pgport="{{ postgres_port }}"
+      recovery_template="{{ pgdata }}/../recovery.conf.{{cluster_name}}.pcmk"
+      op start timeout=60s
+      op stop timeout=60s
+      op promote timeout=30s
+      op demote timeout=120s
+      op notify timeout=60s
+      op monitor interval=15s timeout=10s role="Master"
+      op monitor interval=16s timeout=10s role="Slave"
 
 - name: create master DB resource
-  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
-  pcs_resource: command=master resource_id="{{ cluster_postgres_HA_res_name }}" ms_name="{{ cluster_postgres_res_name }}" disabled=True
-  args:
-    options:
-      master-max      : 1
-      master-node-max : 1
-      clone-max       : "{{ play_hosts|length }}"
-      clone-node-max  : 1
-      notify          : true
+  when: inventory_hostname == cluster_master_host    # run only on one node
+  pcs_resource:
+    name: "{{ cluster_postgres_HA_res_name }}"
+    resource_class: master
+    resource_type: "{{ cluster_postgres_res_name }}"
+    options: >
+      master-max=1
+      master-node-max=1
+      clone-max="{{ play_hosts|length }}"
+      clone-node-max=1
+      notify=true
+      disabled=true
 
 - name: enable database cluster resource
   shell: pcs resource enable "{{ cluster_postgres_HA_res_name }}" 
-  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
+  when: inventory_hostname == cluster_master_host    # run only on one node
 
 - name: setting DB location constraints
   shell: pcs constraint location "{{ cluster_postgres_HA_res_name }}" prefers {% for clhost in play_hosts %}{{clhost}}=100 {% endfor %}
-  when: inventory_hostname == "{{ cluster_master_host }}"   # run only on one node
+  when: inventory_hostname == cluster_master_host    # run only on one node
 
