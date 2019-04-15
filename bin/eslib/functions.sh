@@ -690,13 +690,19 @@ _vm_start() {
 _vm_stop() {
 	local uuid="$1"
 
-	${VMADM} stop "${uuid}" 2>&1
+	# stopping the stopped VM returns failure
+	if [[ "$(_vm_status "${uuid}")" != "stopped" ]]; then
+		${VMADM} stop "${uuid}" 2>&1
+	fi
 }
 
 _vm_stop_force() {
 	local uuid="$1"
 
-	${VMADM} stop "${uuid}" -F 2>&1
+	# stopping the stopped VM returns failure
+	if [[ "$(_vm_status "${uuid}")" != "stopped" ]]; then
+		${VMADM} stop "${uuid}" -F 2>&1
+	fi
 }
 
 _vm_destroy() {
@@ -967,12 +973,20 @@ _service_disable() {
 	local fmri="$1"
 
 	${SVCADM} disable -s "${fmri}" && _service_file_save "${fmri}"
+
+	# If there's any SMF service in maintenance state,
+	# svcadm disable with "-s" returns a non-zero code.
+	# Therefore we have to explicitly check and return
+	# the result of this operation.
+	[[ "$(_service_status "${fmri}")" == "disabled" ]]
 }
 
 _service_enable() {
 	local fmri="$1"
 
 	${SVCADM} enable -s "${fmri}" && _service_file_save "${fmri}"
+	# see comment in _service_disable
+	[[ "$(_service_status "${fmri}")" == "disabled" ]]
 }
 
 _service_restart() {
