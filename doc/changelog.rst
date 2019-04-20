@@ -34,6 +34,7 @@ Bugs
 - Fixed failure when displaying comparative VM graphs on compute node - `#395 <https://github.com/erigones/esdc-ce/issues/395>`__
 - Fixed printing qemu error log when destination VM fails to start after migration - `#422 <https://github.com/erigones/esdc-ce/pull/422>`__
 - Fixed "restarter has no restarter" SMF warning after diskinstall platform upgrade - `#100 <https://github.com/erigones/esdc-factory/issues/100>`__
+- Fixed API/GUI handling of vNIC IDs larger than 10 - `#423 <https://github.com/erigones/esdc-ce/pull/423>`__
 
 
 3.0.0
