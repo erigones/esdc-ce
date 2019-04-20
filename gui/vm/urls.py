@@ -27,7 +27,7 @@ urlpatterns = patterns(
     url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/backup/list/$', 'backup_list', name='vm_backup_list'),
     url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/backup/define/form/$', 'backup_define_form',
         name='vm_backup_define_form'),
-    url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/nic/(?P<nic_id>\d)/ptr/$', 'ptr_form', name='vm_ptr_form'),
+    url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/nic/(?P<nic_id>\d{1,2})/ptr/$', 'ptr_form', name='vm_ptr_form'),
     url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/settings/nic/$', 'nic_settings_form', name='vm_nic_settings_form'),
     url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/settings/disk/$', 'disk_settings_form', name='vm_disk_settings_form'),
     url(r'^(?P<hostname>[A-Za-z0-9\._-]+)/settings/undo/$', 'undo_settings', name='vm_undo_settings'),

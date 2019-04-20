@@ -65,7 +65,7 @@ urlpatterns = patterns(
     url(r'^(?P<hostname_or_uuid>[A-Za-z0-9\._-]+)/define/nic/$',
         'vm_define_nic_list', name='api_vm_define_nic_list'),
     # /vm/<hostname_or_uuid>/define/nic/<nic_id> - get, create, set, delete
-    url(r'^(?P<hostname_or_uuid>[A-Za-z0-9\._-]+)/define/nic/(?P<nic_id>\d)/$',
+    url(r'^(?P<hostname_or_uuid>[A-Za-z0-9\._-]+)/define/nic/(?P<nic_id>\d{1,2})/$',
         'vm_define_nic', name='api_vm_define_nic'),
 
     # define snapshot
