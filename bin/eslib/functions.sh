@@ -690,11 +690,17 @@ _vm_start() {
 _vm_stop() {
 	local uuid="$1"
 
+	# stopping the stopped VM returns failure anyway
+	[[ "$(_vm_status "${uuid}")" == "stopped" ]] && return 0
+
 	${VMADM} stop "${uuid}" 2>&1
 }
 
 _vm_stop_force() {
 	local uuid="$1"
+
+	# stopping the stopped VM returns failure anyway
+	[[ "$(_vm_status "${uuid}")" == "stopped" ]] && return 0
 
 	${VMADM} stop "${uuid}" -F 2>&1
 }
@@ -965,14 +971,48 @@ _service_status() {
 
 _service_disable() {
 	local fmri="$1"
+	local rc=0
 
-	${SVCADM} disable -s "${fmri}" && _service_file_save "${fmri}"
+	${SVCADM} disable -s "${fmri}"
+	rc="$?"
+
+	# If there's any SMF service in maintenance state,
+	# svcadm disable with "-s" returns a non-zero code.
+	# Therefore we have to explicitly check and return
+	# the result of this operation.
+	if [[ "$(_service_status "${fmri}")" == "disabled" ]]; then
+		# success
+		_service_file_save "${fmri}"
+		return 0
+	else
+		# service disable failed, return the original errval
+		return "${rc}"
+	fi
 }
 
 _service_enable() {
 	local fmri="$1"
+	local rc=0
 
-	${SVCADM} enable -s "${fmri}" && _service_file_save "${fmri}"
+	${SVCADM} enable -s "${fmri}"
+	rc="$?"
+
+	# see comment above in _service_disable
+	if [[ "$(_service_status "${fmri}")" == "enabled" ]]; then
+		# success
+		_service_file_save "${fmri}"
+		return 0
+	else
+		# service enable failed, return the original errval
+		# (if non-zero)
+		if [[ "${rc}" -ne 0 ]]; then
+			return "${rc}"
+		else
+			# the svcadm returned success but the service
+			# is not enabled... return failure
+			return 99
+		fi
+	fi
 }
 
 _service_restart() {

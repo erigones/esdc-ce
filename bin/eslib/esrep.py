@@ -772,6 +772,7 @@ timeout_seconds='60'>
             self._vm_disks_cleared.append((dst_disk, dst_disk_property))
             self._clear_dataset_property(dst_disk, 'readonly')
 
+        self._vm_start(self.dst_uuid)
         self._vm_disks_cleared = []  # Start was successful
 
         return {
