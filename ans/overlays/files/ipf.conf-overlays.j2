@@ -8,7 +8,7 @@
 # disallow sending overlay packets without IPSec
 # (log if it happens to allow easier IPSec debugging)
 {% for orule in overlay_rules %}
-{% if overlay_rules[orule]['nodelist']|issuperset([ansible_fqdn]) or overlay_rules[orule]['nodelist'] == 'all' %}
+{% if overlay_rules[orule]['nodelist'] is issuperset([ansible_fqdn]) or overlay_rules[orule]['nodelist'] == 'all' %}
 {% if external_ip != 0 %}
 block out log quick on external0 proto udp from {{ external_ip }} to any port = {{ overlay_rules[orule]['port'] }}
 block in log quick on external0 proto udp from any to {{ external_ip }} port = {{ overlay_rules[orule]['port'] }}

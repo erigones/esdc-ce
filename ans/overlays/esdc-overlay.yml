@@ -92,7 +92,7 @@
       line:    'overlay_rule_{{ item }}="{{ overlay_rules[item]["rule"] }}"'
     with_items: "{{ overlay_rules }}"
     # add rule only if defined for this node and rule is not marked as to be deleted
-    when:   (overlay_rules[item]['nodelist']|issuperset([ansible_fqdn]) or
+    when:   (overlay_rules[item]['nodelist'] is issuperset([ansible_fqdn]) or
                 overlay_rules[item]['nodelist'] == 'all') and
             (del_orule is undefined or
                 (del_orule is defined and
@@ -111,7 +111,7 @@
     args:
       creates: "{{ overlay_rules[item]['arp_json_path'] }}"
     with_items: "{{ overlay_rules }}"
-    when:   (overlay_rules[item]['nodelist']|issuperset([ansible_fqdn]) or
+    when:   (overlay_rules[item]['nodelist'] is issuperset([ansible_fqdn]) or
                 overlay_rules[item]['nodelist'] == 'all') and
             (overlay_rules[item]['arp_json_path'] and not
             (del_orule is defined and del_orule == item))
