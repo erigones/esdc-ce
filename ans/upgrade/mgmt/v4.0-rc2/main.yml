@@ -1,0 +1,5 @@
+#
+# https://github.com/erigones/esdc-ce/issues/401
+#
+- name: Save hostname into /etc/hostname
+  shell: hostname > /etc/hostname
