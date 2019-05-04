@@ -311,6 +311,8 @@ def _vm_status_check(task_id, node_uuid, uuid, state, state_cache=None, vm=None,
     _save_vm_status(task_id, vm, state, old_state=state_cache, deploy_over=deploy_over, change_time=change_time,
                     **kwargs)
 
+    return state
+
 
 # noinspection PyUnusedLocal
 @cq.task(name='api.vm.status.tasks.vm_status_all_cb', ignore_result=True)
@@ -399,6 +401,7 @@ def vm_status_current_cb(result, task_id, vm_uuid=None, force_change=False):
 
     line = stdout.strip().split(':')
     result['status'] = line[0]
+    result['status_changed'] = False
     vm = Vm.objects.select_related('node', 'slavevm').get(uuid=vm_uuid)
 
     try:
@@ -414,8 +417,9 @@ def vm_status_current_cb(result, task_id, vm_uuid=None, force_change=False):
         result['message'] = ''
         state_cache = cache.get(Vm.status_key(vm_uuid))
         # Check and eventually save VM's status
-        _vm_status_check(task_id, vm.node.uuid, vm_uuid, state, state_cache=state_cache, force_change=force_change,
-                         change_time=_get_task_time(result, 'exec_time'))
+        if _vm_status_check(task_id, vm.node.uuid, vm_uuid, state, state_cache=state_cache, force_change=force_change,
+                            change_time=_get_task_time(result, 'exec_time')):
+            result['status_changed'] = True
 
     vm.tasks_del(task_id)
     return result

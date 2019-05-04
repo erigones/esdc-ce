@@ -20,6 +20,7 @@ Features
 - Add `hostname` property into VM's metadata implicitly - `#401 <https://github.com/erigones/esdc-ce/issues/401>`__
 - Added script for manually cleaning up resources after failed VM migration - `#403 <https://github.com/erigones/esdc-ce/pull/403>`__
 - Added dtrace script for debugging pvclock during VM migrations - `#429 <https://github.com/erigones/esdc-ce/pull/429>`__
+- Added VM status refresh button into GUI - `#434 <https://github.com/erigones/esdc-ce/pull/434>`__
 
 Bugs
 ----

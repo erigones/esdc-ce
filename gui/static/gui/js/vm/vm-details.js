@@ -513,6 +513,7 @@ function vm_control_update(hostname, state, apiview) {
   var vm_unfreeze;
   var vm_migrate;
   var vm_replication;
+  var vm_statuscheck;
 
   var control_admin = $('.vm_control_admin_' + _hostname);
   if (control_admin.length) {
@@ -525,6 +526,7 @@ function vm_control_update(hostname, state, apiview) {
     vm_unfreeze = $('#vm_unfreeze__' + _hostname);
     vm_migrate = $('#vm_migrate__' + _hostname);
     vm_replication = $('#vm_replication__' + _hostname);
+    vm_statuscheck = $('#vm_statuscheck__' + _hostname);
   }
 
   function toggle_vm_update() {
@@ -549,6 +551,7 @@ function vm_control_update(hostname, state, apiview) {
       vm_unfreeze.addClass('disabled').hide();
       vm_migrate.addClass('disabled').hide();
       vm_replication.addClass('disabled').hide();
+      vm_statuscheck.addClass('disabled');
     }
     vm_start.addClass('disabled').removeClass('define_changed');
     vm_stop.addClass('disabled'); vm_stop.data('modal_force_only', false);
@@ -574,6 +577,7 @@ function vm_control_update(hostname, state, apiview) {
         vm_freeze.show().removeClass('disabled');
         vm_migrate.show().removeClass(disabled);
         vm_replication.show().removeClass('disabled');
+        vm_statuscheck.removeClass('disabled');
         control_admin.slideDown();
       }
       vm_stop.removeClass('disabled');
@@ -593,6 +597,7 @@ function vm_control_update(hostname, state, apiview) {
         vm_freeze.show().removeClass('disabled');
         vm_migrate.show().removeClass(disabled);
         vm_replication.show().removeClass('disabled');
+        vm_statuscheck.removeClass('disabled');
         control_admin.slideDown();
       }
       vm_start.removeClass('disabled');
@@ -615,6 +620,7 @@ function vm_control_update(hostname, state, apiview) {
         vm_freeze.show().removeClass('disabled'); vm_freeze.data('modal_force_only', true);
         vm_migrate.show();
         vm_replication.show();
+        vm_statuscheck.removeClass('disabled');
         control_admin.slideDown();
       }
       vm_stop.removeClass('disabled'); vm_stop.data('modal_force_only', true);
@@ -651,6 +657,7 @@ function vm_control_update(hostname, state, apiview) {
         vm_freeze.show();
         vm_migrate.show();
         vm_replication.show();
+        vm_statuscheck.removeClass('disabled');
         control_admin.slideDown();
       }
       control.slideDown();
@@ -672,6 +679,7 @@ function vm_control_update(hostname, state, apiview) {
       vm_control_disable();
       if (control_admin.length) {
         control_admin.not('.vm_control_nohide').slideUp();
+        vm_statuscheck.removeClass('disabled');
       }
       control.not('.vm_control_nohide').slideUp();
       break;
@@ -1128,6 +1136,9 @@ function vm_control(hostname, btn) {
   VM_CONTROL_BTN_TIMEOUT = setTimeout(function() { btn.removeClass('clicked'); }, 500);
 
   switch(action[1]) {
+    case 'statuscheck':
+      vm_statuscheck(hostname, true);
+      return false;
     case 'start':
       var btn_vm_update = $(jq('vm_update__' + hostname));
 

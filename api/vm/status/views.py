@@ -28,8 +28,8 @@ def vm_status_list(request, data=None):
     return VmStatus(request, None, None, data).get(many=True)
 
 
-# TODO: Document GET vm_status, current=true
 #: vm_status:   GET:
+#: vm_status:   PUT + current=true: all expect frozen
 #: vm_status:   PUT: running, stopped, stopping, frozen
 @api_view(('GET', 'PUT'))
 @request_data()  # get_vm() = IsVmOwner
@@ -82,8 +82,6 @@ def vm_status(request, hostname_or_uuid, action=None, data=None):
 
         Retrieves current VM status from compute node and updates status value in DB for the VM.
 
-        .. warning:: This API call is intended for internal administrative purposes only and should be used with care.
-
         :DC-bound?:
             * |dc-yes|
         :Permissions:
@@ -92,15 +90,13 @@ def vm_status(request, hostname_or_uuid, action=None, data=None):
             * |async-yes|
         :arg hostname_or_uuid: **required** - Server hostname or uuid
         :type hostname_or_uuid: string
-        :arg data.force: Force change of the current status (default: false)
-        :type data.force: boolean
         :status 200: SUCCESS
         :status 201: PENDING
         :status 400: FAILURE
         :status 403: Forbidden
         :status 404: VM not found
-        :status 423: Node is not operational
-        :status 428: Force parameter must be used
+        :status 409: VM has pending tasks
+        :status 423: Node is not operational / VM is not operational
 
     .. http:put:: /vm/(hostname_or_uuid)/status/start
 
