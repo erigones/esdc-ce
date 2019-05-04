@@ -92,7 +92,9 @@ function vm_tasks(hostname, res, view, method) {
 function vm_control_links(hostname, controls) {
   if (typeof(controls) === 'undefined') {
     var _hostname = _jq(hostname);
-    controls = $('.vm_control_'+_hostname + ' a:not(.nocontrol)' + ', .vm_control_admin_'+_hostname + ' a:not(.nocontrol)');
+    controls = $('.vm_control_'+_hostname + ' a:not(.nocontrol)' +
+                 ', .vm_control_admin_'+_hostname + ' a:not(.nocontrol)' +
+                 ', a#vm_statuscheck__'+_hostname);
   }
   controls.each(function() {
     var btn = $(this);

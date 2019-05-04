@@ -14,7 +14,7 @@ function vm_statuscheck(hostname, force_change) {
   var kwargs = {'action': 'current', 'data': {}};
   var method;
   if (force_change) {
-    method = 'put';
+    method = 'set';
   } else {
     method = 'get';
   }
