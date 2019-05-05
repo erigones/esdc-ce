@@ -77,8 +77,3 @@ a.btn-icon-eye-close:after {
 a.btn-text {
   color: #333333;
 }
-
-/* line 80, ../scss/typography.scss */
-[class^="icon-"]:before, [class*=" icon-"]:before {
-  cursor: default;
-}
