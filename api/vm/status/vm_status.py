@@ -33,13 +33,13 @@ class VmStatus(APIView):
         Vm.RUNNING,
         Vm.STOPPED,
         Vm.STOPPING,
+        Vm.ERROR,
+    )
+    stuck_statuses_force_change_allowed = (
         Vm.CREATING,
         Vm.DEPLOYING_START,
         Vm.DEPLOYING_FINISH,
         Vm.DEPLOYING_DUMMY,
-        Vm.ERROR,
-    )
-    stuck_statuses_force_change_allowed = (
         Vm.NOTREADY,
         Vm.NOTREADY_STOPPED,
         Vm.NOTREADY_RUNNING,
@@ -236,9 +236,8 @@ class VmStatus(APIView):
             return SuccessTaskResponse(request, res, task_id=tid, vm=vm)
 
         elif action == 'current':
-            # for PUT /current/ action user needs to be SuperAdmin
-            # since this operation will forcibly change whatever status a VM has in the DB
-            if not request.user.is_staff:
+            # Limit PUT /current/ action to be Admins and SuperAdmins
+            if not request.user.is_admin(request):
                 raise PermissionDenied
 
             if vm.status in self.statuses_force_change_allowed:

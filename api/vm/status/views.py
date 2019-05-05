@@ -85,7 +85,7 @@ def vm_status(request, hostname_or_uuid, action=None, data=None):
         :DC-bound?:
             * |dc-yes|
         :Permissions:
-            * |SuperAdmin|
+            * |Admin|
         :Asynchronous?:
             * |async-yes|
         :arg hostname_or_uuid: **required** - Server hostname or uuid
