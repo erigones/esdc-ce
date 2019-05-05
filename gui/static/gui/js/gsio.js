@@ -9,6 +9,18 @@ function vm_define(hostname, kwargs) {
   return esio('get', 'vm_define', [hostname], {'data': kwargs});
 }
 
+// Retrieve VM status from compute node
+function vm_statuscheck(hostname, force_change) {
+  var kwargs = {'action': 'current', 'data': {}};
+  var method;
+  if (force_change) {
+    method = 'set';
+  } else {
+    method = 'get';
+  }
+  return esio(method, 'vm_status', [hostname], kwargs);
+}
+
 // Start VM (with optional cdimage)
 function vm_start(hostname, cdimage, update, onetime, cdimage2) {
   var kwargs = {'action': 'start', 'data': {}};
@@ -842,6 +854,9 @@ function _task_status_callback(res, apiview) {
         // If this happens we should refresh server details page (see vm_manage below)
         if (result_msg.indexOf('Successfully updated') >= 0 && t) {
           vm_refresh_page(hostname);
+        } else if (result.status_changed === false) { // this is a PUT vm_status + action:current task
+          // VM display status may be 'pending' -> switch back to last status
+          _update_vm_visuals(hostname, apiview.status_display, apiview);
         }
 
       } else { // FAILURE or REVOKED

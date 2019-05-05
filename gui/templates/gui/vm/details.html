@@ -378,7 +378,7 @@
               <td>{% trans "Status" %}:</td>
               {% with status_display=vm.status_display %}
                 <td>
-                  <span class="label status_{{ status_display }}" id="vm_label_{{ vm.hostname }}" data-status_display="{{ status_display }}" data-define_changed="{{ vm.json_changed }}" data-locked='{{ vm_locked }}'>{% trans vm.state %}</span>
+                  <span class="label status_{{ status_display }}" id="vm_label_{{ vm.hostname }}" data-status_display="{{ status_display }}" data-define_changed="{{ vm.json_changed }}" data-locked='{{ vm_locked }}'>{% trans vm.state %}</span>{% if can_edit and vm.is_deployed %}&nbsp;<a id="vm_statuscheck__{{ vm.hostname }}" href="#" class="button gray mini no-ajax" title="{% trans "Retrieve the actual server's status from compute node." %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-refresh"></i></a>{% endif %}
                 </td>
               {% endwith %}
             </tr>

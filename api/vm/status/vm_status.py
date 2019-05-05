@@ -29,6 +29,23 @@ class VmStatus(APIView):
     detail = ''
     actions = ('start', 'stop', 'reboot', 'current')
     statuses = (Vm.RUNNING, Vm.STOPPED, Vm.STOPPING, Vm.FROZEN)
+    statuses_force_change_allowed = (
+        Vm.RUNNING,
+        Vm.STOPPED,
+        Vm.STOPPING,
+        Vm.ERROR,
+    )
+    stuck_statuses_force_change_allowed = (
+        Vm.CREATING,
+        Vm.DEPLOYING_START,
+        Vm.DEPLOYING_FINISH,
+        Vm.DEPLOYING_DUMMY,
+        Vm.NOTREADY,
+        Vm.NOTREADY_STOPPED,
+        Vm.NOTREADY_RUNNING,
+        Vm.NOTREADY_FROZEN,
+        Vm.NOTREADY_NOTCREATED,
+    )
 
     def __init__(self, request, hostname_or_uuid, action, data):
         super(VmStatus, self).__init__(request)
@@ -133,6 +150,7 @@ class VmStatus(APIView):
         apiview = self.apiview
         msg = LOG_STATUS_GET
         cmd = 'vmadm list -p -H -o state uuid=' + vm.uuid
+        lock = 'vm_status_current vm:%s' % vm.uuid
         meta = {
             'output': {'returncode': 'returncode', 'stdout': 'stdout', 'stderr': 'stderr', 'hostname': vm.hostname},
             'msg': msg,
@@ -146,7 +164,7 @@ class VmStatus(APIView):
         )
 
         tid, err = execute(request, vm.owner.id, cmd, meta=meta, callback=callback, queue=vm.node.fast_queue,
-                           nolog=True)
+                           lock=lock, lock_timeout=5, nolog=True)
 
         if err:
             return FailureTaskResponse(request, err, vm=vm)
@@ -218,17 +236,19 @@ class VmStatus(APIView):
             return SuccessTaskResponse(request, res, task_id=tid, vm=vm)
 
         elif action == 'current':
-            # for PUT /current/ action user needs to be SuperAdmin
-            # since this operation will forcibly change whatever status a VM has in the DB
-            if not request.user.is_staff:
+            # Limit PUT /current/ action to be Admins and SuperAdmins
+            if not request.user.is_admin(request):
                 raise PermissionDenied
 
-            force = self.data.get('force', False)
-
-            if not force:
-                raise PreconditionRequired('Force parameter must be used!')
-
-            return self.get_current_status(force_change=force)
+            if vm.status in self.statuses_force_change_allowed:
+                return self.get_current_status(force_change=True)
+            elif vm.status in self.stuck_statuses_force_change_allowed:
+                if vm.tasks:
+                    raise VmHasPendingTasks
+                else:
+                    return self.get_current_status(force_change=True)
+            else:
+                raise VmIsNotOperational
 
         else:
             raise ExpectationFailed('Bad action')
