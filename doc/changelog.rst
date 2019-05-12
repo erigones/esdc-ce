@@ -21,6 +21,8 @@ Features
 - Added script for manually cleaning up resources after failed VM migration - `#403 <https://github.com/erigones/esdc-ce/pull/403>`__
 - Added dtrace script for debugging pvclock during VM migrations - `#429 <https://github.com/erigones/esdc-ce/pull/429>`__
 - Added VM status refresh button into GUI - `#434 <https://github.com/erigones/esdc-ce/pull/434>`__
+- Enable `vmadm console` support in mgmt VMs and CentOS images - `#130 <https://github.com/erigones/esdc-factory/issues/130>`__
+- Override non-standard net MTU from DHCP in mgmt VMs and CentOS images - `#430 <https://github.com/erigones/esdc-ce/pull/430>`__
 
 Bugs
 ----
