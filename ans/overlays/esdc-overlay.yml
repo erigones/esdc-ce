@@ -150,6 +150,14 @@
             overlay_rules[del_orule] is defined and
             overlay_rules[del_orule]['arp_json_path']
 
+  - name: create IPSec config dir
+    file:
+      path: '/opt/custom/etc/ipsec'
+      state: directory
+      mode: 755
+      owner: root
+      group: root
+
   - name: configure IPSec ike config
     template:
     args:
