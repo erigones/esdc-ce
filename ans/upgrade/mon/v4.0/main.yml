@@ -1,0 +1,17 @@
+# https://github.com/erigones/esdc-ce/issues/430
+- name: Install jq (for parsing sdc:nics mdata)
+  yum: name=jq state=present
+
+- name: Create /var/lib/rc-scripts/04-mtu-set.sh
+  copy: src="{{ current_task_dir }}/files/04-mtu-set.sh" dest=/var/lib/rc-scripts/04-mtu-set.sh owner=root group=root mode=0755
+
+- name: Run /var/lib/rc-scripts/04-mtu-set.sh
+  shell: /var/lib/rc-scripts/04-mtu-set.sh
+
+# https://github.com/erigones/esdc-factory/pull/130
+- name: enable getty on serial console
+  service: 
+    name: 'serial-getty@ttyS0'
+    state: started
+    enabled: yes
+
