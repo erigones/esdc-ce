@@ -23,6 +23,7 @@ Features
 - Added VM status refresh button into GUI - `#434 <https://github.com/erigones/esdc-ce/pull/434>`__
 - Enable `vmadm console` support in mgmt VMs and CentOS images - `#130 <https://github.com/erigones/esdc-factory/issues/130>`__
 - Override non-standard net MTU from DHCP in mgmt VMs and CentOS images - `#430 <https://github.com/erigones/esdc-ce/pull/430>`__
+- Removed freeze/unfreeze buttons from GUI - `#388 <https://github.com/erigones/esdc-ce/issues/388>`__
 
 Bugs
 ----
