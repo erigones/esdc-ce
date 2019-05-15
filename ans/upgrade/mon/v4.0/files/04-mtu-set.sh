@@ -34,6 +34,11 @@ while read -r mtu; do
     cfgline="supersede interface-mtu ${mtu};"
     cfgfile="/etc/dhcp/dhclient-${ifname}.conf"
 
+    if [[ ! "${mtu}" =~ ^[0-9]+$ ]] || [[ "${mtu}" -lt 500 ]] || [[  "${mtu}" -gt 9000 ]]; then
+        echo "$0: warning: incorrect MTU value '${mtu}'. Skipping."
+        continue
+    fi
+
     if [[ "${mtu}" -ne 1500 ]]; then
         # this is the main reason of this script
         if [[ "$(cat "/sys/class/net/${ifname}/mtu")" != "${mtu}" ]]; then
