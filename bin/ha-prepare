@@ -681,6 +681,7 @@ def clone_mgmt_vm(name, original_vm):
     new_vm_disk = source_template['disks'][0]
     add_to_vm_definition(new_vm_disk, {'dc': 'admin'})
     add_to_vm_definition(new_vm_disk, {'image': CONF['mgmt'][name]['image']})
+    new_vm_disk['refreservation'] = new_vm_disk['size']	# sometimes the refreservation happens to be wrong... re-set it
     logline(5, pprint.pformat(new_vm_disk))
     es_create('/vm/'+vmname+'/define/disk/1', **new_vm_disk)
     logline(2, 'Disk added')
