@@ -1753,7 +1753,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
             if max_swap < max_physical_memory:
                 max_swap = max_physical_memory
 
-            self.save_items(ram=value, max_physical_memory=max_physical_memory, max_swap=max_swap, save=False)
+            self.save_items(ram=value, max_physical_memory=max_physical_memory, max_swap=max_swap, max_locked_memory=max_physical_memory, save=False)
         else:
             self.save_items(max_physical_memory=value, max_swap=max_swap, save=False)
 
