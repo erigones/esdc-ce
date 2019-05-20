@@ -95,7 +95,7 @@ class NodeForm(SerializerForm):
                                                                 'required': 'required'}))
     ram_coef = forms.DecimalField(label=_('RAM coefficient'), max_digits=4, decimal_places=2,
                                   help_text=_('Coefficient for calculating the maximum amount of memory '
-                                              'for virtual machines.'),
+                                              'for virtual machines. Keep it under 1 unless you really know what you are doing.'),
                                   widget=forms.TextInput(attrs={'class': 'input-transparent narrow',
                                                                 'required': 'required'}))
 
