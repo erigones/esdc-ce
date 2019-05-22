@@ -1,6 +1,21 @@
 Changelog
 #########
 
+4.1
+===
+Released on TBD
+
+Features
+--------
+
+- Allow overprovisioning of memory - `#441 <https://github.com/erigones/esdc-ce/pull/441>`__
+
+Bugs
+----
+
+- Fix `vminfod` timeout when updating KVM VM memory - `#439 <https://github.com/erigones/esdc-ce/issues/439>`__
+- Fix `refreservation` setting during `ha-prepare` - commit `5948089 <https://github.com/erigones/esdc-ce/commit/5948089d6752cb0f96d95586aa7f7974e07a270d>`__
+
 4.0
 ===
 Released on 2019-05-14

@@ -40,7 +40,7 @@ class NodeDefineSerializer(s.InstanceSerializer):
     cpu = s.IntegerField(source='cpu_total', read_only=True)
     ram = s.IntegerField(source='ram_total', read_only=True)
     cpu_coef = s.DecimalField(min_value=0, max_digits=4, decimal_places=2)
-    ram_coef = s.DecimalField(min_value=0, max_value=1, max_digits=4, decimal_places=2)
+    ram_coef = s.DecimalField(min_value=0, max_digits=4, decimal_places=2)
     cpu_free = s.IntegerField(read_only=True)
     ram_free = s.IntegerField(read_only=True)
     ram_kvm_overhead = s.IntegerField(read_only=True)
