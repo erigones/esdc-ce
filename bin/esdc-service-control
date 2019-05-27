@@ -7,6 +7,30 @@ fi
 
 MAINDIR="$(cd "$(dirname "$0")/.." || exit 64 ; pwd -P)"
 ERIGONES_HOME="${ERIGONES_HOME:-"${MAINDIR}"}"
+ESLIB="${ESLIB:-"${ERIGONES_HOME}/bin/eslib"}"
+
+# shellcheck disable=SC1090
+. "${ESLIB}/functions.sh"
+
+function pcs_resource_action() {
+	local action="$1"
+	local resname="$2"
+	local nodename="$(ha_get_my_nodename)"
+
+	if [[ "${action}" == "status" ]]; then
+		crm_resource -Wr "${resname}"
+	elif crm_resource -Wr "${resname}" | grep -q "running on: ${nodename}"; then
+		# touch only if the resource is running on this node
+		pcs resource "${action}" "${resname}" --wait=20 > /dev/null
+	else
+		echo "Ignoring ${resname} on ${nodename} (not running locally)"
+	fi
+}
+
+systemd_pretty_status() {
+	local svcname="$1"
+	echo "${svcname} is $(get_svc_prop "${svcname}" SubState)"
+}
 
 function node_status() {
 	svcs svc:/application/erigonesd:*
@@ -29,19 +53,43 @@ function node_disable() {
 }
 
 function mgmt_status() {
-	systemctl status esdc@* erigonesd erigonesd-beat
+	if ha_is_active; then
+		pcs_resource_action status postgres-ha
+		pcs_resource_action status erigonesd-beat
+	else
+		systemd_pretty_status erigonesd-beat
+	fi
+	systemd_pretty_status erigonesd
+	systemd_pretty_status esdc@gunicorn-api.service
+	systemd_pretty_status esdc@gunicorn-gui.service
+	systemd_pretty_status esdc@gunicorn-sio.service
 }
 
 function mgmt_restart() {
-	systemctl restart esdc@* erigonesd erigonesd-beat
+	if ha_is_active; then
+		pcs_resource_action restart erigonesd-beat
+		systemctl restart esdc@* erigonesd
+	else
+		systemctl restart esdc@* erigonesd erigonesd-beat
+	fi
 }
 
 function mgmt_stop() {
-	systemctl stop esdc@* erigonesd erigonesd-beat
+	if ha_is_active; then
+		pcs_resource_action disable erigonesd-beat
+		systemctl stop esdc@* erigonesd
+	else
+		systemctl stop esdc@* erigonesd erigonesd-beat
+	fi
 }
 
 function mgmt_disable() {
-	systemctl disable esdc@* erigonesd erigonesd-beat
+	if ha_is_active; then
+		pcs_resource_action disable erigonesd-beat
+		systemctl disable esdc@* erigonesd
+	else
+		systemctl disable esdc@* erigonesd erigonesd-beat
+	fi
 }
 
 function is_node() {

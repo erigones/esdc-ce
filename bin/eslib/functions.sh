@@ -69,6 +69,8 @@ if [[ "$( uname -s )" = "SunOS" ]]; then
 else
 	GSORT=${GSORT:="/usr/bin/sort"}
 fi
+# move somewhere else:
+PG_VERSION="9.5"
 
 ###############################################################
 # Arguments passed to ssh
@@ -1071,6 +1073,59 @@ _service_instance_delete() {
 
 	${SVCCFG} -s "${fmri}" delete "${name}" && _service_file_save "${fmri}"
 }
+
+###############################################################
+# systemd helper functions
+###############################################################
+
+get_svc_prop() {
+	local svcname="$1"
+	local propname="$2"
+	/usr/bin/systemctl show -p "${propname}" "${svcname}" | cut -d= -f2
+}
+
+systemd_service_running() {
+	local svcname="$1"
+
+	if [[ "$(get_svc_prop "${svcname}" SubState)" == "running" ]]; then
+		return 0
+	else
+		return 1
+	fi
+}
+
+systemd_service_enabled() {
+	local svcname="$1"
+
+	if [[ "$(get_svc_prop "${svcname}" UnitFileState)" == "enabled" ]]; then
+		return 0
+	else
+		return 1
+	fi
+}
+
+###############################################################
+# HA helper functions
+###############################################################
+
+# are we running in HA?
+ha_is_active() {
+	if [[ -x "${ERIGONES_HOME}/bin/ha-check-active" ]] && \
+		 "${ERIGONES_HOME}/bin/ha-check-active" > /dev/null; then
+		return 0
+	else
+		return 1
+	fi
+}
+
+ha_get_my_nodename() {
+	crm_node -n
+}
+
+pg_is_running() {
+	/usr/pgsql-${PG_VERSION}/bin/pg_isready -q
+}
+
 
 ###############################################################
 # Disk install helper functions
