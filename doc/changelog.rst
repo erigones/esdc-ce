@@ -1,6 +1,19 @@
 Changelog
 #########
 
+4.2
+===
+Released on TBD
+
+Features
+--------
+
+Bugs
+----
+
+- Fix update of dc_bound parameter on existing DNS domain - `#448 <https://github.com/erigones/esdc-ce/issues/448>`__
+
+
 4.1
 ===
 Released on 2019-05-22

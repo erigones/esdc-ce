@@ -1,6 +1,7 @@
 from api import serializers as s
 from pdns.models import Domain
 from pdns.validators import validate_dns_name
+from vms.models import Dc
 from gui.models import User
 
 
@@ -28,6 +29,8 @@ class DomainSerializer(s.ConditionalDCBoundSerializer):
 
     def _normalize(self, attr, value):
         if attr == 'dc_bound':
+            if isinstance(self._dc_bound, Dc):
+                self._dc_bound = self._dc_bound.id
             return self._dc_bound
         # noinspection PyProtectedMember
         return super(DomainSerializer, self)._normalize(attr, value)
