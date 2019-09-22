@@ -112,7 +112,7 @@ def main():
                             fsfreeze=args.fsfreeze)
     elif cmd == 'ds-delete':
         res = bkp.ds_delete(args.snapshot, last_snapshots=args.remote_snapshot, metadata=args.metadata)
-    elif cmd == 'ds-restore' or 'snap-restore':
+    elif cmd == 'ds-restore' or cmd == 'snap-restore':
         res = bkp.ds_restore(args.snapshot, args.destination)
     elif cmd == 'file-create':
         res = bkp.file_create(args.source, args.file, metadata=args.metadata, json=args.json,
