@@ -11,6 +11,7 @@
 export ERIGONES_HOME=${ERIGONES_HOME:-"/opt/erigones"}
 export PYTHONPATH=${PYTHONPATH:-"${ERIGONES_HOME}:${ERIGONES_HOME}/envs/lib/python2.7/site-packages"}
 export PATH="${ERIGONES_HOME}/bin:/opt/local/bin:/opt/local/sbin:/opt/local/gcc49/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin"
+export ESLIB="${ESLIB:-"${ERIGONES_HOME}/bin/eslib"}"
 
 # Exit codes
 declare -ri _ERR_INPUT=1
@@ -88,6 +89,17 @@ SSH_ARGS=${SSH_ARGS:-"\
 ###############################################################
 MBUFFER_ARGS=${MBUFFER_ARGS:-"-s 128k -m 128M -q -v0 -e -W 300 "}
 
+
+###############################################################
+# Load USB key helper functions
+###############################################################
+
+if [[ -f /lib/sdc/usb-key.sh ]]; then
+	. /lib/sdc/usb-key.sh
+else
+	# fallback load (new esdc version with older platform)
+	. "${ESLIB}/usb-key.sh"
+fi
 
 ###############################################################
 # General helper functions
@@ -1152,38 +1164,6 @@ _usbkey_get_mountpoint() {
 	echo "/mnt/$(svcprop -p 'joyentfs/usb_mountpoint' svc:/system/filesystem/smartdc:default)"
 }
 
-mount_usb_key() {
-	if [[ -n "$(_usbkey_get_mounted_path)" ]]; then
-		# already mounted
-		return 0
-	fi
-
-	# shellcheck disable=SC2155
-	local alldisks="$(/usr/bin/disklist -a)"
-	# shellcheck disable=SC2155
-	local usbmnt="$(_usbkey_get_mountpoint)"
-
-	mkdir -p "${usbmnt}"
-	for key in ${alldisks}; do
-		if [[ "$(${FSTYP} "/dev/dsk/${key}p1" 2> /dev/null)" == 'pcfs' ]]; then
-			if ${MOUNT} -F pcfs -o foldcase,noatime "/dev/dsk/${key}p1" "${usbmnt}"; then
-				if [[ ! -f "${usbmnt}/.joyliveusb" ]]; then
-					${UMOUNT} "${usbmnt}"
-				else
-					break
-				fi
-			fi
-		fi
-	done
-
-	if [[ -z "$(_usbkey_get_mounted_path)" ]]; then
-		# nothing got mounted
-		return 1
-	else
-		return 0
-	fi
-}
-
 # return device name if mounted or nothing if not mounted
 _usbkey_get_mounted_path() {
 	# shellcheck disable=SC2155
@@ -1200,7 +1180,7 @@ _usbkey_get_device() {
 	if [[ -z "${usb_dev}" ]]; then
 		# USB key is not mounted
 		# mount it and get the dev again
-		mount_usb_key
+		mount_usb_key > /dev/null
 		usb_dev="$(_usbkey_get_mounted_path)"
 		umount "${usb_dev}"
 	fi
@@ -1209,11 +1189,7 @@ _usbkey_get_device() {
 }
 
 umount_usb_key() {
-	if [[ -z "$(_usbkey_get_mounted_path)" ]]; then
-		# not mounted
-		return 0
-	else
-		${UMOUNT} "$(_usbkey_get_mountpoint)"
-	fi
+	# call SmartOS function
+	unmount_usb_key
 }
 
