@@ -217,6 +217,10 @@ printmsg "Updating the new boot environment in the background"
 ${RSYNC} -ac --delete --exclude=boot/loader.conf "${PLATFORM_MOUNT_DIR}/"{bin,boot,kernel,lib,platform,sbin,smartdc} "${DCOS_MNTDIR}"
 ${RSYNC} -ac --delete "${USR_ARCHIVE_MOUNT_DIR}/"  "${DCOS_MNTDIR}/usr/"
 ${RSYNC} -a --delete "${PLATFORM_DIR}/platform-${PLATFORM_VER}/i86pc/amd64" "${DCOS_MNTDIR}/platform/i86pc"
+if [[ "$(cat "${DCOS_MNTDIR}/boot/loader.conf")" == 'boot-args="-B smartos=true,computenode=true"' ]]; then 
+	# replace old loader.conf from esdc_20190422T104439Z and lower
+	cp -f "${PLATFORM_MOUNT_DIR}/boot/loader.conf" "${DCOS_MNTDIR}/boot/loader.conf"
+fi
 printmsg "Update boot_archive checksum"
 checksum "${DCOS_MNTDIR}/platform/i86pc/amd64/boot_archive" > "${DCOS_MNTDIR}/platform/i86pc/amd64/boot_archive.hash"
 chown -R root:root "${DCOS_MNTDIR}/platform/i86pc/amd64"
