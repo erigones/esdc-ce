@@ -108,12 +108,12 @@ fi
 
 # shellcheck disable=SC2002
 CURR_USB_VER="$(cat "${USB_VERSION_FILE}" | sed -e 's/^esdc-.e-.n-//')"
-umount_usb_key
 
 if [[ "${LOCAL_UPGRADE}" -ne 1 ]]; then
 	# shellcheck disable=SC2002
 	WANTED_USB_IMG_VARIANT="$(cat "${USB_VERSION_FILE}" | sed -re 's/^(esdc-.e-.n-).*/\1/')"
 	if [[ ${FORCE} -ne 1 ]] && [[ "${CURR_USB_VER}" == "${NEW_USB_VER}" ]]; then
+		umount_usb_key
 		die 0 "Requested ESDC version is already on the USB key. Nothing to do."
 	fi
 
@@ -141,6 +141,7 @@ if [[ "${LOCAL_UPGRADE}" -ne 1 ]]; then
 	printmsg "Download URL: ${ESDC_DOWNLOAD_URL}"
 fi
 
+umount_usb_key
 mkdir -p "${UPG_DIR}"
 
 trap cleanup EXIT
@@ -192,8 +193,9 @@ printmsg "Writing new image to the USB device: ${USB_DEV_P0}"
 ${DD} if="${ESDC_IMG_FULL}" of="${USB_DEV_P0}" bs=16M
 
 printmsg "Mounting newly written USB key into ${USBMNT}"
-# mount exactly the same dev that was written to
-${MOUNT} -F pcfs -o foldcase,noatime "${USB_DEV}" "${USBMNT}"
+if ! mount_usb_key > /dev/null; then
+	die 2 "Failed to mount USB key. Upgrade failed."
+fi
 
 printmsg "Verifying newly written USB key"
 # shellcheck disable=SC2002

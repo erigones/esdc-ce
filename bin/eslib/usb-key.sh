@@ -73,7 +73,7 @@ function mount_usb_key()
 		return 1
 	fi
 
-	readonly alldisks=$(/usr/bin/disklist -a)
+	alldisks=$(/usr/bin/disklist -a)
 
 	for disk in $alldisks; do
 		version=$(usb_key_version "/dev/dsk/${disk}p0")
