@@ -1,0 +1,38 @@
+#!/bin/sh
+#
+# Exit codes:
+# 0: HA is active
+# 1: HA is NOT active
+# other: error occured
+#
+
+set -e
+
+PG_VERSION="9.5"
+PG_SYSTEMD_RES="postgresql-${PG_VERSION}.service"
+
+if [[ "$(uname -o)" != "GNU/Linux" ]]; then
+	echo "Run this script in mgmtXX VM"
+	exit 5
+fi
+
+ERIGONES_HOME=${ERIGONES_HOME:-"/opt/erigones"}
+ESLIB="${ESLIB:-"${ERIGONES_HOME}/bin/eslib"}"
+
+# shellcheck disable=SC1090
+. "${ESLIB}/functions.sh"
+
+if [[ -x /usr/sbin/crm_node ]]; then
+	if pg_is_running && ! systemd_service_enabled "${PG_SYSTEMD_RES}"; then
+		# the cluster is present and DB is running
+		# (querying the cluster info requires root privileges
+		# so we ignore the corner case of manually started DB
+		# and we assume it is started by a cluster)
+		echo HA is active
+		exit 0
+	fi
+fi
+
+# the HA is not active
+echo HA is NOT active
+exit 1
