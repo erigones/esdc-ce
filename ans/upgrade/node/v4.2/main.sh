@@ -31,5 +31,5 @@ svcadm restart svc:/application/zabbix/vm-network-monitor:default \
 # https://github.com/erigones/esdc-ce/issues/453
 #
 if ! grep -q '^smt_enabled=' /usbkey/config; then
-	print 'smt_enabled=true\n' >> /usbkey/config
+	print '\nsmt_enabled=true\n' >> /usbkey/config
 fi
