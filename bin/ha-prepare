@@ -291,7 +291,6 @@ def config_extended():
         if ip == 'auto':
             # auto-assign the first free IP
             ip = free_ips[0]
-        free_ips.remove(ip)
         CONF['mgmt_failover_ip'] = ip
 
         # set failover IP as type 'other' so it won't be assigned to another VM
@@ -299,6 +298,10 @@ def config_extended():
         params = {'note': 'Danube Cloud HA GUI failover IP'}
         es_change('/network/admin/ip/'+CONF['mgmt_failover_ip'], **params)
         save_conf()
+
+    if CONF['mgmt_failover_ip'] is in free_ips:
+        free_ips.remove(CONF['mgmt_failover_ip'])
+		
 
     for vm in populate_vms:
         # create base entry for vm
@@ -314,8 +317,10 @@ def config_extended():
             if ip == 'auto':
                 # auto-assign the first free IP
                 ip = free_ips[0]
-            free_ips.remove(ip)
             CONF['mgmt'][vm]['ip'] = ip
+
+        if CONF['mgmt'][vm]['ip'] is in free_ips:
+            free_ips.remove(CONF['mgmt'][vm]['ip'])
 
         # assign vm image
         if not CONF['mgmt'][vm].has_key('image'):
