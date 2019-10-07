@@ -8,10 +8,14 @@ Released on TBD
 Features
 --------
 
+- Add UEFI boot support - `#450 <https://github.com/erigones/esdc-ce/issues/450>`__
+
 Bugs
 ----
 
 - Fix update of dc_bound parameter on existing DNS domain - `#448 <https://github.com/erigones/esdc-ce/issues/448>`__
+- Fix file backup operations (thanks to klebed) - `#451 <https://github.com/erigones/esdc-ce/pull/451>`__
+- Fix continuous restart of Zabbix monitor subservices on a node - `#446 <https://github.com/erigones/esdc-ce/issues/446>`__
 
 
 4.1
@@ -28,6 +32,7 @@ Bugs
 
 - Fix `vminfod` timeout when updating KVM VM memory - `#439 <https://github.com/erigones/esdc-ce/issues/439>`__
 - Fix setting `refreservation` during `ha-prepare` - `commit 5948089 <https://github.com/erigones/esdc-ce/commit/5948089d6752cb0f96d95586aa7f7974e07a270d>`__
+
 
 4.0
 ===
