@@ -16,6 +16,7 @@ Bugs
 - Fix update of dc_bound parameter on existing DNS domain - `#448 <https://github.com/erigones/esdc-ce/issues/448>`__
 - Fix file backup operations (thanks to klebed) - `#451 <https://github.com/erigones/esdc-ce/pull/451>`__
 - Fix continuous restart of Zabbix monitor subservices on a node - `#446 <https://github.com/erigones/esdc-ce/issues/446>`__
+- Fix `ha-prepare` script IP auto-assign handling on multiple runs - `#454 <https://github.com/erigones/esdc-ce/issues/454>`__
 
 
 4.1
