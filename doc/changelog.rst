@@ -9,6 +9,7 @@ Features
 --------
 
 - Add UEFI boot support - `#450 <https://github.com/erigones/esdc-ce/issues/450>`__
+- Migrate `esdc-appliance-upgrade` to python3 - `#459 <https://github.com/erigones/esdc-ce/issues/459>`__
 
 Bugs
 ----
