@@ -4,7 +4,9 @@
     ansible_python_interpreter: /usr/bin/python2
   tasks:
   - name: install python3
-    yum: "name={{ item }}" state=present
+    yum:
+      name: "{{ item }}"
+      state: present
     with_items:
       - python36
       - python36-virtualenv
