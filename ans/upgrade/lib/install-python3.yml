@@ -1,0 +1,12 @@
+- name: install python3
+  hosts: mgmt* mon*
+  vars:
+    ansible_python_interpreter: /usr/bin/python2
+  tasks:
+  - name: install python3
+    yum: "name={{ item }}" state=present
+    with_items:
+      - python36
+      - python36-virtualenv
+      - python36-psycopg2
+      - python36-httplib2

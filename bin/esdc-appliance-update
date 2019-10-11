@@ -39,13 +39,15 @@ if [[ ! -f "/root/.ssh/id_rsa" ]]; then
 	read -r
 fi
 
-# upgrade only instances of the same number (so we can perform rolling upgrades if there are more of them)
-MYHOSTNAME=$(hostname -s)				# e.g: mgmt01
-APPLIANCE_NUMBER="${MYHOSTNAME:(-2)}"	# e.g: "01"
-
 cd "${ANS_BASE}"
-/usr/bin/ansible-playbook "${UPG_BASE}/lib/runupgrade.yml" --extra-vars="runhosts='mgmt${APPLIANCE_NUMBER}' appliance_type=mgmt"
-/usr/bin/ansible-playbook "${UPG_BASE}/lib/runupgrade.yml" --extra-vars="runhosts='mon${APPLIANCE_NUMBER}' appliance_type=mon"
-/usr/bin/ansible-playbook "${UPG_BASE}/lib/runupgrade.yml" --extra-vars="runhosts='dns${APPLIANCE_NUMBER}' appliance_type=dns"
-/usr/bin/ansible-playbook "${UPG_BASE}/lib/runupgrade.yml" --extra-vars="runhosts='cfgdb${APPLIANCE_NUMBER}' appliance_type=cfgdb"
-/usr/bin/ansible-playbook "${UPG_BASE}/lib/runupgrade.yml" --extra-vars="runhosts='img${APPLIANCE_NUMBER}' appliance_type=img"
+
+# pre-v4.2 check
+if [[ ! -f "/usr/bin/python3" ]]; then
+	/usr/bin/ansible-playbook "${UPG_BASE}/lib/install-python3.yml"
+fi
+
+/usr/bin/ansible-playbook "${UPG_BASE}/lib/runupgrade.yml" --extra-vars="runhosts='mgmt*' appliance_type=mgmt"
+/usr/bin/ansible-playbook "${UPG_BASE}/lib/runupgrade.yml" --extra-vars="runhosts='mon*' appliance_type=mon"
+/usr/bin/ansible-playbook "${UPG_BASE}/lib/runupgrade.yml" --extra-vars="runhosts='dns*' appliance_type=dns"
+/usr/bin/ansible-playbook "${UPG_BASE}/lib/runupgrade.yml" --extra-vars="runhosts='cfgdb*' appliance_type=cfgdb"
+/usr/bin/ansible-playbook "${UPG_BASE}/lib/runupgrade.yml" --extra-vars="runhosts='img*' appliance_type=img"

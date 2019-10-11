@@ -66,6 +66,8 @@ class Command(DanubeCloudCommand):
 
             if not vm.is_kvm():
                 line.append('ansible_python_interpreter=/opt/local/bin/python')
+            else
+                line.append('ansible_python_interpreter=/usr/bin/python3')
 
             yield ' '.join(line)
 
