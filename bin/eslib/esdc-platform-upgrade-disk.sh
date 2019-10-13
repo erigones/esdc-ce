@@ -63,7 +63,7 @@ done
 # Functions
 #####################################################
 
-function recover_efi_partitions()
+function restore_efi_partitions()
 {
 	declare -A disks
 	local bad_part_found=0
@@ -221,7 +221,7 @@ fi
 OLD_PLATFORM_VER="$(uname -v | ${SED} 's/^[a-z]*_//')"
 if [[ "${FORCE}" -ne 1 ]] && [[ "${PLATFORM_VER}" == "${OLD_PLATFORM_VER}" ]]; then
 	printmsg "The requested platform version is already running. Not upgrading."
-	recover_efi_partitions
+	restore_efi_partitions
 	exit 0
 fi
 
@@ -379,6 +379,6 @@ fi
 
 FINISHED_SUCCESSFULLY=1
 
-recover_efi_partitions
+restore_efi_partitions
 
 printmsg "Upgrade completed successfully"
