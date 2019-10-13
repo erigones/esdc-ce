@@ -17,7 +17,7 @@ if [[ -z "${PLATFORM_VER}" ]]; then
 	echo "Parameters:"
 	echo "  --keep-smf-db     don't clear SMF database (useful if you don't want to loose"
 	echo "                    your manual changes to any SMF service properties)"
-	echo "  -v                verbose download"
+	echo "  -v                verbose"
 	echo "  -f                force upgrade even when the requested version is already running"
 	echo "  -y                assume \"yes\" as default answer for all questions"
 
@@ -30,6 +30,7 @@ PLATFORM_VERSION_MAP_URL="https://download.erigones.org/esdc/factory/platform/es
 # curl: 15s conn T/O; allow redirects; 1000s max duration, fail on 404
 CURL_DEFAULT_OPTS="--connect-timeout 15 -L --max-time 1000 -f"
 CURL_QUIET="-s"
+VERBOSE=0
 KEEP_SMF_DB=0
 FORCE=0
 
@@ -42,6 +43,7 @@ while [[ ${#} -gt 0 ]]; do
 			;;
 		"-v")
 			CURL_QUIET=""
+			VERBOSE=1
 			;;
 		"-f")
 			FORCE=1
@@ -55,6 +57,116 @@ while [[ ${#} -gt 0 ]]; do
 	esac
 	shift
 done
+
+
+#####################################################
+# Functions
+#####################################################
+
+function recover_efi_partitions()
+{
+	declare -A disks
+	local bad_part_found=0
+	local good_part_found=0
+
+	# for partition recovery
+	local verified_partition=
+	local partitions_for_recovery=
+	local bad_counter=0
+	local error_during_recovery=0
+
+	printmsg "Checking for EFI partitions"
+
+	for disk in $(_get_zpool_disks); do
+		fulldisk="/dev/dsk/${disk}s0"
+		if _check_fstyp ${fulldisk} "pcfs"; then
+			# EFI disk ok
+			disks["${disk}"]=0
+			good_part_found=1
+		else
+			disks["${disk}"]=1
+			bad_part_found=1
+		fi
+	done
+
+	if [[ "${#disks[@]}" -eq 0 ]]; then
+		# zpool created without EFI partitions or no zpool disks found
+		printmsg "EFI boot partitons not detected. Skipping EFI update."
+
+	elif [[ "${bad_part_found}" -eq 0 ]] && [[ "${good_part_found}" -eq 1 ]]; then
+		printmsg "EFI partitions look correct on all disks."
+
+	elif [[ "${bad_part_found}" -eq 1 ]] && [[ "${good_part_found}" -eq 0 ]]; then
+		echo "WARNING: All EFI partitions within zones pool seem to be corrupted. If that's really true, you \
+will not be able to boot using UEFI at next reboot. The most probable case is that you have replaced all disks \
+without running esdc-platform-upgrade. If you run into boot problems, switch to BIOS boot and/or reinstal the EFI \
+partitions. Detected disks in zones pool: ${!disks[@]}"
+
+	elif [[ "${bad_part_found}" -eq 1 ]] && [[ "${good_part_found}" -eq 1 ]]; then
+		if [[ "${YES}" -ne 1 ]]; then
+			printmsg "Some EFI partitions seem to be corrupted. Most probably some disks were added or replaced."
+			read -p "*** Recover the corrupted EFI partitons? [Y/n] " -n 1 -r confirm
+			echo
+			if [[ -n "${confirm}" ]] && [[ ! "${confirm}" =~ ^[Yy]$ ]]; then
+				printmsg "Skipping the EFI recovery"
+				return 0
+			fi
+		else
+			printmsg "Some EFI partitions seem to be corrupted. Starting recovery."
+		fi
+
+
+		# create list of bad partitions
+		for disk in ${!disks[@]}; do
+			fulldisk="/dev/dsk/${disk}s0"
+			if [[ "${disks["${disk}"]}" -ne 0 ]]; then
+				partitions_for_recovery[$bad_counter]="${fulldisk}"	
+				((++bad_counter)) || true
+			elif [[ -z "${verified_partition}" ]]; then
+				if _verify_efi_part "${fulldisk}"; then
+					# we have found the first partition that can be used as a source to recover the corrupted ones
+					verified_partition="${fulldisk}"
+				fi
+			fi
+		done
+
+		if [[ -z "${verified_partition}" ]]; then
+			echo "WARNING: Cannot find any usable EFI partitions as a source for recovery. Please reinstall EFI \
+partitons manually or use BIOS boot if you encounter UEFI boot problems."
+			return 0
+		fi
+
+		[[ "${VERBOSE}" -eq 1 ]] && echo "Partitions to restore: ${partitions_for_recovery[@]}"
+		[[ "${VERBOSE}" -eq 1 ]] && echo "Verified partition to use as a source: ${verified_partition}"
+
+		# partitions rewrite start
+		for part in ${partitions_for_recovery[@]}; do
+			[[ "${VERBOSE}" -eq 1 ]] && echo "Recovering partition ${part}"
+			if ! ${DD} "if=${verified_partition}" "of=${part}" bs=1M &> /dev/null; then
+				((++error_during_recovery)) || true
+			fi
+		done
+
+		if [[ "${error_during_recovery}" -eq 0 ]]; then
+			printmsg "EFI recovery successfull (${#partitions_for_recovery[@]} partitions)."
+		elif [[ "${error_during_recovery}" < "${#partitions_for_recovery[@]}" ]]; then
+			echo "WARNING: Restore of some corrupted EFI partitions has failed. The UEFI boot process should not \
+be affected as there is still enough usable EFI partitions. If you encounter boot problems, use BIOS boot."
+			printmsg "EFI recovery ended"
+		elif [[ "${error_during_recovery}" == "${#partitions_for_recovery[@]}" ]]; then
+			echo "WARNING: Restore of all corrupted partitions has failed. Please reinstall EFI partitons manually \
+or use BIOS boot if you encounter UEFI boot problems."
+			printmsg "EFI recovery ended"
+		fi
+	fi
+
+}
+
+
+#####################################################
+# Functions END
+#####################################################
+
 
 # check if it's a local file
 if [[ -f "${PLATFORM_VER}" ]] && [[ "${PLATFORM_VER}" =~ platform-[0-9]+T[0-9]+Z\.tgz$ ]]; then
@@ -108,7 +220,9 @@ fi
 # check what platform we currently run
 OLD_PLATFORM_VER="$(uname -v | ${SED} 's/^[a-z]*_//')"
 if [[ "${FORCE}" -ne 1 ]] && [[ "${PLATFORM_VER}" == "${OLD_PLATFORM_VER}" ]]; then
-	die 0 "The requested platform version is already running. Aborting upgrade."
+	printmsg "The requested platform version is already running. Not upgrading."
+	recover_efi_partitions
+	exit 0
 fi
 
 
@@ -264,5 +378,7 @@ if [[ "${ACTIVATE_BE}" -eq 1 ]]; then
 fi
 
 FINISHED_SUCCESSFULLY=1
+
+recover_efi_partitions
 
 printmsg "Upgrade completed successfully"
