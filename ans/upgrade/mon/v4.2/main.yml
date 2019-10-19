@@ -1,0 +1,9 @@
+# https://github.com/erigones/esdc-ce/issues/459
+- name: install python3
+  yum:
+    state: present
+    name:
+      - python36
+      - python36-psycopg2
+      - python36-requests
+

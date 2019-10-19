@@ -9,6 +9,9 @@ Features
 --------
 
 - Add UEFI boot support - `#450 <https://github.com/erigones/esdc-ce/issues/450>`__
+- Verify EFI boot partitions during `esdc-platform-upgrade` - `#461 <https://github.com/erigones/esdc-ce/pull/461>`__
+- Add python3 to CentOS appliances - `#459 <https://github.com/erigones/esdc-ce/issues/459>`__
+- Add more HA cluster scripts for mgmt and monitoring - `#463 <https://github.com/erigones/esdc-ce/pull/463>`__
 
 Bugs
 ----
