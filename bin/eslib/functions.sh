@@ -719,25 +719,23 @@ _zpool_has_efi_part()
 	fi
 }
 
-_get_zpool_disks()
+_get_zpool_efi_disks()
 {
 	local pool="${1:-"zones"}"
 	local disks=
 
 	_zpool_has_efi_part "${pool}" || return 0
 
-	if [[ -z "${disks}" ]] || [[ "${layout}" == manual ]]; then
-		disks="$(zpool status zones | nawk '/^[\t ]*c[0-9]/ {
-			disk = $1;
-			cmd = "prtvtoc /dev/dsk/" disk " 2> /dev/null";
-			while ((cmd | getline) > 0) {
-				if ($1 == "0" && $5 == "524288") {
-					print disk;
-				}
+	disks="$(zpool status zones | nawk '/^[\t ]*c[0-9]/ {
+		disk = $1;
+		cmd = "prtvtoc /dev/dsk/" disk " 2> /dev/null";
+		while ((cmd | getline) > 0) {
+			if ($1 == "0" && $5 == "524288") {
+				print disk;
 			}
-			close(cmd);
-		}')"
-	fi
+		}
+		close(cmd);
+	}')"
 
 	print "${disks}"
 }

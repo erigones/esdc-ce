@@ -77,7 +77,7 @@ function restore_efi_partitions()
 
 	printmsg "Checking for EFI partitions"
 
-	for disk in $(_get_zpool_disks); do
+	for disk in $(_get_zpool_efi_disks); do
 		fulldisk="/dev/dsk/${disk}s0"
 		if _check_fstyp ${fulldisk} "pcfs"; then
 			# EFI disk ok
