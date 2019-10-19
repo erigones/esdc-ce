@@ -29,6 +29,7 @@ declare -r UPGRADE_DIR="/opt/upgrade"
 #
 # Binaries
 ZFS=${ZFS:-"/usr/sbin/zfs"}
+ZPOOL=${ZPOOL:-"/usr/sbin/zpool"}
 SSH=${SSH:-"/usr/bin/ssh"}
 GZIP=${GZIP:-"/usr/bin/gzip"}
 BZIP2=${BZIP2:-"/usr/bin/bzip2"}
@@ -40,6 +41,7 @@ CAT=${CAT:-"/usr/bin/cat"}
 AWK=${AWK:-"/usr/bin/awk"}
 SED=${SED:-"/usr/bin/sed"}
 MKDIR=${MKDIR:-"/usr/bin/mkdir -p"}
+MKTEMP=${MKTEMP:-"/opt/local/bin/mktemp"}
 MBUFFER=${MBUFFER:-"${ERIGONES_HOME}/bin/mbuffer"}
 JSON=${JSON:-"/usr/bin/json"}
 SVCS=${SVCS:-"/usr/bin/svcs"}
@@ -684,6 +686,89 @@ _zfs_destroy_snap_vm() {
 	return $?
 }
 
+# usage: _check_fstyp <dev> <fstyp>
+_check_fstyp()
+{
+	local dev="$1"
+	local fstyp="$2"
+
+	if [[ -z "${dev}" ]] || [[ -z "${fstyp}" ]]; then
+		return 9
+	fi
+
+	if [[ "$(${FSTYP} "${dev}" 2> /dev/null )" == "${fstyp}" ]]; then
+		return 0
+	else
+		return 1
+	fi
+}
+
+_zpool_has_efi_part()
+{
+	local pool="${1:-"zones"}"
+
+	# this can be either "-" or a size
+	local efi_size="$(${ZPOOL} get -Ho value bootsize "${pool}")"
+
+	if [[ "${efi_size}" == "256M" ]]; then
+		# we support only default EFI partition size
+		return 0
+	else
+		# No usable EFI partition is reported.
+		# (if you use a custom size or type, 
+		# you have to manipulate it by yourself)
+		return 1
+	fi
+}
+
+_get_zpool_efi_disks()
+{
+	local pool="${1:-"zones"}"
+	local disks=
+
+	_zpool_has_efi_part "${pool}" || return 0
+
+	disks="$(zpool status zones | nawk '/^[\t ]*c[0-9]/ {
+		disk = $1;
+		cmd = "prtvtoc /dev/dsk/" disk " 2> /dev/null";
+		while ((cmd | getline) > 0) {
+			if ($1 == "0" && $5 == "524288") {
+				print disk;
+			}
+		}
+		close(cmd);
+	}')"
+
+	print "${disks}"
+}
+
+# accepts full dsk path (not rdsk)
+_verify_efi_part()
+{
+	local disk="$1"
+	local retval=99
+	local tmpdir="$(${MKTEMP} -d /tmp/_verify_efi_part.tmpmount.XXX)"
+
+	if [[ ! "${disk}" =~ /dev/dsk/c ]]; then
+		echo "_verify_efi_part: Invalid disk name: ${disk}"
+		retval=9
+
+	elif ! _check_fstyp "${disk}" "pcfs"; then
+		# bad FS type for EFI partition
+		retval=1
+
+	elif mount -F pcfs -o foldcase "${disk}" "${tmpdir}" 2> /dev/null; then
+		if [[ -f "${tmpdir}/efi/boot/bootx64.efi" ]]; then
+			# all looks ok
+			retval=0
+			umount -f "${tmpdir}"
+		fi
+	fi
+
+	rm -r "${tmpdir}"
+
+	return "${retval}"
+}
 
 ###############################################################
 # vmadm helper functions
