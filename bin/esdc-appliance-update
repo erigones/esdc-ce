@@ -13,6 +13,11 @@ if ! [ -x /usr/bin/ansible-playbook ]; then
 	yum -y -q install ansible
 fi
 
+# Ensure ansible is not installed in global pip env (to avoid version conflicts)
+if ! type -t deactivate &> /dev/null; then
+	pip uninstall -qqy ansible
+fi
+
 MAINDIR="$(cd "$(dirname "$0")/.." ; pwd -P)"
 ERIGONES_HOME="${ERIGONES_HOME:-"${MAINDIR}"}"
 ANS_BASE="${ERIGONES_HOME}/ans"
