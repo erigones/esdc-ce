@@ -9,7 +9,7 @@
     versionfile: /etc/esdc.version
   tasks:
   - name: Extracting current appliance version
-    shell: if [ -f "{{ versionfile }}" ]; then cat "{{ versionfile }}"; else echo 'v1.0.0'; fi
+    shell: if [ -f "{{ versionfile }}" ]; then cat "{{ versionfile }}"; else echo 'v3.0.0'; fi
     register: appliance_version
   - name: Getting list of upgrades
     local_action:
