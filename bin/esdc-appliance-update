@@ -14,8 +14,11 @@ if ! [ -x /usr/bin/ansible-playbook ]; then
 fi
 
 # Ensure ansible is not installed in global pip env (to avoid version conflicts)
-if ! type -t deactivate &> /dev/null; then
+if ! type -t deactivate &> /dev/null && pip freeze 2>/dev/null | grep -q ansible; then
+	echo "Uninstalling global pip ansible"
 	pip uninstall -qqy ansible
+	# make sure ansible in system is usable after this uninstall
+	yum -q -y reinstall ansible
 fi
 
 MAINDIR="$(cd "$(dirname "$0")/.." ; pwd -P)"
