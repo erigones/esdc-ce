@@ -708,6 +708,7 @@ _zpool_has_efi_part()
 	local pool="${1:-"zones"}"
 
 	# this can be either "-" or a size
+	# shellcheck disable=SC2155
 	local efi_size="$(${ZPOOL} get -Ho value bootsize "${pool}")"
 
 	if [[ "${efi_size}" == "256M" ]]; then
@@ -747,6 +748,7 @@ _verify_efi_part()
 {
 	local disk="$1"
 	local retval=99
+	# shellcheck disable=SC2155
 	local tmpdir="$(${MKTEMP} -d /tmp/_verify_efi_part.tmpmount.XXX)"
 
 	if [[ ! "${disk}" =~ /dev/dsk/c ]]; then
@@ -1068,12 +1070,25 @@ _service_status() {
 	${SVCS} -H -o "${columns}" "${fmri}"
 }
 
+# return only when transitional state disappears (no "*" at the end of the state)
+_service_wait_for_transition() {
+	local fmri="$1"
+	local timeout="${2:-30}"
+
+	# shellcheck disable=SC2049
+	while [[ "$(_service_status "${fmri}")" =~ \*$ ]] && [[ "${timeout}" -gt 0 ]]; do
+		(( --timeout )) || true
+		sleep 1
+	done
+}
+
 _service_disable() {
 	local fmri="$1"
 	local rc=0
 
-	${SVCADM} disable -s "${fmri}"
-	rc="$?"
+	${SVCADM} disable -s "${fmri}" || rc="$?"
+	# sometimes svcadm returns sooner than expected
+	_service_wait_for_transition "${fmri}"
 
 	# If there's any SMF service in maintenance state,
 	# svcadm disable with "-s" returns a non-zero code.
@@ -1093,8 +1108,9 @@ _service_enable() {
 	local fmri="$1"
 	local rc=0
 
-	${SVCADM} enable -s "${fmri}"
-	rc="$?"
+	${SVCADM} enable -s "${fmri}" || rc="$?"
+	# sometimes svcadm returns sooner than expected
+	_service_wait_for_transition "${fmri}"
 
 	# see comment above in _service_disable
 	if [[ "$(_service_status "${fmri}")" == "enabled" ]]; then
