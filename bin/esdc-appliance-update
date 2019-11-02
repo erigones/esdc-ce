@@ -25,8 +25,12 @@ ANSIBLE_VERSION="$(grep "^ansible==" "${ERIGONES_HOME}/etc/requirements-both.txt
 
 . "${VIRTUAL_ENV}/bin/activate"
 
-if [[ "$(pip freeze -qq | grep "^ansible==")" != "${ANSIBLE_VERSION}" ]]; then
+if [[ -n "${ANSIBLE_VERSION}" ]] && [[ "$(pip freeze -qq | grep "^ansible==")" != "${ANSIBLE_VERSION}" ]]; then
 	echo "Upgrading ansible to version ${ANSIBLE_VERSION/*==}"
+	# pip TMPDIR workaround
+	# https://github.com/erigones/esdc-ce/pull/417
+	export PYTHONUNBUFFERED="true"
+	export TMPDIR="${ERIGONES_HOME}/var"
 	pip install -qq --upgrade "${ANSIBLE_VERSION}"
 fi
 
