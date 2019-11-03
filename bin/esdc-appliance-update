@@ -7,20 +7,6 @@ if [[ "$(id -u)" != "0" ]]; then
 	exit 6
 fi
 
-# ensure ansible is installed
-if ! [ -x /usr/bin/ansible-playbook ]; then
-	echo "Installing ansible package"
-	yum -y -q install ansible
-fi
-
-# Ensure ansible is not installed in global pip env (to avoid version conflicts)
-if ! type -t deactivate &> /dev/null && pip freeze 2>/dev/null | grep -q ansible; then
-	echo "Uninstalling global pip ansible"
-	pip uninstall -qqy ansible
-	# make sure ansible in system is usable after this uninstall
-	yum -q -y reinstall ansible
-fi
-
 MAINDIR="$(cd "$(dirname "$0")/.." ; pwd -P)"
 ERIGONES_HOME="${ERIGONES_HOME:-"${MAINDIR}"}"
 ANS_BASE="${ERIGONES_HOME}/ans"
@@ -33,6 +19,20 @@ export PYTHONPATH VIRTUAL_ENV
 
 # Update ansible inventory
 "${ERIGONES_HOME}"/bin/ctl.sh genhosts --vms > "${ANS_BASE}/hosts.cfg"
+
+ANSIBLE_PLAYBOOK="${VIRTUAL_ENV}/bin/ansible-playbook"
+ANSIBLE_VERSION="$(grep "^ansible==" "${ERIGONES_HOME}/etc/requirements-both.txt")"
+
+. "${VIRTUAL_ENV}/bin/activate"
+
+if [[ -n "${ANSIBLE_VERSION}" ]] && [[ "$(pip freeze -qq | grep "^ansible==")" != "${ANSIBLE_VERSION}" ]]; then
+	echo "Upgrading ansible to version ${ANSIBLE_VERSION/*==}"
+	# pip TMPDIR workaround
+	# https://github.com/erigones/esdc-ce/pull/417
+	export PYTHONUNBUFFERED="true"
+	export TMPDIR="${ERIGONES_HOME}/var"
+	pip install -qq --upgrade "${ANSIBLE_VERSION}"
+fi
 
 # pre-v2.3.1 check
 if [[ ! -f "/root/.ssh/id_rsa" ]]; then
@@ -48,8 +48,8 @@ if [[ ! -f "/root/.ssh/id_rsa" ]]; then
 fi
 
 cd "${ANS_BASE}"
-/usr/bin/ansible-playbook "${UPG_BASE}/lib/runupgrade.yml" --extra-vars="runhosts='mgmt*' appliance_type=mgmt"
-/usr/bin/ansible-playbook "${UPG_BASE}/lib/runupgrade.yml" --extra-vars="runhosts='mon*' appliance_type=mon"
-/usr/bin/ansible-playbook "${UPG_BASE}/lib/runupgrade.yml" --extra-vars="runhosts='dns*' appliance_type=dns"
-/usr/bin/ansible-playbook "${UPG_BASE}/lib/runupgrade.yml" --extra-vars="runhosts='cfgdb*' appliance_type=cfgdb"
-/usr/bin/ansible-playbook "${UPG_BASE}/lib/runupgrade.yml" --extra-vars="runhosts='img*' appliance_type=img"
+"${ANSIBLE_PLAYBOOK}" "${UPG_BASE}/lib/runupgrade.yml" --extra-vars="runhosts='mgmt??' appliance_type=mgmt"
+"${ANSIBLE_PLAYBOOK}" "${UPG_BASE}/lib/runupgrade.yml" --extra-vars="runhosts='mon??' appliance_type=mon"
+"${ANSIBLE_PLAYBOOK}" "${UPG_BASE}/lib/runupgrade.yml" --extra-vars="runhosts='dns??' appliance_type=dns"
+"${ANSIBLE_PLAYBOOK}" "${UPG_BASE}/lib/runupgrade.yml" --extra-vars="runhosts='cfgdb??' appliance_type=cfgdb"
+"${ANSIBLE_PLAYBOOK}" "${UPG_BASE}/lib/runupgrade.yml" --extra-vars="runhosts='img??' appliance_type=img"
