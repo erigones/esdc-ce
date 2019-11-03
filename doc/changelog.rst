@@ -3,7 +3,7 @@ Changelog
 
 4.2
 ===
-Released on TBD
+Released on 2019-11-03
 
 Features
 --------
