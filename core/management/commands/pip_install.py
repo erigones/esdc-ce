@@ -15,7 +15,8 @@ class Command(DanubeCloudCommand):
     req_file_both = DanubeCloudCommand._path(PROJECT_DIR, 'etc', 'requirements-both.txt')
     req_file_mgmt = DanubeCloudCommand._path(PROJECT_DIR, 'etc', 'requirements-mgmt.txt')
     req_file_node = DanubeCloudCommand._path(PROJECT_DIR, 'etc', 'requirements-node.txt')
-	erigones_home = os.path.abspath(os.environ.get('ERIGONES_HOME', '/opt/erigones'))
+    erigones_home = os.path.abspath(os.environ.get('ERIGONES_HOME', '/opt/erigones'))
+    extra_include_dir = erigones_home + '/include/'
 
     def pip_install(self, req_path, params=''):
         if self._path_exists(req_path):
@@ -36,7 +37,7 @@ class Command(DanubeCloudCommand):
             params = ''
 
 		# add include dir for pip builds
-        params+=' --global-option=build_ext --global-option="-I%s/include/"' % erigones_home
+        params+=' --global-option=build_ext --global-option="-I%s"' % self.extra_include_dir
 
         with lcd(self.PROJECT_DIR):
             self.pip_install(self.req_file_both, params=params)
