@@ -12,6 +12,7 @@ Features
 - Verify EFI boot partitions during `esdc-platform-upgrade` - `#461 <https://github.com/erigones/esdc-ce/pull/461>`__
 - Add python3 to CentOS appliances - `#459 <https://github.com/erigones/esdc-ce/issues/459>`__
 - Add more HA cluster scripts for mgmt and monitoring - `#463 <https://github.com/erigones/esdc-ce/pull/463>`__
+- Upgrade procedure now uses ansible from pip virtualenv - `#465 <https://github.com/erigones/esdc-ce/pull/465>`__
 
 Bugs
 ----
@@ -20,6 +21,7 @@ Bugs
 - Fix file backup operations (thanks to klebed) - `#451 <https://github.com/erigones/esdc-ce/pull/451>`__
 - Fix continuous restart of Zabbix monitor subservices on a node - `#446 <https://github.com/erigones/esdc-ce/issues/446>`__
 - Fix `ha-prepare` script IP auto-assign handling on multiple runs - `#454 <https://github.com/erigones/esdc-ce/issues/454>`__
+- Fix replication failover catching a transitional SMF service state - `#467 <https://github.com/erigones/esdc-ce/pull/467>`__
 
 
 4.1
