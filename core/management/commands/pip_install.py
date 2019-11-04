@@ -36,11 +36,10 @@ class Command(DanubeCloudCommand):
             params = ''
 
         # add include dir for pip builds
-        if que_only:
+        if os.uname()[0] == 'SunOS':
             params+=' --global-option=build_ext --global-option="-I%s/include/sunos/"' % self.erigones_home
-        # not currently needed
-        #else:
-        #    params+=' --global-option=build_ext --global-option="-I%s/include/centos/"' % self.erigones_home
+        #else: # not currently needed
+        #    params+=' --global-option=build_ext --global-option="-I%s/include/linux/"' % self.erigones_home
 
         with lcd(self.PROJECT_DIR):
             self.pip_install(self.req_file_both, params=params)
