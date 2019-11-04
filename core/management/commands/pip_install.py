@@ -1,4 +1,5 @@
 from ._base import DanubeCloudCommand, CommandOption, lcd
+import os
 
 PROJECT_DIR = DanubeCloudCommand.PROJECT_DIR
 
@@ -14,6 +15,7 @@ class Command(DanubeCloudCommand):
     req_file_both = DanubeCloudCommand._path(PROJECT_DIR, 'etc', 'requirements-both.txt')
     req_file_mgmt = DanubeCloudCommand._path(PROJECT_DIR, 'etc', 'requirements-mgmt.txt')
     req_file_node = DanubeCloudCommand._path(PROJECT_DIR, 'etc', 'requirements-node.txt')
+    erigones_home = os.path.abspath(os.environ.get('ERIGONES_HOME', '/opt/erigones'))
 
     def pip_install(self, req_path, params=''):
         if self._path_exists(req_path):
@@ -32,6 +34,12 @@ class Command(DanubeCloudCommand):
             params = '-U'
         else:
             params = ''
+
+        # add include dir for pip builds
+        if os.uname()[0] == 'SunOS':
+            params+=' --global-option=build_ext --global-option="-I%s/include/sunos/"' % self.erigones_home
+        #else: # not currently needed
+        #    params+=' --global-option=build_ext --global-option="-I%s/include/linux/"' % self.erigones_home
 
         with lcd(self.PROJECT_DIR):
             self.pip_install(self.req_file_both, params=params)
