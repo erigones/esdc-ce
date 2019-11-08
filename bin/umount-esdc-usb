@@ -3,6 +3,11 @@
 ERIGONES_HOME=${ERIGONES_HOME:-"/opt/erigones"}
 ESLIB="${ESLIB:-"${ERIGONES_HOME}/bin/eslib"}"
 
+if [[ "$(uname -s)" != "SunOS" ]] || [[ "$(zonename)" != "global" ]]; then
+	echo "This script makes sense only on a compute node."
+	exit 1
+fi
+
 if [[ -f /lib/sdc/usb-key.sh ]]; then
 	. /lib/sdc/usb-key.sh
 else
@@ -10,7 +15,7 @@ else
 	. "${ESLIB}/usb-key.sh"
 fi
 
-usbmnt="$(mount_usb_key)"
+unmount_usb_key
 
-echo "USB key mounted at ${usbmnt}"
+[ $? -eq 0 ] && echo "USB key unmounted"
 
