@@ -1,3 +1,11 @@
+# https://github.com/erigones/esdc-ce/issues/469
+- name: update python-devel before python3 install
+  yum:
+    state: latest
+    name:
+    - python-devel
+    - python-rpm-macros
+
 # https://github.com/erigones/esdc-ce/issues/459
 - name: install python3
   yum:
