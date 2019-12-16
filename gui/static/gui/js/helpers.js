@@ -744,7 +744,7 @@ function mdata_display(input_field) {
     }
 
     $.each(value, function(key, val) {
-      row = $(row_template({'key': key, 'value': val, 'sign': 'minus icon-link-enabled'}));
+      row = $(row_template({'key': key, 'value': val.replace(/\n/g, "\\n"), 'sign': 'minus icon-link-enabled'}));
       input_group.append(row);
       input = row.children().get(1);
       input.scrollLeft = input.scrollWidth;
@@ -800,7 +800,7 @@ function mdata_handler(input_field) {
 
     // Update textarea and clean mdata-rows
     rows.remove();
-    input_field.val(JSON.stringify(result, undefined, 4));
+    input_field.val(JSON.stringify(result, undefined, 4).replace(/\\\\n/g, "\\n"));
     input_field.show();
   }
 }
