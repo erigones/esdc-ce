@@ -710,6 +710,19 @@ function mdata_display(input_field) {
     input_field.val(JSON.stringify(current_value, undefined, 4));
   }
 
+  function escapePastedNewlines(event) {
+    var caller = event.target || event.srcElement;
+    var paste = event.clipboardData.getData('text'); 
+    paste = paste.replace(/\n/g, "\\n"); 
+    var curPos = caller.selectionStart + paste.length;
+  	caller.value = caller.value.substring(0, caller.selectionStart) 
+  				 + paste
+  				 + caller.value.substring(caller.selectionEnd, caller.value.length);
+    caller.setSelectionRange(curPos, curPos);
+  
+    event.preventDefault(); 
+  };
+
   function hide_mdata_input() {
     var btn = $(this);
     input_field.off('focus', display_mdata_input);
@@ -748,6 +761,7 @@ function mdata_display(input_field) {
       input_group.append(row);
       input = row.children().get(1);
       input.scrollLeft = input.scrollWidth;
+      input.addEventListener('paste', escapePastedNewlines, false);
     });
 
     input_group.append(row_template({'key': '', 'value': '', 'sign': 'plus icon-link-disabled'}));
