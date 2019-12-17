@@ -1,6 +1,21 @@
 Changelog
 #########
 
+4.3
+===
+Released on TBD
+
+Features
+--------
+
+- Add automatic escaping of multiline metadata in VM properties (GUI) - `#472 <https://github.com/erigones/esdc-ce/pull/472>`__
+
+Bugs
+----
+
+- Fix incorrect conversion of newlines in VM metadata (GUI) - `#471 <https://github.com/erigones/esdc-ce/issues/471>`__
+
+
 4.2
 ===
 Released on 2019-11-03
