@@ -1,20 +1,21 @@
 Changelog
 #########
 
-4.2.1
+4.3
 =====
-Released on 2019-11-08
+Released on TBD
 
 
 Features
 --------
 
 - Add commands `mount-esdc-usb` and `umount-esdc-usb` - `#470 <https://github.com/erigones/esdc-ce/pull/470>`__
+- Generate `answers.json` from every installation for future unattended installs - `#142 <https://github.com/erigones/esdc-factory/pull/142>`__
 
 Bugs
 ----
 
-- Fix rpm conflict during python3 install on some installations - `#469 <https://github.com/erigones/esdc-ce/issues/469>`__
+- Fix rpm conflict during upgrade on some installations - `#469 <https://github.com/erigones/esdc-ce/issues/469>`__
 
 4.2
 ===
