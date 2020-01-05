@@ -40,4 +40,8 @@ class Migration(migrations.Migration):
             },
             bases=(models.Model, pdns.models.pdns_config.DummyPdnsCfg),
         ),
+        migrations.RunSQL("""
+            GRANT select ON cfg_recursor TO pdns;
+            GRANT select ON cfg_pdns TO pdns;
+        """),
     ]
