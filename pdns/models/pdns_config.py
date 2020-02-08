@@ -4,11 +4,6 @@ from logging import getLogger
 from django.db import models, connections
 from django.utils.translation import ugettext_lazy as _
 from django.utils.six import text_type
-from django import setup as django_setup
-
-# fix delete()
-# https://stackoverflow.com/a/55240294/5152980
-django_setup()
 
 logger = getLogger(__name__)
 
