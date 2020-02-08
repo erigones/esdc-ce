@@ -4,6 +4,11 @@ from logging import getLogger
 from django.db import models, connections
 from django.utils.translation import ugettext_lazy as _
 from django.utils.six import text_type
+from django import setup as django_setup
+
+# fix delete()
+# https://stackoverflow.com/a/55240294/5152980
+django_setup()
 
 logger = getLogger(__name__)
 
@@ -11,12 +16,15 @@ logger = getLogger(__name__)
 def epoch():
     return int(time.mktime(time.gmtime()))
 
-class DummyPdnsCfg():
+class DummyPdnsCfg(models.Model):
     key = NotImplemented
     val = NotImplemented
     change_date = NotImplemented
     log_object_name = NotImplemented
     pg_notify_channel = 'pdns_notify'
+
+    class Meta:
+        abstract = True
 
 
     def __unicode__(self):
@@ -26,12 +34,12 @@ class DummyPdnsCfg():
         logger.info('Saving %s entry "%s" with content "%s"',
                     self.my_name, self.key, self.val)
         self.change_date = epoch()
-        return super(self.__class__, self).save(*args, **kwargs)
+        return super(DummyPdnsCfg, self).save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
         logger.info('Deleting %s entry "%s" with content "%s"',
                     self.my_name, self.key, self.val)
-        return super(self.__class__, self).delete(*args, **kwargs)
+        return super(DummyPdnsCfg, self).delete(*args, **kwargs)
 
     # noinspection PyShadowingBuiltins
     @classmethod
@@ -121,7 +129,7 @@ class DummyPdnsCfg():
         cls.send_pg_notify()
 
 
-class PdnsRecursorCfg(models.Model, DummyPdnsCfg):
+class PdnsRecursorCfg(DummyPdnsCfg, models.Model):
     """
     This table contains the config values that will be pushed into PowerDNS recursor
     configuration files by pdns-configd daemon. The daemon relies on table change
@@ -155,7 +163,7 @@ class PdnsRecursorCfg(models.Model, DummyPdnsCfg):
         db_table = 'cfg_recursor'
 
 
-class PdnsCfg(models.Model, DummyPdnsCfg):
+class PdnsCfg(DummyPdnsCfg, models.Model):
     """
     This table contains the config values that will be pushed into PowerDNS 
     configuration files by pdns-configd daemon. The daemon relies on table change

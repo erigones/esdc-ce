@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='PdnsCfg',
             fields=[
-                ('key', models.CharField(primary_key=True, serialize=False, max_length=32, help_text=b'PowerDNS configuration parameter keys', unique=True, verbose_name='Key', db_index=True)),
+                ('key', models.CharField(primary_key=True, serialize=False, max_length=32, help_text=b'PowerDNS configuration parameter keys', unique=True, null=False, verbose_name='Key', db_index=True)),
                 ('val', models.TextField(default=None, help_text=b'PowerDNS configuration parameter values', null=True, verbose_name='Value')),
                 ('change_date', models.IntegerField(default=None, help_text=b'Timestamp for the last update.', null=True, verbose_name='Changed')),
             ],
@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='PdnsRecursorCfg',
             fields=[
-                ('key', models.CharField(primary_key=True, serialize=False, max_length=32, help_text=b'PowerDNS Recursor configuration parameter keys', unique=True, verbose_name='Key', db_index=True)),
+                ('key', models.CharField(primary_key=True, serialize=False, max_length=32, help_text=b'PowerDNS Recursor configuration parameter keys', unique=True, null=False, verbose_name='Key', db_index=True)),
                 ('val', models.TextField(default=None, help_text=b'PowerDNS Recursor configuration parameter values', null=True, verbose_name='Value')),
                 ('change_date', models.IntegerField(default=None, help_text=b'Timestamp for the last update.', null=True, verbose_name='Changed')),
             ],
@@ -40,8 +40,12 @@ class Migration(migrations.Migration):
             },
             bases=(models.Model, pdns.models.pdns_config.DummyPdnsCfg),
         ),
-        migrations.RunSQL("""
-            GRANT select ON cfg_recursor TO pdns;
-            GRANT select ON cfg_pdns TO pdns;
-        """),
+        migrations.RunSQL([
+            "GRANT select ON cfg_recursor TO pdns",
+            "GRANT select ON cfg_pdns TO pdns"
+			], [
+            "REVOKE select ON cfg_recursor TO pdns",
+            "REVOKE select ON cfg_pdns TO pdns"
+			]
+        ),
     ]
