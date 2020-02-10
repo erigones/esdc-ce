@@ -293,7 +293,7 @@
                         "delay_flex": "50/1-7,00:00-24:00",
                         "units": "",
                         "value_type": "3",
-                        "key": "proc.num[pgconfgen]",
+                        "key": "proc.num[,,,pgconfgen]",
                         "delta": "0",
                         "password": "",
                         "snmpv3_privpassphrase": "",
@@ -477,7 +477,7 @@
                         "name": "DNS configurator SMF service is in {ITEM.LASTVALUE} state"
                     }
                 ],
-                "expression": "{t_svc-dns:proc.num[pgconfgen].max(#2)}=0",
+                "expression": "{t_svc-dns:proc.num[,,,pgconfgen].max(#2)}=0",
                 "name": "DNS config daemon is not running"
             },
             {
