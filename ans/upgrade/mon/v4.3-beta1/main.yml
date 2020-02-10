@@ -1,0 +1,6 @@
+- name: Load Zabbix credentials
+  include: "{{ upg_base }}/lib/zabbix_credentials.yml"
+
+# https://github.com/erigones/esdc-ce/issues/387
+- name: Update fixed templates
+  include: "{{ upg_base }}/lib/zabbix_import_templates.yml"

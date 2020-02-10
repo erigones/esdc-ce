@@ -68,10 +68,10 @@ function mgmt_status() {
 function mgmt_restart() {
 	if ha_is_active; then
 		pcs_resource_action restart erigonesd-beat
-		systemctl restart esdc@* erigonesd
 	else
-		systemctl restart esdc@* erigonesd erigonesd-beat
+		systemctl restart erigonesd-beat
 	fi
+	systemctl restart esdc@{gunicorn-api.service,gunicorn-gui.service,gunicorn-sio.service} erigonesd
 }
 
 function mgmt_stop() {
