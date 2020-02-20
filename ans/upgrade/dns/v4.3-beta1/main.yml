@@ -6,6 +6,7 @@
     pdns_recursor_group: pdns-recursor
     pdnsconfd_shell: /usr/bin/false
     pdnsconfd_repo: "https://github.com/erigones/pgconfgen.git"
+    archive_sha256: 23709e06cb03c3c7b5539229d96fec49a57a6a323c4f54bd81540b9ac8bd7c66
 
 # don't do anything if /opt/local upgrade is going to fail
 - name: Verify available free space

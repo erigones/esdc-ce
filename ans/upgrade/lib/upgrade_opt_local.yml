@@ -1,5 +1,6 @@
 
 # modifiers:
+#   archive_sha256 - 
 #   target_pkgsrc_ver (e.g. 2019Q4), default: target appliance version
 #   - note: the archive with specified version must be present in download location
 
@@ -40,7 +41,7 @@
     url: "https://download.erigones.org/esdc/factory/archives/{{ archive_file }}"
     dest: "{{ upgrade_dir }}/{{ archive_file }}"
     tmp_dest: "{{ upgrade_dir }}/tmp"
-    #checksum: sha256:b5bb9d8014a0f9b1d61e21e796d78dccdf1352f23cd32812f4850b878ae4944c
+    checksum: "sha256:{{ archive_sha256 }}"
 
 - name: Extract the new archive
   unarchive:
