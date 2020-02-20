@@ -8,14 +8,8 @@
     pdnsconfd_repo: "https://github.com/erigones/pgconfgen.git"
 
 # don't do anything if /opt/local upgrade is going to fail
-- name: Check free space
-  shell: /opt/local/bin/df -m /opt | /opt/local/bin/tail -1 | /opt/local/bin/awk '{print $4}'
-  register: free_space_mb
-
-- name: Fail if there's too little space for upgrade
-  fail:
-    msg: "No diskspace for upgrade (needed: 1500MB+; current: {{ free_space_mb.stdout }}MB). Please increase disk size for VM '{{ inventory_hostname }}' in 'admin' datacenter"
-  when: free_space_mb.stdout | int < 2000
+- name: Verify available free space
+  include: "{{ upg_base }}/lib/check_free_diskspace.yml"
 
 - name: Update /var/zoneinit/includes/41-dns.sh
   copy: src="{{ current_task_dir }}/files/41-dns.sh" dest=/var/zoneinit/includes/41-dns.sh owner=root group=root mode=0755
@@ -71,7 +65,7 @@
   service: name=pdns-confd enabled=no state=stopped
 
 - name: Update new config files and start services
-  shell: "{{ item }}"
+  shell: bash -c 'function log() { return; } && source "{{ item }}"'
   with_items:
       - /var/zoneinit/includes/41-dns.sh
       - /var/zoneinit/includes/21-zabbix.sh
