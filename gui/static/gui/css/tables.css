@@ -109,7 +109,6 @@ table.box.table-striped tbody tr:nth-child(odd) td, table.box.table-striped tbod
 /* line 107, ../scss/tables.scss */
 table.box.break-words {
   word-wrap: break-word;
-  word-break: break-all;
 }
 /* line 113, ../scss/tables.scss */
 table.box.table-striped tbody tr.info td {

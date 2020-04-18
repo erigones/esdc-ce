@@ -1200,7 +1200,7 @@ class TagField(WritableField):
     https://github.com/alex/django-taggit
     """
     def _strict_tags(self, value):
-        tag_re = re.compile(r'^[A-Za-z0-9_-]+$')  # No dots!
+        tag_re = re.compile(r'^[ :/A-Za-z0-9_-]+$')  # No dots!
 
         for tag in value:
             if not tag_re.search(tag):
