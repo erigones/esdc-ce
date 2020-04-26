@@ -2,20 +2,22 @@ Changelog
 #########
 
 4.3
-=====
+===
 Released on TBD
-
 
 Features
 --------
 
 - Add commands `mount-esdc-usb` and `umount-esdc-usb` - `#470 <https://github.com/erigones/esdc-ce/pull/470>`__
-- Generate `answers.json` from every installation for future unattended installs - `#142 <https://github.com/erigones/esdc-factory/pull/142>`__
+- Generate `answers.json` from every installation - `#142 <https://github.com/erigones/esdc-factory/pull/142>`__
+- Add automatic escaping of multiline metadata in VM properties (GUI) - `#472 <https://github.com/erigones/esdc-ce/pull/472>`__
 
 Bugs
 ----
 
 - Fix rpm conflict during upgrade on some installations - `#469 <https://github.com/erigones/esdc-ce/issues/469>`__
+- Fix incorrect conversion of newlines in VM metadata (GUI) - `#471 <https://github.com/erigones/esdc-ce/issues/471>`__
+
 
 4.2
 ===
