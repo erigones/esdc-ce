@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.db.models import BLANK_CHOICE_DASH
 from django import forms
 
-from pdns.models import Domain, Record
+from pdns.models import Domain, Record, PdnsCfg, PdnsRecursorCfg, RecurseNetworks
 from gui.models import User
 
 
@@ -43,6 +43,40 @@ class RecordAdmin(admin.ModelAdmin):
     list_display = ('name', 'type', 'content', 'domain')
     readonly_fields = ('change_date',)
 
+class PdnsCfgAdminForm(forms.ModelForm):
+    class Meta:
+        model = PdnsCfg
+        exclude = ()
+
+    def __init__(self, *args, **kwargs):
+        super(PdnsCfgAdminForm, self).__init__(*args, **kwargs)
+        self.fields['key'].required = True
+        self.fields['val'].required = True
+
+class PdnsCfgAdmin(admin.ModelAdmin):
+    form = PdnsCfgAdminForm
+    list_display = ('key', 'val')
+    readonly_fields = ('change_date',)
+
+class RecurseNetsAdminForm(forms.ModelForm):
+    class Meta:
+        model = RecurseNetworks
+        exclude = ()
+
+    def __init__(self, *args, **kwargs):
+        super(RecurseNetsAdminForm, self).__init__(*args, **kwargs)
+        self.fields['subnet'].required = True
+        self.fields['net_name'].required = False
+        self.fields['id'].required = True
+
+class RecurseNetsAdmin(admin.ModelAdmin):
+    form = RecurseNetsAdminForm
+    list_display = ('subnet', 'net_name', 'id')
+    readonly_fields = ('change_date',)
+
 
 admin.site.register(Domain, DomainAdmin)
 admin.site.register(Record, RecordAdmin)
+admin.site.register(PdnsCfg, PdnsCfgAdmin)
+admin.site.register(PdnsRecursorCfg, PdnsCfgAdmin)
+admin.site.register(RecurseNetworks, RecurseNetsAdmin)
