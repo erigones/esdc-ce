@@ -33,5 +33,11 @@ class Migration(migrations.Migration):
                 'verbose_name_plural': 'Recursion subnets',
             },
         ),
+        migrations.RunSQL([
+            "GRANT select ON recurse_networks TO pdns"
+			], [
+            "REVOKE select ON recurse_networks FROM pdns"
+			]
+        ),
         migrations.RunPython(sync_recurse_subnets, noop_reverse),
     ]
