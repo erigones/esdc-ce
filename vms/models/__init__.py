@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-from django.db.models.signals import post_delete
+from django.db.models.signals import post_delete, post_save
 
 from vms.models.dc import Dc, DummyDc, DefaultDc, DomainDc  # noqa: F401
 from vms.models.storage import Storage, NodeStorage  # noqa: F401
@@ -32,3 +32,6 @@ post_delete.connect(SlaveVm.post_delete, sender=SlaveVm, dispatch_uid='post_dele
 post_delete.connect(DcNode.post_delete, sender=DcNode, dispatch_uid='post_delete_dc_node')
 post_delete.connect(NodeStorage.post_delete, sender=NodeStorage, dispatch_uid='post_delete_ns')
 post_delete.connect(DomainDc.domain_post_delete, sender=Domain, dispatch_uid='post_delete_domain')
+
+post_save.connect(Subnet.post_save_subnet, sender=Subnet, dispatch_uid='post_save_subnet')
+post_delete.connect(Subnet.post_delete_subnet, sender=Subnet, dispatch_uid='post_delete_subnet')

@@ -209,7 +209,7 @@ class RecurseNetworks(models.Model):
 
     id = models.AutoField(primary_key=True, help_text='Unique handle for network entries')
     subnet = models.CharField(_('Subnet'), max_length=50, null=False, db_index=True,
-                              help_text='Network subnet to allow recursion from')
+                              help_text='Network subnet to allow recursion from (format: x.x.x.x/yy)')
     net_name = models.CharField(_('Network name'), max_length=50, db_index=True,
                                 help_text='Network name in the danube networks list')
     change_date = models.IntegerField(_('Changed'), null=True, default=None,
@@ -239,7 +239,7 @@ class RecurseNetworks(models.Model):
     @classmethod
     def add_entry(cls, subnet, net_name):
         logger.info('Adding allowed recurse network "%s" with content "%s"',
-                    cls.net_name, cls.subnet)
+                    net_name, subnet)
         return cls.objects.create(net_name=net_name, subnet=subnet, change_date=epoch())
         # return self.objects.create(net_name=net_name, subnet=subnet)
 
@@ -261,7 +261,7 @@ class RecurseNetworks(models.Model):
     def delete_entries(cls, id=None, subnet=None, net_name=None):
         """ Deletes all entries that are matched by provided parameters (uses object.filter()) """
         # forward all search arguments
-        nets = cls.get_entries(**{key: value for key, value in locals().items() if key not in 'self'})
+        nets = cls.get_entries(id=id, subnet=subnet, net_name=net_name)
         for net in nets:
             net.delete()
 
@@ -272,7 +272,7 @@ class RecurseNetworks(models.Model):
     def update_entry(cls, id, new_subnet, new_net_name):
         net = cls.objects.get(id=id)
         logger.info('Updating %s entry with content subnet="%s", net_name="%s" (old content: "%s", "%s")',
-                    cls.log_object_name, new_subnet, new_net_name, cls.subnet, cls.net_name)
+                    cls.log_object_name, new_subnet, new_net_name, net.subnet, net.net_name)
         net.subnet = new_subnet
         net.net_name = new_net_name
         return net.save()

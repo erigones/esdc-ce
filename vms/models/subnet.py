@@ -14,6 +14,7 @@ from vms.mixins import _DcMixin
 from vms.models.base import _VirtModel, _UserTasksModel
 from vms.models.vm import Vm
 from vms.models.node import Node
+from pdns.models import RecurseNetworks
 
 
 class Subnet(_VirtModel, _DcMixin, _UserTasksModel):
@@ -154,3 +155,15 @@ class Subnet(_VirtModel, _DcMixin, _UserTasksModel):
                 return True
 
         return False
+
+    # noinspection PyUnusedLocal
+    @classmethod
+    def post_save_subnet(self, sender, instance, **kwargs):
+        """Called via signal after Subnet has been saved to database"""
+        RecurseNetworks.add_or_update_entry(subnet=str(instance.ip_network), net_name=instance.name)
+
+    # noinspection PyUnusedLocal
+    @classmethod
+    def post_delete_subnet(self, sender, instance, **kwargs):
+        """Called via signal after Subnet has been deleted from database"""
+        RecurseNetworks.delete_entries(subnet=str(instance.ip_network), net_name=instance.name)
