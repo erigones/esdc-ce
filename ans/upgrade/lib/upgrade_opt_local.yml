@@ -1,7 +1,7 @@
 
 # modifiers:
 #   archive_sha256 - 
-#   target_pkgsrc_ver (e.g. 2019Q4), default: target appliance version
+#   target_pkgsrc_ver (e.g. 2019Q4), default: target appliance version (e.g. v4.3-beta2)
 #   - note: the archive with specified version must be present in download location
 
 - set_fact:
@@ -12,7 +12,7 @@
 
 # generate exclude list from {{keep_backups_count}} last backups and delete the rest
 - name: Delete old backups if exist
-  shell: if [ -d "{{ upgrade_dir }}/backup" ]; then cd "{{ upgrade_dir }}/backup" && gfind . -maxdepth 1 -name "{{ backup_prefix }}" -regextype posix-extended -and \( -not -regex $(find . -maxdepth 1 -name "{{ backup_prefix }}" -exec ls -d1 {} + | tail -2 | xargs | sed -e 's/ /$|/g' -e 's/$/$/') \) -exec rm -rf {} \; -exec echo Mazem {} \; ; fi
+  shell: if [ -d "{{ upgrade_dir }}/backup" ]; then cd "{{ upgrade_dir }}/backup" && gfind . -maxdepth 1 -name "{{ backup_prefix }}" -regextype posix-extended -and \( -not -regex $(find . -maxdepth 1 -name "{{ backup_prefix }}" -exec ls -d1 {} + | tail -2 | xargs | sed -e 's/ /$|/g' -e 's/$/$/') \) -exec rm -rf {} \; -exec echo Deleting {} \; ; fi
   ignore_errors: true
 
 - name: Ensure "{{ upgrade_dir }}/extracted" does not exist

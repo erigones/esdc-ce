@@ -9,7 +9,11 @@
     pdns_recursor_group: pdns-recursor
     pdnsconfd_shell: /usr/bin/false
     pdnsconfd_repo: "https://github.com/erigones/pgconfgen.git"
-    archive_sha256: 23709e06cb03c3c7b5539229d96fec49a57a6a323c4f54bd81540b9ac8bd7c66
+    dnsdist_user: dnsdist
+    dnsdist_group: dnsdist
+    dnsdist_home: /nonexistent
+    dnsdist_shell: /usr/bin/false
+    archive_sha256: b243b92f7919a8dc8844294e2b9400bf6483c0246522ed9bde1771ceea5afe17
 
 # don't do anything if /opt/local upgrade is going to fail
 - name: Verify available free space
@@ -23,14 +27,28 @@
          name={{ pdnsconfd_group }}
          state=present
 
+- name: Create dnsdist group
+  group: #gid={{ dnsdist_gid }}
+         name={{ dnsdist_group }}
+         state=present
+
 - name: Create pdns-confd user
   user: #uid={{ pdnsconfd_uid }}
         name={{ pdnsconfd_user }}
         group={{ pdnsconfd_group }}
-        groups="{{ pdns_group }},{{ pdns_recursor_group }}"
+        groups="{{ pdns_group }},{{ pdns_recursor_group }},{{ dnsdist_group }}"
         home={{ pdnsconfd_home }}
         shell={{ pdnsconfd_shell }}
         profile="Primary Administrator"
+        createhome=no
+        state=present
+
+- name: Create dnsdist user
+  user: #uid={{ dnsdist_uid }}
+        name={{ dnsdist_user }}
+        group={{ dnsdist_group }}
+        home={{ dnsdist_home }}
+        shell={{ dnsdist_shell }}
         createhome=no
         state=present
 
@@ -64,7 +82,10 @@
 - name: Import pdns-confd SMF manifest
   command: /usr/sbin/svccfg import /opt/local/lib/svc/manifest/pdns-confd.xml
 
-# will be enabled by zoneinit script
+- name: Import pdns-dnsdist SMF manifest
+  command: /usr/sbin/svccfg import /opt/local/lib/svc/manifest/pdns-dnsdist.xml
+
+# it will be enabled by zoneinit script
 - name: Ensure pdns-confd is disabled
   service: name=pdns-confd enabled=no state=stopped
 

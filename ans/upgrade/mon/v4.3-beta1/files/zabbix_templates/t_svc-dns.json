@@ -350,6 +350,92 @@
                         "privatekey": "",
                         "allowed_hosts": "",
                         "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "365",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "50/1-7,00:00-24:00",
+                        "units": "",
+                        "value_type": "3",
+                        "key": "proc.num[,,,dnsdist]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "DNS dnsdist is running",
+                        "applications": [
+                            {
+                                "name": "Service - DNS server"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
+                    },
+                    {
+                        "username": "",
+                        "snmpv3_contextname": "",
+                        "inventory_link": "0",
+                        "multiplier": "0",
+                        "trends": "0",
+                        "snmpv3_authpassphrase": "",
+                        "snmp_oid": "",
+                        "snmpv3_securitylevel": "0",
+                        "port": "",
+                        "logtimefmt": "",
+                        "delay": "60",
+                        "publickey": "",
+                        "params": "",
+                        "snmpv3_securityname": "",
+                        "formula": "1",
+                        "type": "0",
+                        "snmpv3_authprotocol": "0",
+                        "valuemap": [],
+                        "ipmi_sensor": "",
+                        "status": "0",
+                        "authtype": "0",
+                        "snmp_community": "",
+                        "description": "",
+                        "data_type": "0",
+                        "delay_flex": "",
+                        "units": "",
+                        "value_type": "1",
+                        "key": "smf.status[pdns-dnsdist]",
+                        "delta": "0",
+                        "password": "",
+                        "snmpv3_privpassphrase": "",
+                        "snmpv3_privprotocol": "0",
+                        "name": "DNS dnsdist SMF service state",
+                        "applications": [
+                            {
+                                "name": "Service - DNS server"
+                            }
+                        ],
+                        "privatekey": "",
+                        "allowed_hosts": "",
+                        "history": "7"
                     }
                 ],
                 "description": "",
@@ -494,6 +580,36 @@
                 ],
                 "expression": "{t_svc-dns:smf.status[pdns-confd].regexp(online)}=0",
                 "name": "DNS configurator SMF service is in {ITEM.LASTVALUE} state"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "4",
+                "dependencies": [
+                    {
+                        "expression": "{t_svc-dns:smf.status[pdns-dnsdist].regexp(online)}=0",
+                        "name": "DNS dnsdist SMF service is in {ITEM.LASTVALUE} state"
+                    }
+                ],
+                "expression": "{t_svc-dns:proc.num[,,,dnsdist].max(#2)}=0",
+                "name": "DNS dnsdist daemon is not running"
+            },
+            {
+                "status": "0",
+                "description": "",
+                "url": "",
+                "type": "0",
+                "priority": "4",
+                "dependencies": [
+                    {
+                        "expression": "{t_zabbix-agent:agent.ping.nodata(3m)}=1",
+                        "name": "Zabbix agent on {HOST.NAME} is unreachable for 3 minutes"
+                    }
+                ],
+                "expression": "{t_svc-dns:smf.status[pdns-dnsdist].regexp(online)}=0",
+                "name": "DNS dnsdist SMF service is in {ITEM.LASTVALUE} state"
             }
         ]
     }

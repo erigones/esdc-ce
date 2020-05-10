@@ -89,4 +89,5 @@ done
 log "starting PowerDNS services"
 svcadm enable -s pdns
 svcadm enable -s pdns-recursor
+svcadm enable -s pdns-dnsdist
 svcadm enable -s pdns-confd
