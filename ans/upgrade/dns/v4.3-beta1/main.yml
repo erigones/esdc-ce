@@ -56,16 +56,6 @@
         createhome=no
         state=present
 
-- name: Disable pdns services
-  service: 
-    name: '{{ item }}'
-    state: stopped
-    enabled: no
-  with_items:
-      - pdns
-      - pdns-recursor
-      - zabbix-agent
-
 - name: Upgrade /opt/local
   include: "{{ upg_base }}/lib/upgrade_opt_local.yml"
 
@@ -92,6 +82,17 @@
 # it will be enabled by zoneinit script
 - name: Ensure pdns-confd is disabled
   service: name=pdns-confd enabled=no state=stopped
+
+# we have to stop the DNS as late as possible to avoid deadlock by dns outage
+- name: Disable pdns services
+  service:
+    name: '{{ item }}'
+    state: stopped
+    enabled: no
+  with_items:
+      - pdns
+      - pdns-recursor
+      - zabbix-agent
 
 - name: Update new config files and start services
   shell: bash -c 'function log() { return; } && source "{{ item }}"'
