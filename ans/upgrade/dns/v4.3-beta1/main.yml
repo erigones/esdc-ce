@@ -73,6 +73,9 @@
   vars:
     ansible_python_interpreter: /opt/local/bin/python3
 
+- name: Place default dnsdist recurse nets config
+  copy: src="{{ current_task_dir }}/files/50-recursion-subnets.conf" dest=/opt/local/etc/dnsdist.conf.d/50-recursion-subnets.conf owner=pdns-confd group=dnsdist mode=0640
+
 - name: Import pdns-confd SMF manifest
   command: /usr/sbin/svccfg import /opt/local/lib/svc/manifest/pdns-confd.xml
 
