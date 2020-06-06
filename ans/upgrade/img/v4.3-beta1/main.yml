@@ -1,0 +1,70 @@
+---
+# https://github.com/erigones/esdc-ce/issues/400
+
+- set_fact:
+    # new local-esdc-img-v4.3-beta1.txz archive hash:
+    archive_sha256: f8df855c0b61652dcbf6f4635df3b797121385b1aa8270bdcad9b79807047d57
+
+# don't do anything if /opt/local upgrade is going to fail
+- name: Verify available free space
+  include: "{{ upg_base }}/lib/check_free_diskspace.yml"
+
+- name: Upgrade /opt/local
+  include: "{{ upg_base }}/lib/upgrade_opt_local.yml"
+
+# no .git directory, we have to clone it again
+- name: Delete old shipment
+  file:
+    path: /opt/shipment
+    state: absent
+
+- name: Clone shipment source code repository
+  git: repo="https://github.com/erigones/esdc-shipment.git"
+       dest=/opt/shipment
+       version=master
+       accept_hostkey=yes
+
+- name: Place updated shipment config
+  copy: src="{{ current_task_dir }}/files/gunicorn.py" dest=/opt/shipment/etc/gunicorn.py mode=0644
+
+- name: Fix permissions on /opt/shipment/var directories
+  file: path={{ item }}
+        owner=shipment
+        group=shipment
+        state=directory
+        mode=0775
+  with_items:
+    - "/opt/shipment/var/tmp"
+    - "/opt/shipment/var/run"
+    - "/opt/shipment/var/log"
+
+- name: Create python virtualenv
+  pip:
+    chdir: "/opt/shipment"
+    virtualenv: "/opt/shipment/envs"
+    requirements: "/opt/shipment/doc/requirements.txt"
+  vars:
+    ansible_python_interpreter: /opt/local/bin/python3
+
+- name: Restart shipment service
+  service:
+    name: "{{ item }}"
+    enabled: yes
+    state: restarted
+  with_items:
+    - gunicorn:shipment
+    - nginx
+
+- name: Disable zabbix service for reconfiguration
+  service:
+    name: '{{ item }}'
+    state: stopped
+    enabled: no
+  with_items:
+      - zabbix-agent
+
+- name: Update new config files and start services
+  shell: bash -c 'function log() { return; } && source "{{ item }}"'
+  with_items:
+      - /var/zoneinit/includes/21-zabbix.sh
+

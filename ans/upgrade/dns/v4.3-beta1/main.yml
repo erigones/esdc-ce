@@ -23,6 +23,9 @@
 - name: Verify available free space
   include: "{{ upg_base }}/lib/check_free_diskspace.yml"
 
+- name: Update mgmt IP in mdata if needed
+  shell: MD="$(/usr/sbin/mdata-get org.erigones:pgsql_host)" && CF="$(/opt/local/bin/awk -F= '/^gpgsql-host=/ {print $2}' /opt/local/etc/pdns.conf)" && if [ "$MD" != "$CF" ] && [ -n "$CF" ]; then /usr/sbin/mdata-put org.erigones:pgsql_host "${CF}"; fi
+
 - name: Update /var/zoneinit/includes/41-dns.sh
   copy: src="{{ current_task_dir }}/files/41-dns.sh" dest=/var/zoneinit/includes/41-dns.sh owner=root group=root mode=0755
 

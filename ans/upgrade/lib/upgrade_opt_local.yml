@@ -38,7 +38,7 @@
 
 - name: Download new optlocal archive
   get_url: 
-    url: "https://download.erigones.org/esdc/factory/archives/{{ archive_file }}"
+    url: "https://download.danube.cloud/esdc/factory/archives/{{ archive_file }}"
     dest: "{{ upgrade_dir }}/{{ archive_file }}"
     tmp_dest: "{{ upgrade_dir }}/tmp"
     checksum: "sha256:{{ archive_sha256 }}"
