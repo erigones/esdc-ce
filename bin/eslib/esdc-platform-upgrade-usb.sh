@@ -57,7 +57,8 @@ while [[ ${#} -gt 0 ]]; do
 			CURL_AUTH="${1}"
 			;;
 		*)
-			echo "WARNING: Ignoring unknown argument '${1}'"
+			echo "ERROR: Unknown argument '${1}'"
+			exit 10
 			;;
 	esac
 	shift
@@ -117,12 +118,17 @@ if [[ "${LOCAL_UPGRADE}" -ne 1 ]]; then
 		die 0 "Requested ESDC version is already on the USB key. Nothing to do."
 	fi
 
+	if [[ ${WANTED_USB_IMG_VARIANT} =~ -hn-$ ]]; then
+		printmsg "No need for HN image anymore. Switching to CN image to save space."
+		WANTED_USB_IMG_VARIANT="$(echo "${WANTED_USB_IMG_VARIANT}" | sed -e 's/-hn-$/-cn-/')"
+	fi
+
 	printmsg "Downloading new USB image"
 	ESDC_IMG="${WANTED_USB_IMG_VARIANT}${NEW_USB_VER}.img"
 	ESDC_IMG_FULL="${UPG_DIR}/${ESDC_IMG}"
 
 	if [[ "${WANTED_USB_IMG_VARIANT}" == *"-ee-"* ]]; then
-		ESDC_DOWNLOAD_URL="https://download.erigones.com/esdc/usb/${ESDC_IMG}.gz"
+		ESDC_DOWNLOAD_URL="https://download.danube.cloud/esdc/usb/${ESDC_IMG}.gz"
 
 		if [[ -z "${CURL_AUTH}" ]]; then
 			read -p "*** Enter your enterprise edition download username: " -r curl_username
@@ -131,7 +137,7 @@ if [[ "${LOCAL_UPGRADE}" -ne 1 ]]; then
 			CURL_AUTH="${curl_username}:${curl_password}"
 		fi
 	else
-		ESDC_DOWNLOAD_URL="https://download.erigones.org/esdc/usb/stable/${ESDC_IMG}.gz"
+		ESDC_DOWNLOAD_URL="https://download.danube.cloud/esdc/usb/stable/${ESDC_IMG}.gz"
 	fi
 
 	if [[ -n "${CURL_AUTH}" ]]; then
