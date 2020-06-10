@@ -7,20 +7,38 @@
     # directory with the actual upgrade steps:
     upg_dir: "{{ upg_base }}/{{ appliance_type }}"
     versionfile: /etc/esdc.version
+
   tasks:
+  - name: Collect basic info about system
+    setup:
+      gather_subset:
+          - '!all'
+          - '!any'
+          - min
+
+  - name: Run security package upgrade (CentOS only)
+    yum:
+        name: '*'
+        state: latest
+        security: yes
+    when: ansible_distribution == "CentOS"
+
   - name: Extracting current appliance version
     shell: if [ -f "{{ versionfile }}" ]; then cat "{{ versionfile }}"; else echo 'v3.0.0'; fi
     register: appliance_version
+
   - name: Getting list of upgrades
     local_action:
         module: shell
         args: . /opt/erigones/bin/eslib/functions.sh && get_newer_versions_dirs "{{ appliance_version.stdout }}" "{{ upg_dir }}"
     register: upg_subdirs
+
   - include: "{{ upg_base }}/lib/runtasks.yml"
     with_items: "{{ upg_subdirs.stdout.split('\n') }}"
     when: tasklist != ""
     loop_control:
       loop_var: tasklist
+
   handlers:
   - name: sleep 15
     pause: seconds=15
