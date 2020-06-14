@@ -164,7 +164,7 @@
                         "delay_flex": "50/1-7,00:00-24:00",
                         "units": "",
                         "value_type": "3",
-                        "key": "net.dns[127.0.0.1,erigones.com,SOA,1,1]",
+                        "key": "net.dns[127.0.0.1,google.com,SOA,1,1]",
                         "delta": "0",
                         "password": "",
                         "snmpv3_privpassphrase": "",
@@ -518,7 +518,7 @@
                         "name": "Recursive DNS server is not running"
                     }
                 ],
-                "expression": "({TRIGGER.VALUE}=0 and {t_svc-dns:net.dns[127.0.0.1,erigones.com,SOA,1,1].max(#2)}=0 ) or ({TRIGGER.VALUE}=1 and {t_svc-dns:net.dns[127.0.0.1,erigones.com,SOA,1,1].min(#5)}=0)",
+                "expression": "({TRIGGER.VALUE}=0 and {t_svc-dns:net.dns[127.0.0.1,google.com,SOA,1,1].max(#2)}=0 ) or ({TRIGGER.VALUE}=1 and {t_svc-dns:net.dns[127.0.0.1,google.com,SOA,1,1].min(#5)}=0)",
                 "name": "Recursive DNS server is not responding"
             },
             {
