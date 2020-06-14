@@ -1,0 +1,108 @@
+---
+# https://github.com/erigones/esdc-ce/issues/400
+
+- set_fact:
+    pdnsconfd_user: pdns-confd
+    pdnsconfd_group: pdns-confd
+    pdnsconfd_uid: 1002
+    pdnsconfd_gid: 1002
+    pdnsconfd_home: /opt/pdns-confd
+    pdns_group: pdns
+    pdns_recursor_group: pdns-recursor
+    pdnsconfd_shell: /usr/bin/false
+    pdnsconfd_repo: "https://github.com/erigones/pgconfgen.git"
+    dnsdist_user: dnsdist
+    dnsdist_group: dnsdist
+    dnsdist_uid: 1003
+    dnsdist_gid: 1003
+    dnsdist_home: /nonexistent
+    dnsdist_shell: /usr/bin/false
+    archive_sha256: 744d35b63b1acb1bd21bd4afaacf79a2dc63af3a3765afc2a9750a68fd8d12eb
+
+# don't do anything if /opt/local upgrade is going to fail
+- name: Verify available free space
+  include: "{{ upg_base }}/lib/check_free_diskspace.yml"
+
+- name: Update mgmt IP in mdata if needed
+  shell: MD="$(/usr/sbin/mdata-get org.erigones:pgsql_host)" && CF="$(/opt/local/bin/awk -F= '/^gpgsql-host=/ {print $2}' /opt/local/etc/pdns.conf)" && if [ "$MD" != "$CF" ] && [ -n "$CF" ]; then /usr/sbin/mdata-put org.erigones:pgsql_host "${CF}"; fi
+
+- name: Update /var/zoneinit/includes/41-dns.sh
+  copy: src="{{ current_task_dir }}/files/41-dns.sh" dest=/var/zoneinit/includes/41-dns.sh owner=root group=root mode=0755
+
+- name: Create pdns-confd group
+  group: gid={{ pdnsconfd_gid }}
+         name={{ pdnsconfd_group }}
+         state=present
+
+- name: Create dnsdist group
+  group: gid={{ dnsdist_gid }}
+         name={{ dnsdist_group }}
+         state=present
+
+- name: Create pdns-confd user
+  user: uid={{ pdnsconfd_uid }}
+        name={{ pdnsconfd_user }}
+        group={{ pdnsconfd_group }}
+        groups="{{ pdns_group }},{{ pdns_recursor_group }},{{ dnsdist_group }}"
+        home={{ pdnsconfd_home }}
+        shell={{ pdnsconfd_shell }}
+        profile="Primary Administrator"
+        createhome=no
+        state=present
+
+- name: Create dnsdist user
+  user: uid={{ dnsdist_uid }}
+        name={{ dnsdist_user }}
+        group={{ dnsdist_group }}
+        home={{ dnsdist_home }}
+        shell={{ dnsdist_shell }}
+        createhome=no
+        state=present
+
+- name: Upgrade /opt/local
+  include: "{{ upg_base }}/lib/upgrade_opt_local.yml"
+
+- name: Clone pdns-confd source code repository
+  git: repo={{ pdnsconfd_repo }}
+       dest={{ pdnsconfd_home }}
+       version=master
+       accept_hostkey=yes
+
+- name: Create python virtualenv
+  pip:
+    chdir: "{{ pdnsconfd_home }}"
+    virtualenv: "{{ pdnsconfd_home }}/envs"
+    requirements: "{{ pdnsconfd_home }}/requirements.txt"
+  vars:
+    ansible_python_interpreter: /opt/local/bin/python3
+
+- name: Place default dnsdist recurse nets config
+  copy: src="{{ current_task_dir }}/files/50-recursion-subnets.conf" dest=/opt/local/etc/dnsdist.conf.d/50-recursion-subnets.conf owner=pdns-confd group=dnsdist mode=0640
+
+- name: Import pdns-confd SMF manifest
+  command: /usr/sbin/svccfg import /opt/local/lib/svc/manifest/pdns-confd.xml
+
+- name: Import pdns-dnsdist SMF manifest
+  command: /usr/sbin/svccfg import /opt/local/lib/svc/manifest/pdns-dnsdist.xml
+
+# it will be enabled by zoneinit script
+- name: Ensure pdns-confd is disabled
+  service: name=pdns-confd enabled=no state=stopped
+
+# we have to stop the DNS as late as possible to avoid deadlock by dns outage
+- name: Disable pdns services
+  service:
+    name: '{{ item }}'
+    state: stopped
+    enabled: no
+  with_items:
+      - pdns
+      - pdns-recursor
+      - zabbix-agent
+
+- name: Update new config files and start services
+  shell: bash -c 'function log() { return; } && source "{{ item }}"'
+  with_items:
+      - /var/zoneinit/includes/41-dns.sh
+      - /var/zoneinit/includes/21-zabbix.sh
+

@@ -1,0 +1,16 @@
+---
+
+# modifier: set fact "min_free_space" before including this file (default: 2GB)
+
+- name: Check free space
+  shell: df -m /opt | tail -1 | awk '{print $4}'
+  register: free_space_mb
+
+- set_fact:
+    required_diskspace: "{{ min_free_space | default(2000) }}"
+
+- name: Fail if there's too little space for upgrade
+  fail:
+    msg: "No diskspace for upgrade (needed at least {{ required_diskspace }} MB; current: {{ free_space_mb.stdout }} MB). Please increase disk size for VM '{{ inventory_hostname }}' in 'admin' datacenter"
+  when: (free_space_mb.stdout | int) < (required_diskspace | int)
+

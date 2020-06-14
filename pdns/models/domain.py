@@ -3,6 +3,9 @@ from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
+from logging import getLogger
+
+logger = getLogger(__name__)
 
 
 class EmptyDomainOwner(object):
@@ -50,6 +53,8 @@ class Domain(models.Model):
     QServerExclude = Q(name__iendswith='in-addr.arpa')
     _user_model = None  # Cache the User model
     _owner = models.Empty  # Owner (user) object cache
+    pg_notify_channel = 'pdns_notify'
+    pg_notify_payload = 'domains_modified'
 
     MASTER = 'MASTER'
     SLAVE = 'SLAVE'
@@ -218,15 +223,23 @@ class Domain(models.Model):
         """Return lookup_key=value DB pairs which can be used for retrieving objects by log_name value"""
         return {'name': log_name_value}
 
+    @classmethod
+    def send_pg_notify(cls, cursor):
+        logger.info('Sending pg_notify() with channel "%s" and payload "%s"' %
+                (cls.pg_notify_channel, cls.pg_notify_payload))
+        # noinspection SqlDialectInspection,SqlNoDataSourceInspection
+        cursor.execute("select pg_notify('%s', '%s')" % (cls.pg_notify_channel, cls.pg_notify_payload))
+
     # noinspection PyUnusedLocal
-    @staticmethod
-    def post_save_domain(sender, instance, created, **kwargs):
+    @classmethod
+    def post_save_domain(cls, sender, instance, created, **kwargs):
         """Called via signal after domain has been saved to database"""
         if created:
             with connections['pdns'].cursor() as cursor:
                 # noinspection SqlDialectInspection,SqlNoDataSourceInspection
                 cursor.execute("INSERT INTO domainmetadata (domain_id, kind, content) VALUES "
                                "(%s, 'ALLOW-AXFR-FROM', 'AUTO-NS')", [instance.id])
+                cls.send_pg_notify(cursor)
 
     def get_related_dcs(self):
         from vms.models import Dc

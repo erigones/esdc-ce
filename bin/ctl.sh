@@ -68,6 +68,18 @@ update_env() {
 	esac
 }
 
+exec_py() {
+	local py_file="$1"
+	shift
+
+	if [[ ! -x "${py_file}" ]]; then
+		echo "ERROR: File not executable: '${py_file}'"
+		exit 2
+	fi
+
+	"${py_file}" "${@}"
+}
+
 case "${ACTION}" in
 	"clean_envs")
 		virtualenv --relocatable "${ENVS}"
@@ -77,6 +89,12 @@ case "${ACTION}" in
 	;;
 	"init_envs_copy")
 		init_envs "copy"
+	;;
+	"run_raw_py")
+		activate_envs
+		set_django_settings default
+		shift
+		exec_py "${@}"
 	;;
 	*)
 		activate_envs

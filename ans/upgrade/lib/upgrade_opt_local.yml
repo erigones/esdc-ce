@@ -1,0 +1,72 @@
+
+# modifiers:
+#   archive_sha256 - 
+#   target_pkgsrc_ver (e.g. 2019Q4), default: target appliance version (e.g. v4.3-beta2)
+#   - note: the archive with specified version must be present in download location
+
+- set_fact:
+    upgrade_dir: /opt/esdc_upgrade
+    archive_file: "local-esdc-{{ appliance_type }}-{{ target_pkgsrc_ver | default(upgrading_to) }}.txz"
+    keep_backups_count: 2
+    backup_prefix: "local.*"
+
+# generate exclude list from {{keep_backups_count}} last backups and delete the rest
+- name: Delete old backups if exist
+  shell: if [ -d "{{ upgrade_dir }}/backup" ]; then cd "{{ upgrade_dir }}/backup" && gfind . -maxdepth 1 -name "{{ backup_prefix }}" -regextype posix-extended -and \( -not -regex $(find . -maxdepth 1 -name "{{ backup_prefix }}" -exec ls -d1 {} + | tail -2 | xargs | sed -e 's/ /$|/g' -e 's/$/$/') \) -exec rm -rf {} \; -exec echo Deleting {} \; ; fi
+  ignore_errors: true
+
+- name: Ensure "{{ upgrade_dir }}/extracted" does not exist
+  file:
+    path: "{{ upgrade_dir }}/extracted"
+    state: absent
+
+- name: Verify available free space
+  include: "{{ upg_base }}/lib/check_free_diskspace.yml"
+
+- name: Create {{ upgrade_dir }} dir structure
+  file:
+    path: "{{ item }}"
+    owner: root
+    group: root
+    mode: 0750
+    state: directory
+  with_items:
+      - "{{ upgrade_dir }}"
+      - "{{ upgrade_dir }}/tmp"
+      - "{{ upgrade_dir }}/backup"
+      - "{{ upgrade_dir }}/extracted"
+
+- name: Download new optlocal archive
+  get_url: 
+    url: "https://download.danube.cloud/esdc/factory/archives/{{ archive_file }}"
+    dest: "{{ upgrade_dir }}/{{ archive_file }}"
+    tmp_dest: "{{ upgrade_dir }}/tmp"
+    checksum: "sha256:{{ archive_sha256 }}"
+
+- name: Extract the new archive
+  unarchive:
+    remote_src: yes
+    src: "{{ upgrade_dir }}/{{ archive_file }}"
+    dest: "{{ upgrade_dir }}/extracted"
+
+- name: Delete downloaded archive
+  file:
+    path: "{{ upgrade_dir }}/{{ archive_file }}"
+    state: absent
+
+- name: Get current pkgsrc version
+  shell: cat /opt/local/etc/pkgin/repositories.conf | grep -v '^#' | grep joyent.com/packages | awk -F/ '{print $6}'
+  register: current_pkgsrc_ver
+
+- name: Get new pkgsrc version
+  shell: cat "{{ upgrade_dir }}/extracted/local/etc/pkgin/repositories.conf" | grep -v '^#' | grep joyent.com/packages | awk -F/ '{print $6}'
+  register: new_pkgsrc_ver
+
+- name: Clean pkgin cache
+  shell: if [ -f /var/db/pkgin/pkgin.db ]; then mv /var/db/pkgin/pkgin.db /opt/local/pkgin.db; fi; rm -f /var/db/pkgin/pkgin.db /var/db/pkgin/cache/*
+  when: current_pkgsrc_ver.stdout != new_pkgsrc_ver.stdout
+
+- name: Place new /opt/local
+  shell: /bin/mv /opt/local "{{ upgrade_dir }}/backup/local.{{ current_pkgsrc_ver.stdout }}.$(date +%Y%m%d-%H%m%S)" && /bin/mv "{{ upgrade_dir }}/extracted/local" /opt/local
+  when: current_pkgsrc_ver.stdout != new_pkgsrc_ver.stdout
+
