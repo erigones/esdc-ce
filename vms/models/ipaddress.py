@@ -50,6 +50,11 @@ class IPAddress(models.Model):
     def get_ip_address(ipaddr):
         return ipaddress.ip_address(text_type(ipaddr))
 
+    @staticmethod
+    def get_net_address(ipaddr, netmask):
+        """Computes network address from any IP address and netmask"""
+        return text_type(ipaddress.IPv4Network(u'%s/%s' % (ipaddr, netmask), strict=False).network_address)
+
     def is_node_address(self):
         return self.usage == self.NODE
 

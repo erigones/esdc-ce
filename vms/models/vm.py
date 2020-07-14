@@ -1995,14 +1995,24 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
 
         return {dsk['image_uuid'] for dsk in vm_disks if disk_filter(dsk)}
 
-    def get_network_uuids(self):
-        """Return set of network_uuids for currently used/required subnets by this VM"""
+    def get_vm_nics(self):
         vm_nics = self.json_get_nics()
 
         if self.is_deployed():
             vm_nics += self.json_active_get_nics()
 
-        return {nic['network_uuid'] for nic in vm_nics}
+        return vm_nics
+
+    def get_network_uuids(self):
+        """Return set of network_uuids for currently used/required subnets by this VM"""
+        return {nic['network_uuid'] for nic in self.get_vm_nics()}
+
+    def get_nic_config(self, net_uuid):
+        """Return raw nic config for specified network uuid"""
+        for nic in self.get_vm_nics():
+            if nic['network_uuid'] == net_uuid:
+                return nic
+        return None
 
     def is_slave_vm(self):
         """Return True if this a VM object associated with SlaveVM"""
