@@ -1,0 +1,2 @@
+j2cli==0.3.10
+jinja2-base64-filters==0.1.4

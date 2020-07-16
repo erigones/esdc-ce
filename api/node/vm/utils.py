@@ -2,7 +2,7 @@ from logging import getLogger
 
 from django.conf import settings
 
-from vms.models import Vm, VmTemplate, Image, Subnet, IPAddress
+from vms.models import Vm, VmTemplate, Image, Subnet, IPAddress, Dc
 from gui.models import User
 from api.vm.base.utils import vm_update_ipaddress_usage
 from api.vm.define.serializers import VmDefineSerializer, VmDefineNicSerializer
@@ -127,7 +127,49 @@ def vm_from_json(request, task_id, json, dc, owner=settings.ADMIN_USER, template
 
     # subnets
     for net_uuid in vm.get_network_uuids():
-        Subnet.objects.get(uuid=net_uuid, dc=dc)  # May raise Subnet.DoesNotExist
+        if not Subnet.objects.filter(uuid=net_uuid, dc=dc).exists():
+            # VM uses subnet that doesn't exist in database. Let's create it.
+
+            # retrieve nic config for the non-existent network from harvested VM
+            nic = vm.get_nic_config(net_uuid)
+            network = IPAddress.get_net_address(nic['ip'], nic['netmask'])
+
+            logger.warning('VM "%s" uses undefined network "%s/%s" over nic tag "%s". Trying to create it.',
+                           vm.name, network, nic['netmask'], nic['nic_tag'])
+
+            # take the network name from the nic tag
+            net_name = nic['nic_tag']
+            if Subnet.objects.filter(name=net_name).exists():
+                logger.info('Network "%s" already exists, adding number at the end', net_name)
+                net_name_number = 1
+                while net_name_number < 100:
+                    net_name = "%s-%s" % (net_name, net_name_number)
+                    if not Subnet.objects.filter(name=net_name).exists():
+                        # this name doesn't exist, let's use it
+                        break
+                    # if there really exist 99 networks with name "${net_name}-${net_name_number},
+                    # subnet creation will fail
+                    net_name_number += 1
+
+            gateway = None
+            if 'gateway' in nic:
+                gateway = nic['gateway']
+
+            mtu = None
+            if 'mtu' in nic:
+                mtu = nic['mtu']
+
+            # create the network
+            new_network = Subnet(name=net_name, uuid=net_uuid, nic_tag=nic['nic_tag'], mtu=mtu, network=network,
+                       netmask=nic['netmask'], gateway=gateway, owner_id=settings.ADMIN_USER, alias=net_name)
+            new_network.save()
+
+            # attach network to specified dc
+            new_network.dc.add(dc)
+            if dc.name == settings.VMS_DC_ADMIN:
+                # when attaching network to admin DC, attach it also to main dc
+                main_dc = Dc.objects.get(name=settings.VMS_DC_MAIN)
+                new_network.dc.add(main_dc)
 
     # Initialize uptime now
     logger.info(vm.update_uptime(force_init=True))

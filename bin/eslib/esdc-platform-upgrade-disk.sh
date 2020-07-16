@@ -19,14 +19,14 @@ if [[ -z "${PLATFORM_VER}" ]]; then
 	echo "                    your manual changes to any SMF service properties)"
 	echo "  -v                verbose"
 	echo "  -f                force upgrade even when the requested version is already running"
-	echo "  -y                assume \"yes\" as default answer for all questions"
+	echo "  -y                assume \"yes\" as default answer for all questions (e.g. activate new BE)"
 
 	exit 1
 fi
 
 
 # default arguments
-PLATFORM_VERSION_MAP_URL="https://download.erigones.org/esdc/factory/platform/esdc-version-map.json"
+PLATFORM_VERSION_MAP_URL="https://download.danube.cloud/esdc/factory/platform/esdc-version-map.json"
 # curl: 15s conn T/O; allow redirects; 1000s max duration, fail on 404
 CURL_DEFAULT_OPTS="--connect-timeout 15 -L --max-time 1000 -f"
 CURL_QUIET="-s"
@@ -52,7 +52,8 @@ while [[ ${#} -gt 0 ]]; do
 			YES=1
 			;;
 		*)
-			echo "WARNING: Ignoring unknown argument '${1}'"
+			echo "ERROR: Unknown argument '${1}'"
+			exit 10
 			;;
 	esac
 	shift
@@ -235,7 +236,7 @@ DCOS_MNTDIR="${MOUNT_DIR}/dcos"
 PLATFORM_MOUNT_DIR="${MOUNT_DIR}/platform"
 USR_ARCHIVE="${PLATFORM_MOUNT_DIR}/usr.lgz"
 USR_ARCHIVE_MOUNT_DIR="${MOUNT_DIR}/usr"
-PLATFORM_DOWNLOAD_URL="https://download.erigones.org/esdc/factory/platform/platform-${PLATFORM_VER}.tgz"
+PLATFORM_DOWNLOAD_URL="https://download.danube.cloud/esdc/factory/platform/platform-${PLATFORM_VER}.tgz"
 FINISHED_SUCCESSFULLY=0
 ACTIVATE_BE=1
 

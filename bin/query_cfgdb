@@ -133,9 +133,13 @@ out=$("${CURL}" -s -S -X PUT -H "zk-username:${ZK_USERNAME}" -H "zk-password:${Z
 rc_curl="$?"
 
 # Check for curl errors first
-if [[ "${rc_curl}" -ne 0 ]]; then
+if [[ "${rc_curl}" -ne 0 ]] && [[ "${rc_curl}" -ne 56 ]]; then
 	echo "${out}" 1>&2
 	exit "${rc_curl}"
+elif [[ "${rc_curl}" -eq 56 ]]; then
+	# workaround openssl 1.1.1e bug in pkgsrc 2020Q1
+	# https://help.whmcs.com/m/troubleshooting/l/1230985-troubleshooting-curl-error-56-openssl-ssl_read-unexpected-eof-while-reading
+	out="$(echo "${out}" | grep -v '^curl: (56)')"
 fi
 
 # Output must be in JSON format
