@@ -17,7 +17,7 @@
     dnsdist_gid: 1003
     dnsdist_home: /nonexistent
     dnsdist_shell: /usr/bin/false
-    archive_sha256: 744d35b63b1acb1bd21bd4afaacf79a2dc63af3a3765afc2a9750a68fd8d12eb
+    archive_sha256: 0a6d290a9316ffb3ca8c5afdde1d7046c7ff806cacb207fd478e4fc15146b458
 
 # don't do anything if /opt/local upgrade is going to fail
 - name: Verify available free space
