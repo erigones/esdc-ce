@@ -2,8 +2,8 @@
 # https://github.com/erigones/esdc-ce/issues/400
 
 - set_fact:
-    # new local-esdc-img-v4.3-beta1.txz archive hash:
-    archive_sha256: f8df855c0b61652dcbf6f4635df3b797121385b1aa8270bdcad9b79807047d57
+    # new local-esdc-img-v4.3.txz archive hash:
+    archive_sha256: aff2861ac930639a16fd8aa66fc2ff6921883b6b17c15302632e704983d41a89
 
 # don't do anything if /opt/local upgrade is going to fail
 - name: Verify available free space
