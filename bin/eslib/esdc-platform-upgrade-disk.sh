@@ -319,7 +319,7 @@ USR_LOOPDEV="$(lofi_add "${USR_ARCHIVE}")"
 ${MOUNT} -r -F ufs "${USR_LOOPDEV}" "${USR_ARCHIVE_MOUNT_DIR}"
 
 NEW_BE="$(_beadm_get_next_be_name)"
-printmsg "Creating a new boot environment: ${NEW_BE}"
+printmsg "Creating new boot environment: ${NEW_BE}"
 
 if [[ -z "${NEW_BE}" ]]; then
 	die 5 "Cannot determine name of new boot environment"
