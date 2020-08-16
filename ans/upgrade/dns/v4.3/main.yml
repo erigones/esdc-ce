@@ -85,6 +85,37 @@
 - name: Import pdns-dnsdist SMF manifest
   command: /usr/sbin/svccfg import /opt/local/lib/svc/manifest/pdns-dnsdist.xml
 
+- name: Create compat dir structure
+  file:
+    path: "/opt/esdc_upgrade/compat"
+    owner: root
+    group: root
+    mode: 0755
+    state: directory
+  when: ansible_distribution_version < "esdc_20191019T085327Z"
+
+- name: Download newer libc (workaround for old platform)
+  get_url: 
+    url: "https://download.danube.cloud/esdc/factory/archives/libc.so.1-20200715T230801Z"
+    dest: "/opt/esdc_upgrade/compat/libc.so.1"
+    tmp_dest: "{{ upgrade_dir }}/tmp"
+    checksum: "sha256:f6ccf3c30e13284fb3d982eda3157ad43d71e512a7b33c68647a5c9fd7fc9947"
+  when: ansible_distribution_version < "esdc_20191019T085327Z"
+
+- name: Place pdns SMF manifests compatible with older platform
+  copy: src="{{ current_task_dir }}/files/{{ item }}" dest="/opt/local/lib/svc/manifest/{{ item }}" owner=root group=root mode=0644
+  with_items:
+    - pdns.xml
+    - pdns-recursor.xml
+  when: ansible_distribution_version < "esdc_20191019T085327Z"
+
+- name: Import compatible pdns SMF manifest
+  command: /usr/sbin/svccfg import "/opt/local/lib/svc/manifest/{{ item }}"
+  with_items:
+    - pdns.xml
+    - pdns-recursor.xml
+  when: ansible_distribution_version < "esdc_20191019T085327Z"
+
 # it will be enabled by zoneinit script
 - name: Ensure pdns-confd is disabled
   service: name=pdns-confd enabled=no state=stopped
