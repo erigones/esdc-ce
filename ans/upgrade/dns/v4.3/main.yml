@@ -107,6 +107,7 @@
   with_items:
     - pdns.xml
     - pdns-recursor.xml
+    - pdns-dnsdist.xml
   when: ansible_distribution_version < "esdc_20191019T085327Z"
 
 - name: Import compatible pdns SMF manifest
@@ -114,6 +115,7 @@
   with_items:
     - pdns.xml
     - pdns-recursor.xml
+    - pdns-dnsdist.xml
   when: ansible_distribution_version < "esdc_20191019T085327Z"
 
 # it will be enabled by zoneinit script
