@@ -521,7 +521,7 @@ MON_ZABBIX_TEMPLATES_VM = ()  # local, external
 MON_ZABBIX_TEMPLATES_VM_NIC = ()  # local, external
 MON_ZABBIX_TEMPLATES_VM_DISK = ()  # local, external
 MON_ZABBIX_TEMPLATES_VM_MAP_TO_TAGS = False  # local, external
-MON_ZABBIX_TEMPLATES_VM_RESTRICT = True  # local, external
+MON_ZABBIX_TEMPLATES_VM_RESTRICT = False  # local, external
 MON_ZABBIX_TEMPLATES_VM_ALLOWED = ()  # local, external
 
 MON_ZABBIX_HOST_VM_PORT = 10050  # local, external
