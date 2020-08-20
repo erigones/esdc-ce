@@ -11,6 +11,7 @@ Features
 - Add commands `mount-esdc-usb` and `umount-esdc-usb` - `#470 <https://github.com/erigones/esdc-ce/pull/470>`__
 - Generate `answers.json` from every installation - `#142 <https://github.com/erigones/esdc-factory/pull/142>`__
 - Add automatic escaping of multiline metadata in VM properties (GUI) - `#472 <https://github.com/erigones/esdc-ce/pull/472>`__
+- Add links to changelog and release notes to GUI upgrade page - `#496 <https://github.com/erigones/esdc-ce/pull/496>`__
 
 Bugs
 ----
