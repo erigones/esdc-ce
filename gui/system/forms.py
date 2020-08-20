@@ -1,4 +1,5 @@
 from django import forms
+from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
 from gui.forms import SerializerForm
@@ -19,8 +20,12 @@ class UpdateForm(SerializerForm):
 
     version = forms.CharField(label=_('Target version'), required=True,
                               widget=forms.TextInput(attrs={'class': 'input-transparent narrow'}),
-                              help_text=_('Version tag or commit hash to which system should be updated. '
-                                          'NOTE: The version tag is usually prefixed with a "v" character.'))
+                              help_text=mark_safe('Version tag or commit hash to which system should be updated. '
+                                                  '<br>NOTE: The version tag is usually prefixed with a "v" character.'
+                                                  '<br>See <a href="https://github.com/erigones/esdc-ce/blob/master'
+                                                  '/doc/changelog.rst" target="_blank">CHANGELOG</a> and <a '
+                                                  'href="https://github.com/erigones/esdc-ce/wiki/Release-Notes'
+                                                  '" target="_blank">Release notes</a>.'))
     force = forms.BooleanField(label=_('Force update?'), required=False,
                                widget=forms.CheckboxInput(attrs={'class': 'normal-check'}),
                                help_text=_('Force update even though the software is already at selected version.'))
