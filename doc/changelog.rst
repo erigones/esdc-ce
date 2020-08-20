@@ -8,16 +8,26 @@ Released on TBD
 Features
 --------
 
+- Deploy embedded OPNSense image as a router from admin zone during installation - `#486 <https://github.com/erigones/esdc-ce/issues/486>`__
+- Upgrade & redesign PowerDNS service infrastructure - `#400 <https://github.com/erigones/esdc-ce/issues/400>`__
+- Convert HN to CN during USB upgrade - `#485 <https://github.com/erigones/esdc-ce/pull/485>`__
+- Change default value: allow assigning all Zabbix templates to VM - `#493 <https://github.com/erigones/esdc-ce/pull/493>`__
 - Add commands `mount-esdc-usb` and `umount-esdc-usb` - `#470 <https://github.com/erigones/esdc-ce/pull/470>`__
 - Generate `answers.json` from every installation - `#142 <https://github.com/erigones/esdc-factory/pull/142>`__
 - Add automatic escaping of multiline metadata in VM properties (GUI) - `#472 <https://github.com/erigones/esdc-ce/pull/472>`__
 - Add links to changelog and release notes to GUI upgrade page - `#496 <https://github.com/erigones/esdc-ce/pull/496>`__
+- Change all urls to `*.danube.cloud` - `#489 <https://github.com/erigones/esdc-ce/pull/489>`__
+- Create missing networks when harvesting VMs - `#492 <https://github.com/erigones/esdc-ce/pull/492>`__
+- Run security package upgrade on mgmt and mon during DC upgrade - `#aa594c1 <https://github.com/erigones/esdc-ce/commit/524ad05922b096a309fd32447625e6eddfbbd0ba>`__
 
 Bugs
 ----
 
+- Fix kvm-clock clocksource for VMs `#480 <https://github.com/erigones/esdc-ce/issues/480>`__
 - Fix rpm conflict during upgrade on some installations - `#469 <https://github.com/erigones/esdc-ce/issues/469>`__
 - Fix incorrect conversion of newlines in VM metadata (GUI) - `#471 <https://github.com/erigones/esdc-ce/issues/471>`__
+- Various GUI and API fixes towards compatibility with juju tool - `#482 <https://github.com/erigones/esdc-ce/pull/482>`__
+- Fix LD_LIBRARY_PATH in node zabbix agents - `#94f9e3e <https://github.com/erigones/esdc-ce/commit/a4f205d2aa19fd63c6173bd568e6625b44d1fecb>`__
 
 
 4.2
