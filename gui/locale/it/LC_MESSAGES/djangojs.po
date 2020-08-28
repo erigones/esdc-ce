@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Danubecloud\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-01-12 10:06+0000\n"
-"PO-Revision-Date: 2020-08-21 15:32+0200\n"
+"PO-Revision-Date: 2020-08-28 10:01+0200\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -56,12 +56,8 @@ msgid "Socket.io connection problem. Please try again later."
 msgstr "Problema di connessione Socket.io. Per favore riprova più tardi."
 
 #: static/gui/js/gsio.js:375
-msgid ""
-"Your current datacenter was changed by another user session. Please refresh "
-"your browser."
-msgstr ""
-"Il datacenter corrente è stato modificato da un'altra sessione utente. Per "
-"favore, ricarica il browser."
+msgid "Your current datacenter was changed by another user session. Please refresh your browser."
+msgstr "Il datacenter corrente è stato modificato da un'altra sessione utente. Per favore, ricarica il browser."
 
 #: static/gui/js/gsio.js:747
 msgid "Server"
@@ -72,12 +68,8 @@ msgid "changed status to"
 msgstr "stato cambiato in"
 
 #: static/gui/js/gsio.js:800
-msgid ""
-"Your current datacenter was changed. Please log out and log in again or <a "
-"class=\"btn-link\" href=\"/\">navigate to the default page</a>."
-msgstr ""
-"Il tuo attuale data center è stato modificato. Esci e accedi di nuovo oppure "
-"<a class=\"btn-link\" href=\"/\">vai alla pagina predefinita</a>."
+msgid "Your current datacenter was changed. Please log out and log in again or <a class=\"btn-link\" href=\"/\">navigate to the default page</a>."
+msgstr "Il tuo attuale data center è stato modificato. Esci e accedi di nuovo oppure <a class=\"btn-link\" href=\"/\">vai alla pagina predefinita</a>."
 
 #: static/gui/js/gsio.js:893
 msgid "Snapshot successfully created"
@@ -154,32 +146,20 @@ msgstr "Il sistema è stato riavviato. Per favore, ricarica il browser."
 #: static/gui/js/system/maintenance.js:113
 #, javascript-format
 msgid "System update on node %s failed (see task log in the main DC)"
-msgstr ""
-"Aggiornamento del sistema sul nodo %s non riuscito (vedere il registro delle "
-"attività nel DC principale)"
+msgstr "Aggiornamento del sistema sul nodo %s non riuscito (vedere il registro delle attività nel DC principale)"
 
 #: static/gui/js/system/maintenance.js:115
 msgid "System update failed (see task log in the main DC)"
-msgstr ""
-"Aggiornamento del sistema non riuscito (vedere il registro delle attività "
-"nel DC principale)"
+msgstr "Aggiornamento del sistema non riuscito (vedere il registro delle attività nel DC principale)"
 
 #: static/gui/js/system/maintenance.js:119
 #, javascript-format
-msgid ""
-"System update on node %s successfully finished<br>(Please wait for the node "
-"software to be restarted)"
-msgstr ""
-"L'aggiornamento del sistema sul nodo %s è terminato con successo<br> "
-"(attendere il riavvio del software del nodo)"
+msgid "System update on node %s successfully finished<br>(Please wait for the node software to be restarted)"
+msgstr "L'aggiornamento del sistema sul nodo %s è terminato con successo<br> (attendere il riavvio del software del nodo)"
 
 #: static/gui/js/system/maintenance.js:122
-msgid ""
-"System update successfully finished<br>(Please wait for the system software "
-"to be restarted)"
-msgstr ""
-"Aggiornamento del sistema terminato con successo <br> (attendere il riavvio "
-"del software di sistema)"
+msgid "System update successfully finished<br>(Please wait for the system software to be restarted)"
+msgstr "Aggiornamento del sistema terminato con successo <br> (attendere il riavvio del software di sistema)"
 
 #: static/user-guide/_static/doctools.js:191
 msgid "Permalink to this headline"
@@ -206,20 +186,13 @@ msgid "Search Results"
 msgstr "Risultati della ricerca"
 
 #: static/user-guide/_static/searchtools.js:571
-msgid ""
-"Your search did not match any documents. Please make sure that all words are "
-"spelled correctly and that you've selected enough categories."
-msgstr ""
-"La tua ricerca non ha prodotto risultati. Assicurati di aver digitato "
-"correttamente tutte le parole e di aver selezionato un numero sufficiente di "
-"categorie."
+msgid "Your search did not match any documents. Please make sure that all words are spelled correctly and that you've selected enough categories."
+msgstr "La tua ricerca non ha prodotto risultati. Assicurati di aver digitato correttamente tutte le parole e di aver selezionato un numero sufficiente di categorie."
 
 #: static/user-guide/_static/searchtools.js:573
 #, javascript-format
 msgid "Search finished, found %s page(s) matching the search query."
-msgstr ""
-"Ricerca terminata, sono state trovate %s pagine che corrispondono alla query "
-"di ricerca."
+msgstr "Ricerca terminata, sono state trovate %s pagine che corrispondono alla query di ricerca."
 
 #: static/user-guide/_static/searchtools.js:626
 msgid ", in "
