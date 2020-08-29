@@ -15,7 +15,7 @@ if [[ -z "${PLATFORM_VER}" ]]; then
 	echo "Example: $0 20180105T193033Z"
 	echo "Example: $0 platform-20190107T203140Z.tgz"
 	echo "Parameters:"
-	echo "  --keep-smf-db     don't clear SMF database (useful if you don't want to loose"
+	echo "  --keep-smf-db     don't clear SMF database (useful if you don't want to lose"
 	echo "                    your manual changes to any SMF service properties)"
 	echo "  -v                verbose"
 	echo "  -f                force upgrade even when the requested version is already running"
