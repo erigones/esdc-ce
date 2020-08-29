@@ -598,7 +598,7 @@ VMS_IMAGE_IMGADM_CONF = {
 VMS_IMAGE_SOURCES = []
 VMS_IMAGE_LIMIT = None
 VMS_IMAGE_REPOSITORIES = {
-    'danubecloud': 'https://images.danubecloud.org',
+    'danubecloud': 'https://images.danube.cloud',
     'images.joyent.com': 'https://images.joyent.com',
 }
 VMS_ISO_DIR = '/iso'

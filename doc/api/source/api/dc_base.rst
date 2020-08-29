@@ -167,7 +167,7 @@
                     "VMS_ISO_LIMIT": null,
                     "VMS_IMAGE_LIMIT": null,
                     "VMS_IMAGE_REPOSITORIES": {
-                        "danubecloud": "https://images.erigones.org"
+                        "danubecloud": "https://images.danube.cloud"
                     },
                     "VMS_IMAGE_SOURCES": [],
                     "VMS_IMAGE_VM": "15bc0839-c49d-4489-a01b-4570d518fc9f",
