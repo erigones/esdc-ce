@@ -3,7 +3,7 @@ Changelog
 
 4.3
 ===
-Released on TBD
+Released on 2020-08-29
 
 Features
 --------
