@@ -37,7 +37,6 @@ psycopg2==2.7.3.2
 psycogreen==1.0.0
 django-redis-cache==1.7.1
 hiredis==0.2.0
-wsgiref==0.1.2
 django-compressor==2.1.1
 phonenumbers==8.10.6
 django-timezone-field==2.0
