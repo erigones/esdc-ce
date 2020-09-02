@@ -1,5 +1,3 @@
-from types import NoneType
-
 from celery.utils.log import get_task_logger
 from django.utils.six import iteritems, string_types, integer_types, binary_type
 
@@ -8,7 +6,7 @@ from vms.models import Dc, DefaultDc
 
 logger = get_task_logger(__name__)
 
-PRIMITIVES = (float, bool, NoneType, binary_type) + string_types + integer_types
+PRIMITIVES = (float, bool, type(None), binary_type) + string_types + integer_types
 
 
 # noinspection PyAbstractClass

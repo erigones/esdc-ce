@@ -13,7 +13,6 @@ from django.utils.translation import ugettext_noop, ugettext_lazy as _
 from frozendict import frozendict
 from taggit.managers import TaggableManager
 from taggit.models import TaggedItemBase
-from types import NoneType
 from uuid import uuid4, UUID
 
 from vms.utils import SortedPickleDict
@@ -527,7 +526,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
 
         # remove internal_metadata keys with problematic values
         for k, v in _json['internal_metadata'].items():
-            if isinstance(v, (list, tuple, dict, NoneType)):
+            if isinstance(v, (list, tuple, dict, type(None))):
                 del _json['internal_metadata'][k]
 
         if _json['brand'] == 'kvm':

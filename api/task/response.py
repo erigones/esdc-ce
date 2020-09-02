@@ -15,7 +15,6 @@ defined in api.response, namely: BadRequestResponse, OKRequestResponse,
 JSONResponse
 """
 from logging import getLogger
-from types import NoneType
 
 from django.utils.six import string_types, iteritems
 from celery import states
@@ -46,7 +45,7 @@ def to_string(x, quote_string=True):
         return str(x).lower()
     elif isinstance(x, (int, float)):
         return str(x)
-    elif isinstance(x, NoneType):
+    elif isinstance(x, type(None)):
         return 'null'
     elif isinstance(x, dict):
         return to_string(','.join('%s:%s' % (to_string(k, quote_string=False), to_string(v, quote_string=False))
