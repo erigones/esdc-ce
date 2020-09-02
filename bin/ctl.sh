@@ -1,10 +1,5 @@
 #!/bin/bash
 
-if [ -f /opt/rh/python27/enable ]; then
-	# shellcheck disable=SC1091
-	. /opt/rh/python27/enable
-fi
-
 MAINDIR="$(cd "$(dirname "$0")/.." || exit 64 ; pwd -P)"
 ERIGONES_HOME=${ERIGONES_HOME:-"${MAINDIR}"}
 export ERIGONES_HOME
@@ -12,19 +7,20 @@ ENVS="${ERIGONES_HOME}/envs"
 PATH="${ERIGONES_HOME}/bin:/opt/local/bin:/opt/local/sbin:${ENVS}/bin:${PATH}"
 export PATH
 ACTIVATE="${ENVS}/bin/activate"
-PYTHONPATH="${ERIGONES_HOME}:${ERIGONES_HOME}/bin:${ERIGONES_HOME}/envs/lib/python2.7/site-packages:${PYTHONPATH}"
+PYTHONPATH="${ERIGONES_HOME}:${ERIGONES_HOME}/bin:${ERIGONES_HOME}/envs/lib/python3.6/site-packages:${PYTHONPATH}"
 export PYTHONPATH
 MANAGEPY="${ERIGONES_HOME}/bin/manage.py"
 ACTION="$1"
 
 init_envs() {
 	if [ -z "${1}" ]; then
-		virtualenv --python=python2 "${ENVS}"
+		virtualenv --python=python3 "${ENVS}"
 	else
-		virtualenv --python=python2 --always-copy "${ENVS}"
+		virtualenv --python=python3 --always-copy "${ENVS}"
 	fi
 	activate_envs
-	pip2 install -r "${ERIGONES_HOME}/etc/requirements-init.txt"
+	pip install --upgrade pip	
+	pip install -r "${ERIGONES_HOME}/etc/requirements-init.txt"
 }
 
 activate_envs() {
