@@ -240,7 +240,7 @@ def vm_replica_cb(result, task_id, vm_uuid=None, slave_vm_uuid=None):
             esrep_init = jsons[0]
             # New slave VM was successfully created on target node
             # noinspection PyTypeChecker
-            json_active = pickle.loads(base64.decodestring(esrep_init.pop('slave_json')))
+            json_active = pickle.loads(base64.b64decode(esrep_init.pop('slave_json')))
             slave_vm.vm.json = slave_vm.vm.json_active = json_active
             slave_vm.vm.status = Vm.STOPPED
             slave_vm.vm.save(update_fields=('status', 'status_change', 'enc_json', 'enc_json_active', 'changed'))

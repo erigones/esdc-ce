@@ -69,7 +69,7 @@ def validate_ssh_key(value):
         raise ValidationError(_('Invalid SSH public key format (newlines detected).'))
 
     try:
-        data = base64.decodestring(key[1])
+        data = base64.b64decode(key[1])
         int_len = 4
         str_len = struct.unpack('>I', data[:int_len])[0]
 

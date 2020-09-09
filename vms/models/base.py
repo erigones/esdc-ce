@@ -113,7 +113,7 @@ class _PickleModel(models.Model):
     @staticmethod
     def _decode(xdata):
         """Unpickle data from DB and return a PickleDict object"""
-        data = pickle.loads(base64.decodestring(xdata))
+        data = pickle.loads(base64.b64decode(xdata))
         if not isinstance(data, PickleDict):
             data = PickleDict(data)
         return data
@@ -123,7 +123,7 @@ class _PickleModel(models.Model):
         """Pickle a dict object and return data, which can be saved in DB"""
         if not isinstance(xdata, dict):
             raise ValueError('json is not a dict')
-        return base64.encodestring(pickle.dumps(copy.copy(dict(xdata))))
+        return base64.b64encode(pickle.dumps(copy.copy(dict(xdata))))
 
 
 class _JsonPickleModel(_PickleModel):

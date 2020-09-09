@@ -349,7 +349,7 @@ timeout_seconds='60'>
         slave_json = self._vm_get_json(dst_uuid)
 
         if self.pickle:
-            slave_json = base64.encodestring(pickle.dumps(slave_json))
+            slave_json = base64.b64encode(pickle.dumps(slave_json))
 
         return {
             'master': src_uuid,
