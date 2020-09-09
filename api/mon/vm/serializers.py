@@ -46,10 +46,12 @@ class VmMonitoringSerializer(s.InstanceSerializer):
         return attrs
 
     # Allow to use only available templates
-    validate_templates = VmDefineSerializer.validate_monitoring_templates.im_func
+    # XXX: FIXME: breaking ctl.sh runserver
+    # validate_templates = VmDefineSerializer.validate_monitoring_templates.im_func
 
     # Allow to use only available hostgroups
-    validate_hostgroups = VmDefineSerializer.validate_monitoring_hostgroups.im_func
+    # XXX: FIXME: breaking ctl.sh runserver
+    # validate_hostgroups = VmDefineSerializer.validate_monitoring_hostgroups.im_func
 
 
 class NetworkVmMonHistorySerializer(MonHistorySerializer):
