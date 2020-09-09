@@ -478,7 +478,7 @@ def ping(queue, timeout=True, count=1, retry_wait=0.5):
         else:
             if res:
                 for answer in res:
-                    worker, status = answer.items()[0]
+                    worker, status = list(answer.items())[0]
                     if status == {'ok': 'pong'}:
                         pong.append(worker)
                     else:
