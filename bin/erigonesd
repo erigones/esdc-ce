@@ -1,10 +1,5 @@
 #!/bin/bash
 
-if [ -f /opt/rh/python27/enable ]; then
-	# shellcheck disable=SC1091
-	. /opt/rh/python27/enable
-fi
-
 MAINDIR="$(cd "$(dirname "$0")/.." || exit 64; pwd -P)"
 ERIGONES_HOME=${ERIGONES_HOME:-"${MAINDIR}"}
 export ERIGONES_HOME
@@ -23,7 +18,7 @@ else
 	. "${ERIGONES_HOME}/envs/bin/activate"
 fi
 
-PYTHONPATH="${ERIGONES_HOME}:${ERIGONES_HOME}/bin:${ERIGONES_HOME}/envs/lib/python2.7/site-packages:${PYTHONPATH}"
+PYTHONPATH="${ERIGONES_HOME}:${ERIGONES_HOME}/bin:${ERIGONES_HOME}/envs/lib/python3.7/site-packages:${ERIGONES_HOME}/envs/lib/python3.6/site-packages:${PYTHONPATH}"
 export PYTHONPATH
 DJANGO_SETTINGS_MODULE="core.settings"
 export DJANGO_SETTINGS_MODULE

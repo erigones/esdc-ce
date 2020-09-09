@@ -9,7 +9,7 @@
 #
 # Paths
 export ERIGONES_HOME=${ERIGONES_HOME:-"/opt/erigones"}
-export PYTHONPATH=${PYTHONPATH:-"${ERIGONES_HOME}:${ERIGONES_HOME}/envs/lib/python2.7/site-packages"}
+export PYTHONPATH=${PYTHONPATH:-"${ERIGONES_HOME}:${ERIGONES_HOME}/envs/lib/python3.7/site-packages:${ERIGONES_HOME}/envs/lib/python3.6/site-packages"}
 export PATH="${ERIGONES_HOME}/bin:/opt/local/bin:/opt/local/sbin:/opt/local/gcc49/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin"
 export ESLIB="${ESLIB:-"${ERIGONES_HOME}/bin/eslib"}"
 

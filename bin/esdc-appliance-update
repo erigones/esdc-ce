@@ -13,7 +13,7 @@ ANS_BASE="${ERIGONES_HOME}/ans"
 UPG_BASE="${ERIGONES_HOME}/ans/upgrade"
 export ERIGONES_HOME UPG_BASE
 
-PYTHONPATH="${ERIGONES_HOME}:${PYTHONPATH}:${ERIGONES_HOME}/envs/lib/python2.7/site-packages"
+PYTHONPATH="${ERIGONES_HOME}:${PYTHONPATH}:${ERIGONES_HOME}/envs/lib/python3.7/site-packages:${ERIGONES_HOME}/envs/lib/python3.6/site-packages"
 VIRTUAL_ENV="${ERIGONES_HOME}/envs"
 export PYTHONPATH VIRTUAL_ENV
 

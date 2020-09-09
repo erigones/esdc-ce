@@ -7,7 +7,7 @@ ENVS="${ERIGONES_HOME}/envs"
 PATH="${ERIGONES_HOME}/bin:/opt/local/bin:/opt/local/sbin:${ENVS}/bin:${PATH}"
 export PATH
 ACTIVATE="${ENVS}/bin/activate"
-PYTHONPATH="${ERIGONES_HOME}:${ERIGONES_HOME}/bin:${ERIGONES_HOME}/envs/lib/python3.6/site-packages:${PYTHONPATH}"
+PYTHONPATH="${ERIGONES_HOME}:${ERIGONES_HOME}/bin:${ERIGONES_HOME}/envs/lib/python3.7/site-packages:${ERIGONES_HOME}/envs/lib/python3.6/site-packages:${PYTHONPATH}"
 export PYTHONPATH
 MANAGEPY="${ERIGONES_HOME}/bin/manage.py"
 ACTION="$1"
