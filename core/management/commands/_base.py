@@ -80,8 +80,13 @@ class DanubeCloudCommand(BaseCommand):
 
     def get_git_version(self):
         with lcd(self.PROJECT_DIR):
-            _tag = self.local(self.cmd_tag, capture=True).strip().split('/')[-1]
-            _sha = self.local(self.cmd_sha, capture=True).strip()
+            output = self.local(self.cmd_tag, capture=True)
+
+            if isinstance(output, (bytes, bytearray)):
+                output = output.decode("utf-8")
+
+            _tag = output.strip().split('/')[-1]
+            _sha = output.strip()
 
             return _tag, _sha
 
