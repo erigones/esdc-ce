@@ -295,6 +295,9 @@ class DcSettingsSerializer(s.InstanceSerializer):
                                                  help_text=_('Default operating system type. One of: 1 - Linux VM, '
                                                              '2 - SunOS VM, 3 - BSD VM, 4 - Windows VM, '
                                                              '5 - SunOS Zone, 6 - Linux Zone.'))
+    VMS_VM_HVM_TYPE_DEFAULT = s.IntegerChoiceField(label='VMS_VM_HVM_TYPE_DEFAULT', choices=Vm.HVM_TYPE,
+                                                   help_text=_('Default hypervisor type. One of: 1 - KVM, '
+                                                               '2 - Bhyve, 3 - none'))
     VMS_VM_MONITORED_DEFAULT = s.BooleanField(label='VMS_VM_MONITORED_DEFAULT',
                                               help_text=_('Controls whether server synchronization with the monitoring '
                                                           'system is enabled by default.'))
@@ -481,7 +484,7 @@ class DcSettingsSerializer(s.InstanceSerializer):
         global_settings = self.get_global_settings()
 
         if global_settings and not dc.is_default():  # Displaying global settings for non default DC
-            dc1_settings = DefaultDc().settings      # These setting should be read-only and read from default DC
+            dc1_settings = DefaultDc().settings  # These setting should be read-only and read from default DC
             dc_settings = DefAttrDict(dc.custom_settings, defaults=dc1_settings)  # instance
         else:
             dc1_settings = None

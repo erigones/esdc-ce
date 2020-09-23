@@ -298,7 +298,7 @@ class AdminServerSettingsForm(ServerSettingsForm):
             # Disable zone support _only_ when adding new VM (zone must be available in edit mode) - Issue #chili-461
             if not dc_settings.VMS_ZONE_ENABLED:
                 # Remove SunOS Zone support
-                ostype = [i for i in ostype if i[0] not in Vm.ZONE]
+                ostype = [i for i in ostype if i[0] not in Vm.ZONE_OSTYPES]
 
             self.fields['ostype'].choices = ostype
 

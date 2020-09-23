@@ -40,9 +40,28 @@ def get_vm_template(request, data, prefix=''):
     return None
 
 
-def is_kvm(vm, data=None, prefix='', ostype=None, template=None):
+def is_kvm(vm, data=None, prefix='', hvm_type=None, template=None):
     if vm:
-        return vm.is_kvm()
+        return vm.is_hvm()
+
+    if data is not None:
+        hvm_type = data.get(prefix + 'hvm_type', None)
+
+    if hvm_type is None and template:
+        hvm_type = template.vm_define.get('hvm_type', None) or template.hvm_type
+
+    if hvm_type:
+        try:
+            return int(hvm_type) in Vm.HVM
+        except (TypeError, ValueError):
+            pass
+
+    return True
+
+
+def is_hvm(vm, data=None, prefix='', ostype=None, template=None):
+    if vm:
+        return vm.is_hvm()
 
     if data is not None:
         ostype = data.get(prefix + 'ostype', None)
@@ -52,7 +71,7 @@ def is_kvm(vm, data=None, prefix='', ostype=None, template=None):
 
     if ostype:
         try:
-            return int(ostype) in Vm.KVM
+            return int(ostype) in Vm.HVM_OSTYPES
         except (TypeError, ValueError):
             pass
 
@@ -94,6 +113,7 @@ class VmDefineSerializer(VmBaseSerializer):
     hostname = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\.-]+[A-Za-z0-9]$', max_length=128, min_length=4)
     alias = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\.-]+[A-Za-z0-9]$', max_length=24, min_length=4, required=False)
     ostype = s.IntegerChoiceField(choices=Vm.OSTYPE, default=settings.VMS_VM_OSTYPE_DEFAULT)
+    hvm_type = s.IntegerChoiceField(choices=Vm.HVM_TYPE, default=settings.VMS_VM_HVM_TYPE_DEFAULT)
     cpu_type = s.ChoiceField(choices=Vm.CPU_TYPE, default=settings.VMS_VM_CPU_TYPE_DEFAULT)
     vcpus = s.IntegerField(max_value=1024)  # vv (min_value set below)
     ram = s.IntegerField(max_value=1048576, min_value=1)
@@ -146,19 +166,22 @@ class VmDefineSerializer(VmBaseSerializer):
         else:
             vm_template = None
 
-        self._is_kvm = kvm = is_kvm(self.object, data, template=vm_template)
+        self._is_hvm = is_hvm(self.object, data, template=vm_template)
+        kvm = is_kvm(self.object, data, template=vm_template)
 
-        if kvm:
+        if self._is_hvm:
             del self.fields['maintain_resolvers']
             del self.fields['routes']
             del self.fields['dns_domain']
-        else:
+        if not kvm:
+            # these are only KVM properties
             del self.fields['cpu_type']
             del self.fields['vga']
 
         if not kwargs.get('many', False):
             self.fields['owner'].default = request.user.username  # Does not work
             self.fields['ostype'].default = dc_settings.VMS_VM_OSTYPE_DEFAULT
+            self.fields['hvm_type'].default = dc_settings.VMS_VM_HVM_TYPE_DEFAULT
             self.fields['zpool'].default = dc_settings.VMS_STORAGE_DEFAULT
             # noinspection PyProtectedMember
             self.fields['monitored_internal'].default = DefaultDc().settings.MON_ZABBIX_ENABLED \
@@ -196,7 +219,7 @@ class VmDefineSerializer(VmBaseSerializer):
             if kvm:
                 self.fields['vga'].default = dc_settings.VMS_VGA_MODEL_DEFAULT
 
-            if kvm or dc_settings.VMS_VM_CPU_CAP_REQUIRED:
+            if self._is_hvm or dc_settings.VMS_VM_CPU_CAP_REQUIRED:
                 vcpus_min = 1
             else:
                 vcpus_min = 0
@@ -210,7 +233,7 @@ class VmDefineSerializer(VmBaseSerializer):
             self.fields['alias'].default = hostname
 
             # default dns_domain for zones is domain part of hostname
-            if not kvm:
+            if not self._is_hvm:
                 if '.' in hostname:
                     self.fields['dns_domain'].default = hostname.split('.', 1)[-1]
                 else:
@@ -221,8 +244,11 @@ class VmDefineSerializer(VmBaseSerializer):
                 # ostype is in own column
                 if vm_template.ostype is not None:
                     self.fields['ostype'].default = vm_template.ostype
+                if vm_template.hvm_type is not None:
+                    self.fields['hvm_type'].default = vm_template.hvm_type
+
                 # all serializer attributes are in json['vm_define'] object
-                # (also the ostype can be defined here)
+                # (also the ostype and hvm_type can be defined here)
                 for field, value in vm_template.vm_define.items():
                     try:
                         self.fields[field].default = value
@@ -270,6 +296,7 @@ class VmDefineSerializer(VmBaseSerializer):
         # ostype and brand must be set first
         if 'ostype' in data:
             vm.set_ostype(data.pop('ostype'))
+            vm.set_hvm_type(data.pop('hvm_type'))
 
         # Save user data
         for key, val in iteritems(data):
@@ -281,7 +308,7 @@ class VmDefineSerializer(VmBaseSerializer):
                 setattr(vm, key, val)
 
         # Default disk with image for non-global zone
-        if instance is None and not vm.is_kvm() and 'image_uuid' not in vm.json:
+        if instance is None and not vm.is_hvm() and 'image_uuid' not in vm.json:
             vm.save_item('image_uuid', self.zone_img.uuid, save=False)
             vm.save_item('quota', int(round(float(self.zone_img.size) / float(1024))), save=False)
             vm.save_item('zfs_root_compression', self.dc_settings.VMS_DISK_COMPRESSION_DEFAULT, save=False)
@@ -411,7 +438,7 @@ class VmDefineSerializer(VmBaseSerializer):
             if self.object:
                 if self.object.ostype != value:
                     raise s.ValidationError(_('Cannot change ostype.'))
-            elif not is_kvm(self.object, ostype=value):
+            elif not is_hvm(self.object, ostype=value):
                 # Creating zone -> Issue #chili-461 (must be enabled globally and in DC)
                 if not (settings.VMS_ZONE_ENABLED and self.dc_settings.VMS_ZONE_ENABLED):
                     raise s.ValidationError(_('This OS type is not supported.'))
@@ -520,7 +547,7 @@ class VmDefineSerializer(VmBaseSerializer):
                     # Node changed from real node -> always update storage resources associated with old node
                     self.update_storage_resources.extend(list(vm.node.get_node_storages(dc, vm_disks.keys())))
 
-            if self._is_kvm:
+            if self._is_hvm:
                 ram_overhead = settings.VMS_VM_KVM_MEMORY_OVERHEAD
             else:
                 ram_overhead = 0

@@ -19,7 +19,7 @@ from uuid import uuid4, UUID
 from vms.utils import SortedPickleDict
 from vms.models.fields import CommaSeparatedUUIDField
 # noinspection PyProtectedMember
-from vms.models.base import _JsonPickleModel, _StatusModel, _OSType, _UserTasksModel
+from vms.models.base import _JsonPickleModel, _StatusModel, _OSType, _HVMType, _UserTasksModel
 from vms.models.utils import pair_keys_to_items, diff_dict, diff_dict_nested
 from vms.models.dc import Dc
 from vms.models.node import Node
@@ -52,23 +52,31 @@ def is_ip(nic):
     return ip and ip != 'dhcp'
 
 
-class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
+class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
     """
     VM (guest) object.
     """
-    BRAND = (
-        ('kvm', 'kvm'),
-        ('joyent', 'joyent'),
-        ('joyent-minimal', 'joyent-minimal'),
-        ('sngl', 'sngl'),
-        ('lx', 'lx'),
-    )
+    # BRAND = (
+    #     ('hvm', 'hvm'),
+    #     ('kvm', 'kvm'),
+    #     ('bhyve', 'bhyve'),
+    #     ('joyent', 'joyent'),
+    #     ('joyent-minimal', 'joyent-minimal'),
+    #     ('sngl', 'sngl'),
+    #     ('lx', 'lx'),
+    # )
+
+    HVM_TYPE_BRAND = frozendict({
+        _HVMType.Hypervisor_KVM: 'kvm',
+        _HVMType.Hypervisor_BHYVE: 'bhyve',
+        _HVMType.Hypervisor_NONE: 'none',
+    })
 
     OSTYPE_BRAND = frozendict({
-        _OSType.LINUX: 'kvm',
-        _OSType.SUNOS: 'kvm',
-        _OSType.BSD: 'kvm',
-        _OSType.WINDOWS: 'kvm',
+        _OSType.LINUX: 'hvm',
+        _OSType.SUNOS: 'hvm',
+        _OSType.BSD: 'hvm',
+        _OSType.WINDOWS: 'hvm',
         _OSType.SUNOS_ZONE: settings.VMS_VM_BRAND_SUNOS_ZONE_DEFAULT,
         _OSType.LINUX_ZONE: settings.VMS_VM_BRAND_LX_ZONE_DEFAULT,
     })
@@ -215,6 +223,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
     alias = models.CharField(_('User alias'), max_length=24)
     vnc_port = models.IntegerField(_('VNC port'))
     ostype = models.SmallIntegerField(_('Guest OS type'), choices=_OSType.OSTYPE)
+    hvm_type = models.SmallIntegerField(_('Hypervisor type'), choices=_HVMType.HVM_TYPE)
     status = models.SmallIntegerField(_('Status'), choices=STATUS, default=NOTCREATED, db_index=True)
     owner = models.ForeignKey(User, verbose_name=_('Owner'), on_delete=models.PROTECT)
     node = models.ForeignKey(Node, null=True, blank=True, verbose_name=_('Node'))
@@ -329,11 +338,24 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
 
         return hostname
 
+    def set_hvm_type(self, value):
+        """Set HVM type"""
+        self.hvm_type = int(value)
+        brand = self.OSTYPE_BRAND.get(self.ostype, 'hvm')
+        if brand is 'hvm':
+            # 'kvm' here is default of the default:
+            brand_default = self.HVM_TYPE_BRAND.get(settings.VMS_VM_HVM_TYPE_DEFAULT, 'kvm')
+            # choose brand according to hvm_type (not needed for non-hvm as their brands are straightforward)
+            brand = self.HVM_TYPE_BRAND.get(self.hvm_type, brand_default)
+        self.save_item('brand', brand, save=False)
+
     def set_ostype(self, value):
         """Set ostype and brand"""
         self.ostype = int(value)
-        brand = self.OSTYPE_BRAND.get(self.ostype, 'kvm')
-        self.save_item('brand', brand, save=False)
+        brand = self.OSTYPE_BRAND.get(self.ostype, 'hvm')
+        if brand is not 'hvm':
+            # update brand according to ostype
+            self.save_item('brand', brand, save=False)
 
     def set_tags(self, tags):
         """Store tags for save()"""
@@ -711,9 +733,17 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
         except AttributeError:  # Not an image at all
             return False
 
-    def is_kvm(self):
+    def is_hvm(self):
         """Check ostype and return True for KVM"""
-        return self.ostype in self.KVM
+        return self.hvm_type in self.HVM
+
+    def is_kvm(self):
+        """Check hypervisor type and return True for KVM"""
+        return self.hvm_type is _HVMType.Hypervisor_KVM
+
+    def is_bhyve(self):
+        """Check hypervisor type and return True for BHYVE"""
+        return self.hvm_type is _HVMType.Hypervisor_BHYVE
 
     def is_bootable(self):
         """Check if KVM has boot flag or OS zone has an image - bug #chili-418"""

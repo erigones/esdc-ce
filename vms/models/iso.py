@@ -11,7 +11,7 @@ class Iso(_VirtModel, _OSType, _DcMixin, _UserTasksModel):
     """
     ISO Image.
     """
-    OSTYPE = tuple(i for i in _OSType.OSTYPE if i[0] in _OSType.KVM)
+    OSTYPE = tuple(i for i in _OSType.OSTYPE if i[0] in _OSType.HVM_OSTYPES)
 
     ACCESS = (
         (_VirtModel.PUBLIC, _('Public')),

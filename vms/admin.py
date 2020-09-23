@@ -105,7 +105,7 @@ class VmAdmin(admin.ModelAdmin):
     list_display = ('hostname', 'ostype', 'node', 'owner', 'template', 'status', 'status_change', 'dc')
     fieldsets = (
         (None, {
-            'fields': ('uuid', 'hostname', 'alias', 'dc', 'ostype', 'node', 'owner',
+            'fields': ('uuid', 'hostname', 'alias', 'dc', 'ostype', 'hvm_type', 'node', 'owner',
                        'template', 'status', 'vnc_port', 'tags')
         }),
         (_('Status information'), {

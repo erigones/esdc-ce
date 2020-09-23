@@ -9,7 +9,7 @@ import operator
 from functools import reduce
 
 # noinspection PyProtectedMember
-from vms.models.base import _JsonPickleModel, _StatusModel, _UserTasksModel, _OSType
+from vms.models.base import _JsonPickleModel, _StatusModel, _UserTasksModel, _HVMType
 from vms.models.dc import Dc
 from vms.models.storage import Storage, NodeStorage
 from gui.models import User
@@ -692,7 +692,9 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
         else:
             vms = self.vm_set
 
-        vms_count = vms.filter(ostype__in=_OSType.KVM).count()  # FIXME: no index on ostype
+        # XXX: does bhyve brand have memory overhead variable?
+        # vms_count = vms.filter(ostype__in=_OSType.KVM).count()  # FIXME: no index on ostype
+        vms_count = vms.filter(ostype__in=_HVMType.HVM).count()  # FIXME: no index on hvm_type
 
         return vms_count * settings.VMS_VM_KVM_MEMORY_OVERHEAD
 

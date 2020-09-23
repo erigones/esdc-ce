@@ -10,13 +10,13 @@ from vms.utils import PickleDict, FrozenAttrDict
 # noinspection PyProtectedMember
 from vms.mixins import _DcMixin
 # noinspection PyProtectedMember
-from vms.models.base import _VirtModel, _JsonPickleModel, _OSType, _UserTasksModel
+from vms.models.base import _VirtModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel
 from vms.models.vm import Vm
 from vms.models.dc import DefaultDc
 from vms.models.snapshot import Snapshot
 
 
-class Image(_VirtModel, _JsonPickleModel, _OSType, _DcMixin, _UserTasksModel):
+class Image(_VirtModel, _JsonPickleModel, _OSType, _HVMType, _DcMixin, _UserTasksModel):
     """
     VM Image. The json dict will be a imgadm manifest.
     """
@@ -150,7 +150,7 @@ class Image(_VirtModel, _JsonPickleModel, _OSType, _DcMixin, _UserTasksModel):
             if os == cls.OSTYPE2OS[_OSType.SUNOS_ZONE]:  # smartos
                 return _OSType.SUNOS
 
-            os2ostype = {v: k for k, v in cls.OSTYPE2OS.items() if k in cls.KVM}
+            os2ostype = {v: k for k, v in cls.OSTYPE2OS.items() if k in cls.HVM_OSTYPES}
 
             return os2ostype.get(manifest['os'], Image.LINUX)  # fallback for 'other' is Linux
 
@@ -248,7 +248,7 @@ class Image(_VirtModel, _JsonPickleModel, _OSType, _DcMixin, _UserTasksModel):
             'internal': self.access == self.INTERNAL,
         })
 
-        if self.ostype in self.ZONE:
+        if self.ostype in self.ZONE_OSTYPES:
             for i in ('image_size', 'nic_driver', 'disk_driver', 'cpu_type'):
                 try:
                     del manifest[i]

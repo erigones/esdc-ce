@@ -84,7 +84,7 @@ def _save_image(manifest, default_dc, admin_dc):
     tags = manifest.pop('tags', {})
     img.tags = tags.get(Image.TAGS_KEY, [])
     img.deploy = tags.get('deploy', False)
-    img.resize = tags.get('resize', img.ostype in img.ZONE)
+    img.resize = tags.get('resize', img.ostype in img.ZONE_OSTYPES)
     internal = tags.get('internal', False)
 
     if internal:
