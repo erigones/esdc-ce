@@ -1907,7 +1907,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
     def _remove_reserved_mdata_keys(cls, data):
         hide = cls.RESERVED_MDATA_KEYS
 
-        for k in data.keys():
+        for k in list(data):
             if k in hide:
                 del data[k]
 
