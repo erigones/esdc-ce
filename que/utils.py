@@ -62,7 +62,7 @@ def task_id_from_string(user_id, owner_id=None, dummy=False, tt=TT_EXEC, tg=TG_D
     x = str(uuid4())
 
     if dummy:
-        return task_prefix + '-' + hashlib.md5(user_id).hexdigest()[-8:] + x[8:-13]
+        return task_prefix + '-' + hashlib.md5(user_id.encode('utf-8')).hexdigest()[-8:] + x[8:-13]
 
     return task_prefix + '-' + x[:-13]
 
