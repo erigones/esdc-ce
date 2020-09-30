@@ -596,6 +596,10 @@ def get_user_tasks(request, filter_fun=None):
     else:
         tasks = user_tasks.tasklist
 
+    if isinstance(tasks, bytes):
+        # TODO: Check if we need to convert...
+        tasks = tasks.decode()
+
     # Always filter tasks for current datacenter
     dc_id = str(request.dc.id)
     tasks = set([t for t in tasks if dc_id_from_task_id(t) == dc_id])
