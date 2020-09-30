@@ -71,6 +71,9 @@ def task_prefix_from_task_id(task_id):
     """
     Get (user ID, task type, owner ID) tuple from task ID.
     """
+    if isinstance(task_id, bytes):
+        task_id = task_id.decode('utf-8')
+
     tp = RE_TASK_PREFIX.split(task_id[:-24])
     return tuple(tp + DEFAULT_TASK_PREFIX[len(tp):])
 

@@ -33,7 +33,7 @@ def _test_vnc(host, port, timeout=3):
     try:
         sock.connect((host, port))
 
-        if sock.recv(1024).startswith('RFB'):
+        if sock.recv(1024).startswith(b'RFB'):
             return True
     except (socket.error, socket.timeout, socket.herror, socket.gaierror) as err:
         logger.warning('Error "%s" when testing VNC on "%s:%s"', err, host, port)
