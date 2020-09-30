@@ -601,7 +601,7 @@ def get_user_tasks(request, filter_fun=None):
     tasks = set([t for t in tasks if dc_id_from_task_id(t) == dc_id])
 
     if filter_fun:
-        return filter(filter_fun, tasks)
+        return list(filter(filter_fun, tasks))
     else:
         return tasks
 
