@@ -280,7 +280,7 @@ class SerializerForm(forms.Form):
         method = cls._api_method[action]
         logger.info('Calling API view %s %s(%s, data=%s) by user %s in DC %s',
                     method, cls._api_call.__name__, args, data, request.user, request.dc)
-        return call_api_view(request, method, cls._api_call.__func__, *args, data=dict(data), log_response=True)
+        return call_api_view(request, method, cls._api_call, *args, data=dict(data), log_response=True)
 
     def save(self, action=None, args=()):
         # For security reasons you can limit action from view
