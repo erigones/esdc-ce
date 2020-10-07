@@ -1,20 +1,20 @@
-from django.conf.urls import patterns, include, url
+from django.conf.urls import include, url
 from django.views.generic import RedirectView
 from django.conf import settings
+
+from gui.views import cached_javascript_catalog
 
 js_info_dict = {
     'packages': ('gui', 'api'),
 }
 
-urlpatterns = patterns(
-    'gui.views',
-
+urlpatterns = [
     # index redirect to Dashboard
     url(r'^$', RedirectView.as_view(url='servers/', permanent=False)),
     # redirect to user guide (this URL is used in ErigonOS installer)
     url(r'^doc/$', RedirectView.as_view(url='/docs/user-guide/', permanent=False)),
     # Translation for server gsio javascript file
-    url(r'^jsi18n/$', 'cached_javascript_catalog', js_info_dict, name='javascript_catalog'),
+    url(r'^jsi18n/$', cached_javascript_catalog, js_info_dict, name='javascript_catalog'),
     # Registration pages
     url(r'^accounts/', include('gui.accounts.urls')),
     # Profile pages
@@ -34,8 +34,10 @@ urlpatterns = patterns(
     url(r'^monitoring/', include('gui.mon.urls')),
     # Task log
     url(r'^tasklog/', include('gui.tasklog.urls')),
-)
+]
 
 # Support pages
 if settings.SUPPORT_ENABLED:
-    urlpatterns += patterns('', url(r'^support/', include('gui.support.urls')))
+    urlpatterns += [
+        url(r'^support/', include('gui.support.urls'))
+    ]

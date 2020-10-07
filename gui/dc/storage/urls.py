@@ -1,8 +1,8 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
-urlpatterns = patterns(
-    'gui.dc.storage.views',
+from gui.dc.storage.views import dc_storage_form, dc_storage_list
 
-    url(r'^$', 'dc_storage_list', name='dc_storage_list'),
-    url(r'^form/$', 'dc_storage_form', name='dc_storage_form'),
-)
+urlpatterns = [
+    url(r'^$', dc_storage_list, name='dc_storage_list'),
+    url(r'^form/$', dc_storage_form, name='dc_storage_form'),
+]

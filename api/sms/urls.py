@@ -1,7 +1,5 @@
-from django.conf.urls import patterns, url, include
+from django.conf.urls import , url, include
 
-urlpatterns = patterns(
-    'api.sms.views',
-
+urlpatterns = [
     url(r'^smsapi/', include('api.sms.smsapi.urls')),
-)
+]

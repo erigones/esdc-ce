@@ -1,7 +1,7 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
-urlpatterns = patterns(
-    'sio.views',
+from sio.views import socketio
 
-    url(r'^', 'socketio', name='socketio'),
-)
+urlpatterns = [
+    url(r'^', socketio, name='socketio'),
+]

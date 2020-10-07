@@ -1,8 +1,9 @@
-from django.conf.urls import patterns, url, include
+from django.conf.urls import url, include
 from django.conf import settings
 
-urlpatterns = patterns(
-    'api.base.views',
+from api.base.views import api_ping
+
+urlpatterns = [
 
     url(r'^task/', include('api.task.urls')),
     url(r'^accounts/', include('api.accounts.urls')),
@@ -15,14 +16,14 @@ urlpatterns = patterns(
     url(r'^iso/', include('api.iso.urls')),
     url(r'^dc/', include('api.dc.urls')),
     url(r'^system/', include('api.system.urls')),
-    url(r'ping/$', 'api_ping', name='api_ping'),
-)
+    url(r'ping/$', api_ping, name='api_ping'),
+]
 
 if settings.SMS_ENABLED:
-    urlpatterns += patterns('', url(r'^sms/', include('api.sms.urls')))
+    urlpatterns += [url(r'^sms/', include('api.sms.urls'))]
 
 if settings.MON_ZABBIX_ENABLED:
-    urlpatterns += patterns('', url(r'^mon/', include('api.mon.urls')))
+    urlpatterns += [url(r'^mon/', include('api.mon.urls'))]
 
 if settings.DNS_ENABLED:
-    urlpatterns += patterns('', url(r'^dns/', include('api.dns.urls')))
+    urlpatterns += [url(r'^dns/', include('api.dns.urls'))]

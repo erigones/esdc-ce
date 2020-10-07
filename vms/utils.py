@@ -2,7 +2,6 @@ import json
 import re
 import collections
 
-from django.utils.datastructures import SortedDict
 from django.utils.six import iteritems
 from frozendict import frozendict
 
@@ -104,7 +103,7 @@ class PickleDict(dict):
         return None
 
 
-class SortedPickleDict(SortedDict, PickleDict):
+class SortedPickleDict(collections.OrderedDict, PickleDict):
     pass
 
 

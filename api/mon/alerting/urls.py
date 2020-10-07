@@ -1,8 +1,8 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
-urlpatterns = patterns(
-    'api.mon.alerting.views',
+from api.mon.alerting.views import mon_alert_list
 
+urlpatterns = [
     # /mon/alert - get
-    url(r'^', 'mon_alert_list', name='api_mon_alert_list')
-)
+    url(r'^', mon_alert_list, name='api_mon_alert_list')
+]
