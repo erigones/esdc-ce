@@ -4,7 +4,7 @@ from django.utils import six
 
 from openpyxl import load_workbook
 from openpyxl.comments import Comment
-from openpyxl.styles import Style, PatternFill, Font, Color, Border, Side, Alignment
+from openpyxl.styles import NamedStyle, PatternFill, Font, Color, Border, Side, Alignment
 from openpyxl.styles.borders import BORDER_THIN
 
 
@@ -31,7 +31,7 @@ class Excel(object):
             border_bottom = border
         if not border_bottom_style:
             border_bottom_style = border_style
-        return Style(font=Font(name=font, size=size, bold=bold, italic=italic, vertAlign=None, underline=underline,
+        return NamedStyle(font=Font(name=font, size=size, bold=bold, italic=italic, vertAlign=None, underline=underline,
                                strike=strike, color=color),
                      fill=PatternFill(patternType='solid', fgColor=Color(bgcolor)),
                      border=Border(
