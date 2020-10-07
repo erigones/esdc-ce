@@ -14,9 +14,9 @@ ACTION="$1"
 
 init_envs() {
 	if [ -z "${1}" ]; then
-		virtualenv --python=python3 "${ENVS}"
+		virtualenv --python=python3.6 "${ENVS}"
 	else
-		virtualenv --python=python3 --always-copy "${ENVS}"
+		virtualenv --python=python3.6 --always-copy "${ENVS}"
 	fi
 	activate_envs
 	pip install --upgrade pip	
