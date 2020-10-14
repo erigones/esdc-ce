@@ -84,7 +84,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='UserProfile',
             fields=[
-                ('user', models.OneToOneField(primary_key=True, serialize=False, to=settings.AUTH_USER_MODEL)),
+                ('user', models.OneToOneField(primary_key=True, serialize=False, to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
                 ('tos_acceptation', models.BooleanField(default=False, verbose_name='Terms of Service')),
                 ('email_token', models.CharField(max_length=32, verbose_name='Email verification token', blank=True)),
                 ('email_verified', models.BooleanField(default=False, verbose_name='Email verified')),
@@ -134,6 +134,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='usersshkey',
             name='user',
-            field=models.ForeignKey(to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE),
         ),
     ]

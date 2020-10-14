@@ -64,6 +64,7 @@ class User(AbstractBaseUser, PermissionsMixin, _AclMixin, _DcBoundMixin):
         if not self.pk:
             self.new = True
 
+    @property
     def is_authenticated(self):
         return self.is_active
 

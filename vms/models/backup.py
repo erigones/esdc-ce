@@ -40,10 +40,10 @@ class BackupDefine(_VmDiskModel, _ScheduleModel):
     })
 
     # id (implicit), Inherited: disk_id, schedule (property), active (property)
-    vm = models.ForeignKey(Vm, verbose_name=_('Server'))
+    vm = models.ForeignKey(Vm, verbose_name=_('Server'), on_delete=models.CASCADE)
     name = models.CharField(_('Name'), max_length=16)  # User ID
-    node = models.ForeignKey(Node, verbose_name=_('Node'))  # Where?
-    zpool = models.ForeignKey(NodeStorage, verbose_name=_('Zpool'))  # Where?
+    node = models.ForeignKey(Node, verbose_name=_('Node'), on_delete=models.CASCADE)  # Where?
+    zpool = models.ForeignKey(NodeStorage, verbose_name=_('Zpool'), on_delete=models.CASCADE)  # Where?
     type = models.SmallIntegerField(_('Type'), choices=TYPE, default=DATASET)
     desc = models.CharField(_('Description'), max_length=128, blank=True)
     bwlimit = models.IntegerField(_('Bandwidth limit'), blank=True, null=True)  # bytes
@@ -119,7 +119,7 @@ class Backup(_VmDiskModel, _StatusModel, _JsonPickleModel):
     LOCKED = frozenset([PENDING, RESTORE])
 
     # id (implicit), Inherited: status_change, created, changed, json, disk_id
-    dc = models.ForeignKey(Dc, verbose_name=_('Datacenter'))
+    dc = models.ForeignKey(Dc, verbose_name=_('Datacenter'), on_delete=models.CASCADE)
     vm = models.ForeignKey(Vm, verbose_name=_('Server'), null=True, blank=True, on_delete=models.SET_NULL)
     vm_hostname = models.CharField(_('Server hostname'), max_length=128)  # original hostname
     vm_disk_id = models.SmallIntegerField('Array disk ID')  # json disk_id
@@ -130,8 +130,8 @@ class Backup(_VmDiskModel, _StatusModel, _JsonPickleModel):
     file_path = models.CharField(_('File path'), max_length=255, blank=True)
     manifest_path = models.CharField(_('Manifest path'), max_length=255, blank=True)
     checksum = models.CharField(_('Checksum'), max_length=40, blank=True)
-    node = models.ForeignKey(Node, verbose_name=_('Node'))
-    zpool = models.ForeignKey(NodeStorage, verbose_name=_('Zpool'))
+    node = models.ForeignKey(Node, verbose_name=_('Node'), on_delete=models.CASCADE)
+    zpool = models.ForeignKey(NodeStorage, verbose_name=_('Zpool'), on_delete=models.CASCADE)
     type = models.SmallIntegerField(_('Type'), choices=TYPE)
     size = models.BigIntegerField(_('Size'), null=True, blank=True)  # bytes
     time = models.IntegerField(_('Duration'), null=True, blank=True)  # seconds

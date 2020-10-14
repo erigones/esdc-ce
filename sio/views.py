@@ -10,7 +10,7 @@ def socketio(request):
     """
     Starting socket.io connection here.
     """
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         if 'socketio' in request.environ:
             socketio_manage(request.environ, namespaces={'': APINamespace}, request=request)
             try:

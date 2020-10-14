@@ -11,7 +11,7 @@ class UserSSHKey(models.Model):
     """
     User SSH public key.
     """
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(_('Title'), max_length=32)
     fingerprint = models.CharField(_('Fingerprint'), max_length=64, blank=True)
     key = models.TextField(_('Key'))

@@ -99,7 +99,7 @@ class Migration(migrations.Migration):
                 ('ram_free', models.IntegerField(default=0, verbose_name='Free RAM (MB)', editable=False)),
                 ('disk_free', models.IntegerField(default=0, verbose_name='Free disk pool size (MB)', editable=False)),
                 ('strategy', models.SmallIntegerField(default=1, verbose_name='Resource strategy', choices=[(1, 'Shared'), (2, 'Shared with limit'), (3, 'Reserved')])),
-                ('dc', models.ForeignKey(to='vms.Dc')),
+                ('dc', models.ForeignKey(to='vms.Dc', on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'Node',
@@ -111,7 +111,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('domain_id', models.IntegerField(db_index=True)),
-                ('dc', models.ForeignKey(to='vms.Dc')),
+                ('dc', models.ForeignKey(to='vms.Dc', on_delete=models.CASCADE)),
             ],
             options={
                 'db_table': 'vms_domain_dc',
@@ -216,7 +216,7 @@ class Migration(migrations.Migration):
                 ('zpool', models.CharField(max_length=64, verbose_name='Zpool', db_index=True)),
                 ('dc', models.ManyToManyField(to='vms.Dc', verbose_name='Datacenter', blank=True)),
                 ('images', models.ManyToManyField(to='vms.Image', verbose_name='Images', blank=True)),
-                ('node', models.ForeignKey(verbose_name='Compute node', to='vms.Node')),
+                ('node', models.ForeignKey(verbose_name='Compute node', to='vms.Node', on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'Storage',
@@ -267,7 +267,8 @@ class Migration(migrations.Migration):
                 ('desc', models.CharField(max_length=128, verbose_name='Description', blank=True)),
                 ('retention', models.IntegerField(verbose_name='Retention')),
                 ('fsfreeze', models.BooleanField(default=False, verbose_name='Application-Consistent?')),
-                ('periodic_task', models.ForeignKey(blank=True, to='djcelery.PeriodicTask', null=True)),
+                ('periodic_task', models.ForeignKey(blank=True, to='djcelery.PeriodicTask', null=True,
+                                                    on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'Snapshot definition',
@@ -351,8 +352,9 @@ class Migration(migrations.Migration):
                 ('flag', models.SmallIntegerField(default=0, verbose_name='action flag')),
                 ('msg', models.TextField(verbose_name='message')),
                 ('detail', models.TextField(verbose_name='detail', blank=True)),
-                ('content_type', models.ForeignKey(blank=True, to='contenttypes.ContentType', null=True)),
-                ('dc', models.ForeignKey(to='vms.Dc')),
+                ('content_type', models.ForeignKey(blank=True, to='contenttypes.ContentType', null=True,
+                                                   on_delete=models.CASCADE)),
+                ('dc', models.ForeignKey(to='vms.Dc', on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ('-time',),
@@ -378,8 +380,8 @@ class Migration(migrations.Migration):
                 ('enc_json_active', models.TextField(default=b'KGRwMQou\n', editable=False)),
                 ('enc_info', models.TextField(default=b'KGRwMQou\n', editable=False)),
                 ('slave_vms', vms.models.fields.CommaSeparatedUUIDField(default=b'', verbose_name='Slave servers', blank=True)),
-                ('dc', models.ForeignKey(verbose_name='Datacenter', to='vms.Dc')),
-                ('node', models.ForeignKey(verbose_name='Node', blank=True, to='vms.Node', null=True)),
+                ('dc', models.ForeignKey(verbose_name='Datacenter', to='vms.Dc', on_delete=models.CASCADE)),
+                ('node', models.ForeignKey(verbose_name='Node', blank=True, to='vms.Node', null=True, on_delete=models.CASCADE)),
                 ('owner', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, verbose_name='Owner', to=settings.AUTH_USER_MODEL)),
                 ('tags', taggit.managers.TaggableManager(to='taggit.Tag', through='vms.TagVm', blank=True, help_text='A comma-separated list of tags.', verbose_name='Tags')),
             ],
@@ -419,17 +421,17 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='tagvm',
             name='content_object',
-            field=models.ForeignKey(to='vms.Vm'),
+            field=models.ForeignKey(to='vms.Vm', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='tagvm',
             name='tag',
-            field=models.ForeignKey(related_name='vms_tagvm_items', to='taggit.Tag'),
+            field=models.ForeignKey(related_name='vms_tagvm_items', to='taggit.Tag', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='snapshotdefine',
             name='vm',
-            field=models.ForeignKey(verbose_name='Server', to='vms.Vm'),
+            field=models.ForeignKey(verbose_name='Server', to='vms.Vm', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='snapshot',
@@ -439,32 +441,32 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='snapshot',
             name='vm',
-            field=models.ForeignKey(verbose_name='Server', to='vms.Vm'),
+            field=models.ForeignKey(verbose_name='Server', to='vms.Vm', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='snapshot',
             name='zpool',
-            field=models.ForeignKey(verbose_name='Zpool', to='vms.NodeStorage'),
+            field=models.ForeignKey(verbose_name='Zpool', to='vms.NodeStorage', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='slavevm',
             name='master_vm',
-            field=models.ForeignKey(related_name='slave_vm', verbose_name='Master server', to='vms.Vm'),
+            field=models.ForeignKey(related_name='slave_vm', verbose_name='Master server', to='vms.Vm', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='slavevm',
             name='vm',
-            field=models.OneToOneField(to='vms.Vm'),
+            field=models.OneToOneField(to='vms.Vm', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='nodestorage',
             name='storage',
-            field=models.ForeignKey(verbose_name='Storage', to='vms.Storage'),
+            field=models.ForeignKey(verbose_name='Storage', to='vms.Storage', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='ipaddress',
             name='subnet',
-            field=models.ForeignKey(verbose_name='Subnet', to='vms.Subnet'),
+            field=models.ForeignKey(verbose_name='Subnet', to='vms.Subnet', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='ipaddress',
@@ -474,32 +476,32 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='dcnode',
             name='node',
-            field=models.ForeignKey(to='vms.Node'),
+            field=models.ForeignKey(to='vms.Node', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='backupdefine',
             name='node',
-            field=models.ForeignKey(verbose_name='Node', to='vms.Node'),
+            field=models.ForeignKey(verbose_name='Node', to='vms.Node', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='backupdefine',
             name='periodic_task',
-            field=models.ForeignKey(blank=True, to='djcelery.PeriodicTask', null=True),
+            field=models.ForeignKey(blank=True, to='djcelery.PeriodicTask', null=True, on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='backupdefine',
             name='vm',
-            field=models.ForeignKey(verbose_name='Server', to='vms.Vm'),
+            field=models.ForeignKey(verbose_name='Server', to='vms.Vm', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='backupdefine',
             name='zpool',
-            field=models.ForeignKey(verbose_name='Zpool', to='vms.NodeStorage'),
+            field=models.ForeignKey(verbose_name='Zpool', to='vms.NodeStorage', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='backup',
             name='dc',
-            field=models.ForeignKey(verbose_name='Datacenter', to='vms.Dc'),
+            field=models.ForeignKey(verbose_name='Datacenter', to='vms.Dc', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='backup',
@@ -509,7 +511,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='backup',
             name='node',
-            field=models.ForeignKey(verbose_name='Node', to='vms.Node'),
+            field=models.ForeignKey(verbose_name='Node', to='vms.Node', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='backup',
@@ -519,7 +521,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='backup',
             name='zpool',
-            field=models.ForeignKey(verbose_name='Zpool', to='vms.NodeStorage'),
+            field=models.ForeignKey(verbose_name='Zpool', to='vms.NodeStorage', on_delete=models.CASCADE),
         ),
         migrations.AlterUniqueTogether(
             name='vmtemplate',

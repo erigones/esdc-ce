@@ -102,7 +102,7 @@ class APINamespace(BaseNamespace):
     # noinspection PyUnusedLocal
     def on_subscribe(self, *args):
         self.log('Subscribing to que event monitor')
-        if self.request.user.is_authenticated():
+        if self.request.user.is_authenticated:
             self.subscribe()
 
     def get_request(self, method):

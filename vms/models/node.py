@@ -902,8 +902,8 @@ class DcNode(_JsonPickleModel):
     )
 
     # Inherited: json
-    dc = models.ForeignKey('Dc')
-    node = models.ForeignKey('Node')
+    dc = models.ForeignKey('Dc', on_delete=models.CASCADE)
+    node = models.ForeignKey('Node', on_delete=models.CASCADE)
     priority = models.PositiveIntegerField(_('Priority'), default=PRIORITY,
                                            help_text=_('Higher priority means that the automatic node chooser'
                                                        ' will more likely choose this node.'))

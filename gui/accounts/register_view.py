@@ -3,7 +3,7 @@ from django.utils.http import urlsafe_base64_encode
 from django.db import transaction
 from django.views.generic import View
 from django.shortcuts import render, redirect
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 
 from gui.accounts.forms import UserProfileRegisterForm, RegisterForm

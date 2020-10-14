@@ -1,4 +1,4 @@
-from django.contrib.gis.geoip import GeoIP
+from django.contrib.gis.geoip2 import GeoIP2
 from django.utils.translation import get_language
 from django.core.cache import cache
 
@@ -29,7 +29,7 @@ def get_geoip(request):
     Return GeoIP.country dictionary, queried by request IP address.
     """
     ip = get_client_ip(request)
-    geoip = GeoIP()
+    geoip = GeoIP2()
 
     if ip:
         ret = geoip.country(ip)

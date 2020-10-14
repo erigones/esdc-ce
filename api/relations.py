@@ -35,7 +35,7 @@ from __future__ import unicode_literals
 import warnings
 
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from django.core.urlresolvers import resolve, get_script_prefix, NoReverseMatch
+from django.urls import resolve, get_script_prefix, NoReverseMatch
 from django import forms
 from django.db.models.fields import BLANK_CHOICE_DASH
 from django.forms import widgets

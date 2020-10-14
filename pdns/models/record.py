@@ -106,7 +106,7 @@ class Record(models.Model):
     id = models.AutoField(primary_key=True, help_text='This field is used to easily manage the records with this '
                                                       'number as an unique handle.')
     domain = models.ForeignKey(Domain, null=True, default=None, db_column='domain_id', to_field='id',  # Altered in SQL
-                               db_constraint=False,
+                               db_constraint=False, on_delete=models.CASCADE,
                                help_text='This field binds the current record to the unique handle(the id-field) in '
                                          'the domains-table.')
     name = models.CharField(_('Name'), max_length=255, null=True, default=None, db_index=True,

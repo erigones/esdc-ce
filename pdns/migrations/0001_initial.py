@@ -46,7 +46,7 @@ class Migration(migrations.Migration):
                 ('disabled', models.BooleanField(default=False, help_text=b'If set to true, this record is hidden from DNS clients, but can still be modified from the REST API.', verbose_name='Disabled?')),
                 ('ordername', models.CharField(default=None, max_length=255, null=True, verbose_name='Ordername')),
                 ('auth', models.BooleanField(default=True, verbose_name='Auth')),
-                ('domain', models.ForeignKey(db_constraint=False, db_column=b'domain_id', default=None, to='pdns.Domain', help_text=b'This field binds the current record to the unique handle(the id-field) in the domains-table.', null=True)),
+                ('domain', models.ForeignKey(db_constraint=False, db_column=b'domain_id', default=None, to='pdns.Domain', help_text=b'This field binds the current record to the unique handle(the id-field) in the domains-table.', null=True, on_delete=models.CASCADE)),
             ],
             options={
                 'db_table': 'records',

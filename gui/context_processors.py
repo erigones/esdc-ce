@@ -46,7 +46,7 @@ def common_stuff(request):
         'settings': settings,
         'dc_settings': request.dc.settings,
         'dc1_settings': get_dc1_settings(request),
-        'ANALYTICS': None if request.user.is_authenticated() else settings.ANALYTICS,
+        'ANALYTICS': None if request.user.is_authenticated else settings.ANALYTICS,
         'DEBUG': _get_debug_settings(),
         'SOCKETIO_URL': settings.SOCKETIO_URL,
         'THIRD_PARTY_JS': get_third_party_js(),

@@ -15,7 +15,7 @@ class SnapshotDefine(_VmDiskModel, _ScheduleModel):
     Virtual Machine automatic snapshot definition.
     """
     # id (implicit), Inherited: disk_id, schedule (property), active (property)
-    vm = models.ForeignKey(Vm, verbose_name=_('Server'))
+    vm = models.ForeignKey(Vm, verbose_name=_('Server'), on_delete=models.CASCADE)
     name = models.CharField(_('Name'), max_length=16)  # User ID
     desc = models.CharField(_('Description'), max_length=128, blank=True)
     retention = models.IntegerField(_('Retention'))  # max count
@@ -87,13 +87,13 @@ class Snapshot(_StatusModel, _VmDiskModel):
     _cache_status = False  # _StatusModel
 
     # id (implicit), Inherited: status_change, created, changed, disk_id
-    vm = models.ForeignKey(Vm, verbose_name=_('Server'))
+    vm = models.ForeignKey(Vm, verbose_name=_('Server'), on_delete=models.CASCADE)
     define = models.ForeignKey(SnapshotDefine, verbose_name=_('Snapshot definition'), null=True, blank=True,
                                on_delete=models.SET_NULL)
     name = models.CharField(_('Name'), max_length=32)
     type = models.SmallIntegerField(_('Type'), choices=TYPE, default=MANUAL)
     status = models.SmallIntegerField(_('Status'), choices=STATUS)
-    zpool = models.ForeignKey(NodeStorage, verbose_name=_('Zpool'))
+    zpool = models.ForeignKey(NodeStorage, verbose_name=_('Zpool'), on_delete=models.CASCADE)
     size = models.BigIntegerField(_('Size'), null=True, blank=True)  # bytes
     note = models.CharField(_('Note'), max_length=255, blank=True)
     fsfreeze = models.BooleanField(_('Application-Consistent?'), default=False)

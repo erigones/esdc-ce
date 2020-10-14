@@ -85,8 +85,8 @@ def generate_security_hash(random_token, private_key):
     Method for security_hash generation
     """
     mh = hashlib.md5()
-    mh.update(random_token)
-    mh.update(private_key)
+    mh.update(random_token.encode('utf8'))
+    mh.update(private_key.encode('utf8'))
 
     return mh.hexdigest()
 
@@ -163,7 +163,7 @@ class IsAuthenticated(BasePermission):
     Allows access only to authenticated users.
     """
     def has_permission(self, request, view):
-        return request.user and request.user.is_authenticated()
+        return request.user and request.user.is_authenticated
 
 
 class IsAdminUser(BasePermission):
@@ -180,7 +180,7 @@ class IsAuthenticatedOrReadOnly(BasePermission):
     """
 
     def has_permission(self, request, view):
-        return request.method in SAFE_METHODS or request.user and request.user.is_authenticated()
+        return request.method in SAFE_METHODS or request.user and request.user.is_authenticated
 
 
 class HasAPIAccessPermission(BasePermission):

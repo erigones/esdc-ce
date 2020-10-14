@@ -216,7 +216,7 @@ class VmManage(APIView):
         # noinspection PyAugmentAssignment
         if recreate:
             # recreate should be available to every vm owner
-            if not (request.user and request.user.is_authenticated()):
+            if not (request.user and request.user.is_authenticated):
                 raise PermissionDenied
 
             if vm.locked:

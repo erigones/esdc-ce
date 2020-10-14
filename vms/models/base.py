@@ -587,7 +587,7 @@ class _ScheduleModel(models.Model):
     PT = PeriodicTask
     _active = None  # cached enabled attribute
     _schedule = None  # cached crontab entry
-    periodic_task = models.ForeignKey(PT, null=True, blank=True)
+    periodic_task = models.ForeignKey(PT, null=True, blank=True, on_delete=models.CASCADE)
 
     class Meta:
         app_label = 'vms'

@@ -212,7 +212,7 @@ def append(value, item):
     return ''
 
 
-@register.assignment_tag
+@register.simple_tag
 def empty_list():
     return []
 
@@ -227,7 +227,7 @@ def urlfy(value):
     return value.replace('.', '-').lower()
 
 
-@register.assignment_tag
+@register.simple_tag
 def settings(option):
     return getattr(_settings, option, '')
 
@@ -312,7 +312,7 @@ def local_schedule(schedule_or_webdata, tz_name):
     return new_schedule
 
 
-@register.assignment_tag(takes_context=True)
+@register.simple_tag(takes_context=True)
 def is_admin(context, user, dc=None):
     """Check if user is DC admin"""
     return user.is_admin(context['request'], dc=dc)

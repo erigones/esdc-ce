@@ -35,7 +35,7 @@ class UserProfile(models.Model):
     PHONE_PREFIXES = tuple(_tel_prefix_item(prefix) for prefix, val in iteritems(_COUNTRY_CODE_TO_REGION_CODE))
 
     # PK = FK = user
-    user = models.OneToOneField(User, primary_key=True)
+    user = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE)
     # Other fields here
     tos_acceptation = models.BooleanField(_('Terms of Service'), default=False)
     # email is in user model

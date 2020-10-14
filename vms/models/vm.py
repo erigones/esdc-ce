@@ -31,7 +31,7 @@ redis = cache.master_client
 
 
 class TagVm(TaggedItemBase):
-    content_object = models.ForeignKey('vms.Vm')
+    content_object = models.ForeignKey('vms.Vm', on_delete=models.CASCADE)
 
     class Meta:
         app_label = 'vms'
@@ -216,8 +216,8 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
     ostype = models.SmallIntegerField(_('Guest OS type'), choices=_OSType.OSTYPE)
     status = models.SmallIntegerField(_('Status'), choices=STATUS, default=NOTCREATED, db_index=True)
     owner = models.ForeignKey(User, verbose_name=_('Owner'), on_delete=models.PROTECT)
-    node = models.ForeignKey(Node, null=True, blank=True, verbose_name=_('Node'))
-    dc = models.ForeignKey(Dc, verbose_name=_('Datacenter'))
+    node = models.ForeignKey(Node, null=True, blank=True, verbose_name=_('Node'), on_delete=models.CASCADE)
+    dc = models.ForeignKey(Dc, verbose_name=_('Datacenter'), on_delete=models.CASCADE)
     template = models.ForeignKey(VmTemplate, blank=True, null=True, on_delete=models.SET_NULL,
                                  verbose_name=_('Template'))
     uptime = models.IntegerField(_('Aggregated uptime'), default=0, editable=False)

@@ -145,8 +145,8 @@ class NodeStorage(models.Model, _UserTasksModel):
     _dc = None  # Dc object used to simplify API/GUI views
 
     zpool = models.CharField(_('Zpool'), max_length=64, db_index=True)
-    node = models.ForeignKey('vms.Node', verbose_name=_('Compute node'))
-    storage = models.ForeignKey(Storage, verbose_name=_('Storage'))
+    node = models.ForeignKey('vms.Node', on_delete=models.CASCADE, verbose_name=_('Compute node'))
+    storage = models.ForeignKey(Storage, on_delete=models.CASCADE, verbose_name=_('Storage'))
     dc = models.ManyToManyField(Dc, verbose_name=_('Datacenter'), blank=True)
     images = models.ManyToManyField('vms.Image', verbose_name=_('Images'), blank=True)
 

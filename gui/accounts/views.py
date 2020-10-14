@@ -5,9 +5,11 @@ from django.shortcuts import render, redirect
 from django.views.decorators.cache import never_cache
 from django.utils.translation import LANGUAGE_SESSION_KEY, check_for_language, ugettext_lazy as _
 from django.utils.http import is_safe_url, urlsafe_base64_decode
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.views import password_reset, password_reset_confirm, logout_then_login, login as contrib_login
+from django.contrib.auth.views import logout_then_login
+# from django.contrib.auth.views import password_reset, password_reset_confirm, logout_then_login, login as contrib_login
+from django.contrib.auth.views import PasswordResetView, PasswordResetConfirmView, LoginView
 from logging import getLogger
 from functools import partial
 
@@ -285,7 +287,10 @@ def login(request):
     """
     Log users in the system and re-direct them to dashboard or show proper error message when failed.
     """
-    response = contrib_login(request, 'gui/accounts/login.html', authentication_form=partial(LoginForm, request))
+    login_func = LoginView.as_view()
+    response = login_func(request)
+
+    # response = contrib_login(request, 'gui/accounts/login.html', authentication_form=partial(LoginForm, request))
 
     # Setup i18n settings into session
     if request.method == 'POST':

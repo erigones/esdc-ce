@@ -10,6 +10,8 @@ from api.task.utils import is_dummy_task, get_task_status, get_task_result
 from api.task.views import task_status
 from api.utils.request import set_request_method
 
+from gui.middleware import MiddlewareMixin
+
 logger = getLogger(__name__)
 
 ES_STREAM_CLIENT = 'es'
@@ -63,11 +65,14 @@ def task_status_loop(request, response, task_id, stream=None):
         yield response  # is already rendered
 
 
-class APISyncMiddleware(object):
+class APISyncMiddleware(MiddlewareMixin):
     """
     Provide synchronous API. Convert asynchronous responses to synchronous by
     periodically checking task results. Only for HTTP requests to /api/...
     """
+    def __init__(self, get_response):
+        self.get_response = get_response
+
     # noinspection PyMethodMayBeStatic
     def process_view(self, request, view_func, view_args, view_kwargs):
         """

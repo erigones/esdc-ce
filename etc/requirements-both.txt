@@ -11,7 +11,7 @@ amqp==1.4.9
 kombu==3.0.37
 anyjson==0.3.3
 # might want upgrade but can break things
-redis==2.10.6
+redis==3.5.3
 pytz==2018.9
 simplejson==3.16.0
 frozendict==1.2

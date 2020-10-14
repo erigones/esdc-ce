@@ -1144,7 +1144,9 @@ class IPAddressField(RegexField):
         self.strict = kwargs.pop('strict', False)
         if self.strict:
             self.default_validators = (ip_validator,)
-        super(IPAddressField, self).__init__(validators.ipv4_re, *args, **kwargs)
+
+        super(IPAddressField, self).__init__(
+            '^(25[0-5]|2[0-4][0-9]|[0-1]?[0-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9]?[0-9])){3}\Z', *args, **kwargs)
 
 
 class MACAddressField(RegexField):

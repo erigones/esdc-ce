@@ -24,8 +24,9 @@ class SlaveVm(_JsonPickleModel):
         (ON, ugettext_noop('enabled')),
     )
 
-    vm = models.OneToOneField(Vm)
-    master_vm = models.ForeignKey(Vm, related_name='slave_vm', verbose_name=_('Master server'))
+    vm = models.OneToOneField(Vm, on_delete=models.CASCADE)
+    master_vm = models.ForeignKey(Vm, related_name='slave_vm', verbose_name=_('Master server'),
+                                  on_delete=models.CASCADE)
     name = models.CharField(_('Slave name'), max_length=24, blank=True, default='', db_index=True)
     sync_status = models.SmallIntegerField(_('Replication status'), choices=SYNC_STATUS, default=DIS)
     last_sync = models.DateTimeField(_('Last synced'), null=True, blank=True, default=None)

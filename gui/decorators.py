@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.http import HttpResponseBadRequest
 from django.shortcuts import redirect
-from django.core.urlresolvers import reverse
+from django.urls  import reverse
 from django.core.exceptions import PermissionDenied
 
 
@@ -34,7 +34,7 @@ def logout_required(fun):
     to some meaningful page.
     """
     def wrap(request, *args, **kwargs):
-        if request.user and request.user.is_authenticated():
+        if request.user and request.user.is_authenticated:
             return redirect(settings.LOGIN_REDIRECT_URL)
         return fun(request, *args, **kwargs)
     return wrap

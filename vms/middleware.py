@@ -1,14 +1,18 @@
 from logging import getLogger
 
+from gui.middleware import MiddlewareMixin
 from vms.models import Dc, DummyDc
 
 logger = getLogger(__name__)
 
 
-class DcMiddleware(object):
+class DcMiddleware(MiddlewareMixin):
     """
     Attach dc attribute to each request.
     """
+    def __init__(self, get_response):
+        self.get_response = get_response
+
     # noinspection PyMethodMayBeStatic
     def process_request(self, request):
         dc = getattr(request, 'dc', None)
@@ -17,7 +21,7 @@ class DcMiddleware(object):
             if request.path.startswith('/api/'):
                 return  # Managed by ExpireTokenAuthentication and request_data decorator
 
-            if request.user.is_authenticated():
+            if request.user.is_authenticated:
                 # Set request.dc for logged in user
                 request.dc = Dc.objects.get_by_id(request.user.current_dc_id)
                 # Whenever we set a DC we have to set request.dc_user_permissions right after request.dc is available

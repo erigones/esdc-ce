@@ -1,7 +1,7 @@
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import messages
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from logging import getLogger
 
 from api.dc.utils import get_dc, get_dcs

@@ -31,7 +31,7 @@ class IPAddress(models.Model):
     )
 
     ip = models.GenericIPAddressField(_('IP Address'))
-    subnet = models.ForeignKey(Subnet, verbose_name=_('Subnet'))
+    subnet = models.ForeignKey(Subnet, verbose_name=_('Subnet'), on_delete=models.CASCADE)
     vm = models.ForeignKey(Vm, null=True, blank=True, default=None, on_delete=models.SET_NULL, verbose_name=_('Server'))
     vms = models.ManyToManyField(Vm, blank=True, verbose_name=_('Servers'), related_name='allowed_ips')
     usage = models.SmallIntegerField(_('Usage'), choices=USAGE_REAL, default=VM, db_index=True)

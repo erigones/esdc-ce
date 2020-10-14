@@ -152,7 +152,7 @@ class DomainDc(models.Model):
     M2N table for DCs and Domains, because both models are in separate databases.
     This relationship should be in pdns.models.Domain, but the public DNS project does not need it.
     """
-    dc = models.ForeignKey(Dc)
+    dc = models.ForeignKey(Dc, on_delete=models.CASCADE)
     domain_id = models.IntegerField(db_index=True)
 
     class Meta:

@@ -26,5 +26,5 @@ if settings.DEBUG:
         #                                                          'show_indexes': True}),
         url(r'', include('django.contrib.staticfiles.urls')),
         # Django Admin URLs
-        url(r'^' + settings.ADMIN_URL, include(admin.site.urls)),
+        url(r'^' + settings.ADMIN_URL, admin.site.urls),
     ] + urlpatterns

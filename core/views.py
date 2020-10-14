@@ -2,7 +2,7 @@ from django.views import defaults
 from django.http import HttpResponseNotFound, HttpResponseServerError, HttpResponseForbidden
 
 
-def forbidden(request):
+def forbidden(request, exception):
     """
     Custom 403 handler.
     """
@@ -12,7 +12,7 @@ def forbidden(request):
     return defaults.permission_denied(request)
 
 
-def page_not_found(request):
+def page_not_found(request, exception):
     """
     Custom 404 handler.
     """

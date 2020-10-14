@@ -1,9 +1,11 @@
-from django.views.i18n import javascript_catalog
+from django.views.i18n import JavaScriptCatalog
 from django.views.decorators.http import last_modified
 from django.utils import timezone
 
 
 last_modified_date = timezone.now()
+
+javascript_catalog = JavaScriptCatalog.as_view()
 
 
 @last_modified(lambda req, **kw: last_modified_date)

@@ -36,7 +36,7 @@ class TaskLogEntry(models.Model):
     UPDATE = 3
     REMOTE = 4
 
-    dc = models.ForeignKey(Dc)
+    dc = models.ForeignKey(Dc, on_delete=models.CASCADE)
     time = models.DateTimeField(_('time'), db_index=True)
     task = models.CharField(_('task ID'), max_length=64, db_index=True)
     task_type = models.SmallIntegerField(_('task type'), db_index=True, default=0)
@@ -44,7 +44,7 @@ class TaskLogEntry(models.Model):
     user_id = models.IntegerField(_('user ID'))
     username = models.CharField(_('username'), max_length=254)
     owner_id = models.IntegerField(_('owner ID'), db_index=True)
-    content_type = models.ForeignKey(ContentType, null=True, blank=True)
+    content_type = models.ForeignKey(ContentType, null=True, blank=True, on_delete=models.CASCADE)
     content_type_model = models.CharField(_('object type'), max_length=32, blank=True)
     object_pk = models.CharField(_('object ID'), max_length=128, blank=True, db_index=True)
     object_name = models.CharField(_('object name'), max_length=254, blank=True)
