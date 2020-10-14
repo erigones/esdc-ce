@@ -172,7 +172,7 @@ class FastDaemon(_PeriodicTaskDaemon):
         super(FastDaemon, self).start(parent)
         self.vm_status_queue = Queue()
         self.vm_status_watcher = Popen(self.SYSEVENT, bufsize=0, close_fds=True, stdout=PIPE, stderr=STDOUT,
-                                       preexec_fn=os.setsid)
+                                       encoding="utf-8", preexec_fn=os.setsid)
         self.vm_status_monitor_thread = Thread(target=self._vm_status_monitor, name='VMStatusMonitor',
                                                args=(self.vm_status_watcher.stdout,))
         self.vm_status_monitor_thread.daemon = True
