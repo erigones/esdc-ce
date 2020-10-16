@@ -78,7 +78,7 @@ def main():
     file_create.add_argument('-l', '--limit', metavar='BW_LIMIT', type=t_int, help='Bandwidth limit')
     file_create.add_argument('-m', '--metadata', help='VM metadata file storage path', type=t_file)
     file_create.add_argument('-j', '--json', help='VM metadata input json', metavar='JSON', type=JSONFileType())
-    file_create.add_argument('-c', '--compression', metavar='COMPRESSION', choices=('gzip', 'bzip2'),
+    file_create.add_argument('-c', '--compression', metavar='COMPRESSION', choices=('gzip', 'bzip2', 'xz'),
                              help='Compression algorithm')
     file_create.add_argument('-F', '--fsfreeze', metavar='QA_SOCKET', type=t_file,
                              help='Send fsfreeze command to qemu agent socket')
