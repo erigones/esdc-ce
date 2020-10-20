@@ -4,10 +4,10 @@ from api.exceptions import VmIsNotOperational, VmIsLocked, VmHasPendingTasks, Op
 VM_STATUS_OPERATIONAL = frozenset([Vm.NOTCREATED, Vm.RUNNING, Vm.STOPPED, Vm.STOPPING])
 
 
-def is_vm_kvm(fun):
+def is_vm_hvm(fun):
     """Decorator for checking if VM is KVM"""
     def wrap(view, vm, *args, **kwargs):
-        if not vm.is_kvm():
+        if not vm.is_hvm():
             raise OperationNotSupported
         return fun(view, vm, *args, **kwargs)
     return wrap

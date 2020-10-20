@@ -136,7 +136,7 @@
   </div>
   <div class="modal-footer">
     <div class="inner-well">
-      {% if vm.is_kvm %}<span class="pull-left"><a class="vm_modal_more btn btn-small btn-inverse no-ajax">{% trans "Show advanced settings" %}</a></span>{% endif %}
+      {% if vm.is_hvm %}<span class="pull-left"><a class="vm_modal_more btn btn-small btn-inverse no-ajax">{% trans "Show advanced settings" %}</a></span>{% endif %}
       <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
       <a class="vm_modal_create button green no-ajax" data-enter="true">{% trans "Create definition" %}</a>
     </div>
@@ -156,7 +156,7 @@
   </div>
   <div class="modal-footer">
     <div class="inner-well">
-      {% if vm.is_kvm %}<span class="pull-left"><a class="vm_modal_more btn btn-small btn-inverse no-ajax">{% trans "Show advanced settings" %}</a></span>{% endif %}
+      {% if vm.is_hvm %}<span class="pull-left"><a class="vm_modal_more btn btn-small btn-inverse no-ajax">{% trans "Show advanced settings" %}</a></span>{% endif %}
       <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
       <a class="vm_modal_update button green no-ajax" data-enter="true">{% trans "Update definition" %}</a>
       <a class="vm_modal_delete button red no-ajax">{% trans "Delete definition" %}</a>

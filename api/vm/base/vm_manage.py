@@ -45,7 +45,7 @@ class VmManage(APIView):
     def fix_create(vm):
         """SmartOS issue. If a image_uuid is specified then size should be omitted, which is done in vm.fix_json(),
         so run this one before vm.fix_json() to create a command for changing zvol volsize."""
-        if not vm.is_kvm():
+        if not vm.is_hvm():
             return ''
 
         cmd = ''
@@ -203,7 +203,7 @@ class VmManage(APIView):
         if not ser.is_valid():
             return FailureTaskResponse(request, ser.errors, vm=vm)
 
-        if not vm.is_kvm():
+        if not vm.is_hvm():
             if not (vm.dc.settings.VMS_VM_SSH_KEYS_DEFAULT or vm.owner.usersshkey_set.exists()):
                 raise PreconditionRequired('VM owner has no SSH keys available')
 

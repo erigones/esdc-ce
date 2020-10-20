@@ -126,7 +126,7 @@ class VmSnapshot(APIView):
         if not ser.is_valid():
             return FailureTaskResponse(request, ser.errors, vm=vm)
 
-        if vm.is_kvm() and self.data.get('fsfreeze', False):
+        if vm.is_hvm() and self.data.get('fsfreeze', False):
             qga_socket = vm.qga_socket_path
 
             if qga_socket:

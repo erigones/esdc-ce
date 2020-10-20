@@ -57,7 +57,7 @@ def vm_migrate_cb(result, task_id, vm_uuid=None, slave_vm_uuid=None):
         if changing_node:
             vm.set_node(node)
 
-            if vm.is_kvm():
+            if vm.is_hvm():
                 # The VNC port was changed during migration
                 vm.vnc_port = json_active['vnc_port']
                 assert ghost_vm.vm.vnc_port == vm.vnc_port

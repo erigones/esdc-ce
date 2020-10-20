@@ -25,5 +25,5 @@
   </div>
 </div>
 {% endwith %}
-{% if snapform.fsfreeze and vm.is_kvm %}{% include "gui/form_field_checkbox.html" with field=snapform.fsfreeze %}{% endif %}
+{% if snapform.fsfreeze and vm.is_hvm %}{% include "gui/form_field_checkbox.html" with field=snapform.fsfreeze %}{% endif %}
 {% include "gui/form_field.html" with field=snapform.note class="thin" %}

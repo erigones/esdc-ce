@@ -95,7 +95,7 @@ class SnapshotDefineSerializer(s.InstanceSerializer):
             self.fields['retention'].validators.append(validators.MinValueValidator(min_count))
             self.fields['retention'].validators.append(validators.MaxValueValidator(max_count))
 
-            if instance.vm.is_kvm():
+            if instance.vm.is_hvm():
                 self._update_fields_ = list(self._update_fields_)
                 self._update_fields_.append('fsfreeze')
 

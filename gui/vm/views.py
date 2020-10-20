@@ -85,7 +85,7 @@ def details(request, hostname):
     else:
         context['slave_vm'] = None
 
-    if vm.is_kvm():
+    if vm.is_hvm():
         context['iso_images'] = get_iso_images(request, vm.ostype)
 
     if vm.ostype == Vm.WINDOWS:
@@ -259,7 +259,7 @@ def monitoring(request, hostname, graph_type='cpu'):
             (Graph('net-bandwidth', nic_id=i), Graph('net-packets', nic_id=i)) for i in nics
         ]))
     elif graph_type == 'disk':
-        if vm.is_kvm():
+        if vm.is_hvm():
             prefix = 'disk'
         else:
             prefix = 'fs'

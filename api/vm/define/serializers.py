@@ -420,7 +420,7 @@ class VmDefineSerializer(VmBaseSerializer):
                     return attrs
                 if self.object.is_deployed():
                     raise s.ValidationError(_('Cannot change zpool.'))
-                if not self.object.is_kvm():
+                if not self.object.is_hvm():
                     raise s.ValidationError(_('Cannot change zpool for this OS type. '
                                               'Please change it on the first disk.'))
 
@@ -724,10 +724,10 @@ class _VmDefineDiskSerializer(s.Serializer):
                     self.img_error = True  # this should be stopped by default validate_image
                 else:
                     self.fields['size'].default = self.img.size
-                    if vm.is_kvm():
+                    if vm.is_hvm():
                         self.fields['refreservation'].default = self.img.size
 
-            if vm.is_kvm() and data is not None and 'size' in data:
+            if vm.is_hvm() and data is not None and 'size' in data:
                 self.fields['refreservation'].default = data['size']
 
             if self.disk_id == 0:
@@ -775,7 +775,7 @@ class _VmDefineDiskSerializer(s.Serializer):
                 data['image_uuid'] = str(self.img.uuid)
                 data['image_size'] = self.img.size  # needed for valid json
 
-                if self.vm.is_kvm():
+                if self.vm.is_hvm():
                     data.pop('block_size', None)  # block size is inherited from the image
             else:  # remove image from json
                 data.pop('image_uuid', None)
@@ -918,7 +918,7 @@ class _VmDefineDiskSerializer(s.Serializer):
         except KeyError:
             zpool = self.object['zpool']
 
-        if self.vm.is_kvm() and self.img:  # always check size if image
+        if self.vm.is_hvm() and self.img:  # always check size if image
             if not self.img.resize and size != self.img.size:
                 self._errors['size'] = s.ErrorList([_('Cannot define disk size other than image size (%s), '
                                                       'because image does not support resizing.') % self.img.size])
@@ -939,7 +939,7 @@ class _VmDefineDiskSerializer(s.Serializer):
                         self._errors['image'] = s.ErrorList([_('Disk image requires specific disk '
                                                                'model (%s).') % img_disk_driver])
 
-        if self.vm.is_kvm():
+        if self.vm.is_hvm():
             try:
                 refreservation = attrs['refreservation']
             except KeyError:  # self.object must exist here (PUT)
@@ -954,7 +954,7 @@ class _VmDefineDiskSerializer(s.Serializer):
             if refreservation > size:
                 self._errors['refreservation'] = s.ErrorList([_('Cannot define refreservation larger than disk size.')])
 
-        if not self._errors and (size_change or self.zpool_changed) and (self.vm.is_kvm() or self.disk_id == 0):
+        if not self._errors and (size_change or self.zpool_changed) and (self.vm.is_hvm() or self.disk_id == 0):
             self.validate_storage_resources(zpool, size)
 
         return attrs
@@ -1037,7 +1037,7 @@ class ZVmDefineDiskSerializer(_VmDefineDiskSerializer):
 
 # noinspection PyPep8Naming
 def VmDefineDiskSerializer(request, vm, *args, **kwargs):
-    if vm.is_kvm():
+    if vm.is_hvm():
         return KVmDefineDiskSerializer(request, vm, *args, **kwargs)
     else:
         return ZVmDefineDiskSerializer(request, vm, *args, **kwargs)

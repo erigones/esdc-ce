@@ -26,7 +26,7 @@
 
 {% block base_nav %}{% include "gui/vm/navigation.html" with li_details="active" %}{% endblock %}
 
-{% block base_content %}{% with json=vm.json alias=vm.alias is_kvm=vm.is_kvm vm_locked=vm.locked|lower %}
+{% block base_content %}{% with json=vm.json alias=vm.alias is_hvm=vm.is_hvm vm_locked=vm.locked|lower %}
   {% include "gui/mdata_template.html" %}
 
   {% include "gui/vm/stop_or_reboot_modal.html" %}
@@ -49,7 +49,7 @@
     </div>
   </div>
 
-  {% if is_kvm %}{% if can_edit or not vm.is_installed %}
+  {% if is_hvm %}{% if can_edit or not vm.is_installed %}
     <div id="vm_startcd_modal" class="black-box modal hide fade vm_modal" data-last_cdimage="{{ vm.last_cdimage|default_if_none:"" }}">
       <div class="modal-head tab-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -165,7 +165,7 @@
     </div>
   </div>
 
-  <div id="vm_disk_settings_modal" class="black-box modal hide fade vm_modal" data-is_kvm="{% if is_kvm %}true{% endif %}">
+  <div id="vm_disk_settings_modal" class="black-box modal hide fade vm_modal" data-is_kvm="{% if is_hvm %}true{% endif %}">
     <div class="modal-head tab-header">
       <button type="button" class="close" data-dismiss="modal">&times;</button>
       <span class="title_edit"><i class="icon-save"></i> {% trans "Change Disk Settings" %}</span>
@@ -396,8 +396,8 @@
 
                 <div class="vm_control vm_control_{{ vm.hostname }}" data-vm_locked='{{ vm_locked }}'>
                   <a href="#" id="vm_start__{{ vm.hostname }}" class="button gray no-ajax" title="{% trans "Immediately start a stopped server" %}" data-toggle="tooltip" data-placement="top"><i class="icon-play"></i> {% trans "Start" %}</a>
-                  <a href="#" id="vm_reboot__{{ vm.hostname }}" class="button gray no-ajax" data-modal_text="{% trans "<i>Reboot</i> will send a reboot ACPI signal into the server, which initiates a reboot process." %}{% if vm.is_kvm %} {% trans "In case the reboot process takes longer than the <a class='button mini black no-ajax' id='btn_stop_timeout_period'>timeout period</a> (e.g. there is no ACPI daemon) a Force Reboot will take place." %}{% endif %}" data-modal_force_text="{% trans "<i>Force Reboot</i> will <strong>immediately reboot</strong> the server." %}<br><br>If there is a pending configuration <i>update</i>, the server will be stopped first, then the server configuration on compute node will be updated, and finally the server will start." data-modal_yes_text="{% trans "Reboot" %}" data-modal_yes_force_text="{% trans "Force Reboot" %}" data-modal_title="{% trans "Reboot Server" %}" data-modal_nohide="true" title="{% trans "You can choose to forcefully reboot the server or to send a reboot ACPI signal into the system" %}" data-toggle="tooltip" data-placement="top"><i class="icon-refresh"></i> {% trans "Reboot" %}</a>
-                  <a href="#" id="vm_stop__{{ vm.hostname }}" class="button gray no-ajax" data-modal_text="{% trans "<i>Shutdown</i> will send a shutdown ACPI signal into the server, which initiates a shutdown process." %}{% if vm.is_kvm %} {% trans "In case the shutdown process takes longer than the <a class='button mini black no-ajax' id='btn_stop_timeout_period'>timeout period</a> (e.g. there is no ACPI daemon) a Force Shutdown will take place." %}{% endif %}" data-modal_force_text="{% trans "<i>Force shutdown</i> will <strong>immediately power off</strong> the server." %}" data-modal_yes_text="{% trans "Shutdown" %}" data-modal_yes_force_text="{% trans "Force Shutdown" %}" data-modal_title="{% trans "Stop Server" %}" data-modal_nohide="true" title="{% trans "You can choose to forcefully shutdown the server or to send a shutdown ACPI signal into the system" %}" data-toggle="tooltip" data-placement="top"><i class="icon-stop"></i> {% trans "Stop" %}</a>
+                  <a href="#" id="vm_reboot__{{ vm.hostname }}" class="button gray no-ajax" data-modal_text="{% trans "<i>Reboot</i> will send a reboot ACPI signal into the server, which initiates a reboot process." %}{% if vm.is_hvm %} {% trans "In case the reboot process takes longer than the <a class='button mini black no-ajax' id='btn_stop_timeout_period'>timeout period</a> (e.g. there is no ACPI daemon) a Force Reboot will take place." %}{% endif %}" data-modal_force_text="{% trans "<i>Force Reboot</i> will <strong>immediately reboot</strong> the server." %}<br><br>If there is a pending configuration <i>update</i>, the server will be stopped first, then the server configuration on compute node will be updated, and finally the server will start." data-modal_yes_text="{% trans "Reboot" %}" data-modal_yes_force_text="{% trans "Force Reboot" %}" data-modal_title="{% trans "Reboot Server" %}" data-modal_nohide="true" title="{% trans "You can choose to forcefully reboot the server or to send a reboot ACPI signal into the system" %}" data-toggle="tooltip" data-placement="top"><i class="icon-refresh"></i> {% trans "Reboot" %}</a>
+                  <a href="#" id="vm_stop__{{ vm.hostname }}" class="button gray no-ajax" data-modal_text="{% trans "<i>Shutdown</i> will send a shutdown ACPI signal into the server, which initiates a shutdown process." %}{% if vm.is_hvm %} {% trans "In case the shutdown process takes longer than the <a class='button mini black no-ajax' id='btn_stop_timeout_period'>timeout period</a> (e.g. there is no ACPI daemon) a Force Shutdown will take place." %}{% endif %}" data-modal_force_text="{% trans "<i>Force shutdown</i> will <strong>immediately power off</strong> the server." %}" data-modal_yes_text="{% trans "Shutdown" %}" data-modal_yes_force_text="{% trans "Force Shutdown" %}" data-modal_title="{% trans "Stop Server" %}" data-modal_nohide="true" title="{% trans "You can choose to forcefully shutdown the server or to send a shutdown ACPI signal into the system" %}" data-toggle="tooltip" data-placement="top"><i class="icon-stop"></i> {% trans "Stop" %}</a>
                   {% if is_kvm %}{% if can_edit or not vm.is_installed %}
                     <a href="#" id="vm_startcd__{{ vm.hostname }}" class="button gray no-ajax" title="{% trans "Boot server from ISO image" %}" data-toggle="tooltip" data-placement="top"><i class="icon-play-circle"></i> {% trans "Boot CD" %}</a>
                   {% else %}
@@ -414,7 +414,7 @@
                     <a href="#" id="vm_delete__{{ vm.hostname }}" class="button gray no-ajax" data-confirm="{% trans "Are you sure that you want to delete the server definition from the inventory?" %}" title="{% trans "Remove server definition from inventory" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-remove"></i> {% trans "Delete" %}</a>
                     <a href="#" id="vm_destroy__{{ vm.hostname }}" class="button gray no-ajax" data-modal_nohide="true" data-modal_text="{% trans "<i>Destroy</i> will <strong>completely delete the server and its snapshots</strong> from the compute node. <strong>All your data will be lost!</strong>" %}" data-modal_yes_text="{% trans "Destroy" %}" data-modal_yes_force_text="{% blocktrans %}Really destroy {{ alias }}{% endblocktrans %}" data-modal_confirm_text="{% trans "Are you sure that you want completely delete your server data?" %}" title="{% trans "Delete server and its data from compute node. Use with caution!" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-remove"></i> {% trans "Destroy" %}</a>
                     {% comment %}
-                    <a href="#" id="vm_freeze__{{ vm.hostname }}" class="button gray no-ajax" data-modal_text="{% trans "<i>Freeze</i> will send a shutdown signal into the server, which can initiate a shutdown process." %}{% if vm.is_kvm %} {% trans "In case the shutdown process takes longer than the <a class='button mini black no-ajax' id='btn_stop_timeout_period'>timeout period</a> a Force Shutdown will take place." %}{% endif %}" data-modal_force_text="{% trans "<i>Force Freeze</i> will <strong>immediately power off</strong> the server.<br><br>After the shutdown process is completed the server status will be set to <strong>frozen</strong>." %}" data-modal_yes_text="{% trans "Freeze" %}" data-modal_yes_force_text="{% trans "Force Freeze" %}" data-modal_title="{% trans "Shutdown and freeze Server" %}" data-modal_nohide="true" title="{% trans "Shutdown the server and set its status to frozen" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-ban-circle"></i> {% trans "Freeze" %}</a>
+                    <a href="#" id="vm_freeze__{{ vm.hostname }}" class="button gray no-ajax" data-modal_text="{% trans "<i>Freeze</i> will send a shutdown signal into the server, which can initiate a shutdown process." %}{% if vm.is_hvm %} {% trans "In case the shutdown process takes longer than the <a class='button mini black no-ajax' id='btn_stop_timeout_period'>timeout period</a> a Force Shutdown will take place." %}{% endif %}" data-modal_force_text="{% trans "<i>Force Freeze</i> will <strong>immediately power off</strong> the server.<br><br>After the shutdown process is completed the server status will be set to <strong>frozen</strong>." %}" data-modal_yes_text="{% trans "Freeze" %}" data-modal_yes_force_text="{% trans "Force Freeze" %}" data-modal_title="{% trans "Shutdown and freeze Server" %}" data-modal_nohide="true" title="{% trans "Shutdown the server and set its status to frozen" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-ban-circle"></i> {% trans "Freeze" %}</a>
                     <a href="#" id="vm_unfreeze__{{ vm.hostname }}" class="button gray no-ajax" title="{% trans "Remove frozen server status" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-ok-circle"></i> {% trans "Unfreeze" %}</a>
                     {% endcomment %}
                     <a href="#" id="vm_migrate__{{ vm.hostname }}" class="button gray no-ajax" data-modal_nohide="true" title="{% trans "Migrate server stopped to another compute node" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-plane"></i> {% trans "Migrate" %}</a>
@@ -505,7 +505,7 @@
               <thead>
               <tr>
                 <th>{% trans "ID" %}</th>
-                {% if is_kvm %}
+                {% if is_hvm %}
                   <th class="hidden-phone-small">{% trans "Model" %}</th>
                 {% else %}
                   <th class="hidden-phone-small">{% trans "FS" %}</th>
@@ -531,19 +531,19 @@
                       <span class="hide vm_locked" title="{% trans "Server is locked or has slave servers, which means that server settings cannot be changed" %}" data-toggle="tooltip" data-placement="bottom">&nbsp;<i class="icon-lock"></i></span>
                     {% endif %}
                   </td>
-                  {% if is_kvm %}
+                  {% if is_hvm %}
                     <td class="hidden-phone-small">{{ disk.model }}</td>
                   {% else %}
                     <td class="hidden-phone-small">{% if disk.disk_id == 1 %}/{% else %}{% trans "(delegated)" %}{% endif %}</td>
                   {% endif %}
-                  {% if is_kvm %}
+                  {% if is_hvm %}
                     <td>{{ disk.size|multiply:1048576|filesizeformat }}</td>
                   {% elif forloop.first %}
                     <td rowspan="{{ vm_disks_length }}" class="middle">{{ disk.size|multiply:1048576|filesizeformat }}</td>
                   {% endif %}
                   <td>{% if disk.image %}{{ disk.image }}{% else %}{% trans "(none)" %}{% endif %}</td>
                   {% if can_edit %}
-                    {% if is_kvm %}
+                    {% if is_hvm %}
                       <td>{{ disk.zpool }}</td>
                     {% elif forloop.first %}
                       <td rowspan="{{ vm_disks_length }}" class="middle">{{ disk.zpool }}</td>

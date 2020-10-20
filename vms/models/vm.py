@@ -622,7 +622,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
             except KeyError:
                 pass
 
-        if self.is_kvm():
+        if self.is_hvm():
             for x in ('routes', 'dns_domain'):
                 try:
                     del _json[x]
@@ -673,7 +673,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
             if keys:
                 _json['customer_metadata']['root_authorized_keys'] = '\n'.join(keys)
 
-        if not self.is_kvm() and 'user-script' not in _json['customer_metadata']:  # Bug #chili-406
+        if not self.is_hvm() and 'user-script' not in _json['customer_metadata']:  # Bug #chili-406
             user_script = settings.VMS_VM_ZONE_USER_SCRIPT_DEFAULT
 
             if deploy:
@@ -711,7 +711,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
         image then this will always return True."""
         if not self.is_blank():
             return True
-        if self.is_kvm():
+        if self.is_hvm():
             return self.installed
         return True
 
@@ -734,7 +734,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
             return False
 
     def is_hvm(self):
-        """Check ostype and return True for KVM"""
+        """Check hypervisor type and return True for KVM or BHYVE"""
         return self.hvm_type in self.HVM
 
     def is_kvm(self):
@@ -746,8 +746,8 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
         return self.hvm_type is _HVMType.Hypervisor_BHYVE
 
     def is_bootable(self):
-        """Check if KVM has boot flag or OS zone has an image - bug #chili-418"""
-        if self.is_kvm():
+        """Check if HVM has boot flag or OS zone has an image - bug #chili-418"""
+        if self.is_hvm():
             diskboot = [d.get('boot', False) for d in self.json_get_disks()]
             if not diskboot:  # VM without disks is OK
                 return True
@@ -825,7 +825,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
 
     def save_disks(self, disks, **kwargs):
         """Set disks list in json"""
-        if self.is_kvm():
+        if self.is_hvm():
             for i, disk in enumerate(disks):
                 # Remove nocreate attribute if empty
                 if 'nocreate' in disk and not disk['nocreate']:
@@ -874,7 +874,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
 
     def save_nics(self, nics, monitoring_ip=None, **kwargs):
         """Set nics list in json"""
-        kvm = self.is_kvm()
+        hvm = self.is_hvm()
 
         for i, nic in enumerate(nics):
             # Bug #chili-239
@@ -892,7 +892,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
             if 'gateways' in nic:
                 del nics[i]['gateways']
             # Remove model if OS zone
-            if not kvm and 'model' in nic:
+            if not hvm and 'model' in nic:
                 del nics[i]['model']
             # Remove if empty
             for e, __ in self._NICS_REMOVE_EMPTY:
@@ -969,7 +969,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
 
     def create_json_update_disks(self):
         """Call create_json_update_nested() for json['disks']"""
-        if self.is_kvm():
+        if self.is_hvm():
             return self.create_json_update_nested('disks', 'path', remove_empty=self._DISKS_REMOVE_EMPTY)
         return {}  # OS zones have all disks properties in json root
 
@@ -1026,15 +1026,15 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
         _json = self.create_json_update()
         _json.update(self.create_json_update_nics())
 
-        if self.is_kvm():
+        if self.is_hvm():
             _json.update(self.create_json_update_disks())
 
         return _json
 
     @staticmethod
-    def parse_json_disks(uuid, json, is_kvm, is_notcreated=False, zpool=None):
+    def parse_json_disks(uuid, json, is_hvm, is_notcreated=False, zpool=None):
         """Return list of nice disks."""
-        if is_kvm:
+        if is_hvm:
             disks = [d for d in json.get('disks', []) if is_disk(d, zpool)]
         else:
             _zpool = json.get('zpool', Node.ZPOOL)
@@ -1077,7 +1077,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
 
     def _get_disks(self, json, zpool=None):
         """Return list of nice disks."""
-        return self.parse_json_disks(self.uuid, json, self.is_kvm(), is_notcreated=self.is_notcreated(), zpool=zpool)
+        return self.parse_json_disks(self.uuid, json, self.is_hvm(), is_notcreated=self.is_notcreated(), zpool=zpool)
 
     def json_get_disks(self):
         """Get disks from json."""
@@ -1202,7 +1202,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
         cpu = self._get_cpu_zone(json)
         cpu_active = self._get_cpu_zone(json_active)
 
-        if self.is_kvm():
+        if self.is_hvm():
             if ram_overhead:
                 ram = json.get('max_physical_memory', 0)
                 ram_active = json_active.get('max_physical_memory', 0)
@@ -1231,7 +1231,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
         else:
             json = self.json
 
-        if self.is_kvm():
+        if self.is_hvm():
             for i in self._get_disks(json, zpool=zpool):
                 dsk[i['zpool']] += i['size']
         else:
@@ -1251,7 +1251,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
         root_zpool = json.get('zpool', Node.ZPOOL)  # For KVM and ZONE
         zpools = {root_zpool, json_active.get('zpool', root_zpool)}
 
-        if self.is_kvm():
+        if self.is_hvm():
             for _json in (json, json_active):
                 for _disk in self._get_disks(_json):
                     zpools.add(_disk['zpool'])
@@ -1742,7 +1742,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
 
     @property  # Return number of vcpus (real for KVM and a CPU count for zones)
     def vcpus(self):
-        if self.is_kvm():
+        if self.is_hvm():
             return self.json.get('vcpus', 0)
         else:
             return self._get_cpu_zone(self.json)
@@ -1751,21 +1751,21 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
     def vcpus(self, value):
         cpu_cap = self.calculate_cpu_cap_from_vcpus(value)
 
-        if self.is_kvm():
+        if self.is_hvm():
             self.save_items(vcpus=value, cpu_cap=cpu_cap, save=False)
         else:
             self.save_item('cpu_cap', cpu_cap, save=False)
 
     @property  # Return number of vcpus
     def vcpus_active(self):
-        if self.is_kvm():
+        if self.is_hvm():
             return self.json_active.get('vcpus', 0)
         else:
             return self._get_cpu_zone(self.json_active)
 
     @property  # Return RAM size in MB
     def ram(self):
-        if self.is_kvm():
+        if self.is_hvm():
             return self.json.get('ram', 0)
         else:
             return self.json.get('max_physical_memory', 0)
@@ -1777,7 +1777,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
         if max_swap < 256:
             max_swap = 256
 
-        if self.is_kvm():
+        if self.is_hvm():
             max_physical_memory = value + settings.VMS_VM_KVM_MEMORY_OVERHEAD
 
             if max_swap < max_physical_memory:
@@ -1789,14 +1789,14 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
 
     @property  # Return RAM size in MB
     def ram_active(self):
-        if self.is_kvm():
+        if self.is_hvm():
             return self.json_active.get('ram', 0)
         else:
             return self.json_active.get('max_physical_memory', 0)
 
     @property
     def ram_overhead(self):
-        if self.is_kvm():
+        if self.is_hvm():
             return settings.VMS_VM_KVM_MEMORY_OVERHEAD
         else:
             return 0
@@ -1888,7 +1888,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
 
     @routes.setter
     def routes(self, value):
-        if not self.is_kvm():
+        if not self.is_hvm():
             self.save_item('routes', value or {}, save=False)
 
     @property
@@ -1897,7 +1897,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
 
     @dns_domain.setter
     def dns_domain(self, value):
-        if not self.is_kvm():
+        if not self.is_hvm():
             self.save_item('dns_domain', value or '', save=False)
 
     @property
@@ -1914,7 +1914,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
 
     @maintain_resolvers.setter
     def maintain_resolvers(self, value):
-        if not self.is_kvm():
+        if not self.is_hvm():
             self.save_item('maintain_resolvers', value, save=False)
 
     @property
@@ -2001,10 +2001,11 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
 
     @property
     def qga_socket_path(self):
-        if self.is_kvm():
+        if self.is_hvm():
             json = self.json_active
 
-            if settings.VMS_VM_QEMU_GUEST_AGENT_SOCKET in json.get('qemu_extra_opts', ''):
+            if settings.VMS_VM_QEMU_GUEST_AGENT_SOCKET in json.get('qemu_extra_opts', '') or \
+                    settings.VMS_VM_QEMU_GUEST_AGENT_SOCKET in json.get('bhyve_extra_opts', ''):
                 return '/%s/root%s' % (json['zfs_filesystem'], settings.VMS_VM_QEMU_GUEST_AGENT_SOCKET)
 
         return None

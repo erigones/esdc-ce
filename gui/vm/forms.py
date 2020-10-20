@@ -22,7 +22,7 @@ from gui.vm.utils import get_vm_define, get_vm_define_disk, get_vm_define_nic
 # noinspection PyProtectedMember
 from gui.dc.image.forms import _ImageForm
 from api.vm.utils import get_templates, get_nodes, get_images, get_subnets, get_zpools, get_owners
-from api.vm.define.vm_define_disk import DISK_ID_MIN, DISK_ID_MAX, DISK_ID_MAX_OS
+from api.vm.define.vm_define_disk import DISK_ID_MIN, DISK_ID_MAX, DISK_ID_MAX_BHYVE, DISK_ID_MAX_OS
 from api.vm.define.vm_define_nic import NIC_ID_MIN, NIC_ID_MAX
 from api.vm.define.views import vm_define, vm_define_user, vm_define_disk, vm_define_nic, vm_define_revert
 from api.vm.snapshot.views import vm_define_snapshot, image_snapshot
@@ -31,6 +31,7 @@ from api.vm.backup.views import vm_define_backup
 
 DISK_ID_MIN += 1
 DISK_ID_MAX += 1
+DISK_ID_MAX_BHYVE += 1
 DISK_ID_MAX_OS += 1
 NIC_ID_MIN += 1
 NIC_ID_MAX += 1
@@ -333,7 +334,7 @@ class ServerDiskSettingsForm(SerializerForm):
     def __init__(self, request, vm, *args, **kwargs):
         super(ServerDiskSettingsForm, self).__init__(request, vm, *args, **kwargs)
 
-        if not vm.is_kvm():
+        if not vm.is_hvm():
             del self.fields['model']
 
     def _initial_data(self, request, vm):
@@ -376,9 +377,12 @@ class AdminServerDiskSettingsForm(ServerDiskSettingsForm):
         else:
             img_inc = None
 
-        if vm.is_kvm():
+        if vm.is_hvm():
             images = [('', _('(none)'))]
-            self.max_disks = DISK_ID_MAX
+            if vm.is_bhyve():
+                self.max_disks = DISK_ID_MAX_BHYVE
+            else:
+                self.max_disks = DISK_ID_MAX
             self.fields['zpool'].help_text = _('Setting first disk storage to different value than '
                                                'server settings storage (%s) is not recommended.') % vm.zpool
         else:
@@ -410,7 +414,7 @@ class AdminServerDiskSettingsForm(ServerDiskSettingsForm):
             except KeyError:
                 pass
 
-            if not self._obj.is_kvm():  # Also remove size and zpool for OS zones
+            if not self._obj.is_hvm():  # Also remove size and zpool for OS zones
                 try:
                     del data['size']
                 except KeyError:
@@ -439,7 +443,7 @@ class ServerNicSettingsForm(SerializerForm):
     def __init__(self, request, vm, *args, **kwargs):
         super(ServerNicSettingsForm, self).__init__(request, vm, *args, **kwargs)
 
-        if not vm.is_kvm():
+        if not vm.is_hvm():
             del self.fields['model']
 
     def _initial_data(self, request, vm):
