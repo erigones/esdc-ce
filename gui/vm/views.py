@@ -794,6 +794,7 @@ def _render_admin_add(request, context):
     initial['zfs_io_priority'] = dc_settings.VMS_VM_ZFS_IO_PRIORITY_DEFAULT
     initial['zpool'] = dc_settings.VMS_STORAGE_DEFAULT
     initial['ostype'] = dc_settings.VMS_VM_OSTYPE_DEFAULT
+    initial['hvm_type'] = dc_settings.VMS_VM_HVM_TYPE_DEFAULT
     initial['snapshot_limit_manual'] = dc_settings.VMS_VM_SNAPSHOT_LIMIT_MANUAL_DEFAULT
     initial['snapshot_size_limit'] = dc_settings.VMS_VM_SNAPSHOT_SIZE_LIMIT_DEFAULT
     initial['owner'] = request.user.username

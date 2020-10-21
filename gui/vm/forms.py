@@ -28,7 +28,6 @@ from api.vm.define.views import vm_define, vm_define_user, vm_define_disk, vm_de
 from api.vm.snapshot.views import vm_define_snapshot, image_snapshot
 from api.vm.backup.views import vm_define_backup
 
-
 DISK_ID_MIN += 1
 DISK_ID_MAX += 1
 DISK_ID_MAX_BHYVE += 1
@@ -204,6 +203,9 @@ class AdminServerSettingsForm(ServerSettingsForm):
     ostype = forms.TypedChoiceField(label=_('OS Type'), choices=Vm.OSTYPE, required=True, coerce=int,
                                     widget=forms.Select(attrs={'class': 'input-select2 narrow',
                                                                'required': 'required'}))
+    hvm_type = forms.TypedChoiceField(label=_('Hypervisor Type'), choices=Vm.HVM_TYPE_GUI, required=False, coerce=int,
+                                      widget=forms.Select(attrs={'class': 'input-select2 narrow',
+                                                                 'required': 'required'}))
     vcpus = forms.IntegerField(label=_('VCPUs'), required=False,
                                widget=NumberInput(attrs={'class': 'input-transparent narrow', 'required': 'required'}))
     # noinspection SpellCheckingInspection
@@ -289,6 +291,7 @@ class AdminServerSettingsForm(ServerSettingsForm):
         if vm:
             empty_template_data = {}
             self.fields['ostype'].widget.attrs['disabled'] = 'disabled'
+            self.fields['hvm_type'].widget.attrs['disabled'] = 'disabled'
             if vm.is_deployed():
                 self.fields['node'].widget.attrs['class'] += ' disable_created2'
                 self.fields['zpool'].widget.attrs['class'] += ' disable_created2'
@@ -642,6 +645,7 @@ class CreateSnapshotDefineForm(SnapshotDefineForm):
     """
     Create snapshot definition.
     """
+
     def __init__(self, request, vm, *args, **kwargs):
         super(CreateSnapshotDefineForm, self).__init__(request, vm, *args, **kwargs)
         from api.vm.snapshot.serializers import define_schedule_defaults
@@ -655,6 +659,7 @@ class UpdateSnapshotDefineForm(SnapshotDefineForm):
     """
     Update snapshot definition.
     """
+
     def __init__(self, *args, **kwargs):
         super(UpdateSnapshotDefineForm, self).__init__(*args, **kwargs)
         self.fields['name'].widget.attrs['disabled'] = 'disabled'
@@ -774,8 +779,8 @@ class BackupDefineForm(SerializerForm, HostnameForm):
         super(BackupDefineForm, self).__init__(request, vm, *args, **kwargs)
         self.fields['retention'].help_text = _('Maximum number of backups to keep.')
         self.fields['node'].choices = get_nodes(request, is_backup=True).values_list('hostname', 'hostname')
-        self.fields['zpool'].choices = get_zpools(request).filter(node__is_backup=True)\
-                                                          .values_list('zpool', 'storage__alias').distinct()
+        self.fields['zpool'].choices = get_zpools(request).filter(node__is_backup=True) \
+            .values_list('zpool', 'storage__alias').distinct()
 
 
 class CreateBackupDefineForm(BackupDefineForm, CreateSnapshotDefineForm):

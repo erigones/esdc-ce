@@ -343,6 +343,11 @@ class _HVMType(models.Model):
         (Hypervisor_NONE, _('NO hypervisor')),
     )
 
+    HVM_TYPE_GUI = (
+        (Hypervisor_KVM, _('KVM')),
+        (Hypervisor_BHYVE, _('BHYVE')),
+    )
+
     HVM = frozenset([Hypervisor_KVM, Hypervisor_BHYVE])
 
     class Meta:
