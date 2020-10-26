@@ -482,6 +482,7 @@ MON_ZABBIX_NODE_SLA = True  # global, internal
 
 MON_ZABBIX_SENDER = '/usr/bin/zabbix_sender'  # hidden
 MON_ZABBIX_SERVER = 'https://example.com/zabbix'  # local, internal+external
+MON_ZABBIX_SERVER_EXTERNAL_URL = ""
 MON_ZABBIX_SERVER_SSL_VERIFY = True  # local, internal+external
 MON_ZABBIX_TIMEOUT = 15  # local, internal+external
 MON_ZABBIX_USERNAME = 'Admin'  # local, internal+external

@@ -20,7 +20,10 @@ def mon_server_redirect(request):
     """
     Monitoring management.
     """
-    return redirect(request.dc.settings.MON_ZABBIX_SERVER)
+    if request.dc.settings.MON_ZABBIX_SERVER_EXTERNAL_URL is not "":
+        return redirect(request.dc.settings.MON_ZABBIX_SERVER_EXTERNAL_URL)
+    else:
+        return redirect(request.dc.settings.MON_ZABBIX_SERVER)
 
 
 @login_required
