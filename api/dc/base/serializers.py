@@ -199,6 +199,7 @@ class DcSettingsSerializer(s.InstanceSerializer):
         'MON_ZABBIX_HTTP_USERNAME',
         'MON_ZABBIX_HTTP_PASSWORD',
         'MON_ZABBIX_HOST_VM_PROXY',
+        'MON_ZABBIX_SERVER_EXTERNAL_URL',
         'DNS_SOA_DEFAULT',
         'EMAIL_HOST_USER',
         'EMAIL_HOST_PASSWORD',

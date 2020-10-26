@@ -1,4 +1,5 @@
 import json
+from re import match
 
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
@@ -20,12 +21,10 @@ def mon_server_redirect(request):
     """
     Monitoring management.
     """
-    zabbix_ext_url = request.dc.settings.MON_ZABBIX_SERVER_EXTERNAL_URL
-    
-    if zabbix_ext_url is '' or zabbix_ext_url is None:
-        return redirect(request.dc.settings.MON_ZABBIX_SERVER)
+    if match("^http", request.dc.settings.MON_ZABBIX_SERVER_EXTERNAL_URL):
+        return redirect(request.dc.settings.MON_ZABBIX_SERVER_EXTERNAL_URL)
     else:
-        return redirect(zabbix_ext_url)
+        return redirect(request.dc.settings.MON_ZABBIX_SERVER)
 
 
 @login_required
