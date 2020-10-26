@@ -400,7 +400,7 @@ class DcSettingsSerializer(s.InstanceSerializer):
                                               "{ipaddr}, {hostname}, {alias}."))
 
     MON_ZABBIX_SERVER_EXTERNAL_URL = s.RegexField(r'^https?://.*$', label='MON_ZABBIX_SERVER_EXTERNAL_URL',
-                                                  max_length=1024,
+                                                  max_length=1024, required=False,
                                                   help_text=_('External URL address of Zabbix server in case you use '
                                                               'some external reverse proxy. It is used in "Monitoring '
                                                               '-> Monitoring Server" menu button. If blank, '
