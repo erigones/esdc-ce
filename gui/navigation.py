@@ -23,7 +23,7 @@ SYSTEM = {
         {
             'title': _('Maintenance'),
             'icon': 'wrench',
-            'url': 'system_maintenance'
+            'url': 'system_maintenance',
         },
     ]
 }
@@ -164,6 +164,12 @@ MONITORING = {
             'icon': 'external-link',
             'url': 'mon_server_redirect',
             'a_class': 'no-ajax',
+            'extra_tags': [
+                {
+                    'name': 'target',
+                    'val': '_blank',
+                },
+            ],
         },
     ]
 }
