@@ -13,8 +13,7 @@ Links
 - User guide: https://docs.danube.cloud
 - Wiki: https://github.com/erigones/esdc-ce/wiki
 - Bug Tracker: https://github.com/erigones/esdc-ce/issues
-- Twitter: https://twitter.com/danubecloud
-- Gitter: https://gitter.im/erigones/DanubeCloud
+- Gitter chat: https://gitter.im/erigones/DanubeCloud
 
 
 License
