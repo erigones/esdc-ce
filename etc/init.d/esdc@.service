@@ -8,7 +8,7 @@
 
 [Unit]
 Description=Danube Cloud %I Application Server
-Documentation=https://docs.danubecloud.org
+Documentation=https://docs.danube.cloud
 After=network.target
 Requires=redis.service rabbitmq-server.service postgresql-9.5.service pgbouncer.service
 

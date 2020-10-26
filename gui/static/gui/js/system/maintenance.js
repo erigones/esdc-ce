@@ -1,4 +1,4 @@
-var SYSTEM_VERSION_URL = 'https://danubecloud.org/api/releases';
+var SYSTEM_VERSION_URL = 'https://danube.cloud/api/releases';
 var SYSTEM_UPDATE = null;
 var SYSTEM_UPDATE_LOADING = null;
 var SYSTEM_UPDATE_RESTART_DELAY = 10;
