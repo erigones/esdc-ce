@@ -1,6 +1,17 @@
 Changelog
 #########
 
+4.4
+===
+Released on TBD
+
+Features
+--------
+- Allow spaces in ssh key comments in user profile - `#511 <https://github.com/erigones/esdc-ce/issues/511>`__
+- Open Zabbix URL in a new tab from main menu - `#501 <https://github.com/erigones/esdc-ce/issues/501>`__
+- Allow customizing external Zabbix URL - `#513 <https://github.com/erigones/esdc-ce/pull/513>`__
+
+
 4.3
 ===
 Released on 2020-08-29
