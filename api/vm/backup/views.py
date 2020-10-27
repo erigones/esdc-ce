@@ -162,7 +162,7 @@ def vm_define_backup(request, hostname_or_uuid, bkpdef, data=None):
         :type data.retention: integer
         :arg data.active: Enable or disable backup schedule (default: true)
         :type data.active: boolean
-        :arg data.compression: Backup file compression algorithm (0 - none, 1 - gzip, 2 - bzip2) (default: 0)
+        :arg data.compression: Backup file compression algorithm (0 - none, 1 - gzip, 2 - bzip2, 3 - xz) (default: 0)
         :type data.compression: integer
         :arg data.bwlimit: Transfer rate limit in bytes (default: null => no limit)
         :type data.bwlimit: integer
@@ -199,7 +199,7 @@ creating backup snapshot (requires QEMU Guest Agent) (default: false)
         :type data.retention: integer
         :arg data.active: Enable or disable backup schedule
         :type data.active: boolean
-        :arg data.compression: Backup file compression algorithm (0 - none, 1 - gzip, 2 - bzip2)
+        :arg data.compression: Backup file compression algorithm (0 - none, 1 - gzip, 2 - bzip2, 3 - xz)
         :type data.compression: integer
         :arg data.bwlimit: Transfer rate limit in bytes
         :type data.bwlimit: integer
