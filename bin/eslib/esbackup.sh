@@ -40,7 +40,7 @@ _pack() {
 		bzip2|bz2)
 			compressor="${BZIP2} -c"
 			;;
-	  xz)
+		xz)
 			compressor="${XZ} -9 -c"
 			;;
 		*)
@@ -63,8 +63,8 @@ _unpack() {
 		bz2)
 			uncompress="${BZIP2} -dc"
 			;;
-	  xz)
-	    uncompress="${XZ} -dc"
+		xz)
+			uncompress="${XZ} -dc"
 			;;
 		zfs)
 			uncompress="${CAT}"
