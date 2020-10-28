@@ -16,15 +16,20 @@ import markdown
 from api.mon.backends.zabbix.containers import ZabbixMediaContainer
 from api.utils.encoders import JSONEncoder
 from pdns.models import Record
+from vms.models import Subnet
 
 register = template.Library()
 
 
 # noinspection PyPep8Naming
 @register.filter
-def record_PTR(vm, ip):
-    if ip and vm.dc.settings.DNS_ENABLED:
-        return Record.get_record_PTR(ip)
+def record_PTR(vm, nic):
+    if nic.ip and vm.dc.settings.DNS_ENABLED:
+        try:
+            ptr_domain = Subnet.objects.get(name=nic.net).ptr_name
+        except Exception:
+            ptr_domain = ''
+        return Record.get_record_PTR(nic.ip, ptr_domain)
     else:
         return None
 

@@ -1,6 +1,8 @@
 import time
 from datetime import datetime
 from logging import getLogger
+from re import match
+
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils.six import text_type
@@ -214,14 +216,24 @@ class Record(models.Model):
         return rec.save()
 
     @staticmethod
-    def get_reverse(ipaddr):
-        return reversename.from_address(ipaddr).to_text(omit_final_dot=True)
+    def get_reverse(ipaddr, domain=''):
+        rev = reversename.from_address(ipaddr).to_text(omit_final_dot=True)
+        if match('^[0-9]+/', domain):
+            # it's a classless delegated domain (e.g. 0/26.0.0.10-in-addr.arpa),
+            # we need to transform the reverse (e.g. 111.0.0.10-in-addr.arpa -> 111.0/26.0.0.10-in-addr.arpa)
+            ptr_cidr = domain.split('.', 1)[0]
+            rev_split = rev.split('.', 1)
+            return '%s.%s.%s' % (rev_split[0], ptr_cidr, rev_split[1])
+
+        else:
+            # normal PTR domain
+            return rev
 
     # noinspection PyPep8Naming
     @classmethod
-    def get_record_PTR(cls, ipaddr):
+    def get_record_PTR(cls, ipaddr, domain=''):
         try:
-            return cls.objects.select_related('domain').get(type=cls.PTR, name=cls.get_reverse(ipaddr))
+            return cls.objects.select_related('domain').get(type=cls.PTR, name=cls.get_reverse(ipaddr, domain))
         except cls.DoesNotExist:
             return None
         except exception.SyntaxError:  # ipaddr in wrong format
@@ -230,7 +242,7 @@ class Record(models.Model):
     # noinspection PyPep8Naming
     @classmethod
     def add_record_PTR(cls, domain, ipaddr, content):
-        return cls.add_record(cls.PTR, domain, cls.get_reverse(ipaddr), content)
+        return cls.add_record(cls.PTR, domain, cls.get_reverse(ipaddr, domain), content)
 
     # noinspection PyPep8Naming
     @classmethod
