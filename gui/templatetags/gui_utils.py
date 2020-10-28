@@ -23,13 +23,13 @@ register = template.Library()
 
 # noinspection PyPep8Naming
 @register.filter
-def record_PTR(vm, nic):
-    if nic.ip and vm.dc.settings.DNS_ENABLED:
+def record_PTR(vm, ip, netname):
+    if ip and vm.dc.settings.DNS_ENABLED:
         try:
-            ptr_domain = Subnet.objects.get(name=nic.net).ptr_name
+            ptr_domain = Subnet.objects.get(name=netname).ptr_name
         except Exception:
             ptr_domain = ''
-        return Record.get_record_PTR(nic.ip, ptr_domain)
+        return Record.get_record_PTR(ip, ptr_domain)
     else:
         return None
 

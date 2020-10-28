@@ -455,7 +455,7 @@
             </thead>
 
             <tbody id="vm_nic_{{ vm.hostname }}">
-            {% for nic in vm_nics %}{% with ip=nic.ip ptr=vm|record_PTR:nic %}
+            {% for nic in vm_nics %}{% with ip=nic.ip ptr=vm|record_PTR:nic.ip:nic.net %}
               <tr class="row1">
                 <td>
                   {{ nic.nic_id }}
