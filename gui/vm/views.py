@@ -346,8 +346,10 @@ def ptr_form(request, hostname, nic_id):
     vm = get_vm(request, hostname)
 
     try:
-        nic_ip = vm.json_get_nics()[int(nic_id) - 1]['ip']
-        ptr = RecordView.Record.get_record_PTR(nic_ip)
+        nic = vm.json_get_nics()[int(nic_id) - 1]
+        nic_ip = nic['ip']
+        ptr_domain = vm.get_ptr_domain_by_ip(nic_ip)
+        ptr = RecordView.Record.get_record_PTR(nic_ip, ptr_domain)
         if not ptr:
             raise Exception('PTR Record not found')
     except Exception:

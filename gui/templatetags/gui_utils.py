@@ -25,15 +25,9 @@ register = template.Library()
 @register.filter
 def record_PTR(vm, ip):
     if ip and vm.dc.settings.DNS_ENABLED:
-        ptr_domain = ''
-        try:
-            for nic in vm.get_vm_nics():
-                if nic['ip'] == ip:
-                    ptr_domain = Subnet.objects.get(uuid=nic['network_uuid']).ptr_domain
-                    break
-        except Exception:
-            pass
+        ptr_domain = vm.get_ptr_domain_by_ip(ip)
         return Record.get_record_PTR(ip, ptr_domain)
+
     else:
         return None
 
