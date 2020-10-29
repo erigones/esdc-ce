@@ -221,13 +221,17 @@ class Record(models.Model):
         if match('^[0-9]+/', domain):
             # it's a classless delegated domain (e.g. 0/26.0.0.10-in-addr.arpa),
             # we need to transform the reverse (e.g. 111.0.0.10-in-addr.arpa -> 111.0/26.0.0.10-in-addr.arpa)
-            ptr_cidr = domain.split('.', 1)[0]
-            rev_split = rev.split('.', 1)
-            return '%s.%s.%s' % (rev_split[0], ptr_cidr, rev_split[1])
+            try:
+                ptr_cidr = domain.split('.', 1)[0]
+                rev_split = rev.split('.', 1)
+                return '%s.%s.%s' % (rev_split[0], ptr_cidr, rev_split[1])
+            except Exception as exc:
+                logger.error("Failed to compute classless delegated reverse domain entry (domain: %s; IP: %s). "
+                             "Falling back to normal reverse." %(domain, ipaddr))
+                logger.exception(exc)
 
-        else:
-            # normal PTR domain
-            return rev
+        # normal PTR domain
+        return rev
 
     # noinspection PyPep8Naming
     @classmethod
