@@ -125,7 +125,11 @@ def reverse_domain_from_network(ip_network):
     """Create reverse DNS zone name from network address (ipaddress.IPv4Network)"""
     prefixlen = ip_network.prefixlen
 
-    if prefixlen % 8:
+    if prefixlen > 24:  # smaller than C
+        # classless delegated
+        rev_split = ip_network.network_address.reverse_pointer.split('.', 1)
+        return '%s/%d.%s' % (rev_split[0], prefixlen, rev_split[1])
+    elif prefixlen % 8:
         return ip_network.reverse_pointer  # classless
     else:
         return ip_network.network_address.reverse_pointer[(4 - (prefixlen / 8)) * 2:]  # classful
