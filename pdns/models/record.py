@@ -218,15 +218,12 @@ class Record(models.Model):
     @staticmethod
     def get_reverse(ipaddr, domain=''):
         rev = reversename.from_address(ipaddr).to_text(omit_final_dot=True)
-        logger.warning('JJJ: got reverse %s for IP %s and domain %s' % (rev, ipaddr, domain))
         if match('^[0-9]+/', domain):
             # it's a classless delegated domain (e.g. 0/26.0.0.10-in-addr.arpa),
             # we need to transform the reverse (e.g. 111.0.0.10-in-addr.arpa -> 111.0/26.0.0.10-in-addr.arpa)
             ptr_cidr = domain.split('.', 1)[0]
             rev_split = rev.split('.', 1)
-            rev = '%s.%s.%s' % (rev_split[0], ptr_cidr, rev_split[1])
-            logger.warning('JJJJJ: returning rev %s' % rev)
-            return rev
+            return '%s.%s.%s' % (rev_split[0], ptr_cidr, rev_split[1])
 
         else:
             # normal PTR domain
