@@ -25,7 +25,7 @@ register = template.Library()
 @register.filter
 def record_PTR(vm, ip):
     if ip and vm.dc.settings.DNS_ENABLED:
-        ptr_domain = get_ptr_domain_by_ip(ip)
+        ptr_domain = get_ptr_domain_by_ip(vm, ip)
         return Record.get_record_PTR(ip, ptr_domain)
 
     else:
