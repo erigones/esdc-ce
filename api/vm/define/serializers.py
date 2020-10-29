@@ -1593,7 +1593,7 @@ class VmDefineNicSerializer(s.Serializer):
                 data = {
                     'type': record_cls.PTR,
                     'domain': net.ptr_domain,
-                    'name': record_cls.get_reverse(ipaddr),
+                    'name': record_cls.get_reverse(ipaddr, net.ptr_domain),
                     'content': content or default_ptr(vm, ipaddr),
                 }
 
