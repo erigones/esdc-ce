@@ -24,7 +24,6 @@ from vms.models.utils import pair_keys_to_items, diff_dict, diff_dict_nested
 from vms.models.dc import Dc
 from vms.models.node import Node
 from vms.models.vmtemplate import VmTemplate
-from vms.models import Subnet
 from gui.models import User
 
 
@@ -2009,10 +2008,6 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
             if nic['ip'] == ip:
                 return nic
         return None
-
-    def get_ptr_domain_by_ip(self, ip):
-        nic = self.get_nic_by_ip(ip)
-        return Subnet.objects.get(uuid=nic['network_uuid']).ptr_domain
 
     def get_network_uuids(self):
         """Return set of network_uuids for currently used/required subnets by this VM"""

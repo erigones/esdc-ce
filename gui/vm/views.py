@@ -22,7 +22,7 @@ from gui.vm.forms import (
 )
 from gui.vm.utils import (
     get_vm, get_vms, get_vm_snapshots, get_vm_define_disk, get_vm_define_nic, get_vms_tags, get_vm_snapdefs,
-    get_vm_backups, get_vm_bkpdefs, vm_define_all, ImportExportBase
+    get_vm_backups, get_vm_bkpdefs, vm_define_all, ImportExportBase, get_ptr_domain_by_ip
 )
 from gui.decorators import ajax_required, profile_required, admin_required, permission_required
 from gui.fields import SIZE_FIELD_MB_ADDON
@@ -348,7 +348,7 @@ def ptr_form(request, hostname, nic_id):
     try:
         nic = vm.json_get_nics()[int(nic_id) - 1]
         nic_ip = nic['ip']
-        ptr_domain = vm.get_ptr_domain_by_ip(nic_ip)
+        ptr_domain = get_ptr_domain_by_ip(nic_ip)
         ptr = RecordView.Record.get_record_PTR(nic_ip, ptr_domain)
         if not ptr:
             raise Exception('PTR Record not found')
