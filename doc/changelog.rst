@@ -10,6 +10,7 @@ Features
 - Allow spaces in ssh key comments in user profile - `#511 <https://github.com/erigones/esdc-ce/issues/511>`__
 - Open Zabbix URL in a new tab from main menu - `#501 <https://github.com/erigones/esdc-ce/issues/501>`__
 - Allow customizing external Zabbix URL - `#513 <https://github.com/erigones/esdc-ce/pull/513>`__
+- Add XZ compression to file backup (thanks to @marcheschi) - `#515 <https://github.com/erigones/esdc-ce/pull/515>`__
 
 
 4.3
