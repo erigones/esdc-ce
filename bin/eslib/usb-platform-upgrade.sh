@@ -209,7 +209,7 @@ if [[ -z $1 ]] ; then
                 partition=$(/usr/sbin/prtvtoc -h "/dev/dsk/${removables[0]}" | \
                             awk ' $2 == 2 { print $1 }')
                 if [[ $? -eq 0 && -n "$partition" ]]; then
-                        echo -n ", GPT label"
+                        echo -n ", GPT label "
                         usb="/dev/dsk/${removables[0]}s${partition}"
                 fi
         fi
