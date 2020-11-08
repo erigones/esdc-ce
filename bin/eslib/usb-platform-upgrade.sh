@@ -7,9 +7,8 @@
 # Modified to work on Danube cloud by Paolo Marcheschi
 #
 # 
-#rsync -rltD /zones/PAOLO/usb/ m2c.hypervisor.pi.fgm:/zones/tmp/tmp.7Jaw1y/usb/
+#
 #DC USB does not have space left on device to work on usb
-#mkdir /zones/tmp
 cert_file=$(mktemp)
 function cleanup {
         rm "$cert_file"
@@ -91,13 +90,13 @@ OPTIONS:
 
 EXAMPLE:
   # use remote platform file
-  platform-upgrade -u https://download.danube.cloud/esdc/factory/platform/platform-20201105T132431Z.tgz
+  ./platform-upgrade -u https://download.danube.cloud/esdc/factory/platform/platform-20201105T132431Z.tgz
 
   # use remote platform file Forcing installation
-  platform-upgrade -u https://download.danube.cloud/esdc/factory/platform/platform-20201105T132431Z.tgz -f
+  ./platform-upgrade -u https://download.danube.cloud/esdc/factory/platform/platform-20201105T132431Z.tgz -f
 
   # Use local platform and checksum file
-  platform-upgrade -u file:///tmp/platform-20180510T153535Z.tgz -s file:///tmp/md5sum.txt
+  ./platform-upgrade -u file:///tmp/platform-20180510T153535Z.tgz -s file:///tmp/md5sum.txt
 
   # DC upgrade
   ./platform-upgrade -u file:///zones/TEMP/platform-20201105T132431Z.tgz -s file:///zones/TEMP/md5.txt
