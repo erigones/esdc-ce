@@ -6,8 +6,10 @@
 #
 # Modified to work on Danube cloud by Paolo Marcheschi
 #
-
-mkdir /zones/tmp
+# 
+#rsync -rltD /zones/PAOLO/usb/ m2c.hypervisor.pi.fgm:/zones/tmp/tmp.7Jaw1y/usb/
+#DC USB does not have space left on device to work on usb
+#mkdir /zones/tmp
 cert_file=$(mktemp)
 function cleanup {
         rm "$cert_file"
@@ -15,78 +17,68 @@ function cleanup {
 trap cleanup EXIT
 cat >"$cert_file" <<EOF
 -----BEGIN CERTIFICATE-----
-MIIF3jCCA8agAwIBAgIQAf1tMPyjylGoG7xkDjUDLTANBgkqhkiG9w0BAQwFADCB
-iDELMAkGA1UEBhMCVVMxEzARBgNVBAgTCk5ldyBKZXJzZXkxFDASBgNVBAcTC0pl
-cnNleSBDaXR5MR4wHAYDVQQKExVUaGUgVVNFUlRSVVNUIE5ldHdvcmsxLjAsBgNV
-BAMTJVVTRVJUcnVzdCBSU0EgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMTAw
-MjAxMDAwMDAwWhcNMzgwMTE4MjM1OTU5WjCBiDELMAkGA1UEBhMCVVMxEzARBgNV
-BAgTCk5ldyBKZXJzZXkxFDASBgNVBAcTC0plcnNleSBDaXR5MR4wHAYDVQQKExVU
-aGUgVVNFUlRSVVNUIE5ldHdvcmsxLjAsBgNVBAMTJVVTRVJUcnVzdCBSU0EgQ2Vy
-dGlmaWNhdGlvbiBBdXRob3JpdHkwggIiMA0GCSqGSIb3DQEBAQUAA4ICDwAwggIK
-AoICAQCAEmUXNg7D2wiz0KxXDXbtzSfTTK1Qg2HiqiBNCS1kCdzOiZ/MPans9s/B
-3PHTsdZ7NygRK0faOca8Ohm0X6a9fZ2jY0K2dvKpOyuR+OJv0OwWIJAJPuLodMkY
-tJHUYmTbf6MG8YgYapAiPLz+E/CHFHv25B+O1ORRxhFnRghRy4YUVD+8M/5+bJz/
-Fp0YvVGONaanZshyZ9shZrHUm3gDwFA66Mzw3LyeTP6vBZY1H1dat//O+T23LLb2
-VN3I5xI6Ta5MirdcmrS3ID3KfyI0rn47aGYBROcBTkZTmzNg95S+UzeQc0PzMsNT
-79uq/nROacdrjGCT3sTHDN/hMq7MkztReJVni+49Vv4M0GkPGw/zJSZrM233bkf6
-c0Plfg6lZrEpfDKEY1WJxA3Bk1QwGROs0303p+tdOmw1XNtB1xLaqUkL39iAigmT
-Yo61Zs8liM2EuLE/pDkP2QKe6xJMlXzzawWpXhaDzLhn4ugTncxbgtNMs+1b/97l
-c6wjOy0AvzVVdAlJ2ElYGn+SNuZRkg7zJn0cTRe8yexDJtC/QV9AqURE9JnnV4ee
-UB9XVKg+/XRjL7FQZQnmWEIuQxpMtPAlR1n6BB6T1CZGSlCBst6+eLf8ZxXhyVeE
-Hg9j1uliutZfVS7qXMYoCAQlObgOK6nyTJccBz8NUvXt7y+CDwIDAQABo0IwQDAd
-BgNVHQ4EFgQUU3m/WqorSs9UgOHYm8Cd8rIDZsswDgYDVR0PAQH/BAQDAgEGMA8G
-A1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQEMBQADggIBAFzUfA3P9wF9QZllDHPF
-Up/L+M+ZBn8b2kMVn54CVVeWFPFSPCeHlCjtHzoBN6J2/FNQwISbxmtOuowhT6KO
-VWKR82kV2LyI48SqC/3vqOlLVSoGIG1VeCkZ7l8wXEskEVX/JJpuXior7gtNn3/3
-ATiUFJVDBwn7YKnuHKsSjKCaXqeYalltiz8I+8jRRa8YFWSQEg9zKC7F4iRO/Fjs
-8PRF/iKz6y+O0tlFYQXBl2+odnKPi4w2r78NBc5xjeambx9spnFixdjQg3IM8WcR
-iQycE0xyNN+81XHfqnHd4blsjDwSXWXavVcStkNr/+XeTWYRUc+ZruwXtuhxkYze
-Sf7dNXGiFSeUHM9h4ya7b6NnJSFd5t0dCy5oGzuCr+yDZ4XUmFF0sbmZgIn/f3gZ
-XHlKYC6SQK5MNyosycdiyA5d9zZbyuAlJQG03RoHnHcAP9Dc1ew91Pq7P8yF1m9/
-qS3fuQL39ZeatTXaw2ewh0qpKJ4jjv9cJ2vhsE/zB+4ALtRZh8tSQZXq9EfX7mRB
-VXyNWQKV3WKdwrnuWih0hKWbt5DHDAff9Yk2dDLWKMGwsAvgnEzDHNb842m1R0aB
-L6KCq9NjRHDEjf8tM7qtj3u1cIiuPhnPQCjY/MiQu12ZIvVS5ljFH4gxQ+6IHdfG
-jjxDah2nGN59PRbxYvnKkKj9
+MIIFdzCCBF+gAwIBAgISBPzllbVY44lRFupmsOVpFqyaMA0GCSqGSIb3DQEBCwUA
+MEoxCzAJBgNVBAYTAlVTMRYwFAYDVQQKEw1MZXQncyBFbmNyeXB0MSMwIQYDVQQD
+ExpMZXQncyBFbmNyeXB0IEF1dGhvcml0eSBYMzAeFw0yMDEwMDIwNjU5MDNaFw0y
+MDEyMzEwNjU5MDNaMB4xHDAaBgNVBAMTE3BrZ3NyYy5lcmlnb25lcy5jb20wggEi
+MA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDaEJZXHh35jsqFIBK+pmsFsY5Q
++wE1bocePFV9IHuToPYLEEEd1kpfgGOFie6KMBXZyHDfzX29AIitBT4Kht9QFeWI
+WJob26RmF4v+pEfKjqayRmdqE08PMUmJVL7VmjpfQ0qMRYFsPj9fzPpAGOd/4AlP
+kyzmQxJiGicW0glVrWJig286gIwjM5D9CEGx8myajRTy2to22CdUhkY+mn4MukVB
+/hiRoL3D2eB/BOwKL4JGSE+uK6S4VG8chRfMjHQisaDnLItZ7yE4wm25FYCOCQqc
+uGtjyqku7WvQcN5Mh7VIUgp4THNjv7BypJaTElKhTOjrSPldjwWepSGN/pKBAgMB
+AAGjggKBMIICfTAOBgNVHQ8BAf8EBAMCBaAwHQYDVR0lBBYwFAYIKwYBBQUHAwEG
+CCsGAQUFBwMCMAwGA1UdEwEB/wQCMAAwHQYDVR0OBBYEFO7RvZ307AeDih2y8CRo
+j4J4ciRsMB8GA1UdIwQYMBaAFKhKamMEfd265tE5t6ZFZe/zqOyhMG8GCCsGAQUF
+BwEBBGMwYTAuBggrBgEFBQcwAYYiaHR0cDovL29jc3AuaW50LXgzLmxldHNlbmNy
+eXB0Lm9yZzAvBggrBgEFBQcwAoYjaHR0cDovL2NlcnQuaW50LXgzLmxldHNlbmNy
+eXB0Lm9yZy8wNQYDVR0RBC4wLIIVZG93bmxvYWQuZGFudWJlLmNsb3VkghNwa2dz
+cmMuZXJpZ29uZXMuY29tMEwGA1UdIARFMEMwCAYGZ4EMAQIBMDcGCysGAQQBgt8T
+AQEBMCgwJgYIKwYBBQUHAgEWGmh0dHA6Ly9jcHMubGV0c2VuY3J5cHQub3JnMIIB
+BgYKKwYBBAHWeQIEAgSB9wSB9ADyAHcAXqdz+d9WwOe1Nkh90EngMnqRmgyEoRIS
+hBh1loFxRVgAAAF06FJSDgAABAMASDBGAiEAigIorLmlispsd3E4ekIFSXn5dSeH
+HxxEQHYsws1wQhcCIQD9YfGPmAcK03mvXtFaIIqiIIc4J9/vCW6Fazejiu50gAB3
+AAe3XBvlfWj/8bDGHSMVx7rmV3xXlLdq7rxhOhpp06IcAAABdOhSUigAAAQDAEgw
+RgIhAP99vJgcCngAoksF5HqzgUAEXGcO0cluZVPrUgq+hN5qAiEA5qay3yHredM2
+EUDTdFvs8Fp/f/q+0ARmoajK2YAoZVYwDQYJKoZIhvcNAQELBQADggEBAA5Z85fi
+FekX1hWMHHyM9fGmwCNN+RPvwAIrZHtPnwb3RaINMraGotEXP1Rt1Mlqx6oWVvwf
+GhvPyvJsrxhLQ3lLmP4qTyIzhPHbhYLwh/bodFO/gP9wFk06sd1qPjdSXfoP/qiE
+0cSDPjxDHt6sKahMNAbbNkZceJLnT+kxSCPt9YCYw0+g1PK1ay3uoeU+Q+/TP6D2
+xCk5yn2ostDA73SSvwx8p9uMhwvhvhnlfY5az29fdVeK019Djlzip46i9D/DbNHY
+SwhTipsh+OMaqq93YxBZEbegLR0g0YYXoAO//n/7gjMA0e8RJs/uoAMvGpSwxBXu
++S+JEHNyRRKGD/E=
 -----END CERTIFICATE-----
 -----BEGIN CERTIFICATE-----
-MIIGEzCCA/ugAwIBAgIQfVtRJrR2uhHbdBYLvFMNpzANBgkqhkiG9w0BAQwFADCB
-iDELMAkGA1UEBhMCVVMxEzARBgNVBAgTCk5ldyBKZXJzZXkxFDASBgNVBAcTC0pl
-cnNleSBDaXR5MR4wHAYDVQQKExVUaGUgVVNFUlRSVVNUIE5ldHdvcmsxLjAsBgNV
-BAMTJVVTRVJUcnVzdCBSU0EgQ2VydGlmaWNhdGlvbiBBdXRob3JpdHkwHhcNMTgx
-MTAyMDAwMDAwWhcNMzAxMjMxMjM1OTU5WjCBjzELMAkGA1UEBhMCR0IxGzAZBgNV
-BAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYGA1UE
-ChMPU2VjdGlnbyBMaW1pdGVkMTcwNQYDVQQDEy5TZWN0aWdvIFJTQSBEb21haW4g
-VmFsaWRhdGlvbiBTZWN1cmUgU2VydmVyIENBMIIBIjANBgkqhkiG9w0BAQEFAAOC
-AQ8AMIIBCgKCAQEA1nMz1tc8INAA0hdFuNY+B6I/x0HuMjDJsGz99J/LEpgPLT+N
-TQEMgg8Xf2Iu6bhIefsWg06t1zIlk7cHv7lQP6lMw0Aq6Tn/2YHKHxYyQdqAJrkj
-eocgHuP/IJo8lURvh3UGkEC0MpMWCRAIIz7S3YcPb11RFGoKacVPAXJpz9OTTG0E
-oKMbgn6xmrntxZ7FN3ifmgg0+1YuWMQJDgZkW7w33PGfKGioVrCSo1yfu4iYCBsk
-Haswha6vsC6eep3BwEIc4gLw6uBK0u+QDrTBQBbwb4VCSmT3pDCg/r8uoydajotY
-uK3DGReEY+1vVv2Dy2A0xHS+5p3b4eTlygxfFQIDAQABo4IBbjCCAWowHwYDVR0j
-BBgwFoAUU3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFI2MXsRUrYrhd+mb
-+ZsF4bgBjWHhMA4GA1UdDwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0G
-A1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjAbBgNVHSAEFDASMAYGBFUdIAAw
-CAYGZ4EMAQIBMFAGA1UdHwRJMEcwRaBDoEGGP2h0dHA6Ly9jcmwudXNlcnRydXN0
-LmNvbS9VU0VSVHJ1c3RSU0FDZXJ0aWZpY2F0aW9uQXV0aG9yaXR5LmNybDB2Bggr
-BgEFBQcBAQRqMGgwPwYIKwYBBQUHMAKGM2h0dHA6Ly9jcnQudXNlcnRydXN0LmNv
-bS9VU0VSVHJ1c3RSU0FBZGRUcnVzdENBLmNydDAlBggrBgEFBQcwAYYZaHR0cDov
-L29jc3AudXNlcnRydXN0LmNvbTANBgkqhkiG9w0BAQwFAAOCAgEAMr9hvQ5Iw0/H
-ukdN+Jx4GQHcEx2Ab/zDcLRSmjEzmldS+zGea6TvVKqJjUAXaPgREHzSyrHxVYbH
-7rM2kYb2OVG/Rr8PoLq0935JxCo2F57kaDl6r5ROVm+yezu/Coa9zcV3HAO4OLGi
-H19+24rcRki2aArPsrW04jTkZ6k4Zgle0rj8nSg6F0AnwnJOKf0hPHzPE/uWLMUx
-RP0T7dWbqWlod3zu4f+k+TY4CFM5ooQ0nBnzvg6s1SQ36yOoeNDT5++SR2RiOSLv
-xvcRviKFxmZEJCaOEDKNyJOuB56DPi/Z+fVGjmO+wea03KbNIaiGCpXZLoUmGv38
-sbZXQm2V0TP2ORQGgkE49Y9Y3IBbpNV9lXj9p5v//cWoaasm56ekBYdbqbe4oyAL
-l6lFhd2zi+WJN44pDfwGF/Y4QA5C5BIG+3vzxhFoYt/jmPQT2BVPi7Fp2RBgvGQq
-6jG35LWjOhSbJuMLe/0CjraZwTiXWTb2qHSihrZe68Zk6s+go/lunrotEbaGmAhY
-LcmsJWTyXnW0OMGuf1pGg+pRyrbxmRE1a6Vqe8YAsOf4vmSyrcjC8azjUeqkk+B5
-yOGBQMkKW+ESPMFgKuOXwIlCypTPRpgSabuY0MLTDXJLR27lk8QyKGOHQ+SwMj4K
-00u/I5sUKUErmgQfky3xxzlIPK1aEn8=
+MIIEkjCCA3qgAwIBAgIQCgFBQgAAAVOFc2oLheynCDANBgkqhkiG9w0BAQsFADA/
+MSQwIgYDVQQKExtEaWdpdGFsIFNpZ25hdHVyZSBUcnVzdCBDby4xFzAVBgNVBAMT
+DkRTVCBSb290IENBIFgzMB4XDTE2MDMxNzE2NDA0NloXDTIxMDMxNzE2NDA0Nlow
+SjELMAkGA1UEBhMCVVMxFjAUBgNVBAoTDUxldCdzIEVuY3J5cHQxIzAhBgNVBAMT
+GkxldCdzIEVuY3J5cHQgQXV0aG9yaXR5IFgzMIIBIjANBgkqhkiG9w0BAQEFAAOC
+AQ8AMIIBCgKCAQEAnNMM8FrlLke3cl03g7NoYzDq1zUmGSXhvb418XCSL7e4S0EF
+q6meNQhY7LEqxGiHC6PjdeTm86dicbp5gWAf15Gan/PQeGdxyGkOlZHP/uaZ6WA8
+SMx+yk13EiSdRxta67nsHjcAHJyse6cF6s5K671B5TaYucv9bTyWaN8jKkKQDIZ0
+Z8h/pZq4UmEUEz9l6YKHy9v6Dlb2honzhT+Xhq+w3Brvaw2VFn3EK6BlspkENnWA
+a6xK8xuQSXgvopZPKiAlKQTGdMDQMc2PMTiVFrqoM7hD8bEfwzB/onkxEz0tNvjj
+/PIzark5McWvxI0NHWQWM6r6hCm21AvA2H3DkwIDAQABo4IBfTCCAXkwEgYDVR0T
+AQH/BAgwBgEB/wIBADAOBgNVHQ8BAf8EBAMCAYYwfwYIKwYBBQUHAQEEczBxMDIG
+CCsGAQUFBzABhiZodHRwOi8vaXNyZy50cnVzdGlkLm9jc3AuaWRlbnRydXN0LmNv
+bTA7BggrBgEFBQcwAoYvaHR0cDovL2FwcHMuaWRlbnRydXN0LmNvbS9yb290cy9k
+c3Ryb290Y2F4My5wN2MwHwYDVR0jBBgwFoAUxKexpHsscfrb4UuQdf/EFWCFiRAw
+VAYDVR0gBE0wSzAIBgZngQwBAgEwPwYLKwYBBAGC3xMBAQEwMDAuBggrBgEFBQcC
+ARYiaHR0cDovL2Nwcy5yb290LXgxLmxldHNlbmNyeXB0Lm9yZzA8BgNVHR8ENTAz
+MDGgL6AthitodHRwOi8vY3JsLmlkZW50cnVzdC5jb20vRFNUUk9PVENBWDNDUkwu
+Y3JsMB0GA1UdDgQWBBSoSmpjBH3duubRObemRWXv86jsoTANBgkqhkiG9w0BAQsF
+AAOCAQEA3TPXEfNjWDjdGBX7CVW+dla5cEilaUcne8IkCJLxWh9KEik3JHRRHGJo
+uM2VcGfl96S8TihRzZvoroed6ti6WqEBmtzw3Wodatg+VyOeph4EYpr/1wXKtx8/
+wApIvJSwtmVi4MFU5aMqrSDE6ea73Mj2tcMyo5jMd6jmeWUHK8so/joWUoHOUgwu
+X4Po1QYz+3dszkDqMp4fklxBwXRsW10KXzPMTZ+sOPAveyxindmjkW8lGy+QsRlG
+PfZ+G6Z6h7mjem0Y+iWlkYcV4PIWL1iwBi8saCbGS5jN2p8M+X+Q7UNKEkROb3N6
+KOqkqm57TH2H3eDJAkSnh6/DNFu0Qg==
 -----END CERTIFICATE-----
 EOF
 
 function _curl {
-        curl -s --cacert "$cert_file" $@
+        curl -s -k --cacert "$cert_file" $@
 }
 function usage() {
     cat <<- "USAGE"
@@ -98,10 +90,17 @@ OPTIONS:
   -f            : Force installation if version is already present
 
 EXAMPLE:
-  # Use default Joyent URL for latest platform image
-  platform-upgrade
+  # use remote platform file
+  platform-upgrade -u https://download.danube.cloud/esdc/factory/platform/platform-20201105T132431Z.tgz
+
+  # use remote platform file Forcing installation
+  platform-upgrade -u https://download.danube.cloud/esdc/factory/platform/platform-20201105T132431Z.tgz -f
+
   # Use local platform and checksum file
   platform-upgrade -u file:///tmp/platform-20180510T153535Z.tgz -s file:///tmp/md5sum.txt
+
+  # DC upgrade
+  ./platform-upgrade -u file:///zones/TEMP/platform-20201105T132431Z.tgz -s file:///zones/TEMP/md5.txt
 USAGE
 }
 
@@ -125,21 +124,10 @@ while getopts :fu:s: option; do
 done
 shift $((OPTIND-1))
 
-if [[ -n $platform_url ]] && [[ ! -n $md5sums_url ]]; then
-	usage
-	exit -1
-fi
 
 if [[ ! -n $platform_url ]]; then
-    host=https://us-east.manta.joyent.com
-    latest_path="${host}$(_curl "$host/Joyent_Dev/public/SmartOS/latest")"
-    version="$(expr "$latest_path" : '.*\([0-9]\{8\}T[0-9]\{6\}Z\).*')"
-    latest_spec_path="$(_curl "$host/Joyent_Dev/public/SmartOS/$version")"
-    header="$(expr "$latest_spec_path" : '.*platform-release-\([0-9]\{8\}\)-.*')"
-    platform_url="$latest_path/platform-release-$header-$version.tgz"
-    if [[ ! -n $md5sums_url ]]; then
-        md5sums_url="$latest_path/md5sums.txt"
-    fi
+	usage
+	exit -1
 else
     header="$(expr "$platform_url" : '.*platform-\([0-9]\{8\}\)-.*')"
     version="$(expr "$platform_url" : '.*\([0-9]\{8\}T[0-9]\{6\}Z\).*')"
@@ -149,7 +137,7 @@ platform_file="platform-$version.tgz"
 platform_dir="platform-$version"
 
 IFS=_ read brand kernel < <(uname -v)
-echo " brand="  $brand 
+echo "Brand="  $brand
 echo "Actual kernel= " $kernel
 echo "New Version= " $version
 if [[ $kernel == $version ]]; then
@@ -157,7 +145,7 @@ if [[ $kernel == $version ]]; then
     $force || exit -1
 fi
 
-tmp=$(mktemp -d -p /zones/tmp -t)
+tmp=$(mktemp -d -p /tmp -t)
 cd "$tmp" || exit -1
 
 echo -n "Downloading $platform_file..."
@@ -167,19 +155,20 @@ if ! _curl -o "$platform_file" "$platform_url" ; then
 else
         echo " OK"
 fi
-
-echo -n "Verifying checksum..."
-_curl "$md5sums_url" \
+echo "md5sum= |"$md5sums_url"|"
+if [[ -n "$md5sums_url" ]]; then
+  echo -n "Verifying checksum..."
+  _curl "$md5sums_url" \
         | grep "$platform_file" \
         | awk '{print $1}' > expected.md5
-openssl md5 "$platform_file" | awk '{print $2}' > actual.md5
-if ! cmp -s actual.md5 expected.md5 ; then
+  openssl md5 "$platform_file" | awk '{print $2}' > actual.md5
+  if ! cmp -s actual.md5 expected.md5 ; then
         echo " failed"
         exit -1
-else
+  else
         echo " OK"
 fi
-
+fi
 echo -n "Extracting latest platform..."
 if ! gtar zxf "$platform_file" ; then
         echo " failed"
