@@ -75,6 +75,7 @@ LANGUAGE_CODE = 'en-us'
 # Languages we provide translations for.
 LANGUAGES = (
     ('en', 'English'),
+    ('it', 'Italiano'),
     #  ('sk', 'Slovensky (beta)'),
 )
 
