@@ -63,12 +63,6 @@ class DanubeCloudCommand(BaseCommand):
 
     _local_username = None
 
-    def __init__(self, **kwargs):
-        if self.options:
-            self.option_list = self.__class__.option_list + self.options
-
-        super(DanubeCloudCommand, self).__init__(**kwargs)
-
     def add_arguments(self, parser):
         parser.add_argument('--no-newline',
             action='store_true',
