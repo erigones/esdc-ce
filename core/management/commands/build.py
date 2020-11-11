@@ -3,10 +3,13 @@ from ._base import DanubeCloudCommand, CommandOption, CommandError
 
 class Command(DanubeCloudCommand):
     help = 'Install project and python dependencies and build a software package suitable for deployment.'
-    options = (
-        CommandOption('-q', '--que', '--node', action='store_true', dest='que_only', default=False,
-                      help='Build only compute node related stuff.'),
-    )
+
+    def add_arguments(self, parser):
+        parser.add_argument('-q', '--que', '--node',
+            action='store_true',
+            dest='que_only',
+            default=False,
+            help='Build only compute node related stuff.')
 
     def build(self, que_only=False):
         """Helper for the build and build_que commands"""
