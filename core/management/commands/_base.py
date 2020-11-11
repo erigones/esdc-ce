@@ -60,10 +60,6 @@ class DanubeCloudCommand(BaseCommand):
     strip_newline = False
     colors = shell_color
     options = ()
-    option_list = BaseCommand.option_list + (
-        CommandOption('--no-newline', action='store_true', dest='no_newline', default=False,
-                      help='Strip newlines from output'),
-    )
 
     _local_username = None
 
@@ -72,6 +68,13 @@ class DanubeCloudCommand(BaseCommand):
             self.option_list = self.__class__.option_list + self.options
 
         super(DanubeCloudCommand, self).__init__(**kwargs)
+
+    def add_arguments(self, parser):
+        parser.add_argument('--no-newline',
+            action='store_true',
+            dest='no_newline',
+            default=False,
+            help='Strip newlines from output')
 
     def get_version(self):
         """This isn't used anywhere"""
