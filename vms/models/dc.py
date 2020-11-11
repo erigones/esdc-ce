@@ -87,7 +87,7 @@ class Dc(_AclMixin, _VirtModel, _JsonPickleModel, _CacheModel, _UserTasksModel):
 
     def get_user_permissions(self, user):
         """Return set of user permissions in this DC"""
-        if not user.is_authenticated():
+        if not user.is_authenticated:
             return frozenset()
         return user.get_dc_permissions(self)
 
