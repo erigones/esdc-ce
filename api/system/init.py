@@ -182,16 +182,19 @@ def init_mgmt(head_node, images=None):  # noqa: R701
         except Exception as exc:
             logger.exception(exc)
         else:
-            try:  # Create reverse dns domain
-                ptr_zone = reverse_domain_from_network(mgmt_net)
-                api_post(dns_domain, ptr_zone, owner=settings.ADMIN_USERNAME, dc_bound=False)
-                api_post(dc_domain, ptr_zone, dc=main)
-                api_post(dc_domain, ptr_zone, dc=admin)
+            try:
+                # Create reverse dns domain, but:
+                # we don't support reverse domains that are not rounded to classful boundary
+                # (with the exception of networks smaller that C)
+                if mgmt_net.prefixlen % 8 == 0 or mgmt_net.prefixlen > 24:
+                    ptr_zone = reverse_domain_from_network(mgmt_net)
+                    api_post(dns_domain, ptr_zone, owner=settings.ADMIN_USERNAME, dc_bound=False)
+                    api_post(dc_domain, ptr_zone, dc=main)
+                    api_post(dc_domain, ptr_zone, dc=admin)
+                    # Set PTR zone for admin network
+                    mgmt_ifconfig['ptr_domain'] = ptr_zone
             except Exception as exc:
                 logger.exception(exc)
-            else:
-                # Set PTR zone for admin network
-                mgmt_ifconfig['ptr_domain'] = ptr_zone
 
         # Change admin network subnet according to ip/netmask/gw on this machine (mgmt01.local)
         api_put(net_manage, settings.VMS_NET_ADMIN, dns_domain=admin_zone, **mgmt_ifconfig)

@@ -6,7 +6,7 @@ from frozendict import frozendict
 from logging import getLogger
 import json
 
-from vms.models import Vm, Image, SnapshotDefine, Snapshot, BackupDefine, Backup, TagVm
+from vms.models import Vm, Image, SnapshotDefine, Snapshot, BackupDefine, Backup, TagVm, Subnet
 from gui.utils import get_order_by, get_pager
 from gui.exceptions import HttpRedirectException
 from gui.dc.views import dc_switch
@@ -164,6 +164,11 @@ def get_vm_define_nic(request, vm, nic_id=None):
         return VmDefineNicSerializer(request, vm, vm.json_get_nics()[nic_id], nic_id=nic_id).data
 
     return VmDefineNicSerializer(request, vm, vm.json_get_nics(), many=True).data
+
+
+def get_ptr_domain_by_ip(vm, ip):
+    nic = vm.get_nic_by_ip(ip)
+    return Subnet.objects.get(uuid=nic['network_uuid']).ptr_domain
 
 
 def get_vms_tags(vms):

@@ -10,6 +10,7 @@ Links
 =====
 
 - Homepage: https://danube.cloud
+- Download: https://github.com/erigones/esdc-ce/wiki/Download
 - User guide: https://docs.danube.cloud
 - Wiki: https://github.com/erigones/esdc-ce/wiki
 - Bug Tracker: https://github.com/erigones/esdc-ce/issues

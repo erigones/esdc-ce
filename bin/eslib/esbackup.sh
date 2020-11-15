@@ -40,6 +40,9 @@ _pack() {
 		bzip2|bz2)
 			compressor="${BZIP2} -c"
 			;;
+		xz)
+			compressor="${XZ} -9 -c"
+			;;
 		*)
 			die ${ERR_INPUT} "Unsupported compression algorithm: ${algorithm}"
 			;;
@@ -59,6 +62,9 @@ _unpack() {
 			;;
 		bz2)
 			uncompress="${BZIP2} -dc"
+			;;
+		xz)
+			uncompress="${XZ} -dc"
 			;;
 		zfs)
 			uncompress="${CAT}"

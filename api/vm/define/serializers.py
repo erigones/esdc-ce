@@ -1559,7 +1559,7 @@ class VmDefineNicSerializer(s.Serializer):
 
         record_cls = RecordView.Record
         ipaddr = str(ip.ip)
-        ptr = record_cls.get_record_PTR(ipaddr)
+        ptr = record_cls.get_record_PTR(ipaddr, net.ptr_domain)
         logger.info('%s DNS PTR record for vm %s, domain %s, name %s.',
                     'Deleting' if delete else 'Adding', vm, net.ptr_domain, ipaddr)
 
@@ -1593,7 +1593,7 @@ class VmDefineNicSerializer(s.Serializer):
                 data = {
                     'type': record_cls.PTR,
                     'domain': net.ptr_domain,
-                    'name': record_cls.get_reverse(ipaddr),
+                    'name': record_cls.get_reverse(ipaddr, net.ptr_domain),
                     'content': content or default_ptr(vm, ipaddr),
                 }
 
