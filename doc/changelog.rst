@@ -22,9 +22,7 @@ Bugs
 
 - Update SmartOS platform to fix `illumos security issue <https://www.illumos.org/issues/13242>`__ (upstream version: `20201105`)
 - Fix wrong admin network address after install if classless netmask is provided - `#507 <https://github.com/erigones/esdc-ce/issues/507>`__
-- Fix Zabbix template for checking postgresql 10+ - `#499 <https://github.com/erigones/esdc-ce/pull/499>`__
 - Fix `pkgin` operations failures in global zone on nodes installed on `v4.1` or earlier - `#505 <https://github.com/erigones/esdc-ce/issues/505>`__
-- Add XZ compression to file backup (thanks to @marcheschi) - `#515 <https://github.com/erigones/esdc-ce/pull/515>`__
 
 
 4.3
