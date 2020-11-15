@@ -7,10 +7,22 @@ Released on TBD
 
 Features
 --------
+
+- Add Italian translation (thanks to @marcheschi) - `#522 <https://github.com/erigones/esdc-ce/pull/522>`__
 - Allow spaces in ssh key comments in user profile - `#511 <https://github.com/erigones/esdc-ce/issues/511>`__
 - Open Zabbix URL in a new tab from main menu - `#501 <https://github.com/erigones/esdc-ce/issues/501>`__
 - Allow customizing external Zabbix URL - `#513 <https://github.com/erigones/esdc-ce/pull/513>`__
+- Support classless delegated reverse DNS zones - `#517 <https://github.com/erigones/esdc-ce/pull/517>`__
+- Set `mgmt01` VM RAM to 1,5 GB on new installs - `#518 <https://github.com/erigones/esdc-ce/issues/518>`__
+- Add script for in-place USB platform upgrades (thanks to @marcheschi) - `#520 <https://github.com/erigones/esdc-ce/pull/520>`__
 - Add XZ compression to file backup (thanks to @marcheschi) - `#515 <https://github.com/erigones/esdc-ce/pull/515>`__
+
+Bugs
+----
+
+- Update SmartOS platform to fix `illumos security issue <https://www.illumos.org/issues/13242>`__ (upstream version: `20201105`)
+- Fix wrong admin network address after install if classless netmask is provided - `#507 <https://github.com/erigones/esdc-ce/issues/507>`__
+- Fix `pkgin` operations failures in global zone on nodes installed on `v4.1` or earlier - `#505 <https://github.com/erigones/esdc-ce/issues/505>`__
 
 
 4.3
