@@ -1045,7 +1045,7 @@ def VmDefineDiskSerializer(request, vm, *args, **kwargs):
 
 class VmDefineNicSerializer(s.Serializer):
     mac = s.MACAddressField(required=False)  # processed in save_nics()
-    model = s.ChoiceField(choices=Vm.NIC_MODEL, default=settings.VMS_NIC_MODEL_DEFAULT)
+    model = s.ChoiceField(required=False, choices=Vm.NIC_MODEL, default=settings.VMS_NIC_MODEL_DEFAULT)
     net = s.CharField()
     ip = s.IPAddressField(required=False)  # checked in validate()
     netmask = s.IPAddressField(read_only=True)
