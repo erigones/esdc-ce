@@ -332,8 +332,8 @@ class DcSettingsSerializer(s.InstanceSerializer):
                                                  help_text=_('Name of the default disk image used for '
                                                              'newly created Linux zone servers.'))
     VMS_NIC_MODEL_DEFAULT = s.ChoiceField(label='VMS_NIC_MODEL_DEFAULT', choices=Vm.NIC_MODEL,
-                                          help_text=_('Default virtual NIC model of newly created server NICs. '
-                                                      'One of: virtio, e1000, rtl8139.'))
+                                          help_text=_('Default virtual NIC model of newly created KVM server NICs. '
+                                                      'One of: virtio, e1000, rtl8139. Bhyve model is always virtio.'))
     VMS_NIC_MONITORING_DEFAULT = s.IntegerField(label='VMS_NIC_MONITORING_DEFAULT', min_value=NIC_ID_MIN,
                                                 max_value=NIC_ID_MAX,
                                                 help_text=_('Default NIC ID, which will be used for '

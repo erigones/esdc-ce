@@ -1121,7 +1121,8 @@ class VmDefineNicSerializer(s.Serializer):
         if vm.is_kvm():
             self.fields['model'].default = dc_settings.VMS_NIC_MODEL_DEFAULT
         else:
-            del self.fields['model']
+            # bhyve has only the 'virtio' nic model
+            self.fields['model'].default = 'virtio'
 
     def fix_before(self, data):  # noqa: R701
         """

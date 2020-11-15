@@ -518,7 +518,7 @@ def vm_define_nic(request, hostname_or_uuid, nic_id=None, data=None):
         :type data.net: string
         :arg data.ip: Virtual NIC IPv4 address. Must be part of net (default: auto select)
         :type data.ip: string
-        :arg data.model: Virtual NIC Model. One of virtio, e1000, rtl8139 (default: virtio)
+        :arg data.model: Virtual NIC Model. One of virtio, e1000, rtl8139 (default: virtio); Bhyve has only virtio model
         :type data.model: string
         :arg data.dns: Create a DNS A record for VM's FQDN? (default: true for first NIC, otherwise false)
         :type data.dns: boolean
@@ -575,7 +575,7 @@ other VMs. Useful for floating/shared IPs (default: [])
         :type data.net: string
         :arg data.ip: Virtual NIC IPv4 address
         :type data.ip: string
-        :arg data.model: Virtual NIC Model. One of virtio, e1000, rtl8139
+        :arg data.model: Virtual NIC Model. One of virtio, e1000, rtl8139. Bhyve has only virtio model
         :type data.model: string
         :arg data.dns: Create a DNS A record for VM's FQDN?
         :type data.dns: boolean
