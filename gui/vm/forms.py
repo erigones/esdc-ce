@@ -446,7 +446,8 @@ class ServerNicSettingsForm(SerializerForm):
     def __init__(self, request, vm, *args, **kwargs):
         super(ServerNicSettingsForm, self).__init__(request, vm, *args, **kwargs)
 
-        if not vm.is_hvm():
+        # only KVM has multiple vnic models
+        if not vm.is_kvm():
             del self.fields['model']
 
     def _initial_data(self, request, vm):
