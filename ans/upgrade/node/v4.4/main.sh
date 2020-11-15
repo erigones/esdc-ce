@@ -10,5 +10,5 @@ VERSION_DIR="$(cd "$(dirname "$0")" ; pwd -P)"
 #
 PKGIN_REPOS=/opt/local/etc/pkgin/repositories.conf
 if grep -q erigones "${PKGIN_REPOS}"; then
-	/usr/bin/sed -i '' 's;pkgsrc.erigones.org;pkgsrc.danube.cloud;' -e '/erigones/d' "${PKGIN_REPOS}"
+	/usr/bin/sed -i '' -e 's;pkgsrc.erigones.org;pkgsrc.danube.cloud;' -e '/erigones/d' "${PKGIN_REPOS}"
 fi
