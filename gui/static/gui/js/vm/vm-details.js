@@ -1335,3 +1335,31 @@ function vm_control(hostname, btn) {
       return false;
   }
 }
+
+function copy_to_clipboard(text) {
+  var dummy = document.createElement("temp_textarea");
+  document.body.appendChild(dummy);
+  dummy.value = text;
+  $(dummy).focus();
+  $(dummy).select();
+  document.execCommand("copy");
+  alert("Copied the text: " + dummy.value);
+  document.body.removeChild(dummy);
+}
+
+function vm_init_copy_text_to_clipboard(hostname) {
+  if (typeof(niclist) === 'undefined') {
+    niclist = $(jq('vm_nic_' + hostname));
+  }
+  niclist.find('a.j_copy_text_to_clipboard').each(function() {
+    var copy_btn = $(this);
+    copy_btn.click(function() {
+      var elem_to_copy = $(this).children('span').first();
+      copy_to_clipboard(elem_to_copy.html());
+      // elem_to_copy.select();
+      // document.execCommand("copy");
+      // alert("Copied the text: " + elem_to_copy.html());
+      return false;
+    });
+  });
+}
