@@ -43,7 +43,7 @@ class VmManage(APIView):
 
     @staticmethod
     def compute_bhyve_quota(all_disks_size):
-        quota = round((2 * (all_disks_size * 1.03)) + (1.5 * all_disks_size))
+        quota = int(round((2 * (all_disks_size * 1.03)) + (1.5 * all_disks_size)))
         logger.debug('Bhyve VM quota computed to "%s" (from disks size "%")', quota, all_disks_size)
         return quota
 
@@ -60,22 +60,22 @@ class VmManage(APIView):
             for i, disk in enumerate(vm.json_get_disks()):
                 if 'image_uuid' in disk:
                     if disk['size'] != disk['image_size']:
-                        _resize = '; zfs set volsize=%sM %s/%s-disk%s >&2' % (disk['size'], vm.zpool, vm.uuid, i)
+                        _resize = '; zfs set volsize=%sM %s/%s-disk%s >&2; e=$((e+=$?))' % (disk['size'], vm.zpool, vm.uuid, i)
                         cmd += _resize
 
                         if 'refreservation' in disk:
-                            _refres = '; zfs set refreservation=%sM %s/%s-disk%s >&2' % (disk['refreservation'],
+                            _refres = '; zfs set refreservation=%sM %s/%s-disk%s >&2; e=$((e+=$?))' % (disk['refreservation'],
                                                                                          vm.zpool, vm.uuid, i)
                             cmd += _refres
 
         elif vm.is_bhyve():
             quota = VmManage.compute_bhyve_quota(vm.get_disk_size())
-            _set_quota = '; zfs set quota=%sM %s/%s >&2' % (quota, vm.zpool, vm.uuid)
+            _set_quota = '; zfs set quota=%sM %s/%s >&2; e=$((e+=$?))' % (quota, vm.zpool, vm.uuid)
             cmd += _set_quota
             for i, disk in enumerate(vm.json_get_disks()):
                 if 'image_uuid' in disk:
                     if disk['size'] != disk['image_size']:
-                        _resize = '; zfs set volsize=%sM %s/%s/disk%s >&2' % (disk['size'], vm.zpool, vm.uuid, i)
+                        _resize = '; zfs set volsize=%sM %s/%s/disk%s >&2; e=$((e+=$?))' % (disk['size'], vm.zpool, vm.uuid, i)
                         cmd += _resize
 
         return cmd
@@ -92,18 +92,18 @@ class VmManage(APIView):
 
             if 'size' in disk:
                 size = disk.pop('size')
-                cmd += '; zfs set volsize=%sM %s >&2; ' % (size, zfs_filesystem)
+                cmd += '; zfs set volsize=%sM %s >&2; e=$((e+=$?)); ' % (size, zfs_filesystem)
 
             if 'refreservation' in disk:
                 if vm.is_bhyve():
                     del json_update['update_disks'][i]['refreservation']
                 else:
                     refr = disk.pop('refreservation')
-                    cmd += '; zfs set refreservation=%sM %s >&2; ' % (refr, zfs_filesystem)
+                    cmd += '; zfs set refreservation=%sM %s >&2; e=$((e+=$?)); ' % (refr, zfs_filesystem)
 
         if disks and vm.is_bhyve():
             quota = VmManage.compute_bhyve_quota(vm.disk)
-            _set_quota = '; zfs set quota=%sM %s/%s >&2' % (quota, vm.zpool, vm.uuid)
+            _set_quota = '; zfs set quota=%sM %s/%s >&2; e=$((e+=$?)); ' % (quota, vm.zpool, vm.uuid)
             # if the sum of all disk sizes is growing, we need to update quota first;
             # if we are shrinking, the quota needs to be updated last
             if vm.disk > vm.disk_active:    # grow
@@ -382,7 +382,7 @@ class VmManage(APIView):
             stdin = stdin.dump()
 
             # final cmd
-            cmd = cmd1 + 'vmadm update %s >&2; e=$?; vmadm get %s 2>/dev/null; exit $e' % (vm.uuid, vm.uuid)
+            cmd = cmd1 + 'vmadm update %s >&2; e=$((e+=$?)); vmadm get %s 2>/dev/null; exit $e' % (vm.uuid, vm.uuid)
 
             # Possible node_image import task which will block this task on node worker
             block_key = self.node_image_import(vm.node, json_update.get('add_disks', []))
