@@ -43,7 +43,7 @@ class VmManage(APIView):
 
     @staticmethod
     def compute_bhyve_quota(all_disks_size):
-        quota = (2 * (all_disks_size * 1.03)) + (1.5 * all_disks_size)
+        quota = round((2 * (all_disks_size * 1.03)) + (1.5 * all_disks_size))
         logger.debug('Bhyve VM quota computed to "%s" (from disks size "%")', quota, all_disks_size)
         return quota
 
