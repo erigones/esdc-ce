@@ -42,6 +42,10 @@ class VmManage(APIView):
                              check_node_status=('POST', 'DELETE'))
 
     @staticmethod
+    def compute_bhyve_quota(all_disks_size):
+        return (2 * (all_disks_size * 1.03)) + (1.5 * all_disks_size)
+
+    @staticmethod
     def fix_create(vm):
         """SmartOS issue. If a image_uuid is specified then size should be omitted, which is done in vm.fix_json(),
         so run this one before vm.fix_json() to create a command for changing zvol volsize."""
@@ -50,25 +54,38 @@ class VmManage(APIView):
 
         cmd = ''
 
-        for i, disk in enumerate(vm.json_get_disks()):
-            if 'image_uuid' in disk:
-                if disk['size'] != disk['image_size']:
-                    _resize = '; zfs set volsize=%sM %s/%s-disk%s >&2' % (disk['size'], vm.zpool, vm.uuid, i)
-                    cmd += _resize
+        if vm.is_kvm():
+            for i, disk in enumerate(vm.json_get_disks()):
+                if 'image_uuid' in disk:
+                    if disk['size'] != disk['image_size']:
+                        _resize = '; zfs set volsize=%sM %s/%s-disk%s >&2' % (disk['size'], vm.zpool, vm.uuid, i)
+                        cmd += _resize
 
-                    if 'refreservation' in disk:
-                        _refres = '; zfs set refreservation=%sM %s/%s-disk%s >&2' % (disk['refreservation'],
-                                                                                     vm.zpool, vm.uuid, i)
-                        cmd += _refres
+                        if 'refreservation' in disk:
+                            _refres = '; zfs set refreservation=%sM %s/%s-disk%s >&2' % (disk['refreservation'],
+                                                                                         vm.zpool, vm.uuid, i)
+                            cmd += _refres
+
+        elif vm.is_bhyve():
+            quota = VmManage.compute_bhyve_quota(vm.get_disk_size())
+            _set_quota = '; zfs set quota=%sM %s/%s >&2' % (quota, vm.zpool, vm.uuid)
+            cmd += _set_quota
+            for i, disk in enumerate(vm.json_get_disks()):
+                if 'image_uuid' in disk:
+                    if disk['size'] != disk['image_size']:
+                        _resize = '; zfs set volsize=%sM %s/%s/disk%s >&2' % (disk['size'], vm.zpool, vm.uuid, i)
+                        cmd += _resize
 
         return cmd
 
     @staticmethod
-    def fix_update(json_update):
+    def fix_update(json_update, vm):
         """SmartOS issue. Modifying json... Creating manual zfs commands if disk.*.size is being changed."""
         cmd = ''
+        new_disks_size = 0
+        disks = json_update.get('update_disks', [])
 
-        for disk in json_update.get('update_disks', []):
+        for disk in disks:
             zfs_filesystem = '/'.join(disk['path'].split('/')[-2:])  # path is the key in update_disks
 
             if 'size' in disk:
@@ -76,8 +93,21 @@ class VmManage(APIView):
                 cmd += 'zfs set volsize=%sM %s >&2; ' % (size, zfs_filesystem)
 
             if 'refreservation' in disk:
-                refr = disk.pop('refreservation')
-                cmd += 'zfs set refreservation=%sM %s >&2; ' % (refr, zfs_filesystem)
+                if vm.is_bhyve():
+                    del json_update['update_disks']['refreservation']
+                else:
+                    refr = disk.pop('refreservation')
+                    cmd += 'zfs set refreservation=%sM %s >&2; ' % (refr, zfs_filesystem)
+
+        if disks and vm.is_bhyve():
+            quota = VmManage.compute_bhyve_quota(new_disks_size)
+            _set_quota = '; zfs set quota=%sM %s/%s >&2' % (quota, vm.zpool, vm.uuid)
+            # if the sum of all disk sizes is growing, we need to update quota first;
+            # if we are shrinking, the quota needs to be updated last
+            if vm.disk > vm.disk_active:    # grow
+                cmd = _set_quota + cmd
+            else:
+                cmd += _set_quota
 
         return json_update, cmd
 
@@ -344,7 +374,7 @@ class VmManage(APIView):
                 raise VmHasPendingTasks
 
             # create json suitable for update
-            stdin, cmd1 = self.fix_update(json_update)
+            stdin, cmd1 = self.fix_update(json_update, vm)
             self.validate_update(vm, stdin, cmd1)
             stdin = stdin.dump()
 

@@ -604,6 +604,9 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
             - disks.*.path if media is 'disk'
             - disks.*.size if image_uuid is specified
             - disks.*.block_size if image_uuid is specified
+            - disks.*.refreservation is removed if brand==bhyve (it is then set to 'auto')
+
+        Other changes:
             - autoboot is set to false
             - list of attributes that create "invalid property" warnings
 
@@ -655,6 +658,11 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
                         pass
                     try:
                         del _json['disks'][i]['zfs_filesystem']
+                    except KeyError:
+                        pass
+                    try:
+                        if self.is_bhyve():
+                            del _json['disks'][i]['refreservation']
                     except KeyError:
                         pass
 

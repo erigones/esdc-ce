@@ -71,7 +71,7 @@ class VmStatus(APIView):
     def _add_update_cmd(self, orig_cmd, os_cmd_allowed=False, pre_cmd=''):
         from api.vm.base.vm_manage import VmManage
         vm = self.vm
-        json_update, os_cmd = VmManage.fix_update(vm.json_update())
+        json_update, os_cmd = VmManage.fix_update(vm.json_update(), vm)
 
         if os_cmd:
             if os_cmd_allowed:
