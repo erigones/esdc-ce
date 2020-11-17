@@ -85,7 +85,7 @@ class VmManage(APIView):
         new_disks_size = 0
         disks = json_update.get('update_disks', [])
 
-        for disk in disks:
+        for i, disk in enumerate(disks):
             zfs_filesystem = '/'.join(disk['path'].split('/')[-2:])  # path is the key in update_disks
 
             if 'size' in disk:
@@ -94,7 +94,7 @@ class VmManage(APIView):
 
             if 'refreservation' in disk:
                 if vm.is_bhyve():
-                    del json_update['update_disks']['refreservation']
+                    del json_update['update_disks'][i]['refreservation']
                 else:
                     refr = disk.pop('refreservation')
                     cmd += 'zfs set refreservation=%sM %s >&2; ' % (refr, zfs_filesystem)
@@ -311,6 +311,7 @@ class VmManage(APIView):
             # Possible node_image import task which will block this task on node worker
             block_key = self.node_image_import(vm.node, vm.json_get_disks())
             logger.debug('Creating new VM %s on node %s with json: """%s"""', vm, vm.node, stdin)
+            logger.debug('Create command: """%s"""', cmd)
             tid, err = execute(request, vm.owner.id, cmd, stdin=stdin, meta=meta, expires=VM_VM_EXPIRES, lock=self.lock,
                                callback=callback, queue=vm.node.slow_queue, block_key=block_key)
 
@@ -404,6 +405,7 @@ class VmManage(APIView):
         callback = ('api.vm.base.tasks.vm_update_cb', {'vm_uuid': vm.uuid, 'new_node_uuid': new_node_uuid})
 
         logger.debug('Updating VM %s with json: """%s"""', vm, stdin)
+        logger.debug('Update command: """%s"""', cmd)
 
         err = True
         vm.set_notready()
