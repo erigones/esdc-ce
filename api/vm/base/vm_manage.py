@@ -1,4 +1,5 @@
 from logging import getLogger
+from re import sub
 
 from django.utils.six import iteritems
 
@@ -88,7 +89,7 @@ class VmManage(APIView):
         disks = json_update.get('update_disks', [])
 
         for i, disk in enumerate(disks):
-            zfs_filesystem = '/'.join(disk['path'].split('/')[-2:])  # path is the key in update_disks
+            zfs_filesystem = sub("^\/dev\/zvol\/rdsk\/", "", disk['path'])   # path is the key in update_disks
 
             if 'size' in disk:
                 size = disk.pop('size')
