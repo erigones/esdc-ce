@@ -43,7 +43,9 @@ class VmManage(APIView):
 
     @staticmethod
     def compute_bhyve_quota(all_disks_size):
-        return (2 * (all_disks_size * 1.03)) + (1.5 * all_disks_size)
+        quota = (2 * (all_disks_size * 1.03)) + (1.5 * all_disks_size)
+        logger.debug('Bhyve VM quota computed to "%s" (from disks size "%")', quota, all_disks_size)
+        return quota
 
     @staticmethod
     def fix_create(vm):
@@ -90,17 +92,17 @@ class VmManage(APIView):
 
             if 'size' in disk:
                 size = disk.pop('size')
-                cmd += 'zfs set volsize=%sM %s >&2; ' % (size, zfs_filesystem)
+                cmd += '; zfs set volsize=%sM %s >&2; ' % (size, zfs_filesystem)
 
             if 'refreservation' in disk:
                 if vm.is_bhyve():
                     del json_update['update_disks'][i]['refreservation']
                 else:
                     refr = disk.pop('refreservation')
-                    cmd += 'zfs set refreservation=%sM %s >&2; ' % (refr, zfs_filesystem)
+                    cmd += '; zfs set refreservation=%sM %s >&2; ' % (refr, zfs_filesystem)
 
         if disks and vm.is_bhyve():
-            quota = VmManage.compute_bhyve_quota(new_disks_size)
+            quota = VmManage.compute_bhyve_quota(vm.disk)
             _set_quota = '; zfs set quota=%sM %s/%s >&2' % (quota, vm.zpool, vm.uuid)
             # if the sum of all disk sizes is growing, we need to update quota first;
             # if we are shrinking, the quota needs to be updated last
