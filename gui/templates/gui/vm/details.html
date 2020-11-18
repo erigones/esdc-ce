@@ -20,7 +20,6 @@
       {% if mon_sla_enabled %}
         sla_init('mon_vm_sla', '{{ vm.hostname }}', '{% now "Ym" %}');
       {% endif %}
-      vm_init_copy_text_to_clipboard('{{ vm.hostname }}');
     });
   </script>
 {% endblock %}
@@ -306,7 +305,7 @@
             <tr>
               <td>{% trans "Hostname" %}:</td>
               <td>
-                <strong class="vm_hostname">{{ vm.hostname }}</strong>
+                <strong class="vm_hostname">{{ vm.hostname }} <a class="mini no-ajax icon-copy copy_text_to_clipboard" ></a></strong>
               </td>
             </tr>
             <tr>
@@ -469,7 +468,7 @@
                 {% if is_kvm %}
                   <td class="hidden-phone-small">{{ nic.model }}</td>
                 {% endif %}
-                {% with netmask=nic|keyvalue:"netmask" allowed_ips=nic|keyvalue:"allowed_ips" %}<td>{% if ip %}<a href="#" class="mini no-ajax icon-copy j_copy_text_to_clipboard"><span class="hidden">{{ ip }}</span></a>{{ ip|cidr:netmask }}{% endif %}{% if allowed_ips %}<br><small>({{ allowed_ips|join:", " }})</small>{% endif %}</td>{% endwith %}
+                {% with netmask=nic|keyvalue:"netmask" allowed_ips=nic|keyvalue:"allowed_ips" %}<td>{% if ip %}{{ ip|cidr:netmask }} <a class="mini no-ajax icon-copy copy_text_to_clipboard" title="{% trans "Copy IP to clipboard" %}" data-toggle="tooltip" data-placement="bottom"><span class="hidden">{{ ip }}</span></a>{% endif %}{% if allowed_ips %}<br><small>({{ allowed_ips|join:", " }})</small>{% endif %}</td>{% endwith %}
                 <td>{{ nic.gateway|default:"" }}</td>
                 <td>{{ nic.net }}{% if not ip %}<span title="{% trans "IP addresses for this network are managed by an external service" %}" data-toggle="tooltip" data-placement="bottom"><i class="icon-info-sign"></i></span>{% endif %}</td>
               </tr>
