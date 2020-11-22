@@ -1,3 +1,5 @@
+import re
+
 from django.db import models, transaction
 from django.utils import timezone
 from django.utils.six import iteritems, with_metaclass
@@ -599,7 +601,7 @@ class _VmDiskModel(models.Model):
         else:
             disk_path = disk_or_path
 
-        return int(disk_path.split('-')[-1].lstrip('disk'))
+        return int(re.split('-|/', disk_path)[-1].lstrip('disk'))
 
     @classmethod
     def get_disk_id(cls, vm, array_disk_id):
