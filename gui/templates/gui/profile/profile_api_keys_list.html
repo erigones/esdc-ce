@@ -3,7 +3,7 @@
   <tbody>
     <tr>
       <td>{% trans "API key" %}:</td>
-      <td>{% if display_keys %}{{ user.api_key }}{% else %}***{% endif %}</td>
+      <td>{% if display_keys %}{{ user.api_key }} <a class="mini no-ajax icon-copy copy_text_to_clipboard" ></a>{% else %}***{% endif %}</td>
     </tr>
     <tr>
       <td>{% trans "Callback key" %}:</td>

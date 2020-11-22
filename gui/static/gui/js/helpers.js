@@ -1019,6 +1019,8 @@ function copy_to_clipboard(text) {
 }
 
 function init_copy_text_to_clipboard() {
+  // $('a').on('click', '.copy_text_to_clipboard', function() {
+  console.log('Setting up events for copy_to_clipboard() function');
   $('a.copy_text_to_clipboard').click(function() {
     var elem_to_copy;
 
