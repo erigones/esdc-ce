@@ -5,23 +5,44 @@ DC_ADMIN = DanubeCloudCommand.settings.VMS_DC_ADMIN
 
 class Command(DanubeCloudCommand):
     help = 'Generate ansible host inventory.'
-    options = (
-        CommandOption('--vms', action='store_true', dest='vms', default=False,
-                      help='List first IP address of all virtual machines in a specific virtual datacenter.'),
-        CommandOption('--vms-primary', action='store_true', dest='vms_primary', default=False,
-                      help='List primary IP address of all virtual machines in a specific virtual datacenter.'),
-        CommandOption('--nodes', action='store_true', dest='nodes', default=False,
-                      help='List admin IP address of all compute nodes.'),
-        CommandOption('--nodes-external', action='store_true', dest='nodes_external', default=False,
-                      help='List external IP address of all compute nodes.'),
-        CommandOption('--vdc', dest='virtual_dc', default=DC_ADMIN,
-                      help='List hosts from a specific virtual datacenter (vDC). Requires --vms. '
-                           'Defaults to "%s".' % DC_ADMIN),
-        CommandOption('--pdc', dest='physical_dc', default=None,
-                      help='List compute node IP addresses depending on their physical location. '
-                           'Nodes located in this datacenter will use admin network IP addresses; '
-                           'Other nodes will use external IP addresses. Requires --nodes.'),
-    )
+
+    def add_arguments(self, parser):
+        parser.add_argument('--vms',
+                            action='store_true',
+                            dest='vms',
+                            default=False,
+                            help='List first IP address of all virtual machines in a specific virtual datacenter.')
+
+        parser.add_argument('--vms-primary',
+                            action='store_true',
+                            dest='vms_primary',
+                            default=False,
+                            help='List primary IP address of all virtual machines in a specific virtual datacenter.')
+
+        parser.add_argument('--nodes',
+                            action='store_true',
+                            dest='nodes',
+                            default=False,
+                            help='List admin IP address of all compute nodes.')
+
+        parser.add_argument('--nodes-external',
+                            action='store_true',
+                            dest='nodes_external',
+                            default=False,
+                            help='List external IP address of all compute nodes.')
+
+        parser.add_argument('--vdc',
+                            dest='virtual_dc',
+                            default=DC_ADMIN,
+                            help='List hosts from a specific virtual datacenter (vDC). Requires --vms. '
+                                 'Defaults to "%s".' % DC_ADMIN)
+
+        parser.add_argument('--pdc',
+                            dest='physical_dc',
+                            default=None,
+                            help='List compute node IP addresses depending on their physical location. '
+                                 'Nodes located in this datacenter will use admin network IP addresses; '
+                                 'Other nodes will use external IP addresses. Requires --nodes.')
 
     @staticmethod
     def _list_node_hosts(external=False, dc_name=None):

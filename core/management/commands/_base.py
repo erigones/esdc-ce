@@ -65,10 +65,10 @@ class DanubeCloudCommand(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('--no-newline',
-            action='store_true',
-            dest='no_newline',
-            default=False,
-            help='Strip newlines from output')
+                            action='store_true',
+                            dest='no_newline',
+                            default=False,
+                            help='Strip newlines from output')
 
     def get_version(self):
         """This isn't used anywhere"""

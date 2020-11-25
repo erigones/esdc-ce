@@ -3,13 +3,20 @@ from ._base import DanubeCloudCommand, CommandOption, lcd
 
 class Command(DanubeCloudCommand):
     help = 'Switch to git branch or tag.'
-    options = (
-        CommandOption('-t', '--tag', action='store', dest='branch', default=DanubeCloudCommand.DEFAULT_BRANCH,
-                      help='Switch repositories to specific tag.'),
-        CommandOption('-b', '--branch', action='store', dest='branch', default=DanubeCloudCommand.DEFAULT_BRANCH,
-                      help='Switch repositories to specific branch.'),
-    )
     BUILD_PLANS = getattr(DanubeCloudCommand.settings, 'ERIGONES_BUILD_PLANS', {})
+
+    def add_arguments(self, parser):
+        parser.add_argument('-t', '--tag',
+                            action='store',
+                            dest='branch',
+                            default=DanubeCloudCommand.DEFAULT_BRANCH,
+                            help='Switch repositories to specific tag.')
+
+        parser.add_argument('-b', '--branch',
+                            action='store',
+                            dest='branch',
+                            default=DanubeCloudCommand.DEFAULT_BRANCH,
+                            help='Switch repositories to specific branch.')
 
     def git_branch(self, app, branch):
         """Helper function for switching into a branch in an repository"""

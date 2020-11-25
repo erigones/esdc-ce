@@ -4,10 +4,12 @@ from ._base import DanubeCloudCommand, CommandOption
 class Command(DanubeCloudCommand):
     help = 'Display Danube Cloud version.'
 
-    options = (
-        CommandOption('-f', '--full', action='store_true', dest='full', default=False,
-                      help='Display full version string (including edition).'),
-    )
+    def add_arguments(self, parser):
+        parser.add_argument('-f', '--full',
+                            action='store_true',
+                            dest='full',
+                            default=False,
+                            help='Display full version string (including edition).')
 
     def handle(self, full=False, **options):
         from core.version import __version__, __edition__

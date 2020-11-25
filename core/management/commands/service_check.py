@@ -3,10 +3,13 @@ from ._base import DanubeCloudCommand, CommandOption, CommandError
 
 class Command(DanubeCloudCommand):
     help = 'Check connection to internal/admin services.'
-    options = (
-        CommandOption('-q', '--que', '--node', action='store_true', dest='que_only', default=False,
-                      help='Check only services related to erigonesd on a compute node.'),
-    )
+
+    def add_arguments(self, parser):
+        parser.add_argument('-q', '--que', '--node',
+                            action='store_true',
+                            dest='que_only',
+                            default=False,
+                            help='Check only services related to erigonesd on a compute node.')
 
     def _ok(self, ssl_on):
         if ssl_on:

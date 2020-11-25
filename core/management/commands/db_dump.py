@@ -10,27 +10,27 @@ class Command(DanubeCloudCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('-d', '--database',
-            action='store',
-            dest='database',
-            help='Nominates a specific database to dump. Defaults to the "default" database.')
+                            action='store',
+                            dest='database',
+                            help='Nominates a specific database to dump. Defaults to the "default" database.')
 
         parser.add_argument('-a', '--data-only',
-            action='store_true',
-            dest='data_only',
-            default=False,
-            help='Dump only the data, not the schema.')
+                            action='store_true',
+                            dest='data_only',
+                            default=False,
+                            help='Dump only the data, not the schema.')
 
         parser.add_argument('-s', '--schema-only',
-            action='store_true',
-            dest='schema_only',
-            default=False,
-            help='Dump only the schema, no data.')
+                            action='store_true',
+                            dest='schema_only',
+                            default=False,
+                            help='Dump only the schema, no data.')
 
         parser.add_argument('-i', '--inserts',
-            action='store_true',
-            dest='inserts',
-            default=False,
-            help='Dump data as INSERT commands with column names.')
+                            action='store_true',
+                            dest='inserts',
+                            default=False,
+                            help='Dump data as INSERT commands with column names.')
 
     def handle(self, db_name=DEFAULT_DB_ALIAS, data_only=False, schema_only=False, inserts=False, **options):
         db_name = options.get('database') or db_name

@@ -5,10 +5,12 @@ class Command(DanubeCloudCommand):
     help = 'Shortcut for pip uninstall within the application\'s virtual environment.'
     args = '<package1> [package2] ...'
 
-    option_list = (
-        CommandOption('-s', '--silence-errors', action='store_true', dest='silence_errors', default=False,
-                      help='Do not propagate pip errors.'),
-    )
+    def add_arguments(self, parser):
+        parser.add_argument('-s', '--silence-errors',
+                            action='store_true',
+                            dest='silence_errors',
+                            default=False,
+                            help='Do not propagate pip errors.')
 
     def pip_uninstall(self, package, raise_on_error, params='-y'):
         erroneous_return_code = self.local('pip uninstall %s %s' % (params, package), raise_on_error=raise_on_error)

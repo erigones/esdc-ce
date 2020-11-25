@@ -7,14 +7,25 @@ from ._base import lcd, DanubeCloudCommand, CommandOption, CommandError
 
 class Command(DanubeCloudCommand):
     help = 'Synchronize DB with models by running all Django migrations.'
-    options = (
-        CommandOption('-f', '--force', action='store_true', dest='force', default=False,
-                      help='Skip confirmation dialog.'),
-        CommandOption('-i', '--init', action='store_true', dest='init', default=False,
-                      help='Initialize empty database.'),
-        CommandOption('-t', '--test', action='store_true', dest='test', default=False,
-                      help='Synchronize the test database.'),
-    )
+
+    def add_arguments(self, parser):
+        parser.add_argument('-f', '--force',
+                            action='store_true',
+                            dest='force',
+                            default=False,
+                            help='Skip confirmation dialog.')
+
+        parser.add_argument('-i', '--init',
+                            action='store_true',
+                            dest='init',
+                            default=False,
+                            help='Initialize empty database.')
+
+        parser.add_argument('-t', '--test',
+                            action='store_true',
+                            dest='test',
+                            default=False,
+                            help='Synchronize the test database.')
 
     def drop_useless_indexes(self):
         """Django creates lots of indexes by default"""

@@ -8,10 +8,10 @@ class Command(DanubeCloudCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('-q', '--que', '--node',
-            action='store_true',
-            dest='que_only',
-            default=False,
-            help='Byte-compile only compute node related stuff.')
+                            action='store_true',
+                            dest='que_only',
+                            default=False,
+                            help='Byte-compile only compute node related stuff.')
 
     def handle(self, que_only=False, **options):
         if que_only:

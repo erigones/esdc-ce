@@ -9,12 +9,19 @@ class Command(DanubeCloudCommand):
     help = 'Generate documentation files displayed in GUI.'
     DOC_REPO = 'https://github.com/erigones/esdc-docs.git'
     DOC_TMP_DIR = '/var/tmp/esdc-docs'
-    options = (
-        CommandOption('--api', '--api-only', action='store_true', dest='api_only', default=False,
-                      help='Generate only the API documentation.'),
-        CommandOption('--user-guide', '--user-guide-only', action='store_true', dest='user_guide_only', default=False,
-                      help='Generate only the User Guide.'),
-    )
+
+    def add_arguments(self, parser):
+        parser.add_argument('--api', '--api-only',
+                            action='store_true',
+                            dest='api_only',
+                            default=False,
+                            help='Generate only the API documentation.')
+
+        parser.add_argument('--user-guide', '--user-guide-only',
+                            action='store_true',
+                            dest='user_guide_only',
+                            default=False,
+                            help='Generate only the User Guide.')
 
     def gendoc_api(self):
         """Generate api documentation"""

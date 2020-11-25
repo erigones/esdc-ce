@@ -1,16 +1,18 @@
 from .build import Command as BuildCommand
-from ._base import CommandOption
 
 
 class Command(BuildCommand):
     help = 'Install and build the whole application, and prepare the database for an initial start.'
 
     def add_arguments(self, parser):
+        # TODO: run me in VM:
+        # ./ ctl.sh deploy - -update
+
         parser.add_argument('--update',
-            action='store_true',
-            dest='update',
-            default=False,
-            help='Perform update of the application.')
+                            action='store_true',
+                            dest='update',
+                            default=False,
+                            help='Perform update of the application.')
 
     def handle(self, que_only=False, update=False, **options):
         self.build(que_only=que_only)
