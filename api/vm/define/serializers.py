@@ -131,6 +131,7 @@ class VmDefineSerializer(VmBaseSerializer):
     installed = s.BooleanField(default=False)
     snapshot_limit_manual = s.IntegerField(required=False)  # Removed from json if null, limits set below
     snapshot_size_limit = s.IntegerField(required=False)  # Removed from json if null, limits set below
+    snapshot_size_percent_limit = s.IntegerField(required=False)  # Removed from json if null, limits set below
     cpu_cap = s.IntegerField(read_only=True)
     cpu_shares = s.IntegerField(default=settings.VMS_VM_CPU_SHARES_DEFAULT, min_value=0, max_value=1048576)
     zfs_io_priority = s.IntegerField(default=settings.VMS_VM_ZFS_IO_PRIORITY_DEFAULT, min_value=0, max_value=1024)
@@ -173,6 +174,7 @@ class VmDefineSerializer(VmBaseSerializer):
             del self.fields['maintain_resolvers']
             del self.fields['routes']
             del self.fields['dns_domain']
+
         if not kvm:
             # these are only KVM properties
             del self.fields['cpu_type']
@@ -197,8 +199,10 @@ class VmDefineSerializer(VmBaseSerializer):
 
             field_snapshot_limit_manual = self.fields['snapshot_limit_manual']
             field_snapshot_size_limit = self.fields['snapshot_size_limit']
+            field_snapshot_size_percent_limit = self.fields['snapshot_size_percent_limit']
             field_snapshot_limit_manual.default = dc_settings.VMS_VM_SNAPSHOT_LIMIT_MANUAL_DEFAULT
             field_snapshot_size_limit.default = dc_settings.VMS_VM_SNAPSHOT_SIZE_LIMIT_DEFAULT
+            field_snapshot_size_percent_limit.default = dc_settings.VMS_VM_SNAPSHOT_SIZE_PERCENT_LIMIT_DEFAULT
 
             if dc_settings.VMS_VM_SNAPSHOT_LIMIT_MANUAL is None:
                 min_snap, max_snap = 0, 65536
@@ -215,6 +219,14 @@ class VmDefineSerializer(VmBaseSerializer):
                 field_snapshot_size_limit.required = field_snapshot_size_limit.disallow_empty = True
             field_snapshot_size_limit.validators.append(validators.MinValueValidator(min_snaps_size))
             field_snapshot_size_limit.validators.append(validators.MaxValueValidator(max_snaps_size))
+
+            if dc_settings.VMS_VM_SNAPSHOT_SIZE_PERCENT_LIMIT is None:
+                min_snaps_size_perc, max_snaps_size_perc = 0, 10000
+            else:
+                min_snaps_size_perc, max_snaps_size_perc = 1, int(dc_settings.VMS_VM_SNAPSHOT_SIZE_PERCENT_LIMIT)
+                field_snapshot_size_percent_limit.required = field_snapshot_size_percent_limit.disallow_empty = True
+            field_snapshot_size_percent_limit.validators.append(validators.MinValueValidator(min_snaps_size_perc))
+            field_snapshot_size_percent_limit.validators.append(validators.MaxValueValidator(max_snaps_size_perc))
 
             if kvm:
                 self.fields['vga'].default = dc_settings.VMS_VGA_MODEL_DEFAULT
