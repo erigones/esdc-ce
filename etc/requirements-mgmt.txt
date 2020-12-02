@@ -3,14 +3,13 @@
 pip
 setuptools==40.8.0
 Django==2.2
-# appconf 1.0.4 dropped py2
-django-appconf==1.0.3
+django-appconf==1.0.4
 Sphinx==1.6.5
 Jinja2==2.10
 sphinxcontrib-httpdomain==1.7.0
 Pygments==2.7.1
 docutils==0.14
-django-transaction-hooks==0.2
+django-transaction-hooks==0.3
 
 ### dns
 dnspython==1.16.0
@@ -29,18 +28,18 @@ gunicorn==20.0.4
 Pillow==4.2.0
 xmltodict==0.12.0
 python-dateutil==2.8.0
-django-taggit==0.22.2
-django-celery==3.1.17
+django-taggit==1.3.0
+django-celery==3.3.1
 netifaces==0.10.9
 dictdiffer==0.8.1
 zabbix-api-erigones==1.2.4
 psycopg2==2.7.3.2
 psycogreen==1.0.0
-django-redis-cache==2.1.3
+django-redis-cache==3.0.0
 hiredis==1.1.0
 django-compressor==2.1.1
 phonenumbers==8.12.10
-django-timezone-field==2.0
+django-timezone-field==4.1.1
 blinker==1.4
 lxml==4.5.2
 openpyxl==3.0.5
