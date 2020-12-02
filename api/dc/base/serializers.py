@@ -212,6 +212,8 @@ class DcSettingsSerializer(s.InstanceSerializer):
         'VMS_VM_SNAPSHOT_LIMIT_AUTO',
         'VMS_VM_SNAPSHOT_LIMIT_MANUAL',
         'VMS_VM_SNAPSHOT_LIMIT_MANUAL_DEFAULT',
+        'VMS_VM_SNAPSHOT_SIZE_PERCENT_LIMIT',
+        'VMS_VM_SNAPSHOT_SIZE_PERCENT_LIMIT_DEFAULT',
         'VMS_VM_SNAPSHOT_SIZE_LIMIT',
         'VMS_VM_SNAPSHOT_SIZE_LIMIT_DEFAULT',
         'VMS_VM_SNAPSHOT_DC_SIZE_LIMIT',
@@ -377,7 +379,7 @@ class DcSettingsSerializer(s.InstanceSerializer):
     VMS_VM_SNAPSHOT_LIMIT_MANUAL_DEFAULT = s.IntegerField(label='VMS_VM_SNAPSHOT_LIMIT_MANUAL_DEFAULT', required=False,
                                                           help_text=_('Predefined manual snapshot limit '
                                                                       'for new servers.'))
-    VMS_VM_SNAPSHOT_SIZE_PERCENT_LIMIT = s.IntegerField(label='VMS_VM_SNAPSHOT_PERCENT_SIZE_LIMIT',
+    VMS_VM_SNAPSHOT_SIZE_PERCENT_LIMIT = s.IntegerField(label='VMS_VM_SNAPSHOT_SIZE_PERCENT_LIMIT',
                                                         required=False,
                                                         help_text=_('Maximum size (% of all defined VM disk capacity) '
                                                                     'of settable server snapshot size '

@@ -1849,6 +1849,17 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
     def installed(self, value):
         self.save_metadata('installed', value, save=False)
 
+    @property  # Return size limit for all snapshots in percent of assigned VM storage
+    def snapshot_size_percent_limit(self):
+        return self.internal_metadata.get('snapshot_size_percent_limit', None)
+
+    @snapshot_size_percent_limit.setter  # Set json.internal_metadata.snapshot_size_percent_limit
+    def snapshot_size_percent_limit(self, value):
+        if value is None:  # SmartOS doesn't like null in internal_metadata
+            self.delete_metadata('snapshot_size_percent_limit', save=False)
+        else:
+            self.save_metadata('snapshot_size_percent_limit', value, save=False)
+
     @property  # Return size limit for all snapshots
     def snapshot_size_limit(self):
         return self.internal_metadata.get('snapshot_size_limit', None)

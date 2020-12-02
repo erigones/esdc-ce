@@ -228,9 +228,16 @@ class AdminServerSettingsForm(ServerSettingsForm):
     snapshot_limit_manual = forms.IntegerField(label=_('Snapshot count limit'), required=False,
                                                widget=NumberInput(attrs={'class': 'input-transparent narrow'}),
                                                help_text=_('Maximum number of manual server snapshots.'))
+    snapshot_size_percent_limit = forms.IntegerField(label=_('Snapshot size % limit'), required=False,
+                                                     widget=NumberInput(attrs={'class': 'input-transparent narrow'}),
+                                                     help_text=_(
+                                                         'Maximum size of all server snapshots as % of all disk space '
+                                                         'of this VM (example: 200% = VM with 10GB disk(s) can have '
+                                                         '20GB of snapshots).'))
     snapshot_size_limit = forms.IntegerField(label=_('Snapshot size limit'), required=False,
                                              widget=NumberInput(attrs={'class': 'input-transparent narrow'}),
-                                             help_text=_('Maximum size of all server snapshots.'))
+                                             help_text=_('Maximum size of all server snapshots. '
+                                                         'If set, it takes precedence over % limit.'))
     cpu_shares = forms.IntegerField(label=_('CPU Shares'), max_value=1048576, min_value=0, required=True,
                                     widget=NumberInput(attrs={'class': 'input-transparent narrow',
                                                               'required': 'required'}))

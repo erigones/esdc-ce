@@ -119,12 +119,12 @@ then the vcpus value can be 0, which will remove the compute node CPU limit enti
         :arg data.snapshot_limit_manual: Maximum number of manual snapshots for this VM (default: null [unlimited])
         :type data.snapshot_limit_manual: integer
         :arg data.snapshot_size_percent_limit: Maximum size of all snapshots for this VM relative to size of all \
-defined VM disks (default: null [unlimited])
+defined VM disks. Ignored if ``snapshot_size_limit`` is defined (default: null [unlimited])
         :type data.snapshot_size_percent_limit: integer
         :arg data.snapshot_size_limit: Maximum absolute size of all snapshots for this VM in megabytes \
 (default: null [unlimited])
         :type data.snapshot_size_limit: integer
-        :arg data.zpool: The zpool used for the VM zone (default: zones)
+        :arg data.zpool: The zpool used for the VM (default: zones)
         :type data.zpool: string
         :arg data.cpu_shares: Number of VM's CPU shares relative to other VMs (requires |SuperAdmin| permission) \
 (default: 100)
@@ -199,7 +199,7 @@ then the vcpus value can be 0, which will remove the compute node CPU limit enti
         :type data.snapshot_limit_manual: integer
         :type data.snapshot_limit_manual: integer
         :arg data.snapshot_size_percent_limit: Maximum size of all snapshots for this VM relative to size of all \
-defined VM disks
+defined VM disks. Ignored if ``snapshot_size_limit`` is defined
         :arg data.snapshot_size_limit: Maximum absolute size of all snapshots for this VM in megabytes
         :type data.snapshot_size_limit: integer
         :arg data.zpool: The zpool used for the VM zone

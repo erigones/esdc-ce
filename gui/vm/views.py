@@ -25,7 +25,7 @@ from gui.vm.utils import (
     get_vm_backups, get_vm_bkpdefs, vm_define_all, ImportExportBase
 )
 from gui.decorators import ajax_required, profile_required, admin_required, permission_required
-from gui.fields import SIZE_FIELD_MB_ADDON
+from gui.fields import SIZE_FIELD_MB_ADDON, SIZE_FIELD_PERCENT_ADDON
 from gui.utils import collect_view_data, get_pager
 from gui.signals import (view_vm_details, view_vm_snapshot, view_vm_backup, view_vm_console, view_vm_monitoring,
                          view_vm_tasklog)
@@ -69,6 +69,7 @@ def details(request, hostname):
     """
     dc_settings = request.dc.settings
     context = collect_view_data(request, 'vm_list', mb_addon=SIZE_FIELD_MB_ADDON)
+    context['percent_addon'] = SIZE_FIELD_PERCENT_ADDON
     context['vm'] = vm = get_vm(request, hostname, sr=('dc', 'owner', 'node', 'template', 'slavevm'))
     context['vms'] = vms = get_vms(request)
     context['vms_tags'] = get_vms_tags(vms)
@@ -476,6 +477,7 @@ def settings_form(request, hostname):
         'settingsform': form,
         'vm': vm,
         'mb_addon': SIZE_FIELD_MB_ADDON,
+        'percent_addon': SIZE_FIELD_PERCENT_ADDON,
     })
 
 
@@ -508,6 +510,7 @@ def disk_settings_form(request, hostname):
         'disk_settingsform': form,
         'vm': vm,
         'mb_addon': SIZE_FIELD_MB_ADDON,
+        'percent_addon': SIZE_FIELD_PERCENT_ADDON,
     })
 
 
@@ -770,7 +773,7 @@ def _generic_add_context(request):
 
     Partial add VM view, was separated to smaller functions due to code reuse in Enterprise Edition apps (payments).
     """
-    context = collect_view_data(request, 'vm_add', mb_addon=SIZE_FIELD_MB_ADDON)
+    context = collect_view_data(request, 'vm_add', mb_addon=SIZE_FIELD_MB_ADDON, percent_addon=SIZE_FIELD_PERCENT_ADDON)
     context['vms'] = vms = get_vms(request)
     context['vms_tags'] = get_vms_tags(vms)
 
@@ -796,6 +799,7 @@ def _render_admin_add(request, context):
     initial['ostype'] = dc_settings.VMS_VM_OSTYPE_DEFAULT
     initial['hvm_type'] = dc_settings.VMS_VM_HVM_TYPE_DEFAULT
     initial['snapshot_limit_manual'] = dc_settings.VMS_VM_SNAPSHOT_LIMIT_MANUAL_DEFAULT
+    initial['snapshot_size_percent_limit'] = dc_settings.VMS_VM_SNAPSHOT_SIZE_PERCENT_LIMIT_DEFAULT
     initial['snapshot_size_limit'] = dc_settings.VMS_VM_SNAPSHOT_SIZE_LIMIT_DEFAULT
     initial['owner'] = request.user.username
     initial['mdata'] = dc_settings.VMS_VM_MDATA_DEFAULT
