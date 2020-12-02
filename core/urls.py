@@ -1,4 +1,4 @@
-from django.conf.urls import url, include
+from django.urls import path, include
 from django.contrib import admin
 from django.conf import settings
 
@@ -8,23 +8,23 @@ handler500 = 'core.views.server_error'
 
 urlpatterns = [
     # api urls - WARNING: Do NOT change this URL
-    url(r'^api/', include('api.urls')),
+    path('api/', include('api.urls')),
     # gui urls
-    url(r'^', include('gui.urls')),
+    path('', include('gui.urls')),
     # sio urls
-    url(r'^socket\.io/', include('sio.urls')),
+    path('socket.io/', include('sio.urls')),
 ]
 
 if settings.THIRD_PARTY_APPS_ENABLED:
     # Allow to overload ESDC CE URLs with third party app custom functionality.
     for app in settings.THIRD_PARTY_APPS:
-        urlpatterns = [url(r'', include(app + '.urls')),] + urlpatterns
+        urlpatterns = [path('', include(app + '.urls')),] + urlpatterns
 
 if settings.DEBUG:
     urlpatterns = [
-        # url(r'^media/(?P<path>.*)$', django.views.static.serve, {'document_root': settings.MEDIA_ROOT,
-        #                                                          'show_indexes': True}),
-        url(r'', include('django.contrib.staticfiles.urls')),
+        # re_path(r'^media/(?P<path>.*)$', django.views.static.serve, {'document_root': settings.MEDIA_ROOT,
+        #                                                              'show_indexes': True}),
+        path('', include('django.contrib.staticfiles.urls')),
         # Django Admin URLs
-        url(r'^' + settings.ADMIN_URL, admin.site.urls),
+        path('' + settings.ADMIN_URL, admin.site.urls),
     ] + urlpatterns

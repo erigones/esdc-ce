@@ -1,7 +1,7 @@
-from django.conf.urls import url
+from django.urls import path
 
 from api.sms.smsapi.views import callback
 
 urlpatterns = [
-    url(r'callback/$', callback, name='sms_smsapi_callback'),
+    path('callback/$', callback, name='sms_smsapi_callback'),
 ]

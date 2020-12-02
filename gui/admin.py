@@ -4,7 +4,7 @@ from django.contrib.auth.admin import UserAdmin as _UserAdmin
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from django.contrib.auth.models import Group
 from django.utils.translation import ugettext_lazy as _
-from django.conf.urls import url
+from django.urls import path, re_path
 from django.shortcuts import get_object_or_404
 from django.conf import settings
 
@@ -161,10 +161,10 @@ class UserAdmin(_UserAdmin):
 
     def get_urls(self):
         urls = [
-            url(r'cancel_impersonation/$', self.admin_site.admin_view(self.stop_impersonation),
-                name='stop_impersonation'),
-            url(r'(?P<user_id>\d+)/impersonate/$', self.admin_site.admin_view(self.start_impersonation),
-                name='start_impersonation'),
+            path('cancel_impersonation/', self.admin_site.admin_view(self.stop_impersonation),
+                 name='stop_impersonation'),
+            path('<int:user_id>/impersonate/', self.admin_site.admin_view(self.start_impersonation),
+                 name='start_impersonation'),
         ]
         return urls + super(UserAdmin, self).get_urls()
 

@@ -90,8 +90,8 @@ class URLPathVersioning(BaseVersioning):
     Django's URL keyword arguments to determine the version.
     An example URL conf for two views that accept two different versions.
     urlpatterns = [
-        url(r'^(?P<version>[v1|v2]+)/users/$', users_list, name='users-list'),
-        url(r'^(?P<version>[v1|v2]+)/users/(?P<pk>[0-9]+)/$', users_detail, name='users-detail')
+        re_path(r'^(?P<version>[v1|v2]+)/users/$', users_list, name='users-list'),
+        re_path(r'^(?P<version>[v1|v2]+)/users/(?P<pk>[0-9]+)/$', users_detail, name='users-detail')
     ]
     GET /1.0/something/ HTTP/1.1
     Host: example.com
@@ -124,13 +124,13 @@ class NamespaceVersioning(BaseVersioning):
     An example URL conf that is namespaced into two separate versions
     # users/urls.py
     urlpatterns = [
-        url(r'^/users/$', users_list, name='users-list'),
-        url(r'^/users/(?P<pk>[0-9]+)/$', users_detail, name='users-detail')
+        path('/users/', users_list, name='users-list'),
+        path('/users/<int:pk>/', users_detail, name='users-detail')
     ]
     # urls.py
     urlpatterns = [
-        url(r'^v1/', include('users.urls', namespace='v1')),
-        url(r'^v2/', include('users.urls', namespace='v2'))
+        re_path('v1/', include('users.urls', namespace='v1')),
+        re_path('v2/', include('users.urls', namespace='v2'))
     ]
     GET /1.0/something/ HTTP/1.1
     Host: example.com

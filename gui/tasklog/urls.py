@@ -1,8 +1,8 @@
-from django.conf.urls import url
+from django.urls import path
 
 from gui.tasklog.views import index, cached
 
 urlpatterns = [
-    url(r'^$', index, name='tasklog'),
-    url(r'^last/$', cached, name='tasklog_cached'),
+    path('', index, name='tasklog'),
+    path('last/', cached, name='tasklog_cached'),
 ]
