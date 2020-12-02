@@ -19,7 +19,7 @@ celery==3.1.25
 kombu==3.0.37
 pytz==2018.9
 ipaddress==1.0.23
-gevent==1.2.2
+gevent==20.9.0
 gevent-socketio-es==0.3.7
 gevent-websocket==0.10.1
 geoip2==4.1.0
