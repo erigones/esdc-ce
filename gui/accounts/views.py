@@ -7,9 +7,10 @@ from django.utils.translation import LANGUAGE_SESSION_KEY, check_for_language, u
 from django.utils.http import is_safe_url, urlsafe_base64_decode
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.views import logout_then_login
-# from django.contrib.auth.views import password_reset, password_reset_confirm, logout_then_login, login as contrib_login
-from django.contrib.auth.views import PasswordResetView, PasswordResetConfirmView, LoginView
+from django.contrib.auth.views import PasswordResetView, PasswordResetConfirmView, LoginView, logout_then_login
+from django.contrib.auth import login as auth_login
+from django.http import HttpResponseRedirect
+
 from logging import getLogger
 from functools import partial
 
@@ -184,19 +185,20 @@ def forgot_passwd(request):
     """
     dc_settings = request.dc.settings
 
-    return password_reset(
-        request,
-        template_name='gui/accounts/forgot.html',
-        email_template_name='gui/accounts/forgot_email.txt',
-        subject_template_name='gui/accounts/forgot_subject.txt',
-        password_reset_form=partial(ForgotForm, request),
-        post_reset_redirect=reverse('forgot_done'),
-        from_email=dc_settings.DEFAULT_FROM_EMAIL,
-        current_app='gui',
-        extra_context={
-            'e_site_name': dc_settings.SITE_NAME,
-            'e_site_link': dc_settings.SITE_LINK,
-        })
+    password_reset = PasswordResetView()
+    password_reset.template_name = 'gui/accounts/forgot.html'
+    password_reset.email_template_name = 'gui/accounts/forgot_email.txt'
+    password_reset.subject_template_name = 'gui/accounts/forgot_subject.txt'
+    password_reset.password_reset_form = partial(ForgotForm, request)
+    password_reset.post_reset_redirect = reverse('forgot_done')
+    password_reset.from_email = dc_settings.DEFAULT_FROM_EMAIL
+    password_reset.current_app = 'gui'
+    password_reset.extra_context = {
+        'e_site_name': dc_settings.SITE_NAME,
+        'e_site_link': dc_settings.SITE_LINK,
+    }
+
+    return password_reset.as_view()
 
 
 @logout_required
@@ -248,18 +250,18 @@ def forgot_passwd_check(request, uidb64=None, token=None):
                 profile.phone_verified = True
             profile.save()
 
-    return password_reset_confirm(
-        request,
-        uidb64=uidb64,
-        token=token,
-        template_name='gui/accounts/forgot_check.html',
-        set_password_form=set_password_form,
-        post_reset_redirect=reverse('forgot_check_done'),
-        current_app='gui',
-        extra_context={
-            'sms_registration': sms_registration,
-        }
-    )
+    password_reset_confirm = PasswordResetConfirmView()
+    password_reset_confirm.uidb64 = uidb64
+    password_reset_confirm.token = token
+    password_reset_confirm.template_name = 'gui/accounts/forgot_check.html'
+    password_reset_confirm.set_password_form = set_password_form
+    password_reset_confirm.post_reset_redirect = reverse('forgot_check_done')
+    password_reset_confirm.current_app = 'gui'
+    password_reset_confirm.extra_context = {
+        'sms_registration': sms_registration,
+    }
+
+    return password_reset_confirm.as_view()
 
 
 @logout_required
@@ -282,29 +284,30 @@ def forgot_passwd_check_done(request):
     })
 
 
-@logout_required
-def login(request):
+class DCLoginView(LoginView):
     """
     Log users in the system and re-direct them to dashboard or show proper error message when failed.
     """
-    login_func = LoginView.as_view()
-    response = login_func(request)
+    form_class = LoginForm
+    template_name = 'gui/accounts/login.html'
 
-    # response = contrib_login(request, 'gui/accounts/login.html', authentication_form=partial(LoginForm, request))
+    def form_invalid(self, form):
+        """If the form is invalid, render the invalid form."""
+        auth_logger.warning('User %s login failed from %s (%s)', self.request.POST.get('username', None),
+                            get_client_ip(self.request), self.request.META.get('HTTP_USER_AGENT', ''))
 
-    # Setup i18n settings into session
-    if request.method == 'POST':
-        user = request.user
-        if user.is_authenticated():
-            auth_logger.info('User %s successfully logged in from %s (%s)', user, get_client_ip(request),
-                             request.META.get('HTTP_USER_AGENT', ''))
-            user.userprofile.activate_locale(request)
-            clear_attempts_cache(request, user.username)
-        else:
-            auth_logger.warning('User %s login failed from %s (%s)', request.POST.get('username', None),
-                                get_client_ip(request), request.META.get('HTTP_USER_AGENT', ''))
+        return super().form_invalid(form)
 
-    return response
+    def form_valid(self, form):
+        """Security check complete. Log the user in."""
+        user = form.get_user()
+        auth_login(self.request, user)
+        auth_logger.info('User %s successfully logged in from %s (%s)', user, get_client_ip(self.request),
+                         self.request.META.get('HTTP_USER_AGENT', ''))
+        user.userprofile.activate_locale(self.request)
+        clear_attempts_cache(self.request, user.username)
+
+        return HttpResponseRedirect(self.get_success_url())
 
 
 @login_required
