@@ -1910,17 +1910,19 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
         zfs_metadata_overhead = 1.03
         all_disks_size = self.disk
 
+        vm_snap_size_limit = self.snapshot_size_limit
+        snap_perc_limit = self.snapshot_size_percent_limit
         # if hard limit in MB is specified, percent limit is ignored
-        vm_size_limit = self.snapshot_size_limit
-        if vm_size_limit is None and self.snapshot_size_percent_limit is not None:
-            vm_size_limit = (float(self.snapshot_size_percent_limit) / 100) * all_disks_size
-        else:
-            # no snapshot limit is specified
-            return 'none'
+        if vm_snap_size_limit is None:
+            if snap_perc_limit is not None:
+                vm_snap_size_limit = (float(snap_perc_limit) / 100) * all_disks_size
+            else:
+                # no snapshot limit is specified
+                return 'none'
 
         # volume's refreservation value counts as a used space... therefore we need to double the disksize to have
         # useful quota (without doubling, the quota would equal to refreservation and no snapshots would be possible)
-        quota = int(round((2 * (all_disks_size * zfs_metadata_overhead)) + vm_size_limit))
+        quota = int(round((2 * (all_disks_size * zfs_metadata_overhead)) + vm_snap_size_limit))
         return str(quota) + 'M'
 
     @property
