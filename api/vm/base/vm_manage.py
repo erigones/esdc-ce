@@ -43,19 +43,6 @@ class VmManage(APIView):
                              check_node_status=('POST', 'DELETE'))
 
     @staticmethod
-    def compute_bhyve_quota(vm):
-        """
-        Computes overall disk quota from all VM disks. If there are pending VM changes,
-        it takes disk sizes from the new settings, not from active ones.
-        Returns string.
-        """
-        # TODO: if snapshot size limit is undefined, return 'none' (+ move method to Vm ?)
-        all_disks_size = vm.disk
-        quota = int(round((2 * (all_disks_size * 1.03)) + (1.5 * all_disks_size)))
-        logger.debug('Bhyve VM quota computed to "%s" (from disks size "%")', quota, all_disks_size)
-        return str(quota) + 'M'
-
-    @staticmethod
     def fix_create(vm):
         """SmartOS issue. If a image_uuid is specified then size should be omitted, which is done in vm.fix_json(),
         so run this one before vm.fix_json() to create a command for changing zvol volsize."""
@@ -78,7 +65,7 @@ class VmManage(APIView):
                             cmd += _refres
 
         elif vm.is_bhyve():
-            quota = VmManage.compute_bhyve_quota(vm)
+            quota = vm.get_snapshot_zfs_quota(vm)
             _set_quota = '; zfs set quota=%sM %s/%s >&2; e=$((e+=$?))' % (quota, vm.zpool, vm.uuid)
             cmd += _set_quota
             for i, disk in enumerate(vm.json_get_disks()):
@@ -112,13 +99,15 @@ class VmManage(APIView):
                     cmd += '; zfs set refreservation=%sM %s >&2; e=$((e+=$?)); ' % (refr, zfs_filesystem)
 
         if disks and vm.is_bhyve():
-            quota = VmManage.compute_bhyve_quota(vm)
+            quota = vm.get_snapshot_zfs_quota(vm)
+            logger.debug('Bhyve VM quota for "%s" computed to "%s" (from disks size "%d" MB)', vm.name, quota, vm.disk)
             _set_quota = '; zfs set quota=%s %s/%s >&2; e=$((e+=$?)); ' % (quota, vm.zpool, vm.uuid)
+
             # if the sum of all disk sizes is growing, we need to update quota first;
             # if we are shrinking, the quota needs to be updated last
             if vm.disk > vm.disk_active:  # grow
                 cmd = _set_quota + cmd
-            else:
+            else:  # shrink
                 cmd += _set_quota
 
         return json_update, cmd

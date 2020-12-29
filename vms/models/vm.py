@@ -26,7 +26,6 @@ from vms.models.node import Node
 from vms.models.vmtemplate import VmTemplate
 from gui.models import User
 
-
 cache = caches['redis']
 redis = cache.master_client
 
@@ -1519,6 +1518,10 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
         return self.get_ostype_display().lower().replace(' ', '_')
 
     @property
+    def hvm_type_text(self):  # Used by GUI
+        return self.get_hvm_type_display().split(' ')[0]
+
+    @property
     def dc_name(self):  # Used by monitoring
         return self.dc.name
 
@@ -1791,7 +1794,8 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
             if max_swap < max_physical_memory:
                 max_swap = max_physical_memory
 
-            self.save_items(ram=value, max_physical_memory=max_physical_memory, max_swap=max_swap, max_locked_memory=max_physical_memory, save=False)
+            self.save_items(ram=value, max_physical_memory=max_physical_memory, max_swap=max_swap,
+                            max_locked_memory=max_physical_memory, save=False)
         else:
             self.save_items(max_physical_memory=value, max_swap=max_swap, save=False)
 
@@ -1892,6 +1896,32 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
             self.delete_metadata('snapshot_limit_auto', save=False)
         else:
             self.save_metadata('snapshot_limit_auto', value, save=False)
+
+    def get_snapshot_zfs_quota(self):
+        """
+        Currently makes sense only for bhyve. KVM on SmartOS has different layout for disks.
+        Computes overall disk quota from all VM disks. If there are pending VM changes,
+        it takes disk sizes from the new settings, not from active ones.
+        Returns string (because it can return 'none' and it can be directly used in 'zfs set quota=%s').
+        """
+
+        # when disk is 100% full, we still need some place for zfs volume metadata
+        # (1.03 is used in vmadm's flexible_disk_size)
+        zfs_metadata_overhead = 1.03
+        all_disks_size = self.disk
+
+        # if hard limit in MB is specified, percent limit is ignored
+        vm_size_limit = self.snapshot_size_limit
+        if vm_size_limit is None and self.snapshot_size_percent_limit is not None:
+            vm_size_limit = self.snapshot_size_percent_limit * all_disks_size
+        else:
+            # no snapshot limit is specified
+            return 'none'
+
+        # volume's refreservation value counts as a used space... therefore we need to double the disksize to have
+        # useful quota (without doubling, the quota would equal to refreservation and no snapshots would be possible)
+        quota = int(round((2 * (all_disks_size * zfs_metadata_overhead)) + vm_size_limit))
+        return str(quota) + 'M'
 
     @property
     def cpu_shares(self):

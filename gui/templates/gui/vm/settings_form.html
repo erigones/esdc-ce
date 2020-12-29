@@ -45,7 +45,9 @@
   {% include "gui/form_field.html" with field=settingsform.snapshot_size_limit addon=mb_addon %}
   {% endif %}
 {% endif %}
+{% if vm.is_hvm %}
 {% include "gui/form_field.html" with field=settingsform.hvm_type %}
+{% endif %}
 {% include "gui/form_field.html" with field=settingsform.cpu_shares %}
 {% include "gui/form_field.html" with field=settingsform.zfs_io_priority %}
 {% include "gui/form_field.html" with field=settingsform.zpool %}

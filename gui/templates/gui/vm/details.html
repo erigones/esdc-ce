@@ -338,7 +338,7 @@
             </tr>
             <tr>
               <td>{% trans "OS Type" %}:</td>
-              <td>{{ vm.get_ostype_display }}</td>
+              <td>{{ vm.get_ostype_display }}{% if vm.is_hvm %} ({{ vm.hvm_type_text }}){% endif %}</td>
             </tr>
             {% if json %}
               <tr>
