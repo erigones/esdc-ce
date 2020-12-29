@@ -1897,7 +1897,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
         else:
             self.save_metadata('snapshot_limit_auto', value, save=False)
 
-    def get_snapshot_zfs_quota(self):
+    def calculate_zfs_snapshot_quota(self):
         """
         Currently makes sense only for bhyve. KVM on SmartOS has different layout for disks.
         Computes overall disk quota from all VM disks. If there are pending VM changes,
@@ -1913,7 +1913,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
         # if hard limit in MB is specified, percent limit is ignored
         vm_size_limit = self.snapshot_size_limit
         if vm_size_limit is None and self.snapshot_size_percent_limit is not None:
-            vm_size_limit = self.snapshot_size_percent_limit * all_disks_size
+            vm_size_limit = (self.snapshot_size_percent_limit / 100) * all_disks_size
         else:
             # no snapshot limit is specified
             return 'none'
@@ -1922,6 +1922,19 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
         # useful quota (without doubling, the quota would equal to refreservation and no snapshots would be possible)
         quota = int(round((2 * (all_disks_size * zfs_metadata_overhead)) + vm_size_limit))
         return str(quota) + 'M'
+
+    @property
+    def snapshot_quota_update_pending(self):
+        """
+        Returns true if there is any snapshot related parameter in self.json_update()
+        :return: bool
+        """
+        mdata = self.json_update().get('set_internal_metadata', {})
+        snap_parameters = ['snapshot_size_percent_limit', 'snapshot_size_limit']
+        for param in snap_parameters:
+            if param in mdata:
+                return True
+        return False
 
     @property
     def cpu_shares(self):
