@@ -1913,7 +1913,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
         # if hard limit in MB is specified, percent limit is ignored
         vm_size_limit = self.snapshot_size_limit
         if vm_size_limit is None and self.snapshot_size_percent_limit is not None:
-            vm_size_limit = (self.snapshot_size_percent_limit / 100) * all_disks_size
+            vm_size_limit = (float(self.snapshot_size_percent_limit) / 100) * all_disks_size
         else:
             # no snapshot limit is specified
             return 'none'
@@ -1926,7 +1926,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
     @property
     def snapshot_quota_update_pending(self):
         """
-        Returns true if there is any snapshot related parameter in self.json_update()
+        Returns true if there is any snapshot-related parameter in self.json_update()
         :return: bool
         """
         mdata = self.json_update().get('set_internal_metadata', {})
