@@ -65,7 +65,7 @@ class VmManage(APIView):
                             cmd += _refres
 
         elif vm.is_bhyve():
-            quota = vm.get_snapshot_zfs_quota(vm)
+            quota = vm.get_snapshot_zfs_quota()
             _set_quota = '; zfs set quota=%sM %s/%s >&2; e=$((e+=$?))' % (quota, vm.zpool, vm.uuid)
             cmd += _set_quota
             for i, disk in enumerate(vm.json_get_disks()):
@@ -99,7 +99,7 @@ class VmManage(APIView):
                     cmd += '; zfs set refreservation=%sM %s >&2; e=$((e+=$?)); ' % (refr, zfs_filesystem)
 
         if disks and vm.is_bhyve():
-            quota = vm.get_snapshot_zfs_quota(vm)
+            quota = vm.get_snapshot_zfs_quota()
             logger.debug('Bhyve VM quota for "%s" computed to "%s" (from disks size "%d" MB)', vm.name, quota, vm.disk)
             _set_quota = '; zfs set quota=%s %s/%s >&2; e=$((e+=$?)); ' % (quota, vm.zpool, vm.uuid)
 
