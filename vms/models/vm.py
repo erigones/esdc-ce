@@ -1875,6 +1875,19 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
         else:
             self.save_metadata('snapshot_size_limit', value, save=False)
 
+    @property
+    def snapshot_size_quota_value(self):
+        """
+        Returns either snapshot_size_limit (if defined) or snapshot_size_percent_limit calculated to absolute value.
+        :return: int or None
+        """
+        limit = self.snapshot_size_limit
+        limit_perc = self.snapshot_size_percent_limit
+        if limit is None and limit_perc is not None:
+            limit = int(float(limit_perc) / 100 * self.disk)
+
+        return limit
+
     @property  # Return limit for manual snapshots
     def snapshot_limit_manual(self):
         return self.internal_metadata.get('snapshot_limit_manual', None)

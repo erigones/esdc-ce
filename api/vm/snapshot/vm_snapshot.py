@@ -58,11 +58,8 @@ class VmSnapshot(APIView):
 
     def _check_snap_size_limit(self):
         """Issue #chili-848"""
-        try:
-            limit = int(self.vm.json_active['internal_metadata']['snapshot_size_limit'])
-        except (TypeError, KeyError, IndexError):
-            pass
-        else:
+        limit = self.vm.snapshot_size_quota_value
+        if limit is not None:
             total = Snapshot.get_total_vm_size(self.vm)
             if total >= limit:
                 raise ExpectationFailed('VM snapshot size limit reached')
