@@ -1932,8 +1932,9 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
         :return: bool
         """
         mdata = self.json_update().get('set_internal_metadata', {})
-        snap_parameters = ['snapshot_size_percent_limit', 'snapshot_size_limit']
-        for param in snap_parameters:
+        mdata.update(self.json_update().get('remove_internal_metadata', {}))
+
+        for param in ['snapshot_size_percent_limit', 'snapshot_size_limit']:
             if param in mdata:
                 return True
         return False

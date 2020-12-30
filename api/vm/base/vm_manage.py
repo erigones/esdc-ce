@@ -101,7 +101,8 @@ class VmManage(APIView):
         # if there are any disk or quota manipulations, update disk quota
         if vm.is_bhyve() and (disks or vm.snapshot_quota_update_pending):
             quota = vm.calculate_zfs_snapshot_quota()
-            logger.debug('Bhyve VM quota for "%s" computed to "%s" (from disks size "%d" MB)', vm.name, quota, vm.disk)
+            logger.debug('ZFS quota value for bhyve VM "%s" computed to "%s" (from disks size "%d" MB)', vm.name, quota,
+                         vm.disk)
             _set_quota = '; zfs set quota=%s %s/%s >&2; e=$((e+=$?)); ' % (quota, vm.zpool, vm.uuid)
 
             # if the sum of all disk sizes is growing, we need to update quota first;
