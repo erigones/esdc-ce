@@ -1,3 +1,4 @@
+import re
 from collections import defaultdict
 from django.conf import settings
 # noinspection PyProtectedMember
@@ -1097,7 +1098,8 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
     @staticmethod
     def get_real_disk_id(disk):
         """Return real disk ID (disk number in disks.*.path) from disk object (dict)"""
-        return int(disk['path'].split('-')[-1].lstrip('disk'))
+        # last splitting char can be '-' with SmartOS KVM or '/' with other implementations (e.g. BHYVE)
+        return int(re.split('-|/', disk['path'])[-1].lstrip('disk'))
 
     @classmethod
     def get_disk_map(cls, json):
