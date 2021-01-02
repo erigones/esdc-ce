@@ -1946,8 +1946,8 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
         Returns true if there is any snapshot-related parameter in self.json_update()
         :return: bool
         """
-        mdata = self.json_update().get('set_internal_metadata', {})
-        mdata_int = self.json_update().get('remove_internal_metadata', {})
+        mdata = self.json_update().get('set_internal_metadata', [])
+        mdata_int = self.json_update().get('remove_internal_metadata', [])
         if mdata_int:
             mdata.append(mdata_int)
 
