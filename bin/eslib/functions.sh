@@ -657,6 +657,7 @@ _zfs_snap_vm() {
 	if [[ "${ec}" -eq 0 && \
 		  "${uuid}" != *"-disk"* && \
 		  "$(_vm_brand "${uuid}" 2>/dev/null)" != "kvm" && \
+		  "$(_vm_brand "${uuid}" 2>/dev/null)" != "bhyve" && \
 		  "$(_vm_status "${uuid}" 2>/dev/null)" == "running" ]]; then
 
 		_zfs_snap_vm_mount "${zfs_filesystem}" "${snapshot_name}" || true
