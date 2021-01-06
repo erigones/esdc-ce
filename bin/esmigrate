@@ -1370,8 +1370,8 @@ destroy_datasets_src() {
 		fi
 	fi
 
-	# The OS zone delegated dataset is a child and destroyed together with the DS_ROOT
-	if [[ "${#DS_DATA[@]}" -ne 0 ]] && is_hvm; then
+	# The OS zone delegated dataset and bhyve zvols are children and they are destroyed together with the DS_ROOT
+	if [[ "${#DS_DATA[@]}" -ne 0 ]] && is_kvm; then
 		for ds_data in "${DS_DATA[@]}"; do
 			_destroy_dataset "${ds_data%% *}"
 		done
