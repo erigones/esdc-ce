@@ -769,8 +769,8 @@ _send_recv_datasets_init() {
 			# shellcheck disable=SC2206
 			a_ds_data=(${a_ds_data})
 
-			# The OS zone delegated dataset is a child and send together with the DS_ROOT
-			if [[ "${MODE}" == "migrate" ]] && ! is_hvm; then
+			# The OS zone delegated dataset and bhyve disks are children and they are sent together with the DS_ROOT
+			if [[ "${MODE}" == "migrate" ]] && ! is_kvm; then
 				DS_RECV+=("${a_ds_data[1]}")  # but we still want to mark it as received
 			else
 				_send_recv_dataset "${a_ds_data[1]}" "${a_ds_data[0]}@${snap0}"
