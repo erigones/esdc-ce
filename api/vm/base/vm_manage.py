@@ -66,7 +66,7 @@ class VmManage(APIView):
 
         elif vm.is_bhyve():
             quota = vm.calculate_zfs_snapshot_quota()
-            _set_quota = '; zfs set quota=%sM %s/%s >&2; e=$((e+=$?))' % (quota, vm.zpool, vm.uuid)
+            _set_quota = '; zfs set quota=%s %s/%s >&2; e=$((e+=$?))' % (quota, vm.zpool, vm.uuid)
             cmd += _set_quota
             for i, disk in enumerate(vm.json_get_disks()):
                 if 'image_uuid' in disk:
