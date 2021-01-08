@@ -17,6 +17,7 @@ from api.validators import validate_owner, validate_mdata, mod2_validator
 from api.vm.utils import get_nodes, get_templates, get_images, get_subnets, get_zpools, get_owners
 from api.vm.base.serializers import VmBaseSerializer
 from api.dns.record.api_views import RecordView
+from vms.models.base import _HVMType
 
 PERMISSION_DENIED = _('Permission denied')
 INVALID_HOSTNAMES = frozenset(['define', 'status', 'backup', 'snapshot'])
@@ -42,7 +43,7 @@ def get_vm_template(request, data, prefix=''):
 
 def is_kvm(vm, data=None, prefix='', hvm_type=None, template=None):
     if vm:
-        return vm.is_hvm()
+        return vm.is_kvm()
 
     if data is not None:
         hvm_type = data.get(prefix + 'hvm_type', None)
@@ -52,16 +53,19 @@ def is_kvm(vm, data=None, prefix='', hvm_type=None, template=None):
 
     if hvm_type:
         try:
-            return int(hvm_type) in Vm.HVM
+            return int(hvm_type) == _HVMType.Hypervisor_KVM
         except (TypeError, ValueError):
             pass
 
     return True
 
 
-def is_hvm(vm, data=None, prefix='', ostype=None, template=None):
+def is_hvm(vm, data=None, prefix='', ostype=None, hvm_type=None, template=None):
     if vm:
         return vm.is_hvm()
+
+    if hvm_type is not None and hvm_type in _HVMType.HVM:
+        return True
 
     if data is not None:
         ostype = data.get(prefix + 'ostype', None)
@@ -141,6 +145,7 @@ class VmDefineSerializer(VmBaseSerializer):
     dns_domain = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\ \._/-]*$', max_length=1024, required=False)  # OS only
     routes = s.RoutesField(default={})  # OS only
     vga = s.ChoiceField(choices=Vm.VGA_MODEL, default=settings.VMS_VGA_MODEL_DEFAULT)  # KVM only
+    bootrom = s.ChoiceField(choices=Vm.BHYVE_BOOTROM, default=settings.VMS_BHYVE_BOOTROM_DEFAULT)  # bhyve only
     mdata = s.MetadataField(default=settings.VMS_VM_MDATA_DEFAULT,
                             validators=(validate_mdata(Vm.RESERVED_MDATA_KEYS),))
     locked = s.BooleanField(read_only=True, required=False)
@@ -168,17 +173,22 @@ class VmDefineSerializer(VmBaseSerializer):
             vm_template = None
 
         self._is_hvm = is_hvm(self.object, data, template=vm_template)
-        kvm = is_kvm(self.object, data, template=vm_template)
+        self._is_kvm = is_kvm(self.object, data, template=vm_template)
+        self._is_bhyve = self._is_hvm and not self._is_kvm
 
         if self._is_hvm:
             del self.fields['maintain_resolvers']
             del self.fields['routes']
             del self.fields['dns_domain']
 
-        if not kvm:
+        if not self._is_kvm:
             # these are only KVM properties
             del self.fields['cpu_type']
             del self.fields['vga']
+
+        if not self._is_bhyve:
+            # these are only bhyve properties
+            del self.fields['bootrom']
 
         if not kwargs.get('many', False):
             self.fields['owner'].default = request.user.username  # Does not work
@@ -228,8 +238,11 @@ class VmDefineSerializer(VmBaseSerializer):
             field_snapshot_size_percent_limit.validators.append(validators.MinValueValidator(min_snaps_size_perc))
             field_snapshot_size_percent_limit.validators.append(validators.MaxValueValidator(max_snaps_size_perc))
 
-            if kvm:
+            if self._is_kvm:
                 self.fields['vga'].default = dc_settings.VMS_VGA_MODEL_DEFAULT
+
+            if self._is_bhyve:
+                self.fields['bootrom'].default = dc_settings.VMS_BHYVE_BOOTROM_DEFAULT
 
             if self._is_hvm or dc_settings.VMS_VM_CPU_CAP_REQUIRED:
                 vcpus_min = 1
@@ -472,6 +485,19 @@ class VmDefineSerializer(VmBaseSerializer):
 
         return attrs
 
+    def validate_hvm_type(self, attrs, source):
+        # hvm_type cannot change
+        try:
+            value = attrs[source]
+        except KeyError:
+            pass
+        else:
+            if self.object:
+                if self.object.hvm_type != value:
+                    raise s.ValidationError(_('Cannot change hypervisor type.'))
+
+        return attrs
+
     def validate_monitored_internal(self, attrs, source):
         # Only SuperAdmin can change this attribute
         try:
@@ -605,6 +631,12 @@ class VmDefineSerializer(VmBaseSerializer):
 
             if new_disk > 0 and not dc_node.check_free_resources(disk=new_disk):
                 node_errors.append(_('Not enough free disk space on node.'))
+
+            if vm.is_bhyve():
+                if not node.bhyve_capable:
+                    node_errors.append(_('Node is not bhyve capable'))
+                if vm.vcpus > node.bhyve_max_vcpus:
+                    node_errors.append(_('Bhyve support max %d of vcpus') % node.bhyve_max_vcpus)
 
             if node_errors:
                 self._errors['node'] = s.ErrorList(node_errors)

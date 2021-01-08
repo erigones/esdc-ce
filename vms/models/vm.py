@@ -123,6 +123,11 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
         ('vmware', 'vmware'),
     )
 
+    BHYVE_BOOTROM = (
+        ('bios', 'BIOS'),
+        ('uefi', 'UEFI'),
+    )
+
     PENDING = 0  # no real, used only for status changes, not saved in DB
     STOPPED = 1
     RUNNING = 2
@@ -341,11 +346,12 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
     def set_hvm_type(self, value):
         """Set HVM type"""
         self.hvm_type = int(value)
+        # set brand according to ostype
         brand = self.OSTYPE_BRAND.get(self.ostype, 'hvm')
         if brand is 'hvm':
             # 'kvm' here is default of the default:
             brand_default = self.HVM_TYPE_BRAND.get(settings.VMS_VM_HVM_TYPE_DEFAULT, 'kvm')
-            # choose brand according to hvm_type (not needed for non-hvm as their brands are straightforward)
+            # choose exact brand according to hvm_type (not needed for non-hvm as their brands are straightforward)
             brand = self.HVM_TYPE_BRAND.get(self.hvm_type, brand_default)
         self.save_item('brand', brand, save=False)
 
@@ -2013,6 +2019,15 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
     def vga(self, value):
         if self.is_kvm():
             self.save_item('vga', value, save=False)
+
+    @property
+    def bootrom(self):
+        return self.json.get('bootrom', '')
+
+    @bootrom.setter
+    def bootrom(self, value):
+        if self.is_bhyve():
+            self.save_item('bootrom', value, save=False)
 
     @classmethod
     def _remove_reserved_mdata_keys(cls, data):

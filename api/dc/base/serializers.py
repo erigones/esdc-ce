@@ -369,6 +369,9 @@ class DcSettingsSerializer(s.InstanceSerializer):
     VMS_VGA_MODEL_DEFAULT = s.ChoiceField(label='VMS_VGA_MODEL_DEFAULT', choices=Vm.VGA_MODEL,
                                           help_text=_('Default VGA emulation driver of newly created servers. '
                                                       'One of: std, cirrus, vmware.'))
+    VMS_BHYVE_BOOTROM_DEFAULT = s.ChoiceField(label='VMS_BHYVE_BOOTROM_DEFAULT', choices=Vm.BHYVE_BOOTROM,
+                                          help_text=_('Default VM boot firmware emulation. Options are "bios" or '
+                                                      '"uefi". Note that only "uefi" bootrom supports VNC.'))
 
     VMS_VM_SNAPSHOT_DEFINE_LIMIT = s.IntegerField(label='VMS_VM_SNAPSHOT_DEFINE_LIMIT', required=False,
                                                   help_text=_('Maximum number of snapshot definitions per server.'))

@@ -246,6 +246,8 @@ class AdminServerSettingsForm(ServerSettingsForm):
     zfs_io_priority = forms.IntegerField(label=_('IO Priority'), max_value=1024, min_value=0, required=True,
                                          widget=NumberInput(attrs={'class': 'input-transparent narrow',
                                                                    'required': 'required'}))
+    bootrom = forms.ChoiceField(label=_('Bootrom'), required=False,
+                                widget=forms.Select(attrs={'class': 'narrow input-select2'}))
     zpool = forms.ChoiceField(label=_('Storage'), required=False,
                               widget=forms.Select(attrs={'class': 'narrow input-select2'}))
     owner = forms.ChoiceField(label=_('Owner'), required=False,
@@ -278,6 +280,7 @@ class AdminServerSettingsForm(ServerSettingsForm):
         self.fields['node'].choices = [('', _('(auto)'))] + [(i.hostname, i.hostname) for i in self.vm_nodes]
         self.fields['owner'].choices = get_owners(request).values_list('username', 'username')
         self.fields['zpool'].choices = get_zpools(request).values_list('zpool', 'storage__alias').distinct()
+        self.fields['bootrom'].choices = Vm.BHYVE_BOOTROM
 
         if not request.user.is_staff:
             self.fields['cpu_shares'].widget.attrs['disabled'] = 'disabled'

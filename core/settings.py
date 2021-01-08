@@ -634,6 +634,7 @@ VMS_DISK_IMAGE_LX_ZONE_DEFAULT = 'alpine-3'
 VMS_NIC_MODEL_DEFAULT = 'virtio'
 VMS_NIC_MONITORING_DEFAULT = 1
 VMS_VGA_MODEL_DEFAULT = 'std'
+VMS_BHYVE_BOOTROM_DEFAULT = 'bios'
 VMS_STORAGE_DEFAULT = 'zones'
 VMS_VM_ZONE_USER_SCRIPT_DEFAULT = 'if [ ! -f /var/svc/provision_esdc ]; then   ' \
                                   'touch /var/svc/provision_esdc;   ' \
@@ -652,7 +653,7 @@ VMS_VM_SNAPSHOT_LIMIT_AUTO = None  # Maximum number of automatic snapshots (rete
 VMS_VM_SNAPSHOT_LIMIT_MANUAL = None  # Maximum number of manual snapshots (None - unlimited)
 VMS_VM_SNAPSHOT_LIMIT_MANUAL_DEFAULT = None  # Default limit in forms/serializers
 VMS_VM_SNAPSHOT_SIZE_PERCENT_LIMIT = None  # Maximum total % size of all (auto + manual) VM snapshots (None - unlimited)
-VMS_VM_SNAPSHOT_SIZE_PERCENT_LIMIT_DEFAULT = None  # Default % size limit in forms/serializers
+VMS_VM_SNAPSHOT_SIZE_PERCENT_LIMIT_DEFAULT = None  # Default % size snapshot limit displayed in forms/serializers
 VMS_VM_SNAPSHOT_SIZE_LIMIT = None  # Maximum total size of all (automatic and manual) VM snapshots (None - unlimited)
 VMS_VM_SNAPSHOT_SIZE_LIMIT_DEFAULT = None  # Default size limit in forms/serializers
 VMS_VM_SNAPSHOT_DC_SIZE_LIMIT = None  # Maximum total size of snapshots in one DC (None - unlimited)

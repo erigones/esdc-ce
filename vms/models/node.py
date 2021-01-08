@@ -23,7 +23,7 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
     _vlan_id = None
     _sysinfo_shown = ('Boot Time', 'Manufacturer', 'Product', 'Serial Number', 'SKU Number', 'HW Version', 'HW Family',
                       'Datacenter Name', 'VM Capable', 'CPU Type', 'CPU Virtualization', 'CPU Physical Cores',
-                      'Live Image')
+                      'Live Image', 'Bhyve Capable', 'Bhyve Max Vcpus')
 
     ZPOOL = 'zones'
     DEFAULT_OVERLAY_PORT = 4789
@@ -159,6 +159,14 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
         """System information displayed in gui/api"""
         x = self._sysinfo
         return {i: x.get(i, '') for i in self._sysinfo_shown}
+
+    @property
+    def bhyve_capable(self):
+        return self._sysinfo.get('Bhyve Capable', 'false').lower() == 'true'
+
+    @property
+    def bhyve_max_vcpus(self):
+        return int(self._sysinfo.get('Bhyve Max Vcpus', 1000)) # default is 1000 (unlimited)
 
     @property
     def diskinfo(self):
@@ -966,8 +974,11 @@ class DcNode(_JsonPickleModel):
                 resources['disk_free__gte'] = vm_disk[Node.ZPOOL]
 
         try:
-            dc_node = cls.objects.filter(dc=dc, node__status=Node.ONLINE, node__is_compute=True).filter(**resources)\
-                                 .order_by('-priority', 'cpu_free', 'ram_free', 'disk_free')[0]
+            kwargs = {}
+            if vm.is_bhyve:
+                kwargs['node__bhyve_capable'] = True
+            dc_node = cls.objects.filter(dc=dc, node__status=Node.ONLINE, node__is_compute=True, **kwargs) \
+                                 .filter(**resources).order_by('-priority', 'cpu_free', 'ram_free', 'disk_free')[0]
         except IndexError:
             return None
         else:

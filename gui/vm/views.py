@@ -801,6 +801,7 @@ def _render_admin_add(request, context):
     initial['snapshot_limit_manual'] = dc_settings.VMS_VM_SNAPSHOT_LIMIT_MANUAL_DEFAULT
     initial['snapshot_size_percent_limit'] = dc_settings.VMS_VM_SNAPSHOT_SIZE_PERCENT_LIMIT_DEFAULT
     initial['snapshot_size_limit'] = dc_settings.VMS_VM_SNAPSHOT_SIZE_LIMIT_DEFAULT
+    initial['bootrom'] = dc_settings.VMS_BHYVE_BOOTROM_DEFAULT
     initial['owner'] = request.user.username
     initial['mdata'] = dc_settings.VMS_VM_MDATA_DEFAULT
     context['settingsform'] = AdminServerSettingsForm(request, None, prefix='opt', initial=initial)

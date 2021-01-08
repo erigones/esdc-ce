@@ -137,6 +137,9 @@ defined VM disks. Ignored if ``snapshot_size_limit`` is defined (default: null [
         :type data.cpu_type: string
         :arg data.vga: **KVM only**; VGA emulation driver. One of std, cirrus, vmware (default: std)
         :type data.vga: string
+        :arg data.bootrom: **BHYVE only**; Default VM boot firmware. One of bios, uefi (default: bios). \
+Only uefi mode supports VNC.
+        :type data.bootrom: string
         :arg data.dns_domain: Search domain set in /etc/hosts (SunOS Zone only, default: domain part of ``hostname``)
         :type data.dns_domain: string
         :arg data.routes: Key-value object that maps destinations to gateways. \
@@ -212,6 +215,9 @@ defined VM disks. Ignored if ``snapshot_size_limit`` is defined
         :type data.cpu_type: string
         :arg data.vga: **KVM only**; VGA emulation driver. One of std, cirrus, vmware
         :type data.vga: string
+        :arg data.bootrom: **BHYVE only**; Default VM boot firmware. One of bios, uefi (default: bios). \
+Only uefi mode supports VNC.
+        :type data.bootrom: string
         :arg data.dns_domain: Search domain set in /etc/hosts (SunOS Zone only)
         :type data.dns_domain: string
         :arg data.routes: Key-value object that maps destinations to gateways. \
