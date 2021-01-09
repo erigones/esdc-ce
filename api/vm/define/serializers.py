@@ -636,7 +636,7 @@ class VmDefineSerializer(VmBaseSerializer):
                 if not node.bhyve_capable:
                     node_errors.append(_('Node is not bhyve capable'))
                 if vm.vcpus > node.bhyve_max_vcpus:
-                    node_errors.append(_('Bhyve support max %d of vcpus') % node.bhyve_max_vcpus)
+                    node_errors.append(_('Bhyve supports max %d of vcpus') % node.bhyve_max_vcpus)
 
             if node_errors:
                 self._errors['node'] = s.ErrorList(node_errors)
