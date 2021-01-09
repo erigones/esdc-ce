@@ -978,19 +978,21 @@ class DcNode(_JsonPickleModel):
             dc_nodes = cls.objects.filter(dc=dc, node__status=Node.ONLINE, node__is_compute=True, **kwargs) \
                 .filter(**resources).order_by('-priority', 'cpu_free', 'ram_free', 'disk_free')
 
+            dc_node = None
             if vm.is_bhyve:
-                # remove nodes that cannot hold bhyve
-                for dcitem in dc_nodes:
-                    if not dcitem.node.bhyve_capable or vm_cpu > dcitem.node.bhyve_max_vcpus:
-                        dc_nodes.remove(dcitem)
+                # choose the first node matching the criteria
+                for i in range(len(dc_nodes)):
+                    node_candidate = dc_nodes[i].node
+                    if not node_candidate.bhyve_capable or vm_cpu > node_candidate.bhyve_max_vcpus:
+                        continue
+                    dc_node = node_candidate
+            else:
+                dc_node = dc_nodes[0].node
 
-            # choose the best one from remaining
-            dc_node = dc_nodes[0]
+            return dc_node
 
         except IndexError:
             return None
-        else:
-            return dc_node.node
 
     def check_free_resources(self, cpu=None, ram=None, disk=None):
         """Return True if it is possible to allocate resources on this node"""
