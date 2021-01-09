@@ -162,11 +162,11 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
 
     @property
     def bhyve_capable(self):
-        return bool(self._sysinfo.get('Bhyve Capable', 'false').lower())
+        return bool(self._sysinfo.get('Bhyve Capable', 'false'))
 
     @property
     def bhyve_max_vcpus(self):
-        return int(self._sysinfo.get('Bhyve Max Vcpus', 1000)) # default is 1000 (unlimited)
+        return int(self._sysinfo.get('Bhyve Max Vcpus', 1000))  # default is 1000 (unlimited)
 
     @property
     def diskinfo(self):
@@ -448,8 +448,8 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
         nodes = cache.get(cls.NODES_ALL_KEY)
 
         if not nodes:
-            nodes = cls.objects.only('uuid', 'hostname', 'status', 'address', 'is_compute', 'is_backup', 'is_head')\
-                               .order_by('hostname')
+            nodes = cls.objects.only('uuid', 'hostname', 'status', 'address', 'is_compute', 'is_backup', 'is_head') \
+                .order_by('hostname')
             cache.set(cls.NODES_ALL_KEY, nodes, cls.NODES_ALL_EXPIRES)
 
         return nodes
@@ -606,7 +606,7 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
         new_esysinfo = esysinfo.copy()
         config = new_esysinfo.pop('config', '')
         new_esysinfo.pop('sshkey', None)
-        return not(self.esysinfo == new_esysinfo and self.config == config)
+        return not (self.esysinfo == new_esysinfo and self.config == config)
 
     def sshkey_changed(self, esysinfo):
         """Return True if compute node's public SSH key has changed"""
@@ -966,8 +966,8 @@ class DcNode(_JsonPickleModel):
             for zpool, size in vm_disk.items():
                 storages.append(models.Q(zpool=zpool) & models.Q(storage__size_free__gte=size))
 
-            nodes = NodeStorage.objects.filter(dc=dc, zpool__in=vm_disk.keys()).filter(reduce(operator.or_, storages))\
-                                       .distinct('node').values_list('node_id', flat=True)
+            nodes = NodeStorage.objects.filter(dc=dc, zpool__in=vm_disk.keys()).filter(reduce(operator.or_, storages)) \
+                .distinct('node').values_list('node_id', flat=True)
             resources['node_id__in'] = list(nodes)
 
             if Node.ZPOOL in vm_disk:
@@ -978,7 +978,7 @@ class DcNode(_JsonPickleModel):
             if vm.is_bhyve:
                 kwargs['node__bhyve_capable'] = True
             dc_node = cls.objects.filter(dc=dc, node__status=Node.ONLINE, node__is_compute=True, **kwargs) \
-                                 .filter(**resources).order_by('-priority', 'cpu_free', 'ram_free', 'disk_free')[0]
+                .filter(**resources).order_by('-priority', 'cpu_free', 'ram_free', 'disk_free')[0]
         except IndexError:
             return None
         else:
