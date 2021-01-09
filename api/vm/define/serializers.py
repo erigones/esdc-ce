@@ -632,7 +632,7 @@ class VmDefineSerializer(VmBaseSerializer):
             if new_disk > 0 and not dc_node.check_free_resources(disk=new_disk):
                 node_errors.append(_('Not enough free disk space on node.'))
 
-            if vm.is_bhyve():
+            if self._is_bhyve:
                 if not node.bhyve_capable:
                     node_errors.append(_('Node is not bhyve capable'))
                 if vm.vcpus > node.bhyve_max_vcpus:
