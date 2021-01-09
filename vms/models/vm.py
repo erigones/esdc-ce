@@ -556,7 +556,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
         if 'autoboot' not in _json:
             _json['autoboot'] = False
         if 'brand' not in _json:
-            _json['brand'] = 'kvm'
+            _json['brand'] = Vm.HVM_TYPE_BRAND[dc_settings.get('VMS_VM_HVM_TYPE_DEFAULT')]
         if 'customer_metadata' not in _json:
             _json['customer_metadata'] = {}
 
@@ -565,16 +565,23 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
             if isinstance(v, (list, tuple, dict, NoneType)):
                 del _json['internal_metadata'][k]
 
-        if _json['brand'] == 'kvm':
+        json_brand = _json['brand']
+
+        if json_brand == 'kvm':
             # add qemu agent options
             _json['qemu_extra_opts'] = settings.VMS_VM_QEMU_EXTRA_OPTS
+        # TODO
+        # elif json_brand == 'bhyve':
+        #     _json['bhyve_extra_opts'] = settings.VMS_VM_BHYVE_EXTRA_OPTS
 
+        if json_brand == 'kvm' or json_brand == 'bhyve':
             # save vnc port
             if self.node is not None:
                 _json['vnc_port'] = self.vnc_port
             else:
                 _json.pop('vnc_port', None)
-        else:
+
+        else:  # it's zone
             if settings.VMS_ZONE_FEATURE_LEVEL >= 2:
                 # Issue #chili-867 - these limits won't affect creating snapshots and datasets from global zone
                 _json['zfs_filesystem_limit'] = _json['zfs_snapshot_limit'] = 0
