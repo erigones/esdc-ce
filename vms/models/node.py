@@ -975,10 +975,18 @@ class DcNode(_JsonPickleModel):
 
         try:
             kwargs = {}
+            dc_nodes = cls.objects.filter(dc=dc, node__status=Node.ONLINE, node__is_compute=True, **kwargs) \
+                .filter(**resources).order_by('-priority', 'cpu_free', 'ram_free', 'disk_free')
+
             if vm.is_bhyve:
-                kwargs['node__bhyve_capable'] = True
-            dc_node = cls.objects.filter(dc=dc, node__status=Node.ONLINE, node__is_compute=True, **kwargs) \
-                .filter(**resources).order_by('-priority', 'cpu_free', 'ram_free', 'disk_free')[0]
+                # remove nodes that cannot hold bhyve
+                for dcitem in dc_nodes:
+                    if not dcitem.node.bhyve_capable or vm_cpu > dcitem.node.bhyve_max_vcpus:
+                        dc_nodes.remove(dcitem)
+
+            # choose the best one from remaining
+            dc_node = dc_nodes[0]
+
         except IndexError:
             return None
         else:

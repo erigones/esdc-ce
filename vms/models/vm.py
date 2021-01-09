@@ -1936,21 +1936,29 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
         # when disk is 100% full, we still need some place for zfs volume metadata
         # (1.03 is used in vmadm's flexible_disk_size)
         zfs_metadata_overhead = 1.03
+        # with unreasonably small disk sizes, quota becomes smaller than parent dataset...
+        # therefore we need to have a minimum quota size (this does not affect quota limit computation inside DC,
+        # only the underlying zfs command)
+        minimum_quota = 1536  # MB
         all_disks_size = self.disk
+        if all_disks_size == 0:
+            # no disks in this VM
+            return 'none'
 
         vm_snap_size_limit = self.snapshot_size_limit
         snap_perc_limit = self.snapshot_size_percent_limit
         # if hard limit in MB is specified, percent limit is ignored
         if vm_snap_size_limit is None:
-            if snap_perc_limit is not None:
-                vm_snap_size_limit = (float(snap_perc_limit) / 100) * all_disks_size
-            else:
+            if snap_perc_limit is None:
                 # no snapshot limit is specified
                 return 'none'
+            vm_snap_size_limit = (float(snap_perc_limit) / 100) * all_disks_size
 
         # volume's refreservation value counts as a used space... therefore we need to double the disksize to have
         # useful quota (without doubling, the quota would equal to refreservation and no snapshots would be possible)
         quota = int(round((2 * (all_disks_size * zfs_metadata_overhead)) + vm_snap_size_limit))
+        if quota < minimum_quota:
+            quota = minimum_quota
         return str(quota) + 'M'
 
     @property
