@@ -88,10 +88,16 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
         (CPU_TYPE_HOST, CPU_TYPE_HOST),
     )
 
-    DISK_MODEL = (
+    DISK_MODEL_KVM = (
         ('virtio', 'virtio'),
         ('ide', 'ide'),
         ('scsi', 'scsi'),
+    )
+
+    DISK_MODEL_BHYVE = (
+        ('virtio', 'virtio'),
+        ('ahci', 'ahci'),
+        ('nvme', 'nvme'),
     )
 
     DISK_COMPRESSION = (

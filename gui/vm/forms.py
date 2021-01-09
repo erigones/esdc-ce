@@ -343,13 +343,19 @@ class ServerDiskSettingsForm(SerializerForm):
     disk_id = forms.IntegerField(label=_('Disk ID'), min_value=DISK_ID_MIN, max_value=DISK_ID_MAX, required=True,
                                  widget=forms.TextInput(attrs={'class': 'uneditable-input narrow',
                                                                'required': 'required', 'disabled': 'disabled'}))
-    model = forms.ChoiceField(label=_('Model'), choices=Vm.DISK_MODEL, required=False,
-                              widget=forms.Select(attrs={'class': 'narrow input-select2'}))
 
     def __init__(self, request, vm, *args, **kwargs):
         super(ServerDiskSettingsForm, self).__init__(request, vm, *args, **kwargs)
 
-        if not vm.is_hvm():
+        if vm.is_hvm():
+            if vm.is_kvm():
+                model_choices = Vm.DISK_MODEL_KVM
+            else:  # bhyve
+                model_choices = Vm.DISK_MODEL_BHYVE
+
+            self.fields['model'] = forms.ChoiceField(label=_('Model'), choices=model_choices, required=False,
+                                                     widget=forms.Select(attrs={'class': 'narrow input-select2'}))
+        else:  # zone
             del self.fields['model']
 
     def _initial_data(self, request, vm):

@@ -100,7 +100,7 @@ def details(request, hostname):
         initial_disk = {
             'disk_id': len(vm_disks) + 1,
             'zpool': vm.zpool,
-            'model': dc_settings.VMS_DISK_MODEL_DEFAULT,
+            'model': dc_settings.VMS_DISK_MODEL_KVM_DEFAULT,
             'compression': dc_settings.VMS_DISK_COMPRESSION_DEFAULT,
             'image': dc_settings.VMS_DISK_IMAGE_DEFAULT,
         }

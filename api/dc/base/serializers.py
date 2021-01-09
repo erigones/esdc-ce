@@ -318,9 +318,12 @@ class DcSettingsSerializer(s.InstanceSerializer):
     VMS_VM_MDATA_DEFAULT = s.MetadataField(label='VMS_VM_MDATA_DEFAULT', required=False,
                                            validators=(validate_mdata(Vm.RESERVED_MDATA_KEYS),),
                                            help_text=_('Default VM metadata (key=value string pairs).'))
-    VMS_DISK_MODEL_DEFAULT = s.ChoiceField(label='VMS_DISK_MODEL_DEFAULT', choices=Vm.DISK_MODEL,
-                                           help_text=_('Default disk model of newly created server disks. One of: '
-                                                       'virtio, ide, scsi.'))
+    VMS_DISK_MODEL_KVM_DEFAULT = s.ChoiceField(label='VMS_DISK_MODEL_KVM_DEFAULT', choices=Vm.DISK_MODEL_KVM,
+                                               help_text=_('Default disk model of newly created KVM server disks. '
+                                                           'One of: virtio, ide, scsi.'))
+    VMS_DISK_MODEL_BHYVE_DEFAULT = s.ChoiceField(label='VMS_DISK_MODEL_BHYVE_DEFAULT', choices=Vm.DISK_MODEL_BHYVE,
+                                                 help_text=_('Default disk model of newly created bhyve server disks. '
+                                                             'One of: virtio, ahci, nvme.'))
     VMS_DISK_COMPRESSION_DEFAULT = s.ChoiceField(label='VMS_DISK_COMPRESSION_DEFAULT', choices=Vm.DISK_COMPRESSION,
                                                  help_text=_('Default disk compression algorithm. '
                                                              'One of: off, lzjb, gzip, gzip-N, zle, lz4.'))

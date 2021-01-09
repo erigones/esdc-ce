@@ -983,7 +983,8 @@ class _VmDefineDiskSerializer(s.Serializer):
                 self._errors['size'] = s.ErrorList([_('Cannot define smaller disk size than '
                                                       'image size (%s).') % self.img.size])
 
-            if self.vm.is_notcreated():
+            # disk_driver is KVM-only setting
+            if self.vm.is_kvm() and self.vm.is_notcreated():
                 # Check disk_driver in image manifest (bug #chili-605) only if server is not created;
                 # User should be able to change the driver after server is deployed
                 img_disk_driver = self.img.json.get('manifest', {}).get('disk_driver', None)
@@ -1042,7 +1043,6 @@ class _VmDefineDiskSerializer(s.Serializer):
 
 
 class KVmDefineDiskSerializer(_VmDefineDiskSerializer):
-    model = s.ChoiceField(choices=Vm.DISK_MODEL, default=settings.VMS_DISK_MODEL_DEFAULT)
     image = s.CharField(required=False, default=settings.VMS_DISK_IMAGE_DEFAULT, max_length=64)
     refreservation = s.IntegerField(default=0, max_value=268435456, min_value=0)  # default set below
 
@@ -1051,7 +1051,15 @@ class KVmDefineDiskSerializer(_VmDefineDiskSerializer):
     def __init__(self, request, vm, *args, **kwargs):
         super(KVmDefineDiskSerializer, self).__init__(request, vm, *args, **kwargs)
         dc_settings = vm.dc.settings
-        self.fields['model'].default = dc_settings.VMS_DISK_MODEL_DEFAULT
+        if vm.is_kvm():
+            model_default = dc_settings.VMS_DISK_MODEL_KVM_DEFAULT
+            model_choices = Vm.DISK_MODEL_KVM
+        else:  # bhyve
+            model_default = dc_settings.VMS_DISK_MODEL_BHYVE_DEFAULT
+            model_choices = Vm.DISK_MODEL_BHYVE
+
+        self.fields['model'] = s.ChoiceField(choices=model_choices, default=model_default)
+        self.fields['model'].default = model_default
         self.fields['image'].default = dc_settings.VMS_DISK_IMAGE_DEFAULT
 
     def validate_block_size(self, attrs, source):
