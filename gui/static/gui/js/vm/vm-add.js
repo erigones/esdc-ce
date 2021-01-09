@@ -27,6 +27,9 @@ function ServerAdd() {
     // Show single server add modal
     vm_settings_modal(null, elements.btn_add, '#vm_settings_modal');
 
+    update_vm_form_fields_from_hvm_type();
+    update_vm_form_fields_from_ostype();
+
     return false;
   }
 

@@ -37,19 +37,19 @@
 {% include "gui/form_field_checkbox.html" with field=settingsform.monitored %}
 {% endif %}
 {% include "gui/form_field_checkbox.html" with field=settingsform.installed %}
+{% include "gui/form_field.html" with field=settingsform.hvm_type class="hvm-type-related" %}
 {% if dc_settings.VMS_VM_SNAPSHOT_ENABLED %}
 {% include "gui/form_field.html" with field=settingsform.snapshot_limit_manual %}
 {# hidden by js when OSType != bhyve #}
-{% include "gui/form_field.html" with field=settingsform.snapshot_size_percent_limit addon=percent_addon %}
+{% include "gui/form_field.html" with field=settingsform.snapshot_size_percent_limit addon=percent_addon class="bhyve-related" %}
 {# hidden by js when OSType == bhyve #}
-{% include "gui/form_field.html" with field=settingsform.snapshot_size_limit addon=mb_addon %}
+{% include "gui/form_field.html" with field=settingsform.snapshot_size_limit addon=mb_addon class="kvm-related zones-related" %}
 {% endif %}
 {# hidden by js when OSType == container #}
-{% include "gui/form_field.html" with field=settingsform.hvm_type %}
 {% include "gui/form_field.html" with field=settingsform.cpu_shares %}
 {% include "gui/form_field.html" with field=settingsform.zfs_io_priority %}
-{% include "gui/form_field.html" with field=settingsform.bootrom %}
 {% include "gui/form_field.html" with field=settingsform.zpool %}
+{% include "gui/form_field.html" with field=settingsform.bootrom class="bhyve-related" %}
 {% include "gui/form_field.html" with field=settingsform.owner %}
 {% if dc_settings.MON_ZABBIX_ENABLED %}
 {% include "gui/form_field.html" with field=settingsform.monitoring_templates %}

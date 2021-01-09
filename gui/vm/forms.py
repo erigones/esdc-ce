@@ -201,11 +201,13 @@ class AdminServerSettingsForm(ServerSettingsForm):
                                                   'e.g. disks, nics.'),
                                       widget=DataSelect(attrs={'class': 'narrow input-select2'}))
     ostype = forms.TypedChoiceField(label=_('OS Type'), choices=Vm.OSTYPE, required=True, coerce=int,
-                                    widget=forms.Select(attrs={'class': 'input-select2 narrow',
-                                                               'required': 'required'}))
+                                    widget=forms.Select(attrs={'class': 'input-select2 narrow ostype-select',
+                                                               'required': 'required',
+                                                               'onChange': 'update_vm_form_fields_from_ostype()'}))
     hvm_type = forms.TypedChoiceField(label=_('Hypervisor Type'), choices=Vm.HVM_TYPE_GUI, required=False, coerce=int,
-                                      widget=forms.Select(attrs={'class': 'input-select2 narrow',
-                                                                 'required': 'required'}))
+                                      widget=forms.Select(attrs={'class': 'input-select2 narrow hvm-type-select',
+                                                                 'required': 'required',
+                                                                 'onChange': 'update_vm_form_fields_from_hvm_type()'}))
     vcpus = forms.IntegerField(label=_('VCPUs'), required=False,
                                widget=NumberInput(attrs={'class': 'input-transparent narrow', 'required': 'required'}))
     # noinspection SpellCheckingInspection

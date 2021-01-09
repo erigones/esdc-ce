@@ -162,7 +162,7 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
 
     @property
     def bhyve_capable(self):
-        return self._sysinfo.get('Bhyve Capable', 'false').lower() == 'true'
+        return bool(self._sysinfo.get('Bhyve Capable', 'false').lower())
 
     @property
     def bhyve_max_vcpus(self):

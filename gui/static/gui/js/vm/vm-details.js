@@ -1126,6 +1126,30 @@ function iso_image_value_restore(mod) {
   }
 }
 
+// some VM form fields are only kvm/bhyve/zone related and we want to hide them when not applicable
+function update_vm_form_fields_from_ostype() {
+  var selected = $('.ostype-select').filter('select').find(":selected").text().toLowerCase();
+  if(selected.match(/zone/)) {
+    $('.hvm-type-related').hide();
+  } else {
+    $('.hvm-type-related').show();
+  }
+}
+
+// some VM form fields are only kvm/bhyve/zone related and we want to hide them when not applicable
+function update_vm_form_fields_from_hvm_type() {
+  var selected = $('.hvm-type-select').filter('select').find(":selected").text().toLowerCase();
+  if(selected.match(/kvm/)) {
+    $('.bhyve-related').hide();
+    $('.zone-related').hide();
+    $('.kvm-related').show();
+  } else if(selected.match(/bhyve/)) {
+    $('.kvm-related').hide();
+    $('.zone-related').hide();
+    $('.bhyve-related').show();
+  }
+}
+
 // VM control commands
 function vm_control(hostname, btn) {
   if (btn.hasClass('disabled') || btn.hasClass('clicked')) {
