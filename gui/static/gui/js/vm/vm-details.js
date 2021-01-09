@@ -1133,6 +1133,7 @@ function update_vm_form_fields_from_ostype() {
   var selected = $('.ostype-select').filter('select').find(":selected").text().toLowerCase();
   if(selected.match(/zone/)) {
     $('.hvm-type-only').hide();
+    $('.zones-related').show();
   } else {
     $('.hvm-type-only').show();
     update_vm_form_fields_from_hvm_type();
@@ -1144,11 +1145,11 @@ function update_vm_form_fields_from_hvm_type() {
   var selected = $('.hvm-type-select').filter('select').find(":selected").text().toLowerCase();
   if(selected.match(/kvm/)) {
     $('.bhyve-related').hide();
-    $('.zone-related').hide();
+    $('.zones-related').hide();
     $('.kvm-related').show();
   } else if(selected.match(/bhyve/)) {
     $('.kvm-related').hide();
-    $('.zone-related').hide();
+    $('.zones-related').hide();
     $('.bhyve-related').show();
   }
 }

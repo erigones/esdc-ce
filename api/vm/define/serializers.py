@@ -321,6 +321,7 @@ class VmDefineSerializer(VmBaseSerializer):
         # ostype and brand must be set first
         if 'ostype' in data:
             vm.set_ostype(data.pop('ostype'))
+        if 'hvm_type' in data:
             vm.set_hvm_type(data.pop('hvm_type'))
 
         # Save user data
@@ -492,9 +493,21 @@ class VmDefineSerializer(VmBaseSerializer):
         except KeyError:
             pass
         else:
+            ostype = None
             if self.object:
                 if self.object.hvm_type != value:
                     raise s.ValidationError(_('Cannot change hypervisor type.'))
+                elif self.object.ostype is not None:
+                    ostype = self.object.ostype
+
+            if 'ostype' in attrs:
+                # if ostype is newly set, it takes precedence
+                ostype = attrs['ostype']
+
+            if ostype is not None:
+                brand = Vm.OSTYPE_BRAND.get(ostype, 'hvm')
+                if brand == 'hvm' and value == _HVMType.Hypervisor_NONE:
+                    raise s.ValidationError(_('You must select correct hypervisor.'))
 
         return attrs
 

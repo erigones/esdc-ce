@@ -345,15 +345,22 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
 
     def set_hvm_type(self, value):
         """Set HVM type"""
-        self.hvm_type = int(value)
         # set brand according to ostype
         brand = self.OSTYPE_BRAND.get(self.ostype, 'hvm')
         if brand is 'hvm':
             # 'kvm' here is default of the default:
             brand_default = self.HVM_TYPE_BRAND.get(settings.VMS_VM_HVM_TYPE_DEFAULT, 'kvm')
             # choose exact brand according to hvm_type (not needed for non-hvm as their brands are straightforward)
-            brand = self.HVM_TYPE_BRAND.get(self.hvm_type, brand_default)
-        self.save_item('brand', brand, save=False)
+            brand = self.HVM_TYPE_BRAND.get(value, brand_default)
+            # serialisers have already validated that user didn't set NO hypervisor for HVM
+            self.save_item('brand', brand, save=False)
+        else:
+            # set NO hypervisor regardless the user request because anything other than NO is invalid for non-HVMs
+            # (this covers also case when user doesn't specify hypervisor and the value is taken from
+            # VMS_VM_HVM_TYPE_DEFAULT)
+            value = _HVMType.Hypervisor_NONE
+
+        self.hvm_type = int(value)
 
     def set_ostype(self, value):
         """Set ostype and brand"""
