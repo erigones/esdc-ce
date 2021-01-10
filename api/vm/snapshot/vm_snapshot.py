@@ -175,7 +175,7 @@ class VmSnapshot(APIView):
 
             self._check_vm_status(vm=target_vm)
 
-            if vm.brand != target_vm.brand:
+            if not vm.has_compatible_brand(target_vm.brand):
                 raise PreconditionRequired('VM brand mismatch')
 
             source_disk = vm.json_active_get_disks()[self.disk_id - 1]

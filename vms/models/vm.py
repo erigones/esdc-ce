@@ -81,6 +81,10 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
         _OSType.LINUX_ZONE: settings.VMS_VM_BRAND_LX_ZONE_DEFAULT,
     })
 
+    COMPATIBLE_BRANDS = {
+        ['kvm', 'bhyve'],
+    }
+
     CPU_TYPE_QEMU = 'qemu64'
     CPU_TYPE_HOST = 'host'
     CPU_TYPE = (
@@ -174,13 +178,14 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
         'running': RUNNING,
         'stopping': STOPPING,
         'installed': STOPPED,
+        'down': STOPPED,
     })
     STATUS_UNUSED = frozenset([  # not useful states on Node (255)
         'ready',
         'shutting_down',
         'incomplete',
         'configured',
-        'down',
+        # 'down',
         'provisioning',
         'receiving',
         'failed',
@@ -2207,3 +2212,24 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
     @property
     def tag_list(self):
         return self.tags.names()
+
+    @staticmethod
+    def brand_to_hvm_type(brand):
+        for hvm_type in Vm.HVM_TYPE_BRAND:
+            if brand == Vm.HVM_TYPE_BRAND[hvm_type]:
+                return hvm_type
+
+    def has_compatible_brand(self, brand):
+        try:
+            if type(brand) is int:
+                # the input is probably hvm_type... let's convert it to brand string
+                brand = Vm.HVM_TYPE_BRAND[brand]
+        except KeyError:
+            # unknown brand number
+            return False
+
+        for compatible in VM.COMPATIBLE_BRANDS:
+            if brand in compatible and self.brand in compatible:
+                return True
+
+        return False

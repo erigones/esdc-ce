@@ -355,7 +355,8 @@ class ServerDiskSettingsForm(SerializerForm):
 
             self.fields['model'] = forms.ChoiceField(label=_('Model'), choices=model_choices, required=False,
                                                      widget=forms.Select(attrs={'class': 'narrow input-select2'}))
-        else:  # zone
+        # zone
+        elif 'model' in self.fields:
             del self.fields['model']
 
     def _initial_data(self, request, vm):
