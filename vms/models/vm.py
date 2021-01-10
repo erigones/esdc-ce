@@ -82,7 +82,12 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
     })
 
     COMPATIBLE_BRANDS = {
-        ['kvm', 'bhyve'],
+        'kvm':      ['kvm', 'bhyve', 'hvm'],
+        'bhyve':    ['kvm', 'bhyve', 'hvm'],
+        'hvm':      ['kvm', 'bhyve', 'hvm'],
+        'none':     ['none'],
+        'joyent':   ['joyent'],
+        'lx':       ['lx'],
     }
 
     CPU_TYPE_QEMU = 'qemu64'
@@ -2224,12 +2229,12 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
             if type(brand) is int:
                 # the input is probably hvm_type... let's convert it to brand string
                 brand = Vm.HVM_TYPE_BRAND[brand]
-        except KeyError:
-            # unknown brand number
-            return False
 
-        for compatible in VM.COMPATIBLE_BRANDS:
-            if brand in compatible and self.brand in compatible:
+            if brand in Vm.COMPATIBLE_BRANDS[self.brand]:
                 return True
+            else:
+                return False
 
-        return False
+        except KeyError:
+            # unknown brand
+            return False
