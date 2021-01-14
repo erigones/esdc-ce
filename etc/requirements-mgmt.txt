@@ -9,7 +9,6 @@ Jinja2==2.10
 sphinxcontrib-httpdomain==1.7.0
 Pygments==2.7.1
 docutils==0.14
-django-transaction-hooks==0.3
 
 ### dns
 dnspython==1.16.0
