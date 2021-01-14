@@ -491,7 +491,7 @@ class DcSettingsSerializer(s.InstanceSerializer):
         dc_settings['dc'] = dc.name
         super(DcSettingsSerializer, self).__init__(request, dc_settings, *args, **kwargs)
         self._update_fields_ = self.fields.keys()
-        self._update_fields_.remove('dc')
+        self._update_fields_.popitem('dc')
         self.settings = {}
         self.dc = dc
 

@@ -86,31 +86,31 @@ class ArrayWidget(_DefaultAttrsWidget, widgets.TextInput):
 
         return super(ArrayWidget, self).build_attrs(*args, **kwargs)
 
-    def render(self, name, value, attrs=None):
+    def render(self, name, value, attrs=None, renderer=None):
         if value is not None and not isinstance(value, six.string_types):
             value = edit_string_for_items(value, escape_space=self.escape_space, escape_comma=self.escape_comma,
                                           sort=self.tags)
-        return super(ArrayWidget, self).render(name, value, attrs=attrs)
+        return super(ArrayWidget, self).render(name, value, attrs=attrs, renderer=renderer)
 
 
 class ArrayAreaWidget(_DefaultAttrsWidget, widgets.Textarea):
     default_attrs = frozendict({'rows': 3, 'cols': 40})
     default_class = 'input-array'
 
-    def render(self, name, value, attrs=None):
+    def render(self, name, value, attrs=None, renderer=None):
         if value is not None and not isinstance(value, six.string_types):
             value = json.dumps(value, indent=4, ensure_ascii=False)
-        return super(ArrayAreaWidget, self).render(name, value, attrs=attrs)
+        return super(ArrayAreaWidget, self).render(name, value, attrs=attrs, renderer=renderer)
 
 
 class DictWidget(_DefaultAttrsWidget, widgets.Textarea):
     default_attrs = frozendict({'rows': 4, 'cols': 40})
     default_class = 'input-mdata'
 
-    def render(self, name, value, attrs=None):
+    def render(self, name, value, attrs=None, renderer=None):
         if value is not None and not isinstance(value, six.string_types):
             value = json.dumps(value, indent=4, ensure_ascii=False)
-        return super(DictWidget, self).render(name, value, attrs=attrs)
+        return super(DictWidget, self).render(name, value, attrs=attrs, renderer=renderer)
 
 
 class NumberInput(_DefaultAttrsWidget, widgets.Input):
