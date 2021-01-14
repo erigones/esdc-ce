@@ -14,7 +14,7 @@ docutils==0.14
 dnspython==1.16.0
 
 ### api, gui
-celery==3.1.25
+celery==4.3.1
 kombu==3.0.37
 pytz==2018.9
 ipaddress==1.0.23
@@ -32,7 +32,7 @@ django-celery==3.3.1
 netifaces==0.10.9
 dictdiffer==0.8.1
 zabbix-api-erigones==1.2.4
-psycopg2==2.7.3.2
+psycopg2==2.7.7
 psycogreen==1.0.0
 django-redis-cache==3.0.0
 hiredis==1.1.0
