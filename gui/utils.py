@@ -137,7 +137,7 @@ def tags_to_string(tag_list, sep=','):
     if not tag_list:
         return ''
 
-    return sep.join(map(unicode, sorted(tag_list)))
+    return sep.join(sorted(tag_list))
 
 
 def get_order_by(request, api_view=APIView, user_default=None, db_default=None):
