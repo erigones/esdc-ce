@@ -2238,3 +2238,19 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
         except KeyError:
             # unknown brand
             return False
+
+    @property
+    def extra_opts(self):
+        if self.is_kvm() and 'qemu_extra_opts' in self.json:
+            return self.json['qemu_extra_opts']
+        elif self.is_bhyve() and 'bhyve_extra_opts' in self.json:
+            return self.json['bhyve_extra_opts']
+        else:
+            return ''
+
+    @extra_opts.setter
+    def extra_opts(self, extra_opts):
+        if self.is_kvm():
+            self.json['qemu_extra_opts'] = extra_opts
+        elif self.is_bhyve():
+            self.json['bhyve_extra_opts'] = extra_opts

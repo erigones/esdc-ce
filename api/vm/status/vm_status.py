@@ -117,19 +117,38 @@ class VmStatus(APIView):
                     'touch %(iso_path)s/%(iso_name)s || (rm -f %(iso_path)s/%(iso_name)s; ' \
                     'echo "ISO image %(iso_name)s is not available on compute node" >&2; exit 9) &&'
 
-            if once:
-                cmd.append('order=c,once=d cdrom=/iso/%(iso_name)s,ide')
-                vm.last_cdimage = None
-            else:
-                cmd.append('order=d cdrom=/iso/%(iso_name)s,ide')
-                vm.last_cdimage = iso.name
-
             if iso2:
                 self.detail += ' cdimage2=%s' % iso2.name
                 cmd_dict['iso2_name'] = iso2.name
                 touch += '(test -f "%(iso_dir)s/%(iso2_name)s" && ' \
                          'touch %(iso_path)s/%(iso2_name)s || rm -f %(iso_path)s/%(iso2_name)s) >/dev/null 2>/dev/null;'
-                cmd.append('cdrom=/iso/%(iso2_name)s,ide')
+
+            if vm.is_kvm():
+                if once:
+                    cmd.append('order=c,once=d cdrom=/iso/%(iso_name)s,ide')
+                    vm.last_cdimage = None
+                else:
+                    cmd.append('order=d cdrom=/iso/%(iso_name)s,ide')
+                    vm.last_cdimage = iso.name
+
+                if iso2:
+                    cmd.append('cdrom=/iso/%(iso2_name)s,ide')
+
+            elif vm.is_bhyve():
+                # bhyve doesn't support start params, we have to add the ISO params to extra_opts
+                cmd_dict['current_extra_opts'] = vm.extra_opts
+                vm.last_cdimage = iso.name
+
+                # add command before VM start
+                if iso2:
+                    cmd.insert(0, 'vmadm update %(uuid)s bhyve_extra_opts="%(current_extra_opts)s -s 3:0,ahci-cd,/iso/'
+                                  '%(iso_name)s"')
+                else:
+                    cmd.insert(0, 'vmadm update %(uuid)s bhyve_extra_opts="%(current_extra_opts)s -s 3:0,ahci-cd,/iso/'
+                                  '%(iso_name)s -s 3:1,ahci-cd,/iso/%(iso2_name)s"')
+
+                # append command after VM start (remove cdrom params)
+                cmd.append('vmadm update %(uuid)s bhyve_extra_opts="%(current_extra_opts)s"')
 
             cmd.insert(0, touch)
 
