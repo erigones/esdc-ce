@@ -294,7 +294,6 @@ def execute(request, owner_id, cmd, stdin=None, meta=None, callback=None, lock=N
         args = (cmd, stdin)
         kwargs = {'meta': meta, 'callback': callback, 'lock': lock_key, 'block': block_key,
                   'check_user_tasks': check_user_tasks}
-        logger.debug('Executing %s', task)
         # Run task
         task = _execute.apply_async(args=args, kwargs=kwargs, queue=queue, task_id=task_id,
                                     expires=expires, add_to_parent=False)

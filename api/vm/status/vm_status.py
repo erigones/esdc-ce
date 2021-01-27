@@ -142,13 +142,13 @@ class VmStatus(APIView):
                 # add command before VM start
                 if iso2:
                     cmd.insert(0, 'vmadm update %(uuid)s bhyve_extra_opts="%(current_extra_opts)s -s 3:0,ahci-cd,/iso/'
-                                  '%(iso_name)s -s 3:1,ahci-cd,/iso/%(iso2_name)s"')
+                                  '%(iso_name)s -s 3:1,ahci-cd,/iso/%(iso2_name)s" && ')
                 else:
                     cmd.insert(0, 'vmadm update %(uuid)s bhyve_extra_opts="%(current_extra_opts)s -s 3:0,ahci-cd,/iso/'
-                                  '%(iso_name)s"')
+                                  '%(iso_name)s" && ')
 
                 # append command after VM start (remove cdrom params)
-                cmd.append('vmadm update %(uuid)s bhyve_extra_opts="%(current_extra_opts)s"')
+                cmd.append('&& vmadm update %(uuid)s bhyve_extra_opts="%(current_extra_opts)s"')
 
             cmd.insert(0, touch)
 
