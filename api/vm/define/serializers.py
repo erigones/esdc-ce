@@ -992,7 +992,7 @@ class ZVmDefineDiskSerializer(_VmDefineDiskSerializer):
         else:
             self.fields['image'].default = vm.dc.settings.VMS_DISK_IMAGE_ZONE_DEFAULT
 
-        if self.disk_id > 0:
+        if self.disk_id and self.disk_id > 0:
             if not self.object:
                 self.object = {}
             self.object['boot'] = False
