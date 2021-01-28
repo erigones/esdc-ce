@@ -87,7 +87,7 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
         verbose_name = _('Node')
         verbose_name_plural = _('Nodes')
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s' % self.hostname
 
     @property
@@ -920,7 +920,7 @@ class DcNode(_JsonPickleModel):
         verbose_name = _('Node')
         verbose_name_plural = _('Nodes')
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s@%s' % (self.node, self.dc)
 
     @property

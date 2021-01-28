@@ -57,7 +57,7 @@ class BackupDefine(_VmDiskModel, _ScheduleModel):
         verbose_name_plural = _('Backup definitions')
         unique_together = (('vm', 'disk_id', 'name'),)
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s-disk%s %s/%s' % (self.vm_id, self.disk_id, self.name, self.retention)
 
     @property
@@ -146,7 +146,7 @@ class Backup(_VmDiskModel, _StatusModel, _JsonPickleModel):
         unique_together = (('vm_hostname', 'vm_disk_id', 'name'),)
         # index_together = (('created',),)
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s-disk%s@%s' % (self.vm_hostname, self.disk_id, self.name)
 
     def get_disk_map(self):  # See _VmDiskModel

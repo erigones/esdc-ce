@@ -61,7 +61,7 @@ class SlaveVm(_JsonPickleModel):
         else:
             super(SlaveVm, self).__init__(*args, **kwargs)
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s' % self.vm
 
     def save(self, **kwargs):

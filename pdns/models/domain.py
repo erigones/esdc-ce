@@ -117,7 +117,7 @@ class Domain(models.Model):
         verbose_name_plural = _('Domains')
         db_table = 'domains'
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s' % self.name
 
     @classmethod

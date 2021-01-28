@@ -33,7 +33,7 @@ class Role(_DcBoundMixin):
         if not self.pk:
             self.new = True
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s' % self.alias
 
     @property

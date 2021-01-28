@@ -22,7 +22,7 @@ class UserSSHKey(models.Model):
         verbose_name_plural = _('SSH keys')
         unique_together = (('user', 'fingerprint'), ('user', 'title'))
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s' % (self.pk,)
 
     @staticmethod

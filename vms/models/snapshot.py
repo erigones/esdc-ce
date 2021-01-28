@@ -27,7 +27,7 @@ class SnapshotDefine(_VmDiskModel, _ScheduleModel):
         verbose_name_plural = _('Snapshot definitions')
         unique_together = (('vm', 'disk_id', 'name'),)
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s-disk%s %s/%s' % (self.vm_id, self.disk_id, self.name, self.retention)
 
     @property
@@ -104,7 +104,7 @@ class Snapshot(_StatusModel, _VmDiskModel):
         verbose_name_plural = _('Snapshots')
         unique_together = (('vm', 'disk_id', 'name'),)
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s-disk%s@%s' % (self.vm_id, self.disk_id, self.name)
 
     @property  # Gui helper

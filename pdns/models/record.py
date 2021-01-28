@@ -135,7 +135,7 @@ class Record(models.Model):
         db_table = 'records'
         index_together = (('name', 'type'),)
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s (%s: %s)' % (self.id, self.type, self.name)
 
     def save(self, *args, **kwargs):

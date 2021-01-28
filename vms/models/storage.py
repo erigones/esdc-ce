@@ -156,7 +156,7 @@ class NodeStorage(models.Model, _UserTasksModel):
         verbose_name_plural = _('Storages')
         unique_together = (('node', 'zpool'),)
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s' % self.zpool
 
     @property

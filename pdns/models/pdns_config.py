@@ -23,7 +23,7 @@ class DummyPdnsCfg(object):
     class Meta:
         abstract = True
 
-    def __unicode__(self):
+    def __str__(self):
         return '(%s: %s)' % (self.key, self.val)
 
     def save(self, *args, **kwargs):
@@ -221,7 +221,7 @@ class RecurseNetworks(models.Model):
         verbose_name_plural = _('Recursion subnets')
         db_table = 'recurse_networks'
 
-    def __unicode__(self):
+    def __str__(self):
         return '(%s: %s)' % (self.net_name, self.subnet)
 
     def save(self, *args, **kwargs):

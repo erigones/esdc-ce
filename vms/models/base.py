@@ -370,7 +370,7 @@ class _VirtModel(models.Model):
         # unique_together = (('alias', 'owner'),)
         # ^^^^ This is very important and should be placed in the descendant model.
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s' % self.name
 
 

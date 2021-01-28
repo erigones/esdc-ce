@@ -267,7 +267,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _UserTasksModel):
     _fqdn = (None, None)
     _available_domains = None  # List of valid domains for hostname
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s' % self.hostname
 
     def __init__(self, *args, **kwargs):

@@ -43,7 +43,7 @@ class IPAddress(models.Model):
         verbose_name_plural = _('IP addresses')
         unique_together = (('ip', 'subnet'),)
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s@%s' % (self.ip, self.subnet.name)
 
     @staticmethod
