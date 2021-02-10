@@ -103,7 +103,7 @@ timeout_seconds='60'>
     id = 1
 
     _vm_sync = 0
-    _vm_is_kvm = None
+    _vm_is_hvm = None
     _vm_cores_ds = None
     _vm_created = False
     _vm_disks = ()
@@ -212,9 +212,9 @@ timeout_seconds='60'>
 
     def _vm_get_disks(self, uuid, remote=False):
         cfg = self._vm_get_json(uuid, remote=remote)
-        self._vm_is_kvm = cfg['brand'] == 'kvm'
+        self._vm_is_hvm = (cfg['brand'] == 'kvm' or cfg['brand'] == 'bhyve')
 
-        if self._vm_is_kvm:
+        if self._vm_is_hvm:
             return [disk['zfs_filesystem'] for disk in cfg.get('disks', []) if disk.get('media', 'disk') == 'disk']
         else:
             return [cfg['zfs_filesystem']] + cfg.get('datasets', [])
@@ -252,7 +252,7 @@ timeout_seconds='60'>
 
     def _prepare_dataset_destroy(self):
         """Umount core dataset when dealing with OS zone"""
-        if not self._vm_is_kvm:
+        if not self._vm_is_hvm:
             cores_ds = '%s/cores/%s' % (self._vm_local_json['zpool'], self.dst_uuid)
             try:
                 self._unmount_dataset(cores_ds)
@@ -276,7 +276,7 @@ timeout_seconds='60'>
 
     def _should_be_synced(self, dataset):
         """Delegated dataset must not be synced"""
-        return self._vm_is_kvm or dataset.count('/') < 2
+        return self._vm_is_hvm or dataset.count('/') < 2
 
     def _initial_sync(self, disks, src_host, dst_host, clear_src_disk_property=None, clear_dst_disk_property=None):
         """Initial sync used by init and reinit. This is the only place where esrep property values are constructed"""
