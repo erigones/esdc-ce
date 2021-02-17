@@ -134,7 +134,7 @@ def storages(request, hostname):
 
     for ns in context['storages']:
         try:
-            context['zpools'].remove(ns.zpool)
+            list(context['zpools']).remove(ns.zpool)
         except ValueError:
             context['zpools_missing'].append(ns.zpool)  # zpool vanished from node
 
