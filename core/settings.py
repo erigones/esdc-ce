@@ -75,6 +75,7 @@ LANGUAGE_CODE = 'en-us'
 # Languages we provide translations for.
 LANGUAGES = (
     ('en', 'English'),
+    ('it', 'Italiano'),
     #  ('sk', 'Slovensky (beta)'),
 )
 
@@ -489,6 +490,7 @@ MON_ZABBIX_NODE_SLA = True  # global, internal
 
 MON_ZABBIX_SENDER = '/usr/bin/zabbix_sender'  # hidden
 MON_ZABBIX_SERVER = 'https://example.com/zabbix'  # local, internal+external
+MON_ZABBIX_SERVER_EXTERNAL_URL = ''
 MON_ZABBIX_SERVER_SSL_VERIFY = True  # local, internal+external
 MON_ZABBIX_TIMEOUT = 15  # local, internal+external
 MON_ZABBIX_USERNAME = 'Admin'  # local, internal+external
@@ -605,7 +607,7 @@ VMS_IMAGE_IMGADM_CONF = {
 VMS_IMAGE_SOURCES = []
 VMS_IMAGE_LIMIT = None
 VMS_IMAGE_REPOSITORIES = {
-    'danubecloud': 'https://images.danubecloud.org',
+    'danubecloud': 'https://images.danube.cloud',
     'images.joyent.com': 'https://images.joyent.com',
 }
 VMS_ISO_DIR = '/iso'

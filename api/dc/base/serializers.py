@@ -199,6 +199,7 @@ class DcSettingsSerializer(s.InstanceSerializer):
         'MON_ZABBIX_HTTP_USERNAME',
         'MON_ZABBIX_HTTP_PASSWORD',
         'MON_ZABBIX_HOST_VM_PROXY',
+        'MON_ZABBIX_SERVER_EXTERNAL_URL',
         'DNS_SOA_DEFAULT',
         'EMAIL_HOST_USER',
         'EMAIL_HOST_PASSWORD',
@@ -399,6 +400,13 @@ class DcSettingsSerializer(s.InstanceSerializer):
                                               "NIC's IP addresses. Available placeholders are: "
                                               "{ipaddr}, {hostname}, {alias}."))
 
+    MON_ZABBIX_SERVER_EXTERNAL_URL = s.RegexField(r'^https?://.*$', label='MON_ZABBIX_SERVER_EXTERNAL_URL',
+                                                  max_length=1024, required=False,
+                                                  help_text=_('External URL address of Zabbix server in case you use '
+                                                              'some external reverse proxy. It is used in "Monitoring '
+                                                              '-> Monitoring Server" menu button. If blank, '
+                                                              'MON_ZABBIX_SERVER value is used (default). '
+                                                              ))
     MON_ZABBIX_SERVER = s.RegexField(r'^https?://.*$', label='MON_ZABBIX_SERVER', max_length=1024,
                                      help_text=_('URL address of Zabbix server used for external monitoring of servers '
                                                  'in this virtual datacenter. WARNING: Changing this and other '
@@ -481,7 +489,7 @@ class DcSettingsSerializer(s.InstanceSerializer):
         global_settings = self.get_global_settings()
 
         if global_settings and not dc.is_default():  # Displaying global settings for non default DC
-            dc1_settings = DefaultDc().settings      # These setting should be read-only and read from default DC
+            dc1_settings = DefaultDc().settings  # These setting should be read-only and read from default DC
             dc_settings = DefAttrDict(dc.custom_settings, defaults=dc1_settings)  # instance
         else:
             dc1_settings = None

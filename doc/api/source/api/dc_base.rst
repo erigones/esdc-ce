@@ -115,7 +115,8 @@
                     "MON_ZABBIX_NODE_SLA": true, 
                     "MON_ZABBIX_NODE_SYNC": true, 
                     "MON_ZABBIX_PASSWORD": "***", 
-                    "MON_ZABBIX_SERVER": "https://zabbix.example.com/", 
+                    "MON_ZABBIX_SERVER_EXTERNAL_URL": "",
+                    "MON_ZABBIX_SERVER": "https://zabbix.example.com/",
                     "MON_ZABBIX_SERVER_SSL_VERIFY": true,
                     "MON_ZABBIX_TEMPLATES_NODE": [],
                     "MON_ZABBIX_TEMPLATES_VM": [],
@@ -167,7 +168,7 @@
                     "VMS_ISO_LIMIT": null,
                     "VMS_IMAGE_LIMIT": null,
                     "VMS_IMAGE_REPOSITORIES": {
-                        "danubecloud": "https://images.erigones.org"
+                        "danubecloud": "https://images.danube.cloud"
                     },
                     "VMS_IMAGE_SOURCES": [],
                     "VMS_IMAGE_VM": "15bc0839-c49d-4489-a01b-4570d518fc9f",

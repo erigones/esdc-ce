@@ -9,13 +9,12 @@ This is the main repository for the Danube Cloud project.
 Links
 =====
 
-- Homepage: https://danubecloud.org
-- User guide: https://docs.danubecloud.org
+- Homepage: https://danube.cloud
+- Download: https://github.com/erigones/esdc-ce/wiki/Download
+- User guide: https://docs.danube.cloud
 - Wiki: https://github.com/erigones/esdc-ce/wiki
 - Bug Tracker: https://github.com/erigones/esdc-ce/issues
-- Twitter: https://twitter.com/danubecloud
-- Gitter: https://gitter.im/erigones/DanubeCloud
-- IRC: `irc.freenode.net#danubecloud <https://webchat.freenode.net/#danubecloud>`__
+- Gitter chat: https://gitter.im/erigones/DanubeCloud
 
 
 License

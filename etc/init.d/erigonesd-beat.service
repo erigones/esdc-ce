@@ -6,7 +6,7 @@
 
 [Unit]
 Description=Danube Cloud Beat Daemon
-Documentation=https://docs.danubecloud.org
+Documentation=https://docs.danube.cloud
 After=network.target
 Requires=erigonesd.service
 

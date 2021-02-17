@@ -39,7 +39,7 @@ class NetworkSerializer(s.ConditionalDCBoundSerializer):
     mtu = s.IntegerField(min_value=576, max_value=9000, required=False)  # values from man vmadm
     resolvers = s.IPAddressArrayField(source='resolvers_api', required=False, max_items=8)
     dns_domain = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\._-]*$', max_length=250, required=False)  # can be blank
-    ptr_domain = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\._-]*$', max_length=250, required=False)  # can be blank
+    ptr_domain = s.RegexField(r'^[A-Za-z0-9][/A-Za-z0-9\._-]*$', max_length=250, required=False)  # can be blank
     dhcp_passthrough = s.BooleanField(default=False)
     created = s.DateTimeField(read_only=True, required=False)
 

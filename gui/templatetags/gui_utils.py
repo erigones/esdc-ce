@@ -15,6 +15,7 @@ import markdown
 
 from api.mon.backends.zabbix.containers import ZabbixMediaContainer
 from api.utils.encoders import JSONEncoder
+from gui.vm.utils import get_ptr_domain_by_ip
 from pdns.models import Record
 
 register = template.Library()
@@ -24,7 +25,9 @@ register = template.Library()
 @register.filter
 def record_PTR(vm, ip):
     if ip and vm.dc.settings.DNS_ENABLED:
-        return Record.get_record_PTR(ip)
+        ptr_domain = get_ptr_domain_by_ip(vm, ip)
+        return Record.get_record_PTR(ip, ptr_domain)
+
     else:
         return None
 

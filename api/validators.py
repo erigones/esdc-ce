@@ -62,7 +62,7 @@ def validate_mdata(reserved_keys):
 def validate_ssh_key(value):
     key = value.split(' ')
 
-    if not (1 < len(key) < 4 and key[0] in SSH_KEY_TYPES):
+    if not (1 < len(key) and key[0] in SSH_KEY_TYPES):
         raise ValidationError(_('Unknown SSH public key type.'))
 
     if '\n' in value:

@@ -127,6 +127,7 @@
 {% endif %}
 
 <tr><td colspan="2" class="row-header"><i class="icon-bar-chart"></i> {% trans "Monitoring" %}</td></tr>
+{% include "gui/table_form_field.html" with field=form.MON_ZABBIX_SERVER_EXTERNAL_URL %}
 {% include "gui/table_form_field.html" with field=form.MON_ZABBIX_SERVER %}
 {% include "gui/table_form_field_checkbox.html" with field=form.MON_ZABBIX_SERVER_SSL_VERIFY %}
 {% include "gui/table_form_field.html" with field=form.MON_ZABBIX_TIMEOUT %}
