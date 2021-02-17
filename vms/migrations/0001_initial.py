@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
         ('taggit', '0002_auto_20150616_2121'),
         ('contenttypes', '0002_remove_content_type_name'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('djcelery', '0001_initial'),
+        ('django_celery_beat', '0001_initial'),
     ]
 
     operations = [
@@ -267,7 +267,7 @@ class Migration(migrations.Migration):
                 ('desc', models.CharField(max_length=128, verbose_name='Description', blank=True)),
                 ('retention', models.IntegerField(verbose_name='Retention')),
                 ('fsfreeze', models.BooleanField(default=False, verbose_name='Application-Consistent?')),
-                ('periodic_task', models.ForeignKey(blank=True, to='djcelery.PeriodicTask', null=True,
+                ('periodic_task', models.ForeignKey(blank=True, to='django_celery_beat.PeriodicTask', null=True,
                                                     on_delete=models.CASCADE)),
             ],
             options={
@@ -486,7 +486,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='backupdefine',
             name='periodic_task',
-            field=models.ForeignKey(blank=True, to='djcelery.PeriodicTask', null=True, on_delete=models.CASCADE),
+            field=models.ForeignKey(blank=True, to='django_celery_beat.PeriodicTask', null=True, on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='backupdefine',

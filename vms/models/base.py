@@ -5,7 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.cache import cache
 from django.core.exceptions import SuspiciousOperation
 from django.contrib.contenttypes.models import ContentType
-from djcelery.models import PeriodicTask, CrontabSchedule
+from django_celery_beat.models import PeriodicTask, CrontabSchedule
 
 import base64
 import copy

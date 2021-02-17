@@ -192,7 +192,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'gunicorn',
     'taggit',
-    'djcelery',
+    'django_celery_beat',
     'gui.apps.GuiConfig',
     'vms.apps.VmsConfig',
     'api.apps.ApiConfig',

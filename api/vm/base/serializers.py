@@ -70,20 +70,20 @@ class ExtendedVmSerializer(VmSerializer):
         'backups': '''SELECT COUNT(*) FROM "vms_backup" WHERE "vms_vm"."uuid" = "vms_backup"."vm_id"''',
 
         'snapshot_define_active': '''SELECT COUNT(*) FROM "vms_snapshotdefine"
-    LEFT OUTER JOIN "djcelery_periodictask" ON ("vms_snapshotdefine"."periodic_task_id" = "djcelery_periodictask"."id")
-    WHERE "vms_snapshotdefine"."vm_id" = "vms_vm"."uuid" AND "djcelery_periodictask"."enabled" = True''',
+    LEFT OUTER JOIN "django_celery_beat_periodictask" ON ("vms_snapshotdefine"."periodic_task_id" = "django_celery_beat_periodictask"."id")
+    WHERE "vms_snapshotdefine"."vm_id" = "vms_vm"."uuid" AND "django_celery_beat_periodictask"."enabled" = True''',
 
         'snapshot_define_inactive': '''SELECT COUNT(*) FROM "vms_snapshotdefine"
-    LEFT OUTER JOIN "djcelery_periodictask" ON ("vms_snapshotdefine"."periodic_task_id" = "djcelery_periodictask"."id")
-    WHERE "vms_snapshotdefine"."vm_id" = "vms_vm"."uuid" AND "djcelery_periodictask"."enabled" = False''',
+    LEFT OUTER JOIN "django_celery_beat_periodictask" ON ("vms_snapshotdefine"."periodic_task_id" = "django_celery_beat_periodictask"."id")
+    WHERE "vms_snapshotdefine"."vm_id" = "vms_vm"."uuid" AND "django_celery_beat_periodictask"."enabled" = False''',
 
         'backup_define_active': '''SELECT COUNT(*) FROM "vms_backupdefine"
-    LEFT OUTER JOIN "djcelery_periodictask" ON ("vms_backupdefine"."periodic_task_id" = "djcelery_periodictask"."id")
-    WHERE "vms_backupdefine"."vm_id" = "vms_vm"."uuid" AND "djcelery_periodictask"."enabled" = True''',
+    LEFT OUTER JOIN "django_celery_beat_periodictask" ON ("vms_backupdefine"."periodic_task_id" = "django_celery_beat_periodictask"."id")
+    WHERE "vms_backupdefine"."vm_id" = "vms_vm"."uuid" AND "django_celery_beat_periodictask"."enabled" = True''',
 
         'backup_define_inactive': '''SELECT COUNT(*) FROM "vms_backupdefine"
-    LEFT OUTER JOIN "djcelery_periodictask" ON ("vms_backupdefine"."periodic_task_id" = "djcelery_periodictask"."id")
-    WHERE "vms_backupdefine"."vm_id" = "vms_vm"."uuid" AND "djcelery_periodictask"."enabled" = False''',
+    LEFT OUTER JOIN "django_celery_beat_periodictask" ON ("vms_backupdefine"."periodic_task_id" = "django_celery_beat_periodictask"."id")
+    WHERE "vms_backupdefine"."vm_id" = "vms_vm"."uuid" AND "django_celery_beat_periodictask"."enabled" = False''',
 
         'slaves': '''SELECT COUNT(*) FROM "vms_slavevm" WHERE "vms_vm"."uuid" = "vms_slavevm"."master_vm_id"''',
     })

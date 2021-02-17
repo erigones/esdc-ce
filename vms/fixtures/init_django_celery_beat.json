@@ -1,7 +1,7 @@
 [
 {
     "pk": 1, 
-    "model": "djcelery.intervalschedule", 
+    "model": "django_celery_beat.intervalschedule",
     "fields": {
         "every": 7200, 
         "period": "seconds"
@@ -9,7 +9,7 @@
 },
 {
     "pk": 2, 
-    "model": "djcelery.intervalschedule", 
+    "model": "django_celery_beat.intervalschedule",
     "fields": {
         "every": 3600, 
         "period": "seconds"
@@ -17,7 +17,7 @@
 },
 
 {
-    "model": "djcelery.periodictask", 
+    "model": "django_celery_beat.periodictask",
     "fields": {
         "task": "api.vm.status.tasks.vm_uptime_all", 
         "name": "api.vm.status.tasks.vm_uptime_all", 
@@ -37,7 +37,7 @@
     }
 },
 {
-    "model": "djcelery.periodictask", 
+    "model": "django_celery_beat.periodictask",
     "fields": {
         "task": "api.node.snapshot.tasks.node_vm_snapshot_sync_all",
         "name": "api.node.snapshot.tasks.node_vm_snapshot_sync_all", 

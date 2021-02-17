@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 from celery.beat import PersistentScheduler
-from djcelery.schedulers import DatabaseScheduler
+from django_celery_beat.schedulers import DatabaseScheduler
 
 from que.utils import task_id_from_string
 
