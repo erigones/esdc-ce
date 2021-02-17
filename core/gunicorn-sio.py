@@ -44,5 +44,8 @@ def post_fork(server, worker):
     from psycogreen.gevent import patch_psycopg
     patch_psycopg()
     worker.log.info('Made psycopg2 green :)')
+
+    import django
+    django.setup()
     from sio.monitor import que_monitor_loop
     spawn(que_monitor_loop, server, worker)
