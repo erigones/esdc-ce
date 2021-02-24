@@ -9,12 +9,7 @@ from django_celery_beat.models import PeriodicTask, CrontabSchedule
 
 import base64
 import copy
-
-try:
-    # noinspection PyPep8Naming
-    import cPickle as pickle
-except ImportError:
-    import pickle
+import pickle
 
 from vms.utils import PickleDict, RWMethods
 from gui.models import User
@@ -113,6 +108,10 @@ class _PickleModel(models.Model):
     @staticmethod
     def _decode(xdata):
         """Unpickle data from DB and return a PickleDict object"""
+        # xdata are stored as string
+        # Python2 pickle loads accepts string and b64decode accepts both string and bytes and return string
+        # Python3 pickle loads accepts bytes and b64decode accepts both string and bytes and return bytes
+        # Pickle loads detects version of pickle automaticaly: Python2 default version 2, Python3 default version 3 or 4
         data = pickle.loads(base64.b64decode(xdata))
         if not isinstance(data, PickleDict):
             data = PickleDict(data)
@@ -123,7 +122,10 @@ class _PickleModel(models.Model):
         """Pickle a dict object and return data, which can be saved in DB"""
         if not isinstance(xdata, dict):
             raise ValueError('json is not a dict')
-        return base64.b64encode(pickle.dumps(copy.copy(dict(xdata))))
+        # Python2 pickle.dumps returns string, and also b64encode returned string (accepts both bytes and string)
+        # Python3 pickle.dumps returns bytes, and also b64encode returned bytes (accepts ONLY bytes)
+        # Make it compatible with OLD data stored in DB (a.k.a. string) so convert to string!
+        return base64.b64encode(pickle.dumps(copy.copy(dict(xdata)))).decode('utf8')
 
 
 class _JsonPickleModel(_PickleModel):
