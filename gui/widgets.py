@@ -161,8 +161,8 @@ class TelPrefixSelect(widgets.Select):
     def __init__(self, attrs=None, choices=()):
         super(TelPrefixSelect, self).__init__(attrs=attrs, choices=UserProfile.PHONE_PREFIXES)
 
-    def build_attrs(self, extra_attrs=None, **kwargs):
-        attrs = super(TelPrefixSelect, self).build_attrs(extra_attrs=extra_attrs, **kwargs)
+    def build_attrs(self, base_attrs, extra_attrs=None):
+        attrs = super(TelPrefixSelect, self).build_attrs(base_attrs, extra_attrs=extra_attrs)
         attrs['class'] = 'input-select2'
         attrs.pop('maxlength', None)
         return attrs
