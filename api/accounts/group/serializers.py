@@ -40,10 +40,10 @@ class GroupSerializer(s.ConditionalDCBoundSerializer):
         role.save()
 
         if role._permissions_to_save is not None:
-            role.permissions = role._permissions_to_save
+            role.permissions.set(role._permissions_to_save)
 
         if role._users_to_save is not None:
-            role.user_set = role._users_to_save
+            role.user_set.set(role._users_to_save)
 
     def validate_alias(self, attrs, source):
         try:

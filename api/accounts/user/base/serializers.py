@@ -96,7 +96,7 @@ class UserSerializer(ApiKeysSerializer, ConditionalDCBoundSerializer):
 
         if user._roles_to_save is not None:
             self.old_roles = set(user.roles.all())
-            user.roles = user._roles_to_save
+            user.roles.set(user._roles_to_save)
 
         # Newly created user via API is automatically marked as verified
         # Creator has to provide correct email, or in user profile set email as not verified (since email is required)!
