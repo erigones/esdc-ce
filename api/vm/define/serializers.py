@@ -650,6 +650,8 @@ class VmDefineSerializer(VmBaseSerializer):
                     node_errors.append(_('Node is not bhyve capable'))
                 if new_cpu > node.bhyve_max_vcpus:
                     node_errors.append(_('Bhyve supports max %d vcpus') % node.bhyve_max_vcpus)
+                if node.platform_version_short < node.BHYVE_MIN_PLATFORM_SHORT:
+                    node_errors.append(_('Compute node platform is too old for bhyve.'))
 
             if node_errors:
                 self._errors['node'] = s.ErrorList(node_errors)
