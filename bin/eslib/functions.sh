@@ -1114,7 +1114,7 @@ _service_enable() {
 	_service_wait_for_transition "${fmri}"
 
 	# see comment above in _service_disable
-	if [[ "$(_service_status "${fmri}")" == "enabled" ]]; then
+	if [[ "$(_service_status "${fmri}")" == "online" ]]; then
 		# success
 		_service_file_save "${fmri}"
 		return 0
