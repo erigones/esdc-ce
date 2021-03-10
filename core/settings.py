@@ -553,6 +553,7 @@ VMS_VM_JSON_DEFAULTS = {
 VMS_VM_QEMU_GUEST_AGENT_SOCKET = '/tmp/vm.qga'
 VMS_VM_QEMU_EXTRA_OPTS = '-chardev socket,path=/tmp/vm.qga,server,nowait,id=qga0 -device virtio-serial ' \
                          '-device virtserialport,chardev=qga0,name=org.qemu.guest_agent.0'
+VMS_VM_BHYVE_EXTRA_OPTS = '-l com3,socket,/tmp/vm.qga'
 
 API_ENABLED = True  # Module
 API_LOG_USER_CALLBACK = True  # Whether to log user callbacks into task log

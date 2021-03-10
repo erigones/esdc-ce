@@ -583,12 +583,11 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
 
         json_brand = _json['brand']
 
+        # add qemu agent options
         if json_brand == 'kvm':
-            # add qemu agent options
             _json['qemu_extra_opts'] = settings.VMS_VM_QEMU_EXTRA_OPTS
-        # TODO
-        # elif json_brand == 'bhyve':
-        #     _json['bhyve_extra_opts'] = settings.VMS_VM_BHYVE_EXTRA_OPTS
+        elif json_brand == 'bhyve':
+            _json['bhyve_extra_opts'] = settings.VMS_VM_BHYVE_EXTRA_OPTS
 
         if json_brand == 'kvm' or json_brand == 'bhyve':
             # save vnc port
