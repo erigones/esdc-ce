@@ -7,8 +7,6 @@ if [[ "$(id -u)" != "0" ]]; then
 	exit 6
 fi
 
-OPTS="$1"
-
 MAINDIR="$(cd "$(dirname "$0")/.." ; pwd -P)"
 ERIGONES_HOME="${ERIGONES_HOME:-"${MAINDIR}"}"
 ANS_BASE="${ERIGONES_HOME}/ans"
@@ -19,8 +17,8 @@ PYTHONPATH="${ERIGONES_HOME}:${PYTHONPATH}:${ERIGONES_HOME}/envs/lib/python2.7/s
 VIRTUAL_ENV="${ERIGONES_HOME}/envs"
 export PYTHONPATH VIRTUAL_ENV
 
-# Update ansible inventory
-if ! grep -q nogenhosts <<< "${OPTS}"; then
+# Force update ansible inventory if it doesn't exist
+if [[ ! -f "${ANS_BASE}/hosts.cfg" ]]; then
 	"${ERIGONES_HOME}"/bin/ctl.sh genhosts --vms > "${ANS_BASE}/hosts.cfg"
 fi
 

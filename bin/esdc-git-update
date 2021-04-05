@@ -164,6 +164,10 @@ if [[ -z "${ESDC_GIT_UPDATE_2ND_RUN}" ]]; then
 	# Create lock file
 	acquire_lock
 
+	# update ansible hosts before pulling new code
+	# (because after pull the Django might be broken until db migration)
+	"${ERIGONES_HOME}"/bin/ctl.sh genhosts --vms > "${ANS_BASE}/hosts.cfg"
+
 	CURRENT_VERSION_REF=$(git rev-parse HEAD || die ${ERR_GIT_CMD})
 
 	if [[ -n "${VERBOSE}" ]]; then
@@ -290,12 +294,11 @@ if [[ "$(uname -s)" == "SunOS" ]] && [[ -f /usr/bin/zonename ]] && [[ "$(/usr/bi
 	fi
 else
 	# run appliance upgrade
-	"${ERIGONES_HOME}"/bin/ctl.sh genhosts --vms > "${ANS_BASE}/hosts.cfg"
 	if [[ -x "${APPLIANCE_UPDATE_CMD}" ]]; then
 		echo "Upgrading appliances (please wait) ..."
 		appliance_update_log="${LOG_DIR}/update_vms.${VERSION_REF}.log"
 
-		if "${APPLIANCE_UPDATE_CMD}" nogenhosts > "${appliance_update_log}" 2>&1; then
+		if "${APPLIANCE_UPDATE_CMD}" > "${appliance_update_log}" 2>&1; then
 			echo "Appliance upgrade was successful"
 		else
 			cat "${appliance_update_log}" >&2
