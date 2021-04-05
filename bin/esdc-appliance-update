@@ -7,6 +7,8 @@ if [[ "$(id -u)" != "0" ]]; then
 	exit 6
 fi
 
+OPTS="$1"
+
 MAINDIR="$(cd "$(dirname "$0")/.." ; pwd -P)"
 ERIGONES_HOME="${ERIGONES_HOME:-"${MAINDIR}"}"
 ANS_BASE="${ERIGONES_HOME}/ans"
@@ -18,7 +20,9 @@ VIRTUAL_ENV="${ERIGONES_HOME}/envs"
 export PYTHONPATH VIRTUAL_ENV
 
 # Update ansible inventory
-"${ERIGONES_HOME}"/bin/ctl.sh genhosts --vms > "${ANS_BASE}/hosts.cfg"
+if ! grep -q nogenhosts <<< "${OPTS}"; then
+	"${ERIGONES_HOME}"/bin/ctl.sh genhosts --vms > "${ANS_BASE}/hosts.cfg"
+fi
 
 ANSIBLE_PLAYBOOK="${VIRTUAL_ENV}/bin/ansible-playbook"
 ANSIBLE_VERSION="$(grep "^ansible==" "${ERIGONES_HOME}/etc/requirements-both.txt")"

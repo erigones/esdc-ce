@@ -35,6 +35,7 @@ ERR_GIT_CMD=11
 # #################
 MAINDIR="$(cd "$(dirname "$0")/.." || exit 64; pwd -P)"
 ERIGONES_HOME=${ERIGONES_HOME:-"${MAINDIR}"}
+ANS_BASE="${ERIGONES_HOME}/ans"
 LOG_DIR="${ERIGONES_HOME}/var/log"
 LOCK="${ERIGONES_HOME}/var/run/update.lock"
 CTLSH="${ERIGONES_HOME}/bin/ctl.sh"
@@ -289,11 +290,12 @@ if [[ "$(uname -s)" == "SunOS" ]] && [[ -f /usr/bin/zonename ]] && [[ "$(/usr/bi
 	fi
 else
 	# run appliance upgrade
+	"${ERIGONES_HOME}"/bin/ctl.sh genhosts --vms > "${ANS_BASE}/hosts.cfg"
 	if [[ -x "${APPLIANCE_UPDATE_CMD}" ]]; then
 		echo "Upgrading appliances (please wait) ..."
 		appliance_update_log="${LOG_DIR}/update_vms.${VERSION_REF}.log"
 
-		if "${APPLIANCE_UPDATE_CMD}" > "${appliance_update_log}" 2>&1; then
+		if "${APPLIANCE_UPDATE_CMD}" nogenhosts > "${appliance_update_log}" 2>&1; then
 			echo "Appliance upgrade was successful"
 		else
 			cat "${appliance_update_log}" >&2
