@@ -17,10 +17,8 @@ PYTHONPATH="${ERIGONES_HOME}:${PYTHONPATH}:${ERIGONES_HOME}/envs/lib/python2.7/s
 VIRTUAL_ENV="${ERIGONES_HOME}/envs"
 export PYTHONPATH VIRTUAL_ENV
 
-# Force update ansible inventory if it doesn't exist
-if [[ ! -f "${ANS_BASE}/hosts.cfg" ]]; then
-	"${ERIGONES_HOME}"/bin/ctl.sh genhosts --vms > "${ANS_BASE}/hosts.cfg"
-fi
+# Update ansible inventory
+"${ERIGONES_HOME}"/bin/ctl.sh genhosts --vms > "${ANS_BASE}/hosts.cfg"
 
 ANSIBLE_PLAYBOOK="${VIRTUAL_ENV}/bin/ansible-playbook"
 ANSIBLE_VERSION="$(grep "^ansible==" "${ERIGONES_HOME}/etc/requirements-both.txt")"

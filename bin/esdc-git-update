@@ -35,7 +35,6 @@ ERR_GIT_CMD=11
 # #################
 MAINDIR="$(cd "$(dirname "$0")/.." || exit 64; pwd -P)"
 ERIGONES_HOME=${ERIGONES_HOME:-"${MAINDIR}"}
-ANS_BASE="${ERIGONES_HOME}/ans"
 LOG_DIR="${ERIGONES_HOME}/var/log"
 LOCK="${ERIGONES_HOME}/var/run/update.lock"
 CTLSH="${ERIGONES_HOME}/bin/ctl.sh"
@@ -163,10 +162,6 @@ if [[ -z "${ESDC_GIT_UPDATE_2ND_RUN}" ]]; then
 
 	# Create lock file
 	acquire_lock
-
-	# update ansible hosts before pulling new code
-	# (because after pull the Django might be broken until db migration)
-	"${ERIGONES_HOME}"/bin/ctl.sh genhosts --vms > "${ANS_BASE}/hosts.cfg"
 
 	CURRENT_VERSION_REF=$(git rev-parse HEAD || die ${ERR_GIT_CMD})
 
