@@ -14,7 +14,7 @@ for file in bhiostat vm-bhyve-disk-io-monitor vm-disk-discovery; do
 done
 
 for file in zabbix-vm-disk-io-bhyve.xml; do
-	cp -a "${VERSION_DIR}/files/${file}" > "/opt/custom/smf/${file}"
+	cp -a "${VERSION_DIR}/files/${file}" "/opt/custom/smf/${file}"
 	# when OS is installed on disk, the SMF DB is permanent and needs explicit import:
 	/usr/sbin/svccfg import "/opt/custom/smf/${file}"
 done
