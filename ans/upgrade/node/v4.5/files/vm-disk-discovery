@@ -1,0 +1,68 @@
+#!/usr/bin/env python
+
+import json
+import subprocess
+import re
+import os
+import glob
+
+command = ('vmadm list -Hpo uuid,type,alias,state')
+
+regex = r'^(.*):(.*):(.*):(.*)$'
+regex_disks = r'^(.*)[-/](disk[0-9]+)$'
+
+os.chdir("/dev/zvol/dsk/zones")
+disks = [f for f in glob.glob('*-disk*') + glob.glob('*-*-*/*disk*') if re.search(r'^[a-z0-9-]+[-/]disk[0-9]+$', f)]
+
+p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+
+array = []
+
+data = {}
+vm = {}
+
+for line in p.stdout.readlines():
+        
+        line = line.rstrip()
+	
+	state = re.match(regex, line).group(4)
+
+	if state != "running":
+		continue
+
+	vm_type = re.match(regex, line).group(2)
+	
+	if vm_type == "OS":
+		continue
+	
+	uuid = re.match(regex, line).group(1)
+	alias = re.match(regex, line).group(3)
+
+        vm['{#UUID}'] = uuid 
+        vm['{#ALIAS}'] = alias 
+
+        array.append(vm)
+
+        vm = {}
+
+for line in disks:
+	uuid = re.match(regex_disks, line).group(1)
+	disk = re.match(regex_disks, line).group(2)
+
+	for i in range(0, len(array)):
+		
+		if uuid == array[i]['{#UUID}']:
+			if '{#DISK}' in array[i]:
+				vm['{#UUID}'] = array[i]['{#UUID}']
+				vm['{#ALIAS}'] = array[i]['{#ALIAS}']
+				vm['{#DISK}'] = disk
+
+				array.append(vm)
+				vm = {}
+
+			else:	
+				array[i]['{#DISK}'] = disk
+
+data['data'] = array
+
+print json.dumps(data, sort_keys=True, indent=4, separators=(',', ': '))
