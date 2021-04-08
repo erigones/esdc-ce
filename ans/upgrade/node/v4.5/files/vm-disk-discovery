@@ -63,6 +63,8 @@ for line in disks:
 			else:	
 				array[i]['{#DISK}'] = disk
 
+			break
+
 data['data'] = array
 
 print json.dumps(data, sort_keys=True, indent=4, separators=(',', ': '))
