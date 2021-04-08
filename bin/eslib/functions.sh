@@ -33,6 +33,7 @@ ZPOOL=${ZPOOL:-"/usr/sbin/zpool"}
 SSH=${SSH:-"/usr/bin/ssh"}
 GZIP=${GZIP:-"/usr/bin/gzip"}
 BZIP2=${BZIP2:-"/usr/bin/bzip2"}
+XZ=${XZ:-"/usr/bin/xz"}
 DIGEST=${DIGEST:-"/usr/bin/digest -a sha1"}
 DATE=${DATE:-"/usr/bin/date"}
 STAT=${STAT:-"/usr/bin/stat"}

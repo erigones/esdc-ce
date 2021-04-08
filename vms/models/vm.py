@@ -2166,6 +2166,12 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
 
         return vm_nics
 
+    def get_nic_by_ip(self, ip):
+        for nic in self.get_vm_nics():
+            if nic['ip'] == ip:
+                return nic
+        return None
+
     def get_network_uuids(self):
         """Return set of network_uuids for currently used/required subnets by this VM"""
         return {nic['network_uuid'] for nic in self.get_vm_nics()}

@@ -27,16 +27,19 @@ class BackupDefine(_VmDiskModel, _ScheduleModel):
     NONE = 0
     GZIP = 1
     BZIP2 = 2
+    XZ = 3
     COMPRESSION = (
         (NONE, _('None')),
         (GZIP, 'gzip'),
         (BZIP2, 'bzip2'),
+        (XZ, 'xz'),
     )
 
     FILE_SUFFIX = frozendict({
         NONE: 'zfs',
         GZIP: 'zfs.gz',
         BZIP2: 'zfs.bz2',
+        XZ: 'zfs.xz',
     })
 
     # id (implicit), Inherited: disk_id, schedule (property), active (property)
