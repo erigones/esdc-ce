@@ -5,7 +5,8 @@ from vms.models import BackupDefine, Backup, Node, NodeStorage
 from api import serializers as s
 from api.vm.utils import get_nodes, get_zpools
 # noinspection PyProtectedMember
-from api.vm.snapshot.serializers import DISK_ID_MIN, DISK_ID_MAX, RETENTION_MAX, RETENTION_MIN, _HideNodeSerializer
+from api.vm.snapshot.serializers import DISK_ID_MIN, DISK_ID_MAX, DISK_ID_MAX_BHYVE, RETENTION_MAX, RETENTION_MIN, \
+    _HideNodeSerializer
 
 
 class BackupDefineSerializer(_HideNodeSerializer):
@@ -20,7 +21,8 @@ class BackupDefineSerializer(_HideNodeSerializer):
     vm_uuid = s.CharField(source='vm.uuid', read_only=True)
     dc = s.CharField(source='vm.dc', read_only=True)
     name = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\._-]*$', max_length=8, min_length=1)
-    disk_id = s.IntegerField(source='array_disk_id', max_value=DISK_ID_MAX, min_value=DISK_ID_MIN)
+    # we're using DISK_ID_MAX_BHYVE because it's bigger
+    disk_id = s.IntegerField(source='array_disk_id', max_value=DISK_ID_MAX_BHYVE, min_value=DISK_ID_MIN)
     type = s.IntegerChoiceField(choices=BackupDefine.TYPE, default=BackupDefine.DATASET)
     node = s.SlugRelatedField(slug_field='hostname', queryset=Node.objects)  # queryset set below
     zpool = s.CharField(max_length=64)  # validated below
@@ -118,7 +120,8 @@ class BackupSerializer(_HideNodeSerializer):
     dc = s.CharField(source='dc', read_only=True)
     define = s.CharField(source='define.name', read_only=True)
     name = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\._-]*$', max_length=24, min_length=1)
-    disk_id = s.IntegerField(source='array_disk_id', max_value=DISK_ID_MAX, min_value=DISK_ID_MIN)
+    # we're using DISK_ID_MAX_BHYVE because it's bigger
+    disk_id = s.IntegerField(source='array_disk_id', max_value=DISK_ID_MAX_BHYVE, min_value=DISK_ID_MIN)
     type = s.IntegerChoiceField(choices=Backup.TYPE, read_only=True)
     node = s.CharField(source='node.hostname', read_only=True)
     zpool = s.CharField(source='zpool.zpool', read_only=True)
@@ -137,6 +140,7 @@ class BackupSerializer(_HideNodeSerializer):
 
 class BackupRestoreSerializer(s.Serializer):
     target_hostname_or_uuid = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\._-]*$', required=True)
-    target_disk_id = s.IntegerField(max_value=DISK_ID_MAX, min_value=DISK_ID_MIN, required=True)
-    disk_id = s.IntegerField(max_value=DISK_ID_MAX, min_value=DISK_ID_MIN, default=1, required=True)
+    # we're using DISK_ID_MAX_BHYVE because it's bigger
+    target_disk_id = s.IntegerField(max_value=DISK_ID_MAX_BHYVE, min_value=DISK_ID_MIN, required=True)
+    disk_id = s.IntegerField(max_value=DISK_ID_MAX_BHYVE, min_value=DISK_ID_MIN, default=1, required=True)
     force = s.BooleanField(default=True)

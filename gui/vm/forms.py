@@ -342,32 +342,33 @@ class ServerDiskSettingsForm(SerializerForm):
     Partial copy of vm_define_disk serializer (api).
     """
 
-    disk_id = forms.IntegerField(label=_('Disk ID'), min_value=DISK_ID_MIN, max_value=DISK_ID_MAX, required=True,
-                                 widget=forms.TextInput(
-                                     attrs={'class': 'uneditable-input narrow',
-                                            'required': 'required', 'disabled': 'disabled'}
-                                 ))
     admin = False
     _api_call = vm_define_disk
 
     def __init__(self, request, vm, *args, **kwargs):
         super(ServerDiskSettingsForm, self).__init__(request, vm, *args, **kwargs)
 
+        max_disks = DISK_ID_MAX
         if vm.is_hvm():
             if vm.is_kvm():
                 model_choices = Vm.DISK_MODEL_KVM
-                max_disks = DISK_ID_MAX
             else:  # bhyve
                 model_choices = Vm.DISK_MODEL_BHYVE
                 max_disks = DISK_ID_MAX_BHYVE
 
             self.fields['model'] = forms.ChoiceField(label=_('Model'), choices=model_choices, required=False,
                                                      widget=forms.Select(attrs={'class': 'narrow input-select2'}))
-            self.fields['disk_id'].max_value = max_disks
 
         # zone
         elif 'model' in self.fields:
             del self.fields['model']
+
+        self.fields['disk_id'] = forms.IntegerField(label=_('Disk ID'), min_value=DISK_ID_MIN, max_value=max_disks,
+                                                    required=True,
+                                                    widget=forms.TextInput(
+                                                        attrs={'class': 'uneditable-input narrow',
+                                                               'required': 'required', 'disabled': 'disabled'}
+                                                    ))
 
     def _initial_data(self, request, vm):
         return get_vm_define_disk(request, vm, disk_id=int(request.POST['opt-disk-disk_id']) - 1)
@@ -877,7 +878,8 @@ class UpdateBackupForm(BackupForm):
         if self._vm:
             self.fields['disk_id'].choices = vm_disk_id_choices(self._vm)
         else:
-            self.fields['disk_id'].choices = [(i, _('Disk') + ' %d' % i) for i in range(1, DISK_ID_MAX + 1)]
+            # we use DISK_ID_MAX_BHYVE here because it's bigger than DISK_ID_MAX
+            self.fields['disk_id'].choices = [(i, _('Disk') + ' %d' % i) for i in range(1, DISK_ID_MAX_BHYVE + 1)]
 
     def _get_real_disk_id(self):
         return Backup.get_disk_id(self._vm, self.cleaned_data['disk_id'])
