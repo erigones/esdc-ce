@@ -31,7 +31,7 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
     # Used in NodeStorage.size_vms
     VMS_SIZE_TOTAL_KEY = 'vms-size-total:%s'  # %s = zpool.id (NodeStorage)
     VMS_SIZE_DC_KEY = 'vms-size-dc:%s:%s'  # %s = dc.id:zpool.id (NodeStorage)
-    BHYVE_MIN_PLATFORM_SHORT = 20210224
+    BHYVE_MIN_PLATFORM_SHORT = 20210408
 
     NODES_ALL_KEY = 'nodes_list'
     NODES_ALL_EXPIRES = 300
