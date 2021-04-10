@@ -345,9 +345,15 @@ class _HVMType(models.Model):
         (Hypervisor_NONE, _('NO hypervisor')),
     )
 
+    # used on VM create or when editing HVM VM
     HVM_TYPE_GUI = (
         (Hypervisor_KVM, _('KVM')),
         (Hypervisor_BHYVE, _('BHYVE')),
+    )
+
+    # used in VM modal when editing already created zone
+    HVM_TYPE_GUI_NO_HYPERVISOR = (
+        (Hypervisor_NONE, _('NO hypervisor')),
     )
 
     HVM = frozenset([Hypervisor_KVM, Hypervisor_BHYVE])

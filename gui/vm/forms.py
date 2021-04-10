@@ -304,6 +304,10 @@ class AdminServerSettingsForm(ServerSettingsForm):
             empty_template_data = {}
             self.fields['ostype'].widget.attrs['disabled'] = 'disabled'
             self.fields['hvm_type'].widget.attrs['disabled'] = 'disabled'
+            if not vm.is_hvm():
+                # for zones the only HVM choice is NO hypervisor
+                self.fields['hvm_type'].choices = Vm.HVM_TYPE_GUI_NO_HYPERVISOR
+
             if vm.is_deployed():
                 self.fields['node'].widget.attrs['class'] += ' disable_created2'
                 self.fields['zpool'].widget.attrs['class'] += ' disable_created2'
