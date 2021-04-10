@@ -341,6 +341,12 @@ class ServerDiskSettingsForm(SerializerForm):
     """
     Partial copy of vm_define_disk serializer (api).
     """
+
+    disk_id = forms.IntegerField(label=_('Disk ID'), min_value=DISK_ID_MIN, max_value=DISK_ID_MAX, required=True,
+                                 widget=forms.TextInput(
+                                     attrs={'class': 'uneditable-input narrow',
+                                            'required': 'required', 'disabled': 'disabled'}
+                                 ))
     admin = False
     _api_call = vm_define_disk
 
@@ -357,11 +363,7 @@ class ServerDiskSettingsForm(SerializerForm):
 
             self.fields['model'] = forms.ChoiceField(label=_('Model'), choices=model_choices, required=False,
                                                      widget=forms.Select(attrs={'class': 'narrow input-select2'}))
-            self.fields['disk_id'] = forms.IntegerField(label=_('Disk ID'), min_value=DISK_ID_MIN, max_value=max_disks,
-                                                        required=True,
-                                                        widget=forms.TextInput(
-                                                            attrs={'class': 'uneditable-input narrow',
-                                                                   'required': 'required', 'disabled': 'disabled'}))
+            self.fields['disk_id'].max_value = max_disks
 
         # zone
         elif 'model' in self.fields:
