@@ -142,6 +142,9 @@ timeout_seconds='60'>
     def _dst_disk_property(self):
         return self._dst_disk_property_ % self.id
 
+    def _is_bhyve(self):
+        return self._vm_get_json(self.src_uuid, remote=True)['brand'] == 'bhyve'
+
     def _generate_snapshot_name(self):
         return self._snap_prefix + str(get_timestamp())
 
@@ -185,14 +188,18 @@ timeout_seconds='60'>
         return self._run_cmd(cmd, uuid, remote=remote)
 
     def _vm_get_json(self, uuid, remote=False):
-        vm_json = json.loads(self._run_cmd('_vm_json', uuid, remote=remote))
+        def _get_json():
+            return json.loads(self._run_cmd('_vm_json', uuid, remote=remote))
 
+        # if value is cached, don't do query from host
         if remote:
-            self._vm_remote_json = vm_json
+            if self._vm_remote_json == {}:
+                self._vm_remote_json = _get_json()
+            return self._vm_remote_json
         else:
-            self._vm_local_json = vm_json
-
-        return vm_json
+            if self._vm_local_json == {}:
+                self._vm_local_json = _get_json()
+            return self._vm_local_json
 
     def _vm_get_hostname(self, default=None, remote=False):
         if remote:
@@ -248,6 +255,15 @@ timeout_seconds='60'>
         if self.limit:
             cmd.append(self.limit)
 
+        return self._run_cmd(*cmd)
+
+    def _sync_quota(self):
+        src_json = self._vm_get_json(self.src_uuid, remote=True)
+        dst_json = self._vm_get_json(self.dst_uuid, remote=False)
+        src_vol = '%s/%s' % (src_json['zpool'], self.src_uuid)
+        dst_vol = '%s/%s' % (dst_json['zpool'], self.dst_uuid)
+
+        cmd = ['zfs_sync_quota', src_vol, dst_vol, self.host]
         return self._run_cmd(*cmd)
 
     def _prepare_dataset_destroy(self):
@@ -347,6 +363,9 @@ timeout_seconds='60'>
         last_snap = self._initial_sync(vm_disks, src_host_name, dst_host_name)
         self._finalize_initialized_vm()
         slave_json = self._vm_get_json(dst_uuid)
+
+        if dst_json['brand'] == 'bhyve':
+            self._sync_quota()
 
         if self.pickle:
             slave_json = base64.encodestring(pickle.dumps(slave_json))
@@ -650,6 +669,10 @@ timeout_seconds='60'>
         src_host_name, src_disks = self._vm_get_host_and_disks(self.src_uuid, remote=True)
         self._vm_check_disk_count(src_disks, dst_disks)
         vm_disks = []
+
+        # sync quota before syncing disks (quota might have been increased since last sync)
+        if self._is_bhyve():
+            self._sync_quota()
 
         # Check replication metadata and fetch common snapshot
         for src_disk, dst_disk in zip(src_disks, dst_disks):

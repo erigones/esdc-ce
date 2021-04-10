@@ -688,6 +688,23 @@ _zfs_destroy_snap_vm() {
 	return $?
 }
 
+_zfs_get_param()
+{
+		local volume="$1"
+		local param="$2"
+
+		"${ZFS}" get -Ho value "${param}" "${volume}"
+}
+
+_zfs_set_param()
+{
+		local volume="$1"
+		local param="$2"
+		local value="$3"
+
+		"${ZFS}" set "${param}=${value}" "${volume}"
+}
+
 # usage: _check_fstyp <dev> <fstyp>
 _check_fstyp()
 {

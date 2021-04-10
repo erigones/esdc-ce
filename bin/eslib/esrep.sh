@@ -52,6 +52,22 @@ zfs_send_recv() {
 	fi
 }
 
+zfs_sync_quota() {
+		local src_vol="$1"
+		local dst_vol="$2"
+		local host="$3"
+
+		local src_quota="none"
+		local dst_quota
+
+		src_quota="$(run_ssh "root@${host}" _zfs_get_param "${src_vol}" quota)"
+		dst_quota="$(_zfs_get_param "${dst_vol}" quota)"
+
+		if [[ "${src_quota}" != "${dst_quota}" ]]; then
+				_zfs_set_param "${dst_vol}" quota "${src_quota}"
+		fi
+}
+
 
 ###############################################################
 # main
