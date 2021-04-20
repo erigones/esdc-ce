@@ -1,0 +1,2 @@
+LONG_DATETIME_FORMAT = 'Y-m-d H:i:s T'
+TIME_FORMAT = 'G:i'
