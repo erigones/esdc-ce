@@ -59,7 +59,7 @@ class PickleDict(dict):
     """
     Used for vm.json or vm.json_active property.
     """
-    def __unicode__(self):
+    def __str__(self):
         return self.dump()
 
     def __getstate__(self):
