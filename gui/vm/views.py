@@ -8,6 +8,7 @@ from django.core.exceptions import PermissionDenied
 from django.db.models import Q
 from django.http import Http404, HttpResponse
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.http import require_POST
 
@@ -328,7 +329,7 @@ def set_installed(request, hostname):
         res = ServerSettingsForm.api_call('update', vm, request, args=(hostname,), data={'installed': True})
         if res.status_code == 200:
             messages.success(request, _('Server was marked as installed.'))
-            return redirect('vm_details', hostname=hostname)
+            return redirect(request.build_absolute_uri(reverse('vm_details', kwargs={'hostname': hostname})))
         else:
             return JSONResponse(res.data, status=res.status_code)
 
@@ -412,7 +413,7 @@ def add_import_form(request):
                     defined_vms[vm] = html_table[vm]
 
         if redirect_to_vm_list:
-            return redirect('vm_list')
+            return redirect(request.build_absolute_uri(reverse('vm_list')))
 
         # Some server creation has failed, remove all created server definitions
         for vm in defined_vms:
@@ -470,9 +471,11 @@ def settings_form(request, hostname):
         elif status in (200, 201):
             # noinspection PyUnresolvedReferences
             if form.action == 'delete':
-                return redirect('vm_list')
+                return redirect(request.build_absolute_uri(reverse('vm_list')))
             else:
-                return redirect('vm_details', hostname=form.saved_hostname)
+                return redirect(
+                    request.build_absolute_uri(reverse('vm_details', kwargs={'hostname': form.saved_hostname}))
+                )
 
     return render(request, 'gui/vm/settings_form.html', {
         'settingsform': form,
@@ -504,7 +507,7 @@ def disk_settings_form(request, hostname):
         if status == 204:
             return HttpResponse(None, status=status)
         elif status in (200, 201):
-            return redirect('vm_details', hostname=vm.hostname)
+            return redirect(request.build_absolute_uri(reverse('vm_details', kwargs={'hostname': vm.hostname})))
 
     return render(request, 'gui/vm/disk_settings_form.html', {
         'disk_settingsform': form,
@@ -536,7 +539,7 @@ def nic_settings_form(request, hostname):
         if status == 204:
             return HttpResponse(None, status=status)
         elif status in (200, 201):
-            return redirect('vm_details', hostname=vm.hostname)
+            return redirect(request.build_absolute_uri(reverse('vm_details', kwargs={'hostname': vm.hostname})))
 
     return render(request, 'gui/vm/nic_settings_form.html', {'nic_settingsform': form, 'vm': vm})
 
@@ -552,7 +555,7 @@ def undo_settings(request, hostname):
     res = UndoSettingsForm.api_call('update', vm, request, args=(hostname,))
 
     if res.status_code == 200:
-        return redirect('vm_details', hostname=vm.hostname)
+        return redirect(request.build_absolute_uri(reverse('vm_details', kwargs={'hostname': vm.hostname})))
 
     return JSONResponse(res.data, status=res.status_code)
 
@@ -578,9 +581,9 @@ def multi_settings_form(request):
         node = request.GET.get('node', None)
 
         if node:
-            return redirect('node_vms', node)
+            return redirect(request.build_absolute_uri(reverse('node_vms', args=node)))
         else:
-            return redirect('vm_list')
+            return redirect(request.build_absolute_uri(reverse('vm_list')))
 
 
 @login_required
