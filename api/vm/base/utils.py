@@ -150,9 +150,9 @@ def vm_reset(vm):
 
 def vm_update(vm):
     """
-    Internal API used for updating VM if there were changes in jason detected.
+    Internal API used for updating VM if there were changes in json detected.
     """
-    logger.info('Running PUT vm_manage(%s), because something (vnc port?) has changed changed', vm)
+    logger.info('Running PUT vm_manage(%s), because something (vnc port?) has changed', vm)
     from api.vm.base.views import vm_manage
     from api.utils.request import get_dummy_request
     from api.utils.views import call_api_view

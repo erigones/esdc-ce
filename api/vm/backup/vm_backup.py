@@ -203,7 +203,7 @@ class VmBackup(TaskAPIView):
         if vm.locked:
             raise VmIsLocked
 
-        if vm.brand != bkp.vm_brand:
+        if not vm.has_compatible_brand(bkp.vm_brand):
             raise PreconditionRequired('VM brand mismatch')
 
         disk_id, real_disk_id, zfs_filesystem = get_disk_id(request, vm, self.data, key='target_disk_id',

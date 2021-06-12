@@ -13,5 +13,5 @@
 {% include "gui/form_field.html" with field=form.desc %}
 
 <div class="advanced hide">
-{% if vm.is_kvm %}{% include "gui/form_field_checkbox.html" with field=form.fsfreeze %}{% endif %}
+{% if vm.is_hvm %}{% include "gui/form_field_checkbox.html" with field=form.fsfreeze %}{% endif %}
 </div>

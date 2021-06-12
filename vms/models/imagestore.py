@@ -59,7 +59,7 @@ class ImageStoreObject(dict):
             'dc_bound': False,
             'tags': tags.get(Image.TAGS_KEY, []),
             'deploy': tags.get('deploy', False),
-            'resize': tags.get('resize', self['ostype'] in Image.ZONE),
+            'resize': tags.get('resize', self['ostype'] in Image.ZONE_OSTYPES),
             'manifest_url': self['manifest_url'],
         }
 

@@ -79,7 +79,7 @@ class VmStatusStopSerializer(s.Serializer):
     def __init__(self, request, vm, *args, **kwargs):
         super(VmStatusStopSerializer, self).__init__(*args, **kwargs)
 
-        if vm.is_kvm():
+        if vm.is_hvm():
             dc_settings = request.dc.settings
 
             if vm.ostype == vm.WINDOWS:

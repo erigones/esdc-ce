@@ -1,0 +1,102 @@
+#!/usr/bin/awk -f
+#
+# Janci
+# Danube Cloud 2021
+#
+###################
+#
+# This wraps the bhiostat script and does two main things:
+# - fills zero lines for idle disks that bhiostat didn't see
+# - sends data to Zabbix server
+#
+###################
+
+
+function pid_to_uuid(pid) {
+	get_uuid_cmd = "/usr/bin/readlink /proc/" pid "/path/root | /usr/bin/cut -d/ -f3"
+	get_uuid_cmd | getline uuid
+	close(get_uuid_cmd)
+	return uuid
+}
+
+function update_active_disks() {
+	# reset disk list (some disks might have disappeared so we'll build a new list from scratch)
+	delete active_disks
+
+	listbhyves = "/usr/sbin/zoneadm list -p  | /usr/bin/egrep '.*running.*bhyve' | cut -d: -f2"
+	while ((listbhyves | getline vm_entry_uuid) > 0) {
+		getdisks = "egrep -- '/disk[0-9]+\">' /etc/zones/" vm_entry_uuid ".xml | /usr/bin/grep -Eo 'disk[0-9]+'"
+		while ((getdisks | getline disk) > 0) {
+			active_disks[vm_entry_uuid "_" disk] = 0
+		}
+		close(getdisks);
+	}
+	close(listbhyves);
+}
+
+function get_unix_time() {
+	date_cmd = "/usr/bin/date +%s"
+	date_cmd | getline date
+	close(date_cmd)
+	return date
+}
+
+
+BEGIN {
+
+	bhiostat_cmd = "/opt/zabbix/etc/scripts/bhiostat -H -T -i 10"
+	zabbix_cmd = "/opt/zabbix/bin/zabbix_sender -c /opt/zabbix/etc/zabbix_agentd.conf -T -i - >/dev/null"
+
+	update_active_disks()
+	zabbix_data = ""
+
+	while ((bhiostat_cmd | getline) > 0) {
+		if($1 == "---") {
+			# end of dtrace printing, add the remaining disks that were not active during the period
+			for (inst in active_disks) {
+				split(inst, tmp, "_")
+				uuid = tmp[1]
+				disk = tmp[2]
+				date = get_unix_time()
+				
+				zabbix_data = zabbix_data""uuid" vm.disk.io["disk",reads] "   date " 0\n"
+				zabbix_data = zabbix_data""uuid" vm.disk.io["disk",writes] "  date " 0\n"
+				zabbix_data = zabbix_data""uuid" vm.disk.io["disk",read] "    date " 0\n"
+				zabbix_data = zabbix_data""uuid" vm.disk.io["disk",written] " date " 0\n"
+			}
+			if(zabbix_data != "") {
+				# send data if there are any
+				printf zabbix_data | zabbix_cmd
+				close(zabbix_cmd)
+				#printf zabbix_data
+			}
+
+			# cleanup
+			zabbix_data = ""
+			update_active_disks()
+		}
+
+		else {
+			pid = $1
+			disk = $6
+			if(!(disk ~/^disk/)) {
+				# if disks are not recognized, don't send garbage data
+				continue
+			}
+			uuid = pid_to_uuid(pid)
+			delete active_disks[uuid "_" disk]
+			ior = $2
+			iow = $3
+			br = $4
+			bw = $5
+			date = get_unix_time()
+
+			zabbix_data = zabbix_data""uuid" vm.disk.io["disk",reads] "   date" "ior"\n"
+			zabbix_data = zabbix_data""uuid" vm.disk.io["disk",writes] "  date" "iow"\n"
+			zabbix_data = zabbix_data""uuid" vm.disk.io["disk",read] "    date" "br"\n"
+			zabbix_data = zabbix_data""uuid" vm.disk.io["disk",written] " date" "bw"\n"
+		}
+	}
+
+	close(bhiostat_cmd);
+}

@@ -118,9 +118,13 @@ then the vcpus value can be 0, which will remove the compute node CPU limit enti
         :type data.installed: boolean
         :arg data.snapshot_limit_manual: Maximum number of manual snapshots for this VM (default: null [unlimited])
         :type data.snapshot_limit_manual: integer
-        :arg data.snapshot_size_limit: Maximum size of all snapshots for this VM (default: null [unlimited])
+        :arg data.snapshot_size_percent_limit: Maximum size of all snapshots for this VM relative to size of all \
+defined VM disks. Ignored if ``snapshot_size_limit`` is defined (default: null [unlimited])
+        :type data.snapshot_size_percent_limit: integer
+        :arg data.snapshot_size_limit: Maximum absolute size of all snapshots for this VM in megabytes \
+(default: null [unlimited])
         :type data.snapshot_size_limit: integer
-        :arg data.zpool: The zpool used for the VM zone (default: zones)
+        :arg data.zpool: The zpool used for the VM (default: zones)
         :type data.zpool: string
         :arg data.cpu_shares: Number of VM's CPU shares relative to other VMs (requires |SuperAdmin| permission) \
 (default: 100)
@@ -133,6 +137,9 @@ then the vcpus value can be 0, which will remove the compute node CPU limit enti
         :type data.cpu_type: string
         :arg data.vga: **KVM only**; VGA emulation driver. One of std, cirrus, vmware (default: std)
         :type data.vga: string
+        :arg data.bootrom: **BHYVE only**; Default VM boot firmware. One of bios, uefi (default: bios). \
+Only uefi mode supports VNC.
+        :type data.bootrom: string
         :arg data.dns_domain: Search domain set in /etc/hosts (SunOS Zone only, default: domain part of ``hostname``)
         :type data.dns_domain: string
         :arg data.routes: Key-value object that maps destinations to gateways. \
@@ -193,7 +200,10 @@ then the vcpus value can be 0, which will remove the compute node CPU limit enti
         :type data.installed: boolean
         :arg data.snapshot_limit_manual: Maximum number of manual snapshots for this VM
         :type data.snapshot_limit_manual: integer
-        :arg data.snapshot_size_limit: Maximum size of all snapshots for this VM
+        :type data.snapshot_limit_manual: integer
+        :arg data.snapshot_size_percent_limit: Maximum size of all snapshots for this VM relative to size of all \
+defined VM disks. Ignored if ``snapshot_size_limit`` is defined
+        :arg data.snapshot_size_limit: Maximum absolute size of all snapshots for this VM in megabytes
         :type data.snapshot_size_limit: integer
         :arg data.zpool: The zpool used for the VM zone
         :type data.zpool: string
@@ -205,6 +215,9 @@ then the vcpus value can be 0, which will remove the compute node CPU limit enti
         :type data.cpu_type: string
         :arg data.vga: **KVM only**; VGA emulation driver. One of std, cirrus, vmware
         :type data.vga: string
+        :arg data.bootrom: **BHYVE only**; Default VM boot firmware. One of bios, uefi (default: bios). \
+Only uefi mode supports VNC.
+        :type data.bootrom: string
         :arg data.dns_domain: Search domain set in /etc/hosts (SunOS Zone only)
         :type data.dns_domain: string
         :arg data.routes: Key-value object that maps destinations to gateways. \
@@ -518,7 +531,7 @@ def vm_define_nic(request, hostname_or_uuid, nic_id=None, data=None):
         :type data.net: string
         :arg data.ip: Virtual NIC IPv4 address. Must be part of net (default: auto select)
         :type data.ip: string
-        :arg data.model: Virtual NIC Model. One of virtio, e1000, rtl8139 (default: virtio)
+        :arg data.model: Virtual NIC Model. One of virtio, e1000, rtl8139 (default: virtio); Bhyve has only virtio model
         :type data.model: string
         :arg data.dns: Create a DNS A record for VM's FQDN? (default: true for first NIC, otherwise false)
         :type data.dns: boolean
@@ -575,7 +588,7 @@ other VMs. Useful for floating/shared IPs (default: [])
         :type data.net: string
         :arg data.ip: Virtual NIC IPv4 address
         :type data.ip: string
-        :arg data.model: Virtual NIC Model. One of virtio, e1000, rtl8139
+        :arg data.model: Virtual NIC Model. One of virtio, e1000, rtl8139. Bhyve has only virtio model
         :type data.model: string
         :arg data.dns: Create a DNS A record for VM's FQDN?
         :type data.dns: boolean

@@ -50,7 +50,7 @@ class VmReplicaSerializer(s.InstanceSerializer):
             self.fields['node'].queryset = get_nodes(request, is_compute=True)
             self._disks = vm.json_get_disks()
 
-            if vm.is_kvm():
+            if vm.is_hvm():
                 self.fields['disk_zpools'].max_items = len(self._disks)
             else:
                 del self.fields['disk_zpools']
@@ -113,7 +113,7 @@ class VmReplicaSerializer(s.InstanceSerializer):
                 self._detail_dict['root_zpool'] = root_zpool
 
         # Validate disk_zpools (we can do this after we know the new node)
-        if slave_vm.vm.is_kvm():
+        if slave_vm.vm.is_hvm():
             disk_zpools = attrs.get('disk_zpools', {})
             try:
                 disk_zpools = slave_vm_define.save_disk_zpools(disk_zpools)

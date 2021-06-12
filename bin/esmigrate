@@ -153,6 +153,14 @@ is_kvm() {
 	[[ "${VM_BRAND_SRC}" == "kvm" ]]
 }
 
+is_bhyve() {
+	[[ "${VM_BRAND_SRC}" == "bhyve" ]]
+}
+
+is_hvm() {
+	is_kvm || is_bhyve
+}
+
 
 ###############################################################
 # stage 1: parse input, VM json and check requirements
@@ -325,7 +333,7 @@ _set_ds_data_zone_migrate() {
 	DS_DATA[0]="${src} ${dst}"
 }
 
-_set_ds_data_kvm_migrate() {
+_set_ds_data_hvm_migrate() {
 	local src
 	local dst
 	local ids
@@ -371,13 +379,13 @@ set_datasets_migrate() {
 	if [[ -n "${DEST_HOST}" || -n "${DEST_POOL}" ]]; then  # remote or root pool change
 		_set_ds_root_migrate
 
-		if ! is_kvm; then  # add OS zone delegate dataset only when root pool is migrated
+		if ! is_hvm; then  # add OS zone delegate dataset only when root pool is migrated
 			_set_ds_data_zone_migrate
 		fi
 	fi
 
-	if is_kvm; then
-		_set_ds_data_kvm_migrate  # more remote and local migration checks inside function
+	if is_hvm; then
+		_set_ds_data_hvm_migrate  # more remote and local migration checks inside function
 	fi
 }
 
@@ -761,7 +769,7 @@ _send_recv_datasets_init() {
 			# shellcheck disable=SC2206
 			a_ds_data=(${a_ds_data})
 
-			# The OS zone delegated dataset is a child and send together with the DS_ROOT
+			# The OS zone delegated dataset and bhyve disks are children and they are sent together with the DS_ROOT
 			if [[ "${MODE}" == "migrate" ]] && ! is_kvm; then
 				DS_RECV+=("${a_ds_data[1]}")  # but we still want to mark it as received
 			else
@@ -790,8 +798,8 @@ _send_recv_datasets_incr() {
 	fi
 
 	if [[ "${#DS_DATA[@]}" -ne 0 ]]; then
-		# The OS zone delegated dataset is a child and send together with the DS_ROOT
-		[[ "${MODE}" == "migrate" ]] && ! is_kvm && return 0
+		# The OS zone delegated dataset is a child and sent together with the DS_ROOT
+		[[ "${MODE}" == "migrate" ]] && ! is_hvm && return 0
 
 		for a_ds_data in "${DS_DATA[@]}"; do
 			# shellcheck disable=SC2206
@@ -857,7 +865,7 @@ update_zone_xml() {
 		zonecfg="/${DS_ROOT#* }/SUNWdetached.xml"
 
 		# Disable auto boot
-		if is_kvm; then
+		if is_hvm; then
 			update_cmd+=("-e")
 			# shellcheck disable=SC1117
 			update_cmd+=("s#\(<attr .*name=\"vm-autoboot\" .*value=\)\"true\"#\1\"false\"#")
@@ -869,7 +877,7 @@ update_zone_xml() {
 				update_cmd+=("s#\(attr name=\"vnc-port\" .*value=\)\"[^\"]*\"#\1\"${VM_VNC_PORT}\"#")
 			fi
 
-			if [[ -z "${VM_STOP}" ]]; then
+			if is_kvm && [[ -z "${VM_STOP}" ]]; then
 				# Add live migration socket to qemu_extra_opts
 				qemu_extra_opts="$(base64_encode "${VM_QEMU_OPTS_SRC} ${VM_QEMU_OPTS_DST_APPEND}" | tr -d '\n')"
 				update_cmd+=("-e")
@@ -1362,7 +1370,7 @@ destroy_datasets_src() {
 		fi
 	fi
 
-	# The OS zone delegated dataset is a child and destroyed together with the DS_ROOT
+	# The OS zone delegated dataset and bhyve zvols are children and they are destroyed together with the DS_ROOT
 	if [[ "${#DS_DATA[@]}" -ne 0 ]] && is_kvm; then
 		for ds_data in "${DS_DATA[@]}"; do
 			_destroy_dataset "${ds_data%% *}"
@@ -1509,9 +1517,9 @@ cleanup() {
 
 validate_input_migrate() {
 	if [[ -z "${DEST_HOST}" ]]; then  # local
-		if is_kvm; then
-			# local migration of KVM machine's disk(s) into another pool
-			# and/or local migration of KVM machine's root pool into another pool
+		if is_hvm; then
+			# local migration of HVM machine's disk(s) into another pool
+			# and/or local migration of HVM machine's root pool into another pool
 			[[ ${#DEST_DISK[@]} -eq 0 && -z "${DEST_POOL}" ]] && \
 				die ${ERR_INPUT} "Missing target disk pool parameter and/or target zone pool parameter"
 			[[ -z "${VM_STOP}" ]] && die ${ERR_INPUT} "Live migration cannot be performed locally"
@@ -1526,6 +1534,8 @@ validate_input_migrate() {
 			# migrate KVM machine on to another host (all or none parameters can be used)
 			[[ -z "${VM_STOP}" && "${VM_STATUS_SRC}" != "running" ]] && \
 				die ${ERR_INPUT} "Live migration is possible only when source VM is in running state"
+		elif is_bhyve; then
+			[[ -z "${VM_STOP}" ]] && die ${ERR_INPUT} "Live migration is currently available only for KVM"
 		else
 			# migrate whole OS zone on to another host (only target pool can be used)
 			[[ ${#DEST_DISK[@]} -ne 0 ]] && die ${ERR_INPUT} "Redundant target disk pool parameter"

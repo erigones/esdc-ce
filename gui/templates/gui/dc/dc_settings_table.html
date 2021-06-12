@@ -61,10 +61,12 @@
 {% include "gui/table_form_field.html" with field=form.VMS_VM_STOP_TIMEOUT_DEFAULT %}
 {% include "gui/table_form_field.html" with field=form.VMS_VM_STOP_WIN_TIMEOUT_DEFAULT %}
 {% include "gui/table_form_field.html" with field=form.VMS_VM_OSTYPE_DEFAULT %}
+{% include "gui/table_form_field.html" with field=form.VMS_VM_HVM_TYPE_DEFAULT %}
 {% include "gui/table_form_field_checkbox.html" with field=form.VMS_VM_MONITORED_DEFAULT %}
 {% include "gui/table_form_field.html" with field=form.VMS_VM_CPU_SHARES_DEFAULT %}
 {% include "gui/table_form_field.html" with field=form.VMS_VM_ZFS_IO_PRIORITY_DEFAULT %}
-{% include "gui/table_form_field.html" with field=form.VMS_DISK_MODEL_DEFAULT %}
+{% include "gui/table_form_field.html" with field=form.VMS_DISK_MODEL_KVM_DEFAULT %}
+{% include "gui/table_form_field.html" with field=form.VMS_DISK_MODEL_BHYVE_DEFAULT %}
 {% include "gui/table_form_field.html" with field=form.VMS_DISK_COMPRESSION_DEFAULT %}
 {% include "gui/table_form_field.html" with field=form.VMS_DISK_IMAGE_DEFAULT %}
 {% include "gui/table_form_field.html" with field=form.VMS_DISK_IMAGE_ZONE_DEFAULT %}
@@ -74,12 +76,15 @@
 {% include "gui/table_form_field.html" with field=form.VMS_NET_DEFAULT %}
 {% include "gui/table_form_field.html" with field=form.VMS_STORAGE_DEFAULT %}
 {% include "gui/table_form_field.html" with field=form.VMS_VGA_MODEL_DEFAULT %}
+{% include "gui/table_form_field.html" with field=form.VMS_BHYVE_BOOTROM_DEFAULT %}
 {% include "gui/table_form_field.html" with field=form.VMS_VM_SSH_KEYS_DEFAULT %}
 {% include "gui/table_form_field.html" with field=form.VMS_VM_MDATA_DEFAULT %}
 {% include "gui/table_form_field.html" with field=form.VMS_VM_SNAPSHOT_DEFINE_LIMIT %}
 {% include "gui/table_form_field.html" with field=form.VMS_VM_SNAPSHOT_LIMIT_AUTO %}
 {% include "gui/table_form_field.html" with field=form.VMS_VM_SNAPSHOT_LIMIT_MANUAL %}
 {% include "gui/table_form_field.html" with field=form.VMS_VM_SNAPSHOT_LIMIT_MANUAL_DEFAULT %}
+{% include "gui/table_form_field.html" with field=form.VMS_VM_SNAPSHOT_SIZE_PERCENT_LIMIT %}
+{% include "gui/table_form_field.html" with field=form.VMS_VM_SNAPSHOT_SIZE_PERCENT_LIMIT_DEFAULT %}
 {% include "gui/table_form_field.html" with field=form.VMS_VM_SNAPSHOT_SIZE_LIMIT addon=" MB" %}
 {% include "gui/table_form_field.html" with field=form.VMS_VM_SNAPSHOT_SIZE_LIMIT_DEFAULT addon=" MB" %}
 {% include "gui/table_form_field.html" with field=form.VMS_VM_SNAPSHOT_DC_SIZE_LIMIT addon=" MB" %}

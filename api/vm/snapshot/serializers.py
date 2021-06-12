@@ -7,11 +7,12 @@ from vms.models import SnapshotDefine, Snapshot
 from api import serializers as s
 from api.exceptions import ObjectNotFound, InvalidInput
 from api.vm.utils import get_vm
-from api.vm.define.vm_define_disk import DISK_ID_MIN, DISK_ID_MAX
+from api.vm.define.vm_define_disk import DISK_ID_MIN, DISK_ID_MAX, DISK_ID_MAX_BHYVE
 from api.vm.snapshot.utils import get_disk_id
 
 DISK_ID_MIN += 1
 DISK_ID_MAX += 1
+DISK_ID_MAX_BHYVE += 1
 RETENTION_MIN = 0
 RETENTION_MAX = 65536
 
@@ -95,9 +96,11 @@ class SnapshotDefineSerializer(s.InstanceSerializer):
             self.fields['retention'].validators.append(validators.MinValueValidator(min_count))
             self.fields['retention'].validators.append(validators.MaxValueValidator(max_count))
 
-            if instance.vm.is_kvm():
+            if instance.vm.is_hvm():
                 self._update_fields_ = list(self._update_fields_)
                 self._update_fields_.append('fsfreeze')
+                if instance.vm.is_bhyve():
+                    self.fields['disk_id'].max_value = DISK_ID_MAX_BHYVE
 
     def validate(self, attrs):
         # Check total number of existing snapshot definitions - Issue #chili-447
@@ -129,7 +132,8 @@ class SnapshotSerializer(s.InstanceSerializer):
     vm_uuid = s.CharField(source='vm.uuid', read_only=True)
     define = s.CharField(source='define.name', read_only=True)
     name = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\._-]*$', max_length=24, min_length=1)
-    disk_id = s.IntegerField(source='array_disk_id', max_value=DISK_ID_MAX, min_value=DISK_ID_MIN)
+    # we're using DISK_ID_MAX_BHYVE because it's bigger
+    disk_id = s.IntegerField(source='array_disk_id', max_value=DISK_ID_MAX_BHYVE, min_value=DISK_ID_MIN)
     note = s.SafeCharField(max_length=128, required=False)
     type = s.IntegerChoiceField(choices=Snapshot.TYPE, default=2, read_only=True)
     created = s.DateTimeField(read_only=True, required=False)
@@ -140,7 +144,8 @@ class SnapshotSerializer(s.InstanceSerializer):
 
 class SnapshotRestoreSerializer(s.Serializer):
     target_hostname_or_uuid = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\._-]*$', required=False)
-    target_disk_id = s.IntegerField(max_value=DISK_ID_MAX, min_value=DISK_ID_MIN, required=False)
+    # we're using DISK_ID_MAX_BHYVE because it's bigger
+    target_disk_id = s.IntegerField(max_value=DISK_ID_MAX_BHYVE, min_value=DISK_ID_MIN, required=False)
     force = s.BooleanField(default=True)
 
     def __init__(self, request, vm, *args, **kwargs):

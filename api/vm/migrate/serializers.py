@@ -40,7 +40,7 @@ class VmMigrateSerializer(s.Serializer):
         self._disks = vm.json_active_get_disks()
         self._live = False
 
-        if vm.is_kvm():
+        if vm.is_hvm():
             self.fields['disk_zpools'].max_items = len(self._disks)
         else:
             del self.fields['disk_zpools']
@@ -124,7 +124,7 @@ class VmMigrateSerializer(s.Serializer):
             return attrs
 
         # Validate disk_zpools (we can do this after we know the new node)
-        if ghost_vm.vm.is_kvm():
+        if ghost_vm.vm.is_hvm():
             disk_zpools = attrs.get('disk_zpools', {})
             try:
                 disk_zpools = ghost_vm_define.save_disk_zpools(disk_zpools, save_same_zpool=changing_node)
@@ -191,7 +191,7 @@ class VmMigrateSerializer(s.Serializer):
                   '-o GSSAPIKeyExchange=no -o GSSAPIAuthentication=no -o LogLevel=QUIET -l root'
             get_json = '%s %s "%s"' % (ssh, node.address, get_json)
 
-            if vm.is_kvm():
+            if vm.is_hvm():
                 params.append('-C %s' % self.ghost_vm_define.vm.vnc_port)
 
         if self._live:

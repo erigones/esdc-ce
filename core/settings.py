@@ -555,6 +555,7 @@ VMS_VM_JSON_DEFAULTS = {
 VMS_VM_QEMU_GUEST_AGENT_SOCKET = '/tmp/vm.qga'
 VMS_VM_QEMU_EXTRA_OPTS = '-chardev socket,path=/tmp/vm.qga,server,nowait,id=qga0 -device virtio-serial ' \
                          '-device virtserialport,chardev=qga0,name=org.qemu.guest_agent.0'
+VMS_VM_BHYVE_EXTRA_OPTS = '-l com3,socket,/tmp/vm.qga'
 
 API_ENABLED = True  # Module
 API_LOG_USER_CALLBACK = True  # Whether to log user callbacks into task log
@@ -610,6 +611,7 @@ VMS_TEMPLATE_LIMIT = None
 VMS_VM_DEFINE_LIMIT = None
 VMS_VM_DOMAIN_DEFAULT = 'lan'
 VMS_VM_OSTYPE_DEFAULT = 1
+VMS_VM_HVM_TYPE_DEFAULT = 1     # KVM
 VMS_VM_CPU_TYPE_DEFAULT = 'qemu64'
 VMS_VM_BRAND_SUNOS_ZONE_DEFAULT = 'joyent'
 VMS_VM_BRAND_LX_ZONE_DEFAULT = 'lx'
@@ -627,7 +629,8 @@ VMS_VM_SSH_KEYS_DEFAULT = []
 VMS_VM_MDATA_DEFAULT = {}
 VMS_VM_STOP_TIMEOUT_DEFAULT = 180
 VMS_VM_STOP_WIN_TIMEOUT_DEFAULT = 300
-VMS_DISK_MODEL_DEFAULT = 'virtio'
+VMS_DISK_MODEL_KVM_DEFAULT = 'virtio'
+VMS_DISK_MODEL_BHYVE_DEFAULT = 'virtio'
 VMS_DISK_COMPRESSION_DEFAULT = 'lz4'
 VMS_DISK_IMAGE_DEFAULT = ''
 VMS_DISK_IMAGE_ZONE_DEFAULT = 'base-64-es'  # TODO: Rename to VMS_DISK_IMAGE_SUNOS_ZONE_DEFAULT
@@ -635,6 +638,7 @@ VMS_DISK_IMAGE_LX_ZONE_DEFAULT = 'alpine-3'
 VMS_NIC_MODEL_DEFAULT = 'virtio'
 VMS_NIC_MONITORING_DEFAULT = 1
 VMS_VGA_MODEL_DEFAULT = 'std'
+VMS_BHYVE_BOOTROM_DEFAULT = 'bios'
 VMS_STORAGE_DEFAULT = 'zones'
 VMS_VM_ZONE_USER_SCRIPT_DEFAULT = 'if [ ! -f /var/svc/provision_esdc ]; then   ' \
                                   'touch /var/svc/provision_esdc;   ' \
@@ -652,6 +656,8 @@ VMS_VM_SNAPSHOT_DEFINE_LIMIT = None  # Maximum number of snapshot definitions (N
 VMS_VM_SNAPSHOT_LIMIT_AUTO = None  # Maximum number of automatic snapshots (retention limit) (None - unlimited)
 VMS_VM_SNAPSHOT_LIMIT_MANUAL = None  # Maximum number of manual snapshots (None - unlimited)
 VMS_VM_SNAPSHOT_LIMIT_MANUAL_DEFAULT = None  # Default limit in forms/serializers
+VMS_VM_SNAPSHOT_SIZE_PERCENT_LIMIT = None  # Maximum total % size of all (auto + manual) VM snapshots (None - unlimited)
+VMS_VM_SNAPSHOT_SIZE_PERCENT_LIMIT_DEFAULT = None  # Default % size snapshot limit displayed in forms/serializers
 VMS_VM_SNAPSHOT_SIZE_LIMIT = None  # Maximum total size of all (automatic and manual) VM snapshots (None - unlimited)
 VMS_VM_SNAPSHOT_SIZE_LIMIT_DEFAULT = None  # Default size limit in forms/serializers
 VMS_VM_SNAPSHOT_DC_SIZE_LIMIT = None  # Maximum total size of snapshots in one DC (None - unlimited)

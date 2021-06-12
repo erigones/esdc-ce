@@ -1,4 +1,5 @@
 from logging import getLogger
+from re import sub
 
 from django.utils.six import iteritems
 
@@ -45,39 +46,71 @@ class VmManage(APIView):
     def fix_create(vm):
         """SmartOS issue. If a image_uuid is specified then size should be omitted, which is done in vm.fix_json(),
         so run this one before vm.fix_json() to create a command for changing zvol volsize."""
-        if not vm.is_kvm():
+        if not vm.is_hvm():
             return ''
 
         cmd = ''
 
-        for i, disk in enumerate(vm.json_get_disks()):
-            if 'image_uuid' in disk:
-                if disk['size'] != disk['image_size']:
-                    _resize = '; zfs set volsize=%sM %s/%s-disk%s >&2' % (disk['size'], vm.zpool, vm.uuid, i)
-                    cmd += _resize
+        if vm.is_kvm():
+            for i, disk in enumerate(vm.json_get_disks()):
+                if 'image_uuid' in disk:
+                    if disk['size'] != disk['image_size']:
+                        _resize = '; zfs set volsize=%sM %s/%s-disk%s >&2; e=$((e+=$?))' % (
+                            disk['size'], vm.zpool, vm.uuid, i)
+                        cmd += _resize
 
-                    if 'refreservation' in disk:
-                        _refres = '; zfs set refreservation=%sM %s/%s-disk%s >&2' % (disk['refreservation'],
-                                                                                     vm.zpool, vm.uuid, i)
-                        cmd += _refres
+                        if 'refreservation' in disk:
+                            _refres = '; zfs set refreservation=%sM %s/%s-disk%s >&2; e=$((e+=$?))' % (
+                                disk['refreservation'], vm.zpool, vm.uuid, i)
+                            cmd += _refres
+
+        elif vm.is_bhyve():
+            quota = vm.calculate_zfs_snapshot_quota()
+            _set_quota = '; zfs set quota=%s %s/%s >&2; e=$((e+=$?))' % (quota, vm.zpool, vm.uuid)
+            cmd += _set_quota
+            for i, disk in enumerate(vm.json_get_disks()):
+                if 'image_uuid' in disk:
+                    if disk['size'] != disk['image_size']:
+                        _resize = '; zfs set volsize=%sM %s/%s/disk%s >&2; e=$((e+=$?))' % (
+                            disk['size'], vm.zpool, vm.uuid, i)
+                        cmd += _resize
 
         return cmd
 
     @staticmethod
-    def fix_update(json_update):
+    def fix_update(json_update, vm):
         """SmartOS issue. Modifying json... Creating manual zfs commands if disk.*.size is being changed."""
         cmd = ''
+        new_disks_size = 0
+        disks = json_update.get('update_disks', [])
 
-        for disk in json_update.get('update_disks', []):
-            zfs_filesystem = '/'.join(disk['path'].split('/')[-2:])  # path is the key in update_disks
+        for i, disk in enumerate(disks):
+            zfs_filesystem = sub("^/dev/zvol/rdsk/", "", disk['path'])  # path is the key in update_disks
 
             if 'size' in disk:
                 size = disk.pop('size')
-                cmd += 'zfs set volsize=%sM %s >&2; ' % (size, zfs_filesystem)
+                cmd += '; zfs set volsize=%sM %s >&2; e=$((e+=$?)); ' % (size, zfs_filesystem)
 
             if 'refreservation' in disk:
-                refr = disk.pop('refreservation')
-                cmd += 'zfs set refreservation=%sM %s >&2; ' % (refr, zfs_filesystem)
+                if vm.is_bhyve():
+                    del json_update['update_disks'][i]['refreservation']
+                else:
+                    refr = disk.pop('refreservation')
+                    cmd += '; zfs set refreservation=%sM %s >&2; e=$((e+=$?)); ' % (refr, zfs_filesystem)
+
+        # if there are any disk or quota manipulations, update disk quota
+        if vm.is_bhyve() and (disks or vm.snapshot_quota_update_pending):
+            quota = vm.calculate_zfs_snapshot_quota()
+            logger.debug('ZFS quota value for bhyve VM "%s" computed to "%s" (from disks size "%d" MB)', vm.name, quota,
+                         vm.disk)
+            _set_quota = '; zfs set quota=%s %s/%s >&2; e=$((e+=$?)); ' % (quota, vm.zpool, vm.uuid)
+
+            # if the sum of all disk sizes is growing, we need to update quota first;
+            # if we are shrinking, the quota needs to be updated last
+            if vm.disk > vm.disk_active:  # grow
+                cmd = _set_quota + cmd
+            else:  # shrink
+                cmd += _set_quota
 
         return json_update, cmd
 
@@ -203,7 +236,7 @@ class VmManage(APIView):
         if not ser.is_valid():
             return FailureTaskResponse(request, ser.errors, vm=vm)
 
-        if not vm.is_kvm():
+        if not vm.is_hvm():
             if not (vm.dc.settings.VMS_VM_SSH_KEYS_DEFAULT or vm.owner.usersshkey_set.exists()):
                 raise PreconditionRequired('VM owner has no SSH keys available')
 
@@ -281,6 +314,7 @@ class VmManage(APIView):
             # Possible node_image import task which will block this task on node worker
             block_key = self.node_image_import(vm.node, vm.json_get_disks())
             logger.debug('Creating new VM %s on node %s with json: """%s"""', vm, vm.node, stdin)
+            logger.debug('Create command: """%s"""', cmd)
             tid, err = execute(request, vm.owner.id, cmd, stdin=stdin, meta=meta, expires=VM_VM_EXPIRES, lock=self.lock,
                                callback=callback, queue=vm.node.slow_queue, block_key=block_key)
 
@@ -344,12 +378,12 @@ class VmManage(APIView):
                 raise VmHasPendingTasks
 
             # create json suitable for update
-            stdin, cmd1 = self.fix_update(json_update)
+            stdin, cmd1 = self.fix_update(json_update, vm)
             self.validate_update(vm, stdin, cmd1)
             stdin = stdin.dump()
 
             # final cmd
-            cmd = cmd1 + 'vmadm update %s >&2; e=$?; vmadm get %s 2>/dev/null; exit $e' % (vm.uuid, vm.uuid)
+            cmd = cmd1 + 'vmadm update %s >&2; e=$((e+=$?)); vmadm get %s 2>/dev/null; exit $e' % (vm.uuid, vm.uuid)
 
             # Possible node_image import task which will block this task on node worker
             block_key = self.node_image_import(vm.node, json_update.get('add_disks', []))
@@ -374,6 +408,7 @@ class VmManage(APIView):
         callback = ('api.vm.base.tasks.vm_update_cb', {'vm_uuid': vm.uuid, 'new_node_uuid': new_node_uuid})
 
         logger.debug('Updating VM %s with json: """%s"""', vm, stdin)
+        logger.debug('Update command: """%s"""', cmd)
 
         err = True
         vm.set_notready()

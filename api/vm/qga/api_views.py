@@ -26,7 +26,7 @@ class VmQGA(APIView):
     def put(self):
         request, vm, command = self.request, self.vm, self.command
 
-        if not vm.is_kvm():
+        if not vm.is_hvm():
             raise OperationNotSupported
 
         if vm.status not in (vm.RUNNING, vm.STOPPING):

@@ -658,6 +658,7 @@ _zfs_snap_vm() {
 	if [[ "${ec}" -eq 0 && \
 		  "${uuid}" != *"-disk"* && \
 		  "$(_vm_brand "${uuid}" 2>/dev/null)" != "kvm" && \
+		  "$(_vm_brand "${uuid}" 2>/dev/null)" != "bhyve" && \
 		  "$(_vm_status "${uuid}" 2>/dev/null)" == "running" ]]; then
 
 		_zfs_snap_vm_mount "${zfs_filesystem}" "${snapshot_name}" || true
@@ -685,6 +686,23 @@ _zfs_destroy_snap_vm() {
 	_zfs_destroy "${snapshot}"
 
 	return $?
+}
+
+_zfs_get_param()
+{
+		local volume="$1"
+		local param="$2"
+
+		"${ZFS}" get -Ho value "${param}" "${volume}"
+}
+
+_zfs_set_param()
+{
+		local volume="$1"
+		local param="$2"
+		local value="$3"
+
+		"${ZFS}" set "${param}=${value}" "${volume}"
 }
 
 # usage: _check_fstyp <dev> <fstyp>
@@ -1114,7 +1132,7 @@ _service_enable() {
 	_service_wait_for_transition "${fmri}"
 
 	# see comment above in _service_disable
-	if [[ "$(_service_status "${fmri}")" == "enabled" ]]; then
+	if [[ "$(_service_status "${fmri}")" == "online" ]]; then
 		# success
 		_service_file_save "${fmri}"
 		return 0

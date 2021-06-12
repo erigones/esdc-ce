@@ -25,7 +25,7 @@ from gui.vm.utils import (
     get_vm_backups, get_vm_bkpdefs, vm_define_all, ImportExportBase, get_ptr_domain_by_ip
 )
 from gui.decorators import ajax_required, profile_required, admin_required, permission_required
-from gui.fields import SIZE_FIELD_MB_ADDON
+from gui.fields import SIZE_FIELD_MB_ADDON, SIZE_FIELD_PERCENT_ADDON
 from gui.utils import collect_view_data, get_pager
 from gui.signals import (view_vm_details, view_vm_snapshot, view_vm_backup, view_vm_console, view_vm_monitoring,
                          view_vm_tasklog)
@@ -69,6 +69,7 @@ def details(request, hostname):
     """
     dc_settings = request.dc.settings
     context = collect_view_data(request, 'vm_list', mb_addon=SIZE_FIELD_MB_ADDON)
+    context['percent_addon'] = SIZE_FIELD_PERCENT_ADDON
     context['vm'] = vm = get_vm(request, hostname, sr=('dc', 'owner', 'node', 'template', 'slavevm'))
     context['vms'] = vms = get_vms(request)
     context['vms_tags'] = get_vms_tags(vms)
@@ -85,7 +86,7 @@ def details(request, hostname):
     else:
         context['slave_vm'] = None
 
-    if vm.is_kvm():
+    if vm.is_hvm():
         context['iso_images'] = get_iso_images(request, vm.ostype)
 
     if vm.ostype == Vm.WINDOWS:
@@ -99,7 +100,7 @@ def details(request, hostname):
         initial_disk = {
             'disk_id': len(vm_disks) + 1,
             'zpool': vm.zpool,
-            'model': dc_settings.VMS_DISK_MODEL_DEFAULT,
+            'model': dc_settings.VMS_DISK_MODEL_KVM_DEFAULT,
             'compression': dc_settings.VMS_DISK_COMPRESSION_DEFAULT,
             'image': dc_settings.VMS_DISK_IMAGE_DEFAULT,
         }
@@ -259,7 +260,7 @@ def monitoring(request, hostname, graph_type='cpu'):
             (Graph('net-bandwidth', nic_id=i), Graph('net-packets', nic_id=i)) for i in nics
         ]))
     elif graph_type == 'disk':
-        if vm.is_kvm():
+        if vm.is_hvm():
             prefix = 'disk'
         else:
             prefix = 'fs'
@@ -478,6 +479,7 @@ def settings_form(request, hostname):
         'settingsform': form,
         'vm': vm,
         'mb_addon': SIZE_FIELD_MB_ADDON,
+        'percent_addon': SIZE_FIELD_PERCENT_ADDON,
     })
 
 
@@ -510,6 +512,7 @@ def disk_settings_form(request, hostname):
         'disk_settingsform': form,
         'vm': vm,
         'mb_addon': SIZE_FIELD_MB_ADDON,
+        'percent_addon': SIZE_FIELD_PERCENT_ADDON,
     })
 
 
@@ -772,7 +775,7 @@ def _generic_add_context(request):
 
     Partial add VM view, was separated to smaller functions due to code reuse in Enterprise Edition apps (payments).
     """
-    context = collect_view_data(request, 'vm_add', mb_addon=SIZE_FIELD_MB_ADDON)
+    context = collect_view_data(request, 'vm_add', mb_addon=SIZE_FIELD_MB_ADDON, percent_addon=SIZE_FIELD_PERCENT_ADDON)
     context['vms'] = vms = get_vms(request)
     context['vms_tags'] = get_vms_tags(vms)
 
@@ -796,8 +799,11 @@ def _render_admin_add(request, context):
     initial['zfs_io_priority'] = dc_settings.VMS_VM_ZFS_IO_PRIORITY_DEFAULT
     initial['zpool'] = dc_settings.VMS_STORAGE_DEFAULT
     initial['ostype'] = dc_settings.VMS_VM_OSTYPE_DEFAULT
+    initial['hvm_type'] = dc_settings.VMS_VM_HVM_TYPE_DEFAULT
     initial['snapshot_limit_manual'] = dc_settings.VMS_VM_SNAPSHOT_LIMIT_MANUAL_DEFAULT
+    initial['snapshot_size_percent_limit'] = dc_settings.VMS_VM_SNAPSHOT_SIZE_PERCENT_LIMIT_DEFAULT
     initial['snapshot_size_limit'] = dc_settings.VMS_VM_SNAPSHOT_SIZE_LIMIT_DEFAULT
+    initial['bootrom'] = dc_settings.VMS_BHYVE_BOOTROM_DEFAULT
     initial['owner'] = request.user.username
     initial['mdata'] = dc_settings.VMS_VM_MDATA_DEFAULT
     context['settingsform'] = AdminServerSettingsForm(request, None, prefix='opt', initial=initial)

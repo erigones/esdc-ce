@@ -34,7 +34,7 @@ class ImageSerializer(s.ConditionalDCBoundSerializer):
     resize = s.BooleanField(default=False)
     deploy = s.BooleanField(default=False)
     # nic_model = s.ChoiceField(choices=Vm.NIC_MODEL)   # KVM only
-    # disk_model = s.ChoiceField(choices=Vm.DISK_MODEL)  # KVM only
+    # disk_model = s.ChoiceField(choices=Vm.DISK_MODEL_KVM)  # KVM only
     tags = s.TagField(required=False, default=[])
     status = s.IntegerChoiceField(choices=Image.STATUS, read_only=True, required=False)
     created = s.DateTimeField(read_only=True, required=False)
@@ -144,7 +144,7 @@ class ImportImageSerializer(s.Serializer):
             tags = manifest.pop('tags', {})
             img.tags = tags.get(Image.TAGS_KEY, [])
             img.deploy = tags.get('deploy', False)
-            img.resize = tags.get('resize', img.ostype in img.ZONE)
+            img.resize = tags.get('resize', img.ostype in img.ZONE_OSTYPES)
         except Exception:
             raise s.ValidationError(_('Invalid image manifest.'))
 

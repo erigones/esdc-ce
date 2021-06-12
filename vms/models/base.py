@@ -1,3 +1,5 @@
+import re
+
 from django.db import models, transaction
 from django.utils import timezone
 from django.utils.six import iteritems, with_metaclass
@@ -317,14 +319,48 @@ class _OSType(models.Model):
         (LINUX_ZONE, _('Linux Zone')),
     )
 
-    KVM = frozenset([LINUX, SUNOS, BSD, WINDOWS])
-    ZONE = frozenset([SUNOS_ZONE, LINUX_ZONE])
+    # KVM = frozenset([LINUX, SUNOS, BSD, WINDOWS])   # to HVM
+    HVM_OSTYPES = frozenset([LINUX, SUNOS, BSD, WINDOWS])
+    ZONE_OSTYPES = frozenset([SUNOS_ZONE, LINUX_ZONE])
 
     class Meta:
         app_label = 'vms'
         abstract = True
 
     # ostype = models.SmallIntegerField(_('Guest OS type'), choices=OSTYPE)
+
+
+class _HVMType(models.Model):
+    """
+    Abstract class used for children to inherit hvm_type attributes and field.
+    """
+
+    Hypervisor_KVM = 1
+    Hypervisor_BHYVE = 2
+    Hypervisor_NONE = 3    # for zones
+
+    HVM_TYPE = (
+        (Hypervisor_KVM, _('KVM hypervisor')),
+        (Hypervisor_BHYVE, _('BHYVE hypervisor')),
+        (Hypervisor_NONE, _('NO hypervisor')),
+    )
+
+    # used on VM create or when editing HVM VM
+    HVM_TYPE_GUI = (
+        (Hypervisor_KVM, _('KVM')),
+        (Hypervisor_BHYVE, _('BHYVE')),
+    )
+
+    # used in VM modal when editing already created zone
+    HVM_TYPE_GUI_NO_HYPERVISOR = (
+        (Hypervisor_NONE, _('NO hypervisor')),
+    )
+
+    HVM = frozenset([Hypervisor_KVM, Hypervisor_BHYVE])
+
+    class Meta:
+        app_label = 'vms'
+        abstract = True
 
 
 class _VirtModel(models.Model):
@@ -571,7 +607,7 @@ class _VmDiskModel(models.Model):
         else:
             disk_path = disk_or_path
 
-        return int(disk_path.split('-')[-1].lstrip('disk'))
+        return int(re.split('-|/', disk_path)[-1].lstrip('disk'))
 
     @classmethod
     def get_disk_id(cls, vm, array_disk_id):
