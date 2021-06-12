@@ -1014,7 +1014,7 @@ function copy_to_clipboard(text) {
   $('body').append($(dummy));
   $(dummy).val(text).select();
   document.execCommand("copy");
-  // console.log("Copied the text: " + $(dummy).val());
+  console.log("Copied the text: " + $(dummy).val());
   $(dummy).remove();
 }
 
