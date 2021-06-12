@@ -22,7 +22,7 @@
   </thead>
   <tbody id="vm_snaplist_{{ vm.hostname }}">
     {% for snap in snapshots %}{% with disk_id=snap.array_disk_id snap_id=snap.snapid %}
-    <tr{% if snap_id == last_snapid %} class="info"{% endif %} data-disk_id="{{ disk_id }}" data-snapname="{{ snap.name }}" data-status="{{ snap.status }}" data-hostname="" data-type="">
+    <tr {% if snap_id == last_snapid %} class="info"{% endif %} data-disk_id="{{ disk_id }}" data-snapname="{{ snap.name }}" data-status="{{ snap.status }}" data-hostname="" data-type="" data-disk_size="{{ snap.disk_size }}">
       <td class="top chbox hidden-phone-small">
         <div class="input">
           <input type="checkbox" class="normal-check" id="id_{{ snap_id }}"{% if snap.locked %} disabled="disabled" readonly="true"{% endif %} />
