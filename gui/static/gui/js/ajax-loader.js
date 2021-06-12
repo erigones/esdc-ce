@@ -53,6 +53,7 @@ function update_content(url, go_back_on_error) {
         $('#main-body').html(data);
         // Update CURRENT_URL after successfull change
         CURRENT_URL = window.location.href;
+        init_copy_text_to_clipboard();
       },
     },
 
