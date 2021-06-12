@@ -88,13 +88,17 @@ function vm_create_snapshot(hostname, snapname, disk_id, fsfreeze, note) {
 }
 
 // Rollback disk snapshot
-function vm_rollback_snapshot(hostname, snapname, disk_id, force) {
+function vm_rollback_snapshot(hostname, snapname, disk_id, force, target_host= "", target_disk_id= 0) {
   var kwargs = {'data': {}};
   if (typeof(disk_id) !== 'undefined' && (disk_id)) {
     kwargs['data']['disk_id'] = disk_id;
   }
   if (typeof(force) !== 'undefined') {
     kwargs['data']['force'] = force;
+  }
+  if (target_host !== "" && target_disk_id !== 0) {
+    kwargs['data']['target_hostname_or_uuid'] = target_host;
+    kwargs['data']['target_disk_id'] = target_disk_id;
   }
   return esio('set', 'vm_snapshot', [hostname, snapname], kwargs);
 }
@@ -476,8 +480,11 @@ function message_callback(code, res, view, method, args, kwargs, apiview, apidat
 
         if (method == 'PUT') { // is a rollback in progress?
           if (target_hostname && hostname != target_hostname) {
-            // restore to another VM -> update source VM's status and list of snapshots
+            // restore to another VM has a different modal
+            vm_snap2vm_modal_update(hostname, null);  // hide modal if shown
+            // Lock the source VM (source disk/snap must not disappear during restore).
             state = vm_status_display_notready(hostname);
+            // restore to another VM -> update source VM's status and list of snapshots
             _update_vm_visuals(hostname, state);
             vm_snapshots_update(hostname, state);
           } else {
@@ -639,7 +646,12 @@ function message_callback(code, res, view, method, args, kwargs, apiview, apidat
 
       case 'vm_snapshot': // vm_snapshot failed
         if (method == 'DELETE' || method == 'PUT') {
-          vm_snapshot_modal_update(hostname, _sererror_from_result(res)); // show error
+          if (target_hostname && hostname != target_hostname) {
+            // "restore to another VM" has a different modal
+            vm_snap2vm_modal_update(hostname, _sererror_from_result(res)); // show error
+          } else {
+            vm_snapshot_modal_update(hostname, _sererror_from_result(res)); // show error
+          }
         } else {
           alert_message(code, _message_from_result(res));
         }

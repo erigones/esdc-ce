@@ -160,6 +160,7 @@ def snapshot(request, hostname):
         context['snapdeform_update'] = UpdateSnapshotDefineForm(request, vm)
         context['snapdeform_create'] = CreateSnapshotDefineForm(request, vm, prefix='snapdef_create',
                                                                 initial={'disk_id': 1, 'active': True})
+        context['bkpform_restore'] = RestoreBackupForm(vms)
 
     if context['can_image']:
         context['imgform'] = SnapshotImageForm(vm, request, None, prefix='img', initial={'owner': request.user.username,
