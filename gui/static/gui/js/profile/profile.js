@@ -95,6 +95,7 @@ function profile_control(btn) {
       var apikeys = $('#profile_apikey_list');
       return ajax('GET', apikeys.data('source'), ATIMEOUT, function(data, textStatus, jqXHR) {
           apikeys.html(data);
+          init_copy_text_to_clipboard();
         });
 
     case 'password':
