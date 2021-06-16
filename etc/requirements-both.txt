@@ -20,7 +20,7 @@ esdc-api==2.0.1
 PyNaCl==1.4.0
 # paramiko >= 2.6.0 does not build on SmartOS
 paramiko==2.5.1
-ansible==2.8.8
+ansible==2.9.20
 Jinja2==2.10
 # required by setup.py of gevent-socketio-es
 versiontools>=1.7
