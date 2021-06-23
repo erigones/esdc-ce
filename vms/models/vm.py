@@ -2225,9 +2225,15 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
 
     @staticmethod
     def brand_to_hvm_type(brand):
-        for hvm_type in Vm.HVM_TYPE_BRAND:
-            if brand == Vm.HVM_TYPE_BRAND[hvm_type]:
-                return hvm_type
+        if brand not in Vm.COMPATIBLE_BRANDS.keys():
+            raise KeyError('Unknown brand specified: %s' % brand)
+
+        if brand == 'kvm':
+            return Vm.Hypervisor_KVM
+        elif brand == 'bhyve':
+            return Vm.Hypervisor_BHYVE
+        else:
+            return Vm.Hypervisor_NONE
 
     def has_compatible_brand(self, brand):
         try:
