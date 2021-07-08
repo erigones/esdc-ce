@@ -58,11 +58,8 @@ class VmSnapshot(APIView):
 
     def _check_snap_size_limit(self):
         """Issue #chili-848"""
-        try:
-            limit = int(self.vm.json_active['internal_metadata']['snapshot_size_limit'])
-        except (TypeError, KeyError, IndexError):
-            pass
-        else:
+        limit = self.vm.snapshot_size_quota_value
+        if limit is not None:
             total = Snapshot.get_total_vm_size(self.vm)
             if total >= limit:
                 raise ExpectationFailed('VM snapshot size limit reached')
@@ -126,7 +123,7 @@ class VmSnapshot(APIView):
         if not ser.is_valid():
             return FailureTaskResponse(request, ser.errors, vm=vm)
 
-        if vm.is_kvm() and self.data.get('fsfreeze', False):
+        if vm.is_hvm() and self.data.get('fsfreeze', False):
             qga_socket = vm.qga_socket_path
 
             if qga_socket:
@@ -178,7 +175,7 @@ class VmSnapshot(APIView):
 
             self._check_vm_status(vm=target_vm)
 
-            if vm.brand != target_vm.brand:
+            if not vm.has_compatible_brand(target_vm.brand):
                 raise PreconditionRequired('VM brand mismatch')
 
             source_disk = vm.json_active_get_disks()[self.disk_id - 1]

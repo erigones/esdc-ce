@@ -16,6 +16,7 @@ from gui.widgets import ArrayWidget, ArrayAreaWidget, DictWidget
 
 SIZE_FIELD_MB_ADDON = mark_safe(' MB <small class="hidden-phone">&nbsp;&nbsp;&nbsp;<b>' + _('Hint') + ':</b> ' +
                                 _('Press "1g" for 1024 MB') + '</b></small>')
+SIZE_FIELD_PERCENT_ADDON = mark_safe(' %')
 
 
 def parse_items(itemstring, sort=False):

@@ -17,6 +17,7 @@ from api.validators import validate_owner, validate_mdata, mod2_validator
 from api.vm.utils import get_nodes, get_templates, get_images, get_subnets, get_zpools, get_owners
 from api.vm.base.serializers import VmBaseSerializer
 from api.dns.record.api_views import RecordView
+from vms.models.base import _HVMType
 
 PERMISSION_DENIED = _('Permission denied')
 INVALID_HOSTNAMES = frozenset(['define', 'status', 'backup', 'snapshot'])
@@ -40,9 +41,31 @@ def get_vm_template(request, data, prefix=''):
     return None
 
 
-def is_kvm(vm, data=None, prefix='', ostype=None, template=None):
+def is_kvm(vm, data=None, prefix='', hvm_type=None, template=None):
     if vm:
         return vm.is_kvm()
+
+    if data is not None:
+        hvm_type = data.get(prefix + 'hvm_type', None)
+
+    if hvm_type is None and template:
+        hvm_type = template.vm_define.get('hvm_type', None) or template.hvm_type
+
+    if hvm_type:
+        try:
+            return int(hvm_type) == _HVMType.Hypervisor_KVM
+        except (TypeError, ValueError):
+            pass
+
+    return True
+
+
+def is_hvm(vm, data=None, prefix='', ostype=None, hvm_type=None, template=None):
+    if vm:
+        return vm.is_hvm()
+
+    if hvm_type is not None and hvm_type in _HVMType.HVM:
+        return True
 
     if data is not None:
         ostype = data.get(prefix + 'ostype', None)
@@ -52,7 +75,7 @@ def is_kvm(vm, data=None, prefix='', ostype=None, template=None):
 
     if ostype:
         try:
-            return int(ostype) in Vm.KVM
+            return int(ostype) in Vm.HVM_OSTYPES
         except (TypeError, ValueError):
             pass
 
@@ -94,6 +117,7 @@ class VmDefineSerializer(VmBaseSerializer):
     hostname = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\.-]+[A-Za-z0-9]$', max_length=128, min_length=4)
     alias = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\.-]+[A-Za-z0-9]$', max_length=24, min_length=4, required=False)
     ostype = s.IntegerChoiceField(choices=Vm.OSTYPE, default=settings.VMS_VM_OSTYPE_DEFAULT)
+    hvm_type = s.IntegerChoiceField(choices=Vm.HVM_TYPE, default=settings.VMS_VM_HVM_TYPE_DEFAULT)
     cpu_type = s.ChoiceField(choices=Vm.CPU_TYPE, default=settings.VMS_VM_CPU_TYPE_DEFAULT)
     vcpus = s.IntegerField(max_value=1024)  # vv (min_value set below)
     ram = s.IntegerField(max_value=1048576, min_value=1)
@@ -111,6 +135,7 @@ class VmDefineSerializer(VmBaseSerializer):
     installed = s.BooleanField(default=False)
     snapshot_limit_manual = s.IntegerField(required=False)  # Removed from json if null, limits set below
     snapshot_size_limit = s.IntegerField(required=False)  # Removed from json if null, limits set below
+    snapshot_size_percent_limit = s.IntegerField(required=False)  # Removed from json if null, limits set below
     cpu_cap = s.IntegerField(read_only=True)
     cpu_shares = s.IntegerField(default=settings.VMS_VM_CPU_SHARES_DEFAULT, min_value=0, max_value=1048576)
     zfs_io_priority = s.IntegerField(default=settings.VMS_VM_ZFS_IO_PRIORITY_DEFAULT, min_value=0, max_value=1024)
@@ -120,6 +145,7 @@ class VmDefineSerializer(VmBaseSerializer):
     dns_domain = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\ \._/-]*$', max_length=1024, required=False)  # OS only
     routes = s.RoutesField(default={})  # OS only
     vga = s.ChoiceField(choices=Vm.VGA_MODEL, default=settings.VMS_VGA_MODEL_DEFAULT)  # KVM only
+    bootrom = s.ChoiceField(choices=Vm.BHYVE_BOOTROM, default=settings.VMS_BHYVE_BOOTROM_DEFAULT)  # bhyve only
     mdata = s.MetadataField(default=settings.VMS_VM_MDATA_DEFAULT,
                             validators=(validate_mdata(Vm.RESERVED_MDATA_KEYS),))
     locked = s.BooleanField(read_only=True, required=False)
@@ -146,19 +172,28 @@ class VmDefineSerializer(VmBaseSerializer):
         else:
             vm_template = None
 
-        self._is_kvm = kvm = is_kvm(self.object, data, template=vm_template)
+        self._is_hvm = is_hvm(self.object, data, template=vm_template)
+        self._is_kvm = is_kvm(self.object, data, template=vm_template)
+        self._is_bhyve = self._is_hvm and not self._is_kvm
 
-        if kvm:
+        if self._is_hvm:
             del self.fields['maintain_resolvers']
             del self.fields['routes']
             del self.fields['dns_domain']
-        else:
+
+        if not self._is_kvm:
+            # these are only KVM properties
             del self.fields['cpu_type']
             del self.fields['vga']
+
+        if not self._is_bhyve:
+            # these are only bhyve properties
+            del self.fields['bootrom']
 
         if not kwargs.get('many', False):
             self.fields['owner'].default = request.user.username  # Does not work
             self.fields['ostype'].default = dc_settings.VMS_VM_OSTYPE_DEFAULT
+            self.fields['hvm_type'].default = dc_settings.VMS_VM_HVM_TYPE_DEFAULT
             self.fields['zpool'].default = dc_settings.VMS_STORAGE_DEFAULT
             # noinspection PyProtectedMember
             self.fields['monitored_internal'].default = DefaultDc().settings.MON_ZABBIX_ENABLED \
@@ -174,8 +209,10 @@ class VmDefineSerializer(VmBaseSerializer):
 
             field_snapshot_limit_manual = self.fields['snapshot_limit_manual']
             field_snapshot_size_limit = self.fields['snapshot_size_limit']
+            field_snapshot_size_percent_limit = self.fields['snapshot_size_percent_limit']
             field_snapshot_limit_manual.default = dc_settings.VMS_VM_SNAPSHOT_LIMIT_MANUAL_DEFAULT
             field_snapshot_size_limit.default = dc_settings.VMS_VM_SNAPSHOT_SIZE_LIMIT_DEFAULT
+            field_snapshot_size_percent_limit.default = dc_settings.VMS_VM_SNAPSHOT_SIZE_PERCENT_LIMIT_DEFAULT
 
             if dc_settings.VMS_VM_SNAPSHOT_LIMIT_MANUAL is None:
                 min_snap, max_snap = 0, 65536
@@ -193,10 +230,21 @@ class VmDefineSerializer(VmBaseSerializer):
             field_snapshot_size_limit.validators.append(validators.MinValueValidator(min_snaps_size))
             field_snapshot_size_limit.validators.append(validators.MaxValueValidator(max_snaps_size))
 
-            if kvm:
+            if dc_settings.VMS_VM_SNAPSHOT_SIZE_PERCENT_LIMIT is None:
+                min_snaps_size_perc, max_snaps_size_perc = 0, 10000
+            else:
+                min_snaps_size_perc, max_snaps_size_perc = 1, int(dc_settings.VMS_VM_SNAPSHOT_SIZE_PERCENT_LIMIT)
+                field_snapshot_size_percent_limit.required = field_snapshot_size_percent_limit.disallow_empty = True
+            field_snapshot_size_percent_limit.validators.append(validators.MinValueValidator(min_snaps_size_perc))
+            field_snapshot_size_percent_limit.validators.append(validators.MaxValueValidator(max_snaps_size_perc))
+
+            if self._is_kvm:
                 self.fields['vga'].default = dc_settings.VMS_VGA_MODEL_DEFAULT
 
-            if kvm or dc_settings.VMS_VM_CPU_CAP_REQUIRED:
+            if self._is_bhyve:
+                self.fields['bootrom'].default = dc_settings.VMS_BHYVE_BOOTROM_DEFAULT
+
+            if self._is_hvm or dc_settings.VMS_VM_CPU_CAP_REQUIRED:
                 vcpus_min = 1
             else:
                 vcpus_min = 0
@@ -210,7 +258,7 @@ class VmDefineSerializer(VmBaseSerializer):
             self.fields['alias'].default = hostname
 
             # default dns_domain for zones is domain part of hostname
-            if not kvm:
+            if not self._is_hvm:
                 if '.' in hostname:
                     self.fields['dns_domain'].default = hostname.split('.', 1)[-1]
                 else:
@@ -221,8 +269,11 @@ class VmDefineSerializer(VmBaseSerializer):
                 # ostype is in own column
                 if vm_template.ostype is not None:
                     self.fields['ostype'].default = vm_template.ostype
+                if vm_template.hvm_type is not None:
+                    self.fields['hvm_type'].default = vm_template.hvm_type
+
                 # all serializer attributes are in json['vm_define'] object
-                # (also the ostype can be defined here)
+                # (also the ostype and hvm_type can be defined here)
                 for field, value in vm_template.vm_define.items():
                     try:
                         self.fields[field].default = value
@@ -270,6 +321,8 @@ class VmDefineSerializer(VmBaseSerializer):
         # ostype and brand must be set first
         if 'ostype' in data:
             vm.set_ostype(data.pop('ostype'))
+        if 'hvm_type' in data:
+            vm.set_hvm_type(data.pop('hvm_type'))
 
         # Save user data
         for key, val in iteritems(data):
@@ -281,7 +334,7 @@ class VmDefineSerializer(VmBaseSerializer):
                 setattr(vm, key, val)
 
         # Default disk with image for non-global zone
-        if instance is None and not vm.is_kvm() and 'image_uuid' not in vm.json:
+        if instance is None and not vm.is_hvm() and 'image_uuid' not in vm.json:
             vm.save_item('image_uuid', self.zone_img.uuid, save=False)
             vm.save_item('quota', int(round(float(self.zone_img.size) / float(1024))), save=False)
             vm.save_item('zfs_root_compression', self.dc_settings.VMS_DISK_COMPRESSION_DEFAULT, save=False)
@@ -393,7 +446,7 @@ class VmDefineSerializer(VmBaseSerializer):
                     return attrs
                 if self.object.is_deployed():
                     raise s.ValidationError(_('Cannot change zpool.'))
-                if not self.object.is_kvm():
+                if not self.object.is_hvm():
                     raise s.ValidationError(_('Cannot change zpool for this OS type. '
                                               'Please change it on the first disk.'))
 
@@ -411,7 +464,7 @@ class VmDefineSerializer(VmBaseSerializer):
             if self.object:
                 if self.object.ostype != value:
                     raise s.ValidationError(_('Cannot change ostype.'))
-            elif not is_kvm(self.object, ostype=value):
+            elif not is_hvm(self.object, ostype=value):
                 # Creating zone -> Issue #chili-461 (must be enabled globally and in DC)
                 if not (settings.VMS_ZONE_ENABLED and self.dc_settings.VMS_ZONE_ENABLED):
                     raise s.ValidationError(_('This OS type is not supported.'))
@@ -430,6 +483,31 @@ class VmDefineSerializer(VmBaseSerializer):
 
                 if not self.zone_img:
                     raise s.ValidationError(_('Default disk image for this OS type is not available.'))
+
+        return attrs
+
+    def validate_hvm_type(self, attrs, source):
+        # hvm_type cannot change
+        try:
+            value = attrs[source]
+        except KeyError:
+            pass
+        else:
+            ostype = None
+            if self.object:
+                if self.object.hvm_type != value:
+                    raise s.ValidationError(_('Cannot change hypervisor type.'))
+                elif self.object.ostype is not None:
+                    ostype = self.object.ostype
+
+            if 'ostype' in attrs:
+                # if ostype is newly set, it takes precedence
+                ostype = attrs['ostype']
+
+            if ostype is not None:
+                brand = Vm.OSTYPE_BRAND.get(ostype, 'hvm')
+                if brand == 'hvm' and value == _HVMType.Hypervisor_NONE:
+                    raise s.ValidationError(_('You must select correct hypervisor.'))
 
         return attrs
 
@@ -520,7 +598,7 @@ class VmDefineSerializer(VmBaseSerializer):
                     # Node changed from real node -> always update storage resources associated with old node
                     self.update_storage_resources.extend(list(vm.node.get_node_storages(dc, vm_disks.keys())))
 
-            if self._is_kvm:
+            if self._is_hvm:
                 ram_overhead = settings.VMS_VM_KVM_MEMORY_OVERHEAD
             else:
                 ram_overhead = 0
@@ -566,6 +644,14 @@ class VmDefineSerializer(VmBaseSerializer):
 
             if new_disk > 0 and not dc_node.check_free_resources(disk=new_disk):
                 node_errors.append(_('Not enough free disk space on node.'))
+
+            if self._is_bhyve:
+                if not node.bhyve_capable:
+                    node_errors.append(_('Node is not bhyve capable'))
+                if new_cpu > node.bhyve_max_vcpus:
+                    node_errors.append(_('Bhyve supports max %d vcpus') % node.bhyve_max_vcpus)
+                if node.platform_version_short < node.BHYVE_MIN_PLATFORM_SHORT:
+                    node_errors.append(_('Compute node platform is too old for bhyve.'))
 
             if node_errors:
                 self._errors['node'] = s.ErrorList(node_errors)
@@ -697,10 +783,10 @@ class _VmDefineDiskSerializer(s.Serializer):
                     self.img_error = True  # this should be stopped by default validate_image
                 else:
                     self.fields['size'].default = self.img.size
-                    if vm.is_kvm():
+                    if vm.is_hvm():
                         self.fields['refreservation'].default = self.img.size
 
-            if vm.is_kvm() and data is not None and 'size' in data:
+            if vm.is_hvm() and data is not None and 'size' in data:
                 self.fields['refreservation'].default = data['size']
 
             if self.disk_id == 0:
@@ -748,7 +834,7 @@ class _VmDefineDiskSerializer(s.Serializer):
                 data['image_uuid'] = str(self.img.uuid)
                 data['image_size'] = self.img.size  # needed for valid json
 
-                if self.vm.is_kvm():
+                if self.vm.is_hvm():
                     data.pop('block_size', None)  # block size is inherited from the image
             else:  # remove image from json
                 data.pop('image_uuid', None)
@@ -891,7 +977,7 @@ class _VmDefineDiskSerializer(s.Serializer):
         except KeyError:
             zpool = self.object['zpool']
 
-        if self.vm.is_kvm() and self.img:  # always check size if image
+        if self.vm.is_hvm() and self.img:  # always check size if image
             if not self.img.resize and size != self.img.size:
                 self._errors['size'] = s.ErrorList([_('Cannot define disk size other than image size (%s), '
                                                       'because image does not support resizing.') % self.img.size])
@@ -899,7 +985,8 @@ class _VmDefineDiskSerializer(s.Serializer):
                 self._errors['size'] = s.ErrorList([_('Cannot define smaller disk size than '
                                                       'image size (%s).') % self.img.size])
 
-            if self.vm.is_notcreated():
+            # disk_driver is KVM-only setting
+            if self.vm.is_kvm() and self.vm.is_notcreated():
                 # Check disk_driver in image manifest (bug #chili-605) only if server is not created;
                 # User should be able to change the driver after server is deployed
                 img_disk_driver = self.img.json.get('manifest', {}).get('disk_driver', None)
@@ -912,7 +999,7 @@ class _VmDefineDiskSerializer(s.Serializer):
                         self._errors['image'] = s.ErrorList([_('Disk image requires specific disk '
                                                                'model (%s).') % img_disk_driver])
 
-        if self.vm.is_kvm():
+        if self.vm.is_hvm():
             try:
                 refreservation = attrs['refreservation']
             except KeyError:  # self.object must exist here (PUT)
@@ -927,7 +1014,7 @@ class _VmDefineDiskSerializer(s.Serializer):
             if refreservation > size:
                 self._errors['refreservation'] = s.ErrorList([_('Cannot define refreservation larger than disk size.')])
 
-        if not self._errors and (size_change or self.zpool_changed) and (self.vm.is_kvm() or self.disk_id == 0):
+        if not self._errors and (size_change or self.zpool_changed) and (self.vm.is_hvm() or self.disk_id == 0):
             self.validate_storage_resources(zpool, size)
 
         return attrs
@@ -958,7 +1045,6 @@ class _VmDefineDiskSerializer(s.Serializer):
 
 
 class KVmDefineDiskSerializer(_VmDefineDiskSerializer):
-    model = s.ChoiceField(choices=Vm.DISK_MODEL, default=settings.VMS_DISK_MODEL_DEFAULT)
     image = s.CharField(required=False, default=settings.VMS_DISK_IMAGE_DEFAULT, max_length=64)
     refreservation = s.IntegerField(default=0, max_value=268435456, min_value=0)  # default set below
 
@@ -967,7 +1053,15 @@ class KVmDefineDiskSerializer(_VmDefineDiskSerializer):
     def __init__(self, request, vm, *args, **kwargs):
         super(KVmDefineDiskSerializer, self).__init__(request, vm, *args, **kwargs)
         dc_settings = vm.dc.settings
-        self.fields['model'].default = dc_settings.VMS_DISK_MODEL_DEFAULT
+        if vm.is_kvm():
+            model_default = dc_settings.VMS_DISK_MODEL_KVM_DEFAULT
+            model_choices = Vm.DISK_MODEL_KVM
+        else:  # bhyve
+            model_default = dc_settings.VMS_DISK_MODEL_BHYVE_DEFAULT
+            model_choices = Vm.DISK_MODEL_BHYVE
+
+        self.fields['model'] = s.ChoiceField(choices=model_choices, default=model_default)
+        self.fields['model'].default = model_default
         self.fields['image'].default = dc_settings.VMS_DISK_IMAGE_DEFAULT
 
     def validate_block_size(self, attrs, source):
@@ -1010,7 +1104,7 @@ class ZVmDefineDiskSerializer(_VmDefineDiskSerializer):
 
 # noinspection PyPep8Naming
 def VmDefineDiskSerializer(request, vm, *args, **kwargs):
-    if vm.is_kvm():
+    if vm.is_hvm():
         return KVmDefineDiskSerializer(request, vm, *args, **kwargs)
     else:
         return ZVmDefineDiskSerializer(request, vm, *args, **kwargs)
@@ -1094,7 +1188,8 @@ class VmDefineNicSerializer(s.Serializer):
         if vm.is_kvm():
             self.fields['model'].default = dc_settings.VMS_NIC_MODEL_DEFAULT
         else:
-            del self.fields['model']
+            # bhyve has only the 'virtio' nic model
+            self.fields['model'].default = 'virtio'
 
     def fix_before(self, data):  # noqa: R701
         """

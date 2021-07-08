@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!DOCTYPE service_bundle SYSTEM "/usr/share/lib/xml/dtd/service_bundle.dtd.1">
+<service_bundle type="manifest" name="vm-bhyve-disk-io-monitor">
+    <service name="application/zabbix/vm-bhyve-disk-io-monitor" type="service" version="1">
+	<create_default_instance enabled="true"/>
+	<single_instance/>
+
+        <dependency name="network" grouping="require_all" restart_on="error" type="service">
+            <service_fmri value="svc:/milestone/network:default"/>
+        </dependency>
+        <dependency name="filesystem" grouping="require_all" restart_on="error" type="service">
+            <service_fmri value="svc:/system/filesystem/local"/>
+        </dependency>
+	<dependency name='script' grouping='require_all' restart_on='none' type='path'>
+            <service_fmri value='file://localhost/opt/zabbix/etc/scripts/vm-bhyve-disk-io-monitor'/>
+	</dependency>
+
+        <exec_method type="method" name="start" exec="%{config/script_dir}/vm-bhyve-disk-io-monitor" timeout_seconds="30">
+	    <method_context working_directory="/opt/zabbix">
+	      <method_credential user="root" group="root" />
+	      <method_environment>
+	    	<envvar	name="PATH" value="/usr/bin:/usr/sbin:/opt/local/bin:/opt/local/sbin:/opt/zabbix/bin:/opt/zabbix/sbin" />
+	    	<envvar name="LD_LIBRARY_PATH" value="/opt/local/lib" />
+	      </method_environment>
+	    </method_context>
+	</exec_method>
+
+        <exec_method type="method" name="stop" exec=":kill" timeout_seconds="60"/>
+
+    	<property_group name='startd' type='framework'>
+        	 <propval name='duration' type='astring' value='child' />
+    	</property_group>
+
+	<property_group name='config' type='application'>
+		<propval name='script_dir' type='astring' value='/opt/zabbix/etc/scripts' />
+	</property_group>
+
+        <stability value="Unstable"/>
+
+        <template>
+            <common_name>
+                <loctext xml:lang="C">Bhyve disk statistics monitoring</loctext>
+            </common_name>
+        </template>
+
+    </service>
+</service_bundle>

@@ -13,6 +13,7 @@ from api.vm.messages import LOG_DISK_CREATE, LOG_DISK_UPDATE, LOG_DISK_DELETE
 
 DISK_ID_MIN = 0
 DISK_ID_MAX = 1  # Bug #chili-462
+DISK_ID_MAX_BHYVE = 5
 DISK_ID_MAX_OS = 1
 
 
@@ -30,7 +31,9 @@ def _disk_params(fun):
             disks = None
             kwargs['many'] = True
         else:
-            if vm.is_kvm():
+            if vm.is_bhyve():
+                disk_id_max = DISK_ID_MAX_BHYVE
+            elif vm.is_hvm():
                 disk_id_max = DISK_ID_MAX
             else:
                 disk_id_max = DISK_ID_MAX_OS
@@ -100,7 +103,7 @@ class VmDefineDiskView(VmDefineBaseView):
     @_disk_params
     def post(self, vm, disk_id, disks, disk, data):
         """Create VM nic definition"""
-        if not vm.is_kvm() and vm.is_deployed():
+        if not vm.is_hvm() and vm.is_deployed():
             raise OperationNotSupported
 
         ser = VmDefineDiskSerializer(self.request, vm, disk_id=disk_id, data=data)
@@ -142,7 +145,7 @@ class VmDefineDiskView(VmDefineBaseView):
     @_disk_params
     def delete(self, vm, disk_id, disks, disk, data):
         """Delete VM disk definition"""
-        if not vm.is_kvm() and (disk_id == 0 or vm.is_deployed()):
+        if not vm.is_hvm() and (disk_id == 0 or vm.is_deployed()):
             raise OperationNotSupported
 
         ser = VmDefineDiskSerializer(self.request, vm, disk, disk_id=disk_id)

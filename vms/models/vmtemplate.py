@@ -5,7 +5,7 @@ from vms.utils import DefAttrDict, FrozenAttrDict
 # noinspection PyProtectedMember
 from vms.mixins import _DcMixin
 # noinspection PyProtectedMember
-from vms.models.base import _VirtModel, _JsonPickleModel, _OSType, _UserTasksModel
+from vms.models.base import _VirtModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel
 
 
 class _DefineList(list):
@@ -68,7 +68,7 @@ class _BackupDefineObject(_DiskObject):
         return self.BACKUP_DEFINE_TYPE.get(self.type)
 
 
-class VmTemplate(_VirtModel, _JsonPickleModel, _OSType, _DcMixin, _UserTasksModel):
+class VmTemplate(_VirtModel, _JsonPickleModel, _OSType, _HVMType, _DcMixin, _UserTasksModel):
     """
     VM Template. The json dict is copied to new VMs.
     """
@@ -85,6 +85,8 @@ class VmTemplate(_VirtModel, _JsonPickleModel, _OSType, _DcMixin, _UserTasksMode
 
     # Inherited: name, alias, owner, desc, access, created, changed, json, dc, dc_bound
     ostype = models.SmallIntegerField(_('Guest OS type'), choices=_OSType.OSTYPE, null=True, blank=True)
+    # XXX 2DO: set default values for existing VM entries during DB migration
+    hvm_type = models.SmallIntegerField(_('Hypervisor type'), choices=_HVMType.HVM_TYPE, null=True, blank=True)
 
     class Meta:
         app_label = 'vms'

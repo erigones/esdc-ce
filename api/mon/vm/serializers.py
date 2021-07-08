@@ -5,7 +5,7 @@ from api import serializers as s
 from api.mon import MonitoringBackend
 from api.mon.serializers import MonHistorySerializer
 from api.vm.define.serializers import VmDefineSerializer
-from api.vm.define.vm_define_disk import DISK_ID_MIN, DISK_ID_MAX
+from api.vm.define.vm_define_disk import DISK_ID_MIN, DISK_ID_MAX, DISK_ID_MAX_BHYVE
 from api.vm.define.vm_define_nic import NIC_ID_MIN, NIC_ID_MAX
 from vms.models import Vm
 
@@ -74,7 +74,8 @@ class DiskVmMonHistorySerializer(MonHistorySerializer):
     """
     Used by VmHistoryView to validate disk_id value.
     """
-    disk_id = s.IntegerField(required=True, min_value=DISK_ID_MIN + 1, max_value=DISK_ID_MAX + 1)
+    # we use DISK_ID_MAX_BHYVE here because it's bigger than DISK_ID_MAX
+    disk_id = s.IntegerField(required=True, min_value=DISK_ID_MIN + 1, max_value=DISK_ID_MAX_BHYVE + 1)
 
     def validate(self, attrs):
         disk_id = attrs.get('disk_id')

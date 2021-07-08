@@ -804,6 +804,8 @@ function vm_settings_modal(hostname, btn, mod_selector) {
          enable_modal_form_enter(mod);
       });
 
+      update_vm_form_fields_from_ostype();
+
     } else if (mod_selector == '#vm_nic_settings_modal') {
       var nic_ip = $('#id_opt-nic-ip');
       var ip_placeholder = nic_ip.attr('placeholder');
@@ -851,12 +853,12 @@ function vm_settings_modal(hostname, btn, mod_selector) {
 
     } else if (mod_selector == '#vm_disk_settings_modal') {
       var disk_id = $('#id_opt-disk-disk_id').val();
-      var is_kvm = mod.data('is_kvm');
+      var is_hvm = mod.data('is_hvm');
 
       if (disk_id > 1) {
         $('#id_opt-disk-image').parent().parent().parent().hide();
 
-        if (is_kvm) {
+        if (is_hvm) {
           $('#id_opt-disk-boot').parent().parent().parent().hide();
           $('#id_opt-disk-zpool').parent().find('span.note').hide();
         } else {
@@ -878,7 +880,7 @@ function vm_settings_modal(hostname, btn, mod_selector) {
           });
         }
 
-        if (is_kvm) {
+        if (is_hvm) {
           var zpool_change = function(select) {
             if (select.val() == $('#id_opt-zpool').val()) {
               select.parent().find('span.note').css('font-weight', 'normal');
@@ -1123,6 +1125,32 @@ function iso_image_value_restore(mod) {
   if (mod.data('last_cdimage')) {
     $('#id_iso-image').val(mod.data('last_cdimage'));
     $('#id_iso-image-once').prop('checked', false);
+  }
+}
+
+// some VM form fields are only kvm/bhyve/zone related and we want to hide them when not applicable
+function update_vm_form_fields_from_ostype() {
+  var selected = $('.ostype-select').filter('select').find(":selected").text().toLowerCase();
+  if(selected.match(/zone/)) {
+    $('.hvm-type-only').hide();
+    $('.zones-related').show();
+  } else {
+    $('.hvm-type-only').show();
+    update_vm_form_fields_from_hvm_type();
+  }
+}
+
+// some VM form fields are only kvm/bhyve/zone related and we want to hide them when not applicable
+function update_vm_form_fields_from_hvm_type() {
+  var selected = $('.hvm-type-select').filter('select').find(":selected").text().toLowerCase();
+  if(selected.match(/kvm/)) {
+    $('.bhyve-related').hide();
+    $('.zones-related').hide();
+    $('.kvm-related').show();
+  } else if(selected.match(/bhyve/)) {
+    $('.kvm-related').hide();
+    $('.zones-related').hide();
+    $('.bhyve-related').show();
   }
 }
 

@@ -77,7 +77,7 @@ class VmDefineView(VmDefineBaseView):
 
         for i, data in enumerate(vm.template.vm_define_disk):
             if data:
-                if i == 0 and not vm.is_kvm():  # Disk representation within a zone is created together with VM
+                if i == 0 and not vm.is_hvm():  # Disk representation within a zone is created together with VM
                     request = set_request_method(self.request, 'PUT')
                     vm_define_disk = VmDefineDiskView(request)
                     logger.info('Updating disk_id=%d for vm %s defined by template %s', i, vm, vm.template)

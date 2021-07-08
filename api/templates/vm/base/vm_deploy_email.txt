@@ -1,4 +1,4 @@
-{% load i18n %}{% autoescape off %}{% with kvm=vm.is_kvm %}{% blocktrans with server=vm.alias %}Hello,
+{% load i18n %}{% autoescape off %}{% with kvm=vm.is_hvm %}{% blocktrans with server=vm.alias %}Hello,
 
 Your server {{ server }} was successfully deployed and is ready to use.{% endblocktrans %}
 {% if vm.is_blank %}{% blocktrans %}

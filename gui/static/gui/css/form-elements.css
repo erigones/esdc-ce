@@ -1007,6 +1007,11 @@ button.button.mini {
   box-shadow: inset 0px 0px 5px rgba(0, 0, 0, 0.5), 0px 1px 0px transparent;
 }
 
+.button-2nd-left {
+  margin-left: 5px;
+  float: left;
+}
+
 /* line 451, ../scss/form-elements.scss */
 .ui-datepicker {
   width: 210px;

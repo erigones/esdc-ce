@@ -22,7 +22,7 @@ class VmScreenshot(APIView):
     def get(self):
         vm = self.vm
 
-        if not vm.is_kvm():
+        if not vm.is_hvm():
             raise OperationNotSupported
 
         result = {'image': vm.screenshot}
@@ -35,7 +35,7 @@ class VmScreenshot(APIView):
     def post(self):
         request, vm = self.request, self.vm
 
-        if not self.vm.is_kvm():
+        if not self.vm.is_hvm():
             raise OperationNotSupported
 
         if vm.status not in (vm.RUNNING, vm.STOPPING):

@@ -159,7 +159,9 @@ class Backup(_VmDiskModel, _StatusModel, _JsonPickleModel):
     def _get_disks(self):
         if self._disks is None:
             json = self.json
-            self._disks = Vm.parse_json_disks(json['uuid'], json, json.get('brand', 'kvm') == 'kvm')
+            brand = json.get('brand', 'kvm')
+            is_hvm = brand == 'kvm' or brand == 'bhyve'
+            self._disks = Vm.parse_json_disks(json['uuid'], json, is_hvm)
         return self._disks
 
     @property

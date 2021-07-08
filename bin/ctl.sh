@@ -78,7 +78,7 @@ exec_py() {
 
 case "${ACTION}" in
 	"clean_envs")
-		virtualenv --relocatable "${ENVS}"
+		virtualenv-2.7 --relocatable "${ENVS}"
 	;;
 	"init_envs")
 		init_envs

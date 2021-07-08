@@ -213,6 +213,8 @@ class DcSettingsSerializer(s.InstanceSerializer):
         'VMS_VM_SNAPSHOT_LIMIT_AUTO',
         'VMS_VM_SNAPSHOT_LIMIT_MANUAL',
         'VMS_VM_SNAPSHOT_LIMIT_MANUAL_DEFAULT',
+        'VMS_VM_SNAPSHOT_SIZE_PERCENT_LIMIT',
+        'VMS_VM_SNAPSHOT_SIZE_PERCENT_LIMIT_DEFAULT',
         'VMS_VM_SNAPSHOT_SIZE_LIMIT',
         'VMS_VM_SNAPSHOT_SIZE_LIMIT_DEFAULT',
         'VMS_VM_SNAPSHOT_DC_SIZE_LIMIT',
@@ -296,6 +298,9 @@ class DcSettingsSerializer(s.InstanceSerializer):
                                                  help_text=_('Default operating system type. One of: 1 - Linux VM, '
                                                              '2 - SunOS VM, 3 - BSD VM, 4 - Windows VM, '
                                                              '5 - SunOS Zone, 6 - Linux Zone.'))
+    VMS_VM_HVM_TYPE_DEFAULT = s.IntegerChoiceField(label='VMS_VM_HVM_TYPE_DEFAULT', choices=Vm.HVM_TYPE,
+                                                   help_text=_('Default hypervisor type. One of: 1 - KVM, '
+                                                               '2 - Bhyve, 3 - none'))
     VMS_VM_MONITORED_DEFAULT = s.BooleanField(label='VMS_VM_MONITORED_DEFAULT',
                                               help_text=_('Controls whether server synchronization with the monitoring '
                                                           'system is enabled by default.'))
@@ -314,9 +319,12 @@ class DcSettingsSerializer(s.InstanceSerializer):
     VMS_VM_MDATA_DEFAULT = s.MetadataField(label='VMS_VM_MDATA_DEFAULT', required=False,
                                            validators=(validate_mdata(Vm.RESERVED_MDATA_KEYS),),
                                            help_text=_('Default VM metadata (key=value string pairs).'))
-    VMS_DISK_MODEL_DEFAULT = s.ChoiceField(label='VMS_DISK_MODEL_DEFAULT', choices=Vm.DISK_MODEL,
-                                           help_text=_('Default disk model of newly created server disks. One of: '
-                                                       'virtio, ide, scsi.'))
+    VMS_DISK_MODEL_KVM_DEFAULT = s.ChoiceField(label='VMS_DISK_MODEL_KVM_DEFAULT', choices=Vm.DISK_MODEL_KVM,
+                                               help_text=_('Default disk model of newly created KVM server disks. '
+                                                           'One of: virtio, ide, scsi.'))
+    VMS_DISK_MODEL_BHYVE_DEFAULT = s.ChoiceField(label='VMS_DISK_MODEL_BHYVE_DEFAULT', choices=Vm.DISK_MODEL_BHYVE,
+                                                 help_text=_('Default disk model of newly created bhyve server disks. '
+                                                             'One of: virtio, ahci, nvme.'))
     VMS_DISK_COMPRESSION_DEFAULT = s.ChoiceField(label='VMS_DISK_COMPRESSION_DEFAULT', choices=Vm.DISK_COMPRESSION,
                                                  help_text=_('Default disk compression algorithm. '
                                                              'One of: off, lzjb, gzip, gzip-N, zle, lz4.'))
@@ -330,8 +338,8 @@ class DcSettingsSerializer(s.InstanceSerializer):
                                                  help_text=_('Name of the default disk image used for '
                                                              'newly created Linux zone servers.'))
     VMS_NIC_MODEL_DEFAULT = s.ChoiceField(label='VMS_NIC_MODEL_DEFAULT', choices=Vm.NIC_MODEL,
-                                          help_text=_('Default virtual NIC model of newly created server NICs. '
-                                                      'One of: virtio, e1000, rtl8139.'))
+                                          help_text=_('Default virtual NIC model of newly created KVM server NICs. '
+                                                      'One of: virtio, e1000, rtl8139. Bhyve model is always virtio.'))
     VMS_NIC_MONITORING_DEFAULT = s.IntegerField(label='VMS_NIC_MONITORING_DEFAULT', min_value=NIC_ID_MIN,
                                                 max_value=NIC_ID_MAX,
                                                 help_text=_('Default NIC ID, which will be used for '
@@ -365,6 +373,9 @@ class DcSettingsSerializer(s.InstanceSerializer):
     VMS_VGA_MODEL_DEFAULT = s.ChoiceField(label='VMS_VGA_MODEL_DEFAULT', choices=Vm.VGA_MODEL,
                                           help_text=_('Default VGA emulation driver of newly created servers. '
                                                       'One of: std, cirrus, vmware.'))
+    VMS_BHYVE_BOOTROM_DEFAULT = s.ChoiceField(label='VMS_BHYVE_BOOTROM_DEFAULT', choices=Vm.BHYVE_BOOTROM,
+                                          help_text=_('Default VM boot firmware emulation. Options are "bios" or '
+                                                      '"uefi". Note that only "uefi" bootrom supports VNC.'))
 
     VMS_VM_SNAPSHOT_DEFINE_LIMIT = s.IntegerField(label='VMS_VM_SNAPSHOT_DEFINE_LIMIT', required=False,
                                                   help_text=_('Maximum number of snapshot definitions per server.'))
@@ -375,8 +386,18 @@ class DcSettingsSerializer(s.InstanceSerializer):
     VMS_VM_SNAPSHOT_LIMIT_MANUAL_DEFAULT = s.IntegerField(label='VMS_VM_SNAPSHOT_LIMIT_MANUAL_DEFAULT', required=False,
                                                           help_text=_('Predefined manual snapshot limit '
                                                                       'for new servers.'))
+    VMS_VM_SNAPSHOT_SIZE_PERCENT_LIMIT = s.IntegerField(label='VMS_VM_SNAPSHOT_SIZE_PERCENT_LIMIT',
+                                                        required=False,
+                                                        help_text=_('Maximum size (% of all defined VM disk capacity) '
+                                                                    'of settable server snapshot size '
+                                                                    'within this datacenter.'))
+    VMS_VM_SNAPSHOT_SIZE_PERCENT_LIMIT_DEFAULT = s.IntegerField(label='VMS_VM_SNAPSHOT_SIZE_PERCENT_LIMIT_DEFAULT',
+                                                                required=False,
+                                                                help_text=_('Predefined snapshot size limit (%) for '
+                                                                            'new servers.'))
     VMS_VM_SNAPSHOT_SIZE_LIMIT = s.IntegerField(label='VMS_VM_SNAPSHOT_SIZE_LIMIT', required=False,
-                                                help_text=_('Maximum size (MB) of all snapshots per server.'))
+                                                help_text=_('Maximum size (MB) of settable server snapshot size '
+                                                            'within this datacenter.'))
     VMS_VM_SNAPSHOT_SIZE_LIMIT_DEFAULT = s.IntegerField(label='VMS_VM_SNAPSHOT_SIZE_LIMIT_DEFAULT', required=False,
                                                         help_text=_('Predefined snapshot size limit (MB) for new '
                                                                     'servers.'))

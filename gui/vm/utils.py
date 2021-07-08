@@ -271,7 +271,7 @@ def vm_define_all(request, vm_details, method='POST'):
                         disk, request.user, request.dc)
 
             # disk_id 1 for zone is created automatically we can just update it here...
-            if i == 0 and vm['ostype'] in Vm.ZONE:
+            if i == 0 and vm['ostype'] in Vm.ZONE_OSTYPES:
                 res = call_api_view(request, 'PUT', vm_define_disk, hostname, disk_id, data=disk,
                                     disable_throttling=True)
             else:

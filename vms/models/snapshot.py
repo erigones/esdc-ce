@@ -159,7 +159,7 @@ class Snapshot(_StatusModel, _VmDiskModel):
 
     @classmethod
     def get_total_vm_size(cls, vm):
-        """Return cumulative snapshot size for one vM"""
+        """Return cumulative snapshot size for one VM"""
         key = cls.SNAPSHOT_SIZE_TOTAL_VM_KEY % vm.uuid
         qs = cls.objects.filter(vm=vm).exclude(status__in=(cls.PENDING, cls.LOST), size__isnull=True)
 

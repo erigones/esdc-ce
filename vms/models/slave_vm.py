@@ -217,7 +217,7 @@ class SlaveVm(_JsonPickleModel):
     @property
     def disk_zpools(self):
         """Changed disk zpools; used by replication"""
-        if self.vm.is_kvm():
+        if self.vm.is_hvm():
             disks = self.vm.json_get_disks()
             master_disks = self.master_vm.json_get_disks()
             return {i + 1: disk['zpool'] for i, disk in enumerate(disks) if disk['zpool'] != master_disks[i]['zpool']}

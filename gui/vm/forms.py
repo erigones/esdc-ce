@@ -22,15 +22,15 @@ from gui.vm.utils import get_vm_define, get_vm_define_disk, get_vm_define_nic
 # noinspection PyProtectedMember
 from gui.dc.image.forms import _ImageForm
 from api.vm.utils import get_templates, get_nodes, get_images, get_subnets, get_zpools, get_owners
-from api.vm.define.vm_define_disk import DISK_ID_MIN, DISK_ID_MAX, DISK_ID_MAX_OS
+from api.vm.define.vm_define_disk import DISK_ID_MIN, DISK_ID_MAX, DISK_ID_MAX_BHYVE, DISK_ID_MAX_OS
 from api.vm.define.vm_define_nic import NIC_ID_MIN, NIC_ID_MAX
 from api.vm.define.views import vm_define, vm_define_user, vm_define_disk, vm_define_nic, vm_define_revert
 from api.vm.snapshot.views import vm_define_snapshot, image_snapshot
 from api.vm.backup.views import vm_define_backup
 
-
 DISK_ID_MIN += 1
 DISK_ID_MAX += 1
+DISK_ID_MAX_BHYVE += 1
 DISK_ID_MAX_OS += 1
 NIC_ID_MIN += 1
 NIC_ID_MAX += 1
@@ -201,8 +201,13 @@ class AdminServerSettingsForm(ServerSettingsForm):
                                                   'e.g. disks, nics.'),
                                       widget=DataSelect(attrs={'class': 'narrow input-select2'}))
     ostype = forms.TypedChoiceField(label=_('OS Type'), choices=Vm.OSTYPE, required=True, coerce=int,
-                                    widget=forms.Select(attrs={'class': 'input-select2 narrow',
-                                                               'required': 'required'}))
+                                    widget=forms.Select(attrs={'class': 'input-select2 narrow ostype-select',
+                                                               'required': 'required',
+                                                               'onChange': 'update_vm_form_fields_from_ostype()'}))
+    hvm_type = forms.TypedChoiceField(label=_('Hypervisor Type'), choices=Vm.HVM_TYPE_GUI, required=False, coerce=int,
+                                      widget=forms.Select(attrs={'class': 'input-select2 narrow hvm-type-select',
+                                                                 'required': 'required',
+                                                                 'onChange': 'update_vm_form_fields_from_hvm_type()'}))
     vcpus = forms.IntegerField(label=_('VCPUs'), required=False,
                                widget=NumberInput(attrs={'class': 'input-transparent narrow', 'required': 'required'}))
     # noinspection SpellCheckingInspection
@@ -225,9 +230,16 @@ class AdminServerSettingsForm(ServerSettingsForm):
     snapshot_limit_manual = forms.IntegerField(label=_('Snapshot count limit'), required=False,
                                                widget=NumberInput(attrs={'class': 'input-transparent narrow'}),
                                                help_text=_('Maximum number of manual server snapshots.'))
+    snapshot_size_percent_limit = forms.IntegerField(label=_('Snapshot size % limit'), required=False,
+                                                     widget=NumberInput(attrs={'class': 'input-transparent narrow'}),
+                                                     help_text=_(
+                                                         'Maximum size of all server snapshots as % of all disk space '
+                                                         'of this VM (example: 200% = VM with 10GB disk(s) can have '
+                                                         '20GB of snapshots).'))
     snapshot_size_limit = forms.IntegerField(label=_('Snapshot size limit'), required=False,
                                              widget=NumberInput(attrs={'class': 'input-transparent narrow'}),
-                                             help_text=_('Maximum size of all server snapshots.'))
+                                             help_text=_('Maximum size of all server snapshots. '
+                                                         'If set, it takes precedence over % limit.'))
     cpu_shares = forms.IntegerField(label=_('CPU Shares'), max_value=1048576, min_value=0, required=True,
                                     widget=NumberInput(attrs={'class': 'input-transparent narrow',
                                                               'required': 'required'}))
@@ -236,6 +248,8 @@ class AdminServerSettingsForm(ServerSettingsForm):
     zfs_io_priority = forms.IntegerField(label=_('IO Priority'), max_value=1024, min_value=0, required=True,
                                          widget=NumberInput(attrs={'class': 'input-transparent narrow',
                                                                    'required': 'required'}))
+    bootrom = forms.ChoiceField(label=_('Bootrom'), required=False,
+                                widget=forms.Select(attrs={'class': 'narrow input-select2'}))
     zpool = forms.ChoiceField(label=_('Storage'), required=False,
                               widget=forms.Select(attrs={'class': 'narrow input-select2'}))
     owner = forms.ChoiceField(label=_('Owner'), required=False,
@@ -268,6 +282,7 @@ class AdminServerSettingsForm(ServerSettingsForm):
         self.fields['node'].choices = [('', _('(auto)'))] + [(i.hostname, i.hostname) for i in self.vm_nodes]
         self.fields['owner'].choices = get_owners(request).values_list('username', 'username')
         self.fields['zpool'].choices = get_zpools(request).values_list('zpool', 'storage__alias').distinct()
+        self.fields['bootrom'].choices = Vm.BHYVE_BOOTROM
 
         if not request.user.is_staff:
             self.fields['cpu_shares'].widget.attrs['disabled'] = 'disabled'
@@ -288,6 +303,11 @@ class AdminServerSettingsForm(ServerSettingsForm):
         if vm:
             empty_template_data = {}
             self.fields['ostype'].widget.attrs['disabled'] = 'disabled'
+            self.fields['hvm_type'].widget.attrs['disabled'] = 'disabled'
+            if not vm.is_hvm():
+                # for zones the only HVM choice is NO hypervisor
+                self.fields['hvm_type'].choices = Vm.HVM_TYPE_GUI_NO_HYPERVISOR
+
             if vm.is_deployed():
                 self.fields['node'].widget.attrs['class'] += ' disable_created2'
                 self.fields['zpool'].widget.attrs['class'] += ' disable_created2'
@@ -298,7 +318,7 @@ class AdminServerSettingsForm(ServerSettingsForm):
             # Disable zone support _only_ when adding new VM (zone must be available in edit mode) - Issue #chili-461
             if not dc_settings.VMS_ZONE_ENABLED:
                 # Remove SunOS Zone support
-                ostype = [i for i in ostype if i[0] not in Vm.ZONE]
+                ostype = [i for i in ostype if i[0] not in Vm.ZONE_OSTYPES]
 
             self.fields['ostype'].choices = ostype
 
@@ -321,20 +341,34 @@ class ServerDiskSettingsForm(SerializerForm):
     """
     Partial copy of vm_define_disk serializer (api).
     """
+
     admin = False
     _api_call = vm_define_disk
-
-    disk_id = forms.IntegerField(label=_('Disk ID'), min_value=DISK_ID_MIN, max_value=DISK_ID_MAX, required=True,
-                                 widget=forms.TextInput(attrs={'class': 'uneditable-input narrow',
-                                                               'required': 'required', 'disabled': 'disabled'}))
-    model = forms.ChoiceField(label=_('Model'), choices=Vm.DISK_MODEL, required=False,
-                              widget=forms.Select(attrs={'class': 'narrow input-select2'}))
 
     def __init__(self, request, vm, *args, **kwargs):
         super(ServerDiskSettingsForm, self).__init__(request, vm, *args, **kwargs)
 
-        if not vm.is_kvm():
+        max_disks = DISK_ID_MAX
+        if vm.is_hvm():
+            if vm.is_kvm():
+                model_choices = Vm.DISK_MODEL_KVM
+            else:  # bhyve
+                model_choices = Vm.DISK_MODEL_BHYVE
+                max_disks = DISK_ID_MAX_BHYVE
+
+            self.fields['model'] = forms.ChoiceField(label=_('Model'), choices=model_choices, required=False,
+                                                     widget=forms.Select(attrs={'class': 'narrow input-select2'}))
+
+        # zone
+        elif 'model' in self.fields:
             del self.fields['model']
+
+        self.fields['disk_id'] = forms.IntegerField(label=_('Disk ID'), min_value=DISK_ID_MIN, max_value=max_disks,
+                                                    required=True,
+                                                    widget=forms.TextInput(
+                                                        attrs={'class': 'uneditable-input narrow',
+                                                               'required': 'required', 'disabled': 'disabled'}
+                                                    ))
 
     def _initial_data(self, request, vm):
         return get_vm_define_disk(request, vm, disk_id=int(request.POST['opt-disk-disk_id']) - 1)
@@ -376,9 +410,12 @@ class AdminServerDiskSettingsForm(ServerDiskSettingsForm):
         else:
             img_inc = None
 
-        if vm.is_kvm():
+        if vm.is_hvm():
             images = [('', _('(none)'))]
-            self.max_disks = DISK_ID_MAX
+            if vm.is_bhyve():
+                self.max_disks = DISK_ID_MAX_BHYVE
+            else:
+                self.max_disks = DISK_ID_MAX
             self.fields['zpool'].help_text = _('Setting first disk storage to different value than '
                                                'server settings storage (%s) is not recommended.') % vm.zpool
         else:
@@ -410,7 +447,7 @@ class AdminServerDiskSettingsForm(ServerDiskSettingsForm):
             except KeyError:
                 pass
 
-            if not self._obj.is_kvm():  # Also remove size and zpool for OS zones
+            if not self._obj.is_hvm():  # Also remove size and zpool for OS zones
                 try:
                     del data['size']
                 except KeyError:
@@ -439,6 +476,7 @@ class ServerNicSettingsForm(SerializerForm):
     def __init__(self, request, vm, *args, **kwargs):
         super(ServerNicSettingsForm, self).__init__(request, vm, *args, **kwargs)
 
+        # only KVM has multiple vnic models
         if not vm.is_kvm():
             del self.fields['model']
 
@@ -638,6 +676,7 @@ class CreateSnapshotDefineForm(SnapshotDefineForm):
     """
     Create snapshot definition.
     """
+
     def __init__(self, request, vm, *args, **kwargs):
         super(CreateSnapshotDefineForm, self).__init__(request, vm, *args, **kwargs)
         from api.vm.snapshot.serializers import define_schedule_defaults
@@ -651,6 +690,7 @@ class UpdateSnapshotDefineForm(SnapshotDefineForm):
     """
     Update snapshot definition.
     """
+
     def __init__(self, *args, **kwargs):
         super(UpdateSnapshotDefineForm, self).__init__(*args, **kwargs)
         self.fields['name'].widget.attrs['disabled'] = 'disabled'
@@ -770,8 +810,8 @@ class BackupDefineForm(SerializerForm, HostnameForm):
         super(BackupDefineForm, self).__init__(request, vm, *args, **kwargs)
         self.fields['retention'].help_text = _('Maximum number of backups to keep.')
         self.fields['node'].choices = get_nodes(request, is_backup=True).values_list('hostname', 'hostname')
-        self.fields['zpool'].choices = get_zpools(request).filter(node__is_backup=True)\
-                                                          .values_list('zpool', 'storage__alias').distinct()
+        self.fields['zpool'].choices = get_zpools(request).filter(node__is_backup=True) \
+            .values_list('zpool', 'storage__alias').distinct()
 
 
 class CreateBackupDefineForm(BackupDefineForm, CreateSnapshotDefineForm):
@@ -838,7 +878,8 @@ class UpdateBackupForm(BackupForm):
         if self._vm:
             self.fields['disk_id'].choices = vm_disk_id_choices(self._vm)
         else:
-            self.fields['disk_id'].choices = [(i, _('Disk') + ' %d' % i) for i in range(1, DISK_ID_MAX + 1)]
+            # we use DISK_ID_MAX_BHYVE here because it's bigger than DISK_ID_MAX
+            self.fields['disk_id'].choices = [(i, _('Disk') + ' %d' % i) for i in range(1, DISK_ID_MAX_BHYVE + 1)]
 
     def _get_real_disk_id(self):
         return Backup.get_disk_id(self._vm, self.cleaned_data['disk_id'])

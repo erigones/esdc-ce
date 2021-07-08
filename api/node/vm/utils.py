@@ -93,13 +93,15 @@ def vm_from_json(request, task_id, json, dc, owner=settings.ADMIN_USER, template
     try:
         vm.ostype = int(json['internal_metadata']['ostype'])
     except KeyError:
-        if brand == 'kvm':
-            vm.ostype = Vm.LINUX
-        elif brand == 'lx':
+        if brand == 'lx':
             vm.ostype = Vm.LINUX_ZONE
-        else:
+        elif brand == 'joyent':
             vm.ostype = Vm.SUNOS_ZONE
+        else:  # brand == 'kvm' or brand == 'bhyve':
+            vm.ostype = Vm.LINUX
         logger.warning('OS type for new VM %s could not be auto-detected. Fallback to ostype=%s', vm, vm.ostype)
+
+    vm.hvm_type = vm.brand_to_hvm_type(vm.brand)
 
     # owner
     if owner:

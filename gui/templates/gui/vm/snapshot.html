@@ -92,6 +92,7 @@
       {% if can_image %}
       <span class="pull-left"><a href="#" id="image_snapshot_link" class="btn btn-small btn-inverse no-ajax obj_add" data-prefix="img">{% trans "Create Image" %}</a></span>
       {% endif %}
+      <span class="button-2nd-left"><a href="#" id="snapshot_to_vm_link" class="btn btn-small btn-inverse no-ajax obj_add" data-prefix="img">{% trans "To other server..." %}</a></span>
       <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
       <a class="vm_modal_yes_force button gold no-ajax" data-confirm="{% trans "Are you sure that you want to rollback the snapshot?" %}">{% trans "Rollback snapshot" %}</a>
       <a class="vm_modal_yes button red no-ajax" data-confirm="{% trans "Are you sure that you want to delete the snapshot?" %}">{% trans "Delete snapshot" %}</a>
@@ -136,7 +137,7 @@
   </div>
   <div class="modal-footer">
     <div class="inner-well">
-      {% if vm.is_kvm %}<span class="pull-left"><a class="vm_modal_more btn btn-small btn-inverse no-ajax">{% trans "Show advanced settings" %}</a></span>{% endif %}
+      {% if vm.is_hvm %}<span class="pull-left"><a class="vm_modal_more btn btn-small btn-inverse no-ajax">{% trans "Show advanced settings" %}</a></span>{% endif %}
       <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
       <a class="vm_modal_create button green no-ajax" data-enter="true">{% trans "Create definition" %}</a>
     </div>
@@ -156,7 +157,7 @@
   </div>
   <div class="modal-footer">
     <div class="inner-well">
-      {% if vm.is_kvm %}<span class="pull-left"><a class="vm_modal_more btn btn-small btn-inverse no-ajax">{% trans "Show advanced settings" %}</a></span>{% endif %}
+      {% if vm.is_hvm %}<span class="pull-left"><a class="vm_modal_more btn btn-small btn-inverse no-ajax">{% trans "Show advanced settings" %}</a></span>{% endif %}
       <a class="vm_modal_no button blue no-ajax" data-dismiss="modal">{% trans "Cancel" %}</a>
       <a class="vm_modal_update button green no-ajax" data-enter="true">{% trans "Update definition" %}</a>
       <a class="vm_modal_delete button red no-ajax">{% trans "Delete definition" %}</a>
@@ -188,6 +189,8 @@
   </div>
 </div>
 {% endif %}
+
+{% include "gui/vm/snapshot_to_vm_modal.html" %}
 
 <div class="container-fluid">
 

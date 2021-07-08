@@ -126,6 +126,17 @@ function vm_backup_modal_update(hostname, errors) {
   return _vm_snapshot_modal_update(hostname, $(jq('vm_backups_' + hostname) + ', #vm_backups_'), errors);
 }
 
+function vm_snap2vm_modal_update(hostname, errors) {
+  // Check if we have a modal
+  if (MODAL && MODAL.length && (MODAL.selector.indexOf('vm_snapshot') > -1)) {
+    if (errors) {
+      MODAL.find('div.modal_error').show().find('span').html('').text(errors[0]);
+    } else {
+      MODAL.modal('hide');
+    }
+  }
+}
+
 
 // Create snapshot modal
 function vm_snapshot_create_modal(hostname, btn) {
@@ -335,6 +346,80 @@ function vm_snapshot_image_modal(hostname, btn, snapname, disk_id) {
   });
 }
 
+// Restore snapshot to other VM - modal
+function vm_snapshot_to_vm_modal(hostname, btn, snapname, disk_id) {
+  obj_form_modal(btn, '#vm_snapshot_restore_to_vm_modal', function(mod, start) {
+
+    var tr = $("#id_" + disk_id + '_' + snapname).parent().parent().parent();
+    var disk_size = tr.data('disk_size');
+    var target_hostname = $('#id_target_hostname');
+    var target_disk_id = $('#id_target_disk_id');
+
+    var modal = $('#vm_snapshot_restore_to_vm_modal');
+    var modal_snap_info = modal.find('div.vm_modal_text');
+    var modal_snap_info_default = modal_snap_info.html();
+
+    var force_checkbox = modal.find('#vm_snapshot_to_vm_force');
+    var yes_restore = modal.find('a.vm_modal_snap2vm_yes');
+    var yes_restore_default = yes_restore.html();
+
+    var modal_snap_info_filled = modal_snap_info_default.replace('__name__', snapname).replace('__disk_id__', disk_id).replace('__disk_size__', disk_size);
+    modal_snap_info.html(modal_snap_info_filled);
+
+    var handler_yes = function() {
+      if (!yes_restore.hasClass('disabled')) {
+        confirm2(yes_restore.data('confirm'), function() {
+          console.log("Running snap restore from", hostname, "to", target_hostname.val(), "; snapname:", snapname, "; target disk ID:", target_disk_id.val());
+          vm_rollback_snapshot(hostname, snapname, disk_id, force_checkbox.prop('checked'), target_hostname.val(), target_disk_id.val());
+        });
+      }
+    };
+    yes_restore.on('click', handler_yes);
+
+    var handler_force_checkbox = function() {
+      if (force_checkbox.prop('checked')) {
+        yes_restore.removeClass('disabled', 100);
+      } else {
+        yes_restore.addClass('disabled', 100);
+      }
+    };
+    force_checkbox.on('click', handler_force_checkbox);
+    handler_force_checkbox();
+
+    modal.one('hide', function() {
+      yes_restore.off('click');
+      force_checkbox.off('click');
+      target_hostname.select2('destroy');
+      target_disk_id.select2('destroy');
+    });
+    modal.one('hidden', function() {
+      modal_snap_info.html(modal_snap_info_default);
+      yes_restore.html(yes_restore_default);
+      force_checkbox.prop('checked', false);
+    });
+
+    function target_hostname_change() {
+      var th = target_hostname.find(':selected').data('meta');
+
+      if (th) {
+        target_disk_id.empty();
+        _.each(th['disks'], function(i) {
+          var opt = $('<option></option>').attr('value', i[0]).text(i[1]);
+          if (i[2] != disk_size) {
+            opt.attr('disabled', 'disabled');
+          }
+          target_disk_id.append(opt);
+        });
+        target_disk_id.select2('val', '');
+      }
+    }
+    target_hostname.off('change').change(target_hostname_change);
+    target_hostname_change();
+
+    MODAL = modal;
+  });
+}
+
 // Display rollback modal window
 function vm_snapshot_rollback(hostname, btn, destroy_fun, rollback_fun) {
   if (btn.hasClass('disabled')) {
@@ -355,6 +440,7 @@ function vm_snapshot_rollback(hostname, btn, destroy_fun, rollback_fun) {
   var force_force = mod.find('span.vm_modal_force_force');
   var force_box = mod.find('#vm_snapshot_rollback_force');
   var image_snapshot_link = mod.find('#image_snapshot_link');
+  var snapshot_to_vm_link = mod.find('#snapshot_to_vm_link');
 
   var text_filled = text_default.replace('__name__', name).replace('__disk_id__', disk_id);
 
@@ -375,7 +461,7 @@ function vm_snapshot_rollback(hostname, btn, destroy_fun, rollback_fun) {
   var handler_force = function() {
     if (!yes_force.hasClass('disabled')) {
       confirm2(yes_force.data('confirm'), function() {
-        rollback_fun(hostname, name, disk_id, force_box.prop('checked'), vm_hostname);
+        rollback_fun(hostname, name, disk_id, force_box.prop('checked'));
       });
     }
   };
@@ -420,6 +506,13 @@ function vm_snapshot_rollback(hostname, btn, destroy_fun, rollback_fun) {
     image_snapshot_link.one('click', function() {
       mod.modal('hide');
       vm_snapshot_image_modal(hostname, image_snapshot_link, name, disk_id);
+    });
+  }
+
+  if (snapshot_to_vm_link.length) {
+    snapshot_to_vm_link.one('click', function() {
+      mod.modal('hide');
+      vm_snapshot_to_vm_modal(hostname, image_snapshot_link, name, disk_id);
     });
   }
 

@@ -80,7 +80,7 @@ GRAPH_ITEMS = GraphItems({
 
     'disk-throughput': {
         'desc': _('The amount of written and read data on the virtual hard drive.'),
-        'required_ostype': Vm.KVM,
+        'required_ostype': Vm.HVM,
         'items': ('vm.disk.io[disk%(id)d,read]', 'vm.disk.io[disk%(id)d,written]'),
         'update_interval': GraphItems.GRAPH_UPDATE_INTERVAL,
         'history': 0,
@@ -91,7 +91,7 @@ GRAPH_ITEMS = GraphItems({
 
     'disk-io': {
         'desc': _('The amount of write and read I/O operations performed on the virtual hard drive.'),
-        'required_ostype': Vm.KVM,
+        'required_ostype': Vm.HVM,
         'items': ('vm.disk.io[disk%(id)d,reads]', 'vm.disk.io[disk%(id)d,writes]'),
         'update_interval': GraphItems.GRAPH_UPDATE_INTERVAL,
         'history': 0,
@@ -102,7 +102,7 @@ GRAPH_ITEMS = GraphItems({
 
     'fs-throughput': {
         'desc': _('The amount of written and read data on the virtual hard drive.'),
-        'required_ostype': Vm.ZONE,
+        'required_ostype': Vm.ZONE_OSTYPES,
         'items': ('kstat.get[unix:0:vopstats_disk%(id)d:read_bytes]',
                   'kstat.get[unix:0:vopstats_disk%(id)d:write_bytes]'),
         'items_search': {'search': {'key_': 'kstat.get[unix:0:vopstats_*_bytes*'}, 'searchWildcardsEnabled': True,
@@ -117,7 +117,7 @@ GRAPH_ITEMS = GraphItems({
 
     'fs-io': {
         'desc': _('The amount of write and read I/O operations performed on the virtual hard drive.'),
-        'required_ostype': Vm.ZONE,
+        'required_ostype': Vm.ZONE_OSTYPES,
         'items': ('kstat.get[unix:0:vopstats_disk%(id)d:nread]', 'kstat.get[unix:0:vopstats_disk%(id)d:nwrite]'),
         'items_search': {'search': {'key_': 'kstat.get[unix:0:vopstats_*:n*]'}, 'searchWildcardsEnabled': True,
                          'limit': 2, 'sortfield': ['name'], 'sortorder': '???'},

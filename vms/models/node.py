@@ -9,7 +9,7 @@ import operator
 from functools import reduce
 
 # noinspection PyProtectedMember
-from vms.models.base import _JsonPickleModel, _StatusModel, _UserTasksModel, _OSType
+from vms.models.base import _JsonPickleModel, _StatusModel, _UserTasksModel, _HVMType
 from vms.models.dc import Dc
 from vms.models.storage import Storage, NodeStorage
 from gui.models import User
@@ -23,7 +23,7 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
     _vlan_id = None
     _sysinfo_shown = ('Boot Time', 'Manufacturer', 'Product', 'Serial Number', 'SKU Number', 'HW Version', 'HW Family',
                       'Datacenter Name', 'VM Capable', 'CPU Type', 'CPU Virtualization', 'CPU Physical Cores',
-                      'Live Image')
+                      'Live Image', 'Bhyve Capable', 'Bhyve Max Vcpus')
 
     ZPOOL = 'zones'
     DEFAULT_OVERLAY_PORT = 4789
@@ -31,6 +31,7 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
     # Used in NodeStorage.size_vms
     VMS_SIZE_TOTAL_KEY = 'vms-size-total:%s'  # %s = zpool.id (NodeStorage)
     VMS_SIZE_DC_KEY = 'vms-size-dc:%s:%s'  # %s = dc.id:zpool.id (NodeStorage)
+    BHYVE_MIN_PLATFORM_SHORT = 20210408
 
     NODES_ALL_KEY = 'nodes_list'
     NODES_ALL_EXPIRES = 300
@@ -159,6 +160,14 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
         """System information displayed in gui/api"""
         x = self._sysinfo
         return {i: x.get(i, '') for i in self._sysinfo_shown}
+
+    @property
+    def bhyve_capable(self):
+        return bool(self._sysinfo.get('Bhyve Capable', 'false'))
+
+    @property
+    def bhyve_max_vcpus(self):
+        return int(self._sysinfo.get('Bhyve Max Vcpus', 1000))  # default is 1000 (unlimited)
 
     @property
     def diskinfo(self):
@@ -440,8 +449,8 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
         nodes = cache.get(cls.NODES_ALL_KEY)
 
         if not nodes:
-            nodes = cls.objects.only('uuid', 'hostname', 'status', 'address', 'is_compute', 'is_backup', 'is_head')\
-                               .order_by('hostname')
+            nodes = cls.objects.only('uuid', 'hostname', 'status', 'address', 'is_compute', 'is_backup', 'is_head') \
+                .order_by('hostname')
             cache.set(cls.NODES_ALL_KEY, nodes, cls.NODES_ALL_EXPIRES)
 
         return nodes
@@ -598,7 +607,7 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
         new_esysinfo = esysinfo.copy()
         config = new_esysinfo.pop('config', '')
         new_esysinfo.pop('sshkey', None)
-        return not(self.esysinfo == new_esysinfo and self.config == config)
+        return not (self.esysinfo == new_esysinfo and self.config == config)
 
     def sshkey_changed(self, esysinfo):
         """Return True if compute node's public SSH key has changed"""
@@ -692,7 +701,9 @@ class Node(_StatusModel, _JsonPickleModel, _UserTasksModel):
         else:
             vms = self.vm_set
 
-        vms_count = vms.filter(ostype__in=_OSType.KVM).count()  # FIXME: no index on ostype
+        # XXX: does bhyve brand have memory overhead variable?
+        # vms_count = vms.filter(ostype__in=_OSType.KVM).count()  # FIXME: no index on ostype
+        vms_count = vms.filter(ostype__in=_HVMType.HVM).count()  # FIXME: no index on hvm_type
 
         return vms_count * settings.VMS_VM_KVM_MEMORY_OVERHEAD
 
@@ -956,20 +967,33 @@ class DcNode(_JsonPickleModel):
             for zpool, size in vm_disk.items():
                 storages.append(models.Q(zpool=zpool) & models.Q(storage__size_free__gte=size))
 
-            nodes = NodeStorage.objects.filter(dc=dc, zpool__in=vm_disk.keys()).filter(reduce(operator.or_, storages))\
-                                       .distinct('node').values_list('node_id', flat=True)
+            nodes = NodeStorage.objects.filter(dc=dc, zpool__in=vm_disk.keys()).filter(reduce(operator.or_, storages)) \
+                .distinct('node').values_list('node_id', flat=True)
             resources['node_id__in'] = list(nodes)
 
             if Node.ZPOOL in vm_disk:
                 resources['disk_free__gte'] = vm_disk[Node.ZPOOL]
 
         try:
-            dc_node = cls.objects.filter(dc=dc, node__status=Node.ONLINE, node__is_compute=True).filter(**resources)\
-                                 .order_by('-priority', 'cpu_free', 'ram_free', 'disk_free')[0]
+            kwargs = {}
+            dc_nodes = cls.objects.filter(dc=dc, node__status=Node.ONLINE, node__is_compute=True, **kwargs) \
+                .filter(**resources).order_by('-priority', 'cpu_free', 'ram_free', 'disk_free')
+
+            dc_node = None
+            if vm.is_bhyve:
+                # choose the first node matching the criteria
+                for i in range(len(dc_nodes)):
+                    node_candidate = dc_nodes[i].node
+                    if not node_candidate.bhyve_capable or vm_cpu > node_candidate.bhyve_max_vcpus:
+                        continue
+                    dc_node = node_candidate
+            else:
+                dc_node = dc_nodes[0].node
+
+            return dc_node
+
         except IndexError:
             return None
-        else:
-            return dc_node.node
 
     def check_free_resources(self, cpu=None, ram=None, disk=None):
         """Return True if it is possible to allocate resources on this node"""

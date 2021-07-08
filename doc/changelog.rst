@@ -1,6 +1,20 @@
 Changelog
 #########
 
+4.5
+===
+Released on TBD
+
+Features
+--------
+
+- Add `BHYVE` hypervisor support - `#524 <https://github.com/erigones/esdc-ce/issues/524>`__
+- Change `BHYVE` VM disk size without reboot (based on `WIP of mgerdts <https://smartos.org/bugview/OS-6632>`__) - `#79f241f <https://github.com/erigones/illumos-joyent/commit/79f241f0621bf5997c36fd623cac5ee41b629a89>`__
+- Add COM3 and COM4 ports to `BHYVE` (FreeBSD upstream)- `#eed1cc6cdfa <https://cgit.freebsd.org/src/commit/?id=eed1cc6cdfa>`__
+- Support restoring a snapshot to other VM - `#548 <https://github.com/erigones/esdc-ce/pull/548>`__
+- Add buttons to copy VM IP, name or UUID to clipboard - `#526 <https://github.com/erigones/esdc-ce/pull/526>`__
+
+
 4.4
 ===
 Released on 2020-11-16

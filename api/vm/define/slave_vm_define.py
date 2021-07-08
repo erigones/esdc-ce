@@ -82,7 +82,7 @@ class SlaveVmDefine(object):
         if new_root_zpool:  # pool changed
             json['zpool'] = new_root_zpool
 
-            if not vm.is_kvm():
+            if not vm.is_hvm():
                 datasets = json.get('datasets', ())
 
                 # changing delegated datasets

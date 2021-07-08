@@ -85,7 +85,7 @@ class Command(DanubeCloudCommand):
 
             line = [vm.alias, 'ansible_ssh_host=%s' % ip]
 
-            if not vm.is_kvm():
+            if not vm.is_hvm():
                 line.append('ansible_python_interpreter=/opt/local/bin/python')
 
             yield ' '.join(line)

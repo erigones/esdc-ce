@@ -1008,6 +1008,33 @@ function activate_morerow() {
   });
 }
 
+function copy_to_clipboard(text) {
+  var dummy = $('<input>');
+
+  $('body').append($(dummy));
+  $(dummy).val(text).select();
+  document.execCommand("copy");
+  console.log("Copied the text: " + $(dummy).val());
+  $(dummy).remove();
+}
+
+function init_copy_text_to_clipboard() {
+  // $('a').on('click', '.copy_text_to_clipboard', function() {
+  console.log('Setting up events for copy_to_clipboard() function');
+  $('a.copy_text_to_clipboard').click(function() {
+    var elem_to_copy;
+
+    if($(this).children('span').length) {
+      elem_to_copy = $(this).children('span').first();
+    } else {
+      elem_to_copy = $(this).parent();
+    }
+    copy_to_clipboard(elem_to_copy.text().trim());
+
+    return false;
+  });
+}
+
 function check_browser_support() {
   if (!ERIGONES_SUPPORTED_BROWSER) {
     $('#not_supported_browser').show();
@@ -1018,4 +1045,6 @@ $(document).ready(function() {
   $("html, body").off("touchstart");
   check_browser_support();
   activate_tooltips();
+  init_copy_text_to_clipboard();
 });
+

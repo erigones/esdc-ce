@@ -1,0 +1,178 @@
+#!/bin/sh
+
+usage() {
+	cat << EOF
+Usage: $0 [-h] [-i SECS] [-P PROGNAME] [-H] [-T]"
+
+Options:
+-h|--help       This help.
+-i SECS         Interval to print stats in seconds (default: 2).
+-P EXECNAME     Process name to trace (default: bhyve).
+-H              Suppress printing first line (headers).
+-T              Print "---" as last line every interval
+                (to indicate tick even on no I/O activity).
+
+Please note that script prints only disks that were active during the interval.
+
+EOF
+}
+
+# defaults
+INTERVAL=2
+PROG="bhyve"
+#PROG="qemu-system-x86_"
+HEADLINE=1
+PRINT_TICKS=0
+
+while [ "$1" != "" ]; do
+	PARAM="$1"
+	shift
+	case "$PARAM" in
+		-h | --help)
+			usage
+			exit 1
+			;;
+		-i)
+			INTERVAL="$1"
+			if ! [ $INTERVAL -gt 0 ]; then
+				echo "Invalid interval value: $INTERVAL"
+				exit 2
+			fi
+			shift
+			;;
+		-P)
+			PROG="$1"
+			if [ -z "$PROG" ]; then
+				echo "Error: No EXECNAME specified" 
+				exit 3
+			fi
+			shift
+			;;
+		-H)
+			HEADLINE=0
+			;;
+		-T)
+			PRINT_TICKS=1
+			;;
+		*)
+			echo "Unknown parameter: $PARAM"
+			exit 4
+			;;
+	esac
+done
+
+
+/usr/sbin/dtrace -qn '
+
+ inline int INTERVAL 	= '$INTERVAL';
+ inline string PROG		= "'$PROG'";
+ inline int HEADLINE	= '$HEADLINE';
+ inline int PRINT_TICKS	= '$PRINT_TICKS';
+ /*
+ inline int OPT_timings = 1;
+ */
+
+ /* 
+  * Initialise variables
+  */
+ dtrace:::BEGIN 
+ {
+	prog = PROG;
+	secs = INTERVAL;
+
+	/*
+	OPT_timings ? 
+	printf("PID\tDISK\t\tIOR\t\tIOW\t\tB_RD\t\tB_WR\t\tRTIME_AVG\tWTIME_AVG\n") :
+	*/
+	HEADLINE ?
+	printf("PID\tIOR\t\tIOW\t\tB_RD\t\tB_WR\t\tDISK\n") : 1;
+ }
+
+
+ ::pread:entry,
+ ::preadv:entry
+ /execname == prog/
+ {
+	self->file = fds[arg0].fi_name;
+	/*
+	OPT_timings ? self->start_time = timestamp : 1;
+	*/
+ }
+
+ ::pread:return,
+ ::preadv:return
+ /execname == prog && arg0 != -1/
+ {
+	@rbytes[pid, self->file] = sum(arg0);
+	@ior[pid, self->file] = count();
+	/*
+	OPT_timings ? @rtimes_ns[pid, self->file] = avg(timestamp - self->start_time) : 1;
+	*/
+ }
+
+ ::pwrite:entry,
+ ::pwritev:entry
+ /execname == prog/
+ {
+	/*
+	printf("%d writing using to (%d) %s\n", pid, arg0, fds[arg0].fi_name);
+	*/
+	self->file = fds[arg0].fi_name;
+	/*
+	OPT_timings ? self->start_time = timestamp : 1;
+	*/
+ }
+
+ ::pwrite:return,
+ ::pwritev:return
+ /execname == prog && arg0 != -1/
+ {
+	@wbytes[pid, self->file] = sum(arg0);
+	@iow[pid, self->file] = count();
+	/*
+	OPT_timings ? @wtimes_ns[pid, self->file] = avg(timestamp - self->start_time) : 1;
+	*/
+ }
+
+
+ /*
+  * Timer
+  */
+ profile:::tick-1sec
+ {
+	secs--;
+ }
+
+ profile:::tick-1sec
+ /secs == 0/
+ {
+	/*
+	OPT_timings ? 
+	printa("%d\t%s\t\t%@d\t\t%@d\t\t%@d\t\t%@d\t\t%@d\t\t%@d\n", @ior, @iow, @rbytes, @wbytes, @rtimes_ns/1000, @wtimes_ns/1000) :
+	*/
+	printa("%d\t%@d\t\t%@d\t\t%@d\t\t%@d\t\t%s\n", @ior, @iow, @rbytes, @wbytes);
+	PRINT_TICKS ? printf("---\n") : 1;
+
+	/* clear data */
+	trunc(@ior);
+	trunc(@iow);
+	trunc(@rbytes);
+	trunc(@wbytes);
+	/*
+	OPT_timings ? 
+	trunc(@rtimes_ns) : 1;
+	OPT_timings ? 
+	trunc(@wtimes_ns) : 1;
+	*/
+	secs = INTERVAL;
+ }
+
+ dtrace:::END
+ {
+	/* clear data */
+	trunc(@ior);
+	trunc(@iow);
+	trunc(@rbytes);
+	trunc(@wbytes);
+ }
+'

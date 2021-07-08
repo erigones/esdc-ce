@@ -2,6 +2,7 @@
 
 SRC_FILE="$1"
 DEST_VM="$2"
+DISK_ID="${3:-0}"
 
 QEMUBIN="/opt/erigones/bin/qemu-img"
 
@@ -9,10 +10,11 @@ if [[ -z "${SRC_FILE}" ]] || [[ -z "${DEST_VM}" ]]; then
 cat << EOF
 This script converts and imports virtual disks in various source formats
 (e.g. vmdk, raw, qcow2, ...) into specified local virtual machine.
-The first attached disk of the destination VM will be overwritten.
+The first attached disk (if not specified otherwise) of the destination VM will be overwritten.
 
-Usage:   $0 <image_file> <dest_vm_alias>
+Usage:   $0 <image_file> <dest_vm_alias> [disk_id]
 Example: $0 disk1.vmdk mynewvm.lan
+Example: $0 disk1.vmdk mynewvm.lan 0
 
 EOF
 	exit 1
@@ -29,6 +31,14 @@ if [[ -z "${DEST_VM_UUID}" ]]; then
 	exit 2
 fi
 
+VM_JSON="$(vmadm get "${UUID}")"
+
+BRAND="$(json brand <<< "${VM_JSON}")"
+if ! [[ "${BRAND}" == "kvm" || "${BRAND}" == "bhyve" ]]; then
+	echo "ERROR: Cannot import into brand '${BRAND}'"
+	exit 4
+fi
+
 echo
 echo "*** SOURCE DISK INFO ***"
 ${QEMUBIN} info "${SRC_FILE}"
@@ -40,13 +50,16 @@ echo
 echo "PLEASE, USE THE DESTINATION DISK EQUAL OR GREATER THAN THE SOURCE IMAGE SIZE."
 echo
 echo
-if ! zfs list -Ho name  "zones/${DEST_VM_UUID}-disk0" > /dev/null 2>&1; then
-	echo "ERROR: Virtual machine ${DEST_VM} does not seem to have any disk attached!"
+ZFS_FS="$(json "disk.${DISK_ID}.zfs_filesystem" <<< "${VM_JSON}")"
+if [[ -z "${ZFS_FS}" ]]; then
+	echo "ERROR: Disk ID ${DISK_ID} was not found in VM ${DEST_VM}"
+	exit 3
+elif ! zfs list -Ho name  "${ZFS_FS}" > /dev/null 2>&1; then
+	echo "ERROR: Filesystem ${ZFS_FS} does not exist!"
 	exit 3
 fi
 
-
-VM_DISK_DEV="/dev/zvol/rdsk/zones/${DEST_VM_UUID}-disk0"
+VM_DISK_DEV="$(json "disk.${DISK_ID}.path" <<< "${VM_JSON}")"
 echo "File ${SRC_FILE} will be converted and written to file ${VM_DISK_DEV}."
 echo "Data on destination disk will be overwritten."
 echo
