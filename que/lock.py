@@ -107,6 +107,10 @@ class TaskLock(object):
         if not timeout:
             self.log.warning('%s has no timeout set!', self.desc)
 
+        if isinstance(value, dict):
+            self.log.warning('FIXME: we have received a dictionary and expect a string! Value: %s', value)
+            value = str(value)
+
         res = redis_set(self.key, value, timeout=timeout, nx=True)
 
         if res:
