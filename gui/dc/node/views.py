@@ -58,6 +58,7 @@ def dc_node_form(request):
         if status == 204:
             return HttpResponse(None, status=status)
         elif status in (200, 201):
+
             return redirect('dc_node_list', query_string=request.GET)
 
     return render(request, 'gui/dc/node_form.html', {'form': form, 'mb_addon': SIZE_FIELD_MB_ADDON})

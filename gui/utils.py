@@ -204,6 +204,9 @@ def redirect(*args, **kwargs):
     """
     Convenient wrapper around redirect shortcut with optional query_string parameter.
     """
+    if 'request' in kwargs:
+        request = kwargs.pop('request')
+        return _redirect(request.build_absolute_uri(reverse(*args, **kwargs)))
     return _redirect(reverse(*args, **kwargs))
 
 

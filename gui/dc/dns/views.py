@@ -87,7 +87,7 @@ def dc_domain_form(request):
         if status == 204:
             return HttpResponse(None, status=status)
         elif status in (200, 201):
-            return redirect('dc_domain_list', query_string=request.GET)
+            return redirect('dc_domain_list', request=request, query_string=request.GET)
 
     # An error occurred when attaching or detaching object
     if prefix:
@@ -139,7 +139,7 @@ def admin_domain_form(request):
             if form.action == 'create' and not form.cleaned_data.get('dc_bound'):
                 qs['all'] = 1  # Show all items if adding new item and not attaching
 
-            return redirect('dc_domain_list', query_string=qs)
+            return redirect('dc_domain_list', request=request, query_string=qs)
 
     return render(request, 'gui/dc/domain_admin_form.html', {'form': form, 'nodc': nodc})
 
@@ -218,6 +218,6 @@ def domain_record_form(request, name):
             return HttpResponse(None, status=status)
         elif status in (200, 201):
             assert request.GET['flt-domain'] == domain.name
-            return redirect('dc_domain_record_list', query_string=request.GET)
+            return redirect('dc_domain_record_list', request=request, query_string=request.GET)
 
     return render(request, form.template, {'form': form, 'domain': domain})

@@ -82,7 +82,7 @@ class ArrayWidget(_DefaultAttrsWidget, widgets.TextInput):
     def build_attrs(self, *args, **kwargs):
         if self.tag_choices:
             tags = json.dumps(self.tag_choices, indent=None, cls=JSONEncoder)
-            kwargs['data-tags-choices'] = mark_safe(conditional_escape(tags))
+            # kwargs['data-tags-choices'] = mark_safe(conditional_escape(tags))
 
         return super(ArrayWidget, self).build_attrs(*args, **kwargs)
 

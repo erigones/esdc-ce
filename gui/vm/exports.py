@@ -112,11 +112,11 @@ class Export(ImportExportBase, Excel):
 
         self.sheet_dc = self.wb.active
         self.sheet_dc.title = self.sheet_dc_name
-        self.sheet_dc.freeze_panes = self.sheet_dc.cell('B3')
+        self.sheet_dc.freeze_panes = self.sheet_dc.cell(row=3, column=2)  # B3
         self.sheet_dc_generate_header()
 
         self.sheet_data = self.wb.create_sheet(title=self.sheet_data_name)
-        self.sheet_data.freeze_panes = self.sheet_data.cell('A2')
+        self.sheet_data.freeze_panes = self.sheet_data.cell(row=2, column=1)  # A2
         self.sheet_data_generate_content(set_validation=False)
 
     def sheet_dc_generate_header(self):
@@ -227,7 +227,7 @@ class Export(ImportExportBase, Excel):
         dv = DataValidation('list', formula1=dv_str, allow_blank=True)
         self.sheet_dc.add_data_validation(dv)
         # Apply newly created validation in Datacenter sheet to validate against generated values
-        dv.ranges.append(str(validation_column) + '3:' + str(validation_column) + '1048576')
+        dv.add(str(validation_column) + '3:' + str(validation_column) + '1048576')
 
     def generate_networks(self, column_index, row_index=1, label='Network'):
         self.update_cell(self.sheet_data, column_index, row_index, label, color=self.header_color,
@@ -236,7 +236,7 @@ class Export(ImportExportBase, Excel):
         for row_index, network in enumerate(get_subnets(self.request), start=row_index + 1):
             self.update_cell(self.sheet_data, column_index, row_index, network.name)
 
-        self.add_validation(column_index, row_index, self.get_column_index(label))
+        # self.add_validation(column_index, row_index, self.get_column_index(label))
 
     def generate_images(self, column_index, row_index=1, label='Image'):
         self.update_cell(self.sheet_data, column_index, row_index, label, color=self.header_color,
@@ -245,7 +245,7 @@ class Export(ImportExportBase, Excel):
         for row_index, image in enumerate(get_images(self.request), start=row_index + 1):
             self.update_cell(self.sheet_data, column_index, row_index, image.name)
 
-        self.add_validation(column_index, row_index, self.get_column_index(label))
+        # self.add_validation(column_index, row_index, self.get_column_index(label))
 
     def generate_ostypes(self, column_index, row_index=1, label='OS Type'):
         self.update_cell(self.sheet_data, column_index, row_index, label, color=self.header_color,
@@ -255,7 +255,7 @@ class Export(ImportExportBase, Excel):
             row_index += 1
             self.update_cell(self.sheet_data, column_index, row_index, text_type(os))
 
-        self.add_validation(column_index, row_index, self.get_column_index(label))
+        # self.add_validation(column_index, row_index, self.get_column_index(label))
 
     def generate_templates(self, column_index, row_index=1, label='Template'):
         self.update_cell(self.sheet_data, column_index, row_index, label, color=self.header_color,
@@ -264,7 +264,7 @@ class Export(ImportExportBase, Excel):
         for row_index, template in enumerate(get_templates(self.request), start=row_index + 1):
             self.update_cell(self.sheet_data, column_index, row_index, template.name)
 
-        self.add_validation(column_index, row_index, self.get_column_index(label))
+        # self.add_validation(column_index, row_index, self.get_column_index(label))
 
     def generate_storages(self, column_index, row_index=1, label='Storage'):
         self.update_cell(self.sheet_data, column_index, row_index, label, color=self.header_color,
@@ -273,7 +273,7 @@ class Export(ImportExportBase, Excel):
         for row_index, ns in enumerate(get_zpools(self.request).distinct('zpool'), start=row_index + 1):
             self.update_cell(self.sheet_data, column_index, row_index, ns.zpool)
 
-        self.add_validation(column_index, row_index, self.get_column_index(label))
+        # self.add_validation(column_index, row_index, self.get_column_index(label))
 
     def generate_nodes(self, column_index, row_index=1, label='Node', color=False):
         self.update_cell(self.sheet_data, column_index, row_index, label, color=self.header_color,
@@ -285,7 +285,7 @@ class Export(ImportExportBase, Excel):
             else:
                 self.update_cell(self.sheet_data, column_index, row_index, node.hostname)
 
-        self.add_validation(column_index, row_index, self.get_column_index(label))
+        # self.add_validation(column_index, row_index, self.get_column_index(label))
 
     def sheet_data_generate_content(self, set_validation=False):
         # self.clean_sheet(self.sheet_data, 1)

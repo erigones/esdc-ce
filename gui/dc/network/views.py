@@ -83,7 +83,8 @@ def dc_network_form(request):
         if status == 204:
             return HttpResponse(None, status=status)
         elif status in (200, 201):
-            return redirect('dc_network_list', query_string=request.GET)
+            return redirect(request.build_absolute_uri(reverse('dc_network_list',
+                                                               kwargs={'query_string': request.GET})))
 
     # An error occurred when attaching or detaching object
     if prefix:
@@ -144,7 +145,7 @@ def admin_network_form(request):
                 redir_view = 'dc_network_list'
                 redir_args = ()
 
-            return redirect(redir_view, *redir_args, query_string=qs)
+            return redirect(request.build_absolute_uri(reverse(redir_view, *redir_args, kwargs={'query_string': qs})))
 
     return render(request, 'gui/dc/network_admin_form.html', {'form': form, 'nodc': request.GET.get('ips', '')})
 
@@ -271,7 +272,8 @@ def network_ip_form(request, name):
             return HttpResponse(None, status=status)
         elif status in (200, 201):
             messages.success(request, form.get_action_message())
-            return redirect('dc_network_ip_list', net.name, query_string=request.GET)
+            return redirect(request.build_absolute_uri(reverse('dc_network_ip_list', net.name,
+                                                               kwargs={'query_string': request.GET})))
 
     return render(request, form.template, {'form': form, 'net': {'name': name}})
 

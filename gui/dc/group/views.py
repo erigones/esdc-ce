@@ -68,7 +68,7 @@ def dc_group_form(request):
         if status == 204:
             return HttpResponse(None, status=status)
         elif status in (200, 201):
-            return redirect('dc_group_list', query_string=request.GET)
+            return redirect('dc_group_list', request=request, query_string=request.GET)
 
     # An error occurred when attaching or detaching object
     if prefix:
@@ -119,6 +119,6 @@ def admin_group_form(request):
         elif status in (200, 201):
             if form.action == 'create' and not form.cleaned_data.get('dc_bound'):
                 qs['all'] = 1  # Show all items if adding new item and not attaching
-            return redirect('dc_group_list', query_string=qs)
+            return redirect('dc_group_list', request=request, query_string=qs)
 
     return render(request, 'gui/dc/group_admin_form.html', {'form': form})

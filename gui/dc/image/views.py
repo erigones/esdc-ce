@@ -84,7 +84,7 @@ def dc_image_form(request):
         if status == 204:
             return HttpResponse(None, status=status)
         elif status in (200, 201):
-            return redirect('dc_image_list', query_string=request.GET)
+            return redirect('dc_image_list', request=request, query_string=request.GET)
 
     # An error occurred when attaching or detaching object
     if prefix:
@@ -142,7 +142,7 @@ def admin_image_form(request):
             if status == 201:
                 qs['last_img'] = img_name
 
-            return redirect('dc_image_list', query_string=qs)
+            return redirect(request.build_absolute_uri(reverse('dc_image_list', kwargs={'query_string': qs})))
 
     return render(request, 'gui/dc/image_admin_form.html', {'form': form})
 
@@ -228,7 +228,7 @@ def imagestore_update(request, repo):
         msg = _('Downloaded metadata for %(image_count)d images from image repository %(name)s')
         messages.success(request, msg % imagestore)
 
-        return redirect('imagestore_list_repo', repo=repo, query_string=request.GET)
+        return redirect('imagestore_list_repo', request=request, repo=repo, query_string=request.GET)
     else:
         if res.data.get('result', {}).get('error', None):
             status = 200  # The error will be displayed by ImageStoreList JS

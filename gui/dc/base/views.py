@@ -4,6 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.http import require_POST
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.urls import reverse
 from django.conf import settings
 
 from vms.models import Dc
@@ -73,7 +74,7 @@ def dc_form(request):
             return HttpResponse(None, status=status)
         elif status in (200, 201):
             messages.success(request, _('Datacenter settings were successfully updated'))
-            return redirect('dc_list', query_string=request.GET)
+            return redirect(request.build_absolute_uri(reverse('dc_list', kwargs={'query_string': request.GET})))
 
     return render(request, 'gui/dc/dc_form.html', {'form': form})
 
@@ -96,7 +97,7 @@ def dc_settings_form(request):
             return HttpResponse(None, status=status)
         elif status in (200, 201):
             _dc_settings_msg_updated(request)
-            return redirect('dc_list', query_string=request.GET)
+            return redirect(request.build_absolute_uri(reverse('dc_list', kwargs={'query_string': request.GET})))
 
     _dc_settings_msg_error(context)
 
@@ -153,7 +154,7 @@ def dc_settings_table(request):
             return HttpResponse(None, status=status)
         elif status in (200, 201):
             _dc_settings_msg_updated(request)
-            return redirect('dc_settings', query_string=request.GET)
+            return redirect(request.build_absolute_uri(reverse('dc_settings', kwargs={'query_string': request.GET})))
 
     _dc_settings_msg_error(context)
     form.set_mon_zabbix_server_login_error()

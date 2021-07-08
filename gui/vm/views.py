@@ -714,7 +714,7 @@ def snapshot_define_form(request, hostname):
         if status == 204:
             return HttpResponse(None, status=status)
         elif status in (200, 201):
-            return redirect('vm_snapshot', hostname=vm.hostname)
+            return redirect(request.build_absolute_uri(reverse('vm_snapshot', kwargs={'hostname': vm.hostname})))
 
     return render(request, 'gui/vm/snapshot_define_form.html', {'form': form, 'vm': vm})
 
@@ -741,7 +741,7 @@ def backup_define_form(request, hostname):
         if status == 204:
             return HttpResponse(None, status=status)
         elif status in (200, 201):
-            return redirect('vm_backup', hostname=vm.hostname)
+            return redirect(request.build_absolute_uri(reverse('vm_backup', kwargs={'hostname': vm.hostname})))
 
     return render(request, 'gui/vm/backup_define_form.html', {'form': form, 'vm': vm})
 
@@ -764,7 +764,7 @@ def snapshot_image_form(request, hostname):
         if status == 204:
             return HttpResponse(None, status=status)
         elif status in (200, 201):
-            return redirect('vm_snapshot', hostname=vm.hostname)
+            return redirect(request.build_absolute_uri(reverse('vm_snapshot', kwargs={'hostname': vm.hostname})))
 
     return render(request, 'gui/vm/image_snapshot_form.html', {'form': form, 'vm': vm})
 

@@ -16,14 +16,14 @@ class CommaSeparatedUUIDField(UUIDField):
 
     def get_prep_value(self, value):
         value = self.to_python(value)
-        return ','.join(map(self._uuid_field.get_prep_value, value))
+        return ','.join(list(map(self._uuid_field.get_prep_value, value)))
 
     def to_python(self, value):
-        if not value:
+        if not value or value == '{}':
             return []
         if isinstance(value, string_types):
             value = value.split(',')
-        return map(super().to_python, value)
+        return list(map(super().to_python, value))
 
     def from_db_value(self, value, expression, connection, context):
         return self.to_python(value)
@@ -32,7 +32,7 @@ class CommaSeparatedUUIDField(UUIDField):
         val = self._get_val_from_obj(obj)
         if not val:
             return ''
-        return ','.join(map(text_type, val))
+        return ','.join(list(map(text_type, val)))
 
     def formfield(self, **kwargs):
         defaults = {
