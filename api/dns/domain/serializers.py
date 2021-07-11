@@ -1,8 +1,20 @@
 from api import serializers as s
-from pdns.models import Domain
+from pdns.models import Domain, TsigKey
 from pdns.validators import validate_dns_name
 from vms.models import Dc
 from gui.models import User
+
+
+class TsigKeySerializer(s.InstanceSerializer):
+    """
+    pdns.models.TsigKey
+    """
+    _model_ = TsigKey
+    _update_fields_ = ('name', 'algorithm', 'secret')
+
+    name = s.RegexField(r'^[A-Za-z0-9][A-Za-z0-9\._/-]*$', max_length=250, min_length=3, required=False)
+    algorithm = s.ChoiceField(choices=TsigKey.ALGORITHM, required=False)
+    secret = s.SafeCharField(max_length=250, required=False)
 
 
 class DomainSerializer(s.ConditionalDCBoundSerializer):

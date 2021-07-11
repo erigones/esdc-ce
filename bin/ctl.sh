@@ -72,12 +72,7 @@ exec_py() {
 	local py_file="$1"
 	shift
 
-	if [[ ! -x "${py_file}" ]]; then
-		echo "ERROR: File not executable: '${py_file}'"
-		exit 2
-	fi
-
-	"${py_file}" "${@}"
+	python2 "${py_file}" "${@}"
 }
 
 case "${ACTION}" in

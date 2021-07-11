@@ -5,6 +5,8 @@ from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from logging import getLogger
 
+from pdns.models.domainmetadata import TsigKey
+
 logger = getLogger(__name__)
 
 
@@ -181,6 +183,7 @@ class Domain(models.Model):
             'owner': self.owner.username,
             'desc': self.desc,
             'dc_bound': self.dc_bound_bool,
+            'tsig_keys': ','.join([x.to_str() for x in TsigKey.get_linked_axfr_keys(self)]),
         }
 
     #

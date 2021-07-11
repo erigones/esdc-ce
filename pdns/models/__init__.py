@@ -10,6 +10,7 @@ from pdns.models.record import Domain
 from pdns.models.pdns_config import PdnsCfg
 from pdns.models.pdns_config import PdnsRecursorCfg
 from pdns.models.pdns_config import RecurseNetworks
+from pdns.models.domainmetadata import DomainMetadata, TsigKey
 
 post_save.connect(Domain.post_save_domain, sender=Domain, dispatch_uid='post_save_domain')
 post_save.connect(Record.post_save_record, sender=Record, dispatch_uid='post_save_record')
