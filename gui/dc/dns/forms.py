@@ -63,6 +63,12 @@ class AdminDomainForm(SerializerForm):
                                          'between master DNS server and slave DNS servers.'))
     desc = forms.CharField(label=_('Description'), max_length=128, required=False,
                            widget=forms.TextInput(attrs={'class': 'input-transparent wide', 'required': ''}))
+    tsig_keys = forms.CharField(label=_('TSIG Key(s)'), max_length=1000, required=False,
+                                  widget=forms.TextInput(attrs={'class': 'input-transparent', 'required': ''}),
+                                  help_text=_('TSIG DNS keys for external zone transfers. Zone transfers to '
+                                              'external DNS slaves will only be allowed using this key. '
+                                              'For more info on how to generate the key see Danube Cloud docs.'
+                                              ))
 
     def __init__(self, request, domain, *args, **kwargs):
         super(AdminDomainForm, self).__init__(request, domain, *args, **kwargs)
