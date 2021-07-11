@@ -305,7 +305,10 @@ class Record(models.Model):
         try:
             soa_rec = cls.objects.get(type=cls.SOA, domain_id=instance.domain.id)
         except cls.DoesNotExist:
-            logger.warning('SOA record does not exist!')
+            logger.warning('SOA record does not exist! Not doing SOA increment.')
+            return
+        except Domain.DoesNotExist:
+            logger.info('increment_SOA_serial: Domain does not exist. Ignoring SOA increment.')
             return
 
         soa_rec_content = soa_rec.content.split()
