@@ -74,10 +74,14 @@ def dns_domain(request, name, data=None):
         :arg data.owner: User that owns the domain (default: logged in user)
         :type data.owner: string
         :arg data.type: PowerDNS domain type which determines how records are replicated. One of MASTER, NATIVE. \
-When set to MASTER, PowerDNS will use DNS protocol messages to communicate changes with slaves. \
-When set to NATIVE, PowerDNS will use database replication between master DNS \
+When set to MASTER, PowerDNS will send NOTIFY messages after zone changes to all hosts specified in NS record for \
+given domain. When set to NATIVE, PowerDNS will use only internal database replication between master DNS \
 server and slave DNS servers. (default: MASTER)
         :type data.type: string
+        :arg data.tsig_keys: Comma separated list of TSIG keys that will be allowed to do zone transfer query for \
+this domain. Format: "key-type:key-name:secret,key-type:key-name2:secret2"; Example: "hmac-sha256:mykey:aabbcc..". \
+(default: empty)
+        :type data.tsig_keys: string
         :arg data.desc: Domain description
         :type data.desc: string
         :arg data.dc_bound: Whether the domain is bound to a datacenter (requires |SuperAdmin| permission) \
@@ -104,12 +108,16 @@ server and slave DNS servers. (default: MASTER)
         :arg data.access: Access type (1 - Public, 3 - Private)
         :type data.access: integer
         :arg data.type: PowerDNS domain type which determines how records are replicated. One of MASTER, NATIVE. \
-When set to MASTER, PowerDNS will use DNS protocol messages to communicate changes with slaves. \
-When set to NATIVE, PowerDNS will use database replication between master DNS \
-server and slave DNS servers.
+When set to MASTER, PowerDNS will send NOTIFY messages after zone changes to all hosts specified in NS record for \
+given domain. When set to NATIVE, PowerDNS will use only internal database replication between master DNS \
+server and slave DNS servers. (default: MASTER)
         :type data.type: string
         :arg data.owner: User that owns the domain
         :type data.owner: string
+        :arg data.tsig_keys: Comma separated list of TSIG keys that will be allowed to do zone transfer query for \
+this domain. Format: "key-type:key-name:secret,key-type:key-name2:secret2"; Example: "hmac-sha256:mykey:aabbcc..". \
+(default: empty)
+        :type data.tsig_keys: string
         :arg data.desc: Domain description
         :type data.desc: string
         :arg data.dc_bound: Whether the domain is bound to a datacenter (requires |SuperAdmin| permission)
