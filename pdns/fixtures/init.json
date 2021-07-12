@@ -41,7 +41,7 @@
         "domain": 1,
         "name": "local",
         "prio": 0,
-        "content": "ns1.local hostmaster.example.com 2013033100 28800 7200 604800 86400",
+        "content": "ns1.local hostmaster.example.com 100 28800 7200 604800 86400",
         "ttl": 3600,
         "change_date": 1406645299,
         "type": "SOA"
@@ -67,7 +67,7 @@
         "domain": 2,
         "name": "lan",
         "prio": 0,
-        "content": "ns1.local hostmaster.default.com 2013033100 28800 7200 604800 86400",
+        "content": "ns1.local hostmaster.default.com 100 28800 7200 604800 86400",
         "ttl": 86400,
         "change_date": 1406645122,
         "type": "SOA"
@@ -84,6 +84,15 @@
         "ttl": 86400,
         "change_date": 1406645114,
         "type": "NS"
+    }
+},
+{
+    "pk": 1,
+    "model": "pdns.PdnsCfg",
+    "fields": {
+        "key": "allow-axfr-ips",
+        "val": "",
+        "change_date": 1626112479
     }
 }
 ]
