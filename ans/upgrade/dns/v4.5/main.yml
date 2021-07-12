@@ -12,4 +12,5 @@
 - name: Disable public AXFR
   local_action:
     module: shell
-    args: "{{ erigones_home }}/bin/ctl.sh" run_raw_py "{{ current_task_dir }}/files/disable_public_axfr.py"
+    args: "{{ erigones_home }}/bin/ctl.sh run_raw_py {{ current_task_dir }}/files/disable_public_axfr.py"
+
