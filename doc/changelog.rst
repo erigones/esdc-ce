@@ -3,7 +3,7 @@ Changelog
 
 4.5
 ===
-Released on TBD
+Released on 2021-07-13
 
 Features
 --------
@@ -13,6 +13,12 @@ Features
 - Add COM3 and COM4 ports to `BHYVE` (FreeBSD upstream)- `#eed1cc6cdfa <https://cgit.freebsd.org/src/commit/?id=eed1cc6cdfa>`__
 - Support restoring a snapshot to other VM - `#548 <https://github.com/erigones/esdc-ce/pull/548>`__
 - Add buttons to copy VM IP, name or UUID to clipboard - `#526 <https://github.com/erigones/esdc-ce/pull/526>`__
+- Allow external DNS zone transfers using TSIG keys - `#553 <https://github.com/erigones/esdc-ce/pull/553>`__
+
+Bugs
+----
+
+- Fix DNS server zone transfer too permissive - `#550 <https://github.com/erigones/esdc-ce/issues/550>`__
 
 
 4.4
