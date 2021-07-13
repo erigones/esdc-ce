@@ -82,7 +82,6 @@ SSH_ARGS=${SSH_ARGS:-"\
 -c chacha20-poly1305@openssh.com \
 -o BatchMode=yes \
 -o StrictHostKeyChecking=no \
--o GSSAPIKeyExchange=no \
 -o GSSAPIAuthentication=no \
 -o ControlMaster=auto \
 -o ControlPath=~/.ssh/master-%r@%h:%p \

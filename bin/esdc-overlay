@@ -9,7 +9,7 @@ OSSL=/usr/bin/openssl
 TR=/usr/bin/tr
 CUT=/usr/bin/cut
 GREP=/usr/bin/grep
-SSH="/usr/bin/ssh -o StrictHostKeyChecking=no -o GSSAPIKeyExchange=no -o GSSAPIAuthentication=no"
+SSH="/usr/bin/ssh -o StrictHostKeyChecking=no -o GSSAPIAuthentication=no"
 
 CMD="${1}"
 

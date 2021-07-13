@@ -188,7 +188,7 @@ class VmMigrateSerializer(s.Serializer):
             node = self.object['node']
             params.append('-H %s' % node.address)
             ssh = 'ssh -o ConnectTimeout=10 -o BatchMode=yes -o StrictHostKeyChecking=no ' \
-                  '-o GSSAPIKeyExchange=no -o GSSAPIAuthentication=no -o LogLevel=QUIET -l root'
+                  '-o GSSAPIAuthentication=no -o LogLevel=QUIET -l root'
             get_json = '%s %s "%s"' % (ssh, node.address, get_json)
 
             if vm.is_hvm():
