@@ -358,14 +358,14 @@ timeout_seconds='60'>
         for disk in reversed(dst_disks):  # First destroy the delegated dataset in case of a zone
             self._destroy_dataset(disk)
 
+        if dst_json['brand'] == 'bhyve':
+            self._sync_quota()
+
         # Initial sync will create destination datasets and set metadata on both
         vm_disks = zip(src_disks, dst_disks, [None] * len(src_disks))
         last_snap = self._initial_sync(vm_disks, src_host_name, dst_host_name)
         self._finalize_initialized_vm()
         slave_json = self._vm_get_json(dst_uuid)
-
-        if dst_json['brand'] == 'bhyve':
-            self._sync_quota()
 
         if self.pickle:
             slave_json = base64.encodestring(pickle.dumps(slave_json))
