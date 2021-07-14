@@ -1,0 +1,13 @@
+---
+- name: Update dnsdist.conf
+  copy: src="{{ current_task_dir }}/files/dnsdist.conf" dest=/opt/local/etc/dnsdist.conf owner=root group=root mode=0640
+
+- name: Remove deprecated ipv6 value in pdns.conf
+  lineinfile:
+    path: /opt/local/etc/pdns.conf
+    regexp: '^local-ipv6-nonexist-fail.*'
+    line: '##local-ipv6-nonexist-fail=no'
+
+- name: Upgrade powerdns packages
+  script: "{{ current_task_dir }}/files/upgrade_pdns_pkgs.sh"
+
