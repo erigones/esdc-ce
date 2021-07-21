@@ -1,4 +1,5 @@
 import hashlib
+import itertools
 from operator import itemgetter
 from frozendict import frozendict
 from collections import OrderedDict
@@ -94,7 +95,7 @@ class ImageStore(_DummyDataModel):
             data = dict(self.FIELDS)
             data.update(name=name, url=url)
 
-        super(ImageStore, self).__init__(data)
+        super().__init__(data)
 
     def __repr__(self):
         return '<%s: %s>' % (self.__class__.__name__, self.name)
@@ -143,7 +144,7 @@ class ImageStore(_DummyDataModel):
         images = filter(apply_filters(active_filters), self.images)
 
         if limit:
-            images = images[:limit]
+            images = itertools.islice(images, limit)
 
         return images
 
@@ -191,7 +192,7 @@ class ImageStore(_DummyDataModel):
     @property
     def pk(self):  # Required by task_log
         assert self.url
-        return hashlib.md5(self.url).hexdigest()
+        return hashlib.md5(self.url.encode()).hexdigest()
 
     @property
     def log_name(self):  # Required by task_log

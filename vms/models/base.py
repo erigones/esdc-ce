@@ -53,7 +53,7 @@ class _DummyDataModel(with_metaclass(_DummyModelBase)):
 
     def __new__(cls, *args, **kwargs):
         # noinspection PyArgumentList
-        obj = super(_DummyDataModel, cls).__new__(cls, *args, **kwargs)
+        obj = super().__new__(cls)
         obj._data = {}
         return obj
 
@@ -64,19 +64,19 @@ class _DummyDataModel(with_metaclass(_DummyModelBase)):
     def __getattr__(self, key):
         if key.startswith('_'):
             # noinspection PyUnresolvedReferences
-            return super(_DummyDataModel, self).__getattr__(key)
+            return super().__getattr__(key)
         else:
             return self._data[key]
 
     def __setattr__(self, key, value):
         if key.startswith('_'):
-            return super(_DummyDataModel, self).__setattr__(key, value)
+            return super().__setattr__(key, value)
         else:
             self._data[key] = value
 
     def __delattr__(self, key):
         if key.startswith('_'):
-            return super(_DummyDataModel, self).__delattr__(key)
+            return super().__delattr__(key)
         else:
             return self._data.__delitem__(key)
 
@@ -231,7 +231,7 @@ class _StatusModel(models.Model):
         abstract = True
 
     def __init__(self, *args, **kwargs):
-        super(_StatusModel, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._orig_status = self.status
 
     @staticmethod
@@ -273,7 +273,7 @@ class _StatusModel(models.Model):
         if self.status != self._orig_status:
             self.status_change = status_change_time
 
-        res = super(_StatusModel, self).save(*args, **kwargs)
+        res = super().save(*args, **kwargs)
 
         # update cache if status changed
         if self.status != self._orig_status and (update_fields is None or 'status' in update_fields):
@@ -682,7 +682,7 @@ class _ScheduleModel(models.Model):
     def save(self, *args, **kwargs):
         """Create or update periodic task and cron schedule in DB"""
         # Save first, because the periodic_task needs this object's ID
-        super(_ScheduleModel, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
         do_save = False
         pt = self.periodic_task
