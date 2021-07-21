@@ -1,3 +1,5 @@
+import copy
+
 def pair_keys_to_items(items, key):
     """
     Convert the list of key:value dicts (nics or disks) into a dict.
@@ -50,7 +52,9 @@ def diff_dict_nested(old, new, key, remove_empty=()):
                 for i, empty_val in remove_empty:
                     if i not in new[k] and i in old[k]:
                         new[k][i] = empty_val
-                for i, new_i in new[k].items():  # remove same attributes
+
+                new_tmp_k = copy.copy(new[k])
+                for i, new_i in new_tmp_k.items():  # remove same attributes
                     if i != key and i in old[k] and new_i == old[k][i]:
                         del new[k][i]
                 update_.append(new[k])

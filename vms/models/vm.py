@@ -1048,7 +1048,7 @@ class Vm(_StatusModel, _JsonPickleModel, _OSType, _HVMType, _UserTasksModel):
                 res[i] = False
 
         # Remove unchanged items
-        for i in res.keys():
+        for i in list(res.keys()):
             if i in json_active and res[i] == json_active[i]:
                 del res[i]
 
