@@ -3,7 +3,7 @@ Changelog
 
 4.5
 ===
-Released on 2021-07-13
+Released on 2021-07-24
 
 Features
 --------
@@ -18,7 +18,7 @@ Features
 Bugs
 ----
 
-- Fix DNS server zone transfer too permissive - `#550 <https://github.com/erigones/esdc-ce/issues/550>`__
+- Fix too permissive DNS server zone transfers - `#550 <https://github.com/erigones/esdc-ce/issues/550>`__
 
 
 4.4
