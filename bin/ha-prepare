@@ -201,7 +201,7 @@ def save_conf():
 def load_conf():
     with open(ANSIBLE_CFG_FILE, 'r') as stream:
         try:
-            print(yaml.load(stream))
+            print(yaml.safe_load(stream))
         except yaml.YAMLError as exc:
             print(exc)
 
