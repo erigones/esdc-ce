@@ -53,7 +53,7 @@ class VmManage(APIView):
         check_cmd = ''      # verify there's enough space to set the disk size
         # args: zpool name, disk size, disk size
         check_cmd_template = 'if [[ "$(($(zfs get -Hpo value available %s) / 1024 / 1024))" -le %s ]]; then echo ' \
-                             '"Requested disk size (%sM) is greater than the available space."; exit 11; fi && '
+                             '"Requested disk size (%sM) is greater than the available space." >&2; exit 11; fi && '
 
         if vm.is_kvm():
             for i, disk in enumerate(vm.json_get_disks()):
