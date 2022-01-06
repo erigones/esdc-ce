@@ -16,7 +16,7 @@ django-transaction-hooks==0.2
 dnspython==1.16.0
 
 ### api, gui
-celery==3.1.25
+celery==5.2.2
 kombu==3.0.37
 pytz==2018.9
 ipaddress==1.0.22
