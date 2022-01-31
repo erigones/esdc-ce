@@ -1,6 +1,23 @@
 Changelog
 #########
 
+4.6
+===
+Released on TBD
+
+Features
+--------
+
+- Update SmartOS platform to `new version <https://github.com/erigones/smartos-live/tree/new_release_20220127>`__
+- Verify image bootrom requirement before deploy - `#569 <https://github.com/erigones/esdc-ce/pull/569>`__
+
+Bugs
+----
+
+- VM with BIG disk created but DC thinks it's not - `#561 <https://github.com/erigones/esdc-ce/issues/561>`__
+- VMS_DISK_IMAGE_DEFAULT setting applied also to second disk - `#570 <https://github.com/erigones/esdc-ce/pull/570>`__
+
+
 4.5
 ===
 Released on 2021-07-24
