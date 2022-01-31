@@ -1062,7 +1062,9 @@ class KVmDefineDiskSerializer(_VmDefineDiskSerializer):
 
         self.fields['model'] = s.ChoiceField(choices=model_choices, default=model_default)
         self.fields['model'].default = model_default
-        self.fields['image'].default = dc_settings.VMS_DISK_IMAGE_DEFAULT
+        if vm.is_blank() or len(vm.json_get_disks()) == 0:
+            # no disks are defined so far (apply the default image only to the first disk)
+            self.fields['image'].default = dc_settings.VMS_DISK_IMAGE_DEFAULT
 
     def validate_block_size(self, attrs, source):
         try:
