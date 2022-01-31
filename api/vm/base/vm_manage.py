@@ -295,6 +295,14 @@ class VmManage(APIView):
         if not vm.is_bootable():
             raise PreconditionRequired('VM has no bootable disk')
 
+        # check bootrom compatibility for selected image (otherwise the deployment will fail on vmadm error)
+        if vm.is_hvm() and vm.bootrom:
+            img = vm.json_get_first_disk_image()
+            if img and 'bootrom' in img.requirements:
+                if vm.bootrom != img.requirements['bootrom']:
+                    raise PreconditionRequired('Incompatible BOOTROM settings for selected disk image (UEFI vs BIOS). \
+                    Please check advanced settings of this VM.')
+
         if vm.tasks:
             raise VmHasPendingTasks
 
