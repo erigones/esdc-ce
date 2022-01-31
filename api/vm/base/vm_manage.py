@@ -49,7 +49,11 @@ class VmManage(APIView):
         if not vm.is_hvm():
             return ''
 
-        cmd = ''
+        cmd = ''            # set the disk size
+        check_cmd = ''      # verify there's enough space to set the disk size
+        # args: zpool name, disk size, disk size
+        check_cmd_template = 'if [[ "$(($(zfs get -Hpo value available %s) / 1024 / 1024))" -le %s ]]; then echo ' \
+                             '"Requested disk size (%sM) is greater than the available space." >&2; exit 11; fi && '
 
         if vm.is_kvm():
             for i, disk in enumerate(vm.json_get_disks()):
@@ -64,6 +68,8 @@ class VmManage(APIView):
                                 disk['refreservation'], vm.zpool, vm.uuid, i)
                             cmd += _refres
 
+                        check_cmd += check_cmd_template % (vm.zpool, disk['size'], disk['size'])
+
         elif vm.is_bhyve():
             quota = vm.calculate_zfs_snapshot_quota()
             _set_quota = '; zfs set quota=%s %s/%s >&2; e=$((e+=$?))' % (quota, vm.zpool, vm.uuid)
@@ -75,7 +81,9 @@ class VmManage(APIView):
                             disk['size'], vm.zpool, vm.uuid, i)
                         cmd += _resize
 
-        return cmd
+                        check_cmd += check_cmd_template % (vm.zpool, disk['size'], disk['size'])
+
+        return cmd, check_cmd
 
     @staticmethod
     def fix_update(json_update, vm):
@@ -241,9 +249,12 @@ class VmManage(APIView):
                 raise PreconditionRequired('VM owner has no SSH keys available')
 
         apiview = self.apiview
+
+        disk_cmd, disk_check_cmd = self.fix_create(vm)
+
         # noinspection PyTypeChecker
-        cmd = 'vmadm create >&2; e=$? %s; vmadm get %s 2>/dev/null; vmadm start %s >&2; exit $e' % (
-            self.fix_create(vm), vm.uuid, vm.uuid)
+        cmd = '%s vmadm create >&2; e=$? %s; vmadm get %s 2>/dev/null; vmadm start %s >&2; exit $e' % (
+            disk_check_cmd, disk_cmd, vm.uuid, vm.uuid)
 
         recreate = apiview['recreate'] = ser.data['recreate']
         # noinspection PyAugmentAssignment
