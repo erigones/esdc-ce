@@ -47,7 +47,7 @@ class VmManage(APIView):
         """SmartOS issue. If a image_uuid is specified then size should be omitted, which is done in vm.fix_json(),
         so run this one before vm.fix_json() to create a command for changing zvol volsize."""
         if not vm.is_hvm():
-            return ''
+            return '', ''
 
         cmd = ''            # set the disk size
         check_cmd = ''      # verify there's enough space to set the disk size
