@@ -1,0 +1,21 @@
+# https://github.com/erigones/esdc-ce/issues/572
+- name: Create /etc/guacamole dir
+  file:
+    state: directory
+    path: /etc/guacamole
+    mode: 0755
+
+- name: Make guacd listen on ipv4 localhost
+  ini_file:
+    path: /etc/guacamole/guacd.conf
+    section: server
+    option: bind_host
+    value: 127.0.0.1
+    mode: 0644
+    backup: yes
+
+- name: Restart guacd
+  service:
+    name: guacd
+    state: restarted
+
