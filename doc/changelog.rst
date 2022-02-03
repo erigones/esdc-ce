@@ -3,12 +3,12 @@ Changelog
 
 4.6
 ===
-Released on TBD
+Released on 2022-02-02
 
 Features
 --------
 
-- Update SmartOS platform to `new version <https://github.com/erigones/smartos-live/tree/new_release_20220127>`__
+- Update SmartOS platform to `new version <https://github.com/erigones/smartos-live/tree/new_release_20220127>`__ - `c9eec9a <https://github.com/erigones/esdc-factory/commit/c9eec9a22d94f0b44925be775a646a125d9d6550>`__
 - Verify image bootrom requirement before deploy - `#569 <https://github.com/erigones/esdc-ce/pull/569>`__
 
 Bugs
