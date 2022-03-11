@@ -25,7 +25,7 @@ gevent-socketio-es==0.3.7
 gevent-websocket==0.10.1
 greenlet==0.4.15
 gunicorn==19.9.0
-Pillow==4.2.0
+Pillow==9.0.1
 xmltodict==0.12.0
 python-dateutil==2.8.0
 django-taggit==0.22.2
