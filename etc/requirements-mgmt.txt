@@ -43,5 +43,5 @@ phonenumbers==8.10.6
 django-timezone-field==2.0
 blinker==1.4
 lxml==3.6.4
-openpyxl==2.3.5
+openpyxl==2.4.2
 Markdown==2.6.11
