@@ -1,7 +1,7 @@
 --find-links https://download.danube.cloud/pypi/
 ### project
 pip
-setuptools==40.8.0
+setuptools==65.5.1
 Django==1.8.19
 # appconf 1.0.4 dropped py2
 django-appconf==1.0.3
